@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich">
+
+<ui:composition>
+
+	<rich:toolbar itemSeparator="grid" styleClass="headerToolbar" />
+
+
+	<h:panelGrid columns="2" styleClass="header">
+		<h:graphicImage value="/resources/images/logo.jpg" />
+		<h:outputText value="#{msg.application_title}"
+			styleClass="headerTitle" />
+	</h:panelGrid>
+
+	<rich:toolbar itemSeparator="grid" styleClass="headerToolbar">
+		<rich:toolbarGroup location="right">
+			<a4j:commandButton value="#{msg.discard_button}"
+				styleClass="capitalize" action="#{cacheManager.discard}"
+				render="instancesPanel, menu" />
+			<a4j:commandButton value="#{msg.save_button}" styleClass="capitalize"
+				action="#{cacheManager.save}" render="instancesPanel, menu" />
+		</rich:toolbarGroup>
+	</rich:toolbar>
+
+</ui:composition>
+</html>

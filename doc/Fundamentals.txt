@@ -1,0 +1,229 @@
+[unit(COMPOSITION), {[Power(COMPOSITION), Vehicle(INHERITANCE)]}(INHERITANCE)]
+
+
+
+
+[[Vehicle(COMPOSITION) Power(INHERITANCE) ] (COMPOSITION), {[[Vehicle(COMPOSITION) unit(INHERITANCE) ] (COMPOSITION), [Power(COMPOSITION) unit(COMPOSITION) ] (INHERITANCE)]}(INHERITANCE)]
+
+
+[[Vehicle(COMPOSITION) Power(INHERITANCE) ] (COMPOSITION) [Vehicle(COMPOSITION) unit(INHERITANCE) ] (COMPOSITION) [Power(COMPOSITION) unit(COMPOSITION) ] (INHERITANCE) ]  with ancestors : {[[Vehicle(COMPOSITION) Power(INHERITANCE) ] (COMPOSITION), {[[Vehicle(COMPOSITION) unit(INHERITANCE) ] (COMPOSITION), [Power(COMPOSITION) unit(COMPOSITION) ] (INHERITANCE)]}(INHERITANCE)]}(MOCK_SIDE)
+ for expected primaries {[unit(COMPOSITION), {[Power(COMPOSITION), Vehicle(INHERITANCE)]}(INHERITANCE)]}(MOCK_SIDE) 
+
+
+
+
+ 
+
+
+[unit(INHERITANCE), [Power(INHERITANCE), Vehicle(COMPOSITION)](COMPOSITION)]
+
+
+
+[unit(INHERITANCE), Power(COMPOSITION)](INHERITANCE)      [Power(INHERITANCE), Vehicle(COMPOSITION)](COMPOSITION)]     [unit(INHERITANCE), Vehicle(COMPOSITION)(COMPOSITION)](INHERITANCE)       
+
+-----------------------------------------------------------------------
+
+[unit(INHERITANCE), Power(COMPOSITION), Vehicle(COMPOSITION)]
+
+
+     [Power(COMPOSITION), Vehicle(COMPOSITION)](INHERITANCE)]   [unit(INHERITANCE), Power(COMPOSITION)](INHERITANCE)   [unit(INHERITANCE), Vehicle(COMPOSITION)](INHERITANCE)       
+
+----------------------------------------------------------------------------------------
+
+
+
+
+[power(INHERITANCE), Vehicle(COMPOSITION)]
+[power(INHERITANCE)(INHERITANCE), Vehicle(COMPOSITION)(INHERITANCE)]
+[power(INHERITANCE), Vehicle(COMPOSITION)]
+
+[ultraPower(INHERITANCE), Car(COMPOSITION)]
+[[ultraPower(INHERITANCE), Vehicle(COMPOSITION)](INHERITANCE), [Power(INHERITANCE), Car(COMPOSITION)](INHERITANCE)]
+
+
+[outside(INHERITANCE), Vehicle(COMPOSITION), Color(COMPOSITION)]
+[outside(INHERITANCE) Vehicle(COMPOSITION)] (INHERITANCE)], [Vehicle(COMPOSITION) Color(COMPOSITION)](INHERITANCE), [outside(INHERITANCE) Color(COMPOSITION)] (INHERITANCE)
+
+
+Color(INHERITANCE) [Selectable(INHERITANCE), Resizable(INHERITANCE)](COMPOSITION)
+[Color(INHERITANCE) [Selectable(INHERITANCE)](COMPOSITION)](INHERITANCE), [Color(INHERITANCE) [Resizable(INHERITANCE)](COMPOSITION)](INHERITANCE), [Selectable(INHERITANCE), Resizable(INHERITANCE)](COMPOSITION)
+
+[Color(INHERITANCE) Window(COMPOSITION)](INHERITANCE)   [Color(INHERITANCE) SELECTABLE(COMPOSITION)](INHERITANCE)
+
+--------------------------------------------------------------------------------
+
+windowSelectableResizable = context.newSubType("Window",selectable, resizable)
+(window0, selectable0, resizable0)
+(window0, selectable0)0 (selectable0, resizable0)0 (window0, resizable0)0
+
+
+windowSelectableResizable.addAttribute("Color")
+color0, window1, selectable1, resizable1
+(color0, window1, selectable1)0  (window0, selectable0, resizable0)1  (color0, selectable1, resizable1)0  (color0, window1, resizable1)0
+this.isCompositeOf(windowSelectableResizable)=true;
+
+vehicle.addAttribute(color);
+(outside0, vehicle1, color1)
+(outside0, vehicle1)0 (vehicle0, color0)1 (outside0, color1)0
+
+vehiclePower.addAttribute("Unit")
+
+Unit0, VehiclePower1
+
+Unit0,(Power0, Vehicle1)1
+
+(Unit0,(Power0)1)0  ((Power0, Vehicle1)1)0  (Unit0,(Vehicle1)1)0
+
+=> (Unit0,Power1)0  (Power0, Vehicle1)1  (Unit0,Vehicle2)0
+
+
+
+Unit0, VehiclePower1
+
+
+
+Unit0(Power0, Vehicle1)1
+
+Unit0 Power1 Vehicle0
+
+=> (Unit0,Power1)0  (Power0, Vehicle1)1  (Unit0,Vehicle2)0     x[xx]1
+
+
+=> Unit0, power1, vehicle2
+
+
+=> Unit0, (power1, vehicle2)
+
+
+
+
+
+Unit, VehiclePower
+
+Unit, Power, Vehicle
+
+(Unit,Power)0  (Power, Vehicle)1  (Unit,Vehicle)0
+
+
+Unit0, (Power0, Vehicle1)1
+(Unit0, Power1)0 (Power0, vehicle1)1  (Unit0, vehicle2)0 
+this.isCompositeOf(Power0, vehicle1);
+
+typA=context.newSubType(typA',typA")
+typA'0,typA"0
+(typA'0, typA"0) 1,1
+
+
+typA.addRelation(rel,typB)
+(rel0, [typA'1, typA"1],typB1) 
+(rel0, typA'1, typA"1)0   (typA'0, typA"0,typB0)1    (rel0, typA"1,typB1)0    (rel0, typA'1, typB1)0         [1,2,1]  // Stocké
+
+
+
+
+
+                    Humain Car
+Selectionnable      Transformer
+           TransformerSelectionnable.addAttribute("power")
+power  TransformerSelectionnable
+
+
+power0,[Selectionnable0, [humain0, car0]0]1
+
+power0,[Selectionnable0, [humain0]0]1   [Selectionnable0, [humain0, car0]0]1    power0,[[humain0, car0]0]1    power0,[Selectionnable0, [car0]0]1
+
+
+Problème : On veut poser un attribut sur un type complex (type qui hérite de plusieurs types qui eux même peuvent hériter de plusieurs types)
+
+1)postBind
+	1.1) on retrouve ou on crée l'attribut (type implicit)
+	1.2) decomposition du type complex en primaire
+		1.2.a) méthode de décomposition :
+					- on construit un PrimarySide de l'implicit en inheritance, placé en première position d'un tableau de TypedSide (Side ou SideArray)
+					- en deuxième position on va positionner la décomposition du type complex en un TypedSide en composition
+					Cette décomposition se fait par la construction d'un tableau de TypedSide transformer en un SideArray de composition simple ou
+					d'un Side en composition simple si le tableau ne contient qu'un seul élément.
+					
+					- le tableau est construit sur la base de l'arbre des ancêtres déraciné :
+					L'arbre des ancêtres est décomposé de manière récursive, chaque ancêtre rencontrer est décomposé en ses ancêtres directs tant que ceux-ci 
+					ne sont pas des primaires. Le tableau des primaires ainsi construit est techniquement enraciné, et donc devient un arbre, avec un faux type 
+					de side. L'arbre des primaires est ensuite passé à la méthode bind.
+					
+	1.3) ajout de l'attribut (type implicit) en première positon de la décomposition
+
+2)bind
+	2.1) responsabilité : construire ou trouver le noueud correspondant à l'arbre des primaires dans le graphe.
+		2.1.a) construction ou récupération des ancêtres du noueud à construire :
+					- calcul de l'arbre des primaires de chaque ancêtre pour rappeler de manière récursive le bin afin de trouver ou construire chaque ancêtre
+					Le nombre d'ancêtre correspont au nombre de primaire de l'arbre communiqué au bind.
+					Pour chaque ancêtre, l'arbre communiqué en bind va être reproduit moyennant le remplaçement du primaire, qui correspont à l'ancêtre rechercher, 
+					par son unique ancêtre si celui-ci n'est pas Engine.
+					Dans le cas contraire le Side est supprimé et s'oppère alors un netoyage de l'arbre.					
+					
+					Le principe du nettoyage est qu'il ne doit pas rester de SideArray qui ne contiendrait qu'un seul Side, une fonction récursive accumule alors le nombre de composition
+					dans le Side unique compris dans le SideArray et ce dernier est alors supmprimé. En dernier lieu un méthode de factorisation du nombre de composition du SideArray est alors passé.					
+					
+					L'arbre construit pour chaque ancêtre est alors repasser à la méthode bin afin de construire cette ancêtre.
+					Si l'arbre passé au bind est un Side, le généric compris dans le Side est retourné sans traitement. Pour le premier ancêtre retourné un parcours des dépendances est réalisé afin de sélectionner
+					un noueud qui correspondrait à celui que l'on souhaite construire, pour cela une comparaison de la décomposition en primaire est réalisé. 
+					
+					Si le noeud que l'on cherche à construire est trouver, 
+					il est alors retourner par le bind. Dans le cas contraire chacun des ancêtres est construit, et le noeud est instancié sur la base d'un tableau de Side en héritage construit pour chacun de
+					ses ancêtres. Chacun des éléments du tableau aura été nettoyé (accumulation des compositions et factorisation). 
+ 
+3)afterBind
+
+
+
+
+
+
+
+
+
+
+=> typA'1, typA"1
+=> (typA'0, typA"0)1
+
+bind(typA'0,typA''0)
+
+ => (typA)1
+
+
+
+
+
+
+car.addSubAttribute(vehiclePower,"ultraPower")
+(ultrapower0, car1)
+(ultrapower0, vehicle1)0 (power0, car1)0 
+
+windowSelectableResizable.newInstance("myWindow")
+myWindow[META]0, myWindow[META]0, myWindow[META]0
+(myWindow[META]0, myWindow[META]0, resizable0)0 (window0, myWindow[META]0, myWindow[META]0)0 (selectable0, myWindow[META]0, myWindow[META]0)0
+
+bmw.addValue(vehiclePower,"230hp");
+(230hp[META]0, bmw[META]1)
+(230hp0,vehicle1)0 (power0,bmw1)0
+
+
+bmw.addValue(carPower,"230hp");
+(230hp[META]0, bmw[META]1)
+(230hp0,car1)0 (power0,bmw1)0
+
+
+
+
+
+
+[unit(INHERITANCE), [Power(INHERITANCE), Vehicle(COMPOSITION)](COMPOSITION)]
+[unit(INHERITANCE), [Power(INHERITANCE)](COMPOSITION)](INHERITANCE),  [unit(INHERITANCE),[Vehicle(COMPOSITION)](COMPOSITION)](INHERITANCE)], [[Power(INHERITANCE), Vehicle(COMPOSITION)](COMPOSITION)](INHERITANCE)
+[unit(INHERITANCE), Power(COMPOSITION)](INHERITANCE), [Power(INHERITANCE), Vehicle(COMPOSITION)](COMPOSITION)
+
+
+[unit(INHERITANCE), [UltraPower(INHERITANCE), Car(COMPOSITION)](COMPOSITION)]
+[unit(INHERITANCE), [UltraPower(INHERITANCE), Vehicle(COMPOSITION)](COMPOSITION)](INHERITANCE)   [unit(INHERITANCE), [Power(INHERITANCE), Vehicle(COMPOSITION)](COMPOSITION)](INHERITANCE) , [UltraPower(INHERITANCE), Car(COMPOSITION)](COMPOSITION)](INHERITANCE)
+
+
+
+

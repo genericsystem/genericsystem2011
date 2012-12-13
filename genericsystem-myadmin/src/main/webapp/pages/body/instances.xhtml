@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:middleware="http://java.sun.com/jsf/composite/middleware">
+
+<ui:composition>
+
+	<h:panelGrid id="instancesPanel">
+		<c:if test="#{not empty selectedType}">
+			<rich:panel rendered="#{not empty selectedType}">
+				<f:facet name="header">
+					<h:outputText value="#{selectedType}" />
+				</f:facet>
+
+				<middleware:composite_linkslist type="#{selectedType}"
+					instances="#{linksList.getAllInstances(selectedType)}"
+					editable="true" />
+
+				<!--  
+				<h:commandButton styleClass="capitalize"
+					value="#{msg.create} #{msg.a} #{msg.subtype} #{msg.of} #{selectedType}">
+					<rich:componentControl target="createSubTypePopup" operation="show" />
+				</h:commandButton>
+				<h:commandButton styleClass="capitalize"
+					value="#{msg.create} #{msg.a} #{msg.propertie} #{msg.of} #{selectedType}">
+					<rich:componentControl target="createPropertyPopup"
+						operation="show" />
+				</h:commandButton>
+				<h:commandButton styleClass="capitalize"
+					value="#{msg.create} #{msg.a} #{msg.attribute} #{msg.of} #{selectedType}">
+					<rich:componentControl target="createAttributePopup"
+						operation="show" />
+				</h:commandButton>
+				<h:commandButton styleClass="capitalize"
+					value="#{msg.create} #{msg.a} #{msg.relation} #{msg.of} #{selectedType}">
+					<rich:componentControl target="createRelationPopup"
+						operation="show" />
+				</h:commandButton>
+-->
+				<rich:dataTable styleClass="instancesPanel"
+					value="#{instancesManager.instances}" var="instance">
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText styleClass="capitalize" value="#{msg.name}" />
+						</f:facet>
+						<a4j:commandLink value="#{instance}"
+							action="#{selectedInstanceManager.applySelectedInstance(instance)}"
+							render="instancesPanel" />
+					</rich:column>
+				</rich:dataTable>
+				<!--
+					<c:forEach var="property" items="#{propertiesManager.properties}">
+						<rich:column>
+							<f:facet name="header">
+								<h:outputText value="#{property.implicitInstance}" />
+							</f:facet>
+							<h:outputText
+								value="#{instance.getValueHolder(property).implicitInstance}" />
+						</rich:column>
+
+					</c:forEach>
+					<c:forEach var="relation" items="#{relationManager.relations}">
+						<rich:column>
+							<f:facet name="header">
+								<h:outputText value="#{relation}" />
+							</f:facet>
+							<h:outputText value="#{relation}" />
+						</rich:column>
+					</c:forEach>
+					<rich:column>
+						<a4j:commandButton value="#{msg.delete}"
+							action="#{instancesManager.remove(instance)}"
+							render="instancesPanel" />
+					</rich:column>
+				</rich:dataTable>
+				 -->
+
+
+				<div class="createInstancePanel">
+					<!--
+					<h:outputText styleClass="capitalize"
+						value="#{msg.create} #{msg.a} #{msg.instance} : " />
+					<h:inputText value="#{instancesManager.newInstance}" />
+					<a4j:commandButton value="#{msg.create}"
+						action="#{instancesManager.add}" render="instancesPanel" />
+						
+						-->
+					<ui:include src="edit.xhtml" />
+				</div>
+			</rich:panel>
+		</c:if>
+	</h:panelGrid>
+
+</ui:composition>
+</html>

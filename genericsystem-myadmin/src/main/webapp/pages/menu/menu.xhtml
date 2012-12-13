@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich">
+
+<ui:composition>
+
+	<h:panelGrid id="menu" columns="1">
+		<rich:panel>
+			<f:facet name="header">
+				<h:outputText styleclass="uppercase"
+					value="#{msg.list} #{msg.of} #{msg.types}" />
+			</f:facet>
+			<a4j:region>
+				<rich:dataTable value="#{typesProvider.types}" var="type">
+					<rich:column>
+						<a4j:commandLink value="#{type}"
+							render="createGenericPopup, instancesPanel"
+							action="#{typesManager.applySelectedType(type)}" />
+					</rich:column>
+				</rich:dataTable>
+			</a4j:region>
+			<h:commandButton value="#{msg.create} #{msg.a} #{msg.type}">
+				<rich:componentControl target="createTypePopup" operation="show" />
+			</h:commandButton>
+			<h:commandButton
+				value="#{msg.create} #{msg.a} #{msg.multiple}  #{msg.inheritance} #{msg.type}">
+				<rich:componentControl target="createMultipleInheritanceTypePopup"
+					operation="show" />
+			</h:commandButton>
+		</rich:panel>
+
+		<rich:panel>
+			<f:facet name="header">
+				<h:outputText styleclass="uppercase"
+					value="#{msg.tree} #{msg.of} #{msg.types}" />
+			</f:facet>
+			<a4j:region>
+				<rich:tree id="tree" toggleType="client" var="item"
+					selectionType="ajax" render="createGenericPopup, instancesPanel"
+					selectionChangeListener="#{typesManager.selectionChanged}">
+					<rich:treeModelRecursiveAdaptor roots="#{typesProvider.roots}"
+						nodes="#{typesProvider.getTypes(item)}">
+						<rich:treeNode>
+							#{item}
+						</rich:treeNode>
+					</rich:treeModelRecursiveAdaptor>
+				</rich:tree>
+				<rich:contextMenu target="tree" mode="ajax">
+					<rich:menuItem styleClass="capitalize"
+						label="#{msg.create} #{msg.a} #{msg.subtype}"
+						render="popupContent"
+						oncomplete="#{rich:component('createSubTypePopup')}.show()"
+						mode="ajax" />
+					<rich:menuItem styleClass="capitalize"
+						label="#{msg.create} #{msg.a} #{msg.propertie}"
+						render="popupContent"
+						oncomplete="#{rich:component('createPropertyPopup')}.show()"
+						mode="ajax" />
+					<rich:menuItem styleClass="capitalize"
+						label="#{msg.create} #{msg.a} #{msg.attribute}"
+						render="popupContent"
+						oncomplete="#{rich:component('createAttributePopup')}.show()"
+						mode="ajax" />
+					<rich:menuItem styleClass="capitalize"
+						label="#{msg.create} #{msg.a} #{msg.relation}"
+						render="popupContent"
+						oncomplete="#{rich:component('createRelationPopup')}.show()"
+						mode="ajax" />
+				</rich:contextMenu>
+			</a4j:region>
+		</rich:panel>
+
+		<rich:panel>
+			<f:facet name="header">
+				<h:outputText styleclass="uppercase"
+					value="#{msg.tree} #{msg.of} #{msg.types} #{msg.with} #{msg.implicit}" />
+			</f:facet>
+			<a4j:region>
+				<rich:tree id="treeWithImplicit" toggleType="client" var="item"
+					selectionType="ajax" render="createGenericPopup, instancesPanel"
+					selectionChangeListener="#{typesManager.selectionChanged}">
+					<rich:treeModelRecursiveAdaptor roots="#{typesProvider.roots}"
+						nodes="#{typesProvider.getTypesWithImplicit(item)}">
+						<rich:treeNode>
+							#{item}
+						</rich:treeNode>
+					</rich:treeModelRecursiveAdaptor>
+				</rich:tree>
+				<rich:contextMenu target="treeWithImplicit" mode="ajax">
+					<rich:menuItem styleClass="capitalize"
+						label="#{msg.create} #{msg.a} #{msg.subtype}"
+						render="popupContent"
+						oncomplete="#{rich:component('createSubTypePopup')}.show()"
+						mode="ajax" />
+					<rich:menuItem styleClass="capitalize"
+						label="#{msg.create} #{msg.a} #{msg.propertie}"
+						render="popupContent"
+						oncomplete="#{rich:component('createPropertyPopup')}.show()"
+						mode="ajax" />
+					<rich:menuItem styleClass="capitalize"
+						label="#{msg.create} #{msg.a} #{msg.attribute}"
+						render="popupContent"
+						oncomplete="#{rich:component('createAttributePopup')}.show()"
+						mode="ajax" />
+					<rich:menuItem styleClass="capitalize"
+						label="#{msg.create} #{msg.a} #{msg.relation}"
+						render="popupContent"
+						oncomplete="#{rich:component('createRelationPopup')}.show()"
+						mode="ajax" />
+				</rich:contextMenu>
+			</a4j:region>
+		</rich:panel>
+
+	</h:panelGrid>
+
+</ui:composition>
+</html>
