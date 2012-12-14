@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * 
  */
-
 public abstract class AbstractContext implements Context, Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractContext.class);
