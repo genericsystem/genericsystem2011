@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * 
  */
+
 public abstract class AbstractContext implements Context, Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractContext.class);
@@ -158,7 +159,8 @@ public abstract class AbstractContext implements Context, Serializable {
 				if (interface_.isEngine()) {
 					if (interfaces.length >= 2)
 						magicAdd(Statics.truncate(i, interfaces), components, eligibility);
-				} else
+				}
+				else
 					for (Generic superGeneric : ((GenericImpl) interface_).directSupers)
 						magicAdd(Statics.replace(i, interfaces, superGeneric), components, eligibility);
 			}
