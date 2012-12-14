@@ -28,7 +28,6 @@ import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
-import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.impl.constraints.RequiredConstraintImpl;
 import org.genericsystem.impl.constraints.axed.SingularConstraintImpl;
@@ -933,21 +932,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 					@Override
 					public boolean isSelected() {
 						return sets.add(next);
-					}
-				};
-			}
-		};
-	}
-
-	public Snapshot<Value> getConstraintInstances(final Context context, final Class<? extends Constraint> clazz) {
-		final Property property = ((AbstractContext) context).find(clazz);
-		return new AbstractSnapshot<Value>() {
-			@Override
-			public Iterator<Value> iterator() {
-				return new AbstractFilterIterator<Value>(GenericImpl.this.<Value> mainIterator(context, property, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false)) {
-					@Override
-					public boolean isSelected() {
-						return !Boolean.FALSE.equals(next.getValue());
 					}
 				};
 			}

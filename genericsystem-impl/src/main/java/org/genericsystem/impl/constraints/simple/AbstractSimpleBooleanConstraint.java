@@ -6,13 +6,12 @@ import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.AbstractConstraint;
-import org.genericsystem.impl.core.GenericImpl;
 
 /**
  * 
  * @author Michael Ory
  * @author Nicolas Feybesse
- *
+ * 
  */
 public abstract class AbstractSimpleBooleanConstraint extends AbstractConstraint {
 
@@ -20,7 +19,7 @@ public abstract class AbstractSimpleBooleanConstraint extends AbstractConstraint
 
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		for (Value constraintValueNode : ((GenericImpl) modified).getConstraintInstances(context, getClass())) {
+		for (Value constraintValueNode : getConstraintInstances(context, modified, getClass())) {
 			if (!(constraintValueNode.getValue() instanceof Boolean))
 				throw new ConstraintViolationException("The constraint " + getClass() + " must be a boolean constraint, the value is " + constraintValueNode.getValue());
 			Boolean value = constraintValueNode.getValue();
