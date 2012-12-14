@@ -15,6 +15,7 @@ import org.genericsystem.api.exception.PropertyConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
+import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 
@@ -30,8 +31,8 @@ public class PropertyConstraintImpl extends AbstractSimpleBooleanConstraint {
 	@Override
 	protected void internalCheck(Context context, final Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
 		if (modified.isAttribute()) {
-//			for (final Generic baseComponent : ((GenericImpl) ((Value) modified).getBaseComponent()).getAllInheritings(context)) {
-				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) constraintBaseType.getValues(context, (Attribute) constraintBaseType).iterator()) {
+			for (final Generic baseComponent : ((GenericImpl) ((Value) modified).getBaseComponent()).getAllInheritings(context)) {
+				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) baseComponent.getValues(context, (Attribute) constraintBaseType).iterator()) {
 					@Override
 					public boolean isSelected() {
 						for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
@@ -45,7 +46,7 @@ public class PropertyConstraintImpl extends AbstractSimpleBooleanConstraint {
 					if (it.hasNext())
 						throw new PropertyConstraintViolationException(value.info() + it.next().info());
 				}
-//			}
+			}
 			return;
 		}
 		if (new AbstractFilterIterator<Generic>(((Type) constraintBaseType).getAllInstances(context).iterator()) {

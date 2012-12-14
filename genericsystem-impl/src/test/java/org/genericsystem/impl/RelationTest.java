@@ -11,7 +11,6 @@ import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Property;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
@@ -1245,23 +1244,18 @@ public class RelationTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type person = cache.newType("Person");
 		final Property age = person.addProperty(cache, "Age");
-		Value age25 = person.setValue(cache, age, "25");
+		person.setValue(cache, age, "25");
 
 		final Type student = person.newSubType(cache, "Student");
-		assert ((Property) student).getValue(cache, age).toString().equals("25");
 		student.setValue(cache, age, "30");
-		assert ((Property) student).getValue(cache, age).toString().equals("30");
 
 		final Type teacher = person.newSubType(cache, "Teacher");
-		assert ((Property) teacher).getValue(cache, age).toString().equals("25");
 		teacher.setValue(cache, age, "20");
-		assert ((Property) teacher).getValue(cache, age).toString().equals("20");
 
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				Type doctoral = cache.newSubType("doctoral", student, teacher);
-				log.info(((Property) doctoral).getValue(cache, age).toString());
+				cache.newSubType("doctoral", student, teacher).getValue(cache, age);
 			}
 		}.assertIsCausedBy(IllegalStateException.class);
 
