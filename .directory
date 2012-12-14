@@ -1,5 +1,7 @@
 [Dolphin]
-Timestamp=2012,2,13,14,59,29
+PreviewsShown=true
+Timestamp=2012,12,14,10,13,8
+ViewMode=2
 
 [Settings]
 HiddenFilesShown=true

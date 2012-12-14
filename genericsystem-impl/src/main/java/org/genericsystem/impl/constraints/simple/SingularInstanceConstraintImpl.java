@@ -12,7 +12,6 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.SingularInstanceConstraintViolationException;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.core.Statics;
 
 @SystemGeneric
@@ -26,10 +25,10 @@ public class SingularInstanceConstraintImpl extends AbstractSimpleBooleanConstra
 	private static final long serialVersionUID = -7689576125534105005L;
 	
 	@Override
-	protected void internalCheck(Context context, Generic modified, Value constraintValueNode) throws ConstraintViolationException {
-		int instanceNumber = ((Type) constraintValueNode).getAllInstances(context).size();
+	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
+		int instanceNumber = ((Type) constraintBaseType).getAllInstances(context).size();
 		if (instanceNumber > 1)
-			throw new SingularInstanceConstraintViolationException("Singular instance constraint violation : type " + constraintValueNode + " has " + instanceNumber + " instances.");
+			throw new SingularInstanceConstraintViolationException("Singular instance constraint violation : type " + constraintBaseType + " has " + instanceNumber + " instances.");
 	}
 	
 }

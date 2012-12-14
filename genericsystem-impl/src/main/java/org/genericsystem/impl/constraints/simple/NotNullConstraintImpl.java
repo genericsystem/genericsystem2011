@@ -21,7 +21,7 @@ public class NotNullConstraintImpl extends AbstractSimpleBooleanConstraint {
 	private static final long serialVersionUID = -6429972259714036057L;
 	
 	@Override
-	protected void internalCheck(Context context, Generic modified, Value constraintValueNode) throws ConstraintViolationException {
+	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
 		if (modified.getValue() == null)
 			throw new NotNullConstraintViolationException("Value should not be null for relation " + ((Value) modified).getMeta());
 	}

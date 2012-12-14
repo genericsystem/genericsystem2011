@@ -3,7 +3,7 @@ package org.genericsystem.impl.constraints.simple;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
-import org.genericsystem.api.generic.Relation;
+import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.AbstractConstraint;
 import org.genericsystem.impl.core.GenericImpl;
@@ -20,10 +20,10 @@ public abstract class AbstractSimpleBooleanConstraint extends AbstractConstraint
 			Boolean value = constraintValueNode.getValue();
 			if (value == null)
 				throw new ConstraintViolationException("The constraint " + getClass() + " must have a not null value");
-			internalCheck(context, modified, constraintValueNode.<Relation> getBaseComponent());
+			internalCheck(context, modified, constraintValueNode.<Type> getBaseComponent());
 		}
 	}
 
-	protected abstract void internalCheck(Context context, Generic modified, Value constraintValueNode) throws ConstraintViolationException;
+	protected abstract void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException;
 
 }

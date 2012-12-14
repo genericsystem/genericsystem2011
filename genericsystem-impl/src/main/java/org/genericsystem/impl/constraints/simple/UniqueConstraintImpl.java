@@ -11,7 +11,6 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.UniqueConstraintViolationException;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.core.Statics;
 
 @SystemGeneric
@@ -24,10 +23,10 @@ public class UniqueConstraintImpl extends AbstractSimpleBooleanConstraint {
 	private static final long serialVersionUID = -6429972259714036057L;
 	
 	@Override
-	protected void internalCheck(Context context, Generic modified, Value constraintValueNode) throws ConstraintViolationException {
-		for (Generic generic : ((Type) constraintValueNode).getAllInstances(context))
+	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
+		for (Generic generic : ((Type) constraintBaseType).getAllInstances(context))
 			if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
-				throw new UniqueConstraintViolationException("Value " + modified.getValue() + " is duplicate for type " + constraintValueNode + ".");
+				throw new UniqueConstraintViolationException("Value " + modified.getValue() + " is duplicate for type " + constraintBaseType + ".");
 	}
 	
 }

@@ -14,7 +14,6 @@ import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.PhantomConstraintViolationException;
-import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
 
@@ -28,7 +27,7 @@ public class PhantomConstraintImpl extends AbstractSimpleBooleanConstraint {
 	private static final long serialVersionUID = -1175582355395269087L;
 
 	@Override
-	protected void internalCheck(Context context, Generic modified, Value constraintValueNode) throws ConstraintViolationException {
+	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
 		if (modified.isAlive(context))
 			if (((GenericImpl) modified.getImplicit().getSupers().first()).isPhantom())
 				throw new PhantomConstraintViolationException(modified.info());
