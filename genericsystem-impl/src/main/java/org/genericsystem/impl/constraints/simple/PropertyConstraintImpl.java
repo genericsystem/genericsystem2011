@@ -29,10 +29,10 @@ public class PropertyConstraintImpl extends AbstractSimpleBooleanConstraint {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	protected void internalCheck(Context context, final Generic modified, Value constraintValueNode) throws ConstraintViolationException {
+	protected void internalCheck(Context context, final Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
 		if (modified.isAttribute()) {
 			for (final Generic baseComponent : ((GenericImpl) ((Value) modified).getBaseComponent()).getAllInheritings(context)) {
-				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) baseComponent.getValues(context, (Attribute) constraintValueNode).iterator()) {
+				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) baseComponent.getValues(context, (Attribute) constraintBaseType).iterator()) {
 					@Override
 					public boolean isSelected() {
 						for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
@@ -49,7 +49,7 @@ public class PropertyConstraintImpl extends AbstractSimpleBooleanConstraint {
 			}
 			return;
 		}
-		if (new AbstractFilterIterator<Generic>(((Type) constraintValueNode).getAllInstances(context).iterator()) {
+		if (new AbstractFilterIterator<Generic>(((Type) constraintBaseType).getAllInstances(context).iterator()) {
 			@Override
 			public boolean isSelected() {
 				return !next.equals(modified) && Objects.equals(next.getValue(), modified.getValue());

@@ -12,7 +12,6 @@ import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.OptimisticLockConstraintViolationException;
-import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.core.CacheImpl;
 import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
@@ -27,7 +26,7 @@ public class OptimisticLockConstraintImpl extends AbstractSimpleBooleanConstrain
 	private static final long serialVersionUID = -9140332757904379387L;
 	
 	@Override
-	protected void internalCheck(Context context, Generic modified, Value constraintValueNode) throws ConstraintViolationException {
+	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
 		if (context instanceof CacheImpl && ((CacheImpl) context).isScheduledToRemove(modified)
 				&& (!((CacheImpl) context).getSubContext().isAlive(modified) || ((GenericImpl) modified).getLifeManager().willDie()))
 			throw new OptimisticLockConstraintViolationException("Generic : " + modified + " has already been removed by another thread");
