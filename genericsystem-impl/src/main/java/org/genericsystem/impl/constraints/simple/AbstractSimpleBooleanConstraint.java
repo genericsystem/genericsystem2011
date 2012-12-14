@@ -8,6 +8,12 @@ import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.AbstractConstraint;
 import org.genericsystem.impl.core.GenericImpl;
 
+/**
+ * 
+ * @author Michael Ory
+ * @author Nicolas Feybesse
+ *
+ */
 public abstract class AbstractSimpleBooleanConstraint extends AbstractConstraint {
 
 	private static final long serialVersionUID = 3553977162062086353L;
