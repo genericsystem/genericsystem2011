@@ -1,5 +1,6 @@
 package org.genericsystem.impl.constraints;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 import org.genericsystem.api.annotation.Priority;
@@ -54,6 +55,11 @@ public abstract class AbstractConstraint implements Constraint {
 				};
 			}
 		};
+	}
+	
+	@Override
+	public Serializable getDefaultValue() {
+		return false;
 	}
 
 }

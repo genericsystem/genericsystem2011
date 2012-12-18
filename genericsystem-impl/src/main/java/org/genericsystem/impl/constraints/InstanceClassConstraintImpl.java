@@ -31,4 +31,5 @@ public class InstanceClassConstraintImpl extends AbstractConstraint {
 			}
 	}
 
+
 }

@@ -24,15 +24,15 @@ import org.genericsystem.impl.iterator.AbstractFilterIterator;
 @SingularConstraint(Statics.BASE_POSITION)
 @InstanceClassConstraint(Boolean.class)
 public class PropertyConstraintImpl extends AbstractSimpleBooleanConstraint {
-	
+
 	private static final long serialVersionUID = -6429972259714036057L;
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected void internalCheck(Context context, final Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
 		if (modified.isAttribute()) {
-			for (final Generic baseComponent : ((GenericImpl) ((Value) modified).getBaseComponent()).getAllInheritings(context)) {
-				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) baseComponent.getValues(context, (Attribute) constraintBaseType).iterator()) {
+			for (final Generic inheriting : ((GenericImpl) ((Value) modified).getBaseComponent()).getAllInheritings(context)) {
+				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getValues(context, (Attribute) constraintBaseType).iterator()) {
 					@Override
 					public boolean isSelected() {
 						for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
@@ -57,5 +57,5 @@ public class PropertyConstraintImpl extends AbstractSimpleBooleanConstraint {
 		}.hasNext())
 			throw new PropertyConstraintViolationException("");
 	}
-	
+
 }
