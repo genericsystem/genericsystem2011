@@ -28,6 +28,7 @@ public class AliveConstraintImpl extends AbstractSimpleBooleanConstraint {
 	
 	@Override
 	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
+		//TODO check directSupers
 		if (modified.isAlive(context))
 			for (Generic generic : ((GenericImpl) modified).getComponents())
 				if (generic != null && !generic.isAlive(context))

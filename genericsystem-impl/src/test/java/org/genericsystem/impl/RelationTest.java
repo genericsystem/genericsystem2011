@@ -927,7 +927,9 @@ public class RelationTest extends AbstractTest {
 		yourAudi.bind(cache, carDriver, ayrton);
 		ourFerrari.bind(cache, carDriver, me);
 		ourFerrari.bind(cache, carDriver, you);
+		Statics.debugCurrentThread();
 		ourFerrari.bind(cache, sportsCarPilot, ayrton);
+		Statics.stopDebugCurrentThread();
 
 		assert myBmw.getTargets(cache, carDriver).contains(me);
 		assert myBmw.getTargets(cache, carDriver).contains(ayrton);

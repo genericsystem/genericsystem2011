@@ -268,7 +268,6 @@ public class PropertyConstraintTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				Statics.debugCurrentThread();
 				vehicle.addValue(cache,equipment, "GPS");
 			}
 		}.assertIsCausedBy(PropertyConstraintViolationException.class);

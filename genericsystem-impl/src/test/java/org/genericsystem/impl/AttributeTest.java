@@ -107,7 +107,8 @@ public class AttributeTest extends AbstractTest {
 		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Value myVehicle123 = myVehicle.addValue(cache, vehiclePower, "123");
-		assert myVehicle.getValues(cache, vehiclePower).size() == 1;
+		assert myVehicle123.isAttributeOf(myVehicle);
+		assert myVehicle.getValues(cache, vehiclePower).size() == 1:myVehicle.getValues(cache, vehiclePower);
 		assert myVehicle.getValues(cache, vehiclePower).contains(myVehicle123);
 		Value myVehicle126 = myVehicle.addValue(cache, vehiclePower, "126");
 		assert myVehicle.getValues(cache, vehiclePower).size() == 2;

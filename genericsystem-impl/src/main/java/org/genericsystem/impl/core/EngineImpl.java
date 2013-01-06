@@ -126,7 +126,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
 					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, NotNullConstraintImpl.class, InstanceClassConstraintImpl.class, PhantomConstraintImpl.class,
-					AliveConstraintImpl.class, UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, NoInheritanceSystemProperty.class);
+					AliveConstraintImpl.class, UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class);
 			for (Class<?> clazz : classes)
 				if (get(clazz) == null)
 					bind(cache, clazz);
@@ -156,12 +156,12 @@ public class EngineImpl extends GenericImpl implements Engine {
 			if (MetaAttribute.class.equals(clazz)) {
 				systemProperty = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this });
 				if (systemProperty == null)
-					systemProperty = cache.insert(new GenericImpl().initialize(new Generic[] { EngineImpl.this }, cache.getDirectSupers(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }), new Generic[] { EngineImpl.this }));
+					systemProperty = cache.insert(new GenericImpl().initialize(new Generic[] { EngineImpl.this }, new Generic[]{EngineImpl.this}, new Generic[] { EngineImpl.this }));
 			}
 			else if (MetaRelation.class.equals(clazz)) {
 				systemProperty = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (systemProperty == null)
-					systemProperty = cache.insert(new GenericImpl().initialize(new Generic[] { EngineImpl.this }, cache.getDirectSupers(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this }), new Generic[] {
+					systemProperty = cache.insert(new GenericImpl().initialize(new Generic[] { EngineImpl.this }, new Generic[]{get(MetaAttribute.class)}, new Generic[] {
 							EngineImpl.this, EngineImpl.this }));
 			}
 			else {

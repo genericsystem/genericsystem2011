@@ -2,9 +2,13 @@ package org.genericsystem.impl.core;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.genericsystem.api.core.Generic;
@@ -219,5 +223,57 @@ public class Statics {
 
 	static String getFilename(final long ts) {
 		return new SimpleDateFormat(Statics.PATTERN).format(new Date(ts / Statics.MILLI_TO_NANOSECONDS)) + "---" + ts;
+	}
+
+	static class Primaries extends TreeSet<Generic>{
+		private static final long serialVersionUID = 7222889429002770779L;
+		Primaries(Generic generic) {
+			add(generic);
+		}
+		Primaries(Generic... generics) {
+			add(generics);
+		}
+
+		public boolean add(Generic[] generics) {
+			boolean modified = false;
+			for (Generic generic : generics)
+				if (add(generic))
+					modified = true;
+			return modified;
+		}
+
+		@Override
+		public boolean add(Generic generic) {
+			if(((GenericImpl)generic).isPrimary())
+				return restrictedAdd(generic);
+			boolean adds = false;
+			for(Generic directSuper : ((GenericImpl)generic).directSupers)
+				if(add(directSuper))
+					adds=true;
+			return adds;
+		}
+
+
+		private boolean restrictedAdd(Generic candidate){
+			assert ((GenericImpl)candidate).isPrimary();
+
+			for (Generic generic : this)
+				if (generic.inheritsFrom(candidate)) {
+					return false;
+				}
+			Iterator<Generic> it = this.iterator();
+			while (it.hasNext()) {
+				Generic next= it.next();
+				if (candidate.inheritsFrom(next)) {
+					it.remove();
+				}
+			}
+			return super.add(candidate);
+		};
+
+		@Override
+		public Generic[] toArray() {
+			return toArray(new Generic[size()]);
+		}
 	}
 }

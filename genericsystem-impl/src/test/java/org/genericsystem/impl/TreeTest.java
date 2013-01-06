@@ -194,6 +194,7 @@ public class TreeTest extends AbstractTest {
 		assert cache.getMetaAttribute().isMeta();
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
+		root.log();
 		Node child = root.addNode(cache, "Child");
 		root.addNode(cache, "Child2");
 		child.addNode(cache, "Child3");
