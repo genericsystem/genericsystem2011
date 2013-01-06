@@ -56,6 +56,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	private LifeManager lifeManager;
 
+	//Generic implicit;
 	Generic[] interfaces;
 	Generic[] directSupers;
 	Generic[] components;

@@ -334,6 +334,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic newGeneric = ((GenericImpl) getEngine().getFactory().newGeneric()).initialize(interfaces,supers, components);
 		T superGeneric = this.<T> insert(newGeneric);
 		for (Generic orderedDependency : orderedDependencies) {
+			assert false;//TODO test this
 			Generic bind = insert(((GenericImpl) getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).interfaces, getDirectSupers(((GenericImpl) orderedDependency).interfaces, ((GenericImpl) orderedDependency).components),
 					((GenericImpl) orderedDependency).components));
 			assert bind.inheritsFrom(superGeneric) : bind.info() + " / " + superGeneric.info();
@@ -378,21 +379,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		assert interfaces.length+components.length>=2;
 		Generic[] directSupers =  getDirectSupers(interfaces, components);
-	
+
 		log.info("zzzzzzzzz"+Arrays.toString(directSupers));
 		for (Generic g1 : directSupers)
 			for (Generic g2 : directSupers)
 				if(!g1.equals(g2)) {
 					assert !g1.inheritsFrom(g2) : ""+Arrays.toString(directSupers);
 				}
-		
+
 		if(directSupers.length==1 && Arrays.equals(((GenericImpl)directSupers[0]).nullArrayComponents(),components) && Arrays.equals(((GenericImpl)directSupers[0]).interfaces,interfaces))
 			return (T) directSupers[0];
 
 		//		T found = find(directSupers, components);
 		//		if (found != null)
 		//			return found;
-		
+
 		T generic = rebindDependencies(interfaces, directSupers, components);
 		assert generic == find(directSupers, components) : find(interfaces, components)+generic.info();
 		assert ((GenericImpl) generic).isPrimary() || (new Primaries(generic).equals(new Primaries(interfaces))) : new Primaries(generic) +" <----> "+ new Primaries(interfaces);
