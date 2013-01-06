@@ -6,7 +6,6 @@ import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.AbstractConstraint;
-import org.genericsystem.impl.core.GenericImpl;
 
 public abstract class AbstractAxedIntegerConstraint extends AbstractConstraint {
 
@@ -14,7 +13,7 @@ public abstract class AbstractAxedIntegerConstraint extends AbstractConstraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		for (Value constraintValueNode : ((GenericImpl) modified).getConstraintInstances(context, getClass())) {
+		for (Value constraintValueNode : getConstraintInstances(context, modified, getClass())) {
 			if (!(constraintValueNode.getValue() instanceof Integer))
 				throw new ConstraintViolationException("The constraint " + getClass() + " must be axed");
 			Integer axe = constraintValueNode.getValue();

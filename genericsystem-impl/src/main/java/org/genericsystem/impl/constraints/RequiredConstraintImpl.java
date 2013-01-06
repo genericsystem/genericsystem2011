@@ -21,21 +21,20 @@ import org.genericsystem.impl.core.Statics;
 @PropertyConstraint
 @SingularConstraint(Statics.BASE_POSITION)
 public class RequiredConstraintImpl extends AbstractConstraint {
-	
+
 	private static final long serialVersionUID = -6429972259714036057L;
-	
+
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
 		/*
-		 * We check the attribute corresponding to the value that's being
-		 * removed has at least one value.
+		 * We check the attribute corresponding to the value that's being removed has at least one value.
 		 */
 		if (!((GenericImpl) modified).isPrimary() && !modified.isAlive(context)) {
 			Attribute requiredAttribute = ((Value) modified).getMeta();
 			if (requiredAttribute == null || !requiredAttribute.isSystemPropertyEnabled(context, this.getClass()))
 				return;
 			Generic base = ((Value) modified).getBaseComponent();
-			
+
 			assert ((GenericImpl) requiredAttribute).isSystemPropertyEnabled(context, this.getClass());
 			if (base.getValues(context, requiredAttribute).size() < 1)
 				throw new RequiredConstraintViolationException("The generic " + base + " has no value for the attribute " + requiredAttribute + ".");
@@ -43,31 +42,31 @@ public class RequiredConstraintImpl extends AbstractConstraint {
 		/*
 		 * Check the instance's required attributes have been instantiated.
 		 */
-		else
-			if (SystemGeneric.CONCRETE == modified.getMetaLevel()) {
-				Type typeuh = modified.getMeta();
-				
-				Snapshot<Attribute> attributes = typeuh.getAttributes(context);
-				Generic base = modified;
-				
-				boolean foundConstrainedAttribute = false;
-				for (Attribute attribute : attributes) {
-					if (((GenericImpl) attribute).isSystemPropertyEnabled(context, this.getClass()) && base.getValues(context, attribute).size() < 1) { throw new RequiredConstraintViolationException(
-							"The generic " + base + " has no value for the attribute " + attribute + "."); }
-					foundConstrainedAttribute = true;
+		else if (SystemGeneric.CONCRETE == modified.getMetaLevel()) {
+			Type typeuh = modified.getMeta();
+
+			Snapshot<Attribute> attributes = typeuh.getAttributes(context);
+			Generic base = modified;
+
+			boolean foundConstrainedAttribute = false;
+			for (Attribute attribute : attributes) {
+				if (((GenericImpl) attribute).isSystemPropertyEnabled(context, this.getClass()) && base.getValues(context, attribute).size() < 1) {
+					throw new RequiredConstraintViolationException("The generic " + base + " has no value for the attribute " + attribute + ".");
 				}
-				assert foundConstrainedAttribute : "Should not be testing requirement on this object.";
+				foundConstrainedAttribute = true;
 			}
+			assert foundConstrainedAttribute : "Should not be testing requirement on this object.";
+		}
 	}
-	
+
 	@Override
 	public boolean isCheckedAt(CheckingType type) {
 		return type.equals(CheckingType.CHECK_ON_REMOVE_NODE) || type.equals(CheckingType.CHECK_ON_ADD_NODE);
 	}
-	
+
 	@Override
 	public boolean isImmediatelyCheckable() {
 		return false;
 	}
-	
+
 }
