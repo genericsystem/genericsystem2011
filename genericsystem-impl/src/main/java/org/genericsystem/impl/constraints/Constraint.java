@@ -19,6 +19,5 @@ public interface Constraint extends Comparable<Constraint>, Serializable {
 	boolean isCheckedAt(CheckingType type);
 
 	int getPriority();
-	
-	Serializable getDefaultValue();
+
 }

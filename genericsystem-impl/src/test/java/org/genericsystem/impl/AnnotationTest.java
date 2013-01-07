@@ -192,6 +192,7 @@ public class AnnotationTest extends AbstractTest {
 				Children.class, Vehicle.class, Human.class,
 				ChildrenGames.class, Transformer.class,
 				TransformerChildrenGames.class);
+		
 		Type games = cache.find(Games.class);
 		Type children = cache.find(Children.class);
 		Type vehicle = cache.find(Vehicle.class);
@@ -206,7 +207,9 @@ public class AnnotationTest extends AbstractTest {
 		assert transformerChildrenGames.inheritsFrom(children);
 		assert transformerChildrenGames.inheritsFrom(vehicle);
 		assert transformerChildrenGames.inheritsFrom(human);
-		assert transformerChildrenGames.getSupers().contains(childrenGames);
+		
+		assert transformerChildrenGames.inheritsFrom(childrenGames);
+		assert transformerChildrenGames.getSupers().contains(childrenGames) : transformerChildrenGames.info();
 		assert transformerChildrenGames.getSupers().contains(transformer);
 		assert transformerChildrenGames.getSupers().contains(
 				transformerChildrenGames.getImplicit());

@@ -57,9 +57,4 @@ public abstract class AbstractConstraint implements Constraint {
 		};
 	}
 	
-	@Override
-	public Serializable getDefaultValue() {
-		return false;
-	}
-
 }

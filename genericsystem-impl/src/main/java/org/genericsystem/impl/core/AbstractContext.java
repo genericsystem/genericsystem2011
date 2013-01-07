@@ -1,10 +1,13 @@
 package org.genericsystem.impl.core;
 
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
@@ -28,7 +31,9 @@ import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
+import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
+import org.genericsystem.impl.iterator.AbstractMagicIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,116 +102,63 @@ public abstract class AbstractContext implements Context, Serializable {
 
 	public abstract boolean isScheduledToRemove(Generic generic);
 
-	private static class Wrapper {
-		private final Generic[] interfaces;
-		private final Generic[] components;
+	Iterator<Generic> getDirectSupersIterator(final Generic[] interfaces, final Generic[] components){
+		return new AbstractMagicIterator(this,getEngine()) {
 
-		private Wrapper(Generic[] interfaces, Generic[] components) {
-			this.interfaces = interfaces;
-			this.components = components;
-		}
+			@Override
+			protected boolean isSelectable() {
+				return true;
+			}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof Wrapper))
-				return false;
-			return Arrays.equals(interfaces, (((Wrapper) obj).interfaces)) && Arrays.equals(components, (((Wrapper) obj).components));
-		}
-
-		@Override
-		public int hashCode() {
-			return Arrays.hashCode(interfaces);
-		}
+			@Override
+			protected boolean isSelected(Generic candidate) {
+				boolean result = GenericImpl.isSuperOf(((GenericImpl)candidate).isPrimary() ? new Generic[]{(GenericImpl)candidate} : ((GenericImpl)candidate).interfaces, ((GenericImpl)candidate).components, interfaces, components);
+//				log.info("super :"+Arrays.toString(((GenericImpl)candidate).interfaces)+Arrays.toString(((GenericImpl)candidate).components));
+//				log.info("sub"+Arrays.toString(interfaces)+Arrays.toString(components));
+//				log.info("result selected : "+result);
+				return result;
+			}
+		};
 	}
 
-	class MagicSet extends LinkedHashSet<Generic> {
 
-		private static final long serialVersionUID = -4311532704968965859L;
-
-		private Set<Wrapper> alreadyComputed = new HashSet<Wrapper>();
-
-		@Override
-		public boolean add(Generic candidate) {
-			for (Generic generic : this)
-				if (generic.inheritsFrom(candidate))
-					return false;
-			Iterator<Generic> it = this.iterator();
-			while (it.hasNext())
-				if (candidate.inheritsFrom(it.next()))
-					it.remove();
-			return super.add(candidate);
-		}
-
-		private void magicAdd(Generic[] interfaces, Generic[] components, boolean eligibility) {
-			if (alreadyComputed.add(new Wrapper(interfaces, components))) {
-				assert interfaces.length >= 1;
-				if (eligibility) {
-					Generic generic = find(interfaces, components);
-					if (generic != null) {
-						add(generic);
-						eligibility = false;
-					}
+	protected Generic[] getDirectSupers( final Generic[] interfaces, final Generic[] components) {
+		List<Generic> list = new ArrayList<Generic>(){
+			private static final long serialVersionUID = 3578292736549817796L;
+			{
+				final Iterator<Generic> iterator = getDirectSupersIterator(interfaces,components);
+				while (iterator.hasNext()) {
+					Generic g = iterator.next();
+					//log.info("G : "+g);
+					add(g);
 				}
-				traverse(interfaces, components, eligibility);
 			}
-		}
-
-		protected MagicSet traverse(Generic[] interfaces, Generic[] components, boolean eligibility) {
-			assert interfaces.length >= 1;
-			for (int i = 0; i < interfaces.length; i++) {
-				Generic interface_ = interfaces[i];
-				if (interface_.isEngine()) {
-					if (interfaces.length >= 2)
-						magicAdd(Statics.truncate(i, interfaces), components, eligibility);
-				}
-				else
-					for (Generic superGeneric : ((GenericImpl) interface_).directSupers)
-						magicAdd(Statics.replace(i, interfaces, superGeneric), components, eligibility);
-			}
-			for (int i = 0; i < components.length; i++) {
-				Generic component = components[i];
-				if (component == null)
-					magicAdd(interfaces, Statics.replace(i, components, getEngine()), eligibility);
-				else if (component.isEngine())
-					magicAdd(interfaces, Statics.truncate(i, components), eligibility);
-				else
-					for (Generic superGeneric : ((GenericImpl) component).directSupers)
-						magicAdd(interfaces, Statics.replace(i, components, superGeneric), eligibility);
-			}
-			return this;
-		}
+		};
+		return list.toArray(new Generic[list.size()]);
 	}
 
-	protected Generic[] getDirectSupers(Generic[] interfaces, Generic[] components) {
-		MagicSet set = new MagicSet().traverse(interfaces, components, true);
-		assert set.size() != 0 : " for interfaces : " + Arrays.toString(interfaces) + " components : " + Arrays.toString(components);
-		return set.toArray(new Generic[set.size()]);
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T extends Generic> T find(Generic[] interfaces, Generic... components) {
-		// log.info("find interfaces : " + Arrays.toString(interfaces) + " components : " + Arrays.toString(components));
-		assert interfaces.length != 0 || components.length != 0;
-		if (interfaces.length == 0 && components.length == 1) {
-			return (T) components[0];
-		}
-		if (interfaces.length == 1 && components.length == 0) {
-			// log.info("Found : " + interfaces[0]);
-			return (T) interfaces[0];
-		}
-		if (interfaces.length == 1 && components.length == 1) {
-			if (interfaces[0].isEngine() && getEngine().equals(components[0]))
-				return getMetaAttribute();
-		}
-		if (interfaces.length == 1 && components.length == 2) {
-			if (interfaces[0].isEngine() && getEngine().equals(components[0]) && getEngine().equals(components[1]))
-				return getMetaRelation();
-		}
-		for (Generic component : components)
-			if (component != null)
-				return find(compositesIterator(component), interfaces, components);
-		return find(directInheritingsIterator(getDirectSupers(interfaces, components)[0]), interfaces, components);
-	}
+//	@SuppressWarnings("unchecked")
+//	public <T extends Generic> T find(Generic[] directSupers, Generic... components) {
+//		assert directSupers.length != 0 || components.length != 0;
+//		if (directSupers.length == 0 && components.length == 1) {
+//			return (T) components[0];//  not possible !
+//		}
+//		if (directSupers.length == 1 && components.length == 0) {
+//			return (T) directSupers[0];
+//		}
+//		if (directSupers.length == 1 && components.length == 1) {
+//			if (directSupers[0].isEngine() && getEngine().equals(components[0]))
+//				return getMetaAttribute();
+//		}
+//		if (directSupers.length == 1 && components.length == 2) {
+//			if (directSupers[0].isEngine() && getEngine().equals(components[0]) && getEngine().equals(components[1]))
+//				return getMetaRelation();
+//		}
+//		T result =  this.<T>internalFind(directSupers, components);
+//		//log.info(Arrays.toString(directSupers)+Arrays.toString(components)+" result : "+result);
+//		return result;
+//
+//	}
 
 	private static Generic[] transform(Generic[] components, Generic generic) {
 		Generic[] result = components.clone();
@@ -217,12 +169,12 @@ public abstract class AbstractContext implements Context, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	static <T extends Generic> T find(Iterator<Generic> iterator, Generic[] interfaces, Generic[] components) {
+	<T extends Generic> T find(Generic[] directSupers, Generic[] components) {
+		Iterator<Generic> iterator = components.length>0 && components[0]!=null ? compositesIterator(components[0]) : directInheritingsIterator(directSupers[0]);
 		while (iterator.hasNext()) {
 			Generic directInheriting = iterator.next();
-			if (Arrays.equals(((GenericImpl) directInheriting).interfaces, interfaces))
-				if (Arrays.equals(((GenericImpl) directInheriting).components, transform(components, directInheriting)))
-					return (T) directInheriting;
+			if (Arrays.equals(((GenericImpl) directInheriting).directSupers, directSupers) && Arrays.equals(((GenericImpl) directInheriting).components, transform(components, directInheriting)))
+				return (T) directInheriting;
 		}
 		return null;
 	}
@@ -230,6 +182,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	public abstract boolean isAlive(Generic generic);
 
 	public <T extends Generic> T find(Class<?> clazz) {
+		//log.info(""+clazz);
 		return this.<EngineImpl> getEngine().find(this, clazz);
 	}
 
@@ -249,22 +202,24 @@ public abstract class AbstractContext implements Context, Serializable {
 	}
 
 	static Generic[] orderInterfaces(final Generic[] interfaces) {
-		Set<Generic> adjusted = new TreeSet<Generic>() {
-			private static final long serialVersionUID = 4439816099896120671L;
-			{
-				for (Generic candidate : interfaces) {
-					boolean toAdd = true;
-					for (Generic generic : this)
-						if (generic.inheritsFrom(candidate)) {
-							toAdd = false;
-							break;
-						}
-					if (toAdd)
-						add(candidate);
-				}
-			}
-		};
-		return adjusted.toArray(new Generic[adjusted.size()]);
+		return new Primaries(interfaces).toArray();
+
+//		Set<Generic> adjusted = new TreeSet<Generic>() {
+//			private static final long serialVersionUID = 4439816099896120671L;
+//			{
+//				for (Generic candidate : interfaces) {
+//					boolean toAdd = true;
+//					for (Generic generic : this)
+//						if (generic.inheritsFrom(candidate)) {
+//							toAdd = false;
+//							break;
+//						}
+//					if (toAdd)
+//						add(candidate);
+//				}
+//			}
+//		};
+//		return adjusted.toArray(new Generic[adjusted.size()]);
 	}
 
 	Generic getSuperToCheck(Generic[] annotedInterfaces) {
