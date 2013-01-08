@@ -59,8 +59,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 	
 	final void restoreEngine(long designTs, long birthTs, long lastReadTs, long deathTs) {
-		restore(ENGINE_VALUE, SystemGeneric.META, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
-		assert this.equals(interfaces[0]);
+		restore(ENGINE_VALUE, SystemGeneric.META, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
 		assert components.length == 0;
 	}
 	
@@ -155,11 +154,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 			if (MetaAttribute.class.equals(clazz)) {
 				systemProperty = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this });
 				if (systemProperty == null)
-					systemProperty = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }));
+					systemProperty = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }));
 			} else if (MetaRelation.class.equals(clazz)) {
 				systemProperty = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (systemProperty == null)
-					systemProperty = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { EngineImpl.this }, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
+					systemProperty = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
 			} else {
 				systemProperty = cache.<T> internalBind(clazz);
 				put(clazz, systemProperty);

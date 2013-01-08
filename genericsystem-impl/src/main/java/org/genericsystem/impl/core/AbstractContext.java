@@ -110,7 +110,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			
 			@Override
 			protected boolean isSelected(Generic candidate) {
-				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).isPrimary() ? new Generic[] { (GenericImpl) candidate } : ((GenericImpl) candidate).interfaces, ((GenericImpl) candidate).components, interfaces, components);
+				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).components, interfaces, components);
 				// log.info("super :"+Arrays.toString(((GenericImpl)candidate).interfaces)+Arrays.toString(((GenericImpl)candidate).components));
 				// log.info("sub"+Arrays.toString(interfaces)+Arrays.toString(components));
 				// log.info("result selected : "+result);
@@ -226,6 +226,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		// return adjusted.toArray(new Generic[adjusted.size()]);
 	}
 	
+	// TODO clean
 	Generic getSuperToCheck(Generic[] annotedInterfaces) {
 		if (annotedInterfaces.length == 0)
 			return getEngine();
@@ -234,17 +235,9 @@ public abstract class AbstractContext implements Context, Serializable {
 		return getEngine();
 	}
 	
-	static Generic[] getInterfaces(Generic[] annotedInterfaces) {
-		if (annotedInterfaces.length == 0)
-			return Statics.EMPTY_GENERIC_ARRAY;
-		if (annotedInterfaces.length == 1)
-			return Statics.truncate(0, ((GenericImpl) annotedInterfaces[0]).interfaces);
-		return annotedInterfaces;
-	}
-	
 	<T extends Generic> T findMeta(Generic[] interfaces, Generic[] components) {
 		for (T composite : getEngine().<T> getComposites(this))
-			if (composite.isMeta() && Arrays.equals(interfaces, ((GenericImpl) composite).interfaces) && Arrays.equals(components, ((GenericImpl) composite).components))
+			if (composite.isMeta() && Arrays.equals(interfaces, ((GenericImpl) composite).getPrimariesArray()) && Arrays.equals(components, ((GenericImpl) composite).components))
 				return composite;
 		return null;
 	}

@@ -55,7 +55,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	private LifeManager lifeManager;
 	
-	Generic[] interfaces;
 	Generic[] directSupers;
 	Generic[] components;
 	
@@ -63,19 +62,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	Serializable value;
 	
 	final Generic initPrimary(Serializable value, int metaLevel, Generic primaryAncestor) {
-		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, new Generic[] { primaryAncestor }, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY);
+		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY);
 	}
 	
-	final GenericImpl initialize(Serializable value, int metaLevel, Generic[] interfaces, Generic[] directSupers, Generic[] components) {
-		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, interfaces, directSupers, components);
+	final GenericImpl initialize(Serializable value, int metaLevel, Generic[] directSupers, Generic[] components) {
+		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
 	}
 	
-	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] interfaces, Generic[] directSupers, Generic[] components) {
-		// assert !value.equals("Engine") || EngineImpl.ENGINE_VALUE == value;
-		
+	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
 		this.value = value;
 		this.metaLevel = metaLevel;
-		this.interfaces = interfaces;
 		this.directSupers = directSupers;
 		this.components = components;
 		
@@ -86,7 +82,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				if (!g1.equals(g2)) {
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 				}
-		assert isPrimary() || getPrimaries().equals(new Primaries(interfaces)) : getPrimaries() + " <----> " + new Primaries(interfaces) + info();
 		return this;
 	}
 	
@@ -419,12 +414,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).add(this, value, getMetaLevel() + 1, Statics.truncate(0, this.interfaces), components);
+		return ((CacheImpl) cache).add(this, value, getMetaLevel() + 1, getPrimariesArray(), components);
 	}
 	
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).add(this, value, getMetaLevel(), Statics.truncate(0, interfaces), components);
+		return ((CacheImpl) cache).add(this, value, getMetaLevel(), getPrimariesArray(), components);
 	}
 	
 	@Override
@@ -516,8 +511,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return superOf;
 	}
 	
-	private Set<Generic> getPrimaries() {
+	private Primaries getPrimaries() {
 		return new Primaries(this);
+	}
+	
+	Generic[] getPrimariesArray() {
+		return getPrimaries().toArray();
 	}
 	
 	private class InheritanceCalculator extends HashSet<Generic> {
@@ -549,7 +548,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			return isEngine();
 		if (((GenericImpl) generic).isPrimary())
 			return isSuperOf(((GenericImpl) generic).directSupers[0]);
-		return isSuperOf(isPrimary() ? new Generic[] { this } : this.interfaces, this.components, ((GenericImpl) generic).interfaces, ((GenericImpl) generic).components);
+		return isSuperOf(getPrimariesArray(), this.components, ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).components);
 	}
 	
 	public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents) {
@@ -566,14 +565,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 					return false;
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] == null) {
-					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).interfaces) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components)) {
+					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components)) {
 						assert false;// reach with a good exemple
-						if (isSuperOf(interfaces, components, ((GenericImpl) subComponents[i]).interfaces, ((GenericImpl) subComponents[i]).components))
+						if (isSuperOf(interfaces, components, ((GenericImpl) subComponents[i]).getPrimariesArray(), ((GenericImpl) subComponents[i]).components))
 							return false;
 					}
 				} else if (subComponents[i] != null) {
-					if (!Arrays.equals(interfaces, ((GenericImpl) components[i]).interfaces) || !Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).interfaces) || !Arrays.equals(components, ((GenericImpl) components[i]).components)
-							|| !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components)) {
+					if (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray())
+							|| !Arrays.equals(components, ((GenericImpl) components[i]).components) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components)) {
 						if (!((GenericImpl) components[i]).isSuperOf(subComponents[i])) {
 							return false;
 						}
@@ -656,21 +655,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	@Override
-	public <T extends Generic> Snapshot<T> getInterfaces() {
-		return new AbstractSnapshot<T>() {
-			
-			@Override
-			public Iterator<T> iterator() {
-				return interfacesIterator();
-			}
-		};
-	}
-	
-	private <T extends Generic> Iterator<T> interfacesIterator() {
-		return new ArrayIterator<T>((T[]) interfaces);
-	}
-	
-	@Override
 	public <T extends Link> Snapshot<T> getLinks(Context context, final Relation relation, Generic... targets) {
 		return getLinks(context, relation, Statics.BASE_POSITION, targets);
 	}
@@ -735,9 +719,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		s += "Value          : " + value + "\n";
 		// s += "getMeta()      : " + getMeta() + "\n";
 		s += "getInstanciationLevel() : " + getMetaLevel() + "\n";
-		for (Generic interface_ : interfaces) {
+		for (Generic interface_ : getPrimariesArray())
 			s += "Interface #" + "    : " + interface_ + " (" + System.identityHashCode(interface_) + ")\n";
-		}
 		for (Generic primary : getPrimaries())
 			s += "Primary #" + "       : " + primary + " (" + System.identityHashCode(primary) + ")\n";
 		for (Generic component : components)
@@ -753,7 +736,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public String toString() {
 		if (isPrimary())
 			return value instanceof Class ? ((Class<?>) value).getSimpleName() : value != null ? value.toString() : "null";
-		return Arrays.toString(interfaces) + "/" + toString(components);
+		return Arrays.toString(getPrimariesArray()) + "/" + toString(components);
 	}
 	
 	private String toString(Object[] a) {
@@ -778,7 +761,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	public boolean isPrimary() {
-		return components.length == 0 && interfaces.length == 1;
+		return components.length == 0 && directSupers.length == 1;/* && ((GenericImpl) directSupers[0]).isPrimary() */
 	}
 	
 	@Override

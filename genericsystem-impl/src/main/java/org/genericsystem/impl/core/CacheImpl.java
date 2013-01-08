@@ -234,7 +234,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 	
 	<T extends Generic> T update(Generic old, Serializable value) {
-		return reInsert(orderAndRemoveDependencies(old).iterator(), ((GenericImpl) old).getImplicit(), bindPrimaryByValue(old.<GenericImpl> getImplicit().interfaces[0], value, old.getMetaLevel()));
+		return reInsert(orderAndRemoveDependencies(old).iterator(), ((GenericImpl) old).getImplicit(), bindPrimaryByValue(old.<GenericImpl> getImplicit().directSupers[0], value, old.getMetaLevel()));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -249,7 +249,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (((GenericImpl) genericToReplace).isPrimary())
 			return bindPrimaryByValue(((GenericImpl) genericToReplace).directSupers[0], genericToReplace.getValue(), genericToReplace.getMetaLevel());
 		
-		Generic[] interfaces = ((GenericImpl) genericToReplace).interfaces;
+		Generic[] interfaces = ((GenericImpl) genericToReplace).getPrimariesArray();
 		Generic[] components = ((GenericImpl) genericToReplace).components;
 		Generic[] resultInterfaces = new Generic[interfaces.length];
 		Generic[] resultComponents = new Generic[components.length];
@@ -268,7 +268,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return oldSubPrimary;
 		if (oldSubPrimary.equals(oldPrimary))
 			return newPrimary;
-		return bindPrimaryByValue(getNewPrimary(((GenericImpl) oldSubPrimary).interfaces[0], oldPrimary, newPrimary), oldSubPrimary.getValue(), oldSubPrimary.getMetaLevel());
+		return bindPrimaryByValue(getNewPrimary(((GenericImpl) oldSubPrimary).directSupers[0], oldPrimary, newPrimary), oldSubPrimary.getValue(), oldSubPrimary.getMetaLevel());
 	}
 	
 	@Override
@@ -322,7 +322,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Iterator<Generic> removeIterator = new AbstractFilterIterator<Generic>(directInheritingsIterator(superGeneric)) {
 				@Override
 				public boolean isSelected() {
-					return GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).interfaces, ((GenericImpl) next).components);
+					return GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
 				}
 			};
 			while (removeIterator.hasNext()) {
@@ -331,12 +331,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 				orderedDependencies.addAll(orderAndRemoveDependencies(next));
 			}
 		}
-		Generic newGeneric = ((GenericImpl) getEngine().getFactory().newGeneric()).initialize(value, metaLevel, interfaces, supers, components);
+		Generic newGeneric = ((GenericImpl) getEngine().getFactory().newGeneric()).initialize(value, metaLevel, supers, components);
 		T superGeneric = this.<T> insert(newGeneric);
 		for (Generic orderedDependency : orderedDependencies) {
 			assert false;// TODO test this
-			Generic bind = insert(((GenericImpl) getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel, ((GenericImpl) orderedDependency).interfaces,
-					getDirectSupers(((GenericImpl) orderedDependency).interfaces, ((GenericImpl) orderedDependency).components), ((GenericImpl) orderedDependency).components));
+			Generic bind = insert(((GenericImpl) getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel,
+					getDirectSupers(((GenericImpl) orderedDependency).getPrimariesArray(), ((GenericImpl) orderedDependency).components), ((GenericImpl) orderedDependency).components));
 			assert bind.inheritsFrom(superGeneric) : bind.info() + " / " + superGeneric.info();
 		}
 		return superGeneric;
@@ -377,19 +377,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 		assert interfaces.length + components.length >= 2;
 		Generic[] directSupers = getDirectSupers(interfaces, components);
 		
-		log.info("zzzzzzzzz" + Arrays.toString(directSupers));
 		for (Generic g1 : directSupers)
 			for (Generic g2 : directSupers)
 				if (!g1.equals(g2)) {
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 				}
 		
-		if (directSupers.length == 1 && Arrays.equals(((GenericImpl) directSupers[0]).nullArrayComponents(), components) && Arrays.equals(((GenericImpl) directSupers[0]).interfaces, interfaces))
+		if (directSupers.length == 1 && Arrays.equals(((GenericImpl) directSupers[0]).nullArrayComponents(), components) && Arrays.equals(((GenericImpl) directSupers[0]).getPrimariesArray(), interfaces))
 			return (T) directSupers[0];
-		
-		// T found = find(directSupers, components);
-		// if (found != null)
-		// return found;
 		
 		T generic = rebindDependencies(value, metaLevel, interfaces, directSupers, components);
 		assert generic == find(directSupers, components) : find(interfaces, components) + generic.info();
@@ -399,13 +394,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 	
 	private static void checkSuperRule(GenericImpl generic, Generic[] interfaces, Generic[] components) {
-		if (!GenericImpl.isSuperOf(generic.interfaces, generic.components, interfaces, components))
+		if (!GenericImpl.isSuperOf(generic.getPrimariesArray(), generic.components, interfaces, components))
 			throw new SuperRuleConstraintViolationException("Interfaces : " + Arrays.toString(interfaces) + " Components : " + Arrays.toString(components) + " should inherits from : " + generic);
 	}
 	
 	<T extends Generic> T internalBind(Class<?> clazz) {
 		Generic[] annotedInterfaces = findAnnotedInterfaces(clazz);
-		return add(getSuperToCheck(annotedInterfaces), getImplictValue(clazz), clazz.getAnnotation(SystemGeneric.class).value(), getInterfaces(annotedInterfaces), findComponents(clazz));
+		return add(getSuperToCheck(annotedInterfaces), getImplictValue(clazz), clazz.getAnnotation(SystemGeneric.class).value(), annotedInterfaces, findComponents(clazz));
 	}
 	
 	protected void triggersDependencies(Class<?> clazz) {
