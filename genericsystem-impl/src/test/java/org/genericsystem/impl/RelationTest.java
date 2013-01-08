@@ -1,9 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
@@ -415,7 +412,7 @@ public class RelationTest extends AbstractTest {
 		
 		Link myBmwMe1 = me.setLink(cache, carOwner, "value1", Statics.TARGET_POSITION, myBmw);
 		Link myBmwMe2 = me.setLink(cache, carOwner, "value1", Statics.TARGET_POSITION, myBmw);
-		assert myBmwMe1 != myBmwMe2;
+		assert myBmwMe1 == myBmwMe2;
 		
 		assert me.getLinks(cache, carOwner, Statics.TARGET_POSITION).size() == 1 : me.getLinks(cache, (Property) carOwner);
 	}
