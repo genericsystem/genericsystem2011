@@ -124,14 +124,13 @@ public abstract class AbstractContext implements Context, Serializable {
 			private static final long serialVersionUID = 3578292736549817796L;
 			{
 				final Iterator<Generic> iterator = getDirectSupersIterator(interfaces, components);
-				while (iterator.hasNext()) {
-					Generic g = iterator.next();
-					// log.info("G : "+g);
-					add(g);
-				}
+				while (iterator.hasNext())
+					add(iterator.next());
 			}
 		};
-		return list.toArray(new Generic[list.size()]);
+		Generic[] result = list.toArray(new Generic[list.size()]);
+		assert Arrays.equals(new Primaries(result).toArray(), interfaces);
+		return result;
 	}
 	
 	// @SuppressWarnings("unchecked")
@@ -181,58 +180,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	public abstract boolean isAlive(Generic generic);
 	
 	public <T extends Generic> T find(Class<?> clazz) {
-		// log.info(""+clazz);
 		return this.<EngineImpl> getEngine().find(this, clazz);
-	}
-	
-	// <T extends Generic> T internalFind(Class<?> clazz) {
-	// checkSystemGenericClass(clazz);
-	// Generic[] annotedInterfaces = findAnnotedInterfaces(clazz);
-	// Generic implicit =
-	// findPrimaryByValue(getSuperToCheck(annotedInterfaces).getImplicit(),
-	// getImplictValue(clazz),
-	// clazz.getAnnotation(SystemGeneric.class).value());
-	// if (implicit == null)
-	// return null;
-	// return find(Statics.insertFirstIntoArray(implicit,
-	// orderInterfaces(getInterfaces(annotedInterfaces))),
-	// findComponents(clazz));
-	// }
-	
-	protected void checkSystemGenericClass(Class<?> clazz) {
-		SystemGeneric systemGeneric = clazz.getAnnotation(SystemGeneric.class);
-		if (systemGeneric == null)
-			throw new IllegalStateException("Unable to provide non annoted @SystemGeneric class : " + clazz);
-	}
-	
-	static Generic[] orderInterfaces(final Generic[] interfaces) {
-		return new Primaries(interfaces).toArray();
-		
-		// Set<Generic> adjusted = new TreeSet<Generic>() {
-		// private static final long serialVersionUID = 4439816099896120671L;
-		// {
-		// for (Generic candidate : interfaces) {
-		// boolean toAdd = true;
-		// for (Generic generic : this)
-		// if (generic.inheritsFrom(candidate)) {
-		// toAdd = false;
-		// break;
-		// }
-		// if (toAdd)
-		// add(candidate);
-		// }
-		// }
-		// };
-		// return adjusted.toArray(new Generic[adjusted.size()]);
-	}
-	
-	// TODO clean
-	Generic getSuperToCheck(Generic[] annotedInterfaces) {
-		if (annotedInterfaces.length == 0)
-			return getEngine();
-		if (annotedInterfaces.length == 1)
-			return annotedInterfaces[0];
-		return getEngine();
 	}
 	
 	<T extends Generic> T findMeta(Generic[] interfaces, Generic[] components) {
@@ -242,6 +190,12 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 	
+	// TODO clean
+	Generic getSuperToCheck(Generic[] annotedInterfaces) {
+		return annotedInterfaces.length == 1 ? annotedInterfaces[0] : getEngine();
+	}
+	
+	// TODO clean
 	protected Generic[] findAnnotedInterfaces(Class<?> clazz) {
 		LinkedHashSet<Class<?>> interfacesClasses = getAdditionalInterfaceClasses(clazz);
 		Type[] interfaces = new Type[interfacesClasses.size()];
@@ -289,10 +243,6 @@ public abstract class AbstractContext implements Context, Serializable {
 		if (clazz.getAnnotation(PhantomValue.class) != null)
 			return Statics.PHAMTOM;
 		return clazz;
-	}
-	
-	protected Generic getImplicitSuper(Type[] interfaces) {
-		return interfaces.length == 1 ? interfaces[0].getImplicit() : getEngine();
 	}
 	
 	@SuppressWarnings("unchecked")

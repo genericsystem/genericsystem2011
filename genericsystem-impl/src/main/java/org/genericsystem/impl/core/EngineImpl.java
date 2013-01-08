@@ -159,14 +159,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 				systemProperty = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (systemProperty == null)
 					systemProperty = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
-			} else {
-				systemProperty = cache.<T> internalBind(clazz);
-				put(clazz, systemProperty);
-				((GenericImpl) systemProperty).mountConstraints(cache, clazz);
-				cache.triggersDependencies(clazz);
-				return systemProperty;
-			}
+			} else
+				systemProperty = cache.<T> bind(clazz);
 			put(clazz, systemProperty);
+			((GenericImpl) systemProperty).mountConstraints(cache, clazz);
+			cache.triggersDependencies(clazz);
 			return systemProperty;
 		}
 	}

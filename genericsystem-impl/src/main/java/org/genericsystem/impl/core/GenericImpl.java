@@ -19,6 +19,7 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.core.Snapshot.Filter;
 import org.genericsystem.api.core.Snapshot.Projector;
+import org.genericsystem.api.exception.SuperRuleConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Node;
@@ -62,7 +63,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	Serializable value;
 	
 	final Generic initPrimary(Serializable value, int metaLevel, Generic primaryAncestor) {
-		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY);
+		return initialize(value, metaLevel, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY);
 	}
 	
 	final GenericImpl initialize(Serializable value, int metaLevel, Generic[] directSupers, Generic[] components) {
@@ -76,7 +77,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		this.components = components;
 		
 		initSelfComponents();
-		this.lifeManager = new LifeManager(designTs == null ? getEngine().pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
+		lifeManager = new LifeManager(designTs == null ? getEngine().pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
 		for (Generic g1 : directSupers)
 			for (Generic g2 : directSupers)
 				if (!g1.equals(g2)) {
@@ -548,7 +549,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			return isEngine();
 		if (((GenericImpl) generic).isPrimary())
 			return isSuperOf(((GenericImpl) generic).directSupers[0]);
-		return isSuperOf(getPrimariesArray(), this.components, ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).components);
+		return isSuperOf(getPrimariesArray(), components, ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).components);
 	}
 	
 	public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents) {
@@ -1022,9 +1023,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	private boolean isValuePhantomOverride(Value nodeValue, Serializable value) {
-		if (equals(nodeValue.getBaseComponent()) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.getImplicit().getSupers().first().getValue(), value))
-			return true;
-		return false;
+		return (equals(nodeValue.getBaseComponent()) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.getImplicit().getSupers().first().getValue(), value));
 	}
 	
 	/*********************************************/
@@ -1319,5 +1318,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			if (this.equals(nullableComponents[i]))
 				nullableComponents[i] = null;
 		return nullableComponents;
+	}
+	
+	void checkSuperRule(Generic[] interfaces, Generic[] components) {
+		if (!GenericImpl.isSuperOf(getPrimariesArray(), this.components, interfaces, components))
+			throw new SuperRuleConstraintViolationException("Interfaces : " + Arrays.toString(interfaces) + " Components : " + Arrays.toString(components) + " should inherits from : " + this);
+	}
+	
+	boolean equiv(Generic[] interfaces, Generic[] components) {
+		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullArrayComponents(), components);
 	}
 }

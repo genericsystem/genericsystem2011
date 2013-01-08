@@ -21,7 +21,6 @@ import org.genericsystem.api.exception.ConcurrencyControlException;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.api.exception.RollbackException;
-import org.genericsystem.api.exception.SuperRuleConstraintViolationException;
 import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
@@ -120,7 +119,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			((CacheImpl) subContext).pickNewTs();
 		else {
 			long ts = getTs();
-			this.subContext = new Transaction(getEngine());
+			subContext = new Transaction(getEngine());
 			assert getTs() > ts;
 		}
 	}
@@ -316,47 +315,33 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return getEngine().getFactory().newCache(this);
 	}
 	
-	private <T extends Generic> T rebindDependencies(Serializable value, int metaLevel, final Generic[] interfaces, final Generic[] supers, final Generic[] components) {
-		TreeSet<Generic> orderedDependencies = new TreeSet<Generic>();
-		for (Generic superGeneric : supers) {
-			Iterator<Generic> removeIterator = new AbstractFilterIterator<Generic>(directInheritingsIterator(superGeneric)) {
-				@Override
-				public boolean isSelected() {
-					return GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
-				}
-			};
-			while (removeIterator.hasNext()) {
-				Generic next = removeIterator.next();
-				log.info("Remove : " + next);
-				orderedDependencies.addAll(orderAndRemoveDependencies(next));
+	SortedSet<Generic> orderAndRemoveDependencies(final Generic old) {
+		TreeSet<Generic> orderedGenerics = new TreeSet<Generic>() {
+			private static final long serialVersionUID = 1800091182375951902L;
+			{
+				add(old);
 			}
-		}
-		Generic newGeneric = ((GenericImpl) getEngine().getFactory().newGeneric()).initialize(value, metaLevel, supers, components);
-		T superGeneric = this.<T> insert(newGeneric);
-		for (Generic orderedDependency : orderedDependencies) {
-			assert false;// TODO test this
-			Generic bind = insert(((GenericImpl) getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel,
-					getDirectSupers(((GenericImpl) orderedDependency).getPrimariesArray(), ((GenericImpl) orderedDependency).components), ((GenericImpl) orderedDependency).components));
-			assert bind.inheritsFrom(superGeneric) : bind.info() + " / " + superGeneric.info();
-		}
-		return superGeneric;
-	}
-	
-	TreeSet<Generic> orderAndRemoveDependencies(Generic old) {
-		TreeSet<Generic> orderedGenerics = new TreeSet<Generic>();
-		buildDependencies(orderedGenerics, old);
+			
+			@Override
+			public boolean add(Generic generic) {
+				super.add(generic);
+				for (Generic directInheriting : generic.getInheritings(CacheImpl.this))
+					add(directInheriting);
+				for (Generic composite : generic.getComposites(CacheImpl.this))
+					if (!composite.equals(generic))
+						add(composite);
+				return true;
+			}
+		};
 		for (Generic generic : orderedGenerics.descendingSet())
 			remove(generic);
 		return orderedGenerics;
 	}
 	
-	private void buildDependencies(SortedSet<Generic> orderedVertices, Generic generic) {
-		orderedVertices.add(generic);
-		for (Generic directInheriting : generic.getInheritings(this))
-			buildDependencies(orderedVertices, directInheriting);
-		for (Generic composite : generic.getComposites(this))
-			if (!composite.equals(generic))
-				buildDependencies(orderedVertices, composite);
+	<T extends Generic> T bind(Class<?> clazz) {
+		Generic[] annotedInterfaces = findAnnotedInterfaces(clazz);
+		// TODO clean getSuperToCheck(annotedInterfaces)
+		return add(getSuperToCheck(annotedInterfaces), getImplictValue(clazz), clazz.getAnnotation(SystemGeneric.class).value(), annotedInterfaces, findComponents(clazz));
 	}
 	
 	public <T extends Generic> T add(Generic genericToCheck, Serializable value, int metaLevel, Generic[] additionalInterfaces, Generic[] components) {
@@ -365,42 +350,35 @@ public class CacheImpl extends AbstractContext implements Cache {
 		primaries.add(implicit);
 		primaries.add(genericToCheck);
 		Generic[] interfaces = primaries.toArray();
-		checkSuperRule((GenericImpl) genericToCheck, interfaces, components);
+		((GenericImpl) genericToCheck).checkSuperRule(interfaces, components);
 		return bind(value, metaLevel, interfaces, components);
 	}
 	
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T bind(Serializable value, int metaLevel, Generic[] interfaces, Generic... components) {
-		if (interfaces.length == 1 && components.length == 0)
-			return (T) interfaces[0];
-		
-		assert interfaces.length + components.length >= 2;
+	<T extends Generic> T bind(Serializable value, int metaLevel, final Generic[] interfaces, final Generic[] components) {
 		Generic[] directSupers = getDirectSupers(interfaces, components);
-		
-		for (Generic g1 : directSupers)
-			for (Generic g2 : directSupers)
-				if (!g1.equals(g2)) {
-					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
-				}
-		
-		if (directSupers.length == 1 && Arrays.equals(((GenericImpl) directSupers[0]).nullArrayComponents(), components) && Arrays.equals(((GenericImpl) directSupers[0]).getPrimariesArray(), interfaces))
+		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
 			return (T) directSupers[0];
-		
-		T generic = rebindDependencies(value, metaLevel, interfaces, directSupers, components);
-		assert generic == find(directSupers, components) : find(interfaces, components) + generic.info();
-		assert ((GenericImpl) generic).isPrimary() || (new Primaries(generic).equals(new Primaries(interfaces))) : new Primaries(generic) + " <----> " + new Primaries(interfaces);
-		
-		return generic;
-	}
-	
-	private static void checkSuperRule(GenericImpl generic, Generic[] interfaces, Generic[] components) {
-		if (!GenericImpl.isSuperOf(generic.getPrimariesArray(), generic.components, interfaces, components))
-			throw new SuperRuleConstraintViolationException("Interfaces : " + Arrays.toString(interfaces) + " Components : " + Arrays.toString(components) + " should inherits from : " + generic);
-	}
-	
-	<T extends Generic> T internalBind(Class<?> clazz) {
-		Generic[] annotedInterfaces = findAnnotedInterfaces(clazz);
-		return add(getSuperToCheck(annotedInterfaces), getImplictValue(clazz), clazz.getAnnotation(SystemGeneric.class).value(), annotedInterfaces, findComponents(clazz));
+		TreeSet<Generic> orderedDependencies = new TreeSet<Generic>();
+		for (Generic superGeneric : directSupers) {
+			Iterator<Generic> removeIterator = new AbstractFilterIterator<Generic>(directInheritingsIterator(superGeneric)) {
+				@Override
+				public boolean isSelected() {
+					return GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
+				}
+			};
+			while (removeIterator.hasNext())
+				orderedDependencies.addAll(orderAndRemoveDependencies(removeIterator.next()));
+		}
+		Generic newGeneric = ((GenericImpl) getEngine().getFactory().newGeneric()).initialize(value, metaLevel, directSupers, components);
+		T superGeneric = this.<T> insert(newGeneric);
+		for (Generic orderedDependency : orderedDependencies) {
+			Generic bind = insert(((GenericImpl) getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel,
+					getDirectSupers(((GenericImpl) orderedDependency).getPrimariesArray(), ((GenericImpl) orderedDependency).components), ((GenericImpl) orderedDependency).components));
+			assert bind.inheritsFrom(superGeneric) : bind.info() + " / " + superGeneric.info();
+		}
+		assert superGeneric == find(directSupers, components);
+		return superGeneric;
 	}
 	
 	protected void triggersDependencies(Class<?> clazz) {
