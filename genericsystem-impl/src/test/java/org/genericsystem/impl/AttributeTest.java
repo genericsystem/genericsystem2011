@@ -377,13 +377,4 @@ public class AttributeTest extends AbstractTest {
 		assert Boolean.TRUE.equals(((Property) myBmw).getValue(cache, vehiclePower));
 	}
 
-	public void testRebindDependencies() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Attribute carPower = car.addAttribute(cache, "Power");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
-		assert !carPower.isAlive(cache);
-		assert car.addAttribute(cache, "Power").inheritsFrom(vehiclePower);
-	}
 }
