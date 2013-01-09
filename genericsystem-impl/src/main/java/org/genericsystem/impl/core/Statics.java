@@ -2,12 +2,12 @@ package org.genericsystem.impl.core;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
+import java.util.ArrayDeque;
+import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -225,13 +225,43 @@ public class Statics {
 		return new SimpleDateFormat(Statics.PATTERN).format(new Date(ts / Statics.MILLI_TO_NANOSECONDS)) + "---" + ts;
 	}
 
-	static class Primaries extends TreeSet<Generic>{
+	static class Primaries extends TreeSet<Generic> {
 		private static final long serialVersionUID = 7222889429002770779L;
-		Primaries(Generic generic) {
-			add(generic);
-		}
+
 		Primaries(Generic... generics) {
+			super(new Comparator<Generic>() {
+
+				@Override
+				public int compare(Generic generic1, Generic generic2) {
+					Deque<Generic> deque1 = getPrimariesStack(generic1);
+					Deque<Generic> deque2 = getPrimariesStack(generic2);
+
+					while (!deque1.isEmpty() && !deque2.isEmpty()) {
+						int compare = deque1.pop().compareTo(deque2.pop());
+						if (compare != 0)
+							return compare;
+					}
+					return deque1.isEmpty() ? !deque2.isEmpty() ? 1 : 0 : -1;
+				}
+			});
 			add(generics);
+		}
+
+		private static Deque<Generic> getPrimariesStack(final Generic generic) {
+			return new ArrayDeque<Generic>() {
+				private static final long serialVersionUID = 1525213213728043363L;
+				{
+					push(generic);
+				}
+
+				@Override
+				public void push(Generic generic) {
+					if (!generic.isEngine()) {
+						super.push(generic);
+						push(((GenericImpl) generic).directSupers[0]);
+					}
+				}
+			};
 		}
 
 		public boolean add(Generic[] generics) {
@@ -244,18 +274,17 @@ public class Statics {
 
 		@Override
 		public boolean add(Generic generic) {
-			if(((GenericImpl)generic).isPrimary())
+			if (((GenericImpl) generic).isPrimary())
 				return restrictedAdd(generic);
 			boolean adds = false;
-			for(Generic directSuper : ((GenericImpl)generic).directSupers)
-				if(add(directSuper))
-					adds=true;
+			for (Generic directSuper : ((GenericImpl) generic).directSupers)
+				if (add(directSuper))
+					adds = true;
 			return adds;
 		}
 
-
-		private boolean restrictedAdd(Generic candidate){
-			assert ((GenericImpl)candidate).isPrimary();
+		private boolean restrictedAdd(Generic candidate) {
+			assert ((GenericImpl) candidate).isPrimary();
 
 			for (Generic generic : this)
 				if (generic.inheritsFrom(candidate)) {
@@ -263,7 +292,7 @@ public class Statics {
 				}
 			Iterator<Generic> it = this.iterator();
 			while (it.hasNext()) {
-				Generic next= it.next();
+				Generic next = it.next();
 				if (candidate.inheritsFrom(next)) {
 					it.remove();
 				}
