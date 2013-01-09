@@ -148,23 +148,23 @@ public class EngineImpl extends GenericImpl implements Engine {
 		
 		@SuppressWarnings("unchecked")
 		private <T extends Generic> T bind(CacheImpl cache, Class<?> clazz) {
-			T systemProperty;
+			T result;
 			if (Engine.class.equals(clazz))
-				systemProperty = (T) EngineImpl.this;
+				result = (T) EngineImpl.this;
 			if (MetaAttribute.class.equals(clazz)) {
-				systemProperty = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this });
-				if (systemProperty == null)
-					systemProperty = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }));
+				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this });
+				if (result == null)
+					result = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }));
 			} else if (MetaRelation.class.equals(clazz)) {
-				systemProperty = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
-				if (systemProperty == null)
-					systemProperty = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
+				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
+				if (result == null)
+					result = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
 			} else
-				systemProperty = cache.<T> bind(clazz);
-			put(clazz, systemProperty);
-			((GenericImpl) systemProperty).mountConstraints(cache, clazz);
+				result = cache.<T> bind(clazz);
+			put(clazz, result);
+			((GenericImpl) result).mountConstraints(cache, clazz);
 			cache.triggersDependencies(clazz);
-			return systemProperty;
+			return result;
 		}
 	}
 	
