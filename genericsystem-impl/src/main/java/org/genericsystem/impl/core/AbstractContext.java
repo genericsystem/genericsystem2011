@@ -133,31 +133,6 @@ public abstract class AbstractContext implements Context, Serializable {
 		return result;
 	}
 	
-	// @SuppressWarnings("unchecked")
-	// public <T extends Generic> T find(Generic[] directSupers, Generic...
-	// components) {
-	// assert directSupers.length != 0 || components.length != 0;
-	// if (directSupers.length == 0 && components.length == 1) {
-	// return (T) components[0];// not possible !
-	// }
-	// if (directSupers.length == 1 && components.length == 0) {
-	// return (T) directSupers[0];
-	// }
-	// if (directSupers.length == 1 && components.length == 1) {
-	// if (directSupers[0].isEngine() && getEngine().equals(components[0]))
-	// return getMetaAttribute();
-	// }
-	// if (directSupers.length == 1 && components.length == 2) {
-	// if (directSupers[0].isEngine() && getEngine().equals(components[0]) &&
-	// getEngine().equals(components[1]))
-	// return getMetaRelation();
-	// }
-	// T result = this.<T>internalFind(directSupers, components);
-	// //log.info(Arrays.toString(directSupers)+Arrays.toString(components)+" result : "+result);
-	// return result;
-	//
-	// }
-	
 	private static Generic[] transform(Generic[] components, Generic generic) {
 		Generic[] result = components.clone();
 		for (int i = 0; i < result.length; i++)
