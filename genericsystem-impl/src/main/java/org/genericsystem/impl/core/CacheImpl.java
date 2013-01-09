@@ -15,6 +15,7 @@ import org.genericsystem.api.annotation.Dependencies;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Context;
+import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.AliveConstraintViolationException;
 import org.genericsystem.api.exception.ConcurrencyControlException;
@@ -219,7 +220,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 	
 	@Override
-	public EngineImpl getEngine() {
+	public <T extends Engine> T getEngine() {
 		return subContext.getEngine();
 	}
 	
@@ -312,7 +313,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	
 	@Override
 	public Cache newSuperCache() {
-		return getEngine().getFactory().newCache(this);
+		return this.<EngineImpl> getEngine().getFactory().newCache(this);
 	}
 	
 	SortedSet<Generic> orderAndRemoveDependencies(final Generic old) {
@@ -370,10 +371,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 			while (removeIterator.hasNext())
 				orderedDependencies.addAll(orderAndRemoveDependencies(removeIterator.next()));
 		}
-		Generic newGeneric = ((GenericImpl) getEngine().getFactory().newGeneric()).initialize(value, metaLevel, directSupers, components);
+		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(value, metaLevel, directSupers, components);
 		T superGeneric = this.<T> insert(newGeneric);
 		for (Generic orderedDependency : orderedDependencies) {
-			Generic bind = insert(((GenericImpl) getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel,
+			Generic bind = insert(((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel,
 					getDirectSupers(((GenericImpl) orderedDependency).getPrimariesArray(), ((GenericImpl) orderedDependency).components), ((GenericImpl) orderedDependency).components));
 			assert bind.inheritsFrom(superGeneric) : bind.info() + " / " + superGeneric.info();
 		}

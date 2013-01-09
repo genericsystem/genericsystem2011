@@ -80,9 +80,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		lifeManager = new LifeManager(designTs == null ? getEngine().pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
 		for (Generic g1 : directSupers)
 			for (Generic g2 : directSupers)
-				if (!g1.equals(g2)) {
+				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
-				}
 		return this;
 	}
 	
