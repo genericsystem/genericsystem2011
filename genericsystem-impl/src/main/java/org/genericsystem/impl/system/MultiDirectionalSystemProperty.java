@@ -11,5 +11,5 @@ import org.genericsystem.impl.core.Statics;
 @Components(Engine.class)
 @SingularConstraint(Statics.BASE_POSITION)
 @PropertyConstraint
-public class MultiDirectionalSystemProperty {
+public class MultiDirectionalSystemProperty extends AbstractSystemProperty {
 }

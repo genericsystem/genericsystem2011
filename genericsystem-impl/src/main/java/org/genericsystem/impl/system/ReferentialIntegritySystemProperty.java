@@ -1,17 +1,20 @@
 package org.genericsystem.impl.system;
 
+import java.io.Serializable;
+
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.IntValue;
 import org.genericsystem.api.annotation.Interfaces;
 import org.genericsystem.api.annotation.PhantomValue;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.core.Engine;
+import org.genericsystem.api.core.Generic;
 
 @SystemGeneric
 @Components(Engine.class)
 // @Dependencies(value = { ReferentialIntegritySystemProperty.DefaultValueMetaType.class, ReferentialIntegritySystemProperty.DefaultValueMetaAttribute.class, ReferentialIntegritySystemProperty.BaseDefaultValueMetaRelation.class,
 // ReferentialIntegritySystemProperty.TargetDefaultValueMetaRelation.class })
-public class ReferentialIntegritySystemProperty {
+public class ReferentialIntegritySystemProperty extends AbstractSystemProperty {
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
@@ -39,6 +42,15 @@ public class ReferentialIntegritySystemProperty {
 	@IntValue(1)
 	@Interfaces(ReferentialIntegritySystemProperty.class)
 	public static class TargetDefaultValueMetaRelation {
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Serializable> T getDefaultValue(Generic generic) {
+		assert false;
+		if (generic.isReallyAttribute())
+			return (T) Boolean.FALSE;
+		return (T) Boolean.TRUE;
 	}
 
 }

@@ -1,6 +1,5 @@
 package org.genericsystem.impl.constraints;
 
-import java.io.Serializable;
 import java.util.Iterator;
 
 import org.genericsystem.api.annotation.Priority;
@@ -14,8 +13,9 @@ import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
+import org.genericsystem.impl.system.AbstractSystemProperty;
 
-public abstract class AbstractConstraint implements Constraint {
+public abstract class AbstractConstraint extends AbstractSystemProperty implements Constraint {
 
 	private static final long serialVersionUID = -6936080356593512744L;
 
@@ -41,11 +41,6 @@ public abstract class AbstractConstraint implements Constraint {
 		if (result != 0)
 			return result;
 		return this.getClass().getName().compareTo(otherConstraint.getClass().getName());
-	}
-
-	@Override
-	public <T extends Serializable> T getDefaultValue() {
-		return (T) "youpi";
 	}
 
 	protected Snapshot<Value> getConstraintInstances(final Context context, final Generic modified, final Class<? extends Constraint> clazz) {

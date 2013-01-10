@@ -6,6 +6,6 @@ import org.genericsystem.api.core.Engine;
 
 @SystemGeneric
 @Components(Engine.class)
-public class CascadeRemoveSystemProperty {
+public class CascadeRemoveSystemProperty extends AbstractSystemProperty {
 
 }
