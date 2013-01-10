@@ -45,11 +45,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 	
 	private Factory factory;
 	
-	private SnapshotsArchiver archiver;
+	private Archiver archiver;
 	
 	public EngineImpl(Config config, Class<?>... userClasses) {
 		factory = config.getFactory();
-		archiver = new SnapshotsArchiver(this, config.getDirectoryPath());
+		archiver = new Archiver(this, config.getDirectoryPath());
 		systemCache.init(userClasses);
 		archiver.startScheduler();
 	}
