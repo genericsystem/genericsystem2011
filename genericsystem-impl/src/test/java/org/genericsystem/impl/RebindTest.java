@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 @Test
 public class RebindTest {
 
-	public void testRebindDependenciesOK() {
+	public void simpleTestRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -23,7 +23,7 @@ public class RebindTest {
 		assert ((GenericImpl) carPower).reBind(cache).inheritsFrom(vehiclePower);
 	}
 
-	public void testRebindDependenciesKO() {
+	public void testRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -38,7 +38,7 @@ public class RebindTest {
 		assert ((GenericImpl) carPower).reBind(cache).inheritsFrom(vehiclePower);
 	}
 
-	public void testRelationRebind() {
+	public void testRelationRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type metal = cache.newType("metal");
 		Type preciousMetal = metal.newSubType(cache, "preciousMetal");
