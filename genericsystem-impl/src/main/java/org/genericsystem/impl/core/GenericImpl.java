@@ -499,7 +499,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (generic == null)
 			return false;
 		boolean inheritance = ((GenericImpl) generic).new InheritanceCalculator().isSuperOf(this);
-		// log.info("--------------------------------"+generic.info()+this.info());
 		boolean superOf = ((GenericImpl) generic).isSuperOf(this);
 		assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
 		return superOf;
@@ -560,7 +559,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] == null) {
 					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components)) {
-						assert false;// reach with a good exemple
+						assert false;// TODO reach with a good exemple
 						if (isSuperOf(interfaces, components, ((GenericImpl) subComponents[i]).getPrimariesArray(), ((GenericImpl) subComponents[i]).components))
 							return false;
 					}
