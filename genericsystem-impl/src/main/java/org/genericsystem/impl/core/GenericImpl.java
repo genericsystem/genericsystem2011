@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
 import org.genericsystem.api.annotation.constraints.NotNullConstraint;
@@ -198,17 +199,36 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Value> Snapshot<T> getValues(Context context, final T attribute) {
-		return mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false);
+		return getValues(context, attribute, false);
 	}
 
 	public <T extends Value> Snapshot<T> getValues(Context context, final T attribute, final boolean readPhantom) {
-		return mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, readPhantom);
+		Snapshot<T> snapshot = mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, readPhantom);
+		if (snapshot.isEmpty())
+			return new AbstractSnapshot<T>() {
+				@Override
+				public Iterator<T> iterator() {
+					return (Iterator<T>) new ArrayIterator<>(new Value[] { getDefaultValue((Attribute) attribute) });
+				}
+			};
+		return snapshot;
 	}
 
 	@Override
 	public <T extends Serializable> T getValue(Context context, Property property) {
 		Value holder = getLink(context, property);
-		return holder == null ? null : holder.<T> getValue();
+		return holder == null ? this.<T> getDefaultValue(property) : holder.<T> getValue();
+	}
+
+	private <T extends Serializable> T getDefaultValue(Attribute attribute) {
+		try {
+			Class<?> constraint = Class.forName("" + attribute.getValue());
+			if (constraint.isAssignableFrom(Constraint.class))
+				return ((Constraint) constraint.newInstance()).getDefaultValue();
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			throw new IllegalStateException(e);
+		}
+		return null;
 	}
 
 	@Override
@@ -555,10 +575,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		assert subInterfaces.length >= 1;
 		if (subInterfaces.length >= 2)
 			assert Arrays.equals(new Primaries(Statics.truncate(0, subInterfaces)).toArray(), Statics.truncate(0, subInterfaces));
-		
+
 		if (interfaces.length > subInterfaces.length || components.length > subComponents.length)
 			return false;
-
+		
 		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
 			for (int i = 0; i < subInterfaces.length; i++)
 				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i]))
@@ -566,8 +586,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] == null) {
 					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components)) {
-						assert false;// reach with a good exemple
-						if (isSuperOf(interfaces, components, ((GenericImpl) subComponents[i]).getPrimariesArray(), ((GenericImpl) subComponents[i]).components))
+								assert false;// TODO reach with a good exemple
+				if (isSuperOf(interfaces, components, ((GenericImpl) subComponents[i]).getPrimariesArray(), ((GenericImpl) subComponents[i]).components))
 							return false;
 					}
 				} else if (subComponents[i] != null) {
@@ -580,7 +600,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				}
 
 			}
-			return true;
+					
+	return true;
 		}
 		if (subInterfaces.length > 1 && interfaces.length < subInterfaces.length)
 			for (int i = 0; i < subInterfaces.length; i++) {
@@ -759,7 +780,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	public boolean isPrimary() {
-		return components.length == 0 && directSupers.length == 1;/* && ((GenericImpl) directSupers[0]).isPrimary() */
+		return components.length == 0 && directSupers.length == 1;/*
+																 * && ((GenericImpl ) directSupers [0 ]).isPrimary ()
+																 */
 	}
 
 	@Override
@@ -959,21 +982,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		};
 	}
 
-	public Snapshot<Value> getConstraintInstances(final Context context, final Class<? extends Constraint> clazz) {
-		final Property property = ((AbstractContext) context).find(clazz);
-		return new AbstractSnapshot<Value>() {
-			@Override
-			public Iterator<Value> iterator() {
-				return new AbstractFilterIterator<Value>(GenericImpl.this.<Value> mainIterator(context, property, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false)) {
-					@Override
-					public boolean isSelected() {
-						return !Boolean.FALSE.equals(next.getValue());
-					}
-				};
-			}
-		};
-	}
-
 	void mountConstraints(Cache cache, Class<?> clazz) {
 		UniqueConstraint distinct = clazz.getAnnotation(UniqueConstraint.class);
 		if (distinct != null)
@@ -1110,7 +1118,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
 		Property systemProperty = cache.find(systemPropertyClass);
-		for (Value nodeValue : this.getValues(cache, systemProperty))
+		for (Value nodeValue : getValues(cache, systemProperty))
 			if (nodeValue.getValue().equals(componentPos))
 				if (this.equals(nodeValue.getBaseComponent()))
 					nodeValue.remove(cache);
@@ -1126,7 +1134,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos) {
-		for (Value nodeValue : this.getValues(context, ((AbstractContext) context).<Property> find(systemPropertyClass)))
+		for (Value nodeValue : getValues(context, ((AbstractContext) context).<Property> find(systemPropertyClass)))
 			if (Objects.equals(nodeValue.getValue(), componentPos))
 				return true;
 		return false;
