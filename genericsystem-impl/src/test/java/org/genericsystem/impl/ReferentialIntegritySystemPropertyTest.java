@@ -10,10 +10,6 @@ import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.system.ReferentialIntegritySystemProperty;
-import org.genericsystem.impl.system.ReferentialIntegritySystemProperty.BaseDefaultValueMetaRelation;
-import org.genericsystem.impl.system.ReferentialIntegritySystemProperty.DefaultValueMetaAttribute;
-import org.genericsystem.impl.system.ReferentialIntegritySystemProperty.DefaultValueMetaType;
-import org.genericsystem.impl.system.ReferentialIntegritySystemProperty.TargetDefaultValueMetaRelation;
 import org.testng.annotations.Test;
 
 @Test
@@ -21,11 +17,6 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 
 	public void testAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		cache.find(DefaultValueMetaType.class).getImplicit().log();
-		cache.find(DefaultValueMetaAttribute.class).getImplicit().log();
-		cache.find(BaseDefaultValueMetaRelation.class).getImplicit().log();
-		cache.find(TargetDefaultValueMetaRelation.class).getImplicit().log();
-
 		Attribute metaAttribute = cache.getMetaAttribute();
 		assert !metaAttribute.isReferentialIntegrity(cache, 0);
 

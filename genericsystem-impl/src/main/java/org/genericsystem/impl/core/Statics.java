@@ -247,7 +247,7 @@ public class Statics {
 			add(generics);
 		}
 
-		private static Deque<Generic> getPrimariesStack(final Generic generic) {
+		static Deque<Generic> getPrimariesStack(final Generic generic) {
 			return new ArrayDeque<Generic>() {
 				private static final long serialVersionUID = 1525213213728043363L;
 				{

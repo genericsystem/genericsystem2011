@@ -26,10 +26,10 @@ public class AliveConstraintImpl extends AbstractSimpleBooleanConstraint {
 
 	@Override
 	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
-		//if (modified.isAlive(context)) {
-			for (Generic generic : ((GenericImpl) modified).getComponents())
-				if (generic != null && !generic.isAlive(context))
-					throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");
+		// if (modified.isAlive(context)) {
+		for (Generic generic : ((GenericImpl) modified).getComponents())
+			if (generic != null && !generic.isAlive(context))
+				throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");
 
 		for (Generic generic : ((GenericImpl) modified).getSupers())
 			if (!generic.isAlive(context))
@@ -37,11 +37,11 @@ public class AliveConstraintImpl extends AbstractSimpleBooleanConstraint {
 
 	}
 
-		@SystemGeneric(SystemGeneric.CONCRETE)
-		@Components(Engine.class)
-		@BooleanValue(true)
-		@Interfaces(AliveConstraintImpl.class)
-		public static class DefaultValue {
-		}
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Components(Engine.class)
+	@BooleanValue(true)
+	@Interfaces(AliveConstraintImpl.class)
+	public static class DefaultValue {
+	}
 
 }

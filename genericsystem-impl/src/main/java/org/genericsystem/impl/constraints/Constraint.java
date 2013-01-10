@@ -20,4 +20,6 @@ public interface Constraint extends Comparable<Constraint>, Serializable {
 
 	int getPriority();
 
+	<T extends Serializable> T getDefaultValue();
+
 }

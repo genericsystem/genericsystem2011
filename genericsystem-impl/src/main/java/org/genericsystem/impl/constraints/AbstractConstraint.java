@@ -43,6 +43,11 @@ public abstract class AbstractConstraint implements Constraint {
 		return this.getClass().getName().compareTo(otherConstraint.getClass().getName());
 	}
 
+	@Override
+	public <T extends Serializable> T getDefaultValue() {
+		return (T) "youpi";
+	}
+
 	protected Snapshot<Value> getConstraintInstances(final Context context, final Generic modified, final Class<? extends Constraint> clazz) {
 		return new AbstractSnapshot<Value>() {
 			@Override
@@ -56,5 +61,5 @@ public abstract class AbstractConstraint implements Constraint {
 			}
 		};
 	}
-	
+
 }

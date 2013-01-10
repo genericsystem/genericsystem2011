@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.genericsystem.api.annotation.Dependencies;
@@ -153,6 +153,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void internalRemove(Generic node) throws ConstraintViolationException {
+		// assert !node.getValue().equals("Power");
 		checkIsAlive(node);
 		removeDependencies(node);
 		if (isAlive(node))
@@ -317,25 +318,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<EngineImpl> getEngine().getFactory().newCache(this);
 	}
 
-	SortedSet<Generic> orderAndRemoveDependencies(final Generic old) {
-		TreeSet<Generic> orderedGenerics = new TreeSet<Generic>() {
-			private static final long serialVersionUID = 1800091182375951902L;
-			{
-				add(old);
-			}
-
-			@Override
-			public boolean add(Generic generic) {
-				super.add(generic);
-				for (Generic directInheriting : generic.getInheritings(CacheImpl.this))
-					add(directInheriting);
-				for (Generic composite : generic.getComposites(CacheImpl.this))
-					if (!composite.equals(generic))
-						add(composite);
-				return true;
-			}
-		};
-		for (Generic generic : orderedGenerics.descendingSet())
+	<T extends Generic> NavigableSet<T> orderAndRemoveDependencies(final T old) {
+		NavigableSet<T> orderedGenerics = orderDependencies(old);
+		for (T generic : orderedGenerics.descendingSet())
 			remove(generic);
 		return orderedGenerics;
 	}
@@ -370,17 +355,50 @@ public class CacheImpl extends AbstractContext implements Cache {
 				}
 			};
 			while (removeIterator.hasNext())
-				orderedDependencies.addAll(orderAndRemoveDependencies(removeIterator.next()));
+				orderedDependencies.addAll(orderDependencies(removeIterator.next()));
 		}
+		for (Generic generic : orderedDependencies.descendingSet())
+			remove(generic);
+
 		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(value, metaLevel, directSupers, components);
 		T superGeneric = this.<T> insert(newGeneric);
+
+		Map<Generic, Generic> connectionMap = new HashMap<>();
 		for (Generic orderedDependency : orderedDependencies) {
+			Generic[] newComponents = adjustComponent(((GenericImpl) orderedDependency).components, connectionMap);
 			Generic bind = insert(((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel,
-					getDirectSupers(((GenericImpl) orderedDependency).getPrimariesArray(), ((GenericImpl) orderedDependency).components), ((GenericImpl) orderedDependency).components));
-			assert bind.inheritsFrom(superGeneric) : bind.info() + " / " + superGeneric.info();
+					getDirectSupers(((GenericImpl) orderedDependency).getPrimariesArray(), newComponents), newComponents));
+			connectionMap.put(orderedDependency, bind);
 		}
 		assert superGeneric == find(directSupers, components);
 		return superGeneric;
+	}
+
+	private Generic[] adjustComponent(Generic[] oldComponents, Map<Generic, Generic> connectionMap) {
+		Generic[] newComponents = new Generic[oldComponents.length];
+		for (int i = 0; i < newComponents.length; i++)
+			newComponents[i] = connectionMap.get(oldComponents[i]) == null ? oldComponents[i] : connectionMap.get(oldComponents[i]);
+		return newComponents;
+	}
+
+	private <T extends Generic> NavigableSet<T> orderDependencies(final T old) {
+		return new TreeSet<T>() {
+			private static final long serialVersionUID = 1800091182375951902L;
+			{
+				add(old);
+			}
+
+			@Override
+			public boolean add(T generic) {
+				super.add(generic);
+				for (T directInheriting : generic.<T> getInheritings(CacheImpl.this))
+					add(directInheriting);
+				for (T composite : generic.<T> getComposites(CacheImpl.this))
+					if (!composite.equals(generic))
+						add(composite);
+				return true;
+			}
+		};
 	}
 
 	protected void triggersDependencies(Class<?> clazz) {
