@@ -332,21 +332,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		};
 	}
 	
-	// protected CacheImpl getCacheContext() {
-	// AbstractContext context = getCurrentContext();
-	// if (!(context instanceof CacheImpl))
-	// throw new
-	// CacheContextAwareException("Cache context is required for doing this !");
-	// return (CacheImpl) getCurrentContext();
-	// }
-	
-	// public AbstractContext getCurrentContext() {
-	// return ((GenericImpl) getEngine()).getCurrentContext();
-	// }
-	
 	@Override
 	public <T extends Attribute> T getAttribute(Context context, Serializable value) {
-		// TODO optimize this
+		// TODO to optimize !
 		for (T attribute : this.<T> getAttributes(context))
 			if (Objects.equals(attribute.getValue(), value))
 				return attribute;
@@ -355,7 +343,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	@Override
 	public <T extends Relation> T getRelation(Context context, Serializable value) {
-		// TODO optimize this
+		// TODO to optimize !
 		for (T relation : this.<T> getRelations(context))
 			if (Objects.equals(relation.getValue(), value))
 				return relation;
