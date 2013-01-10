@@ -1317,12 +1317,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return !isSystemPropertyEnabled(context, NoInheritanceSystemProperty.class);
 	}
 	
-	Generic[] nullArrayComponents() {
-		Generic[] nullableComponents = components.clone();
-		for (int i = 0; i < nullableComponents.length; i++)
-			if (this.equals(nullableComponents[i]))
-				nullableComponents[i] = null;
-		return nullableComponents;
+	Generic[] nullComponentsArray() {
+		Generic[] nullComponents = components.clone();
+		for (int i = 0; i < nullComponents.length; i++)
+			if (this.equals(nullComponents[i]))
+				nullComponents[i] = null;
+		return nullComponents;
 	}
 	
 	void checkSuperRule(Generic[] interfaces, Generic[] components) {
@@ -1331,6 +1331,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	boolean equiv(Generic[] interfaces, Generic[] components) {
-		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullArrayComponents(), components);
+		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullComponentsArray(), components);
 	}
 }
