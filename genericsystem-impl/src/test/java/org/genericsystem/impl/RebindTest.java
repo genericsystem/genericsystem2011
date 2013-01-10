@@ -4,6 +4,7 @@ import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.core.GenericImpl;
@@ -12,7 +13,7 @@ import org.testng.annotations.Test;
 @Test
 public class RebindTest {
 
-	public void testRebindDependenciesOK() {
+	public void simpleTestRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -22,7 +23,7 @@ public class RebindTest {
 		assert ((GenericImpl) carPower).reBind(cache).inheritsFrom(vehiclePower);
 	}
 
-	public void testRebindDependenciesKO() {
+	public void testRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -34,8 +35,26 @@ public class RebindTest {
 		assert vPower.getValues(cache, carPowerUnit).contains(vUnit);
 		assert myCar.getValues(cache, carPower).contains(vPower);
 		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
-//		assert carPower.isAlive(cache);
 		assert ((GenericImpl) carPower).reBind(cache).inheritsFrom(vehiclePower);
+	}
+
+	public void testRelationRebindDependencies() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type metal = cache.newType("metal");
+		Type preciousMetal = metal.newSubType(cache, "preciousMetal");
+		Generic zink = metal.newInstance(cache, "zink");
+		Generic iron = preciousMetal.newInstance(cache, "iron");
+		Type color = cache.newType("color");
+		Type primeColor = color.newSubType(cache, "primeColor");
+		Generic gray = color.newInstance(cache, "gray");
+		Generic yellow = primeColor.newInstance(cache, "yellow");
+		Relation preciousMetalPrimeColor = preciousMetal.addRelation(cache, "metalColor", primeColor);
+		iron.bind(cache, preciousMetalPrimeColor, yellow);
+		iron.setLink(cache, preciousMetalPrimeColor, "almost", yellow);
+		assert zink.inheritsFrom(metal);
+		Relation metalColor = metal.addRelation(cache, "metalColor", color);
+		zink.bind(cache, metalColor, gray);
+		assert metalColor.isAlive(cache);
 	}
 
 }
