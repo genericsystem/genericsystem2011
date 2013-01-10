@@ -33,8 +33,9 @@ public class RebindTest {
 		Value vUnit = vPower.addValue(cache, carPowerUnit, "HorsePower");
 		assert vPower.getValues(cache, carPowerUnit).contains(vUnit);
 		assert myCar.getValues(cache, carPower).contains(vPower);
-		Attribute vehiclePower = vehicle.addAttribute(cache, "VehiclePower");
-		assert !carPower.isAlive(cache);
+		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
+//		assert carPower.isAlive(cache);
 		assert ((GenericImpl) carPower).reBind(cache).inheritsFrom(vehiclePower);
 	}
+
 }
