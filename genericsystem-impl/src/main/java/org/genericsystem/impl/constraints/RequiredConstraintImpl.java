@@ -7,7 +7,6 @@ import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.RequiredConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
@@ -26,36 +25,16 @@ public class RequiredConstraintImpl extends AbstractConstraint {
 
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
-		/*
-		 * We check the attribute corresponding to the value that's being removed has at least one value.
-		 */
-		if (!((GenericImpl) modified).isPrimary() && !modified.isAlive(context)) {
-			Attribute requiredAttribute = ((Value) modified).getMeta();
-			if (requiredAttribute == null || !requiredAttribute.isSystemPropertyEnabled(context, this.getClass()))
-				return;
-			Generic base = ((Value) modified).getBaseComponent();
+		if (!((GenericImpl) modified).isPrimary() && !modified.isAlive(context))
+			checkRequired(((Value) modified).getBaseComponent(), ((Value) modified).getMeta(), context);
+		else if (SystemGeneric.CONCRETE == modified.getMetaLevel())
+			for (Attribute requiredAttribute : ((Type) modified.getMeta()).getAttributes(context))
+				checkRequired(modified, requiredAttribute, context);
+	}
 
-			assert ((GenericImpl) requiredAttribute).isSystemPropertyEnabled(context, this.getClass());
-			if (base.getValueHolders(context, requiredAttribute).size() < 1)
-				throw new RequiredConstraintViolationException("The generic " + base + " has no value for the attribute " + requiredAttribute + ".");
-		}
-		/*
-		 * Check the instance's required attributes have been instantiated.
-		 */
-		else if (SystemGeneric.CONCRETE == modified.getMetaLevel()) {
-			Type typeuh = modified.getMeta();
-
-			Snapshot<Attribute> attributes = typeuh.getAttributes(context);
-			Generic base = modified;
-
-			boolean foundConstrainedAttribute = false;
-			for (Attribute attribute : attributes) {
-				if (((GenericImpl) attribute).isSystemPropertyEnabled(context, this.getClass()) && base.getValueHolders(context, attribute).size() < 1) {
-					throw new RequiredConstraintViolationException("The generic " + base + " has no value for the attribute " + attribute + ".");
-				}
-				foundConstrainedAttribute = true;
-			}
-			assert foundConstrainedAttribute : "Should not be testing requirement on this object.";
+	private void checkRequired(Generic baseGeneric, Generic requiredGeneric, Context context) throws RequiredConstraintViolationException {
+		if (((GenericImpl) requiredGeneric).isSystemPropertyEnabled(context, this.getClass()) && baseGeneric.getValueHolders(context, (Attribute) requiredGeneric).isEmpty()) {
+			throw new RequiredConstraintViolationException("The generic " + baseGeneric + " has no value for the attribute " + requiredGeneric + ".");
 		}
 	}
 
