@@ -330,7 +330,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return add(getSuperToCheck(annotedInterfaces), getImplictValue(clazz), clazz.getAnnotation(SystemGeneric.class).value(), annotedInterfaces, findComponents(clazz));
 	}
 	
-	public <T extends Generic> T add(Generic genericToCheck, Serializable value, int metaLevel, Generic[] additionalInterfaces, Generic[] components) {
+	<T extends Generic> T add(Generic genericToCheck, Serializable value, int metaLevel, Generic[] additionalInterfaces, Generic[] components) {
 		Generic implicit = bindPrimaryByValue(genericToCheck.getImplicit(), value, metaLevel);
 		Primaries primaries = new Primaries(additionalInterfaces);
 		primaries.add(implicit);

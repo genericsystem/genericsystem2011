@@ -350,6 +350,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return null;
 	}
 	
+	// TODO KK
 	public <T extends Generic> T reBind(Cache cache) {
 		return isAlive(cache) ? (T) this : ((CacheImpl) cache).<T> bind(value, metaLevel, getPrimariesArray(), components);
 	}
@@ -547,9 +548,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents) {
 		assert subInterfaces.length >= 1;
-		if (subInterfaces.length >= 2)
-			assert Arrays.equals(new Primaries(Statics.truncate(0, subInterfaces)).toArray(), Statics.truncate(0, subInterfaces));
-		
 		if (interfaces.length > subInterfaces.length || components.length > subComponents.length)
 			return false;
 		
@@ -577,10 +575,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			return true;
 		}
 		if (subInterfaces.length > 1 && interfaces.length < subInterfaces.length)
-			for (int i = 0; i < subInterfaces.length; i++) {
+			for (int i = 0; i < subInterfaces.length; i++)
 				if (isSuperOf(interfaces, components, Statics.truncate(i, subInterfaces), subComponents))
 					return true;
-			}
 		if (components.length < subComponents.length)
 			for (int i = 0; i < subComponents.length; i++)
 				if (isSuperOf(interfaces, components, subInterfaces, Statics.truncate(i, subComponents)))

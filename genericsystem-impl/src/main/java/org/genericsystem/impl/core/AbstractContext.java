@@ -247,7 +247,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		Iterator<Generic> it = directInheritingsIterator(primaryAncestor);
 		while (it.hasNext()) {
 			Generic candidate = it.next();
-			if (((GenericImpl) candidate).isPrimary() && (metaLevel == candidate.getMetaLevel()) && Objects.equals(value, candidate.getValue()))
+			if (((GenericImpl) candidate).isPrimary() && (metaLevel == candidate.getMetaLevel()) && (Objects.hashCode(value) == Objects.hashCode(candidate.getValue())) && Objects.equals(value, candidate.getValue()))
 				return (T) candidate;
 		}
 		return null;
