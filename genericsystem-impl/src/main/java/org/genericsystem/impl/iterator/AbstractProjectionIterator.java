@@ -2,7 +2,7 @@ package org.genericsystem.impl.iterator;
 
 import java.util.Iterator;
 
-public abstract class AbstractProjectionIterator<T,U> implements Iterator<U> {
+public abstract class AbstractProjectionIterator<T, U> implements Iterator<U> {
 
 	private Iterator<T> iterator;
 
@@ -10,7 +10,7 @@ public abstract class AbstractProjectionIterator<T,U> implements Iterator<U> {
 		this.iterator = iterator;
 	}
 
-	public abstract U project(T side);
+	public abstract U project(T generic);
 
 	@Override
 	public U next() {

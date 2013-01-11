@@ -108,12 +108,12 @@ public class AttributeTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Value myVehicle123 = myVehicle.addValue(cache, vehiclePower, "123");
 		assert myVehicle123.isAttributeOf(myVehicle);
-		assert myVehicle.getValues(cache, vehiclePower).size() == 1 : myVehicle.getValues(cache, vehiclePower);
-		assert myVehicle.getValues(cache, vehiclePower).contains(myVehicle123);
+		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1 : myVehicle.getValueHolders(cache, vehiclePower);
+		assert myVehicle.getValueHolders(cache, vehiclePower).contains(myVehicle123);
 		Value myVehicle126 = myVehicle.addValue(cache, vehiclePower, "126");
-		assert myVehicle.getValues(cache, vehiclePower).size() == 2;
-		assert myVehicle.getValues(cache, vehiclePower).contains(myVehicle126);
-		assert myVehicle.getValues(cache, vehiclePower).contains(myVehicle123);
+		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 2;
+		assert myVehicle.getValueHolders(cache, vehiclePower).contains(myVehicle126);
+		assert myVehicle.getValueHolders(cache, vehiclePower).contains(myVehicle123);
 	}
 
 	public void testPropertyGetAttributeWithValue() {
@@ -122,11 +122,11 @@ public class AttributeTest extends AbstractTest {
 		Property vehiclePower = vehicle.addProperty(cache, "power");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Value myVehicle123 = myVehicle.addValue(cache, vehiclePower, "123");
-		assert myVehicle.getValues(cache, vehiclePower).size() == 1;
-		assert myVehicle.getValues(cache, vehiclePower).contains(myVehicle123);
+		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1;
+		assert myVehicle.getValueHolders(cache, vehiclePower).contains(myVehicle123);
 		Value myVehicle126 = myVehicle.setValue(cache, vehiclePower, "126");
-		assert myVehicle.getValues(cache, vehiclePower).size() == 1;
-		assert myVehicle.getValues(cache, vehiclePower).contains(myVehicle126);
+		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1;
+		assert myVehicle.getValueHolders(cache, vehiclePower).contains(myVehicle126);
 	}
 
 	public void testGetAttributeWithInheritance() {
@@ -209,13 +209,13 @@ public class AttributeTest extends AbstractTest {
 		assert vehiclePower.getInstances(cache).contains(p214);
 		assert vehiclePower.getInstances(cache).contains(p333);
 
-		assert vehicle.getValues(cache, vehiclePower).size() == 2;
-		assert vehicle.getValues(cache, vehiclePower).contains(p213);
-		assert vehicle.getValues(cache, vehiclePower).contains(p214);
+		assert vehicle.getValueHolders(cache, vehiclePower).size() == 2;
+		assert vehicle.getValueHolders(cache, vehiclePower).contains(p213);
+		assert vehicle.getValueHolders(cache, vehiclePower).contains(p214);
 
-		assert car.getValues(cache, vehiclePower).size() == 2 : car.getValues(cache, vehiclePower);
-		assert car.getValues(cache, vehiclePower).contains(p214);
-		assert car.getValues(cache, vehiclePower).contains(p333);
+		assert car.getValueHolders(cache, vehiclePower).size() == 2 : car.getValueHolders(cache, vehiclePower);
+		assert car.getValueHolders(cache, vehiclePower).contains(p214);
+		assert car.getValueHolders(cache, vehiclePower).contains(p333);
 	}
 
 	public void testOverrideValueWithInstances() {
@@ -232,17 +232,17 @@ public class AttributeTest extends AbstractTest {
 		Value p214 = vehicle.addValue(cache, vehiclePower, "214");
 		Value p333 = myCar.addValue(cache, p213, "333");
 
-		assert myVehicle.getValues(cache, vehiclePower).size() == 2;
-		assert myVehicle.getValues(cache, vehiclePower).contains(p213);
-		assert myVehicle.getValues(cache, vehiclePower).contains(p214);
+		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 2;
+		assert myVehicle.getValueHolders(cache, vehiclePower).contains(p213);
+		assert myVehicle.getValueHolders(cache, vehiclePower).contains(p214);
 
-		assert myCar.getValues(cache, vehiclePower).size() == 2;
-		assert myCar.getValues(cache, vehiclePower).contains(p333);
-		assert myCar.getValues(cache, vehiclePower).contains(p214);
+		assert myCar.getValueHolders(cache, vehiclePower).size() == 2;
+		assert myCar.getValueHolders(cache, vehiclePower).contains(p333);
+		assert myCar.getValueHolders(cache, vehiclePower).contains(p214);
 
-		assert myCar2.getValues(cache, vehiclePower).size() == 2;
-		assert myCar2.getValues(cache, vehiclePower).contains(p213);
-		assert myCar2.getValues(cache, vehiclePower).contains(p214);
+		assert myCar2.getValueHolders(cache, vehiclePower).size() == 2;
+		assert myCar2.getValueHolders(cache, vehiclePower).contains(p213);
+		assert myCar2.getValueHolders(cache, vehiclePower).contains(p214);
 	}
 
 	public void testOverrideThreeAttribute() {
@@ -318,16 +318,16 @@ public class AttributeTest extends AbstractTest {
 
 		Value v235 = vehicle.addValue(cache, vehiclePower, "235");
 		Attribute vehiclePowerUnit = vehiclePower.addAttribute(cache, "Unit");
-		assert vehicle.getValues(cache, vehiclePower).size() == 1 : v235.info();
-		assert vehicle.getValues(cache, vehiclePower).contains(v235);
+		assert vehicle.getValueHolders(cache, vehiclePower).size() == 1 : v235.info();
+		assert vehicle.getValueHolders(cache, vehiclePower).contains(v235);
 
 		Value vHP = v235.addValue(cache, vehiclePowerUnit, "HP");
 		assert vHP.isAttributeOf(v235) : vHP.getBaseComponent();
-		assert v235.getValues(cache, vehiclePowerUnit).size() == 1 : vHP.info();
-		assert v235.getValues(cache, vehiclePowerUnit).contains(vHP);
+		assert v235.getValueHolders(cache, vehiclePowerUnit).size() == 1 : vHP.info();
+		assert v235.getValueHolders(cache, vehiclePowerUnit).contains(vHP);
 
-		assert vehicle.getValues(cache, vehiclePower).size() == 1;
-		assert vehicle.getValues(cache, vehiclePower).contains(v235);
+		assert vehicle.getValueHolders(cache, vehiclePower).size() == 1;
+		assert vehicle.getValueHolders(cache, vehiclePower).contains(v235);
 	}
 
 	public void testDefaultAttributeValue() {
@@ -335,9 +335,9 @@ public class AttributeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
 		Value value = vehicle.addValue(cache, vehiclePower, true);
-		assert vehicle.getValues(cache, vehiclePower).contains(value);
+		assert vehicle.getValueHolders(cache, vehiclePower).contains(value);
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		assert myVehicle.getValues(cache, vehiclePower).contains(value);
+		assert myVehicle.getValueHolders(cache, vehiclePower).contains(value);
 	}
 
 	public void testDefaultPropertyValue() {
@@ -353,7 +353,7 @@ public class AttributeTest extends AbstractTest {
 		assert value.getBaseComponent().equals(vehicle);
 		assert !value.inheritsFrom(vehicle);
 		assert value.isAttributeOf(vehicle);
-		assert vehicle.getValues(cache, vehiclePower).contains(value);
+		assert vehicle.getValueHolders(cache, vehiclePower).contains(value);
 		assert Boolean.TRUE.equals(((Property) vehicle).getValue(cache, vehiclePower)) : ((Property) vehicle).getValue(cache, vehiclePower);
 		assert vehiclePower.isAlive(cache);
 		assert vehiclePower.equals(vehicle.getProperty(cache, "power")) : vehicle.getAttributes(cache);

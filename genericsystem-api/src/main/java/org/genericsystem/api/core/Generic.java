@@ -331,7 +331,7 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Generic> Snapshot<T> getTargets(Context context, Relation relation, int basePos, int targetPos);
 
-	<T extends Value> Snapshot<T> getValues(Context context, T attribute);
+	<T extends Value> Snapshot<T> getValueHolders(Context context, T attribute);
 
 	void log();
 

@@ -32,7 +32,7 @@ public class PropertyConstraintImpl extends AbstractSimpleBooleanConstraint {
 	protected void internalCheck(Context context, final Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
 		if (modified.isAttribute()) {
 			for (final Generic inheriting : ((GenericImpl) ((Value) modified).getBaseComponent()).getAllInheritings(context)) {
-				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getValues(context, (Attribute) constraintBaseType).iterator()) {
+				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getValueHolders(context, (Attribute) constraintBaseType).iterator()) {
 					@Override
 					public boolean isSelected() {
 						for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)

@@ -2,7 +2,10 @@ package org.genericsystem.impl.constraints.simple;
 
 import java.io.Serializable;
 
+import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.Components;
+import org.genericsystem.api.annotation.Dependencies;
+import org.genericsystem.api.annotation.Interfaces;
 import org.genericsystem.api.annotation.Priority;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.SingularConstraint;
@@ -17,7 +20,7 @@ import org.genericsystem.impl.core.Statics;
 
 @SystemGeneric
 @Components(Engine.class)
-// @Dependencies(OptimisticLockConstraintImpl.DefaultValue.class)
+@Dependencies(OptimisticLockConstraintImpl.DefaultValue.class)
 @Priority(0)
 @SingularConstraint(Statics.BASE_POSITION)
 public class OptimisticLockConstraintImpl extends AbstractSimpleBooleanConstraint {
@@ -35,12 +38,12 @@ public class OptimisticLockConstraintImpl extends AbstractSimpleBooleanConstrain
 		return type.equals(CheckingType.CHECK_ON_REMOVE_NODE);
 	}
 
-	// @SystemGeneric(SystemGeneric.CONCRETE)
-	// @Components(Engine.class)
-	// @BooleanValue(true)
-	// @Interfaces(OptimisticLockConstraintImpl.class)
-	// public static class DefaultValue {
-	// }
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Components(Engine.class)
+	@BooleanValue(true)
+	@Interfaces(OptimisticLockConstraintImpl.class)
+	public static class DefaultValue {
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override

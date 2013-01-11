@@ -2,7 +2,10 @@ package org.genericsystem.impl.constraints.simple;
 
 import java.io.Serializable;
 
+import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.Components;
+import org.genericsystem.api.annotation.Dependencies;
+import org.genericsystem.api.annotation.Interfaces;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.PropertyConstraint;
 import org.genericsystem.api.annotation.constraints.SingularConstraint;
@@ -16,7 +19,7 @@ import org.genericsystem.impl.core.Statics;
 
 @SystemGeneric
 @Components(Engine.class)
-// @Dependencies(PhantomConstraintImpl.DefaultValue.class)
+@Dependencies(PhantomConstraintImpl.DefaultValue.class)
 @PropertyConstraint
 @SingularConstraint(Statics.BASE_POSITION)
 public class PhantomConstraintImpl extends AbstractSimpleBooleanConstraint {
@@ -36,10 +39,10 @@ public class PhantomConstraintImpl extends AbstractSimpleBooleanConstraint {
 		return (T) Boolean.TRUE;
 	}
 
-	// @SystemGeneric(CONCRETE)
-	// @Components(Engine.class)
-	// @BooleanValue(true)
-	// @Interfaces(PhantomConstraintImpl.class)
-	// public static class DefaultValue {
-	// }
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Components(Engine.class)
+	@BooleanValue(true)
+	@Interfaces(PhantomConstraintImpl.class)
+	public static class DefaultValue {
+	}
 }

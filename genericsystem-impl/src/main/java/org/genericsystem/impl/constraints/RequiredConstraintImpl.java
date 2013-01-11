@@ -36,7 +36,7 @@ public class RequiredConstraintImpl extends AbstractConstraint {
 			Generic base = ((Value) modified).getBaseComponent();
 
 			assert ((GenericImpl) requiredAttribute).isSystemPropertyEnabled(context, this.getClass());
-			if (base.getValues(context, requiredAttribute).size() < 1)
+			if (base.getValueHolders(context, requiredAttribute).size() < 1)
 				throw new RequiredConstraintViolationException("The generic " + base + " has no value for the attribute " + requiredAttribute + ".");
 		}
 		/*
@@ -50,7 +50,7 @@ public class RequiredConstraintImpl extends AbstractConstraint {
 
 			boolean foundConstrainedAttribute = false;
 			for (Attribute attribute : attributes) {
-				if (((GenericImpl) attribute).isSystemPropertyEnabled(context, this.getClass()) && base.getValues(context, attribute).size() < 1) {
+				if (((GenericImpl) attribute).isSystemPropertyEnabled(context, this.getClass()) && base.getValueHolders(context, attribute).size() < 1) {
 					throw new RequiredConstraintViolationException("The generic " + base + " has no value for the attribute " + attribute + ".");
 				}
 				foundConstrainedAttribute = true;

@@ -60,7 +60,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		metaRelation.disableSystemProperty(cache, ReferentialIntegritySystemProperty.class, 0);
 		assert !metaAttribute.isReferentialIntegrity(cache, 0);
 		assert !metaRelation.isReferentialIntegrity(cache, 0);
-		assert metaRelation.isReferentialIntegrity(cache, 1);
+		// assert metaRelation.isReferentialIntegrity(cache, 1);
 
 		metaRelation.disableSystemProperty(cache, ReferentialIntegritySystemProperty.class, 1);
 		assert !metaRelation.isReferentialIntegrity(cache, 1);

@@ -47,7 +47,6 @@ import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
 import org.genericsystem.impl.system.MultiDirectionalSystemProperty;
 import org.genericsystem.impl.system.NoInheritanceSystemProperty;
 import org.genericsystem.impl.system.ReferentialIntegritySystemProperty;
-import org.genericsystem.impl.system.SystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -219,30 +218,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				};
 			}
 		};
-		if (mainSnapshot.isEmpty())
-			return new AbstractSnapshot<Serializable>() {
-				@Override
-				public ArrayIterator<Serializable> iterator() {
-					return new ArrayIterator<>(new Serializable[] { getDefaultValue((Attribute) attribute) });
-				}
-			};
+		// if (mainSnapshot.isEmpty())
+		// return new AbstractSnapshot<Serializable>() {
+		// @Override
+		// public ArrayIterator<Serializable> iterator() {
+		// return new ArrayIterator<>(new Serializable[] { getDefaultValue((Attribute) attribute) });
+		// }
+		// };
 		return mainSnapshot;
 	}
 
 	@Override
 	public <T extends Serializable> T getValue(Context context, Property property) {
 		Link holder = getLink(context, property);
-		return holder != null ? holder.<T> getValue() : this.<T> getDefaultValue(property);
+		return holder != null ? holder.<T> getValue() : null;// this.<T> getDefaultValue(property);
 	}
 
-	private <T extends Serializable> T getDefaultValue(Attribute attribute) {
-		try {
-			if (attribute.getValue() instanceof Class && SystemProperty.class.isAssignableFrom(((Class<?>) attribute.getValue())))
-				return ((Class<? extends SystemProperty>) attribute.getValue()).newInstance().getDefaultValue(this);
-		} catch (InstantiationException | IllegalAccessException e) {
-		}
-		return null;
-	}
+	// private <T extends Serializable> T getDefaultValue(Attribute attribute) {
+	// try {
+	// if (attribute.getValue() instanceof Class && SystemProperty.class.isAssignableFrom(((Class<?>) attribute.getValue())))
+	// return ((Class<? extends SystemProperty>) attribute.getValue()).newInstance().getDefaultValue(this);
+	// } catch (InstantiationException | IllegalAccessException e) {
+	// }
+	// return null;
+	// }
 
 	@Override
 	public <T extends Value> T setValue(Cache cache, Property property, Serializable value) {
@@ -1124,11 +1123,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
 		Snapshot<Property> valueHolders = getValueHolders(cache, cache.<Property> find(systemPropertyClass));
-		if (valueHolders.isEmpty()) {
-			Serializable defaultValue = getDefaultValue(cache.<Property> find(systemPropertyClass));
-			if (Objects.equals(defaultValue, componentPos) || Objects.equals(defaultValue, Boolean.TRUE))
-				setSystemPropertyValue(cache, systemPropertyClass, Boolean.FALSE);
-		}
+		// if (valueHolders.isEmpty()) {
+		// Serializable defaultValue = getDefaultValue(cache.<Property> find(systemPropertyClass));
+		// if (Objects.equals(defaultValue, componentPos) || Objects.equals(defaultValue, Boolean.TRUE))
+		// setSystemPropertyValue(cache, systemPropertyClass, Boolean.FALSE);
+		// }
 		for (Value nodeValue : valueHolders)
 			if (nodeValue.getValue().equals(componentPos))
 				if (equals(nodeValue.getBaseComponent()))

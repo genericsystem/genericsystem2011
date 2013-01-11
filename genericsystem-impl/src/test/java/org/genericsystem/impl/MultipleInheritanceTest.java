@@ -213,10 +213,10 @@ public class MultipleInheritanceTest extends AbstractTest {
 
 		assert selectableWindow.getInstances(cache).size() == 1 : selectableWindow.getInstances(cache);
 		assert selectableWindow.getInstances(cache).contains(mySelectableWindow);
-		assert mySelectableWindow.getValues(cache, size).size() == 1 : mySelectableWindow.getValues(cache, size);
-		assert mySelectableWindow.getValues(cache, size).contains(v12);
-		assert mySelectableWindow.getValues(cache, selectedSelectable).size() == 1;
-		assert mySelectableWindow.getValues(cache, selectedSelectable).contains(vTrue);
+		assert mySelectableWindow.getValueHolders(cache, size).size() == 1 : mySelectableWindow.getValueHolders(cache, size);
+		assert mySelectableWindow.getValueHolders(cache, size).contains(v12);
+		assert mySelectableWindow.getValueHolders(cache, selectedSelectable).size() == 1;
+		assert mySelectableWindow.getValueHolders(cache, selectedSelectable).contains(vTrue);
 	}
 
 	public void testBaseComponent() {

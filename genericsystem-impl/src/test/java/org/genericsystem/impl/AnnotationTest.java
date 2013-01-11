@@ -179,11 +179,11 @@ public class AnnotationTest extends AbstractTest {
 				.getInstances(cache);
 		assert selectableWindow.getInstances(cache)
 				.contains(mySelectableWindow);
-		assert mySelectableWindow.getValues(cache, size).size() == 1 : mySelectableWindow
-				.getValues(cache, size);
-		assert mySelectableWindow.getValues(cache, size).contains(v12);
-		assert mySelectableWindow.getValues(cache, selectedSelectable).size() == 1;
-		assert mySelectableWindow.getValues(cache, selectedSelectable)
+		assert mySelectableWindow.getValueHolders(cache, size).size() == 1 : mySelectableWindow
+				.getValueHolders(cache, size);
+		assert mySelectableWindow.getValueHolders(cache, size).contains(v12);
+		assert mySelectableWindow.getValueHolders(cache, selectedSelectable).size() == 1;
+		assert mySelectableWindow.getValueHolders(cache, selectedSelectable)
 				.contains(vTrue);
 	}
 
