@@ -204,7 +204,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	public <T extends Value> Snapshot<T> getValues(Context context, final T attribute, final boolean readPhantom) {
 		// TODO idem que getValue ?
-		return mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, readPhantom);
+		Snapshot<T> mainSnapshot = mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, readPhantom);
+		if (mainSnapshot.isEmpty()) {
+			getDefaultValue((Attribute) attribute);
+		}
+		return mainSnapshot;
 	}
 
 	@Override
@@ -463,6 +467,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	public <T extends Generic> Iterator<T> internalInheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
 		return (Iterator<T>) new AbstractMagicIterator(context, origin) {
+			
 			@Override
 			protected boolean isSelected(Generic candidate) {
 				return candidate.getMetaLevel() <= metaLevel && ((GenericImpl) candidate).safeIsEnabled(context, ((AbstractContext) context).<Property> find(MultiDirectionalSystemProperty.class)) ? candidate.isAttributeOf(GenericImpl.this) : candidate
@@ -557,9 +562,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents) {
 		assert subInterfaces.length >= 1;
-		if (subInterfaces.length >= 2)
-			assert Arrays.equals(new Primaries(Statics.truncate(0, subInterfaces)).toArray(), Statics.truncate(0, subInterfaces));
-
 		if (interfaces.length > subInterfaces.length || components.length > subComponents.length)
 			return false;
 
