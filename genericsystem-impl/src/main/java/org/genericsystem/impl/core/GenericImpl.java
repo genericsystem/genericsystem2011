@@ -364,12 +364,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return relation;
 		return null;
 	}
-<<<<<<< HEAD
 
-=======
-	
 	// TODO KK
->>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 	public <T extends Generic> T reBind(Cache cache) {
 		return isAlive(cache) ? (T) this : ((CacheImpl) cache).<T> bind(value, metaLevel, getPrimariesArray(), components);
 	}
@@ -472,7 +468,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	public <T extends Generic> Iterator<T> internalInheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
 		return (Iterator<T>) new AbstractMagicIterator(context, origin) {
-			
+
 			@Override
 			protected boolean isSelected(Generic candidate) {
 				return candidate.getMetaLevel() <= metaLevel && ((GenericImpl) candidate).safeIsEnabled(context, ((AbstractContext) context).<Property> find(MultiDirectionalSystemProperty.class)) ? candidate.isAttributeOf(GenericImpl.this) : candidate
