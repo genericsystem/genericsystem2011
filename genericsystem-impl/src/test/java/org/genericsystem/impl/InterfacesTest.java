@@ -1,7 +1,5 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.api.annotation.SystemGeneric;
-import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.core.CacheImpl;
@@ -9,17 +7,6 @@ import org.testng.annotations.Test;
 
 @Test
 public class InterfacesTest extends AbstractTest {
-
-	public void testInterfacesAndPrimaryInterfaces() {
-		CacheImpl cache = (CacheImpl) GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type robot = cache.newType("Robot");
-		Type transformer = cache.newSubType("Transformer", vehicle, robot);
-		Generic myTransformer = transformer.newInstance(cache, "myTransformer");
-
-		Generic bind = cache.add(transformer, "myTransformer", SystemGeneric.CONCRETE, new Generic[] { robot, vehicle }, new Generic[] {});
-		assert myTransformer == bind : myTransformer.info() + bind.info();
-	}
 
 	public void testInterfacesAndReverseInterfaces() {
 		CacheImpl cache = (CacheImpl) GenericSystem.newCacheOnANewInMemoryEngine();
