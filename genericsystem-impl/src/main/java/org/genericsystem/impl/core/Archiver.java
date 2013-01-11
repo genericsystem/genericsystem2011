@@ -34,16 +34,16 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * 
  */
-public class SnapshotsArchiver {
+public class Archiver {
 	
-	private static final Logger log = LoggerFactory.getLogger(SnapshotsArchiver.class);
+	private static final Logger log = LoggerFactory.getLogger(Archiver.class);
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 	
 	private Engine engine;
 	private File directory;
 	private FileOutputStream lockFile;
 	
-	public SnapshotsArchiver(Engine engine, String directoryPath) {
+	public Archiver(Engine engine, String directoryPath) {
 		this.engine = engine;
 		prepareAndLockDirectory(directoryPath);
 		ObjectInputStream inputStream = getInputStream();
@@ -112,10 +112,10 @@ public class SnapshotsArchiver {
 		log.info("END SNAPSHOT");
 	}
 	
-	private void saveSnapshot(AbstractContext context, OutputStream out) {
+	private static void saveSnapshot(AbstractContext context, OutputStream out) {
 		try {
 			ObjectOutputStream oos = new ObjectOutputStream(out);
-			SortedSet<Generic> orderGenerics = buildDependenciesOrdered(context);
+			SortedSet<Generic> orderGenerics = context.orderDependencies(context.getEngine());
 			for (Generic orderGeneric : orderGenerics)
 				writeGeneric(((GenericImpl) orderGeneric), oos);
 			
@@ -124,27 +124,6 @@ public class SnapshotsArchiver {
 		} catch (IOException ioe) {
 			throw new IllegalStateException(ioe);
 		}
-	}
-	
-	private SortedSet<Generic> buildDependenciesOrdered(final AbstractContext context) {
-		return new TreeSet<Generic>() {
-			private static final long serialVersionUID = 1053909994506452123L;
-			{
-				add(context.getEngine());
-			}
-			
-			@Override
-			public boolean add(Generic e) {
-				if (super.add(e)) {
-					for (Generic inheritingDependency : e.getInheritings(context))
-						add(inheritingDependency);
-					for (Generic compositeDependency : e.getComposites(context))
-						add(compositeDependency);
-					return true;
-				}
-				return false;
-			}
-		};
 	}
 	
 	private static void writeGeneric(GenericImpl generic, ObjectOutputStream out) throws IOException {
@@ -241,7 +220,7 @@ public class SnapshotsArchiver {
 		private ObjectInputStream inputstream;
 		
 		private SnapshotLoader(ObjectInputStream inputStream) {
-			this.inputstream = inputStream;
+			inputstream = inputStream;
 		}
 		
 		private void loadSnapshot() {
@@ -294,7 +273,7 @@ public class SnapshotsArchiver {
 		private ZipOutputStream zipOutputStream;
 		
 		private SnapshotZipOutputStream(String directoryPath, String fileName) throws FileNotFoundException {
-			this.zipOutputStream = new ZipOutputStream(new FileOutputStream(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));
+			zipOutputStream = new ZipOutputStream(new FileOutputStream(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));
 			ZipEntry zipEntry = new ZipEntry(fileName + Statics.SNAPSHOT_EXTENSION);
 			try {
 				zipOutputStream.putNextEntry(zipEntry);
@@ -325,7 +304,7 @@ public class SnapshotsArchiver {
 		private ZipInputStream zipInputStream;
 		
 		private SnapshotZipInputStream(String directoryPath, String fileName) throws FileNotFoundException {
-			this.zipInputStream = new ZipInputStream(new FileInputStream(new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION)));
+			zipInputStream = new ZipInputStream(new FileInputStream(new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION)));
 			try {
 				zipInputStream.getNextEntry();
 			} catch (IOException e) {
@@ -335,12 +314,12 @@ public class SnapshotsArchiver {
 		
 		@Override
 		public int read() throws IOException {
-			return this.zipInputStream.read();
+			return zipInputStream.read();
 		}
 		
 		@Override
 		public void close() throws IOException {
-			this.zipInputStream.close();
+			zipInputStream.close();
 		}
 	}
 }

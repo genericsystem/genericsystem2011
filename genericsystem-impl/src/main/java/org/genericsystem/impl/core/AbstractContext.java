@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
@@ -152,6 +153,25 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 	
+	<T extends Generic> NavigableSet<T> orderDependencies(final Generic generic) {
+		return new TreeSet<T>() {
+			private static final long serialVersionUID = 1053909994506452123L;
+			{
+				addDependencies(generic);
+			}
+			
+			@SuppressWarnings("unchecked")
+			public void addDependencies(Generic g) {
+				if (super.add((T) g)) {// protect from loop
+					for (T inheritingDependency : g.<T> getInheritings(AbstractContext.this))
+						addDependencies(inheritingDependency);
+					for (T compositeDependency : g.<T> getComposites(AbstractContext.this))
+						addDependencies(compositeDependency);
+				}
+			}
+		};
+	}
+	
 	public abstract boolean isAlive(Generic generic);
 	
 	public <T extends Generic> T find(Class<?> clazz) {
@@ -165,12 +185,12 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 	
-	// TODO clean
+	// TODO KK
 	Generic getSuperToCheck(Generic[] annotedInterfaces) {
 		return annotedInterfaces.length == 1 ? annotedInterfaces[0] : getEngine();
 	}
 	
-	// TODO clean
+	// TODO KK
 	protected Generic[] findAnnotedInterfaces(Class<?> clazz) {
 		LinkedHashSet<Class<?>> interfacesClasses = getAdditionalInterfaceClasses(clazz);
 		Type[] interfaces = new Type[interfacesClasses.size()];
@@ -227,7 +247,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		Iterator<Generic> it = directInheritingsIterator(primaryAncestor);
 		while (it.hasNext()) {
 			Generic candidate = it.next();
-			if (((GenericImpl) candidate).isPrimary() && (metaLevel == candidate.getMetaLevel()) && Objects.equals(value, candidate.getValue()))
+			if (((GenericImpl) candidate).isPrimary() && (metaLevel == candidate.getMetaLevel()) && (Objects.hashCode(value) == Objects.hashCode(candidate.getValue())) && Objects.equals(value, candidate.getValue()))
 				return (T) candidate;
 		}
 		return null;

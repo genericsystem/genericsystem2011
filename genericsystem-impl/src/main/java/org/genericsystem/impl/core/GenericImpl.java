@@ -364,7 +364,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return relation;
 		return null;
 	}
+<<<<<<< HEAD
 
+=======
+	
+	// TODO KK
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 	public <T extends Generic> T reBind(Cache cache) {
 		return isAlive(cache) ? (T) this : ((CacheImpl) cache).<T> bind(value, metaLevel, getPrimariesArray(), components);
 	}
@@ -590,10 +595,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			return true;
 		}
 		if (subInterfaces.length > 1 && interfaces.length < subInterfaces.length)
-			for (int i = 0; i < subInterfaces.length; i++) {
+			for (int i = 0; i < subInterfaces.length; i++)
 				if (isSuperOf(interfaces, components, Statics.truncate(i, subInterfaces), subComponents))
 					return true;
-			}
 		if (components.length < subComponents.length)
 			for (int i = 0; i < subComponents.length; i++)
 				if (isSuperOf(interfaces, components, subInterfaces, Statics.truncate(i, subComponents)))
