@@ -40,6 +40,7 @@ import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractMagicIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
+import org.genericsystem.impl.iterator.AbstractProjectionIterator;
 import org.genericsystem.impl.iterator.ArrayIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
 import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
@@ -198,16 +199,33 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Value> Snapshot<T> getValues(Context context, final T attribute) {
-		return getValues(context, attribute, false);
+	public <T extends Value> Snapshot<T> getValueHolders(Context context, final T attribute) {
+		return getValueHolders(context, attribute, false);
 	}
 
-	public <T extends Value> Snapshot<T> getValues(Context context, final T attribute, final boolean readPhantom) {
-		// TODO idem que getValue ?
-		Snapshot<T> mainSnapshot = mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, readPhantom);
-		if (mainSnapshot.isEmpty()) {
-			getDefaultValue((Attribute) attribute);
-		}
+	public <T extends Value> Snapshot<T> getValueHolders(Context context, final T attribute, final boolean readPhantom) {
+		return mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, readPhantom);
+	}
+
+	public <T extends Value> Snapshot<Serializable> getValues(final Context context, final T attribute) {
+		Snapshot<Serializable> mainSnapshot = new AbstractSnapshot<Serializable>() {
+			@Override
+			public Iterator<Serializable> iterator() {
+				return new AbstractProjectionIterator<Value, Serializable>(GenericImpl.this.<Value> mainIterator(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false)) {
+					@Override
+					public Serializable project(Value generic) {
+						return generic.getValue();
+					}
+				};
+			}
+		};
+		if (mainSnapshot.isEmpty())
+			return new AbstractSnapshot<Serializable>() {
+				@Override
+				public ArrayIterator<Serializable> iterator() {
+					return new ArrayIterator<>(new Serializable[] { getDefaultValue((Attribute) attribute) });
+				}
+			};
 		return mainSnapshot;
 	}
 
@@ -364,12 +382,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return relation;
 		return null;
 	}
-<<<<<<< HEAD
 
-=======
-	
 	// TODO KK
->>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 	public <T extends Generic> T reBind(Cache cache) {
 		return isAlive(cache) ? (T) this : ((CacheImpl) cache).<T> bind(value, metaLevel, getPrimariesArray(), components);
 	}
@@ -472,7 +486,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	public <T extends Generic> Iterator<T> internalInheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
 		return (Iterator<T>) new AbstractMagicIterator(context, origin) {
-			
+
 			@Override
 			protected boolean isSelected(Generic candidate) {
 				return candidate.getMetaLevel() <= metaLevel && ((GenericImpl) candidate).safeIsEnabled(context, ((AbstractContext) context).<Property> find(MultiDirectionalSystemProperty.class)) ? candidate.isAttributeOf(GenericImpl.this) : candidate
@@ -1049,7 +1063,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Node> Snapshot<T> getChildren(Context context) {
-		return this.<T> getValues(context, this.<T> getMeta()).filter(new Filter<T>() {
+		return this.<T> getValueHolders(context, this.<T> getMeta()).filter(new Filter<T>() {
 			@Override
 			public boolean isSelected(T node) {
 				return !GenericImpl.this.equals(node);
@@ -1097,7 +1111,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
 		Property systemProperty = cache.find(systemPropertyClass);
-		for (Value nodeValue : getValues(cache, systemProperty, true)) {
+		for (Value nodeValue : getValueHolders(cache, systemProperty, true)) {
 			if (Integer.valueOf(componentPos).equals(nodeValue.getValue()))
 				return (T) this;
 			if (isValuePhantomOverride(nodeValue, componentPos))
@@ -1109,10 +1123,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
-		Property systemProperty = cache.find(systemPropertyClass);
-		for (Value nodeValue : getValues(cache, systemProperty))
+		Snapshot<Property> valueHolders = getValueHolders(cache, cache.<Property> find(systemPropertyClass));
+		if (valueHolders.isEmpty()) {
+			Serializable defaultValue = getDefaultValue(cache.<Property> find(systemPropertyClass));
+			if (Objects.equals(defaultValue, componentPos) || Objects.equals(defaultValue, Boolean.TRUE))
+				setSystemPropertyValue(cache, systemPropertyClass, Boolean.FALSE);
+		}
+		for (Value nodeValue : valueHolders)
 			if (nodeValue.getValue().equals(componentPos))
-				if (this.equals(nodeValue.getBaseComponent()))
+				if (equals(nodeValue.getBaseComponent()))
 					nodeValue.remove(cache);
 				else
 					cancel(cache, nodeValue);
@@ -1126,8 +1145,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos) {
-		for (Value nodeValue : getValues(context, ((AbstractContext) context).<Property> find(systemPropertyClass)))
-			if (Objects.equals(nodeValue.getValue(), componentPos))
+		for (Serializable value : getValues(context, ((AbstractContext) context).<Property> find(systemPropertyClass)))
+			if (Objects.equals(value, componentPos) || Objects.equals(value, Boolean.TRUE))
 				return true;
 		return false;
 	}
