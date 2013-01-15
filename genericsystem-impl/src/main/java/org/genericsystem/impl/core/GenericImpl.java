@@ -399,7 +399,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public <T extends Attribute> T addSubAttribute(Cache cache, Attribute attribute, Serializable value) {
 		assert !Objects.equals(value, attribute.getValue());
-		return ((CacheImpl) cache).add(attribute, value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[] { this });
+		return ((CacheImpl) cache).bind(attribute, value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[] { this });
 	}
 	
 	@Override
@@ -430,7 +430,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public <T extends Relation> T addSubRelation(Cache cache, Relation relation, Serializable value, Type... targets) {
 		assert !Objects.equals(value, relation.getValue());
-		return ((CacheImpl) cache).add(relation, value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
+		return ((CacheImpl) cache).bind(relation, value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
 	}
 	
 	@Override
@@ -440,12 +440,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).add(this, value, getMetaLevel() + 1, getPrimariesArray(), components);
+		return ((CacheImpl) cache).bind(this, value, getMetaLevel() + 1, getPrimariesArray(), components);
 	}
 	
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).add(this, value, getMetaLevel(), getPrimariesArray(), components);
+		return ((CacheImpl) cache).bind(this, value, getMetaLevel(), getPrimariesArray(), components);
 	}
 	
 	@Override
@@ -460,7 +460,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	@Override
 	public <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int basePos, Generic... targets) {
-		return ((CacheImpl) cache).add(relation, value, SystemGeneric.CONCRETE, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
+		return ((CacheImpl) cache).bind(relation, value, SystemGeneric.CONCRETE, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
 	}
 	
 	@Override
@@ -1019,7 +1019,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public void cancel(Cache cache, Value attribute) {
 		if (equals(attribute.getBaseComponent()))
 			throw new IllegalStateException("Only inherited attributes can be cancelled");
-		((CacheImpl) cache).add(attribute, Statics.PHAMTOM, attribute.getMetaLevel(), Statics.EMPTY_GENERIC_ARRAY, Statics.replace(Statics.BASE_POSITION, ((GenericImpl) attribute).components, this));
+		((CacheImpl) cache).bind(attribute, Statics.PHAMTOM, attribute.getMetaLevel(), Statics.EMPTY_GENERIC_ARRAY, Statics.replace(Statics.BASE_POSITION, ((GenericImpl) attribute).components, this));
 	}
 	
 	@Override
@@ -1044,17 +1044,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	@Override
 	public <T extends Node> T newRoot(Cache cache, Serializable value, int dim) {
-		return ((CacheImpl) cache).add(this, value, getMetaLevel() + 1, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]);
+		return ((CacheImpl) cache).bind(this, value, getMetaLevel() + 1, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]);
 	}
 	
 	@Override
 	public <T extends Node> T addNode(Cache cache, Serializable value, Generic... targets) {
-		return ((CacheImpl) cache).add(getMeta(), value, SystemGeneric.CONCRETE, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
+		return ((CacheImpl) cache).bind(getMeta(), value, SystemGeneric.CONCRETE, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
 	}
 	
 	@Override
 	public <T extends Node> T addSubNode(Cache cache, Serializable value, Generic... targets) {
-		return ((CacheImpl) cache).add(this, value, SystemGeneric.CONCRETE, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
+		return ((CacheImpl) cache).bind(this, value, SystemGeneric.CONCRETE, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
 	}
 	
 	@Override
