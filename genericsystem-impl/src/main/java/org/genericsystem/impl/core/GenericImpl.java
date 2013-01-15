@@ -39,6 +39,10 @@ import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
+<<<<<<< HEAD
+=======
+import org.genericsystem.impl.iterator.AbstractProjectionIterator;
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 import org.genericsystem.impl.iterator.AbstractSelectableLeafInheritedIterator;
 import org.genericsystem.impl.iterator.ArrayIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
@@ -206,12 +210,49 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, readPhantom);
 	}
 	
+<<<<<<< HEAD
+=======
+	public <T extends Value> Snapshot<Serializable> getValues(final Context context, final T attribute) {
+		Snapshot<Serializable> mainSnapshot = new AbstractSnapshot<Serializable>() {
+			@Override
+			public Iterator<Serializable> iterator() {
+				return new AbstractProjectionIterator<Value, Serializable>(GenericImpl.this.<Value> mainIterator(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false)) {
+					@Override
+					public Serializable project(Value generic) {
+						return generic.getValue();
+					}
+				};
+			}
+		};
+		// if (mainSnapshot.isEmpty())
+		// return new AbstractSnapshot<Serializable>() {
+		// @Override
+		// public ArrayIterator<Serializable> iterator() {
+		// return new ArrayIterator<>(new Serializable[] { getDefaultValue((Attribute) attribute) });
+		// }
+		// };
+		return mainSnapshot;
+	}
+	
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 	@Override
 	public <T extends Serializable> T getValue(Context context, Property property) {
 		Link holder = getLink(context, property);
 		return holder != null ? holder.<T> getValue() : null;
 	}
 	
+<<<<<<< HEAD
+=======
+	// private <T extends Serializable> T getDefaultValue(Attribute attribute) {
+	// try {
+	// if (attribute.getValue() instanceof Class && SystemProperty.class.isAssignableFrom(((Class<?>) attribute.getValue())))
+	// return ((Class<? extends SystemProperty>) attribute.getValue()).newInstance().getDefaultValue(this);
+	// } catch (InstantiationException | IllegalAccessException e) {
+	// }
+	// return null;
+	// }
+	
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 	@Override
 	public <T extends Value> T setValue(Cache cache, Property property, Serializable value) {
 		return setLink(cache, property, value);
@@ -1123,6 +1164,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return value.<GenericImpl> getBaseComponent().defaultIsActive(systemPropertyClass) ? false : true;
 		return defaultIsActive(systemPropertyClass);
 	}
+<<<<<<< HEAD
 
 	private boolean defaultIsActive(Class<?> systemPropertyClass) {
 		try {
@@ -1134,6 +1176,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			throw new IllegalStateException(e);
 		}
 	}
+=======
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 	
 	@Override
 	public <T extends Attribute> T enableMultiDirectional(Cache cache) {

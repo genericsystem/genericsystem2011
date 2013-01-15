@@ -3,7 +3,6 @@ package org.genericsystem.impl.system;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.core.Engine;
-import org.genericsystem.api.core.Generic;
 
 @SystemGeneric
 @Components(Engine.class)
@@ -43,8 +42,8 @@ public class ReferentialIntegritySystemProperty extends AbstractSystemProperty {
 	// }
 
 	@Override
-	public boolean defaultIsActive(Generic generic) {
-		return !generic.isReallyAttribute();
+	public boolean defaultIsActive() {
+		return true;
 	}
 
 }
