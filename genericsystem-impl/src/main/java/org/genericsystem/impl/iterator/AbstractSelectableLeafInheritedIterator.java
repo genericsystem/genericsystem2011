@@ -6,11 +6,11 @@ import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.impl.core.GenericImpl;
 
-public abstract class AbstractMagicIterator extends AbstractSelectablePostTreeIterator<Generic> {
+public abstract class AbstractSelectableLeafInheritedIterator extends AbstractSelectablePostTreeIterator<Generic> {
 
 	private final Context context;
 
-	public AbstractMagicIterator(Context context, Generic root) {
+	public AbstractSelectableLeafInheritedIterator(Context context, Generic root) {
 		super(root);
 		this.context = context;
 	}
@@ -20,7 +20,7 @@ public abstract class AbstractMagicIterator extends AbstractSelectablePostTreeIt
 		return new AbstractFilterIterator<Generic>(((GenericImpl) father).directInheritingsIterator(context)) {
 			@Override
 			public boolean isSelected() {
-				return AbstractMagicIterator.this.isSelected(next);
+				return AbstractSelectableLeafInheritedIterator.this.isSelected(next);
 			}
 		};
 	}

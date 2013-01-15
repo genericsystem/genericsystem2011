@@ -1,7 +1,5 @@
 package org.genericsystem.impl.constraints.simple;
 
-import java.io.Serializable;
-
 import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
@@ -31,12 +29,6 @@ public class PhantomConstraintImpl extends AbstractSimpleBooleanConstraint {
 		if (modified.isAlive(context))
 			if (((GenericImpl) modified.getImplicit().getSupers().first()).isPhantom())
 				throw new PhantomConstraintViolationException(modified.info());
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Serializable> T getDefaultValue(Generic generic) {
-		return (T) Boolean.TRUE;
 	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
