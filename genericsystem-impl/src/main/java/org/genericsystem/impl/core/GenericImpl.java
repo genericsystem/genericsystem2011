@@ -37,7 +37,7 @@ import org.genericsystem.impl.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
-import org.genericsystem.impl.iterator.AbstractMagicIterator;
+import org.genericsystem.impl.iterator.AbstractLeafInheritedIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
 import org.genericsystem.impl.iterator.AbstractProjectionIterator;
 import org.genericsystem.impl.iterator.ArrayIterator;
@@ -483,7 +483,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	public <T extends Generic> Iterator<T> internalInheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
-		return (Iterator<T>) new AbstractMagicIterator(context, origin) {
+		return (Iterator<T>) new AbstractLeafInheritedIterator(context, origin) {
 			
 			@Override
 			protected boolean isSelected(Generic candidate) {
@@ -513,7 +513,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	boolean safeIsEnabled(Context context, Property property) {
-		Iterator<Generic> iterator = new AbstractMagicIterator(context, property) {
+		Iterator<Generic> iterator = new AbstractLeafInheritedIterator(context, property) {
 			@Override
 			protected boolean isSelected(Generic candidate) {
 				return (candidate.getMetaLevel() <= SystemGeneric.CONCRETE) && candidate.isAttributeOf(GenericImpl.this);
@@ -867,11 +867,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	@Override
 	public <T extends Generic> Snapshot<T> getInstances(final Context context) {
-		// KK
+		// KK change to a prefixed traversal (see getAllInstances)
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return (Iterator<T>) new AbstractMagicIterator(context, GenericImpl.this) {
+				return (Iterator<T>) new AbstractLeafInheritedIterator(context, GenericImpl.this) {
 					@Override
 					protected boolean isSelected(Generic candidate) {
 						return candidate.isInstanceOf(GenericImpl.this);

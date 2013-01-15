@@ -32,7 +32,7 @@ import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
-import org.genericsystem.impl.iterator.AbstractMagicIterator;
+import org.genericsystem.impl.iterator.AbstractLeafInheritedIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +102,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	public abstract boolean isScheduledToRemove(Generic generic);
 	
 	Iterator<Generic> getDirectSupersIterator(final Generic[] interfaces, final Generic[] components) {
-		return new AbstractMagicIterator(this, getEngine()) {
+		return new AbstractLeafInheritedIterator(this, getEngine()) {
 			
 			@Override
 			protected boolean isSelectable() {
