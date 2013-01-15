@@ -251,11 +251,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return bindPrimaryByValue(((GenericImpl) genericToReplace).directSupers[0], genericToReplace.getValue(), genericToReplace.getMetaLevel());
 		
 		Generic[] interfaces = ((GenericImpl) genericToReplace).getPrimariesArray();
-		Generic[] components = ((GenericImpl) genericToReplace).components;
 		Generic[] resultInterfaces = new Generic[interfaces.length];
-		Generic[] resultComponents = new Generic[components.length];
 		for (int i = 0; i < interfaces.length; i++)
 			resultInterfaces[i] = ((GenericImpl) interfaces[i]).isPrimary() ? getNewPrimary(interfaces[i], oldPrimary, newPrimary) : replace(interfaces[i], oldPrimary, newPrimary);
+		Generic[] components = ((GenericImpl) genericToReplace).components;
+		Generic[] resultComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++)
 			if (genericToReplace.equals(components[i]))
 				resultComponents[i] = null;

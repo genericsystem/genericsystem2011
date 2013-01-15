@@ -5,8 +5,10 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.exception.RequiredConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
+import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
 @Test
@@ -18,8 +20,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Generic myFiat = vehicle.newInstance(cache, "myFiat");
 		Attribute wheel = vehicle.addAttribute(cache, "wheel");
 		wheel.enableRequiredConstraint(cache);
-
-		final Value wheelMyFiat = myFiat.addValue(cache, wheel, "BigWheel");
+		Value wheelMyFiat = myFiat.addValue(cache, wheel, "BigWheel");
 		cache.flush();
 		wheelMyFiat.remove(cache);
 
@@ -37,7 +38,6 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.newInstance(cache, "myFiat");
 		vehicle.addAttribute(cache, "wheel").enableRequiredConstraint(cache);
-
 		new RollbackCatcher() {
 
 			@Override
@@ -48,25 +48,97 @@ public class RequiredConstraintTest extends AbstractTest {
 	}
 
 	public void addOneRequired() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Generic myFiat = vehicle.newInstance(cache, "myFiat");
-
 		Attribute vehicleWheel = vehicle.addAttribute(cache, "wheel").enableRequiredConstraint(cache);
 		myFiat.addValue(cache, vehicleWheel, "BigWheel");
-
 		cache.flush();
 	}
 
 	public void addSubOneRequired() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicleType = cache.newType("Vehicle");
+		Generic myFiat = vehicleType.newInstance(cache, "myFiat");
+		Attribute wheel = vehicleType.addAttribute(cache, "wheel");
+		wheel.enableRequiredConstraint(cache);
+		Attribute subAttribute = vehicleType.addSubAttribute(cache, wheel, "LittleWheel");
+		myFiat.addValue(cache, subAttribute, "littlePinkWheel");
+		cache.flush();
+	}
+
+	public void addRequiredOnSubType() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicleType = cache.newType("Vehicle");
-		Generic vehicle = vehicleType.newInstance(cache, "myFiat");
+		vehicleType.addAttribute(cache, "wheel").enableRequiredConstraint(cache);
+		Type carType = vehicleType.newSubType(cache, "Car");
+		carType.newInstance(cache, "myFiat");
 
-		Attribute attribute = vehicleType.addAttribute(cache, "wheel");
-		attribute.enableRequiredConstraint(cache);
-		Attribute subAttribute = vehicleType.addSubAttribute(cache, attribute, "LittleWheel");
-		vehicle.addValue(cache, subAttribute, "littlePinkWheel");
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				cache.flush();
+			}
+		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+	}
+
+	public void addRequiredOnRelationBaseSide() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.addRelation(cache, "carColor", color);
+		carColor.enableRequiredConstraint(cache, Statics.BASE_POSITION);
+		cache.flush();
+		assert carColor.isRequiredConstraintEnabled(cache, Statics.BASE_POSITION);
+		car.newInstance(cache, "myFiat");
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				cache.flush();
+			}
+		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+	}
+
+	public void addRequiredOnRelationTargetSide() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.addRelation(cache, "carColor", color);
+		carColor.enableRequiredConstraint(cache, Statics.TARGET_POSITION);
+		assert carColor.isRequiredConstraintEnabled(cache, Statics.TARGET_POSITION);
+		color.newInstance(cache, "red");
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				cache.flush();
+			}
+		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+	}
+
+	public void addRequiredOnRelationBaseSideOk() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.addRelation(cache, "carColor", color);
+		carColor.enableRequiredConstraint(cache, Statics.BASE_POSITION);
+		assert carColor.isRequiredConstraintEnabled(cache, Statics.BASE_POSITION);
+		color.newInstance(cache, "red");
+		cache.flush();
+	}
+
+	public void addRequiredOnRelationOk() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.addRelation(cache, "carColor", color);
+		carColor.enableRequiredConstraint(cache, Statics.TARGET_POSITION);
+		assert carColor.isRequiredConstraintEnabled(cache, Statics.TARGET_POSITION);
+		car.newInstance(cache, "myFiat");
 		cache.flush();
 	}
 }
