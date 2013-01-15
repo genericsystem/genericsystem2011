@@ -25,7 +25,7 @@ public class RequiredConstraintImpl extends AbstractConstraint {
 
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
-		if (!((GenericImpl) modified).isPrimary() && !modified.isAlive(context))
+		if (!modified.isAlive(context))
 			checkRequired(((Value) modified).getBaseComponent(), ((Value) modified).getMeta(), context);
 		else if (SystemGeneric.CONCRETE == modified.getMetaLevel())
 			for (Attribute requiredAttribute : ((Type) modified.getMeta()).getAttributes(context))
