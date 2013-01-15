@@ -23,7 +23,7 @@ public class RequiredAxedConstraintImpl extends AbstractAxedIntegerConstraint {
 
 	@Override
 	protected void internalCheck(Context context, Generic required, Relation constraintType, Integer axe) throws ConstraintViolationException {
-		Generic component = ((Relation) required).getComponent(1);
+		Generic component = ((Relation) required).getComponent(axe);
 		if (component.getLinks(context, constraintType, axe).size() < 1)
 			throw new RequiredConstraintViolationException(required + " have no required " + component + " on axe (n° " + axe + ").");
 	}
