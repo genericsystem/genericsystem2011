@@ -1244,7 +1244,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class);
 	}
 
-
 	@Override
 	public <T extends Type> T enableRequiredConstraint(Cache cache, int componentPos) {
 		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class, componentPos);
