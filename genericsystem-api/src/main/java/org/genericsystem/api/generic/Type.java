@@ -245,6 +245,27 @@ public interface Type extends Generic {
 	boolean isRequiredConstraintEnabled(Context context);
 
 	/**
+	 * Enable required constraint for the component position
+	 * 
+	 * @return this
+	 */
+	<T extends Type> T enableRequiredConstraint(Cache cache, int componentPos);
+
+	/**
+	 * Disable required constraint for the component position
+	 * 
+	 * @return this
+	 */
+	<T extends Type> T disableRequiredConstraint(Cache cache, int componentPos);
+
+	/**
+	 * Returns true if the required constraint enabled for the component position
+	 * 
+	 * @return true if the required constraint enabled for the component position
+	 */
+	boolean isRequiredConstraintEnabled(Context context, int componentPos);
+
+	/**
 	 * Enable distinct constraint
 	 * 
 	 * @return this

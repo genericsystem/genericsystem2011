@@ -33,7 +33,7 @@ public class RequiredConstraintImpl extends AbstractConstraint {
 	}
 
 	private void checkRequired(Generic baseGeneric, Generic requiredGeneric, Context context) throws RequiredConstraintViolationException {
-		if (((GenericImpl) requiredGeneric).isSystemPropertyEnabled(context, this.getClass()) && baseGeneric.getValueHolders(context, (Attribute) requiredGeneric).isEmpty())
+		if (((GenericImpl) requiredGeneric).isSystemPropertyEnabled(context, RequiredConstraintImpl.class) && baseGeneric.getValueHolders(context, (Attribute) requiredGeneric).isEmpty())
 			throw new RequiredConstraintViolationException("The generic " + baseGeneric + " has no value for the attribute " + requiredGeneric + ".");
 	}
 
