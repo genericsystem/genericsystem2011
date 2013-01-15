@@ -73,6 +73,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		vehicleType.addAttribute(cache, "wheel").enableRequiredConstraint(cache);
 		Type carType = vehicleType.newSubType(cache, "Car");
 		carType.newInstance(cache, "myFiat");
+
 		new RollbackCatcher() {
 
 			@Override
@@ -86,8 +87,9 @@ public class RequiredConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.addRelation(cache, "carColor", car, color);
+		Relation carColor = car.addRelation(cache, "carColor", color);
 		carColor.enableRequiredConstraint(cache, Statics.BASE_POSITION);
+		cache.flush();
 		assert carColor.isRequiredConstraintEnabled(cache, Statics.BASE_POSITION);
 		car.newInstance(cache, "myFiat");
 
@@ -104,7 +106,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.addRelation(cache, "carColor", car, color);
+		Relation carColor = car.addRelation(cache, "carColor", color);
 		carColor.enableRequiredConstraint(cache, Statics.TARGET_POSITION);
 		assert carColor.isRequiredConstraintEnabled(cache, Statics.TARGET_POSITION);
 		color.newInstance(cache, "red");
@@ -118,4 +120,25 @@ public class RequiredConstraintTest extends AbstractTest {
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
 
+	public void addRequiredOnRelationBaseSideOk() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.addRelation(cache, "carColor", color);
+		carColor.enableRequiredConstraint(cache, Statics.BASE_POSITION);
+		assert carColor.isRequiredConstraintEnabled(cache, Statics.BASE_POSITION);
+		color.newInstance(cache, "red");
+		cache.flush();
+	}
+
+	public void addRequiredOnRelationOk() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.addRelation(cache, "carColor", color);
+		carColor.enableRequiredConstraint(cache, Statics.TARGET_POSITION);
+		assert carColor.isRequiredConstraintEnabled(cache, Statics.TARGET_POSITION);
+		car.newInstance(cache, "myFiat");
+		cache.flush();
+	}
 }
