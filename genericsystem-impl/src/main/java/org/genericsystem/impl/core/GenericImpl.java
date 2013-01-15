@@ -36,9 +36,9 @@ import org.genericsystem.impl.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.impl.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
-import org.genericsystem.impl.iterator.AbstractFilterIterator;import org.genericsystem.impl.iterator.AbstractLeafInheritedIterator;
-
-import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
+import org.genericsystem.impl.iterator.AbstractFilterIterator;
+import org.genericsystem.impl.iterator.AbstractLeafInheritedIterator;
+import org.genericsystem.impl.iterator.AbstractProjectionIterator;
 import org.genericsystem.impl.iterator.ArrayIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
 import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
