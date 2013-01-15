@@ -30,6 +30,7 @@ import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.impl.constraints.RequiredAxedConstraintImpl;
 import org.genericsystem.impl.constraints.RequiredConstraintImpl;
 import org.genericsystem.impl.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.impl.constraints.simple.NotNullConstraintImpl;
@@ -1079,7 +1080,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		Property systemProperty = cache.find(systemPropertyClass);
 		for (Value nodeValue : getValueHolders(cache, systemProperty, true)) {
 			if (nodeValue.getValue().equals(componentPos)) {
-				if (defaultIsActive(systemPropertyClass))
+				if (defaultIsActive(systemPropertyClass, nodeValue.getBaseComponent()))
 					if (equals(nodeValue.getBaseComponent()))
 						nodeValue.remove(cache);
 					else
@@ -1089,7 +1090,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			if (isValuePhantomOverride(nodeValue, componentPos))
 				nodeValue.remove(cache);
 		}
-		if (!defaultIsActive(systemPropertyClass))
+		if (!defaultIsActive(systemPropertyClass, this))
 			addValue(cache, systemProperty, componentPos);
 		return (T) this;
 	}
@@ -1097,7 +1098,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
 		Snapshot<Property> valueHolders = getValueHolders(cache, cache.<Property> find(systemPropertyClass));
-		if (valueHolders.isEmpty() && defaultIsActive(systemPropertyClass))
+		if (valueHolders.isEmpty() && defaultIsActive(systemPropertyClass, this))
 			addValue(cache, cache.<Property> find(systemPropertyClass), componentPos);
 		else {
 			boolean check = false;
@@ -1109,7 +1110,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 					else
 						cancel(cache, nodeValue);
 				}
-			if (!check && defaultIsActive(systemPropertyClass))
+			if (!check && defaultIsActive(systemPropertyClass, this))
 				addValue(cache, cache.<Property> find(systemPropertyClass), componentPos);
 		}
 		return (T) this;
@@ -1124,13 +1125,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos) {
 		for (Value value : getValueHolders(context, ((AbstractContext) context).<Property> find(systemPropertyClass)))
 			if (Objects.equals(value.getValue(), componentPos))
-				return defaultIsActive(systemPropertyClass) ? false : true;
-		return defaultIsActive(systemPropertyClass);
+				return defaultIsActive(systemPropertyClass, value.getBaseComponent()) ? false : true;
+		return defaultIsActive(systemPropertyClass, this);
 	}
 
-	private boolean defaultIsActive(Class<?> systemPropertyClass) {
+	private boolean defaultIsActive(Class<?> systemPropertyClass, Generic generic) {
 		try {
-			return ((Class<? extends SystemProperty>) systemPropertyClass).newInstance().defaultIsActive(this);
+			return ((Class<? extends SystemProperty>) systemPropertyClass).newInstance().defaultIsActive(generic);
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new IllegalStateException(e);
 		}
@@ -1241,6 +1242,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context) {
 		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class);
+	}
+
+
+	@Override
+	public <T extends Type> T enableRequiredConstraint(Cache cache, int componentPos) {
+		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class, componentPos);
+	}
+
+	@Override
+	public <T extends Type> T disableRequiredConstraint(Cache cache, int componentPos) {
+		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class, componentPos);
+	}
+
+	@Override
+	public boolean isRequiredConstraintEnabled(Context context, int componentPos) {
+		return isSystemPropertyEnabled(context, RequiredAxedConstraintImpl.class, componentPos);
 	}
 
 	@Override
