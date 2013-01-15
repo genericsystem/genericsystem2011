@@ -26,7 +26,7 @@ public class RequiredAxedConstraintImpl extends AbstractConstraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (SystemGeneric.CONCRETE == modified.getMetaLevel()) {
+		if (modified.isConcrete()) {
 			Iterator<Generic> requiredRelationIterator = ((Type) modified.getMeta()).getComposites(context).iterator();
 			while (requiredRelationIterator.hasNext())
 				checkRequiredRelation(modified, (Relation) requiredRelationIterator.next(), context);
@@ -42,7 +42,7 @@ public class RequiredAxedConstraintImpl extends AbstractConstraint {
 				throw new ConstraintViolationException("The constraint " + RequiredAxedConstraintImpl.class + " must have a not null value");
 			Generic component = requiredRelation.getComponent(componentPos);
 			if (!((Type) component).getAllInstances(context).isEmpty() && component.getLinks(context, requiredRelation, componentPos).size() < 1)
-				throw new RequiredConstraintViolationException(modified + " have no required " + component + " on component position (n° " + componentPos + ").");
+				throw new RequiredConstraintViolationException(requiredRelation.getValue() + " is required for new " + modified.getMeta() + " " + modified);
 		}
 	}
 
