@@ -1,4 +1,4 @@
-package org.genericsystem.impl.constraints;
+package org.genericsystem.impl.constraints.axed;
 
 import java.util.Iterator;
 
@@ -14,6 +14,7 @@ import org.genericsystem.api.exception.RequiredConstraintViolationException;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
+import org.genericsystem.impl.constraints.AbstractConstraint;
 import org.genericsystem.impl.core.Statics;
 
 @SystemGeneric
