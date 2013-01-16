@@ -24,30 +24,6 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		assert cache.getMetaRelation().isReferentialIntegrity(cache, 1);
 	}
 
-	public void test() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type superCar = car.newSubType(cache, "SuperCar");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
-		car.cancel(cache, vehiclePower);
-		Attribute superCarPower = superCar.addAttribute(cache, "Power");
-		log.info("" + superCar.getAttributes(cache));
-		superCarPower.log();
-	}
-
-	public void test2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type superCar = car.newSubType(cache, "SuperCar");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
-		car.cancel(cache, vehiclePower);
-		Attribute ultraCarPower = superCar.addSubAttribute(cache, vehiclePower, "UltraPower");
-		log.info("" + superCar.getAttributes(cache));
-		ultraCarPower.log();
-	}
-
 	public void testAttribute2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Attribute metaAttribute = cache.getEngine().getMetaAttribute();
@@ -56,17 +32,32 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Relation metaRelation = cache.getEngine().getMetaRelation();
 		assert metaRelation.isReferentialIntegrity(cache, 0);
 		assert metaRelation.isReferentialIntegrity(cache, 1);
+		// assert metaRelation.isReferentialIntegrity(cache, 2);
 
 		metaRelation.disableSystemProperty(cache, ReferentialIntegritySystemProperty.class, 0);
 		assert !metaAttribute.isReferentialIntegrity(cache, 0);
 		assert !metaRelation.isReferentialIntegrity(cache, 0);
-		// assert metaRelation.isReferentialIntegrity(cache, 1);
+		assert metaRelation.isReferentialIntegrity(cache, 1);
+		// assert metaRelation.isReferentialIntegrity(cache, 2);
 
 		metaRelation.disableSystemProperty(cache, ReferentialIntegritySystemProperty.class, 1);
+		assert !metaAttribute.isReferentialIntegrity(cache, 0);
+		assert !metaRelation.isReferentialIntegrity(cache, 0);
 		assert !metaRelation.isReferentialIntegrity(cache, 1);
+		// assert metaRelation.isReferentialIntegrity(cache, 2);
+
 		metaAttribute.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, 0);
 		assert metaAttribute.isReferentialIntegrity(cache, 0);
+		// metaRelation inherits metaAttribute
 		assert metaRelation.isReferentialIntegrity(cache, 0);
+		assert !metaRelation.isReferentialIntegrity(cache, 1);
+		// assert metaRelation.isReferentialIntegrity(cache, 2);
+
+		metaRelation.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, 0);
+		assert metaAttribute.isReferentialIntegrity(cache, 0);
+		assert metaRelation.isReferentialIntegrity(cache, 0);
+		assert !metaRelation.isReferentialIntegrity(cache, 1);
+		// assert metaRelation.isReferentialIntegrity(cache, 2);
 	}
 
 	public void testRelation() {

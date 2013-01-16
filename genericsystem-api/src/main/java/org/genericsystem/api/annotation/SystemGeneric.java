@@ -14,6 +14,8 @@ import java.lang.annotation.Target;
 public @interface SystemGeneric {
 	int value() default STRUCTURAL;
 
+	// boolean defaultBehavior() default false;
+
 	static final int META = 0;
 	static final int STRUCTURAL = 1;
 	static final int CONCRETE = 2;

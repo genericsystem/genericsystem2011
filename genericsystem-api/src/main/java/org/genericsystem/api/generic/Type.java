@@ -287,6 +287,27 @@ public interface Type extends Generic {
 	boolean isUniqueConstraintEnabled(Context context);
 
 	/**
+	 * Enable virtual constraint
+	 * 
+	 * @return this
+	 */
+	<T extends Type> T enableVirtualConstraint(Cache cache);
+
+	/**
+	 * Disable virtual constraint
+	 * 
+	 * @return this
+	 */
+	<T extends Type> T disableVirtualConstraint(Cache cache);
+
+	/**
+	 * Returns true if the virtual constraint enabled
+	 * 
+	 * @return true if the virtual constraint enabled
+	 */
+	boolean isVirtualConstraintEnabled(Context context);
+
+	/**
 	 * Enable inheritance
 	 * 
 	 * @return this

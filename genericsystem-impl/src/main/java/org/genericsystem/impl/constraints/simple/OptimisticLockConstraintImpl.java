@@ -1,7 +1,5 @@
 package org.genericsystem.impl.constraints.simple;
 
-import java.io.Serializable;
-
 import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
@@ -43,11 +41,5 @@ public class OptimisticLockConstraintImpl extends AbstractSimpleBooleanConstrain
 	@BooleanValue(true)
 	@Interfaces(OptimisticLockConstraintImpl.class)
 	public static class DefaultValue {
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Serializable> T getDefaultValue(Generic generic) {
-		return (T) Boolean.TRUE;
 	}
 }
