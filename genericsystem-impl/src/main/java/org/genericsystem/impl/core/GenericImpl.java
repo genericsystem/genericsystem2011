@@ -41,7 +41,6 @@ import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
-import org.genericsystem.impl.iterator.AbstractProjectionIterator;
 import org.genericsystem.impl.iterator.AbstractSelectableLeafInheritedIterator;
 import org.genericsystem.impl.iterator.ArrayIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
@@ -206,28 +205,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	public <T extends Value> Snapshot<T> getValueHolders(Context context, final T attribute, final boolean readPhantom) {
 		return mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, readPhantom);
-	}
-
-	public <T extends Value> Snapshot<Serializable> getValues(final Context context, final T attribute) {
-		Snapshot<Serializable> mainSnapshot = new AbstractSnapshot<Serializable>() {
-			@Override
-			public Iterator<Serializable> iterator() {
-				return new AbstractProjectionIterator<Value, Serializable>(GenericImpl.this.<Value> mainIterator(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false)) {
-					@Override
-					public Serializable project(Value generic) {
-						return generic.getValue();
-					}
-				};
-			}
-		};
-		// if (mainSnapshot.isEmpty())
-		// return new AbstractSnapshot<Serializable>() {
-		// @Override
-		// public ArrayIterator<Serializable> iterator() {
-		// return new ArrayIterator<>(new Serializable[] { getDefaultValue((Attribute) attribute) });
-		// }
-		// };
-		return mainSnapshot;
 	}
 
 	@Override
@@ -1147,6 +1124,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return true;// value.<GenericImpl> getBaseComponent().defaultIsActive(systemPropertyClass) ? false : true;
 		return false;// defaultIsActive(systemPropertyClass);
 	}
+
+	// private boolean defaultIsActive(Class<?> systemPropertyClass) {
+	// SystemGeneric systemGeneric = systemPropertyClass.getAnnotation(SystemGeneric.class);
+	// if (systemGeneric == null)
+	// throw new IllegalStateException("Class " + systemPropertyClass + " must be SystemGeneric annoted");
+	// if (ReferentialIntegritySystemProperty.class.isAssignableFrom(systemPropertyClass))
+	// return !isReallyAttribute();
+	// return systemGeneric.defaultBehavior();
+	// }
 
 	// private boolean defaultIsActive(Class<?> systemPropertyClass) {
 	// SystemGeneric systemGeneric = systemPropertyClass.getAnnotation(SystemGeneric.class);
