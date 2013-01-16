@@ -8,12 +8,14 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.genericsystem.api.annotation.SystemGeneric;
+import org.genericsystem.api.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
 import org.genericsystem.api.annotation.constraints.NotNullConstraint;
 import org.genericsystem.api.annotation.constraints.PropertyConstraint;
 import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.annotation.constraints.SingularInstanceConstraint;
 import org.genericsystem.api.annotation.constraints.UniqueConstraint;
+import org.genericsystem.api.annotation.constraints.VirtualConstraint;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
@@ -952,6 +954,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	void mountConstraints(Cache cache, Class<?> clazz) {
+		InheritanceDisabled notInheritable = clazz.getAnnotation(InheritanceDisabled.class);
+		if (notInheritable != null)
+			disableInheritance(cache);
+
+		VirtualConstraint virtualConstraint = clazz.getAnnotation(VirtualConstraint.class);
+		if (virtualConstraint != null)
+			enableVirtualConstraint(cache);
 		UniqueConstraint distinct = clazz.getAnnotation(UniqueConstraint.class);
 		if (distinct != null)
 			enableUniqueConstraint(cache);
