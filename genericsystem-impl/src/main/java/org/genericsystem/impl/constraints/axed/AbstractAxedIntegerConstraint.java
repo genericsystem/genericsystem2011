@@ -16,10 +16,10 @@ public abstract class AbstractAxedIntegerConstraint extends AbstractConstraint {
 		for (Value constraintValueNode : getConstraintInstances(context, modified, getClass())) {
 			if (!(constraintValueNode.getValue() instanceof Integer))
 				throw new ConstraintViolationException("The constraint " + getClass() + " must be axed");
-			Integer axe = constraintValueNode.getValue();
-			if (axe == null)
+			Integer componentPos = constraintValueNode.getValue();
+			if (componentPos == null)
 				throw new ConstraintViolationException("The constraint " + getClass() + " must have a not null value");
-			internalCheck(context, modified, constraintValueNode.<Relation> getBaseComponent(), axe);
+			internalCheck(context, modified, constraintValueNode.<Relation> getBaseComponent(), componentPos);
 		}
 	}
 
