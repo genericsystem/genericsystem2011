@@ -47,7 +47,6 @@ import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
 import org.genericsystem.impl.system.MultiDirectionalSystemProperty;
 import org.genericsystem.impl.system.NoInheritanceSystemProperty;
 import org.genericsystem.impl.system.ReferentialIntegritySystemProperty;
-import org.genericsystem.impl.system.SystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1076,39 +1075,39 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		Property systemProperty = cache.find(systemPropertyClass);
 		for (Value nodeValue : getValueHolders(cache, systemProperty, true)) {
 			if (nodeValue.getValue().equals(componentPos)) {
-				if (nodeValue.<GenericImpl> getBaseComponent().defaultIsActive(systemPropertyClass))
-					if (equals(nodeValue.getBaseComponent()))
-						nodeValue.remove(cache);
-					else
-						cancel(cache, nodeValue);
+				// if (nodeValue.<GenericImpl> getBaseComponent().defaultIsActive(systemPropertyClass))
+				// if (equals(nodeValue.getBaseComponent()))
+				// nodeValue.remove(cache);
+				// else
+				// cancel(cache, nodeValue);
 				return (T) this;
 			}
 			if (isValuePhantomOverride(nodeValue, componentPos))
 				nodeValue.remove(cache);
 		}
-		if (!defaultIsActive(systemPropertyClass))
-			addValue(cache, systemProperty, componentPos);
+		// if (!defaultIsActive(systemPropertyClass))
+		addValue(cache, systemProperty, componentPos);
 		return (T) this;
 	}
 
 	@Override
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
 		Snapshot<Property> valueHolders = getValueHolders(cache, cache.<Property> find(systemPropertyClass));
-		if (valueHolders.isEmpty() && defaultIsActive(systemPropertyClass))
-			addValue(cache, cache.<Property> find(systemPropertyClass), componentPos);
-		else {
-			boolean check = false;
-			for (Value nodeValue : valueHolders)
-				if (nodeValue.getValue().equals(componentPos)) {
-					check = true;
-					if (equals(nodeValue.getBaseComponent()))
-						nodeValue.remove(cache);
-					else
-						cancel(cache, nodeValue);
-				}
-			if (!check && defaultIsActive(systemPropertyClass))
-				addValue(cache, cache.<Property> find(systemPropertyClass), componentPos);
-		}
+		// if (valueHolders.isEmpty() && defaultIsActive(systemPropertyClass))
+		// addValue(cache, cache.<Property> find(systemPropertyClass), componentPos);
+		// else {
+		// boolean check = false;
+		for (Value nodeValue : valueHolders)
+			if (nodeValue.getValue().equals(componentPos)) {
+				// check = true;
+				if (equals(nodeValue.getBaseComponent()))
+					nodeValue.remove(cache);
+				else
+					cancel(cache, nodeValue);
+			}
+		// if (!check && defaultIsActive(systemPropertyClass))
+		// addValue(cache, cache.<Property> find(systemPropertyClass), componentPos);
+		// }
 		return (T) this;
 	}
 
@@ -1121,20 +1120,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos) {
 		for (Value value : getValueHolders(context, ((AbstractContext) context).<Property> find(systemPropertyClass)))
 			if (Objects.equals(value.getValue(), componentPos))
-				return value.<GenericImpl> getBaseComponent().defaultIsActive(systemPropertyClass) ? false : true;
-		return defaultIsActive(systemPropertyClass);
+				return true;// value.<GenericImpl> getBaseComponent().defaultIsActive(systemPropertyClass) ? false : true;
+		return false;// defaultIsActive(systemPropertyClass);
 	}
 
-	private boolean defaultIsActive(Class<?> systemPropertyClass) {
-		try {
-			SystemProperty systemProperty = ((Class<? extends SystemProperty>) systemPropertyClass).newInstance();
-			if (systemProperty instanceof ReferentialIntegritySystemProperty)
-				return !isReallyAttribute();
-			return systemProperty.defaultIsActive();
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+	// private boolean defaultIsActive(Class<?> systemPropertyClass) {
+	// SystemGeneric systemGeneric = systemPropertyClass.getAnnotation(SystemGeneric.class);
+	// if (systemGeneric == null)
+	// throw new IllegalStateException("Class " + systemPropertyClass + " must be SystemGeneric annoted");
+	// if (ReferentialIntegritySystemProperty.class.isAssignableFrom(systemPropertyClass))
+	// return !isReallyAttribute();
+	// return systemGeneric.defaultBehavior();
+	// }
 
 	@Override
 	public <T extends Attribute> T enableMultiDirectional(Cache cache) {

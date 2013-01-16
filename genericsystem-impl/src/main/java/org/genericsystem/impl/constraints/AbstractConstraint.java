@@ -13,9 +13,8 @@ import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
-import org.genericsystem.impl.system.AbstractSystemProperty;
 
-public abstract class AbstractConstraint extends AbstractSystemProperty implements Constraint {
+public abstract class AbstractConstraint implements Constraint {
 
 	private static final long serialVersionUID = -6936080356593512744L;
 

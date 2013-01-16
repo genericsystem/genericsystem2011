@@ -6,6 +6,6 @@ import org.genericsystem.api.core.Engine;
 
 @SystemGeneric
 @Components(Engine.class)
-public class NoInheritanceSystemProperty extends AbstractSystemProperty {
+public class NoInheritanceSystemProperty {
 
 }
