@@ -33,33 +33,33 @@ public class SystemPropertyTest extends AbstractTest {
 		assert !humanPossessVehicle.isMultiDirectional(cache);
 	}
 
-	public void relationMultiDirectionalTestWithJump() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type human = cache.newType("Human");
-		Type man = human.newSubType(cache, "Man");
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Relation humanPossessVehicle = human.addRelation(cache, "possess", vehicle);
-		Relation manDriveCar = man.addSubRelation(cache, humanPossessVehicle, "drive", car);
-		humanPossessVehicle.enableMultiDirectional(cache);
-		assert manDriveCar.isMultiDirectional(cache);
-		humanPossessVehicle.disableMultiDirectional(cache);
-		assert !manDriveCar.isMultiDirectional(cache);
-	}
+	// public void relationMultiDirectionalTestWithJump() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type human = cache.newType("Human");
+	// Type man = human.newSubType(cache, "Man");
+	// Type vehicle = cache.newType("Vehicle");
+	// Type car = vehicle.newSubType(cache, "Car");
+	// Relation humanPossessVehicle = human.addRelation(cache, "possess", vehicle);
+	// Relation manDriveCar = man.addSubRelation(cache, humanPossessVehicle, "drive", car);
+	// humanPossessVehicle.enableMultiDirectional(cache);
+	// assert manDriveCar.isMultiDirectional(cache);
+	// humanPossessVehicle.disableMultiDirectional(cache);
+	// assert !manDriveCar.isMultiDirectional(cache);
+	// }
 
-	public void relationMultiDirectionalTestWithJump2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type human = cache.newType("Human");
-		Type man = human.newSubType(cache, "Man");
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Relation humanPossessVehicle = human.addRelation(cache, "possess", vehicle);
-		Relation manDriveCar = man.addSubRelation(cache, humanPossessVehicle, "drive", car);
-		manDriveCar.enableMultiDirectional(cache);
-		assert !humanPossessVehicle.isMultiDirectional(cache);
-		manDriveCar.disableMultiDirectional(cache);
-		assert !humanPossessVehicle.isMultiDirectional(cache);
-	}
+	// public void relationMultiDirectionalTestWithJump2() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type human = cache.newType("Human");
+	// Type man = human.newSubType(cache, "Man");
+	// Type vehicle = cache.newType("Vehicle");
+	// Type car = vehicle.newSubType(cache, "Car");
+	// Relation humanPossessVehicle = human.addRelation(cache, "possess", vehicle);
+	// Relation manDriveCar = man.addSubRelation(cache, humanPossessVehicle, "drive", car);
+	// manDriveCar.enableMultiDirectional(cache);
+	// assert !humanPossessVehicle.isMultiDirectional(cache);
+	// manDriveCar.disableMultiDirectional(cache);
+	// assert !humanPossessVehicle.isMultiDirectional(cache);
+	// }
 
 	public void cascadeRemoveTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
@@ -73,22 +73,22 @@ public class SystemPropertyTest extends AbstractTest {
 		assert !humanPossessVehicle.isCascadeRemove(cache, 0);
 	}
 
-	public void cascadeRemoveWithJump() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type human = cache.newType("Human");
-		Type man = human.newSubType(cache, "Man");
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-
-		Relation humanPossessVehicle = human.addRelation(cache, "possess", vehicle);
-		final Relation manDriveCar = man.addSubRelation(cache, humanPossessVehicle, "drive", car);
-
-		humanPossessVehicle.enableCascadeRemove(cache, 0);
-		assert manDriveCar.isCascadeRemove(cache, 0);
-		manDriveCar.disableCascadeRemove(cache, 0);
-		assert humanPossessVehicle.isCascadeRemove(cache, 0);
-		assert !manDriveCar.isCascadeRemove(cache, 0);
-	}
+	// public void cascadeRemoveWithJump() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type human = cache.newType("Human");
+	// Type man = human.newSubType(cache, "Man");
+	// Type vehicle = cache.newType("Vehicle");
+	// Type car = vehicle.newSubType(cache, "Car");
+	//
+	// Relation humanPossessVehicle = human.addRelation(cache, "possess", vehicle);
+	// final Relation manDriveCar = man.addSubRelation(cache, humanPossessVehicle, "drive", car);
+	//
+	// humanPossessVehicle.enableCascadeRemove(cache, 0);
+	// assert manDriveCar.isCascadeRemove(cache, 0);
+	// manDriveCar.disableCascadeRemove(cache, 0);
+	// assert humanPossessVehicle.isCascadeRemove(cache, 0);
+	// assert !manDriveCar.isCascadeRemove(cache, 0);
+	// }
 
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();

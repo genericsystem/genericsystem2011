@@ -246,22 +246,22 @@ public class SingularConstraintTest extends AbstractTest {
 
 	}
 
-	public void noMoreThanOneAttributePerEntity2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type car = cache.newType("Car");
-		Type frenchCar = car.newSubType(cache, "frenchCar");
-		Attribute registration = car.addAttribute(cache, "registration");
-		final Attribute frenchRegistration = frenchCar.addSubAttribute(cache, registration, "French Registration");
-		registration.enableSingularConstraint(cache);
-		final Generic myBmw = frenchCar.newInstance(cache, "myBmw");
-		myBmw.addValue(cache, registration, "AB123CD");
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				myBmw.addValue(cache, frenchRegistration, "JAIME75");
-			}
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
-	}
+	// public void noMoreThanOneAttributePerEntity2() {
+	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type car = cache.newType("Car");
+	// Type frenchCar = car.newSubType(cache, "frenchCar");
+	// Attribute registration = car.addAttribute(cache, "registration");
+	// final Attribute frenchRegistration = frenchCar.addSubAttribute(cache, registration, "French Registration");
+	// registration.enableSingularConstraint(cache);
+	// final Generic myBmw = frenchCar.newInstance(cache, "myBmw");
+	// myBmw.addValue(cache, registration, "AB123CD");
+	// new RollbackCatcher() {
+	// @Override
+	// public void intercept() {
+	// myBmw.addValue(cache, frenchRegistration, "JAIME75");
+	// }
+	// }.assertIsCausedBy(SingularConstraintViolationException.class);
+	// }
 
 	public void singularForTargetAxe() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();

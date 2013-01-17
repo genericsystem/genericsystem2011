@@ -56,16 +56,16 @@ public class RequiredConstraintTest extends AbstractTest {
 		cache.flush();
 	}
 
-	public void addSubOneRequired() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicleType = cache.newType("Vehicle");
-		Generic myFiat = vehicleType.newInstance(cache, "myFiat");
-		Attribute wheel = vehicleType.addAttribute(cache, "wheel");
-		wheel.enableRequiredConstraint(cache);
-		Attribute subAttribute = vehicleType.addSubAttribute(cache, wheel, "LittleWheel");
-		myFiat.addValue(cache, subAttribute, "littlePinkWheel");
-		cache.flush();
-	}
+	// public void addSubOneRequired() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type vehicleType = cache.newType("Vehicle");
+	// Generic myFiat = vehicleType.newInstance(cache, "myFiat");
+	// Attribute wheel = vehicleType.addAttribute(cache, "wheel");
+	// wheel.enableRequiredConstraint(cache);
+	// Attribute subAttribute = vehicleType.addSubAttribute(cache, wheel, "LittleWheel");
+	// myFiat.addValue(cache, subAttribute, "littlePinkWheel");
+	// cache.flush();
+	// }
 
 	public void addRequiredOnSubType() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
