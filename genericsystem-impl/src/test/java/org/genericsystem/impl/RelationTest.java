@@ -1111,32 +1111,32 @@ public class RelationTest extends AbstractTest {
 		assert human.getRelation(cache, "passenger") == null;
 	}
 
-	public void testSubRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type human = cache.newType("Human");
-		Relation possessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
-		Relation possessCar = human.addSubRelation(cache, possessVehicle, "HumanPossessCar", car);
-		assert human.getRelations(cache).size() == 1;
-		assert human.getRelations(cache).contains(possessCar);
-		assert possessCar.inheritsFrom(possessVehicle);
-	}
+	// public void testSubRelation() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type vehicle = cache.newType("Vehicle");
+	// Type car = vehicle.newSubType(cache, "Car");
+	// Type human = cache.newType("Human");
+	// Relation possessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
+	// Relation possessCar = human.addSubRelation(cache, possessVehicle, "HumanPossessCar", car);
+	// assert human.getRelations(cache).size() == 1;
+	// assert human.getRelations(cache).contains(possessCar);
+	// assert possessCar.inheritsFrom(possessVehicle);
+	// }
 
-	public void testSubRelationSymetric() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type human = cache.newType("Human");
-		Type man = human.newSubType(cache, "Man");
-		Relation humanPossessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
-		Relation manPossessCar = man.addSubRelation(cache, humanPossessVehicle, "ManPossessCar", car);
-		assert human.getRelations(cache).size() == 1;
-		assert human.getRelations(cache).contains(humanPossessVehicle);
-		assert man.getRelations(cache).size() == 1;
-		assert man.getRelations(cache).contains(manPossessCar);
-		assert manPossessCar.inheritsFrom(humanPossessVehicle);
-	}
+	// public void testSubRelationSymetric() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type vehicle = cache.newType("Vehicle");
+	// Type car = vehicle.newSubType(cache, "Car");
+	// Type human = cache.newType("Human");
+	// Type man = human.newSubType(cache, "Man");
+	// Relation humanPossessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
+	// Relation manPossessCar = man.addSubRelation(cache, humanPossessVehicle, "ManPossessCar", car);
+	// assert human.getRelations(cache).size() == 1;
+	// assert human.getRelations(cache).contains(humanPossessVehicle);
+	// assert man.getRelations(cache).size() == 1;
+	// assert man.getRelations(cache).contains(manPossessCar);
+	// assert manPossessCar.inheritsFrom(humanPossessVehicle);
+	// }
 
 	public void testTargetsAncestor() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();

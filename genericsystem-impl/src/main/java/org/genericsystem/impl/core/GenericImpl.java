@@ -366,24 +366,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Attribute> T addAttribute(Cache cache, Serializable value) {
-		return addSubAttribute(cache, getEngine(), value);
+		// return addSubAttribute(cache, getEngine(), value);
+		assert !Objects.equals(value, getEngine().getValue());
+		return ((CacheImpl) cache).bind(getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[] { this });
 	}
 
-	@Override
-	public <T extends Attribute> T addSubAttribute(Cache cache, Attribute attribute, Serializable value) {
-		assert !Objects.equals(value, attribute.getValue());
-		return ((CacheImpl) cache).bind(attribute, value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[] { this });
-	}
+	// @Override
+	// public <T extends Attribute> T addSubAttribute(Cache cache, Attribute attribute, Serializable value) {
+	// assert !Objects.equals(value, attribute.getValue());
+	// return ((CacheImpl) cache).bind(attribute, value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[] { this });
+	// }
 
 	@Override
 	public <T extends Property> T addProperty(Cache cache, Serializable value) {
 		return (T) addAttribute(cache, value).enablePropertyConstraint(cache);
 	}
 
-	@Override
-	public <T extends Property> T addSubProperty(Cache cache, Property property, Serializable value) {
-		return (T) addSubAttribute(cache, property, value).enablePropertyConstraint(cache);
-	}
+	// @Override
+	// public <T extends Property> T addSubProperty(Cache cache, Property property, Serializable value) {
+	// return (T) addSubAttribute(cache, property, value).enablePropertyConstraint(cache);
+	// }
 
 	@Override
 	public <T extends Value> T addValue(Cache cache, Value attribute, Serializable value) {
@@ -397,14 +399,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Relation> T addRelation(Cache cache, Serializable value, Type... targets) {
-		return addSubRelation(cache, getEngine(), value, targets);
+		// return addSubRelation(cache, getEngine(), value, targets);
+		assert !Objects.equals(value, getEngine().getValue());
+		return ((CacheImpl) cache).bind(getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
 	}
 
-	@Override
-	public <T extends Relation> T addSubRelation(Cache cache, Relation relation, Serializable value, Type... targets) {
-		assert !Objects.equals(value, relation.getValue());
-		return ((CacheImpl) cache).bind(relation, value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
-	}
+	// @Override
+	// public <T extends Relation> T addSubRelation(Cache cache, Relation relation, Serializable value, Type... targets) {
+	// assert !Objects.equals(value, relation.getValue());
+	// return ((CacheImpl) cache).bind(relation, value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
+	// }
 
 	@Override
 	public <T extends Generic> T newAnonymousInstance(Cache cache, Generic... components) {

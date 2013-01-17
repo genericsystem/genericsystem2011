@@ -3,10 +3,8 @@ package org.genericsystem.impl;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.VirtualConstraint;
 import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.exception.VirtualConstraintException;
-import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
 import org.testng.annotations.Test;
 
@@ -46,18 +44,18 @@ public class VirtualConstraintTest extends AbstractTest {
 		cache.flush();
 	}
 
-	public void virtualConstraintOnAttribute() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "car");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
-		Generic myAudi = car.newInstance(cache, "myAudi");
-		vehiclePower.enableVirtualConstraint(cache);
-		assert vehiclePower.isVirtualConstraintEnabled(cache);
-		Attribute horsePower = car.addSubAttribute(cache, vehiclePower, "horsePower");
-		myAudi.addValue(cache, horsePower, "200");
-		cache.flush();
-	}
+	// public void virtualConstraintOnAttribute() {
+	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type vehicle = cache.newType("Vehicle");
+	// Type car = vehicle.newSubType(cache, "car");
+	// Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
+	// Generic myAudi = car.newInstance(cache, "myAudi");
+	// vehiclePower.enableVirtualConstraint(cache);
+	// assert vehiclePower.isVirtualConstraintEnabled(cache);
+	// Attribute horsePower = car.addSubAttribute(cache, vehiclePower, "horsePower");
+	// myAudi.addValue(cache, horsePower, "200");
+	// cache.flush();
+	// }
 
 	@SystemGeneric
 	@VirtualConstraint

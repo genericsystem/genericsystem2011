@@ -50,27 +50,27 @@ public class NotNullConstraintTest extends AbstractTest {
 		}.assertIsCausedBy(NotNullConstraintViolationException.class);
 	}
 
-	public void testPropertyInheritedRelationKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type car = cache.newType("Car");
-		Type road = cache.newType("Road");
-		Type human = cache.newType("Human");
-
-		final Relation possessing = car.addRelation(cache, "Possessing", human, road);
-		possessing.enableNotNullConstraint(cache);
-		final Relation driving = car.addSubRelation(cache, possessing, "DrivingAlong", human, road);
-
-		final Generic myCar = car.newInstance(cache, "myCar");
-		final Generic myHuman = human.newInstance(cache, "myHuman");
-		final Generic myRoad = road.newInstance(cache, "myRoad");
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myCar.addLink(cache, driving, null, myHuman, myRoad);
-			}
-		}.assertIsCausedBy(NotNullConstraintViolationException.class);
-	}
+	// public void testPropertyInheritedRelationKO() {
+	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type car = cache.newType("Car");
+	// Type road = cache.newType("Road");
+	// Type human = cache.newType("Human");
+	//
+	// final Relation possessing = car.addRelation(cache, "Possessing", human, road);
+	// possessing.enableNotNullConstraint(cache);
+	// final Relation driving = car.addSubRelation(cache, possessing, "DrivingAlong", human, road);
+	//
+	// final Generic myCar = car.newInstance(cache, "myCar");
+	// final Generic myHuman = human.newInstance(cache, "myHuman");
+	// final Generic myRoad = road.newInstance(cache, "myRoad");
+	//
+	// new RollbackCatcher() {
+	//
+	// @Override
+	// public void intercept() {
+	// myCar.addLink(cache, driving, null, myHuman, myRoad);
+	// }
+	// }.assertIsCausedBy(NotNullConstraintViolationException.class);
+	// }
 
 }

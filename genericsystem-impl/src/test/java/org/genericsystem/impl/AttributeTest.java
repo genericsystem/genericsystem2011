@@ -167,18 +167,18 @@ public class AttributeTest extends AbstractTest {
 		assert !vehicleColor.isReallyAttribute();
 	}
 
-	public void testOverrideAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
-		Attribute carUltraPower = car.addSubAttribute(cache, vehiclePower, "ultraPower");
-
-		assert carUltraPower.isAttribute();
-		assert vehicle.getAttributes(cache).contains(vehiclePower) : vehicle.getAttributes(cache);
-		assert car.getAttributes(cache).contains(carUltraPower) : car.getAttributes(cache);
-		assert carUltraPower.inheritsFrom(vehiclePower);
-	}
+	// public void testOverrideAttribute() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type vehicle = cache.newType("Vehicle");
+	// Type car = vehicle.newSubType(cache, "Car");
+	// Attribute vehiclePower = vehicle.addAttribute(cache, "power");
+	// Attribute carUltraPower = car.addSubAttribute(cache, vehiclePower, "ultraPower");
+	//
+	// assert carUltraPower.isAttribute();
+	// assert vehicle.getAttributes(cache).contains(vehiclePower) : vehicle.getAttributes(cache);
+	// assert car.getAttributes(cache).contains(carUltraPower) : car.getAttributes(cache);
+	// assert carUltraPower.inheritsFrom(vehiclePower);
+	// }
 
 	public void testJumpOverrideAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
@@ -246,19 +246,19 @@ public class AttributeTest extends AbstractTest {
 		assert myCar2.getValueHolders(cache, vehiclePower).contains(p214);
 	}
 
-	public void testOverrideThreeAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type superCar = car.newSubType(cache, "SuperCar");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
-		Attribute carUltraPower = car.addSubAttribute(cache, vehiclePower, "UltraPower");
-
-		Attribute superCarFullUltraPower = superCar.addSubAttribute(cache, carUltraPower, "FullUltraPower");
-		assert superCar.getAttributes(cache).contains(superCarFullUltraPower);
-		assert car.getAttributes(cache).contains(carUltraPower);
-		assert vehicle.getAttributes(cache).contains(vehiclePower);
-	}
+	// public void testOverrideThreeAttribute() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Type vehicle = cache.newType("Vehicle");
+	// Type car = vehicle.newSubType(cache, "Car");
+	// Type superCar = car.newSubType(cache, "SuperCar");
+	// Attribute vehiclePower = vehicle.addAttribute(cache, "power");
+	// Attribute carUltraPower = car.addSubAttribute(cache, vehiclePower, "UltraPower");
+	//
+	// Attribute superCarFullUltraPower = superCar.addSubAttribute(cache, carUltraPower, "FullUltraPower");
+	// assert superCar.getAttributes(cache).contains(superCarFullUltraPower);
+	// assert car.getAttributes(cache).contains(carUltraPower);
+	// assert vehicle.getAttributes(cache).contains(vehiclePower);
+	// }
 
 	public void testAttributeOnAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();

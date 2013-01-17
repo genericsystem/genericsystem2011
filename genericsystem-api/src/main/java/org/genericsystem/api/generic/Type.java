@@ -70,7 +70,7 @@ public interface Type extends Generic {
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T addSubAttribute(Cache cache, Attribute attribute, Serializable value);
+	// <T extends Attribute> T addSubAttribute(Cache cache, Attribute attribute, Serializable value);
 
 	/**
 	 * Create a property for the type <br/>
@@ -90,7 +90,7 @@ public interface Type extends Generic {
 	 * @return the property
 	 * @see Property
 	 */
-	<T extends Property> T addSubProperty(Cache cache, Property property, Serializable value);
+	// <T extends Property> T addSubProperty(Cache cache, Property property, Serializable value);
 
 	/**
 	 * Create a relation
@@ -116,7 +116,7 @@ public interface Type extends Generic {
 	 * @return the relation
 	 * @see Relation
 	 */
-	<T extends Relation> T addSubRelation(Cache cache, Relation relation, Serializable value, Type... targets);
+	// <T extends Relation> T addSubRelation(Cache cache, Relation relation, Serializable value, Type... targets);
 
 	/**
 	 * Enable singular constraint
