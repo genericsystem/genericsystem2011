@@ -17,9 +17,11 @@ public class MetaGenericTest extends AbstractTest {
 	public void testMetaForMeta() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Engine engine = cache.getEngine();
+		Attribute metaAttribute = engine.getMetaAttribute();
+		Relation metaRelation = engine.getMetaRelation();
 		assert engine.getMeta().equals(engine);
-		assert engine.getMetaAttribute().getMeta().equals(engine.getMetaAttribute()) : engine.getMetaAttribute().getMeta();
-		assert engine.getMetaRelation().getMeta().equals(engine.getMetaRelation()) : engine.getMetaRelation().getMeta();
+		assert engine.getMetaAttribute().getMeta().equals(metaAttribute);
+		assert engine.getMetaRelation().getMeta().equals(metaRelation);
 	}
 
 	public void testMetaForTypeAndSubType() {
@@ -33,14 +35,13 @@ public class MetaGenericTest extends AbstractTest {
 
 	public void testMetaForAttributeAndSubAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Engine engine = cache.getEngine();
 		Attribute metaAttribute = cache.getEngine().getMetaAttribute();
 		Type newType = cache.newType("newType");
 		Type newSubType = newType.newSubType(cache, "newSubType");
 		Attribute newAttribute = newType.addAttribute(cache, "newAttribute");
 		assert newAttribute.getMeta().equals(metaAttribute);
 		Attribute newSubAttribute = newSubType.addAttribute(cache, "newAttribute");
-		assert newSubAttribute.getMeta().equals(engine.getMetaAttribute());
+		assert newSubAttribute.getMeta().equals(metaAttribute);
 	}
 
 	public void testMetaForRelation() {
