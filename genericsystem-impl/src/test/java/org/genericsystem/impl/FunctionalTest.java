@@ -5,7 +5,7 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.core.Snapshot.Filter;
-import org.genericsystem.api.generic.Property;
+import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
 import org.testng.annotations.Test;
 
@@ -16,7 +16,7 @@ public class FunctionalTest extends AbstractTest {
 	public void getCarInstancesWithPowerHigherThan90HP() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		final Property carPower = car.addProperty(cache, "Power");
+		final Attribute carPower = car.addProperty(cache, "Power");
 		Generic myCar = car.newInstance(cache, "myCar");
 		myCar.setValue(cache, carPower, 233);
 		Generic yourCar = car.newInstance(cache, "yourCar");

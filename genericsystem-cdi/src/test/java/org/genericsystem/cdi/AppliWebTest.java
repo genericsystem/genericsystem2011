@@ -5,7 +5,6 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
-import org.genericsystem.api.generic.Property;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.core.Statics;
@@ -54,7 +53,7 @@ public class AppliWebTest extends AbstractTest {
 	}
 
 	public void testPropertyIsAttribute() {
-		Property vehiclePower = expressions.evaluateMethodExpression("#{cache.newType('Vehicle').addProperty(cache, 'power')}");
+		Attribute vehiclePower = expressions.evaluateMethodExpression("#{cache.newType('Vehicle').addProperty(cache, 'power')}");
 		assert vehiclePower.isAttribute();
 		assert vehiclePower.isAttributeOf(expressions.evaluateMethodExpression("#{cache.newType('Vehicle')}", Type.class));
 	}
@@ -79,8 +78,10 @@ public class AppliWebTest extends AbstractTest {
 	public void testOverrideAttribute() {
 		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newSubType(cache, 'Car').addSubAttribute(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), 'power').isAttribute()}", Boolean.class);
 		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').getAttributes(cache).contains(cache.newType('Vehicle').addAttribute(cache, 'power'))}", Boolean.class);
-		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newSubType(cache, 'Car').getAttributes(cache).contains(cache.newType('Vehicle').newSubType(cache, 'Car').addSubAttribute(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), 'power'))}", Boolean.class);
-		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newSubType(cache, 'Car').addSubAttribute(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), 'power').inheritsFrom(cache.newType('Vehicle').addAttribute(cache, 'power'))}", Boolean.class);
+		assert expressions.evaluateMethodExpression(
+				"#{cache.newType('Vehicle').newSubType(cache, 'Car').getAttributes(cache).contains(cache.newType('Vehicle').newSubType(cache, 'Car').addSubAttribute(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), 'power'))}", Boolean.class);
+		assert expressions.evaluateMethodExpression(
+				"#{cache.newType('Vehicle').newSubType(cache, 'Car').addSubAttribute(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), 'power').inheritsFrom(cache.newType('Vehicle').addAttribute(cache, 'power'))}", Boolean.class);
 	}
 
 	public void testJumpOverrideAttribute() {
@@ -112,12 +113,13 @@ public class AppliWebTest extends AbstractTest {
 		myBmw.bind(cache, carOwner, sven);
 		yourAudi.bind(cache, carOwner, sven);
 
-		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, (Property) carOwner);
-		assert yourAudi.getLinks(cache, carOwner).size() == 1 : yourAudi.getLinks(cache, (Property) carOwner);
+		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, carOwner);
+		assert yourAudi.getLinks(cache, carOwner).size() == 1 : yourAudi.getLinks(cache, carOwner);
 	}
 
 	public void testSimpleReverse() {
-		cache.newType("Person").newInstance(cache, "me").bind(cache, (Relation) cache.newType("Car").addRelation(cache, "driver", cache.newType("Person")).enableSingularConstraint(cache, Statics.TARGET_POSITION), Statics.TARGET_POSITION, cache.newType("Car").newInstance(cache, "myBmw"));
+		cache.newType("Person").newInstance(cache, "me")
+				.bind(cache, (Relation) cache.newType("Car").addRelation(cache, "driver", cache.newType("Person")).enableSingularConstraint(cache, Statics.TARGET_POSITION), Statics.TARGET_POSITION, cache.newType("Car").newInstance(cache, "myBmw"));
 		assert cache.newType("Person").newInstance(cache, "me").getLinks(cache, (Relation) cache.newType("Car").addRelation(cache, "driver", cache.newType("Person")).enableSingularConstraint(cache, Statics.TARGET_POSITION), Statics.TARGET_POSITION).size() == 1;
 	}
 
@@ -237,7 +239,8 @@ public class AppliWebTest extends AbstractTest {
 	}
 
 	public void testDependency() {
-		assert expressions.evaluateMethodExpression("#{cache.getEngine().getInheritings(cache).containsAll(Arrays.asList(cache.newType('Vehicle'), cache.newType('Human'), cache.newType('Vehicle').addRelation(cache, 'pilot', cache.newType('Human')).getImplicit()))}", Boolean.class);
+		assert expressions.evaluateMethodExpression(
+				"#{cache.getEngine().getInheritings(cache).containsAll(Arrays.asList(cache.newType('Vehicle'), cache.newType('Human'), cache.newType('Vehicle').addRelation(cache, 'pilot', cache.newType('Human')).getImplicit()))}", Boolean.class);
 	}
 
 	public void testIsRelation() {
@@ -249,7 +252,9 @@ public class AppliWebTest extends AbstractTest {
 
 	public void testIsTernaryRelation() {
 		assert expressions.evaluateMethodExpression("#{cache.newType('Human').addRelation(cache, 'Games', cache.newType('Car'), cache.newType('Level')).isAttributeOf(cache.newType('Human'))}", Boolean.class);
-		assert expressions.evaluateMethodExpression("#{cache.newType('Human').addRelation(cache, 'Games', cache.newType('Car'), cache.newType('Level')).inheritsFrom(cache.newType('Human').addRelation(cache, 'Games', cache.newType('Car'), cache.newType('Level')).getImplicit())}", Boolean.class);
+		assert expressions.evaluateMethodExpression(
+				"#{cache.newType('Human').addRelation(cache, 'Games', cache.newType('Car'), cache.newType('Level')).inheritsFrom(cache.newType('Human').addRelation(cache, 'Games', cache.newType('Car'), cache.newType('Level')).getImplicit())}",
+				Boolean.class);
 		assert !expressions.evaluateMethodExpression("#{cache.newType('Human').addRelation(cache, 'Games', cache.newType('Car'), cache.newType('Level')).inheritsFrom(cache.newType('Human'))}", Boolean.class);
 		assert !expressions.evaluateMethodExpression("#{cache.newType('Human').addRelation(cache, 'Games', cache.newType('Car'), cache.newType('Level')).inheritsFrom(cache.newType('Car'))}", Boolean.class);
 		assert !expressions.evaluateMethodExpression("#{cache.newType('Human').addRelation(cache, 'Games', cache.newType('Car'), cache.newType('Level')).inheritsFrom(cache.newType('Level'))}", Boolean.class);

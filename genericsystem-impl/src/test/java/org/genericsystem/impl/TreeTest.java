@@ -9,7 +9,6 @@ import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.api.generic.Node;
 import org.genericsystem.api.generic.Node.Visitor;
-import org.genericsystem.api.generic.Property;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
@@ -167,7 +166,7 @@ public class TreeTest extends AbstractTest {
 		header.bind(cache, graphicComponentColor, blue);
 		footer.bind(cache, graphicComponentColor, yellow);
 
-		assert red.equals(body.getLink(cache, (Property) graphicComponentColor).getTargetComponent());
+		assert red.equals(body.getLink(cache, graphicComponentColor).getTargetComponent());
 		assert "Red".equals(body.getLinks(cache, graphicComponentColor).first().getTargetComponent().getValue());
 		cache.flush();
 	}

@@ -4,7 +4,7 @@ import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.generic.Property;
+import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.core.GenericImpl;
@@ -27,19 +27,19 @@ public class SuperOfTest extends AbstractTest {
 		Type robot = cache.newType("Robot");
 		cache.newSubType("Transformer", vehicle, robot);
 	}
-	
+
 	public void testMultiInheritingsWithInstance() {
 		Type vehicle = cache.newType("Vehicle");
 		Type robot = cache.newType("Robot");
 		Type transformer = cache.newSubType("Transformer", vehicle, robot);
-		Property power = transformer.addProperty(cache,"Power");
-		Generic myTransformer = transformer.newInstance(cache,"myTransformer");
-		myTransformer.addValue(cache,power, 123);
-		
+		Attribute power = transformer.addProperty(cache, "Power");
+		Generic myTransformer = transformer.newInstance(cache, "myTransformer");
+		myTransformer.addValue(cache, power, 123);
+
 		Type human = cache.newType("Human");
-		Relation humanPilotTransformer = human.addRelation(cache,"pilot", transformer);
-		Generic myck = human.newInstance(cache,"myck");
-		myck.addLink(cache,humanPilotTransformer, "myPilot", myTransformer);
+		Relation humanPilotTransformer = human.addRelation(cache, "pilot", transformer);
+		Generic myck = human.newInstance(cache, "myck");
+		myck.addLink(cache, humanPilotTransformer, "myPilot", myTransformer);
 	}
 
 	@AfterMethod

@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
-import org.genericsystem.api.generic.Property;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Value;
 
@@ -139,21 +138,21 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * 
-	 * @param property
-	 *            the property
+	 * @param relation
+	 *            the relation
 	 * @param targets
 	 *            the optional targets
 	 */
-	<T extends Link> T getLink(Context context, Property property, Generic... targets);
+	<T extends Link> T getLink(Context context, Relation relation, Generic... targets);
 
 	/**
 	 * 
-	 * @param property
-	 *            the property
+	 * @param relation
+	 *            the relation
 	 * @param targets
 	 *            the optional targets
 	 */
-	<T extends Link> T getLink(Context context, Property property, int basePos, Generic... targets);
+	<T extends Link> T getLink(Context context, Relation relation, int basePos, Generic... targets);
 
 	/**
 	 * 
@@ -300,22 +299,22 @@ public interface Generic extends Comparable<Generic> {
 	boolean isReferentialIntegrity(Context context, int componentPos);
 
 	/**
-	 * Returns the value of property
+	 * Returns the value of the attribute
 	 * 
-	 * @param property
-	 *            the property
+	 * @param attribute
+	 *            the attribute
 	 * @return the value
 	 */
-	<S extends Serializable> S getValue(Context context, Property property);
+	<S extends Serializable> S getValue(Context context, Attribute attribute);
 
 	/**
-	 * Set the value of property
+	 * Set the value of attribute
 	 * 
-	 * @param property
+	 * @param attribute
 	 * @param value
 	 * @return the value holder node
 	 */
-	<T extends Value> T setValue(Cache cache, Property property, Serializable value);
+	<T extends Value> T setValue(Cache cache, Attribute attribute, Serializable value);
 
 	<T extends Generic> T getImplicit();
 

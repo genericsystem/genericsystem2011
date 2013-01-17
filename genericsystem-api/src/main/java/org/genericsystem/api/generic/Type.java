@@ -30,7 +30,7 @@ public interface Type extends Generic {
 	 *            the property value
 	 * @return the property or null if no property find
 	 */
-	<T extends Property> T getProperty(Context context, Serializable value);
+	<T extends Attribute> T getProperty(Context context, Serializable value);
 
 	/**
 	 * Find the relation by value
@@ -77,10 +77,10 @@ public interface Type extends Generic {
 	 * 
 	 * @param value
 	 *            the property value
-	 * @return the property
-	 * @see Property
+	 * @return the attribute
+	 * @see Attribute
 	 */
-	<T extends Property> T addProperty(Cache cache, Serializable value);
+	<T extends Attribute> T addProperty(Cache cache, Serializable value);
 
 	/**
 	 * Create a property

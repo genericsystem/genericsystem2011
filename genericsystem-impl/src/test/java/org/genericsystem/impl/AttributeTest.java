@@ -4,7 +4,6 @@ import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.generic.Attribute;
-import org.genericsystem.api.generic.Property;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
@@ -28,7 +27,7 @@ public class AttributeTest extends AbstractTest {
 	public void testPropertyAncestorAndStructural() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Property vehiclePower = vehicle.addProperty(cache, "power");
+		Attribute vehiclePower = vehicle.addProperty(cache, "power");
 
 		Type power = vehiclePower.getImplicit();
 		assert power.isStructural();
@@ -52,7 +51,7 @@ public class AttributeTest extends AbstractTest {
 	public void testPropertyDependency() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Property vehiclePower = vehicle.addProperty(cache, "power");
+		Attribute vehiclePower = vehicle.addProperty(cache, "power");
 
 		Type power = vehiclePower.getImplicit();
 		assert cache.getEngine().getInheritings(cache).contains(power);
@@ -72,7 +71,7 @@ public class AttributeTest extends AbstractTest {
 	public void testPropertyIsAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Property vehiclePower = vehicle.addProperty(cache, "power");
+		Attribute vehiclePower = vehicle.addProperty(cache, "power");
 		assert vehiclePower.isAttribute();
 		assert vehiclePower.isAttributeOf(vehicle);
 	}
@@ -86,7 +85,7 @@ public class AttributeTest extends AbstractTest {
 	public void testGetAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Property vehiclePower = vehicle.addProperty(cache, "power");
+		Attribute vehiclePower = vehicle.addProperty(cache, "power");
 		assert vehicle.getAttribute(cache, "power").equals(vehiclePower);
 		assert vehicle.getAttribute(cache, "Pilot") == null;
 	}
@@ -94,7 +93,7 @@ public class AttributeTest extends AbstractTest {
 	public void testgetAttributes() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Property vehiclePower = vehicle.addProperty(cache, "power");
+		Attribute vehiclePower = vehicle.addProperty(cache, "power");
 		Attribute vehicleWheelsNumber = vehicle.addAttribute(cache, "WheelsNumber");
 		assert vehicle.getAttributes(cache).contains(vehiclePower);
 		assert vehicle.getAttributes(cache).contains(vehicleWheelsNumber);
@@ -119,7 +118,7 @@ public class AttributeTest extends AbstractTest {
 	public void testPropertyGetAttributeWithValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Property vehiclePower = vehicle.addProperty(cache, "power");
+		Attribute vehiclePower = vehicle.addProperty(cache, "power");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Value myVehicle123 = myVehicle.addValue(cache, vehiclePower, "123");
 		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1;
@@ -344,18 +343,18 @@ public class AttributeTest extends AbstractTest {
 	public void testDefaultPropertyValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Property vehiclePower = vehicle.addProperty(cache, "power");
+		Attribute vehiclePower = vehicle.addProperty(cache, "power");
 		assert vehiclePower.equals(vehicle.getProperty(cache, "power")) : vehicle.getAttributes(cache);
 		assert vehiclePower.isAlive(cache);
-		assert vehicle.getLink(cache, vehiclePower) == null;
-		Value value = ((Property) vehicle).setValue(cache, vehiclePower, true);
+		assert vehicle.getLink(cache, (Relation) vehiclePower) == null;
+		Value value = ((Attribute) vehicle).setValue(cache, vehiclePower, true);
 		assert vehiclePower.isAlive(cache);
 
 		assert value.getBaseComponent().equals(vehicle);
 		assert !value.inheritsFrom(vehicle);
 		assert value.isAttributeOf(vehicle);
 		assert vehicle.getValueHolders(cache, vehiclePower).contains(value);
-		assert Boolean.TRUE.equals(((Property) vehicle).getValue(cache, vehiclePower)) : ((Property) vehicle).getValue(cache, vehiclePower);
+		assert Boolean.TRUE.equals(((Attribute) vehicle).getValue(cache, vehiclePower)) : ((Attribute) vehicle).getValue(cache, vehiclePower);
 		assert vehiclePower.isAlive(cache);
 		assert vehiclePower.equals(vehicle.getProperty(cache, "power")) : vehicle.getAttributes(cache);
 	}
@@ -365,17 +364,17 @@ public class AttributeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
-		Property vehiclePower = vehicle.addProperty(cache, "power");
+		Attribute vehiclePower = vehicle.addProperty(cache, "power");
 		assert vehiclePower.equals(car.getProperty(cache, "power")) : car.getProperty(cache, "power");
-		Value falseVehicle = ((Property) vehicle).setValue(cache, vehiclePower, false);
+		Value falseVehicle = ((Attribute) vehicle).setValue(cache, vehiclePower, false);
 		assert falseVehicle.isAttributeOf(vehicle);
-		assert Boolean.FALSE.equals(((Property) myBmw).getValue(cache, vehiclePower));
-		Value trueCar = ((Property) car).setValue(cache, vehiclePower, true);
+		assert Boolean.FALSE.equals(((Attribute) myBmw).getValue(cache, vehiclePower));
+		Value trueCar = ((Attribute) car).setValue(cache, vehiclePower, true);
 		assert trueCar.isAttributeOf(car);
 		assert !trueCar.inheritsFrom(falseVehicle);
-		assert Boolean.FALSE.equals(((Property) vehicle).getValue(cache, vehiclePower)) : ((Property) vehicle).getValue(cache, vehiclePower);
-		assert Boolean.TRUE.equals(((Property) car).getValue(cache, vehiclePower));
-		assert Boolean.TRUE.equals(((Property) myBmw).getValue(cache, vehiclePower));
+		assert Boolean.FALSE.equals(((Attribute) vehicle).getValue(cache, vehiclePower)) : ((Attribute) vehicle).getValue(cache, vehiclePower);
+		assert Boolean.TRUE.equals(((Attribute) car).getValue(cache, vehiclePower));
+		assert Boolean.TRUE.equals(((Attribute) myBmw).getValue(cache, vehiclePower));
 	}
 
 }

@@ -5,7 +5,6 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
-import org.genericsystem.api.generic.Property;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.testng.annotations.Test;
@@ -64,9 +63,9 @@ public class RemoveTest extends AbstractTest {
 	public void testRemoveProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type window = cache.newType("Window");
-		Property height = window.addProperty(cache, "Height");
+		Attribute height = window.addProperty(cache, "Height");
 		Generic myWindow = window.newInstance(cache, "MyWindow");
-		Value myHeight1 = ((Property) myWindow).setValue(cache, height, 165);
+		Value myHeight1 = ((Attribute) myWindow).setValue(cache, height, 165);
 		myHeight1.remove(cache);
 		assert cache.getEngine().getInheritings(cache).contains(window);
 		assert cache.getEngine().getInheritings(cache).contains(height.getImplicit());

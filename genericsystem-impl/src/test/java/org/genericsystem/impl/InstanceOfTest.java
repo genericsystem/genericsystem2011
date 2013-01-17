@@ -5,7 +5,8 @@ import java.util.Objects;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.generic.Property;
+import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.testng.annotations.Test;
@@ -71,7 +72,7 @@ public class InstanceOfTest extends AbstractTest {
 		assert myCar.isInstanceOf(vehicle);
 		assert !myVehicle.isInstanceOf(car);
 
-		Property vehiclePower = vehicle.addProperty(cache, "Power");
+		Attribute vehiclePower = vehicle.addProperty(cache, "Power");
 
 		Value v90 = myVehicle.setValue(cache, vehiclePower, 90);
 		Value v235 = myCar.setValue(cache, vehiclePower, 235);
@@ -84,13 +85,13 @@ public class InstanceOfTest extends AbstractTest {
 		assert Objects.equals(myVehicle.getValue(cache, vehiclePower), 90);
 		assert Objects.equals(myCar.getValue(cache, vehiclePower), 235);
 
-		assert v90.equals(myVehicle.getLink(cache, vehiclePower));
-		assert v235.equals(myCar.getLink(cache, vehiclePower));
+		assert v90.equals(myVehicle.getLink(cache, (Relation) vehiclePower));
+		assert v235.equals(myCar.getLink(cache, (Relation) vehiclePower));
 
 		v90.remove(cache);
 
 		assert myVehicle.getValue(cache, vehiclePower) == null;
-		assert myVehicle.getLink(cache, vehiclePower) == null;
+		assert myVehicle.getLink(cache, (Relation) vehiclePower) == null;
 
 		cache.flush();
 	}

@@ -7,8 +7,8 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.exception.SingularConstraintViolationException;
+import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
-import org.genericsystem.api.generic.Property;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.core.Statics;
@@ -56,7 +56,7 @@ public class RelationTest extends AbstractTest {
 		Generic you = person.newInstance(cache, "you");
 		myBmw.bind(cache, carDriver, me);
 		myBmw.bind(cache, carDriver, you);
-		assert myBmw.getLinks(cache, carDriver).size() == 2 : myBmw.getLinks(cache, (Property) carDriver);
+		assert myBmw.getLinks(cache, carDriver).size() == 2 : myBmw.getLinks(cache, carDriver);
 	}
 
 	public void testSimpleReverse() {
@@ -88,7 +88,7 @@ public class RelationTest extends AbstractTest {
 		myBmw.bind(cache, carDriverTime, me, myTime);
 		myBmw.bind(cache, carDriverTime, you, yourTime);
 
-		assert myBmw.getLinks(cache, carDriverTime).size() == 2 : myBmw.getLinks(cache, (Property) carDriverTime);
+		assert myBmw.getLinks(cache, carDriverTime).size() == 2 : myBmw.getLinks(cache, carDriverTime);
 		assert carDriverTime.getComponents().get(Statics.BASE_POSITION).equals(car);
 		assert carDriverTime.getComponents().get(Statics.TARGET_POSITION).equals(person);
 		assert carDriverTime.getComponents().get(Statics.SECOND_TARGET_POSITION).equals(time);
@@ -189,8 +189,8 @@ public class RelationTest extends AbstractTest {
 		myBmw.bind(cache, carOwner, sven);
 		yourAudi.bind(cache, carOwner, sven);
 
-		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, (Property) carOwner);
-		assert yourAudi.getLinks(cache, carOwner).size() == 1 : yourAudi.getLinks(cache, (Property) carOwner);
+		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, carOwner);
+		assert yourAudi.getLinks(cache, carOwner).size() == 1 : yourAudi.getLinks(cache, carOwner);
 	}
 
 	public void testToOneReverse() {
@@ -209,7 +209,7 @@ public class RelationTest extends AbstractTest {
 		sven.bind(cache, carOwner, Statics.TARGET_POSITION, myBmw);
 		sven.bind(cache, carOwner, Statics.TARGET_POSITION, yourAudi);
 
-		assert sven.getLinks(cache, carOwner, Statics.TARGET_POSITION).size() == 2 : sven.getLinks(cache, (Property) carOwner, Statics.TARGET_POSITION);
+		assert sven.getLinks(cache, carOwner, Statics.TARGET_POSITION).size() == 2 : sven.getLinks(cache, carOwner, Statics.TARGET_POSITION);
 	}
 
 	public void testToOneTernary() {
@@ -230,7 +230,7 @@ public class RelationTest extends AbstractTest {
 		final Generic yesterday = time.newInstance(cache, "yesterday");
 
 		Link myBmwNicolasToday = myBmw.bind(cache, carOwnerTime, nicolas, today);
-		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, (Property) carOwnerTime);
+		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, carOwnerTime);
 		Link myBmwMichaelYesterday = myBmw.bind(cache, carOwnerTime, michael, yesterday);
 
 		assert myBmw.getLinks(cache, carOwnerTime).contains(myBmwMichaelYesterday);
@@ -254,12 +254,12 @@ public class RelationTest extends AbstractTest {
 		Generic you = owner.newInstance(cache, "you");
 
 		Link carMe = car.setLink(cache, carOwner, "defaultOwner", me);
-		assert myBmw.getLink(cache, (Property) carOwner).getBaseComponent().equals(car);
+		assert myBmw.getLink(cache, carOwner).getBaseComponent().equals(car);
 
 		Link carYou = myBmw.bind(cache, carOwner, you);
 
-		assert myBmw.getLink(cache, (Property) carOwner).equals(carYou) : myBmw.getLinks(cache, (Property) carOwner);
-		assert !myBmw.getLinks(cache, carOwner).contains(carMe) : myBmw.getLinks(cache, (Property) carOwner);
+		assert myBmw.getLink(cache, carOwner).equals(carYou) : myBmw.getLinks(cache, carOwner);
+		assert !myBmw.getLinks(cache, carOwner).contains(carMe) : myBmw.getLinks(cache, carOwner);
 	}
 
 	public void testToOneInheritanceReverse() {
@@ -277,7 +277,7 @@ public class RelationTest extends AbstractTest {
 		final Generic you = owner.newInstance(cache, "you");
 
 		me.setLink(cache, carOwner, "defaultOwner", Statics.TARGET_POSITION, car);
-		assert myBmw.getLink(cache, (Property) carOwner).getBaseComponent().equals(car);
+		assert myBmw.getLink(cache, carOwner).getBaseComponent().equals(car);
 
 		new RollbackCatcher() {
 
@@ -307,12 +307,12 @@ public class RelationTest extends AbstractTest {
 		Generic yesterday = time.newInstance(cache, "yesterday");
 
 		Link carMeToday = car.setLink(cache, carOwnerTime, "defaultOwner", me, today);
-		assert myBmw.getLink(cache, (Property) carOwnerTime).getBaseComponent().equals(car);
+		assert myBmw.getLink(cache, carOwnerTime).getBaseComponent().equals(car);
 
 		Link carYouYesterday = myBmw.bind(cache, carOwnerTime, you, yesterday);
 
-		assert myBmw.getLink(cache, (Property) carOwnerTime).equals(carYouYesterday) : myBmw.getLinks(cache, (Property) carOwnerTime);
-		assert !myBmw.getLinks(cache, carOwnerTime).contains(carMeToday) : myBmw.getLinks(cache, (Property) carOwnerTime);
+		assert myBmw.getLink(cache, carOwnerTime).equals(carYouYesterday) : myBmw.getLinks(cache, carOwnerTime);
+		assert !myBmw.getLinks(cache, carOwnerTime).contains(carMeToday) : myBmw.getLinks(cache, carOwnerTime);
 	}
 
 	public void testToOneNewTarget() {
@@ -332,7 +332,7 @@ public class RelationTest extends AbstractTest {
 		Link myBmwYou = myBmw.bind(cache, carOwner, you);
 		assert !myBmw.getLinks(cache, carOwner).contains(myBmwMe);
 		assert myBmw.getLinks(cache, carOwner).contains(myBmwYou);
-		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, (Property) carOwner);
+		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, carOwner);
 	}
 
 	public void testToOneNewTargetReverse() {
@@ -377,7 +377,7 @@ public class RelationTest extends AbstractTest {
 		Link myBmwYou = myBmw.bind(cache, carOwnerTime, you, today);
 		assert !myBmw.getLinks(cache, carOwnerTime).contains(myBmwMeToday);
 		assert myBmw.getLinks(cache, carOwnerTime).contains(myBmwYou);
-		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, (Property) carOwnerTime);
+		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, carOwnerTime);
 	}
 
 	public void testToOneSameValue() {
@@ -396,7 +396,7 @@ public class RelationTest extends AbstractTest {
 		Link myBmwMe2 = myBmw.setLink(cache, carOwner, "value1", me);
 		assert myBmwMe1 == myBmwMe2;
 
-		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, (Property) carOwner);
+		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, carOwner);
 	}
 
 	public void testToOneSameValueReverse() {
@@ -415,7 +415,7 @@ public class RelationTest extends AbstractTest {
 		Link myBmwMe2 = me.setLink(cache, carOwner, "value1", Statics.TARGET_POSITION, myBmw);
 		assert myBmwMe1 == myBmwMe2;
 
-		assert me.getLinks(cache, carOwner, Statics.TARGET_POSITION).size() == 1 : me.getLinks(cache, (Property) carOwner);
+		assert me.getLinks(cache, carOwner, Statics.TARGET_POSITION).size() == 1 : me.getLinks(cache, carOwner);
 	}
 
 	public void testToOneSameValueTernary() {
@@ -437,10 +437,10 @@ public class RelationTest extends AbstractTest {
 		Link myBmwMe1 = myBmw.setLink(cache, carOwnerTime, "value1", me, today);
 		Link myBmwMe2 = myBmw.setLink(cache, carOwnerTime, "value1", me, today);
 		assert myBmwMe1 == myBmwMe2;
-		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, (Property) carOwnerTime);
+		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, carOwnerTime);
 
 		myBmw.setLink(cache, carOwnerTime, "value2", me, today);
-		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, (Property) carOwnerTime);
+		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, carOwnerTime);
 	}
 
 	public void testToOneDifferentValue() {
@@ -459,7 +459,7 @@ public class RelationTest extends AbstractTest {
 		Link myBmwMe2 = myBmw.setLink(cache, carOwner, "value2", me);
 		assert myBmwMe1 != myBmwMe2;
 
-		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, (Property) carOwner);
+		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, carOwner);
 		assert myBmw.getLinks(cache, carOwner).findFirst("value1") == null;
 		assert myBmw.getLinks(cache, carOwner).findFirst("value2") != null;
 	}
@@ -486,7 +486,7 @@ public class RelationTest extends AbstractTest {
 
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 
-		assert me.getLinks(cache, carOwner, Statics.TARGET_POSITION).size() == 1 : me.getLinks(cache, (Property) carOwner, Statics.TARGET_POSITION);
+		assert me.getLinks(cache, carOwner, Statics.TARGET_POSITION).size() == 1 : me.getLinks(cache, carOwner, Statics.TARGET_POSITION);
 		assert me.getLinks(cache, carOwner, Statics.TARGET_POSITION).findFirst("value1") != null;
 		assert me.getLinks(cache, carOwner, Statics.TARGET_POSITION).findFirst("value2") == null;
 		cache.flush();
@@ -510,7 +510,7 @@ public class RelationTest extends AbstractTest {
 		Link myBmwMeToday2 = myBmw.setLink(cache, carOwnerTime, "value2", me, today);
 		assert myBmwMeToday1 != myBmwMeToday2;
 
-		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, (Property) carOwnerTime);
+		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, carOwnerTime);
 		assert myBmw.getLinks(cache, carOwnerTime).findFirst("value1") == null;
 		assert myBmw.getLinks(cache, carOwnerTime).findFirst("value2") != null;
 	}
@@ -536,7 +536,7 @@ public class RelationTest extends AbstractTest {
 		myBmw.bind(cache, carTyres, rearLeft);
 		myBmw.bind(cache, carTyres, rearRight);
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, (Property) carTyres);
+		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
 	}
 
 	public void testOneToManyReverse() {
@@ -560,10 +560,10 @@ public class RelationTest extends AbstractTest {
 		rearLeft.bind(cache, carTyres, Statics.TARGET_POSITION, myBmw);
 		rearRight.bind(cache, carTyres, Statics.TARGET_POSITION, myBmw);
 
-		assert frontLeft.getLinks(cache, carTyres, Statics.TARGET_POSITION).size() == 1 : frontLeft.getLinks(cache, (Property) carTyres, Statics.TARGET_POSITION);
-		assert frontRight.getLinks(cache, carTyres, Statics.TARGET_POSITION).size() == 1 : frontLeft.getLinks(cache, (Property) carTyres, Statics.TARGET_POSITION);
-		assert rearLeft.getLinks(cache, carTyres, Statics.TARGET_POSITION).size() == 1 : frontLeft.getLinks(cache, (Property) carTyres, Statics.TARGET_POSITION);
-		assert rearRight.getLinks(cache, carTyres, Statics.TARGET_POSITION).size() == 1 : frontLeft.getLinks(cache, (Property) carTyres, Statics.TARGET_POSITION);
+		assert frontLeft.getLinks(cache, carTyres, Statics.TARGET_POSITION).size() == 1 : frontLeft.getLinks(cache, carTyres, Statics.TARGET_POSITION);
+		assert frontRight.getLinks(cache, carTyres, Statics.TARGET_POSITION).size() == 1 : frontLeft.getLinks(cache, carTyres, Statics.TARGET_POSITION);
+		assert rearLeft.getLinks(cache, carTyres, Statics.TARGET_POSITION).size() == 1 : frontLeft.getLinks(cache, carTyres, Statics.TARGET_POSITION);
+		assert rearRight.getLinks(cache, carTyres, Statics.TARGET_POSITION).size() == 1 : frontLeft.getLinks(cache, carTyres, Statics.TARGET_POSITION);
 	}
 
 	public void testOneToManyInheritance() {
@@ -584,15 +584,15 @@ public class RelationTest extends AbstractTest {
 		Generic center = tyre.newInstance(cache, "center");
 
 		Link carCenter = car.setLink(cache, carTyres, "defaultTyre", center);
-		assert myBmw.getLink(cache, (Property) carTyres).getBaseComponent().equals(car);
+		assert myBmw.getLink(cache, carTyres).getBaseComponent().equals(car);
 
 		myBmw.bind(cache, carTyres, frontLeft);
 		myBmw.bind(cache, carTyres, frontRight);
 		myBmw.bind(cache, carTyres, rearLeft);
 		myBmw.bind(cache, carTyres, rearRight);
 
-		assert myBmw.getLinks(cache, carTyres).size() == 5 : myBmw.getLinks(cache, (Property) carTyres);
-		assert myBmw.getLinks(cache, (Property) carTyres).contains(carCenter) : myBmw.getLinks(cache, (Property) carTyres);
+		assert myBmw.getLinks(cache, carTyres).size() == 5 : myBmw.getLinks(cache, carTyres);
+		assert myBmw.getLinks(cache, carTyres).contains(carCenter) : myBmw.getLinks(cache, carTyres);
 	}
 
 	public void testOneToManyInheritanceReverse() {
@@ -613,19 +613,19 @@ public class RelationTest extends AbstractTest {
 		Generic pierre = person.newInstance(cache, "pierre");
 
 		Link carPierre = pierre.setLink(cache, carPerson, "defaultPerson", Statics.TARGET_POSITION, car);
-		assert myBmw.getLink(cache, (Property) carPerson).getBaseComponent().equals(car);
+		assert myBmw.getLink(cache, carPerson).getBaseComponent().equals(car);
 
 		michael.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
 		nicolas.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
 		sven.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
 		sofiane.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
 
-		assert michael.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : michael.getLinks(cache, (Property) carPerson, Statics.TARGET_POSITION);
-		assert nicolas.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : nicolas.getLinks(cache, (Property) carPerson, Statics.TARGET_POSITION);
-		assert sven.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : sven.getLinks(cache, (Property) carPerson, Statics.TARGET_POSITION);
-		assert sofiane.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : sofiane.getLinks(cache, (Property) carPerson, Statics.TARGET_POSITION);
+		assert michael.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : michael.getLinks(cache, carPerson, Statics.TARGET_POSITION);
+		assert nicolas.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : nicolas.getLinks(cache, carPerson, Statics.TARGET_POSITION);
+		assert sven.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : sven.getLinks(cache, carPerson, Statics.TARGET_POSITION);
+		assert sofiane.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : sofiane.getLinks(cache, carPerson, Statics.TARGET_POSITION);
 
-		assert myBmw.getLinks(cache, (Property) carPerson).contains(carPierre) : myBmw.getLinks(cache, (Property) carPerson);
+		assert myBmw.getLinks(cache, carPerson).contains(carPierre) : myBmw.getLinks(cache, carPerson);
 
 	}
 
@@ -657,7 +657,7 @@ public class RelationTest extends AbstractTest {
 		assert !myBmwRearRight1.isAlive(cache);
 		assert myBmwRearRight2.isAlive(cache);
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, (Property) carTyres);
+		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
 		assert myBmw.getLinks(cache, carTyres).findFirst("value1") == null;
 		assert myBmw.getLinks(cache, carTyres).findFirst("value2") != null;
 
@@ -698,7 +698,7 @@ public class RelationTest extends AbstractTest {
 		assert !myBmwRearRight1.isAlive(cache);
 		assert myBmwRearRight2.isAlive(cache);
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, (Property) carTyres);
+		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
 		assert myBmw.getLinks(cache, carTyres).findFirst("value1") == null;
 		assert myBmw.getLinks(cache, carTyres).findFirst("value2") != null;
 
@@ -733,7 +733,7 @@ public class RelationTest extends AbstractTest {
 		Link myBmwRearRight2 = myBmw.setLink(cache, carTyres, "value1", rearRight);
 		assert myBmwRearRight1 == myBmwRearRight2;
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, (Property) carTyres);
+		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
 		assert myBmw.getLinks(cache, carTyres).contains(myBmwRearRight1);
 	}
 
@@ -761,7 +761,7 @@ public class RelationTest extends AbstractTest {
 		Link myBmwRearRight2 = rearRight.setLink(cache, carTyres, "value1", Statics.TARGET_POSITION, myBmw);
 		assert myBmwRearRight1 == myBmwRearRight2;
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, (Property) carTyres);
+		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
 		assert myBmw.getLinks(cache, carTyres).contains(myBmwRearRight1);
 	}
 
@@ -782,8 +782,8 @@ public class RelationTest extends AbstractTest {
 		yourAudi.bind(cache, carColor, blue);
 		yourAudi.bind(cache, carColor, red);
 
-		assert myBmw.getLinks(cache, carColor).size() == 2 : myBmw.getLinks(cache, (Property) carColor);
-		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, (Property) carColor);
+		assert myBmw.getLinks(cache, carColor).size() == 2 : myBmw.getLinks(cache, carColor);
+		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, carColor);
 	}
 
 	public void testManyToManyReverse() {
@@ -803,8 +803,8 @@ public class RelationTest extends AbstractTest {
 		blue.bind(cache, carColor, Statics.TARGET_POSITION, yourAudi);
 		red.bind(cache, carColor, Statics.TARGET_POSITION, yourAudi);
 
-		assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 2 : red.getLinks(cache, (Property) carColor, Statics.TARGET_POSITION);
-		assert blue.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 2 : yourAudi.getLinks(cache, (Property) carColor, Statics.TARGET_POSITION);
+		assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 2 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
+		assert blue.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 2 : yourAudi.getLinks(cache, carColor, Statics.TARGET_POSITION);
 	}
 
 	public void testManyToManyInheritance() {
@@ -818,7 +818,7 @@ public class RelationTest extends AbstractTest {
 
 		Relation carColor = car.addRelation(cache, "CarColor", color);
 		Link carRed = car.setLink(cache, carColor, "defaultColor", red);
-		assert yourAudi.getLink(cache, (Property) carColor).getBaseComponent().equals(car);
+		assert yourAudi.getLink(cache, carColor).getBaseComponent().equals(car);
 
 		Link yourAudiRed = yourAudi.bind(cache, carColor, red);
 
@@ -838,7 +838,7 @@ public class RelationTest extends AbstractTest {
 
 		Relation carColor = car.addRelation(cache, "CarColor", color);
 		Link carRed = red.setLink(cache, carColor, "defaultColor", Statics.TARGET_POSITION, car);
-		assert red.getLink(cache, (Property) carColor, Statics.TARGET_POSITION).getBaseComponent().equals(car);
+		assert red.getLink(cache, carColor, Statics.TARGET_POSITION).getBaseComponent().equals(car);
 
 		Link yourAudiRed = red.bind(cache, carColor, Statics.TARGET_POSITION, yourAudi);
 
@@ -867,10 +867,10 @@ public class RelationTest extends AbstractTest {
 		yourAudi.bind(cache, carColor, blue);
 		yourAudi.bind(cache, carColor, red);
 
-		assert myBmw.getLinks(cache, carColor).size() == 1 : myBmw.getLinks(cache, (Property) carColor);
+		assert myBmw.getLinks(cache, carColor).size() == 1 : myBmw.getLinks(cache, carColor);
 		assert myBmw.getLinks(cache, carColor).findFirst("value1") == null;
 		assert myBmw.getLinks(cache, carColor).findFirst("value2") == bmwRed2;
-		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, (Property) carColor);
+		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, carColor);
 	}
 
 	public void testManyToManyPropertyConstraintReverse() {
@@ -893,13 +893,13 @@ public class RelationTest extends AbstractTest {
 		blue.bind(cache, carColor, Statics.TARGET_POSITION, yourAudi);
 		red.bind(cache, carColor, Statics.TARGET_POSITION, yourAudi);
 
-		assert myBmw.getLinks(cache, carColor).size() == 1 : myBmw.getLinks(cache, (Property) carColor);
+		assert myBmw.getLinks(cache, carColor).size() == 1 : myBmw.getLinks(cache, carColor);
 		assert myBmw.getLinks(cache, carColor).findFirst("value1") == null;
 		assert myBmw.getLinks(cache, carColor).findFirst("value2") == bmwRed2;
-		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, (Property) carColor);
+		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, carColor);
 
 		assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).findFirst("value2") == bmwRed2;
-		assert blue.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 1 : blue.getLinks(cache, (Property) carColor, Statics.TARGET_POSITION);
+		assert blue.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 1 : blue.getLinks(cache, carColor, Statics.TARGET_POSITION);
 	}
 
 	public void testSimpleRelation() {
@@ -1243,7 +1243,7 @@ public class RelationTest extends AbstractTest {
 	public void testDiamantKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type person = cache.newType("Person");
-		final Property age = person.addProperty(cache, "Age");
+		final Attribute age = person.addProperty(cache, "Age");
 		person.setValue(cache, age, "25");
 
 		final Type student = person.newSubType(cache, "Student");
@@ -1264,7 +1264,7 @@ public class RelationTest extends AbstractTest {
 	public void testDiamantOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type person = cache.newType("Person");
-		Property age = person.addProperty(cache, "Age");
+		Attribute age = person.addProperty(cache, "Age");
 		person.setValue(cache, age, "25");
 
 		Type student = person.newSubType(cache, "Student");

@@ -14,7 +14,6 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.generic.Attribute;
-import org.genericsystem.api.generic.Property;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.testng.annotations.Test;
@@ -68,9 +67,9 @@ public class SerializationTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 
-		Property height = window.addProperty(cache, "Height");
+		Attribute height = window.addProperty(cache, "Height");
 		Generic myWindow = window.newInstance(cache, "MyWindow");
-		Value myHeight1 = ((Property) myWindow).setValue(cache, height, 165);
+		Value myHeight1 = ((Attribute) myWindow).setValue(cache, height, 165);
 
 		cache.flush();
 
