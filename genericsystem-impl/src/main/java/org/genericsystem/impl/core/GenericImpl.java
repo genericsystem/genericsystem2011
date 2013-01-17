@@ -769,9 +769,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	// TODO KK
 	@Override
 	public <T extends Generic> T getMeta() {
-		if (equals(getEngine().getMetaAttribute()) || equals(getEngine().getMetaRelation()))
-			return (T) getEngine();
-		final int instanciationLevel = getMetaLevel() - 1;
+		final int instanciationLevel = getMetaLevel() == 0 ? 0 : getMetaLevel() - 1;
 		return levelFilter(new AbstractPreTreeIterator<T>((T) this) {
 			@Override
 			public Iterator<T> children(T node) {
