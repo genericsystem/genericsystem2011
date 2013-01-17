@@ -27,7 +27,6 @@ import org.genericsystem.api.exception.ConcurrencyControlException;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
-import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
@@ -184,21 +183,6 @@ public abstract class AbstractContext implements Context, Serializable {
 			if (composite.isMeta() && Arrays.equals(interfaces, ((GenericImpl) composite).getPrimariesArray()) && Arrays.equals(components, ((GenericImpl) composite).components))
 				return composite;
 		return null;
-	}
-
-	// TODO KK
-	Generic getSuperToCheck(Generic[] annotedInterfaces) {
-		return annotedInterfaces.length == 1 ? annotedInterfaces[0] : getEngine();
-	}
-
-	// TODO KK
-	protected Generic[] findAnnotedInterfaces(Class<?> clazz) {
-		LinkedHashSet<Class<?>> interfacesClasses = getAdditionalInterfaceClasses(clazz);
-		Type[] interfaces = new Type[interfacesClasses.size()];
-		int i = 0;
-		for (Class<?> interfacesClasse : interfacesClasses)
-			interfaces[i++] = this.<Type> find(interfacesClasse);
-		return interfaces;
 	}
 
 	protected Generic[] findComponents(Class<?> clazz) {
