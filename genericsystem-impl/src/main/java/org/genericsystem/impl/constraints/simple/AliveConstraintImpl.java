@@ -21,27 +21,25 @@ import org.genericsystem.impl.core.Statics;
 @PropertyConstraint
 @SingularConstraint(Statics.BASE_POSITION)
 public class AliveConstraintImpl extends AbstractSimpleBooleanConstraint {
-
+	
 	private static final long serialVersionUID = -6429972259714036057L;
-
+	
 	@Override
 	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
-		// if (modified.isAlive(context)) {
 		for (Generic generic : ((GenericImpl) modified).getComponents())
 			if (generic != null && !generic.isAlive(context))
 				throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");
-
+		
 		for (Generic generic : ((GenericImpl) modified).getSupers())
 			if (!generic.isAlive(context))
 				throw new AliveConstraintViolationException("Super : " + generic + " of added node " + modified + " should be alive.");
-
+		
 	}
-
+	
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
 	@BooleanValue(true)
 	@Interfaces(AliveConstraintImpl.class)
-	public static class DefaultValue {
-	}
-
+	public static class DefaultValue {}
+	
 }

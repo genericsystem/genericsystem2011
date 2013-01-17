@@ -5,12 +5,12 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Value;
-import org.genericsystem.impl.constraints.AbstractConstraint;
+import org.genericsystem.impl.constraints.Constraint;
 
-public abstract class AbstractAxedIntegerConstraint extends AbstractConstraint {
-
+public abstract class AbstractAxedIntegerConstraint extends Constraint {
+	
 	private static final long serialVersionUID = 3553977162062086353L;
-
+	
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		for (Value constraintValueNode : getConstraintInstances(context, modified, getClass())) {
@@ -22,7 +22,7 @@ public abstract class AbstractAxedIntegerConstraint extends AbstractConstraint {
 			internalCheck(context, modified, constraintValueNode.<Relation> getBaseComponent(), componentPos);
 		}
 	}
-
+	
 	protected abstract void internalCheck(Context context, Generic modified, Relation constraintType, Integer axe) throws ConstraintViolationException;
-
+	
 }

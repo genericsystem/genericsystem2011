@@ -16,10 +16,10 @@ import org.genericsystem.impl.core.GenericImpl;
 @SystemGeneric
 @Components(Engine.class)
 @PropertyConstraint
-public class RequiredConstraintImpl extends AbstractConstraint {
-
+public class RequiredConstraintImpl extends Constraint {
+	
 	private static final long serialVersionUID = -6429972259714036057L;
-
+	
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
 		if (!modified.isAlive(context))
@@ -28,20 +28,20 @@ public class RequiredConstraintImpl extends AbstractConstraint {
 			for (Attribute requiredAttribute : ((Type) modified.getMeta()).getAttributes(context))
 				checkRequired(modified, requiredAttribute, context);
 	}
-
+	
 	private void checkRequired(Generic baseGeneric, Generic requiredGeneric, Context context) throws RequiredConstraintViolationException {
 		if (((GenericImpl) requiredGeneric).isSystemPropertyEnabled(context, RequiredConstraintImpl.class) && baseGeneric.getValueHolders(context, (Attribute) requiredGeneric).isEmpty())
 			throw new RequiredConstraintViolationException("The generic " + baseGeneric + " has no value for the attribute " + requiredGeneric + ".");
 	}
-
+	
 	@Override
 	public boolean isCheckedAt(CheckingType type) {
 		return type.equals(CheckingType.CHECK_ON_REMOVE_NODE) || type.equals(CheckingType.CHECK_ON_ADD_NODE);
 	}
-
+	
 	@Override
 	public boolean isImmediatelyCheckable() {
 		return false;
 	}
-
+	
 }

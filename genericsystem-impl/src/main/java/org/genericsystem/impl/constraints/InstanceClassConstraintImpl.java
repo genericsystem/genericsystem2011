@@ -16,10 +16,10 @@ import org.genericsystem.impl.core.Statics;
 @Components(Engine.class)
 @SingularConstraint(Statics.BASE_POSITION)
 // @PropertyConstraint
-public class InstanceClassConstraintImpl extends AbstractConstraint {
-
+public class InstanceClassConstraintImpl extends Constraint {
+	
 	private static final long serialVersionUID = -6429972259714036057L;
-
+	
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
 		for (Value constraintValueNode : getConstraintInstances(context, modified, this.getClass()))
@@ -30,6 +30,5 @@ public class InstanceClassConstraintImpl extends AbstractConstraint {
 							+ constraintValueNode.getBaseComponent().getValue());
 			}
 	}
-
-
+	
 }
