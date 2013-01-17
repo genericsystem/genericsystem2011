@@ -203,9 +203,10 @@ public class AttributeTest extends AbstractTest {
 
 		Value p333 = car.addValue(cache, p213, "333");
 
-		assert p333.inheritsFrom(p213);
+		assert !p333.inheritsFrom(p213);
 
-		assert vehiclePower.getInstances(cache).size() == 2 : vehiclePower.getInstances(cache);
+		assert vehiclePower.getInstances(cache).size() == 3 : vehiclePower.getInstances(cache);
+		assert vehiclePower.getInstances(cache).contains(p213);
 		assert vehiclePower.getInstances(cache).contains(p214);
 		assert vehiclePower.getInstances(cache).contains(p333);
 
@@ -371,7 +372,7 @@ public class AttributeTest extends AbstractTest {
 		assert Boolean.FALSE.equals(((Property) myBmw).getValue(cache, vehiclePower));
 		Value trueCar = ((Property) car).setValue(cache, vehiclePower, true);
 		assert trueCar.isAttributeOf(car);
-		assert trueCar.inheritsFrom(falseVehicle);
+		assert !trueCar.inheritsFrom(falseVehicle);
 		assert Boolean.FALSE.equals(((Property) vehicle).getValue(cache, vehiclePower)) : ((Property) vehicle).getValue(cache, vehiclePower);
 		assert Boolean.TRUE.equals(((Property) car).getValue(cache, vehiclePower));
 		assert Boolean.TRUE.equals(((Property) myBmw).getValue(cache, vehiclePower));

@@ -967,14 +967,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (distinct != null)
 			enableUniqueConstraint(cache);
 
-		InstanceClassConstraint instanceClass = clazz.getAnnotation(InstanceClassConstraint.clas		InheritanceDisabled notInheritable = clazz.getAnnotation(InheritanceDisabled.class);
-		if (notInheritable != null)
-			disableInheritance(cache);
-
-		VirtualConstraint virtualConstraint = clazz.getAnnotation(VirtualConstraint.class);
-		if (virtualConstraint != null)
-			enableVirtualConstraint(cache);
-s);
+		InstanceClassConstraint instanceClass = clazz.getAnnotation(InstanceClassConstraint.class);
 		if (instanceClass != null)
 			setConstraintClass(cache, instanceClass.value());
 
@@ -1176,14 +1169,14 @@ s);
 	@Override
 	public boolean isMultiDirectional(Context context) {
 		return isSystemPropertyEnabled(context, MultiDirectionalSystemProperty.class);
-	// private boolean defaultIsActive(Class<?> systemPropertyClass) {
-	// SystemGeneric systemGeneric = systemPropertyClass.getAnnotation(SystemGeneric.class);
-	// if (systemGeneric == null)
-	// throw new IllegalStateException("Class " + systemPropertyClass + " must be SystemGeneric annoted");
-	// if (ReferentialIntegritySystemProperty.class.isAssignableFrom(systemPropertyClass))
-	// return !isReallyAttribute();
-	// return systemGeneric.defaultBehavior();
-	// }
+		// private boolean defaultIsActive(Class<?> systemPropertyClass) {
+		// SystemGeneric systemGeneric = systemPropertyClass.getAnnotation(SystemGeneric.class);
+		// if (systemGeneric == null)
+		// throw new IllegalStateException("Class " + systemPropertyClass + " must be SystemGeneric annoted");
+		// if (ReferentialIntegritySystemProperty.class.isAssignableFrom(systemPropertyClass))
+		// return !isReallyAttribute();
+		// return systemGeneric.defaultBehavior();
+		// }
 
 	}
 

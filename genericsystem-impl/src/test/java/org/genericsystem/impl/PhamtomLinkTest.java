@@ -1,10 +1,13 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.api.core.Cache;
+import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
+import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
+import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.Test;
 
 @Test
@@ -19,9 +22,16 @@ public class PhamtomLinkTest extends AbstractTest {
 		assert car.getAttributes(cache).contains(vehiclePower);
 
 		car.cancel(cache, vehiclePower);
+		assert car.getAttributes(cache).filter(new Snapshot.Filter<Attribute>() {
+
+			@Override
+			public boolean isSelected(Attribute element) {
+				return ((GenericImpl) element).isPhantom();
+			}
+		}).isEmpty();
 		assert !car.getAttributes(cache).contains(vehiclePower);
 
-		car.restore(cache,vehiclePower);
+		car.restore(cache, vehiclePower);
 		assert car.getAttributes(cache).contains(vehiclePower);
 	}
 
@@ -29,24 +39,20 @@ public class PhamtomLinkTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Type color = cache.newType("Color");
 		Relation vehicleHuman = vehicle.addRelation(cache, "VehicleHuman", human);
-		Relation vehicleColor = vehicle.addRelation(cache, "vehicleColor", color);
 		Type car = vehicle.newSubType(cache, "Car");
 
-		assert vehicle.getRelations(cache).size() == 2;
-		assert car.getRelations(cache).size() == 2;
+		assert vehicle.getRelations(cache).size() == 1;
+		assert car.getRelations(cache).size() == 1;
 
 		car.cancel(cache, vehicleHuman);
-		assert vehicle.getRelations(cache).size() == 2;
-		assert car.getRelations(cache).size() == 1;
-		assert car.getRelations(cache).contains(vehicleColor);
+		assert vehicle.getRelations(cache).size() == 1;
+		assert car.getRelations(cache).size() == 0;
 
-		car.restore(cache,vehicleHuman);
-		assert vehicle.getRelations(cache).size() == 2;
-		assert car.getRelations(cache).size() == 2;
-		assert car.getRelations(cache).get(0).equals(vehicleHuman);
-		assert car.getRelations(cache).get(1).equals(vehicleColor);
+		car.restore(cache, vehicleHuman);
+		assert vehicle.getRelations(cache).size() == 1;
+		assert car.getRelations(cache).size() == 1;
+		assert car.getRelations(cache).contains(vehicleHuman);
 	}
 
 	public void testPhantomHierarchyRelation() {
@@ -63,10 +69,12 @@ public class PhamtomLinkTest extends AbstractTest {
 
 		car.cancel(cache, vehicleHuman);
 		assert vehicle.getRelations(cache).contains(vehicleHuman);
+		assert car.getRelations(cache).size() == 0;
 		assert !car.getRelations(cache).contains(vehicleHuman);
+		assert convertible.getRelations(cache).size() == 0;
 		assert !convertible.getRelations(cache).contains(vehicleHuman);
 
-		car.restore(cache,vehicleHuman);
+		car.restore(cache, vehicleHuman);
 		assert vehicle.getRelations(cache).contains(vehicleHuman);
 		assert car.getRelations(cache).contains(vehicleHuman);
 		assert convertible.getRelations(cache).contains(vehicleHuman);
@@ -74,6 +82,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		convertible.cancel(cache, vehicleHuman);
 		assert vehicle.getRelations(cache).contains(vehicleHuman);
 		assert car.getRelations(cache).contains(vehicleHuman);
+		assert convertible.getRelations(cache).size() == 0;
 		assert !convertible.getRelations(cache).contains(vehicleHuman);
 	}
 
@@ -81,10 +90,10 @@ public class PhamtomLinkTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
+		Relation vehicleColor = vehicle.addRelation(cache, "VehicleColor", color);
 		Type car = vehicle.newSubType(cache, "Car");
 		Type breakVehicle = car.newSubType(cache, "BreakVehicle");
 		Type convertible = car.newSubType(cache, "Convertible");
-		Relation vehicleColor = vehicle.addRelation(cache, "VehicleColor", color);
 
 		car.cancel(cache, vehicleColor);
 		assert vehicle.getRelations(cache).size() == 1;
@@ -92,7 +101,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		assert breakVehicle.getRelations(cache).size() == 0;
 		assert convertible.getRelations(cache).size() == 0;
 
-		car.restore(cache,vehicleColor);
+		car.restore(cache, vehicleColor);
 		assert vehicle.getRelations(cache).size() == 1;
 		assert car.getRelations(cache).get(0).equals(vehicleColor);
 		assert breakVehicle.getRelations(cache).get(0).equals(vehicleColor);
@@ -114,9 +123,74 @@ public class PhamtomLinkTest extends AbstractTest {
 		assert car.getRelations(cache).get(0).getTargetComponent().equals(human);
 
 		car.cancel(cache, vehicleHuman);
-		car.restore(cache,vehicleHuman);
+		car.restore(cache, vehicleHuman);
 		assert car.getRelations(cache).size() == 1;
 		assert car.getRelations(cache).get(0).getTargetComponent().equals(human);
+	}
+
+	public void testAttributeWithGetInstances() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
+
+		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
+		Generic myCar = car.newInstance(cache, "myCar");
+
+		myVehicle.addValue(cache, vehiclePower, "123");
+		myCar.addValue(cache, vehiclePower, "256");
+
+		assert vehiclePower.getInstances(cache).filter(new Snapshot.Filter<Generic>() {
+
+			@Override
+			public boolean isSelected(Generic element) {
+				return ((GenericImpl) element).isPhantom();
+			}
+		}).isEmpty();
+		assert vehiclePower.getAllInstances(cache).filter(new Snapshot.Filter<Generic>() {
+
+			@Override
+			public boolean isSelected(Generic element) {
+				return ((GenericImpl) element).isPhantom();
+			}
+		}).isEmpty();
+	}
+
+	public void testAttributeWithGetSubTypes() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
+
+		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
+		Generic myCar = car.newInstance(cache, "myCar");
+
+		myVehicle.addValue(cache, vehiclePower, "123");
+		myCar.addValue(cache, vehiclePower, "256");
+
+		assert vehiclePower.getSubTypes(cache).isEmpty();
+		assert vehiclePower.getAllSubTypes(cache).size() == 1 && vehiclePower.getAllSubTypes(cache).contains(vehiclePower);
+	}
+
+	public void testAttributeWithGetInheritings() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
+
+		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
+		Generic myCar = car.newInstance(cache, "myCar");
+
+		myVehicle.addValue(cache, vehiclePower, "123");
+		myCar.addValue(cache, vehiclePower, "256");
+
+		assert vehiclePower.getInheritings(cache).filter(new Snapshot.Filter<Generic>() {
+
+			@Override
+			public boolean isSelected(Generic element) {
+				return ((GenericImpl) element).isPhantom();
+			}
+		}).isEmpty();
 	}
 
 }
