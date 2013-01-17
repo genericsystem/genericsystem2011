@@ -8,12 +8,14 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.genericsystem.api.annotation.SystemGeneric;
+import org.genericsystem.api.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
 import org.genericsystem.api.annotation.constraints.NotNullConstraint;
 import org.genericsystem.api.annotation.constraints.PropertyConstraint;
 import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.annotation.constraints.SingularInstanceConstraint;
 import org.genericsystem.api.annotation.constraints.UniqueConstraint;
+import org.genericsystem.api.annotation.constraints.VirtualConstraint;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
@@ -30,8 +32,9 @@ import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.impl.constraints.RequiredAxedConstraintImpl;
 import org.genericsystem.impl.constraints.RequiredConstraintImpl;
+import org.genericsystem.impl.constraints.VirtualConstraintImpl;
+import org.genericsystem.impl.constraints.axed.RequiredAxedConstraintImpl;
 import org.genericsystem.impl.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.impl.constraints.simple.NotNullConstraintImpl;
 import org.genericsystem.impl.constraints.simple.PropertyConstraintImpl;
@@ -415,7 +418,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).bind(this, value, getMetaLevel(), getPrimariesArray(), components);
+		return ((CacheImpl) cache).bind(this, value, SystemGeneric.STRUCTURAL, getPrimariesArray(), components);
 	}
 
 	@Override
@@ -430,7 +433,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int basePos, Generic... targets) {
-		return ((CacheImpl) cache).bind(relation, value, SystemGeneric.CONCRETE, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
+		if (relation.isConcrete())
+			cancel(cache, relation);
+		return ((CacheImpl) cache).bind(relation.isConcrete() ? relation.getMeta() : relation, value, SystemGeneric.CONCRETE, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	@Override
@@ -850,7 +855,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 					@Override
 					public boolean isSelectable() {
-						return next.isInstanceOf(GenericImpl.this);
+						return next.isInstanceOf(GenericImpl.this) && !((GenericImpl) next).isPhantom();
 					}
 				};
 			}
@@ -879,7 +884,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return new AbstractFilterIterator<Generic>(((GenericImpl) node).directInheritingsIterator(context)) {
 					@Override
 					public boolean isSelected() {
-						return next.getMetaLevel() <= metaLevel && alreadySelected.add(next);
+						return next.getMetaLevel() <= metaLevel && alreadySelected.add(next) && !((GenericImpl) next).isPhantom();
 					}
 				};
 			}
@@ -951,11 +956,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	void mountConstraints(Cache cache, Class<?> clazz) {
+		InheritanceDisabled notInheritable = clazz.getAnnotation(InheritanceDisabled.class);
+		if (notInheritable != null)
+			disableInheritance(cache);
+
+		VirtualConstraint virtualConstraint = clazz.getAnnotation(VirtualConstraint.class);
+		if (virtualConstraint != null)
+			enableVirtualConstraint(cache);
 		UniqueConstraint distinct = clazz.getAnnotation(UniqueConstraint.class);
 		if (distinct != null)
 			enableUniqueConstraint(cache);
 
-		InstanceClassConstraint instanceClass = clazz.getAnnotation(InstanceClassConstraint.class);
+		InstanceClassConstraint instanceClass = clazz.getAnnotation(InstanceClassConstraint.clas		InheritanceDisabled notInheritable = clazz.getAnnotation(InheritanceDisabled.class);
+		if (notInheritable != null)
+			disableInheritance(cache);
+
+		VirtualConstraint virtualConstraint = clazz.getAnnotation(VirtualConstraint.class);
+		if (virtualConstraint != null)
+			enableVirtualConstraint(cache);
+s);
 		if (instanceClass != null)
 			setConstraintClass(cache, instanceClass.value());
 
@@ -1133,6 +1152,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	// return systemGeneric.defaultBehavior();
 	// }
 
+	// private boolean defaultIsActive(Class<?> systemPropertyClass) {
+	// SystemGeneric systemGeneric = systemPropertyClass.getAnnotation(SystemGeneric.class);
+	// if (systemGeneric == null)
+	// throw new IllegalStateException("Class " + systemPropertyClass + " must be SystemGeneric annoted");
+	// if (ReferentialIntegritySystemProperty.class.isAssignableFrom(systemPropertyClass))
+	// return !isReallyAttribute();
+	// return systemGeneric.defaultBehavior();
+	// }
+
 	@Override
 	public <T extends Attribute> T enableMultiDirectional(Cache cache) {
 		setSystemPropertyValue(cache, MultiDirectionalSystemProperty.class, Boolean.TRUE);
@@ -1148,6 +1176,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public boolean isMultiDirectional(Context context) {
 		return isSystemPropertyEnabled(context, MultiDirectionalSystemProperty.class);
+	// private boolean defaultIsActive(Class<?> systemPropertyClass) {
+	// SystemGeneric systemGeneric = systemPropertyClass.getAnnotation(SystemGeneric.class);
+	// if (systemGeneric == null)
+	// throw new IllegalStateException("Class " + systemPropertyClass + " must be SystemGeneric annoted");
+	// if (ReferentialIntegritySystemProperty.class.isAssignableFrom(systemPropertyClass))
+	// return !isReallyAttribute();
+	// return systemGeneric.defaultBehavior();
+	// }
+
 	}
 
 	@Override
@@ -1283,6 +1320,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public boolean isUniqueConstraintEnabled(Context context) {
 		return isSystemPropertyEnabled(context, UniqueConstraintImpl.class);
+	}
+
+	@Override
+	public <T extends Type> T enableVirtualConstraint(Cache cache) {
+		return enableSystemProperty(cache, VirtualConstraintImpl.class);
+	}
+
+	@Override
+	public <T extends Type> T disableVirtualConstraint(Cache cache) {
+		return disableSystemProperty(cache, VirtualConstraintImpl.class);
+	}
+
+	@Override
+	public boolean isVirtualConstraintEnabled(Context context) {
+		return isSystemPropertyEnabled(context, VirtualConstraintImpl.class);
 	}
 
 	@Override
