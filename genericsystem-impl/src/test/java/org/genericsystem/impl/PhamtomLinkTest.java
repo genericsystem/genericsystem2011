@@ -137,8 +137,8 @@ public class PhamtomLinkTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Generic myCar = car.newInstance(cache, "myCar");
 
-		myVehicle.addValue(cache, vehiclePower, "123");
-		myCar.addValue(cache, vehiclePower, "256");
+		myVehicle.setValue(cache, vehiclePower, "123");
+		myCar.setValue(cache, vehiclePower, "256");
 
 		assert vehiclePower.getInstances(cache).filter(new Snapshot.Filter<Generic>() {
 
@@ -165,8 +165,8 @@ public class PhamtomLinkTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Generic myCar = car.newInstance(cache, "myCar");
 
-		myVehicle.addValue(cache, vehiclePower, "123");
-		myCar.addValue(cache, vehiclePower, "256");
+		myVehicle.setValue(cache, vehiclePower, "123");
+		myCar.setValue(cache, vehiclePower, "256");
 
 		assert vehiclePower.getSubTypes(cache).isEmpty();
 		assert vehiclePower.getAllSubTypes(cache).size() == 1 && vehiclePower.getAllSubTypes(cache).contains(vehiclePower);
@@ -181,8 +181,8 @@ public class PhamtomLinkTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Generic myCar = car.newInstance(cache, "myCar");
 
-		myVehicle.addValue(cache, vehiclePower, "123");
-		myCar.addValue(cache, vehiclePower, "256");
+		myVehicle.setValue(cache, vehiclePower, "123");
+		myCar.setValue(cache, vehiclePower, "256");
 
 		assert vehiclePower.getInheritings(cache).filter(new Snapshot.Filter<Generic>() {
 

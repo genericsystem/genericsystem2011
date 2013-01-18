@@ -34,12 +34,12 @@ public class SuperOfTest extends AbstractTest {
 		Type transformer = cache.newSubType("Transformer", vehicle, robot);
 		Attribute power = transformer.addProperty(cache, "Power");
 		Generic myTransformer = transformer.newInstance(cache, "myTransformer");
-		myTransformer.addValue(cache, power, 123);
+		myTransformer.setValue(cache, power, 123);
 
 		Type human = cache.newType("Human");
 		Relation humanPilotTransformer = human.addRelation(cache, "pilot", transformer);
 		Generic myck = human.newInstance(cache, "myck");
-		myck.addLink(cache, humanPilotTransformer, "myPilot", myTransformer);
+		myck.setLink(cache, humanPilotTransformer, "myPilot", myTransformer);
 	}
 
 	@AfterMethod

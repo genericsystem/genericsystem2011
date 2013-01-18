@@ -19,13 +19,13 @@ public class UniqueConstraintTest extends AbstractTest {
 		registration.enableUniqueConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
 		final Generic yourCar = car.newInstance(cache, "yourCar");
-		myCar.addValue(cache, registration, "315DT75");
+		myCar.setValue(cache, registration, "315DT75");
 
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				yourCar.addValue(cache, registration, "315DT75");
+				yourCar.setValue(cache, registration, "315DT75");
 			}
 		}.assertIsCausedBy(UniqueConstraintViolationException.class);
 	}
@@ -45,14 +45,14 @@ public class UniqueConstraintTest extends AbstractTest {
 		final Generic yourCar = car.newInstance(cache, "yourCar");
 		final Generic yourHuman = human.newInstance(cache, "yourHuman");
 		final Generic yourRoad = road.newInstance(cache, "yourRoad");
-		myCar.addLink(cache, driving, "_MY_driving", myHuman, myRoad);
-		yourCar.addLink(cache, driving, "_YOUR_driving", yourHuman, yourRoad);
+		myCar.setLink(cache, driving, "_MY_driving", myHuman, myRoad);
+		yourCar.setLink(cache, driving, "_YOUR_driving", yourHuman, yourRoad);
 
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				yourCar.addLink(cache, driving, "_MY_driving", yourHuman, yourRoad);
+				yourCar.setLink(cache, driving, "_MY_driving", yourHuman, yourRoad);
 			}
 		}.assertIsCausedBy(UniqueConstraintViolationException.class);
 	}
@@ -73,14 +73,14 @@ public class UniqueConstraintTest extends AbstractTest {
 	// final Generic yourCar = car.newInstance(cache,"yourBMW");
 	// final Generic yourHuman = human.newInstance(cache,"yourHuman");
 	// final Generic yourRoad = road.newInstance(cache,"yourRoad");
-	// myCar.addLink(cache,being, "_MY_driving", myHuman, myRoad);
-	// yourCar.addLink(cache,driving, "_YOUR_driving", yourHuman, yourRoad);
+	// myCar.setLink(cache,being, "_MY_driving", myHuman, myRoad);
+	// yourCar.setLink(cache,driving, "_YOUR_driving", yourHuman, yourRoad);
 	//
 	// new RollbackCatcher() {
 	//
 	// @Override
 	// public void intercept() {
-	// yourCar.addLink(cache,driving, "_MY_driving", yourHuman, yourRoad);
+	// yourCar.setLink(cache,driving, "_MY_driving", yourHuman, yourRoad);
 	// }
 	// }.assertIsCausedBy(UniqueConstraintViolationException.class);
 	// }

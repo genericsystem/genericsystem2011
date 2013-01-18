@@ -65,7 +65,7 @@ public class MetaGenericTest extends AbstractTest {
 		Type newType = cache.newType("newType");
 		Attribute newAttribute = newType.addAttribute(cache, "newAttribute");
 		Generic aNewType = newType.newInstance(cache, "aNewType");
-		Value value = aNewType.addValue(cache, newAttribute, "aNewAttribute");
+		Value value = aNewType.setValue(cache, newAttribute, "aNewAttribute");
 		assert value.getMeta().equals(newAttribute);
 	}
 
@@ -76,7 +76,7 @@ public class MetaGenericTest extends AbstractTest {
 		Relation newType1NewType2 = newType1.addRelation(cache, "newType1NewType2", newType2);
 		Generic aNewType1 = newType1.newInstance(cache, "aNewType1");
 		Generic aNewType2 = newType2.newInstance(cache, "aNewType2");
-		Link aNewType1Type2 = aNewType1.addLink(cache, newType1NewType2, "aNewType1NewType2", aNewType2);
+		Link aNewType1Type2 = aNewType1.setLink(cache, newType1NewType2, "aNewType1NewType2", aNewType2);
 		assert aNewType1Type2.getMeta().equals(newType1NewType2);
 	}
 }

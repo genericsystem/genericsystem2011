@@ -5,8 +5,10 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.exception.SingularConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
+import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
@@ -49,9 +51,9 @@ public class SingularConstraintTest extends AbstractTest {
 
 		vehiclePower.enableSingularConstraint(cache, 0);
 		assert vehiclePower.isSingularConstraintEnabled(cache, 0);
-		myVehicle.addValue(cache, vehiclePower, "5").remove(cache);
-		myVehicle.addValue(cache, vehiclePower, "6");
-		myVehicle.addValue(cache, vehicleDriver, "JC");
+		myVehicle.setValue(cache, vehiclePower, "5").remove(cache);
+		myVehicle.setValue(cache, vehiclePower, "6");
+		myVehicle.setValue(cache, vehicleDriver, "JC");
 		cache.flush();
 	}
 
@@ -60,17 +62,14 @@ public class SingularConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		final Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-
 		vehiclePower.enableSingularConstraint(cache, 0);
 		assert vehiclePower.isSingularConstraintEnabled(cache, 0);
-
-		myVehicle.addValue(cache, vehiclePower, "5");
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				myVehicle.addValue(cache, vehiclePower, 2);
-			}
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
+		Value myVehiclePowerValue1 = myVehicle.setValue(cache, vehiclePower, "5");
+		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1;
+		assert myVehicle.getValueHolders(cache, vehiclePower).get(0).equals(myVehiclePowerValue1);
+		Value myVehiclePowerValue2 = myVehicle.setValue(cache, vehiclePower, 2);
+		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1;
+		assert myVehicle.getValueHolders(cache, vehiclePower).get(0).equals(myVehiclePowerValue2);
 	}
 
 	public void testRelationOK() {
@@ -80,17 +79,13 @@ public class SingularConstraintTest extends AbstractTest {
 		final Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog);
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
-
 		runsOver.enableSingularConstraint(cache, 0);
 		assert runsOver.isSingularConstraintEnabled(cache, 0);
-
-		myBMW.addLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				myBMW.addLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourDog);
-			}
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
+		Link runsOverLink1 = myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
+		assert myBMW.getLink(cache, runsOver, yourDog).equals(runsOverLink1) : myBMW.getLink(cache, runsOver, yourDog);
+		Link runsOverLink2 = myBMW.setLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourDog);
+		assert !runsOverLink1.isAlive(cache);
+		assert myBMW.getLink(cache, runsOver, yourDog).equals(runsOverLink2) : myBMW.getLink(cache, runsOver, yourDog);
 	}
 
 	public void testRelationWithTwoSingular() {
@@ -102,28 +97,16 @@ public class SingularConstraintTest extends AbstractTest {
 		final Generic nico = human.newInstance(cache, "nico");
 		final Generic myckVehicle = vehicle.newInstance(cache, "myckVehicle");
 		final Generic nicoVehicle = vehicle.newInstance(cache, "nicoVehicle");
-
 		humanDriveVehicle.enableSingularConstraint(cache, Statics.BASE_POSITION);
 		humanDriveVehicle.enableSingularConstraint(cache, Statics.TARGET_POSITION);
 		assert humanDriveVehicle.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
 		assert humanDriveVehicle.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
-
-		myck.addLink(cache, humanDriveVehicle, "myckDrive", myckVehicle);
+		Link humanDriveVehicleLink1 = myck.setLink(cache, humanDriveVehicle, "myckDrive", myckVehicle);
 		cache.flush();
-
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				myck.addLink(cache, humanDriveVehicle, "myckDrive", nicoVehicle);
-			}
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				nico.addLink(cache, humanDriveVehicle, "nicoDrive", myckVehicle);
-			}
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
-
+		Link humanDriveVehicleLink2 = myck.setLink(cache, humanDriveVehicle, "myckDrive", nicoVehicle);
+		assert !humanDriveVehicleLink1.isAlive(cache);
+		assert myck.getLink(cache, humanDriveVehicle, nicoVehicle).equals(humanDriveVehicleLink2);
+		nico.setLink(cache, humanDriveVehicle, "nicoDrive", myckVehicle);
 		assert humanDriveVehicle.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
 		assert humanDriveVehicle.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
 	}
@@ -139,11 +122,11 @@ public class SingularConstraintTest extends AbstractTest {
 		runsOver.enableSingularConstraint(cache, 1);
 		assert runsOver.isSingularConstraintEnabled(cache, 1);
 
-		myBMW.addLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
+		myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				myBMW.addLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourDog);
+				myBMW.setLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourDog);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
@@ -160,8 +143,8 @@ public class SingularConstraintTest extends AbstractTest {
 		runsOver.enableSingularConstraint(cache, 1);
 		assert runsOver.isSingularConstraintEnabled(cache, 1);
 
-		myBMW.addLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
-		myBMW.addLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourSecondDog);
+		myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
+		myBMW.setLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourSecondDog);
 	}
 
 	public void testDoubleRelationOK() {
@@ -178,8 +161,8 @@ public class SingularConstraintTest extends AbstractTest {
 		runsOver.enableSingularConstraint(cache, 1);
 		assert runsOver.isSingularConstraintEnabled(cache, 1);
 
-		myBMW.addLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad);
-		myBMW.addLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourSecondDog, myRoad);
+		myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad);
+		myBMW.setLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourSecondDog, myRoad);
 	}
 
 	public void testDoubleRelationKO() {
@@ -196,11 +179,11 @@ public class SingularConstraintTest extends AbstractTest {
 		runsOver.enableSingularConstraint(cache, 1);
 		assert runsOver.isSingularConstraintEnabled(cache, 1);
 
-		myBMW.addLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad);
+		myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				myBMW.addLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourDog, myRoad2);
+				myBMW.setLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourDog, myRoad2);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
@@ -219,11 +202,11 @@ public class SingularConstraintTest extends AbstractTest {
 		runsOver.enableSingularConstraint(cache, 2);
 		assert runsOver.isSingularConstraintEnabled(cache, 2);
 
-		vehicle.addLink(cache, runsOver, "myBMWRunsOverYourDog", dog, road);
+		vehicle.setLink(cache, runsOver, "myBMWRunsOverYourDog", dog, road);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				vehicle.addLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", dog2, road);
+				vehicle.setLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", dog2, road);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
@@ -236,14 +219,11 @@ public class SingularConstraintTest extends AbstractTest {
 		final Generic myBmw = car.newInstance(cache, "myBmw");
 		final Attribute registration = car.addAttribute(cache, "registration");
 		registration.enableSingularConstraint(cache);
-		myBmw.addValue(cache, registration, "AB123CD");
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				myBmw.addValue(cache, registration, "DC321BA");
-			}
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
-
+		Value myBmwRegistration1 = myBmw.setValue(cache, registration, "AB123CD");
+		Value myBmwRegistration2 = myBmw.setValue(cache, registration, "DC321BA");
+		assert !myBmwRegistration1.isAlive(cache);
+		assert myBmw.getValueHolders(cache, registration).size() == 1;
+		assert myBmw.getValueHolders(cache, registration).get(0).equals(myBmwRegistration2);
 	}
 
 	// public void noMoreThanOneAttributePerEntity2() {
@@ -254,11 +234,11 @@ public class SingularConstraintTest extends AbstractTest {
 	// final Attribute frenchRegistration = frenchCar.addSubAttribute(cache, registration, "French Registration");
 	// registration.enableSingularConstraint(cache);
 	// final Generic myBmw = frenchCar.newInstance(cache, "myBmw");
-	// myBmw.addValue(cache, registration, "AB123CD");
+	// myBmw.setValue(cache, registration, "AB123CD");
 	// new RollbackCatcher() {
 	// @Override
 	// public void intercept() {
-	// myBmw.addValue(cache, frenchRegistration, "JAIME75");
+	// myBmw.setValue(cache, frenchRegistration, "JAIME75");
 	// }
 	// }.assertIsCausedBy(SingularConstraintViolationException.class);
 	// }
@@ -276,10 +256,10 @@ public class SingularConstraintTest extends AbstractTest {
 				Generic mama1 = mother.newInstance(cache, "mama1");
 				Generic mama2 = mother.newInstance(cache, "mama2");
 				Generic baby1 = children.newInstance(cache, "baby1");
-				mama1.addLink(cache, myChildren, "mama1_baby1", baby1);
+				mama1.setLink(cache, myChildren, "mama1_baby1", baby1);
 				Generic baby2 = children.newInstance(cache, "baby2");
-				mama1.addLink(cache, myChildren, "mama1_baby2", baby2);
-				mama2.addLink(cache, myChildren, "mama2_baby2", baby2);
+				mama1.setLink(cache, myChildren, "mama1_baby2", baby2);
+				mama2.setLink(cache, myChildren, "mama2_baby2", baby2);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
@@ -296,10 +276,10 @@ public class SingularConstraintTest extends AbstractTest {
 
 				Generic mama1 = mother.newInstance(cache, "mama1");
 				Generic baby1 = children.newInstance(cache, "baby1");
-				mama1.addLink(cache, myChildren, "mama1_baby1", baby1);
+				mama1.setLink(cache, myChildren, "mama1_baby1", baby1);
 				Generic baby2 = children.newInstance(cache, "baby2");
-				mama1.addLink(cache, myChildren, "mama1_baby2", baby2);
-				mama1.addLink(cache, myChildren, "test", baby2);
+				mama1.setLink(cache, myChildren, "mama1_baby2", baby2);
+				mama1.setLink(cache, myChildren, "test", baby2);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}

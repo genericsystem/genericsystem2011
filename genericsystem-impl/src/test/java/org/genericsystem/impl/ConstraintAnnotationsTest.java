@@ -57,12 +57,12 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 		final Generic myBMW = car.newInstance(cache, "myBMW");
 
 		assert humanPossessVehicleRel.getBaseComponent() != null;
-		myck.addLink(cache, humanPossessVehicleRel, "yourckPossessMicksBMW", myBMW);
+		myck.setLink(cache, humanPossessVehicleRel, "yourckPossessMicksBMW", myBMW);
 
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				yourck.addLink(cache, manPossessCarRel, "myckPossessHisBMWToo", myBMW);
+				yourck.setLink(cache, manPossessCarRel, "myckPossessHisBMWToo", myBMW);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
@@ -87,13 +87,13 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 		Attribute electrikPower = cache.find(ElectrikPower.class);
 		final Generic myBMW = car.newInstance(cache, "myBMW");
 		assert electrikPower.getBaseComponent() != null : electrikPower.info();
-		final Value electrikPowerMyBMW = myBMW.addValue(cache, electrikPower, 106);
-		electrikPowerMyBMW.addValue(cache, unit, "Nm");
+		final Value electrikPowerMyBMW = myBMW.setValue(cache, electrikPower, 106);
+		electrikPowerMyBMW.setValue(cache, unit, "Nm");
 
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				electrikPowerMyBMW.addValue(cache, unit, 27);
+				electrikPowerMyBMW.setValue(cache, unit, 27);
 			}
 		}.assertIsCausedBy(ClassInstanceConstraintViolationException.class);
 	}

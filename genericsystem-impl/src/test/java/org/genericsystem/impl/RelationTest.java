@@ -1194,7 +1194,7 @@ public class RelationTest extends AbstractTest {
 		Relation possessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Generic myHuman = human.newInstance(cache, "myHuman");
-		Link possession = myHuman.addLink(cache, possessVehicle, "possession", myVehicle);
+		Link possession = myHuman.setLink(cache, possessVehicle, "possession", myVehicle);
 		assert possessVehicle.getTargetComponent().equals(vehicle);
 
 		assert myVehicle.getLinks(cache, possessVehicle, 1).size() == 1;
@@ -1212,7 +1212,7 @@ public class RelationTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Generic myHuman = human.newInstance(cache, "myHuman");
 		Generic myRoad = road.newInstance(cache, "myRoad");
-		Link driving = myHuman.addLink(cache, drivesOn, "myDrivingOn", myVehicle, myRoad);
+		Link driving = myHuman.setLink(cache, drivesOn, "myDrivingOn", myVehicle, myRoad);
 		assert drivesOn.getTargetComponent().equals(vehicle);
 
 		assert myRoad.getLinks(cache, drivesOn, Statics.SECOND_TARGET_POSITION).size() == 1;

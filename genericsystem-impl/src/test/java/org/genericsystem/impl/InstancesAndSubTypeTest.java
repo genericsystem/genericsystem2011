@@ -80,7 +80,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute(cache,"vehiclePower");
 		Generic myVehicle = vehicle.newInstance(cache,"myVehicle");
-		Value valueOfAttribute = myVehicle.addValue(cache,vehiclePower, "233 HP");
+		Value valueOfAttribute = myVehicle.setValue(cache,vehiclePower, "233 HP");
 		Snapshot<Generic> snapshot = vehiclePower.getInstances(cache);
 		assert snapshot.size() == 1 : snapshot;
 		assert snapshot.contains(valueOfAttribute);
@@ -91,7 +91,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute(cache,"power");
 		Generic myVehicle = vehicle.newInstance(cache,"myVehicle");
-		Value valueOfAttribute = myVehicle.addValue(cache,vehiclePower, "123");
+		Value valueOfAttribute = myVehicle.setValue(cache,vehiclePower, "123");
 		Snapshot<Generic> snapshot = vehiclePower.getAllInstances(cache);
 		assert snapshot.size() == 1 : snapshot;
 		assert snapshot.contains(valueOfAttribute);
@@ -104,7 +104,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Relation relation = color.addRelation(cache,"relation", car);
 		Generic bmw = car.newInstance(cache,"bmw");
 		Generic red = color.newInstance(cache,"red");
-		Link link2 = red.addLink(cache,relation, "link2", bmw);
+		Link link2 = red.setLink(cache,relation, "link2", bmw);
 		assert relation.getInstances(cache).size() == 1 : relation.getInstances(cache);
 		assert relation.getInstances(cache).contains(link2);
 	}
@@ -118,7 +118,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Generic myck = human.newInstance(cache,"myck");
 		Generic myBmw = vehicle.newInstance(cache,"myBmw");
 		Generic myTime = time.newInstance(cache,"myTime");
-		Link link = myck.addLink(cache,drive, "theDrive", myBmw, myTime);
+		Link link = myck.setLink(cache,drive, "theDrive", myBmw, myTime);
 		assert drive.getInstances(cache).size() == 1 : drive.getInstances(cache);
 		assert drive.getInstances(cache).contains(link);
 	}
@@ -130,7 +130,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Relation driver = human.addRelation(cache,"drive", vehicle);
 		Generic myBmw = vehicle.newInstance(cache,"myBmw");
 		Generic myck = human.newInstance(cache,"myck");
-		Link link = myck.addLink(cache,driver, "theDrive", myBmw);
+		Link link = myck.setLink(cache,driver, "theDrive", myBmw);
 		assert driver.getAllInstances(cache).size() == 1 : driver.getAllInstances(cache);
 		assert driver.getAllInstances(cache).contains(link);
 	}

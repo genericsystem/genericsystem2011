@@ -105,11 +105,11 @@ public class AttributeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Value myVehicle123 = myVehicle.addValue(cache, vehiclePower, "123");
+		Value myVehicle123 = myVehicle.setValue(cache, vehiclePower, "123");
 		assert myVehicle123.isAttributeOf(myVehicle);
 		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1 : myVehicle.getValueHolders(cache, vehiclePower);
 		assert myVehicle.getValueHolders(cache, vehiclePower).contains(myVehicle123);
-		Value myVehicle126 = myVehicle.addValue(cache, vehiclePower, "126");
+		Value myVehicle126 = myVehicle.setValue(cache, vehiclePower, "126");
 		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 2;
 		assert myVehicle.getValueHolders(cache, vehiclePower).contains(myVehicle126);
 		assert myVehicle.getValueHolders(cache, vehiclePower).contains(myVehicle123);
@@ -120,7 +120,7 @@ public class AttributeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty(cache, "power");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Value myVehicle123 = myVehicle.addValue(cache, vehiclePower, "123");
+		Value myVehicle123 = myVehicle.setValue(cache, vehiclePower, "123");
 		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1;
 		assert myVehicle.getValueHolders(cache, vehiclePower).contains(myVehicle123);
 		Value myVehicle126 = myVehicle.setValue(cache, vehiclePower, "126");
@@ -193,14 +193,14 @@ public class AttributeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
-		Value p213 = vehicle.addValue(cache, vehiclePower, "213");
-		Value p214 = vehicle.addValue(cache, vehiclePower, "214");
+		Value p213 = vehicle.setValue(cache, vehiclePower, "213");
+		Value p214 = vehicle.setValue(cache, vehiclePower, "214");
 
 		assert vehiclePower.getInstances(cache).size() == 2 : vehiclePower.getInstances(cache);
 		assert vehiclePower.getInstances(cache).contains(p213);
 		assert vehiclePower.getInstances(cache).contains(p214);
 
-		Value p333 = car.addValue(cache, p213, "333");
+		Value p333 = car.setValue(cache, (Attribute) p213, "333");
 
 		assert !p333.inheritsFrom(p213);
 
@@ -228,9 +228,9 @@ public class AttributeTest extends AbstractTest {
 		Generic myCar = car.newInstance(cache, "myCar");
 		Generic myCar2 = car.newInstance(cache, "myCar2");
 
-		Value p213 = vehicle.addValue(cache, vehiclePower, "213");
-		Value p214 = vehicle.addValue(cache, vehiclePower, "214");
-		Value p333 = myCar.addValue(cache, p213, "333");
+		Value p213 = vehicle.setValue(cache, vehiclePower, "213");
+		Value p214 = vehicle.setValue(cache, vehiclePower, "214");
+		Value p333 = myCar.setValue(cache, (Attribute) p213, "333");
 
 		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 2;
 		assert myVehicle.getValueHolders(cache, vehiclePower).contains(p213);
@@ -282,8 +282,8 @@ public class AttributeTest extends AbstractTest {
 
 		assert vehicle.getMeta().equals(cache.getEngine());
 
-		Value v235 = vehicle.addValue(cache, vehiclePower, "235");
-		Value vHP = v235.addValue(cache, vehiclePowerUnit, "HP");
+		Value v235 = vehicle.setValue(cache, vehiclePower, "235");
+		Value vHP = v235.setValue(cache, vehiclePowerUnit, "HP");
 
 		assert v235.getMeta().equals(vehiclePower);
 		assert vHP.getMeta().equals(vehiclePowerUnit) : vHP.getSupers();
@@ -316,12 +316,12 @@ public class AttributeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
 
-		Value v235 = vehicle.addValue(cache, vehiclePower, "235");
+		Value v235 = vehicle.setValue(cache, vehiclePower, "235");
 		Attribute vehiclePowerUnit = vehiclePower.addAttribute(cache, "Unit");
 		assert vehicle.getValueHolders(cache, vehiclePower).size() == 1 : v235.info();
 		assert vehicle.getValueHolders(cache, vehiclePower).contains(v235);
 
-		Value vHP = v235.addValue(cache, vehiclePowerUnit, "HP");
+		Value vHP = v235.setValue(cache, vehiclePowerUnit, "HP");
 		assert vHP.isAttributeOf(v235) : vHP.getBaseComponent();
 		assert v235.getValueHolders(cache, vehiclePowerUnit).size() == 1 : vHP.info();
 		assert v235.getValueHolders(cache, vehiclePowerUnit).contains(vHP);
@@ -334,7 +334,7 @@ public class AttributeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
-		Value value = vehicle.addValue(cache, vehiclePower, true);
+		Value value = vehicle.setValue(cache, vehiclePower, true);
 		assert vehicle.getValueHolders(cache, vehiclePower).contains(value);
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		assert myVehicle.getValueHolders(cache, vehiclePower).contains(value);

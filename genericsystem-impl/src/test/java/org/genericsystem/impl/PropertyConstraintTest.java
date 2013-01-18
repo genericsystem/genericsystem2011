@@ -5,6 +5,7 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.exception.PropertyConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
@@ -27,7 +28,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Attribute equipment = vehicle.addAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		myVehicle.addValue(cache, equipment, "ABS");
+		myVehicle.setValue(cache, equipment, "ABS");
 	}
 
 	public void testMultipleValuesAttribute() {
@@ -35,22 +36,17 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Attribute equipment = vehicle.addAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		myVehicle.addValue(cache, equipment, "ABS");
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myVehicle.addValue(cache, equipment, "GPS");
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
+		Value abs = myVehicle.setValue(cache, equipment, "ABS");
+		myVehicle.setValue(cache, equipment, "GPS");
+		assert !abs.isAlive(cache);
 	}
 
 	public void testMultipleValuesAttributeWithoutConstraint() {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.addAttribute(cache, "Equipment");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		myVehicle.addValue(cache, equipment, "ABS");
-		myVehicle.addValue(cache, equipment, "GPS");
+		myVehicle.setValue(cache, equipment, "ABS");
+		myVehicle.setValue(cache, equipment, "GPS");
 	}
 
 	public void testMultipleValuesAttributeWithDisabledConstraint() {
@@ -58,8 +54,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Attribute equipment = vehicle.addAttribute(cache, "Equipment");
 		equipment.disablePropertyConstraint(cache);
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		myVehicle.addValue(cache, equipment, "ABS");
-		myVehicle.addValue(cache, equipment, "GPS");
+		myVehicle.setValue(cache, equipment, "ABS");
+		myVehicle.setValue(cache, equipment, "GPS");
 	}
 
 	public void testBinaryRelationDifferentTarget() {
@@ -70,8 +66,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "MyVehicle");
 		Generic red = color.newInstance(cache, "red");
 		Generic blue = color.newInstance(cache, "blue");
-		myVehicle.addLink(cache, vehicleColor, "VehicleColor", red);
-		myVehicle.addLink(cache, vehicleColor, "VehicleColor", blue);
+		myVehicle.setLink(cache, vehicleColor, "VehicleColor", red);
+		myVehicle.setLink(cache, vehicleColor, "VehicleColor", blue);
 	}
 
 	public void testBinaryRelationSameTarget() {
@@ -81,15 +77,10 @@ public class PropertyConstraintTest extends AbstractTest {
 		vehicleColor.enablePropertyConstraint(cache);
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		final Generic red = color.newInstance(cache, "red");
-
-		myVehicle.addLink(cache, vehicleColor, "myVehicleRed", red);
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myVehicle.addLink(cache, vehicleColor, "myVehicleRedAgain", red);
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
+		Link myVehicleRed = myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
+		Link myVehicleRedAgain = myVehicle.setLink(cache, vehicleColor, "myVehicleRedAgain", red);
+		assert !myVehicleRed.isAlive(cache);
+		assert myVehicleRedAgain.isAlive(cache);
 	}
 
 	public void testTernaryRelationDifferentTargets() {
@@ -102,8 +93,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic red = color.newInstance(cache, "red");
 		Generic myPilot = pilot.newInstance(cache, "myPilot");
 		Generic anotherPilot = pilot.newInstance(cache, "anotherPilot");
-		myVehicle.addLink(cache, vehicleColor, "myVehicleRed", red, myPilot);
-		myVehicle.addLink(cache, vehicleColor, "myVehicleRed", red, anotherPilot);
+		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red, myPilot);
+		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red, anotherPilot);
 	}
 
 	public void testTernaryRelationSameTargets() {
@@ -115,16 +106,10 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		final Generic red = color.newInstance(cache, "red");
 		final Generic myPilot = pilot.newInstance(cache, "myPilot");
-
-		myVehicle.addLink(cache, vehicleColor, "myVehicleRed", red, myPilot);
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myVehicle.addLink(cache, vehicleColor, "myVehicleRedAgain", red, myPilot);
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
+		Link myVehicleRed = myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red, myPilot);
+		Link myVehicleRedAgain = myVehicle.setLink(cache, vehicleColor, "myVehicleRedAgain", red, myPilot);
+		assert !myVehicleRed.isAlive(cache);
+		assert myVehicleRedAgain.isAlive(cache);
 	}
 
 	public void testSingleValueAttributeForSubtype() {
@@ -133,7 +118,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Attribute equipment = vehicle.addAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		Generic myCar = car.newInstance(cache, "myCar");
-		myCar.addValue(cache, equipment, "ABS");
+		myCar.setValue(cache, equipment, "ABS");
 	}
 
 	public void testMultipleValuesAttributeForSubtype() {
@@ -142,15 +127,10 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Attribute equipment = vehicle.addAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
-
-		myCar.addValue(cache, equipment, "ABS");
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myCar.addValue(cache, equipment, "GPS");
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
+		Value absValue = myCar.setValue(cache, equipment, "ABS");
+		Value gpsValue = myCar.setValue(cache, equipment, "GPS");
+		assert !absValue.isAlive(cache);
+		assert gpsValue.isAlive(cache);
 	}
 
 	public void testMultipleValuesAttributeForSubtypeOtherWay() {
@@ -159,15 +139,10 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Attribute equipment = vehicle.addAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
-
-		myCar.addValue(cache, equipment, "ABS");
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myCar.addValue(cache, equipment, "GPS");
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
+		Value absValue = myCar.setValue(cache, equipment, "ABS");
+		Value gpsValue = myCar.setValue(cache, equipment, "GPS");
+		assert !absValue.isAlive(cache);
+		assert gpsValue.isAlive(cache);
 	}
 
 	public void testSameTarget() {
@@ -178,15 +153,10 @@ public class PropertyConstraintTest extends AbstractTest {
 		vehicleColor.enablePropertyConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
 		final Generic red = color.newInstance(cache, "red");
-
-		myCar.addLink(cache, vehicleColor, "myVehiclePower", red);
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myCar.addLink(cache, vehicleColor, "myVehiclePower2", red);
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
+		Link myVehiclePower = myCar.setLink(cache, vehicleColor, "myVehiclePower", red);
+		Link myVehiclePower2 = myCar.setLink(cache, vehicleColor, "myVehiclePower2", red);
+		assert !myVehiclePower.isAlive(cache);
+		assert myVehiclePower2.isAlive(cache);
 	}
 
 	public void testBinaryRelationBetweenSubtypeAndSameTarget() {
@@ -198,15 +168,10 @@ public class PropertyConstraintTest extends AbstractTest {
 		vehicleColor.enablePropertyConstraint(cache);
 		final Generic myBike = bike.newInstance(cache, "myBike");
 		final Generic red = color.newInstance(cache, "red");
-
-		myBike.addLink(cache, vehicleColor, "myVehicleRed", red);
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myBike.addLink(cache, vehicleColor, "myVehicleRedAgain", red);
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
+		Link myVehicleRed = myBike.setLink(cache, vehicleColor, "myVehicleRed", red);
+		Link myVehicleRedAgain = myBike.setLink(cache, vehicleColor, "myVehicleRedAgain", red);
+		assert !myVehicleRed.isAlive(cache);
+		assert myVehicleRedAgain.isAlive(cache);
 	}
 
 	public void testUniqueInstance() {
@@ -242,16 +207,11 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Attribute equipment = vehicle.addAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-
-		vehicle.addValue(cache, equipment, "ABS");
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myVehicle.addValue(cache, equipment, "GPS");
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
+		Value absValue = vehicle.setValue(cache, equipment, "ABS");
+		Value gpsValue = myVehicle.setValue(cache, equipment, "GPS");
+		// Todo check remove old value
+		assert absValue.isAlive(cache);
+		assert myVehicle.getValue(cache, equipment).equals(gpsValue.getValue());
 	}
 
 	public void testMultipleDefaultValuesAttribute2() {
@@ -260,7 +220,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		equipment.enablePropertyConstraint(cache);
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 
-		final Value v = myVehicle.addValue(cache, equipment, "ABS");
+		myVehicle.setValue(cache, equipment, "ABS");
 
 		assert vehicle.getAllInstances(cache).contains(myVehicle);
 
@@ -269,7 +229,7 @@ public class PropertyConstraintTest extends AbstractTest {
 			@Override
 			public void intercept() {
 				Statics.debugCurrentThread();
-				vehicle.addValue(cache, equipment, "GPS");
+				vehicle.setValue(cache, equipment, "GPS");
 			}
 		}.assertIsCausedBy(PropertyConstraintViolationException.class);
 	}

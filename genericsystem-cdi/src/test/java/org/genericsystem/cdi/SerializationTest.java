@@ -82,10 +82,10 @@ public class SerializationTest extends AbstractTest {
 		Generic myBmw = vehicle.newInstance(cache, "myBmw");
 		Generic bmw = vehicle.newInstance(cache, "Bmw");
 		Generic myMercedes = car.newInstance(cache, "myMercedes");
-		bmw.addValue(cache, vehiclePower, "213");
-		myBmw.addValue(cache, vehiclePower, "512");
-		myMercedes.addValue(cache, vehiclePower, "1024");
-		myMercedes.addValue(cache, vehiclePower, 33);
+		bmw.setValue(cache, vehiclePower, "213");
+		myBmw.setValue(cache, vehiclePower, "512");
+		myMercedes.setValue(cache, vehiclePower, "1024");
+		myMercedes.setValue(cache, vehiclePower, 33);
 
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
 		cache.newSubType("selectableWindow", selectable, window);

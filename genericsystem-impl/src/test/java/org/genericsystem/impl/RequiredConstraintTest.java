@@ -20,7 +20,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Generic myFiat = vehicle.newInstance(cache, "myFiat");
 		Attribute wheel = vehicle.addAttribute(cache, "wheel");
 		wheel.enableRequiredConstraint(cache);
-		Value wheelMyFiat = myFiat.addValue(cache, wheel, "BigWheel");
+		Value wheelMyFiat = myFiat.setValue(cache, wheel, "BigWheel");
 		cache.flush();
 		wheelMyFiat.remove(cache);
 
@@ -52,7 +52,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Generic myFiat = vehicle.newInstance(cache, "myFiat");
 		Attribute vehicleWheel = vehicle.addAttribute(cache, "wheel").enableRequiredConstraint(cache);
-		myFiat.addValue(cache, vehicleWheel, "BigWheel");
+		myFiat.setValue(cache, vehicleWheel, "BigWheel");
 		cache.flush();
 	}
 
@@ -63,7 +63,7 @@ public class RequiredConstraintTest extends AbstractTest {
 	// Attribute wheel = vehicleType.addAttribute(cache, "wheel");
 	// wheel.enableRequiredConstraint(cache);
 	// Attribute subAttribute = vehicleType.addSubAttribute(cache, wheel, "LittleWheel");
-	// myFiat.addValue(cache, subAttribute, "littlePinkWheel");
+	// myFiat.setValue(cache, subAttribute, "littlePinkWheel");
 	// cache.flush();
 	// }
 

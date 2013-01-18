@@ -208,8 +208,8 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Attribute selectedSelectable = selectable.addAttribute(cache, "Selected");
 		Generic mySelectableWindow = selectableWindow.newInstance(cache, "mySelectableWindow");
 
-		Value v12 = mySelectableWindow.addValue(cache, size, 12);
-		Value vTrue = mySelectableWindow.addValue(cache, selectedSelectable, true);
+		Value v12 = mySelectableWindow.setValue(cache, size, 12);
+		Value vTrue = mySelectableWindow.setValue(cache, selectedSelectable, true);
 
 		assert selectableWindow.getInstances(cache).size() == 1 : selectableWindow.getInstances(cache);
 		assert selectableWindow.getInstances(cache).contains(mySelectableWindow);

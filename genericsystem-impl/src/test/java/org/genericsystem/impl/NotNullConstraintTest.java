@@ -23,7 +23,7 @@ public class NotNullConstraintTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				myCar.addValue(cache, registration, null);
+				myCar.setValue(cache, registration, null);
 			}
 		}.assertIsCausedBy(NotNullConstraintViolationException.class);
 	}
@@ -45,7 +45,7 @@ public class NotNullConstraintTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				myCar.addLink(cache, driving, null, myHuman, myRoad);
+				myCar.setLink(cache, driving, null, myHuman, myRoad);
 			}
 		}.assertIsCausedBy(NotNullConstraintViolationException.class);
 	}
@@ -68,7 +68,7 @@ public class NotNullConstraintTest extends AbstractTest {
 	//
 	// @Override
 	// public void intercept() {
-	// myCar.addLink(cache, driving, null, myHuman, myRoad);
+	// myCar.setLink(cache, driving, null, myHuman, myRoad);
 	// }
 	// }.assertIsCausedBy(NotNullConstraintViolationException.class);
 	// }

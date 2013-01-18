@@ -171,9 +171,9 @@ public class AnnotationTest extends AbstractTest {
 				.info() + selectableWindow.info();
 
 		assert mySelectableWindow.inheritsFrom(cache.find(Selectable.class));
-		Value vTrue = mySelectableWindow.addValue(cache, selectedSelectable,
+		Value vTrue = mySelectableWindow.setValue(cache, selectedSelectable,
 				true);
-		Value v12 = mySelectableWindow.addValue(cache, size, 12);
+		Value v12 = mySelectableWindow.setValue(cache, size, 12);
 
 		assert selectableWindow.getInstances(cache).size() == 1 : selectableWindow
 				.getInstances(cache);

@@ -53,7 +53,7 @@ public class VirtualConstraintTest extends AbstractTest {
 	// vehiclePower.enableVirtualConstraint(cache);
 	// assert vehiclePower.isVirtualConstraintEnabled(cache);
 	// Attribute horsePower = car.addSubAttribute(cache, vehiclePower, "horsePower");
-	// myAudi.addValue(cache, horsePower, "200");
+	// myAudi.setValue(cache, horsePower, "200");
 	// cache.flush();
 	// }
 

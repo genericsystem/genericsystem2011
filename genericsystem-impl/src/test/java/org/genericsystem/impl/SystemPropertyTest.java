@@ -158,7 +158,7 @@ public class SystemPropertyTest extends AbstractTest {
 
 		Generic myBmw = car.newInstance(cache, "myBmw");
 		Generic myMotor = motor.newInstance(cache, "myMotor");
-		Link myBmwPoweredMyMotor = myBmw.addLink(cache, powered, "myBmwPoweredMyMotor", myMotor);
+		Link myBmwPoweredMyMotor = myBmw.setLink(cache, powered, "myBmwPoweredMyMotor", myMotor);
 
 		myBmwPoweredMyMotor.remove(cache);
 
@@ -178,7 +178,7 @@ public class SystemPropertyTest extends AbstractTest {
 
 		Generic myBmw = car.newInstance(cache, "myBmw");
 		Generic myMotor = motor.newInstance(cache, "myMotor");
-		Link myBmwPoweredMyMotor = myBmw.addLink(cache, powered, "myBmwPoweredMyMotor", myMotor);
+		Link myBmwPoweredMyMotor = myBmw.setLink(cache, powered, "myBmwPoweredMyMotor", myMotor);
 
 		myBmwPoweredMyMotor.remove(cache);
 

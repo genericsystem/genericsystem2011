@@ -88,7 +88,7 @@ public class IteratorTest extends AbstractTest {
 		Relation humanDriveCar = human.addRelation(cache, "drive", car);
 		Generic audi = car.newInstance(cache, "audi");
 		Generic myck = human.newInstance(cache, "myck");
-		Link link = myck.addLink(cache, humanDriveCar, "myckAudi", audi);
+		Link link = myck.setLink(cache, humanDriveCar, "myckAudi", audi);
 		Snapshot<Link> snapshot = myck.getLinks(cache, humanDriveCar);
 		assert snapshot.size() == 1 : snapshot;
 		assert snapshot.contains(link);

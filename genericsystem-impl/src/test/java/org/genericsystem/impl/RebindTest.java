@@ -30,8 +30,8 @@ public class RebindTest {
 		Attribute carPower = car.addAttribute(cache, "Power");
 		Attribute carPowerUnit = carPower.addAttribute(cache, "Unit");
 		Generic myCar = car.newInstance(cache, "Audi");
-		Value vPower = myCar.addValue(cache, carPower, "200");
-		Value vUnit = vPower.addValue(cache, carPowerUnit, "HorsePower");
+		Value vPower = myCar.setValue(cache, carPower, "200");
+		Value vUnit = vPower.setValue(cache, carPowerUnit, "HorsePower");
 		assert vPower.getValueHolders(cache, carPowerUnit).contains(vUnit);
 		assert myCar.getValueHolders(cache, carPower).contains(vPower);
 		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");

@@ -47,7 +47,7 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 		Generic myFiat = vehicle.newInstance(cache, "myFiat");
 		Attribute wheelVehcile = vehicle.addAttribute(cache, "wheel");
 		wheelVehcile.setConstraintClass(cache, Wheel.class);
-		myFiat.addValue(cache, wheelVehcile, new Wheel("bigWheel"));
+		myFiat.setValue(cache, wheelVehcile, new Wheel("bigWheel"));
 	}
 
 	public void simpleAttributeValueKO() {
@@ -60,7 +60,7 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				myFiat.addValue(cache, wheelVehcile, 23);
+				myFiat.setValue(cache, wheelVehcile, 23);
 			}
 		}.assertIsCausedBy(ClassInstanceConstraintViolationException.class);
 	}

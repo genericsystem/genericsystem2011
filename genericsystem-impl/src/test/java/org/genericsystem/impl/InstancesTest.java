@@ -36,11 +36,11 @@ public class InstancesTest extends AbstractTest {
 		Type newType = cache.newType("newType");
 		Attribute newAttribute = cache.getEngine().addAttribute(cache, "newAttribute");
 		Generic aNewType1 = newType.newInstance(cache, "aNewType1");
-		Value value1 = aNewType1.addValue(cache, newAttribute, "value1");
+		Value value1 = aNewType1.setValue(cache, newAttribute, "value1");
 		assert newAttribute.getInstances(cache).size() == 1;
 		assert newAttribute.getInstances(cache).contains(value1);
 		Generic aNewType2 = newType.newInstance(cache, "aNewType2");
-		Value value2 = aNewType2.addValue(cache, newAttribute, "value2");
+		Value value2 = aNewType2.setValue(cache, newAttribute, "value2");
 		assert value1.isAlive(cache);
 		assert newAttribute.getInstances(cache).size() == 2;
 		assert newAttribute.getInstances(cache).contains(value1);

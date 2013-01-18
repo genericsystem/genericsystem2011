@@ -102,35 +102,35 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	<S extends Serializable> S getValue();
 
-	/**
-	 * Add a value for the attribute
-	 * 
-	 * @param attribute
-	 *            the attribute
-	 * @param value
-	 *            the value
-	 * @return the object that represents the value
-	 * @see Value
-	 */
-	<T extends Value> T addValue(Cache cache, Value attribute, Serializable value);
+	// /**
+	// * Add a value for the attribute
+	// *
+	// * @param attribute
+	// * the attribute
+	// * @param value
+	// * the value
+	// * @return the object that represents the value
+	// * @see Value
+	// */
+	// <T extends Value> T addValue(Cache cache, Value attribute, Serializable value);
 
 	<T extends Value> T flag(Cache cache, Value attribute);
 
-	<T extends Link> T addLink(Cache cache, Link relation, Serializable value, int basePos, Generic... targets);
+	// <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int basePos, Generic... targets);
 
-	/**
-	 * Add a link for the relation
-	 * 
-	 * @param relation
-	 *            the relation
-	 * @param value
-	 *            the value of link
-	 * @param generic
-	 *            the generic links targets
-	 * @return the link
-	 * @see Link
-	 */
-	<T extends Link> T addLink(Cache cache, Link relation, Serializable value, Generic... generic);
+	// /**
+	// * Add a link for the relation
+	// *
+	// * @param relation
+	// * the relation
+	// * @param value
+	// * the value of link
+	// * @param generic
+	// * the generic links targets
+	// * @return the link
+	// * @see Link
+	// */
+	// <T extends Link> T addLink(Cache cache, Link relation, Serializable value, Generic... generic);
 
 	<T extends Link> T bind(Cache cache, Link relation, Generic... generic);
 

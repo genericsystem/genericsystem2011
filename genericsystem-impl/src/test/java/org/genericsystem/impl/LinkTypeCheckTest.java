@@ -26,7 +26,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 			
 			@Override
 			public void intercept() {
-				myBMW.addLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, yourDog);
+				myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, yourDog);
 			}
 		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}
@@ -45,7 +45,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 			
 			@Override
 			public void intercept() {
-				myBMW.addLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
+				myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
 			}
 		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}
@@ -59,7 +59,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 		Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		Generic yourDog = dog.newInstance(cache, "yourDog");
 		Generic myRoad = road.newInstance(cache, "myRoad");
-		myBMW.addLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad, yourDog);
+		myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad, yourDog);
 	}
 	
 	public void malformedAttributeWrongBase() {
@@ -70,12 +70,12 @@ public class LinkTypeCheckTest extends AbstractTest {
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		
-		myBMW.addValue(cache, runs, "myBMWRuns");
+		myBMW.setValue(cache, runs, "myBMWRuns");
 		new RollbackCatcher() {
 			
 			@Override
 			public void intercept() {
-				yourDog.addValue(cache, runs, "myDogRuns");
+				yourDog.setValue(cache, runs, "myDogRuns");
 			}
 		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}

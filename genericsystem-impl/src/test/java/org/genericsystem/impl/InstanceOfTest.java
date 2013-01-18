@@ -21,10 +21,10 @@ public class InstanceOfTest extends AbstractTest {
 	// Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
 	// Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 	// Generic myCar = car.newInstance(cache, "myCar");
-	// Value myVehiclePower236 = myVehicle.addValue(cache, vehiclePower, 236);
+	// Value myVehiclePower236 = myVehicle.setValue(cache, vehiclePower, 236);
 	// Attribute carSubPower = car.addSubAttribute(cache, vehiclePower, "subPower");
 	//
-	// Value myCarPower235 = myCar.addValue(cache, carSubPower, 235);
+	// Value myCarPower235 = myCar.setValue(cache, carSubPower, 235);
 	//
 	// assert myVehiclePower236.getMeta().equals(vehiclePower) : myVehiclePower236.getMeta() + "  " + myVehiclePower236.getSupers();
 	// assert myCarPower235.getMeta().equals(carSubPower) : myCarPower235.getMeta();
@@ -50,8 +50,8 @@ public class InstanceOfTest extends AbstractTest {
 	// Generic titine = vehicle.newInstance(cache, "myTitine");
 	// Generic f1 = car.newInstance(cache, "myF1");
 	//
-	// Link drives = maurice.addLink(cache, driving, "Maurice_drives_Titine", titine);
-	// Link pilots = federer.addLink(cache, piloting, "Federer_pilots_F1", f1);
+	// Link drives = maurice.setLink(cache, driving, "Maurice_drives_Titine", titine);
+	// Link pilots = federer.setLink(cache, piloting, "Federer_pilots_F1", f1);
 	//
 	// assert drives.getMeta().equals(driving) : drives.getMeta();
 	//

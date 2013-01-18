@@ -161,7 +161,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 		assert !weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 		Generic myck = human.newInstance(cache, "myck");
-		Value myckWeight90 = myck.addValue(cache, weight, 90);
+		Value myckWeight90 = myck.setValue(cache, weight, 90);
 		assert myck.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 		assert !myckWeight90.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 	}
@@ -175,7 +175,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 		assert weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 		Generic myck = human.newInstance(cache, "myck");
-		Value myckWeight90 = myck.addValue(cache, weight, 90);
+		Value myckWeight90 = myck.setValue(cache, weight, 90);
 		assert myck.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 		assert myckWeight90.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 	}
@@ -191,7 +191,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		assert humanDriveVehicle.getImplicit().isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 		Generic myck = human.newInstance(cache, "myck");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Link myckMyDriveMyVehicle = myck.addLink(cache, humanDriveVehicle, "myDrive", myVehicle);
+		Link myckMyDriveMyVehicle = myck.setLink(cache, humanDriveVehicle, "myDrive", myVehicle);
 		assert myckMyDriveMyVehicle.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, 0);
 	}
 
