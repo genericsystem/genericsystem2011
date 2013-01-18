@@ -256,19 +256,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	private <T extends Link> T setToOneLink(Cache cache, Link property, Serializable value, int basePos, Generic... targets) {
 		T link = getLink(cache, (Relation) property, basePos);
 		if (link == null)
-			return addLink(cache, property, value, basePos, targets);
+			return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
 		for (int i = 0; i < ((GenericImpl) link).components.length; i++)
 			if (i != basePos)
 				if (!((GenericImpl) link).components[i].equals(targets[i - (i >= basePos ? 1 : 0)])) {
 					if (this.equals(link.getComponent(basePos))) {
 						link.remove(cache);
-						return addLink(cache, property, value, basePos, targets);
+						return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
 					}
 					cancel(cache, link);
-					return addLink(cache, property, value, basePos, targets);
+					return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
 				}
 		if (!this.equals(link.getComponent(basePos)))
-			return addLink(cache, link, value, basePos, targets);
+			return addLink(cache, link, value, SystemGeneric.CONCRETE, basePos, targets);
 		if (Objects.equals(value, link.getValue()))
 			return link;
 		return update(cache, link, value);
@@ -278,18 +278,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (((Type) property).isPropertyConstraintEnabled(cache)) {
 			T link = getLink(cache, (Relation) property, basePos, targets);
 			if (link == null)
-				return addLink(cache, property, value, basePos, targets);
+				return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
 			if (!this.equals(link.getComponent(basePos)))
-				return addLink(cache, link, value, basePos, targets);
+				return addLink(cache, link, value, SystemGeneric.CONCRETE, basePos, targets);
 			if (Objects.equals(value, link.getValue()))
 				return link;
 			return update(cache, link, value);
 		}
 		T link = this.<T> getLinks(cache, (Relation) property, basePos, targets).findFirst(value);
 		if (link == null)
-			return addLink(cache, property, value, basePos, targets);
+			return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
 		if (!this.equals(link.getComponent(basePos)))
-			return addLink(cache, link, value, basePos, targets);
+			return addLink(cache, link, value, SystemGeneric.CONCRETE, basePos, targets);
 		return link;
 	}
 
@@ -399,7 +399,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public <T extends Relation> T addRelation(Cache cache, Serializable value, Type... targets) {
 		// return addSubRelation(cache, getEngine(), value, targets);
 		assert !Objects.equals(value, getEngine().getValue());
-		return ((CacheImpl) cache).bind(getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
+		// return ((CacheImpl) cache).bind(getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, Statics.insertFirstIntoArray(this, targets));
+		return addLink(cache, getEngine(), value, SystemGeneric.STRUCTURAL, 0, targets);
 	}
 
 	// @Override
@@ -433,10 +434,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return setLink(cache, relation, Statics.FLAG, basePos, targets);
 	}
 
-	private <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int basePos, Generic... targets) {
+	private <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int metaLevel, int basePos, Generic... targets) {
 		if (relation.isConcrete())
 			cancel(cache, relation);
-		return ((CacheImpl) cache).bind(relation.isConcrete() ? relation.getMeta() : relation, value, SystemGeneric.CONCRETE, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
+		return ((CacheImpl) cache).bind(relation.isConcrete() ? relation.getMeta() : relation, value, metaLevel, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	// public <T extends Link> T addLink(Cache cache, Link relation, Serializable value, Generic... targets) {
@@ -1097,7 +1098,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		}
 		// if (!defaultIsActive(systemPropertyClass))
 		// addLink(cache, (Link) systemProperty, componentPos);
-		addLink(cache, (Link) systemProperty, componentPos, Statics.BASE_POSITION);
+		addLink(cache, (Link) systemProperty, componentPos, SystemGeneric.CONCRETE, Statics.BASE_POSITION);
 		return (T) this;
 	}
 
