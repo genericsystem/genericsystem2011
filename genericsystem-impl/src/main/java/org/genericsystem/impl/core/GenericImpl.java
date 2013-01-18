@@ -335,21 +335,43 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Attribute> T getAttribute(Context context, Serializable value) {
+	public <T extends Attribute> T getAttribute(final Context context, final Serializable value) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return new AbstractFilterIterator<T>(GenericImpl.this.<T> structuralIterator(context)) {
+					@Override
+					public boolean isSelected() {
+						return next.isReallyAttribute() && Objects.equals(next.getValue(), value);
+					}
+				};
+			}
+		}.get(0);
 		// TODO to optimize !
-		for (T attribute : this.<T> getAttributes(context))
-			if (Objects.equals(attribute.getValue(), value))
-				return attribute;
-		return null;
+		// for (T attribute : this.<T> getAttributes(context))
+		// if (Objects.equals(attribute.getValue(), value))
+		// return attribute;
+		// return null;
 	}
 
 	@Override
-	public <T extends Relation> T getRelation(Context context, Serializable value) {
+	public <T extends Relation> T getRelation(final Context context, final Serializable value) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return new AbstractFilterIterator<T>(GenericImpl.this.<T> structuralIterator(context)) {
+					@Override
+					public boolean isSelected() {
+						return next.isRelation() && Objects.equals(next.getValue(), value);
+					}
+				};
+			}
+		}.get(0);
 		// TODO to optimize !
-		for (T relation : this.<T> getRelations(context))
-			if (Objects.equals(relation.getValue(), value))
-				return relation;
-		return null;
+		// for (T relation : this.<T> getRelations(context))
+		// if (Objects.equals(relation.getValue(), value))
+		// return relation;
+		// return null;
 	}
 
 	// TODO KK
