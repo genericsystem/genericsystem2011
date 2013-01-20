@@ -294,11 +294,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
-		// if (superTypes.length == 0)
-		// superTypes = new Type[] { getEngine() };
-		// if (superTypes.length == 1)
-		// return add(superTypes[0], value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, components);
-		return bind(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes, components);
+		return bind(getEngine(), getEngine(), value, SystemGeneric.STRUCTURAL, superTypes, components);
 	}
 	
 	@Override
@@ -309,7 +305,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return (T) this.<T> bind(getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).disableInheritance(this);
+		return (T) this.<T> bind(getEngine(), getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).disableInheritance(this);
 	}
 	
 	@Override
@@ -331,11 +327,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Class<?> interfaceClasse : getAdditionalInterfaceClasses(clazz))
 			annotedInterfaces[i++] = this.<Type> find(interfaceClasse);
 		Generic genericToCheck = annotedInterfaces.length == 1 ? annotedInterfaces[0] : getEngine();
-		return bind(genericToCheck, getImplictValue(clazz), clazz.getAnnotation(SystemGeneric.class).value(), annotedInterfaces, findComponents(clazz));
+		return bind(genericToCheck.getImplicit(), genericToCheck, getImplictValue(clazz), clazz.getAnnotation(SystemGeneric.class).value(), annotedInterfaces, findComponents(clazz));
 	}
 	
-	public <T extends Generic> T bind(Generic genericToCheck, Serializable value, int metaLevel, Generic[] additionalInterfaces, Generic[] components) {
-		Generic implicit = bindPrimaryByValue(genericToCheck.getImplicit(), value, metaLevel);
+	public <T extends Generic> T bind(Generic implicitSuper, Generic genericToCheck, Serializable value, int metaLevel, Generic[] additionalInterfaces, Generic[] components) {
+		Generic implicit = bindPrimaryByValue(implicitSuper, value, metaLevel);
 		Primaries primaries = new Primaries(additionalInterfaces);
 		primaries.add(implicit);
 		primaries.add(genericToCheck);

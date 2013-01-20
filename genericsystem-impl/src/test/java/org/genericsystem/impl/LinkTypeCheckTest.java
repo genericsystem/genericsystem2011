@@ -75,7 +75,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 			
 			@Override
 			public void intercept() {
-				yourDog.setValue(cache, runs, "myDogRuns");
+				yourDog.setValue(cache, runs, "myDogRuns").log();
 			}
 		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}

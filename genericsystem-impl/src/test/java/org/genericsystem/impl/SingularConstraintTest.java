@@ -14,41 +14,41 @@ import org.testng.annotations.Test;
 
 @Test
 public class SingularConstraintTest extends AbstractTest {
-
+	
 	public void testSingularConstraint() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Relation metaRelation = cache.getMetaRelation();
-
+		
 		metaRelation.enableSingularConstraint(cache, Statics.BASE_POSITION);
 		assert metaRelation.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
 		assert !metaRelation.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
-
+		
 		metaRelation.enableSingularConstraint(cache, Statics.TARGET_POSITION);
 		assert metaRelation.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
 		assert metaRelation.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
-
+		
 		metaRelation.disableSingularConstraint(cache, Statics.BASE_POSITION);
 		assert !metaRelation.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
 		assert metaRelation.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
-
+		
 		metaRelation.enableSingularConstraint(cache);
 		assert metaRelation.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
 		assert metaRelation.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
 		assert metaRelation.isSingularConstraintEnabled(cache);
-
+		
 		metaRelation.disableSingularConstraint(cache);
 		assert !metaRelation.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
 		assert metaRelation.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
 		assert !metaRelation.isSingularConstraintEnabled(cache);
 	}
-
+	
 	public void testConstraintCheckOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
 		Attribute vehicleDriver = vehicle.addAttribute(cache, "Driver");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-
+		
 		vehiclePower.enableSingularConstraint(cache, 0);
 		assert vehiclePower.isSingularConstraintEnabled(cache, 0);
 		myVehicle.setValue(cache, vehiclePower, "5").remove(cache);
@@ -56,7 +56,7 @@ public class SingularConstraintTest extends AbstractTest {
 		myVehicle.setValue(cache, vehicleDriver, "JC");
 		cache.flush();
 	}
-
+	
 	public void testConstraintCheckKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
@@ -71,7 +71,7 @@ public class SingularConstraintTest extends AbstractTest {
 		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1;
 		assert myVehicle.getValueHolders(cache, vehiclePower).get(0).equals(myVehiclePowerValue2);
 	}
-
+	
 	public void testRelationOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
@@ -87,7 +87,7 @@ public class SingularConstraintTest extends AbstractTest {
 		assert !runsOverLink1.isAlive(cache);
 		assert myBMW.getLink(cache, runsOver, yourDog).equals(runsOverLink2) : myBMW.getLink(cache, runsOver, yourDog);
 	}
-
+	
 	public void testRelationWithTwoSingular() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type human = cache.newType("Human");
@@ -110,7 +110,7 @@ public class SingularConstraintTest extends AbstractTest {
 		assert humanDriveVehicle.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
 		assert humanDriveVehicle.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
 	}
-
+	
 	public void testDoubleRelationSimpleKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
@@ -118,10 +118,10 @@ public class SingularConstraintTest extends AbstractTest {
 		final Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog);
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
-
+		
 		runsOver.enableSingularConstraint(cache, 1);
 		assert runsOver.isSingularConstraintEnabled(cache, 1);
-
+		
 		myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
 		new RollbackCatcher() {
 			@Override
@@ -130,7 +130,7 @@ public class SingularConstraintTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
-
+	
 	public void testDoubleRelationSimpleOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
@@ -139,14 +139,14 @@ public class SingularConstraintTest extends AbstractTest {
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		final Generic yourSecondDog = dog.newInstance(cache, "yourSecondDog");
-
+		
 		runsOver.enableSingularConstraint(cache, 1);
 		assert runsOver.isSingularConstraintEnabled(cache, 1);
-
+		
 		myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
 		myBMW.setLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourSecondDog);
 	}
-
+	
 	public void testDoubleRelationOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
@@ -157,14 +157,14 @@ public class SingularConstraintTest extends AbstractTest {
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		final Generic yourSecondDog = dog.newInstance(cache, "yourSecondDog");
 		final Generic myRoad = road.newInstance(cache, "myRoad");
-
+		
 		runsOver.enableSingularConstraint(cache, 1);
 		assert runsOver.isSingularConstraintEnabled(cache, 1);
-
+		
 		myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad);
 		myBMW.setLink(cache, runsOver, "myBMWRunsOverAndOverOverYourDog", yourSecondDog, myRoad);
 	}
-
+	
 	public void testDoubleRelationKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
@@ -175,10 +175,10 @@ public class SingularConstraintTest extends AbstractTest {
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		final Generic myRoad = road.newInstance(cache, "myRoad");
 		final Generic myRoad2 = road.newInstance(cache, "myRoad2");
-
+		
 		runsOver.enableSingularConstraint(cache, 1);
 		assert runsOver.isSingularConstraintEnabled(cache, 1);
-
+		
 		myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad);
 		new RollbackCatcher() {
 			@Override
@@ -187,7 +187,7 @@ public class SingularConstraintTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
-
+	
 	public void testDoubleRelationKO2() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicleType = cache.newType("Vehicle");
@@ -198,10 +198,10 @@ public class SingularConstraintTest extends AbstractTest {
 		final Generic dog = dogType.newInstance(cache, "yourDog");
 		final Generic dog2 = dogType.newInstance(cache, "yourSecondDog");
 		final Generic road = roadType.newInstance(cache, "myRoad");
-
+		
 		runsOver.enableSingularConstraint(cache, 2);
 		assert runsOver.isSingularConstraintEnabled(cache, 2);
-
+		
 		vehicle.setLink(cache, runsOver, "myBMWRunsOverYourDog", dog, road);
 		new RollbackCatcher() {
 			@Override
@@ -210,9 +210,9 @@ public class SingularConstraintTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
-
+	
 	// Rapportés depuis 2010 ----------------------------------------------------------------------
-
+	
 	public void noMoreThanOneAttributePerEntity() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
@@ -221,11 +221,11 @@ public class SingularConstraintTest extends AbstractTest {
 		registration.enableSingularConstraint(cache);
 		Value myBmwRegistration1 = myBmw.setValue(cache, registration, "AB123CD");
 		Value myBmwRegistration2 = myBmw.setValue(cache, registration, "DC321BA");
-		assert !myBmwRegistration1.isAlive(cache);
 		assert myBmw.getValueHolders(cache, registration).size() == 1;
 		assert myBmw.getValueHolders(cache, registration).get(0).equals(myBmwRegistration2);
+		assert !myBmwRegistration1.isAlive(cache);
 	}
-
+	
 	// public void noMoreThanOneAttributePerEntity2() {
 	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 	// Type car = cache.newType("Car");
@@ -242,7 +242,7 @@ public class SingularConstraintTest extends AbstractTest {
 	// }
 	// }.assertIsCausedBy(SingularConstraintViolationException.class);
 	// }
-
+	
 	public void singularForTargetAxe() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		new RollbackCatcher() {
@@ -252,7 +252,7 @@ public class SingularConstraintTest extends AbstractTest {
 				Type children = cache.newType("children");
 				Relation myChildren = mother.addRelation(cache, "myChildren", children);
 				myChildren.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-
+				
 				Generic mama1 = mother.newInstance(cache, "mama1");
 				Generic mama2 = mother.newInstance(cache, "mama2");
 				Generic baby1 = children.newInstance(cache, "baby1");
@@ -263,7 +263,7 @@ public class SingularConstraintTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
-
+	
 	public void singularForTargetAxe2() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		new RollbackCatcher() {
@@ -273,7 +273,7 @@ public class SingularConstraintTest extends AbstractTest {
 				Type children = cache.newType("children");
 				Relation myChildren = mother.addRelation(cache, "myChildren", children);
 				myChildren.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-
+				
 				Generic mama1 = mother.newInstance(cache, "mama1");
 				Generic baby1 = children.newInstance(cache, "baby1");
 				mama1.setLink(cache, myChildren, "mama1_baby1", baby1);
