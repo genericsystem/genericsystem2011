@@ -358,16 +358,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	// TODO KK
-	public <T extends Generic> T reBind(Cache cache) {
+	public <T extends Generic> T reFind(Cache cache) {
 		if (isAlive(cache))
 			return (T) this;
 		Generic[] primariesArray = getPrimariesArray();
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
 		for (int i = 0; i < primariesArray.length; i++)
-			boundPrimaries[i] = ((GenericImpl) primariesArray[i]).reBind(cache);
+			boundPrimaries[i] = ((GenericImpl) primariesArray[i]).reFind(cache);
 		Generic[] boundComponents = new Generic[components.length];
 		for (int j = 0; j < components.length; j++)
-			boundComponents[j] = equals(components[j]) ? null : ((GenericImpl) components[j]).reBind(cache);
+			boundComponents[j] = equals(components[j]) ? null : ((GenericImpl) components[j]).reFind(cache);
 		return ((CacheImpl) cache).<T> findByInterfaces(boundPrimaries, boundComponents);
 	}
 
@@ -1341,7 +1341,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	public <T extends Generic> T rebind(Cache cache) {
-		// assert !isPrimary();
+		assert !isPrimary();
 		return ((CacheImpl) cache).reBindNode(this);
 	}
 

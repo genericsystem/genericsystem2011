@@ -20,7 +20,7 @@ public class RebindTest {
 		Attribute carPower = car.addAttribute(cache, "Power");
 		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
 		assert !carPower.isAlive(cache);
-		assert ((GenericImpl) carPower).reBind(cache).inheritsFrom(vehiclePower);
+		assert ((GenericImpl) carPower).reFind(cache).inheritsFrom(vehiclePower);
 	}
 
 	public void testRebindDependencies() {
@@ -35,7 +35,7 @@ public class RebindTest {
 		assert vPower.getValueHolders(cache, carPowerUnit).contains(vUnit);
 		assert myCar.getValueHolders(cache, carPower).contains(vPower);
 		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
-		assert ((GenericImpl) carPower).reBind(cache).inheritsFrom(vehiclePower);
+		assert ((GenericImpl) carPower).reFind(cache).inheritsFrom(vehiclePower);
 	}
 
 	public void testRelationRebindDependencies() {
@@ -61,13 +61,14 @@ public class RebindTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type color = cache.newType("color");
 		Type primeColor = color.newSubType(cache, "primeColor");
-		primeColor.newInstance(cache, "red");
-		int colorHashCode = System.identityHashCode(color);
-		Generic reboundColor = ((GenericImpl) color).rebind(cache);
-		int newReboundColor = System.identityHashCode(reboundColor);
-		assert colorHashCode != newReboundColor;
-		assert !color.isAlive(cache);
-		assert reboundColor.isAlive(cache);
+		Generic red = primeColor.newInstance(cache, "red");
+		Attribute lightness = primeColor.addAttribute(cache, "lightness");
+		Value lightnessValue = red.setValue(cache, lightness, "40");
+		Generic reboundLightnessValue = ((GenericImpl) lightness).rebind(cache);
+		assert !lightness.isAlive(cache);
+		assert !lightnessValue.isAlive(cache);
+		assert null != ((GenericImpl) lightness).reFind(cache);
+		assert reboundLightnessValue.isAlive(cache);
 		assert primeColor.isAlive(cache);
 
 	}

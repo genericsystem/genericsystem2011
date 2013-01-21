@@ -382,6 +382,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return superGeneric;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T extends Generic> T reBindNode(Generic generic) {
 		final Generic[] interfaces = ((GenericImpl) generic).getPrimariesArray();
 		final Generic[] components = ((GenericImpl) generic).components;
@@ -398,24 +399,24 @@ public class CacheImpl extends AbstractContext implements Cache {
 			while (removeIterator.hasNext())
 				orderedDependencies.addAll(orderDependencies(removeIterator.next()));
 		}
+		orderedDependencies.add(generic);
 		for (Generic dependency : orderedDependencies.descendingSet())
 			remove(dependency);
+		// Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(generic.getValue(), generic.getMetaLevel(), directSupers, components);
+		// T superGeneric = this.<T> insert(newGeneric);
 
-		// Generic oldGeneric = findByInterfaces(interfaces, components);
-		// remove(oldGeneric);
-
-		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(generic.getValue(), generic.getMetaLevel(), directSupers, components);
-		T superGeneric = this.<T> insert(newGeneric);
-
+		T rebind = null;
 		Map<Generic, Generic> connectionMap = new HashMap<>();
 		for (Generic orderedDependency : orderedDependencies) {
 			Generic[] newComponents = adjustComponent(((GenericImpl) orderedDependency).components, connectionMap);
 			Generic bind = insert(((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel,
 					getDirectSupers(((GenericImpl) orderedDependency).getPrimariesArray(), newComponents), newComponents));
 			connectionMap.put(orderedDependency, bind);
+			if (rebind == null)
+				rebind = (T) bind;
 		}
-		assert superGeneric == find(directSupers, components);
-		return superGeneric;
+		assert rebind == find(((GenericImpl) rebind).directSupers, ((GenericImpl) rebind).components);
+		return rebind;
 	}
 
 	private Generic[] adjustComponent(Generic[] oldComponents, Map<Generic, Generic> connectionMap) {
