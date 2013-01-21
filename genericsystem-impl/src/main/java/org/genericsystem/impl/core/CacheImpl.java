@@ -342,6 +342,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@SuppressWarnings("unchecked")
+	<T extends Generic> T findByInterfaces(Generic[] interfaces, Generic[] components) {
+		Generic[] directSupers = getDirectSupers(interfaces, components);
+		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
+			return (T) directSupers[0];
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
 	<T extends Generic> T bind(Serializable value, int metaLevel, final Generic[] interfaces, final Generic[] components) {
 		Generic[] directSupers = getDirectSupers(interfaces, components);
 		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
@@ -361,6 +369,42 @@ public class CacheImpl extends AbstractContext implements Cache {
 			remove(generic);
 
 		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(value, metaLevel, directSupers, components);
+		T superGeneric = this.<T> insert(newGeneric);
+
+		Map<Generic, Generic> connectionMap = new HashMap<>();
+		for (Generic orderedDependency : orderedDependencies) {
+			Generic[] newComponents = adjustComponent(((GenericImpl) orderedDependency).components, connectionMap);
+			Generic bind = insert(((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel,
+					getDirectSupers(((GenericImpl) orderedDependency).getPrimariesArray(), newComponents), newComponents));
+			connectionMap.put(orderedDependency, bind);
+		}
+		assert superGeneric == find(directSupers, components);
+		return superGeneric;
+	}
+
+	public <T extends Generic> T reBindNode(Generic generic) {
+		final Generic[] interfaces = ((GenericImpl) generic).getPrimariesArray();
+		final Generic[] components = ((GenericImpl) generic).components;
+
+		Generic[] directSupers = getDirectSupers(interfaces, components);
+		TreeSet<Generic> orderedDependencies = new TreeSet<Generic>();
+		for (Generic superGeneric : directSupers) {
+			Iterator<Generic> removeIterator = new AbstractFilterIterator<Generic>(directInheritingsIterator(superGeneric)) {
+				@Override
+				public boolean isSelected() {
+					return GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
+				}
+			};
+			while (removeIterator.hasNext())
+				orderedDependencies.addAll(orderDependencies(removeIterator.next()));
+		}
+		for (Generic dependency : orderedDependencies.descendingSet())
+			remove(dependency);
+
+		// Generic oldGeneric = findByInterfaces(interfaces, components);
+		// remove(oldGeneric);
+
+		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(generic.getValue(), generic.getMetaLevel(), directSupers, components);
 		T superGeneric = this.<T> insert(newGeneric);
 
 		Map<Generic, Generic> connectionMap = new HashMap<>();

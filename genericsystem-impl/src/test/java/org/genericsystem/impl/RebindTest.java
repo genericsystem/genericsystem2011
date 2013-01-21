@@ -57,4 +57,19 @@ public class RebindTest {
 		assert metalColor.isAlive(cache);
 	}
 
+	public void rebindNode() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type color = cache.newType("color");
+		Type primeColor = color.newSubType(cache, "primeColor");
+		primeColor.newInstance(cache, "red");
+		int colorHashCode = System.identityHashCode(color);
+		Generic reboundColor = ((GenericImpl) color).rebind(cache);
+		int newReboundColor = System.identityHashCode(reboundColor);
+		assert colorHashCode != newReboundColor;
+		assert !color.isAlive(cache);
+		assert reboundColor.isAlive(cache);
+		assert primeColor.isAlive(cache);
+
+	}
+
 }
