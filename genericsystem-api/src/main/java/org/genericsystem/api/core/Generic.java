@@ -322,6 +322,10 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Generic> Snapshot<T> getComponents();
 
+	int getComponentsSize();
+
+	int getSupersSize();
+
 	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, Generic... targets);
 
 	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, int basePos, Generic... targets);
@@ -353,9 +357,5 @@ public interface Generic extends Comparable<Generic> {
 	boolean isMeta();
 
 	boolean isTree();
-
-	// void cancel(Cache cache, Value attribute);
-
-	// void restore(Cache cache, Attribute attribute);
 
 }
