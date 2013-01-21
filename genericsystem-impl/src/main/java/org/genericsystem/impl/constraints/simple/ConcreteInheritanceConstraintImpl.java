@@ -25,9 +25,8 @@ public class ConcreteInheritanceConstraintImpl extends AbstractSimpleBooleanCons
 	private static final long serialVersionUID = -6429972259714036057L;
 
 	@Override
-	// TODO clean comment
 	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
-		if (modified.isConcrete() && ((GenericImpl) modified).isPrimary() /* && !((GenericImpl) modified).isPhantom() */)
+		if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
 			if (((GenericImpl) modified).getSupers().first().isConcrete())
 				throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified);
 	}
