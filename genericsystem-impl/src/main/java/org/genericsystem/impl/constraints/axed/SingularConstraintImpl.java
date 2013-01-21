@@ -24,11 +24,12 @@ public class SingularConstraintImpl extends AbstractAxedIntegerConstraint {
 	// TODO do the same as PropertyConstraint
 
 	@Override
+	// TODO clean comment
 	protected void internalCheck(final Context context, Generic modified, final Relation constraintType, final Integer basePos) throws ConstraintViolationException {
 		final Generic component = ((Link) modified).getComponent(basePos);
 		// if (component.getLinks(context, constraintType, basePos).size() > 1)
 		// throw new SingularConstraintViolationException("Multiple links of type " + constraintType + " on target " + component + " (n° " + basePos + ").");
-		Iterator<Generic> it = ((GenericImpl) component).<Generic> mainIterator(context, constraintType, SystemGeneric.CONCRETE, basePos, false);
+		Iterator<Generic> it = ((GenericImpl) component).<Generic> mainIterator(context, constraintType, SystemGeneric.CONCRETE, basePos/* , false */);
 		if (it.hasNext()) {
 			it.next();
 			if (it.hasNext())

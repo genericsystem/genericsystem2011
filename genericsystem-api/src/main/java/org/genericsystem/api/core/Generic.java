@@ -354,8 +354,8 @@ public interface Generic extends Comparable<Generic> {
 
 	boolean isTree();
 
-	void cancel(Cache cache, Value attribute);
+	// void cancel(Cache cache, Value attribute);
 
-	void restore(Cache cache, Attribute attribute);
+	// void restore(Cache cache, Attribute attribute);
 
 }
