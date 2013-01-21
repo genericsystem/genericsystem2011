@@ -8,12 +8,12 @@ import org.genericsystem.impl.core.Statics;
 /**
  * @author Nicolas Feybesse
  */
-public abstract class AbstractAggregateIterator<U, T> extends AbstractAwareIterator<T> implements Iterator<T> {
+public abstract class AbstractConcateIterator<U, T> extends AbstractAwareIterator<T> implements Iterator<T> {
 
 	private Iterator<U> elements;
 	private Iterator<T> iterator = Statics.emptyIterator();
 
-	public AbstractAggregateIterator(Iterator<U> elements) {
+	public AbstractConcateIterator(Iterator<U> elements) {
 		this.elements = elements;
 	}
 
@@ -34,10 +34,10 @@ public abstract class AbstractAggregateIterator<U, T> extends AbstractAwareItera
 		}
 	}
 
-	public static class AggregateIterator<T> extends AbstractAggregateIterator<Iterator<T>, T> {
+	public static class ConcateIterator<T> extends AbstractConcateIterator<Iterator<T>, T> {
 
 		@SafeVarargs
-		public AggregateIterator(Iterator<T>... iterators) {
+		public ConcateIterator(Iterator<T>... iterators) {
 			super(Arrays.asList(iterators).iterator());
 		}
 
