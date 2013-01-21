@@ -22,15 +22,10 @@ public class TreeTest extends AbstractTest {
 	public void testTree() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Tree tree = cache.newTree("Tree");
-		tree.log();
 		final Node root = tree.newRoot(cache, "Root");
-		root.log();
 		Node child = root.addNode(cache, "Child");
-		child.log();
 		Node child2 = root.addNode(cache, "Child2");
-		child2.log();
 		Node child3 = child.addNode(cache, "Child3");
-		child3.log();
 
 		assert root.getMeta().equals(tree);
 		assert root.inheritsFrom(tree);
@@ -142,11 +137,8 @@ public class TreeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 
 		Tree graphicComponent = cache.newTree("GraphicComponent");
-		graphicComponent.log();
 		Node webPage = graphicComponent.newRoot(cache, "webPage");
-		webPage.log();
 		Node header = webPage.addSubNode(cache, "header");
-		header.log();
 		Node body = webPage.addSubNode(cache, "body");
 		Node footer = webPage.addSubNode(cache, "footer");
 		body.addSubNode(cache, "message1");
@@ -166,7 +158,7 @@ public class TreeTest extends AbstractTest {
 		header.bind(cache, graphicComponentColor, blue);
 		footer.bind(cache, graphicComponentColor, yellow);
 
-		assert red.equals(body.getLink(cache, graphicComponentColor).getTargetComponent());
+		assert red.equals(body.getLink(cache, graphicComponentColor).getTargetComponent()) : body.getLinks(cache, graphicComponentColor);
 		assert "Red".equals(body.getLinks(cache, graphicComponentColor).first().getTargetComponent().getValue());
 		cache.flush();
 	}
