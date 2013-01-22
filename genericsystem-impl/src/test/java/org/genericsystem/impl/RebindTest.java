@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 @Test
 public class RebindTest {
-
+	
 	public void simpleTestRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
@@ -22,7 +22,7 @@ public class RebindTest {
 		assert !carPower.isAlive(cache);
 		assert ((GenericImpl) carPower).reFind(cache).inheritsFrom(vehiclePower);
 	}
-
+	
 	public void testRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
@@ -37,7 +37,7 @@ public class RebindTest {
 		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
 		assert ((GenericImpl) carPower).reFind(cache).inheritsFrom(vehiclePower);
 	}
-
+	
 	public void testRelationRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type metal = cache.newType("metal");
@@ -56,7 +56,7 @@ public class RebindTest {
 		zink.bind(cache, metalColor, gray);
 		assert metalColor.isAlive(cache);
 	}
-
+	
 	public void rebindNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type color = cache.newType("color");
@@ -64,13 +64,13 @@ public class RebindTest {
 		Generic red = primeColor.newInstance(cache, "red");
 		Attribute lightness = primeColor.addAttribute(cache, "lightness");
 		Value lightnessValue = red.setValue(cache, lightness, "40");
-		Generic reboundLightnessValue = ((GenericImpl) lightness).rebind(cache);
+		Generic reboundLightnessValue = ((GenericImpl) lightness).reBind(cache);
 		assert !lightness.isAlive(cache);
 		assert !lightnessValue.isAlive(cache);
 		assert null != ((GenericImpl) lightness).reFind(cache);
 		assert reboundLightnessValue.isAlive(cache);
 		assert primeColor.isAlive(cache);
-
+		
 	}
-
+	
 }
