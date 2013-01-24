@@ -7,6 +7,7 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
+import org.genericsystem.impl.core.CacheImpl;
 import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.Test;
 
@@ -20,7 +21,9 @@ public class RebindTest {
 		Attribute carPower = car.addAttribute(cache, "Power");
 		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
 		assert !carPower.isAlive(cache);
-		assert ((GenericImpl) carPower).reBind(cache).inheritsFrom(vehiclePower);
+		
+		assert ((GenericImpl) carPower).reFind(cache).inheritsFrom(vehiclePower);
+		
 	}
 	
 	public void testRebindDependencies() {
@@ -35,7 +38,7 @@ public class RebindTest {
 		assert vPower.getValueHolders(cache, carPowerUnit).contains(vUnit);
 		assert myCar.getValueHolders(cache, carPower).contains(vPower);
 		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
-		assert ((GenericImpl) carPower).reBind(cache).inheritsFrom(vehiclePower);
+		assert ((CacheImpl) cache).reFind(carPower).inheritsFrom(vehiclePower);
 	}
 	
 	public void testRelationRebindDependencies() {
@@ -57,19 +60,35 @@ public class RebindTest {
 		assert metalColor.isAlive(cache);
 	}
 	
-	public void rebindNode() {
+	public void rebindAttributeNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type color = cache.newType("color");
 		Type primeColor = color.newSubType(cache, "primeColor");
-		primeColor.newInstance(cache, "red");
-		int colorHashCode = System.identityHashCode(color);
-		Generic reboundColor = ((GenericImpl) color).reFind(cache);
-		int newReboundColor = System.identityHashCode(reboundColor);
-		assert colorHashCode != newReboundColor;
-		assert !color.isAlive(cache);
-		assert reboundColor.isAlive(cache);
+		
+		Generic red = primeColor.newInstance(cache, "red");
+		Attribute lightness = primeColor.addAttribute(cache, "lightness");
+		Value lightnessValue = red.setValue(cache, lightness, "40");
+		Generic reboundLightness = ((GenericImpl) lightness).reBind(cache);
+		assert !lightness.isAlive(cache);
+		assert !lightnessValue.isAlive(cache);
+		assert null != ((CacheImpl) cache).reFind(lightness);
+		assert reboundLightness.isAlive(cache);
 		assert primeColor.isAlive(cache);
 		
+	}
+	
+	public void rebindTypeNode() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type color = cache.newType("color");
+		Type primeColor = color.newSubType(cache, "primeColor");
+		Generic red = primeColor.newInstance(cache, "red");
+		Attribute lightness = primeColor.addAttribute(cache, "lightness");
+		red.setValue(cache, lightness, "40");
+		Generic reboundColor = ((GenericImpl) color).reBind(cache);
+		assert !color.isAlive(cache);
+		assert !primeColor.isAlive(cache);
+		assert null != ((CacheImpl) cache).reFind(color);
+		assert reboundColor.isAlive(cache);
 	}
 	
 }

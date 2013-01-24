@@ -356,18 +356,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return null;
 	}
 	
-	// TODO KK
 	public <T extends Generic> T reFind(Cache cache) {
-		if (isAlive(cache))
-			return (T) this;
-		Generic[] primariesArray = getPrimariesArray();
-		Generic[] boundPrimaries = new Generic[primariesArray.length];
-		for (int i = 0; i < primariesArray.length; i++)
-			boundPrimaries[i] = ((GenericImpl) primariesArray[i]).reBind(cache);
-		Generic[] boundComponents = new Generic[components.length];
-		for (int j = 0; j < components.length; j++)
-			boundComponents[j] = equals(components[j]) ? null : ((GenericImpl) components[j]).reBind(cache);
-		return ((CacheImpl) cache).<T> findByInterfaces(boundPrimaries, boundComponents);
+		return ((CacheImpl) cache).reFind(this);
 	}
 	
 	@Override
@@ -567,7 +557,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 					return isSuperOf(truncatedInterfaces, components, truncatedSubInterfaces, subComponents);
 			}
 		} else {
-			if (isConcreteInheritance(interfaces[i], subInterfaces[i])) {
+			if (isConcreteInheritance(components[i], subComponents[i])) {
 				Generic[] truncatedComponents = Statics.truncate(i, components);
 				Generic[] truncatedSubComponents = Statics.truncate(i, subComponents);
 				if (!isEquals(interfaces, truncatedComponents, subInterfaces, truncatedSubComponents))
@@ -1363,7 +1353,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	public <T extends Generic> T reBind(Cache cache) {
-		assert !isPrimary();
+		// assert !isPrimary();
 		return ((CacheImpl) cache).reBindNode(this);
 	}
 	

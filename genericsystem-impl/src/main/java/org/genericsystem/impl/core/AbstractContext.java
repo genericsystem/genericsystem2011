@@ -118,6 +118,10 @@ public abstract class AbstractContext implements Context, Serializable {
 		};
 	}
 
+	protected Generic[] getDirectSupers(Generic generic, Generic[] components) {
+		return (((GenericImpl) generic).isPrimary()) ? new Generic[] { ((GenericImpl) generic).directSupers[0] } : getDirectSupers(((GenericImpl) generic).getPrimariesArray(), components);
+	}
+
 	protected Generic[] getDirectSupers(final Generic[] interfaces, final Generic[] components) {
 		List<Generic> list = new ArrayList<Generic>() {
 			private static final long serialVersionUID = 3578292736549817796L;
