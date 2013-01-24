@@ -556,10 +556,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
 			for (int i = 0; i < subInterfaces.length; i++) {
 				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i]))
-					if (!interfaces[i].isConcrete() || !subInterfaces[i].isConcrete() || !interfaces[i].<GenericImpl> getMeta().isSuperOf(subInterfaces[i].getMeta()))
-						return false;
-					else if (Arrays.equals(components, subComponents))
-						return false;
+					// if (!interfaces[i].isConcrete() || !subInterfaces[i].isConcrete() || !interfaces[i].<GenericImpl> getMeta().isSuperOf(subInterfaces[i].getMeta()))
+					return false;
+				// else if (Arrays.equals(components, subComponents))
+				// return false;
 			}
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null)
