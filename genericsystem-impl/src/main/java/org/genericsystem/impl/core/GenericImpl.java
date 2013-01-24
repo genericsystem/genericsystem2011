@@ -363,10 +363,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		Generic[] primariesArray = getPrimariesArray();
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
 		for (int i = 0; i < primariesArray.length; i++)
-			boundPrimaries[i] = ((GenericImpl) primariesArray[i]).reFind(cache);
+			boundPrimaries[i] = ((GenericImpl) primariesArray[i]).reBind(cache);
 		Generic[] boundComponents = new Generic[components.length];
 		for (int j = 0; j < components.length; j++)
-			boundComponents[j] = equals(components[j]) ? null : ((GenericImpl) components[j]).reFind(cache);
+			boundComponents[j] = equals(components[j]) ? null : ((GenericImpl) components[j]).reBind(cache);
 		return ((CacheImpl) cache).<T> findByInterfaces(boundPrimaries, boundComponents);
 	}
 	
@@ -548,23 +548,51 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return isSuperOf(getPrimariesArray(), components, ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).components);
 	}
 	
+	// TODO Pb trees
+	static boolean isEquals(Generic[] interfaces, Generic[] components, Generic[] subInterfaces, Generic[] subComponents) {
+		return Arrays.equals(interfaces, subInterfaces) && Arrays.equals(components, subComponents);
+	}
+	
+	static boolean isConcreteInheritance(Generic superGeneric, Generic subGeneric) {
+		return subGeneric.isConcrete() && superGeneric.isConcrete() && subGeneric.getMeta().inheritsFrom(superGeneric.getMeta());
+	}
+	
+	static boolean isValidConcreteInheritance(Generic[] interfaces, Generic[] components, Generic[] subInterfaces, Generic[] subComponents, int i, boolean onInterfaces) {
+		
+		if (onInterfaces) {
+			if (isConcreteInheritance(interfaces[i], subInterfaces[i])) {
+				Generic[] truncatedInterfaces = Statics.truncate(i, interfaces);
+				Generic[] truncatedSubInterfaces = Statics.truncate(i, subInterfaces);
+				if (!isEquals(truncatedInterfaces, components, truncatedSubInterfaces, subComponents))
+					return isSuperOf(truncatedInterfaces, components, truncatedSubInterfaces, subComponents);
+			}
+		} else {
+			if (isConcreteInheritance(interfaces[i], subInterfaces[i])) {
+				Generic[] truncatedComponents = Statics.truncate(i, components);
+				Generic[] truncatedSubComponents = Statics.truncate(i, subComponents);
+				if (!isEquals(interfaces, truncatedComponents, subInterfaces, truncatedSubComponents))
+					return isSuperOf(interfaces, truncatedComponents, subInterfaces, truncatedSubComponents);
+			}
+		}
+		return false;
+	}
+	
 	public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents) {
-		assert subInterfaces.length >= 1;
+		// assert subInterfaces.length >= 1;
 		if (interfaces.length > subInterfaces.length || components.length > subComponents.length)
 			return false;
 		
 		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
 			for (int i = 0; i < subInterfaces.length; i++) {
 				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i]))
-					// if (!interfaces[i].isConcrete() || !subInterfaces[i].isConcrete() || !interfaces[i].<GenericImpl> getMeta().isSuperOf(subInterfaces[i].getMeta()))
-					return false;
-				// else if (Arrays.equals(components, subComponents))
-				// return false;
+					if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, true))
+						return false;
 			}
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null)
 					if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
-						return false;
+						if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, false))
+							return false;
 				if (components[i] == null) {
 					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
 						return false;

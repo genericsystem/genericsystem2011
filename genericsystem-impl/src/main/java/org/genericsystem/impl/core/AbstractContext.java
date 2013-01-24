@@ -29,7 +29,6 @@ import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
-import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractSelectableLeafInheritedIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
@@ -129,7 +128,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			}
 		};
 		Generic[] result = list.toArray(new Generic[list.size()]);
-		assert Arrays.equals(new Primaries(result).toArray(), interfaces);
+		// assert Arrays.equals(new Primaries(result).toArray(), interfaces) : new Primaries(result) + " <---> " + Arrays.toString(interfaces);
 		return result;
 	}
 
