@@ -738,8 +738,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		s += "Value          : " + value + "\n";
 		s += "getMeta()      : " + getMeta() + "\n";
 		s += "getInstanciationLevel() : " + getMetaLevel() + "\n";
-		for (Generic interface_ : getPrimariesArray())
-			s += "Interface #" + "    : " + interface_ + " (" + System.identityHashCode(interface_) + ")\n";
 		for (Generic primary : getPrimaries())
 			s += "Primary #" + "       : " + primary + " (" + System.identityHashCode(primary) + ")\n";
 		for (Generic component : components)

@@ -9,6 +9,7 @@ import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
+import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -229,7 +230,7 @@ public class PropertyConstraintTest extends AbstractTest {
 			public void intercept() {
 				vehicle.setValue(cache, equipment, "GPS");
 				assert !result.isAlive(cache);
-				// assert ((AbstractContext)cache)equipment.
+				assert ((GenericImpl) result).reFind(cache) != null;
 			}
 		}.assertIsCausedBy(PropertyConstraintViolationException.class);
 	}

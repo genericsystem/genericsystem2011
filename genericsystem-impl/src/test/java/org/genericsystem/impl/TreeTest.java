@@ -161,6 +161,7 @@ public class TreeTest extends AbstractTest {
 		
 		assert red.equals(body.getLink(cache, graphicComponentColor).getTargetComponent()) : body.getLinks(cache, graphicComponentColor);
 		assert "Red".equals(body.getLinks(cache, graphicComponentColor).first().getTargetComponent().getValue());
+		header.bind(cache, graphicComponentColor, blue).log();
 		cache.flush();
 	}
 	
