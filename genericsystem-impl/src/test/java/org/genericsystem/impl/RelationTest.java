@@ -1126,7 +1126,7 @@ public class RelationTest extends AbstractTest {
 		Type human = cache.newType("Human");
 		Relation humanPilot = human.addRelation(cache, "pilot", vehicle, bike);
 		Relation getRelation = human.getRelation(cache, "pilot");
-		assert human.getAttribute(cache, "pilot") == null;
+		assert human.getAttribute(cache, "pilot") != null;
 		assert getRelation != null;
 		assert getRelation.equals(humanPilot);
 		assert human.getRelation(cache, "passenger") == null;

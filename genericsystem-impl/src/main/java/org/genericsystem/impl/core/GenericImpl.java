@@ -554,27 +554,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			return false;
 		
 		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
-			for (int i = 0; i < subInterfaces.length; i++)
+			for (int i = 0; i < subInterfaces.length; i++) {
 				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i]))
-					return false;
-			for (int i = 0; i < subComponents.length; i++) {
-				if (components[i] == null) {
-					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components)) {
-						assert false;// TODO reach with a good exemple
-						if (isSuperOf(interfaces, components, ((GenericImpl) subComponents[i]).getPrimariesArray(), ((GenericImpl) subComponents[i]).components))
-							return false;
-					}
-				} else if (subComponents[i] != null) {
-					if (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray())
-							|| !Arrays.equals(components, ((GenericImpl) components[i]).components) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components)) {
-						if (!((GenericImpl) components[i]).isSuperOf(subComponents[i])) {
-							return false;
-						}
-					}
-				}
-				
+					if (!interfaces[i].isConcrete() || !subInterfaces[i].isConcrete() || !interfaces[i].<GenericImpl> getMeta().isSuperOf(subInterfaces[i].getMeta()))
+						return false;
+					else if (Arrays.equals(components, subComponents))
+						return false;
 			}
-			
+			for (int i = 0; i < subComponents.length; i++) {
+				if (components[i] != null && subComponents[i] != null)
+					if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
+						return false;
+				if (components[i] == null) {
+					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
+						return false;
+				} else if (subComponents[i] == null)
+					if (!components[i].isEngine() && (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
+						return false;
+			}
 			return true;
 		}
 		if (subInterfaces.length > 1 && interfaces.length < subInterfaces.length)
