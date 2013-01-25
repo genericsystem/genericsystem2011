@@ -1,6 +1,7 @@
 package org.genericsystem.impl.core;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,7 +60,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	private LifeManager lifeManager;
 	
 	Generic[] directSupers;
-	Generic[] components;
+	public Generic[] components;
 	
 	int metaLevel;
 	Serializable value;
@@ -187,11 +188,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public boolean isAttributeOf(Generic generic, int componentPos) {
 		if (componentPos >= components.length)
 			return false;
-		// if (((GenericImpl) generic).isTree2(componentPos)) {
-		// if (equals(components[componentPos]))
-		// return true;
-		// return components[componentPos].isAttributeOf(generic, componentPos);
-		// } else
 		return generic.inheritsFrom(components[componentPos]);
 	}
 	
@@ -263,6 +259,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (!this.equals(link.getComponent(basePos)))
 			return addLink(cache, link, value, SystemGeneric.CONCRETE, basePos, targets);
 		if (!Arrays.equals(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) link).components)) {
+			// link.log();
+			// log.info("zzzzzzzzz     " + Arrays.toString(Statics.insertIntoArray(this, targets, basePos)) + "    ---      " + Arrays.toString(((GenericImpl) link).components));
 			link.remove(cache);
 			return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
 		}
@@ -432,12 +430,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			implicit = ((GenericImpl) implicit).directSupers[0];
 			if (!Objects.equals(relation.getValue(), value))
 				additionalInterfaces = new Generic[] { relation.getImplicit() };
-			for (int i = 0; i < ((GenericImpl) relation).components.length; i++) {
-				Generic superComponent = ((GenericImpl) relation).components[i];
-				Generic component = components[i];
-				if (!component.inheritsFrom(superComponent))
-					components = Statics.insertLastIntoArray(superComponent, components);
-			}
+			// for (int i = 0; i < ((GenericImpl) relation).components.length; i++) {
+			// Generic superComponent = ((GenericImpl) relation).components[i];
+			// Generic component = components[i];
+			// if (!component.inheritsFrom(superComponent))
+			// components = Statics.insertLastIntoArray(superComponent, components);
+			// }
 		}
 		return ((CacheImpl) cache).bind(implicit, relation, value, metaLevel, additionalInterfaces, components);
 	}
@@ -506,6 +504,45 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return getPrimaries().toArray();
 	}
 	
+	Generic[] getExtendedComponentsArray() {
+		return new ExtendedComponents(components).addSupers(directSupers).toArray();
+	}
+	
+	static public class ExtendedComponents extends ArrayList<Generic> {
+		
+		private static final long serialVersionUID = 5192296074644405884L;
+		
+		public ExtendedComponents(Generic[] components) {
+			addAll(Arrays.asList(components));
+		}
+		
+		public ExtendedComponents addSupers(Generic... directSupers) {
+			if (directSupers.length == 1 && directSupers[0].isEngine())
+				return this;
+			for (Generic directSuper : directSupers) {
+				for (Generic component : ((GenericImpl) directSuper).getExtendedComponentsArray())
+					restrictedAdd(component);
+			}
+			return this;
+		}
+		
+		public boolean restrictedAdd(Generic newComponent) {
+			Iterator<Generic> iterator = iterator();
+			while (iterator.hasNext()) {
+				Generic component = iterator.next();
+				if (((GenericImpl) newComponent).new InheritanceCalculator().isSuperOf(component))
+					return false;
+				assert !((GenericImpl) component).new InheritanceCalculator().isSuperOf(newComponent);
+			}
+			return super.add(newComponent);
+		}
+		
+		@Override
+		public Generic[] toArray() {
+			return super.toArray(new Generic[size()]);
+		}
+	}
+	
 	private class InheritanceCalculator extends HashSet<Generic> {
 		private static final long serialVersionUID = -894665449193645526L;
 		
@@ -535,7 +572,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			return isEngine();
 		if (((GenericImpl) generic).isPrimary())
 			return isSuperOf(((GenericImpl) generic).directSupers[0]);
-		return isSuperOf(getPrimariesArray(), components, ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).components);
+		return isSuperOf(getPrimariesArray(), getExtendedComponentsArray(), ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).getExtendedComponentsArray());
 	}
 	
 	// TODO Pb trees
@@ -575,14 +612,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
 			for (int i = 0; i < subInterfaces.length; i++) {
 				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i]))
-					if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, true))
-						return false;
+					// if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, true))
+					return false;
 			}
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null)
 					if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
-						if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, false))
-							return false;
+						// if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, false))
+						return false;
 				if (components[i] == null) {
 					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
 						return false;

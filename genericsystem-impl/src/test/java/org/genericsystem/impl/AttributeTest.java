@@ -203,7 +203,7 @@ public class AttributeTest extends AbstractTest {
 		Value p333 = car.setValue(cache, (Attribute) p213, "333");
 		
 		assert p333.inheritsFrom(p213) : p333.info();
-		assert p333.inheritsFrom(p214) : p333.info();
+		assert !p333.inheritsFrom(p214) : p333.info();
 		
 		// assert vehiclePower.getInstances(cache).size() == 2 : vehiclePower.getInstances(cache);
 		// assert vehiclePower.getInstances(cache).contains(p213) : vehiclePower.getInstances(cache);
@@ -218,8 +218,8 @@ public class AttributeTest extends AbstractTest {
 		assert vehicle.getValueHolders(cache, vehiclePower).contains(p213);
 		assert vehicle.getValueHolders(cache, vehiclePower).contains(p214);
 		
-		assert car.getValueHolders(cache, vehiclePower).size() == 1 : car.getValueHolders(cache, vehiclePower);
-		assert !car.getValueHolders(cache, vehiclePower).contains(p214);
+		assert car.getValueHolders(cache, vehiclePower).size() == 2 : car.getValueHolders(cache, vehiclePower);
+		assert car.getValueHolders(cache, vehiclePower).contains(p214);
 		assert !car.getValueHolders(cache, vehiclePower).contains(p213);
 		assert car.getValueHolders(cache, vehiclePower).contains(p333);
 	}
@@ -242,7 +242,8 @@ public class AttributeTest extends AbstractTest {
 		assert myVehicle.getValueHolders(cache, vehiclePower).contains(p213);
 		assert myVehicle.getValueHolders(cache, vehiclePower).contains(p214);
 		
-		assert myCar.getValueHolders(cache, vehiclePower).size() == 1;
+		assert myCar.getValueHolders(cache, vehiclePower).size() == 2;
+		assert myCar.getValueHolders(cache, vehiclePower).contains(p214);
 		assert myCar.getValueHolders(cache, vehiclePower).contains(p333);
 		
 		assert myCar2.getValueHolders(cache, vehiclePower).size() == 2;

@@ -10,11 +10,31 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
+import org.genericsystem.impl.core.GenericImpl;
+import org.genericsystem.impl.core.GenericImpl.ExtendedComponents;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
 @Test
 public class RelationTest extends AbstractTest {
+	
+	public void test() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		Type color = cache.newType("Color");
+		Generic red = color.newInstance(cache, "red");
+		Generic yellow = color.newInstance(cache, "yellow");
+		Relation carColor = car.addRelation(cache, "carColor", color);
+		Link carRed = car.bind(cache, carColor, red);
+		assert carRed.inheritsFrom(carColor);
+		Link myBmwYellow = myBmw.bind(cache, carRed, yellow);
+		myBmwYellow.log();
+		assert myBmwYellow.inheritsFrom(carRed);
+		
+		log.info("zzzzzzzz" + Arrays.toString(new ExtendedComponents(new Generic[] { myBmw, yellow }).addSupers(carRed).toArray()));
+		log.info("yyyyyyyy" + Arrays.toString(((GenericImpl) myBmwYellow).components));
+	}
 	
 	public void testToOneOverride() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
@@ -1251,11 +1271,11 @@ public class RelationTest extends AbstractTest {
 		
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance(cache, "red");
-		color.newInstance(cache, "blue");
+		Generic blue = color.newInstance(cache, "blue");
 		
 		Relation carColor = car.addRelation(cache, "carColor", color);
 		car.bind(cache, carColor, red);
-		myBmw.bind(cache, carColor, red);
+		myBmw.bind(cache, carColor, blue);
 		
 		assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 3 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
 		assert false : red.getTargets(cache, carColor, Statics.TARGET_POSITION, Statics.BASE_POSITION);
