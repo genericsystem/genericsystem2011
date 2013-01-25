@@ -60,6 +60,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	private LifeManager lifeManager;
 	
 	Generic[] directSupers;
+	
 	public Generic[] components;
 	
 	int metaLevel;
@@ -576,36 +577,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	// TODO Pb trees
-	static boolean isEquals(Generic[] interfaces, Generic[] components, Generic[] subInterfaces, Generic[] subComponents) {
+	private static boolean isEquals(Generic[] interfaces, Generic[] components, Generic[] subInterfaces, Generic[] subComponents) {
 		return Arrays.equals(interfaces, subInterfaces) && Arrays.equals(components, subComponents);
 	}
 	
-	static boolean isConcreteInheritance(Generic superGeneric, Generic subGeneric) {
+	private static boolean isConcreteInheritance(Generic superGeneric, Generic subGeneric) {
 		return subGeneric.isConcrete() && superGeneric.isConcrete() && subGeneric.getMeta().inheritsFrom(superGeneric.getMeta());
 	}
 	
-	static boolean isValidConcreteInheritance(Generic[] interfaces, Generic[] components, Generic[] subInterfaces, Generic[] subComponents, int i, boolean onInterfaces) {
-		
+	private static boolean isValidConcreteInheritance(Generic[] interfaces, Generic[] components, Generic[] subInterfaces, Generic[] subComponents, int i, boolean onInterfaces) {
 		if (onInterfaces) {
-			if (isConcreteInheritance(interfaces[i], subInterfaces[i])) {
-				Generic[] truncatedInterfaces = Statics.truncate(i, interfaces);
-				Generic[] truncatedSubInterfaces = Statics.truncate(i, subInterfaces);
-				if (!isEquals(truncatedInterfaces, components, truncatedSubInterfaces, subComponents))
-					return isSuperOf(truncatedInterfaces, components, truncatedSubInterfaces, subComponents);
-			}
+			Generic[] truncateInterface = Statics.truncate(i, interfaces);
+			Generic[] truncateSubInterface = Statics.truncate(i, subInterfaces);
+			if (isConcreteInheritance(interfaces[i], subInterfaces[i]) && !isEquals(truncateInterface, components, truncateSubInterface, subComponents))
+				return isSuperOf(truncateInterface, components, truncateSubInterface, subComponents);
 		} else {
-			if (isConcreteInheritance(components[i], subComponents[i])) {
-				Generic[] truncatedComponents = Statics.truncate(i, components);
-				Generic[] truncatedSubComponents = Statics.truncate(i, subComponents);
-				if (!isEquals(interfaces, truncatedComponents, subInterfaces, truncatedSubComponents))
-					return isSuperOf(interfaces, truncatedComponents, subInterfaces, truncatedSubComponents);
-			}
+			Generic[] truncateComponents = Statics.truncate(i, components);
+			Generic[] truncateSubComponents = Statics.truncate(i, subComponents);
+			if (isConcreteInheritance(components[i], subComponents[i]) && !isEquals(interfaces, truncateComponents, subInterfaces, truncateSubComponents))
+				return isSuperOf(interfaces, truncateComponents, subInterfaces, truncateSubComponents);
 		}
 		return false;
 	}
 	
 	public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents) {
-		// assert subInterfaces.length >= 1;
 		if (interfaces.length > subInterfaces.length || components.length > subComponents.length)
 			return false;
 		

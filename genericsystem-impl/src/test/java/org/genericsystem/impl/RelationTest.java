@@ -632,8 +632,8 @@ public class RelationTest extends AbstractTest {
 		myBmw.bind(cache, carTyres, rearLeft);
 		myBmw.bind(cache, carTyres, rearRight);
 		
-		assert myBmw.getLinks(cache, carTyres).size() == 5 : myBmw.getLinks(cache, carTyres);
-		assert myBmw.getLinks(cache, carTyres).contains(carCenter) : myBmw.getLinks(cache, carTyres);
+		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
+		assert !myBmw.getLinks(cache, carTyres).contains(carCenter) : myBmw.getLinks(cache, carTyres);
 	}
 	
 	public void testOneToManyInheritanceReverse() {
@@ -656,17 +656,21 @@ public class RelationTest extends AbstractTest {
 		Link carPierre = pierre.setLink(cache, carPerson, "defaultPerson", Statics.TARGET_POSITION, car);
 		assert myBmw.getLink(cache, carPerson).getBaseComponent().equals(car);
 		
-		michael.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
-		nicolas.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
-		sven.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
-		sofiane.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
+		Link myBmwMichael = michael.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
+		Link myBmwNicolas = nicolas.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
+		Link myBmwSven = sven.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
+		Link myBmwSofiane = sofiane.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
 		
 		assert michael.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : michael.getLinks(cache, carPerson, Statics.TARGET_POSITION);
 		assert nicolas.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : nicolas.getLinks(cache, carPerson, Statics.TARGET_POSITION);
 		assert sven.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : sven.getLinks(cache, carPerson, Statics.TARGET_POSITION);
 		assert sofiane.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : sofiane.getLinks(cache, carPerson, Statics.TARGET_POSITION);
 		
-		assert myBmw.getLinks(cache, carPerson).contains(carPierre) : myBmw.getLinks(cache, carPerson);
+		assert !myBmw.getLinks(cache, carPerson).contains(carPierre) : myBmw.getLinks(cache, carPerson);
+		assert myBmw.getLinks(cache, carPerson).contains(myBmwMichael) : myBmw.getLinks(cache, carPerson);
+		assert myBmw.getLinks(cache, carPerson).contains(myBmwNicolas) : myBmw.getLinks(cache, carPerson);
+		assert myBmw.getLinks(cache, carPerson).contains(myBmwSven) : myBmw.getLinks(cache, carPerson);
+		assert myBmw.getLinks(cache, carPerson).contains(myBmwSofiane) : myBmw.getLinks(cache, carPerson);
 		
 	}
 	
@@ -863,8 +867,8 @@ public class RelationTest extends AbstractTest {
 		
 		Link yourAudiRed = yourAudi.bind(cache, carColor, red);
 		
-		assert yourAudi.getLinks(cache, carColor).size() == 2;
-		assert yourAudi.getLinks(cache, carColor).contains(carRed);
+		assert yourAudi.getLinks(cache, carColor).size() == 1;
+		assert !yourAudi.getLinks(cache, carColor).contains(carRed);
 		assert yourAudi.getLinks(cache, carColor).contains(yourAudiRed);
 	}
 	
@@ -883,8 +887,8 @@ public class RelationTest extends AbstractTest {
 		
 		Link yourAudiRed = red.bind(cache, carColor, Statics.TARGET_POSITION, yourAudi);
 		
-		assert yourAudi.getLinks(cache, carColor).size() == 2;
-		assert yourAudi.getLinks(cache, carColor).contains(carRed);
+		assert yourAudi.getLinks(cache, carColor).size() == 1;
+		assert !yourAudi.getLinks(cache, carColor).contains(carRed);
 		assert yourAudi.getLinks(cache, carColor).contains(yourAudiRed);
 	}
 	
@@ -1271,11 +1275,12 @@ public class RelationTest extends AbstractTest {
 		
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance(cache, "red");
-		Generic blue = color.newInstance(cache, "blue");
+		
+		color.newInstance(cache, "blue");
 		
 		Relation carColor = car.addRelation(cache, "carColor", color);
 		car.bind(cache, carColor, red);
-		myBmw.bind(cache, carColor, blue);
+		myBmw.bind(cache, carColor, red);
 		
 		assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 3 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
 		assert false : red.getTargets(cache, carColor, Statics.TARGET_POSITION, Statics.BASE_POSITION);
