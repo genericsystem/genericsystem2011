@@ -627,10 +627,10 @@ public class RelationTest extends AbstractTest {
 		Link carCenter = car.setLink(cache, carTyres, "defaultTyre", center);
 		assert myBmw.getLink(cache, carTyres).getBaseComponent().equals(car);
 		
-		myBmw.bind(cache, carTyres, frontLeft);
-		myBmw.bind(cache, carTyres, frontRight);
-		myBmw.bind(cache, carTyres, rearLeft);
-		myBmw.bind(cache, carTyres, rearRight);
+		myBmw.bind(cache, carCenter, frontLeft);
+		myBmw.bind(cache, carCenter, frontRight);
+		myBmw.bind(cache, carCenter, rearLeft);
+		myBmw.bind(cache, carCenter, rearRight);
 		
 		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
 		assert !myBmw.getLinks(cache, carTyres).contains(carCenter) : myBmw.getLinks(cache, carTyres);
@@ -867,8 +867,8 @@ public class RelationTest extends AbstractTest {
 		
 		Link yourAudiRed = yourAudi.bind(cache, carColor, red);
 		
-		assert yourAudi.getLinks(cache, carColor).size() == 1;
-		assert !yourAudi.getLinks(cache, carColor).contains(carRed);
+		assert yourAudi.getLinks(cache, carColor).size() == 2;
+		assert yourAudi.getLinks(cache, carColor).contains(carRed);
 		assert yourAudi.getLinks(cache, carColor).contains(yourAudiRed);
 	}
 	
@@ -1272,15 +1272,16 @@ public class RelationTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic myAudi = car.newInstance(cache, "myAudi");
 		
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance(cache, "red");
-		
-		color.newInstance(cache, "blue");
+		Generic blue = color.newInstance(cache, "blue");
 		
 		Relation carColor = car.addRelation(cache, "carColor", color);
 		car.bind(cache, carColor, red);
 		myBmw.bind(cache, carColor, red);
+		myAudi.bind(cache, carColor, blue);
 		
 		assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 3 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
 		assert false : red.getTargets(cache, carColor, Statics.TARGET_POSITION, Statics.BASE_POSITION);
