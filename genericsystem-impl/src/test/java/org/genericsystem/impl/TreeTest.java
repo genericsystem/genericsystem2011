@@ -68,6 +68,7 @@ public class TreeTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
 		tree.disableReferentialIntegrity(cache, Statics.BASE_POSITION);
+		
 		root.remove(cache);
 		assert !root.isAlive(cache);
 		assert !child.isAlive(cache);
@@ -157,6 +158,7 @@ public class TreeTest extends AbstractTest {
 		assert graphicComponentColor.isPropertyConstraintEnabled(cache);
 
 		webPage.bind(cache, graphicComponentColor, red);
+		header.bind(cache, graphicComponentColor, blue);
 		header.bind(cache, graphicComponentColor, blue);
 		footer.bind(cache, graphicComponentColor, yellow);
 
