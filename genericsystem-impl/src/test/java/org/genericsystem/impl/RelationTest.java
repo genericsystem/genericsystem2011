@@ -867,7 +867,6 @@ public class RelationTest extends AbstractTest {
 
 		Link yourAudiRed = yourAudi.bind(cache, carColor, red);
 
-		assert yourAudiRed.inheritsFrom(carRed) : yourAudiRed.info();
 		assert yourAudi.getLinks(cache, carColor).size() == 2;
 		assert yourAudi.getLinks(cache, carColor).contains(carRed);
 		assert yourAudi.getLinks(cache, carColor).contains(yourAudiRed);
@@ -1274,16 +1273,13 @@ public class RelationTest extends AbstractTest {
 		Type car = cache.newType("Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
 		Generic myAudi = car.newInstance(cache, "myAudi");
-
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance(cache, "red");
 		Generic blue = color.newInstance(cache, "blue");
-
 		Relation carColor = car.addRelation(cache, "carColor", color);
 		car.bind(cache, carColor, red);
 		myBmw.bind(cache, carColor, red);
 		myAudi.bind(cache, carColor, blue);
-
 		assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 3 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
 		assert false : red.getTargets(cache, carColor, Statics.TARGET_POSITION, Statics.BASE_POSITION);
 	}
