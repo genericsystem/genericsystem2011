@@ -619,12 +619,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 					if (!((GenericImpl) components[i]).isSuperOf2(subComponents[i]))
 						if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, false))
 							return false;
-				if (components[i] == null) {
-					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
-						return false;
-				} else if (subComponents[i] == null)
-					if (!components[i].isEngine() && (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
-						return false;
+				if (!manageNullComponents(interfaces, components, subInterfaces, subComponents, i))
+					return false;
 			}
 			return true;
 		}
@@ -644,22 +640,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			return false;
 
 		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
-			for (int i = 0; i < subInterfaces.length; i++) {
+			for (int i = 0; i < subInterfaces.length; i++)
 				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i]))
-					// if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, true))
 					return false;
-			}
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null)
 					if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
-						// if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, false))
 						return false;
-				if (components[i] == null) {
-					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
-						return false;
-				} else if (subComponents[i] == null)
-					if (!components[i].isEngine() && (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
-						return false;
+				if (!manageNullComponents(interfaces, components, subInterfaces, subComponents, i))
+					return false;
 			}
 			return true;
 		}
@@ -673,6 +662,57 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 					return true;
 		return false;
 	}
+
+	private static boolean manageNullComponents(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents, int i) {
+		if (components[i] == null) {
+			if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
+				return false;
+		} else if (subComponents[i] == null)
+			if (!components[i].isEngine() && (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
+				return false;
+		return true;
+	}
+
+	// public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents, boolean checkValidConcreteInheritance) {
+	// if (interfaces.length > subInterfaces.length || components.length > subComponents.length)
+	// return false;
+	//
+	// if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
+	// for (int i = 0; i < subInterfaces.length; i++) {
+	// if (!((GenericImpl) interfaces[i]).isSuperOf2(subInterfaces[i]))
+	// if (checkValidConcreteInheritance) {
+	// if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, true))
+	// return false;
+	// } else
+	// return false;
+	// }
+	// for (int i = 0; i < subComponents.length; i++) {
+	// if (components[i] != null && subComponents[i] != null)
+	// if (!((GenericImpl) components[i]).isSuperOf2(subComponents[i]))
+	// if (checkValidConcreteInheritance) {
+	// if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, false))
+	// return false;
+	// } else
+	// return false;
+	// if (components[i] == null) {
+	// if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
+	// return false;
+	// } else if (subComponents[i] == null)
+	// if (!components[i].isEngine() && (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
+	// return false;
+	// }
+	// return true;
+	// }
+	// if (subInterfaces.length > 1 && interfaces.length < subInterfaces.length)
+	// for (int i = 0; i < subInterfaces.length; i++)
+	// if (isSuperOf(interfaces, components, Statics.truncate(i, subInterfaces), subComponents, checkValidConcreteInheritance))
+	// return true;
+	// if (components.length < subComponents.length)
+	// for (int i = 0; i < subComponents.length; i++)
+	// if (isSuperOf(interfaces, components, subInterfaces, Statics.truncate(i, subComponents), checkValidConcreteInheritance))
+	// return true;
+	// return false;
+	// }
 
 	@Override
 	public void remove(Cache cache) {
