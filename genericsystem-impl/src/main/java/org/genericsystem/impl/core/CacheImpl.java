@@ -339,15 +339,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return bind(value, metaLevel, components, supers);
 	}
 
-	public <T extends Generic> T bind2(Generic implicitSuper, Generic genericToCheck, Serializable value, int metaLevel, Generic[] additionalInterfaces, Generic[] components) {
-		Generic implicit = bindPrimaryByValue(implicitSuper, value, metaLevel);
-		Primaries primaries = new Primaries(additionalInterfaces);
-		primaries.add(implicit);
-		primaries.add(genericToCheck);
-		Generic[] interfaces = primaries.toArray();
-		((GenericImpl) genericToCheck).checkSuperRule(interfaces, components);
-		return bind(value, metaLevel, interfaces, components);
-	}
+	// public <T extends Generic> T bind2(Generic implicitSuper, Generic genericToCheck, Serializable value, int metaLevel, Generic[] additionalInterfaces, Generic[] components) {
+	// Generic implicit = bindPrimaryByValue(implicitSuper, value, metaLevel);
+	// Primaries primaries = new Primaries(additionalInterfaces);
+	// primaries.add(implicit);
+	// primaries.add(genericToCheck);
+	// Generic[] interfaces = primaries.toArray();
+	// ((GenericImpl) genericToCheck).checkSuperRule(interfaces, components);
+	// return bind(value, metaLevel, interfaces, components);
+	// }
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T findByInterfaces(Generic[] interfaces, Generic[] components) {
