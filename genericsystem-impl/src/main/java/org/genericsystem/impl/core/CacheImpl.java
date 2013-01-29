@@ -369,13 +369,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return (T) directSupers[0];
 		
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
-		for (Generic superGeneric : directSupers) {
-			Iterator<Generic> removeIterator = new AbstractFilterIterator<Generic>(directInheritingsIterator(superGeneric)) {
-				@Override
-				public boolean isSelected() {
-					return GenericImpl.isSuperOf(interfaces, extendedComponents, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).getExtendedComponentsArray());
-				}
-			};
+		for (Generic directSuper : directSupers) {
+			Iterator<Generic> removeIterator = concernedDependencies(directSuper, interfaces, extendedComponents);
 			while (removeIterator.hasNext())
 				orderedDependencies.addAll(orderDependencies(removeIterator.next()));
 		}
@@ -387,6 +382,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 		new ConnexionMap().reBuild(orderedDependencies);
 		assert superGeneric == find(directSupers, components);
 		return superGeneric;
+	}
+	
+	private Iterator<Generic> concernedDependencies(Generic directSuper, final Generic[] interfaces, final Generic[] extendedComponents) {
+		return new AbstractFilterIterator<Generic>(directInheritingsIterator(directSuper)) {
+			@Override
+			public boolean isSelected() {
+				return GenericImpl.isSuperOf(interfaces, extendedComponents, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).getExtendedComponentsArray());
+			}
+		};
 	}
 	
 	@SuppressWarnings("unchecked")
