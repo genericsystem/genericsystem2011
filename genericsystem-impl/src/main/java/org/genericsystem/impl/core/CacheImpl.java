@@ -348,7 +348,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
 		for (int i = 0; i < primariesArray.length; i++)
 			boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
-		Generic[] extendedComponents = new ExtendedComponents(((GenericImpl) generic).components).addSupers(((GenericImpl) generic).directSupers).toArray();
+		Generic[] extendedComponents = ((GenericImpl) generic).getExtendedComponentsArray();
 		Generic[] extendedBoundComponents = new Generic[((GenericImpl) generic).components.length];
 		for (int i = 0; i < extendedComponents.length; i++)
 			extendedBoundComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
@@ -403,7 +403,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		
 		private void reBuild(NavigableSet<Generic> orderedDependencies) {
 			for (Generic orderedDependency : orderedDependencies) {
-				Generic[] newComponents = adjust(new ExtendedComponents(((GenericImpl) orderedDependency).components).addSupers(((GenericImpl) orderedDependency).directSupers).toArray());
+				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).getExtendedComponentsArray());
 				Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).directSupers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
 				adjust(((GenericImpl) orderedDependency).directSupers[0]);
 				Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel, directSupers, newComponents));
