@@ -421,12 +421,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	private <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int metaLevel, int basePos, Generic... targets) {
-		Generic[] additionalInterfaces = Statics.EMPTY_GENERIC_ARRAY;
-		Generic[] components = Statics.insertIntoArray(this, targets, basePos);
-		Generic implicit = relation.getImplicit();
-		if (relation.isConcrete())
-			implicit = ((GenericImpl) implicit).directSupers[0];
-		return ((CacheImpl) cache).bind(implicit, relation, value, metaLevel, additionalInterfaces, components);
+		Generic implicit = relation.isConcrete() ? relation.<GenericImpl> getImplicit().directSupers[0] : relation.getImplicit();
+		return ((CacheImpl) cache).bind(implicit, relation, value, metaLevel, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
 	}
 	
 	public <T extends Generic> Iterator<T> mainIterator(Context context, Generic origin, final int metaLevel, final int pos) {
