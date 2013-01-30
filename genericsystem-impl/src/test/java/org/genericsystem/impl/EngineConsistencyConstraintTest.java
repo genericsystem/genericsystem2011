@@ -6,7 +6,7 @@ import org.genericsystem.api.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
-public class GoodEngineConstraintTest extends AbstractTest {
+public class EngineConsistencyConstraintTest extends AbstractTest {
 
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
