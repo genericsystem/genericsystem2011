@@ -22,7 +22,7 @@ import org.genericsystem.impl.core.Statics.Primaries;
 @PropertyConstraint
 public class SuperRuleConstraintImpl extends AbstractSimpleBooleanConstraint {
 
-	private static final long serialVersionUID = -6429972259714036057L;
+	private static final long serialVersionUID = 6874090673594299362L;
 
 	@Override
 	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
