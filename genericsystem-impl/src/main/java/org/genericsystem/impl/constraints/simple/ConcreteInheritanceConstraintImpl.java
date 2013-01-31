@@ -3,7 +3,7 @@ package org.genericsystem.impl.constraints.simple;
 import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
-import org.genericsystem.api.annotation.Interfaces;
+import org.genericsystem.api.annotation.Supers;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.PropertyConstraint;
 import org.genericsystem.api.annotation.constraints.SingularConstraint;
@@ -34,7 +34,7 @@ public class ConcreteInheritanceConstraintImpl extends AbstractSimpleBooleanCons
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
 	@BooleanValue(true)
-	@Interfaces(ConcreteInheritanceConstraintImpl.class)
+	@Supers(value = { ConcreteInheritanceConstraintImpl.class }, implicitSuper = ConcreteInheritanceConstraintImpl.class)
 	public static class DefaultValue {
 	}
 

@@ -8,12 +8,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 /**
- * Used to declare the Interfaces of generic.
- * A generic inherits directly or indirectly of the interfaces.
+ * Used to declare the Supers of generic.
+ * A generic inherits directly of the supers.
  * 
  * @author Michael Ory
+ * @author Nicolas Feybesse
  */
-public @interface Interfaces {
-	
+public @interface Supers {
+
 	Class<?>[] value();
+
+	Class<?> implicitSuper();
 }

@@ -3,7 +3,7 @@ package org.genericsystem.impl.constraints.simple;
 import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
-import org.genericsystem.api.annotation.Interfaces;
+import org.genericsystem.api.annotation.Supers;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.PropertyConstraint;
 import org.genericsystem.api.core.Context;
@@ -29,7 +29,7 @@ public class EngineConsistencyConstraintImpl extends AbstractSimpleBooleanConstr
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
 	@BooleanValue(true)
-	@Interfaces(EngineConsistencyConstraintImpl.class)
+	@Supers(value = { EngineConsistencyConstraintImpl.class }, implicitSuper = EngineConsistencyConstraintImpl.class)
 	public static class DefaultValue {
 	}
 

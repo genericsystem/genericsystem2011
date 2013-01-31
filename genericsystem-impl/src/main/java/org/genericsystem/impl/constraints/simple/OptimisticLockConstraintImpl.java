@@ -3,8 +3,8 @@ package org.genericsystem.impl.constraints.simple;
 import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
-import org.genericsystem.api.annotation.Interfaces;
 import org.genericsystem.api.annotation.Priority;
+import org.genericsystem.api.annotation.Supers;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
@@ -39,7 +39,7 @@ public class OptimisticLockConstraintImpl extends AbstractSimpleBooleanConstrain
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
 	@BooleanValue(true)
-	@Interfaces(OptimisticLockConstraintImpl.class)
+	@Supers(value = { OptimisticLockConstraintImpl.class }, implicitSuper = OptimisticLockConstraintImpl.class)
 	public static class DefaultValue {
 	}
 }
