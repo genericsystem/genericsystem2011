@@ -12,7 +12,7 @@ import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.Test;
 
 @Test
-public class RebindTest {
+public class RebindTest extends AbstractTest {
 
 	public void simpleTestRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();

@@ -65,14 +65,14 @@ public class AppliWebTest extends AbstractTest {
 	}
 
 	public void testGetAttributeWithValue() {
-		expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').addValue(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), '123')}", Generic.class);
-		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').getValues(cache, cache.newType('Vehicle').addAttribute(cache, 'power'))}", Snapshot.class).size() == 1;
+		expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').setValue(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), '123')}", Generic.class);
+		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').getValueHolders(cache, cache.newType('Vehicle').addAttribute(cache, 'power'))}", Snapshot.class).size() == 1;
 
-		expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').addValue(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), '123')}");
-		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').getValues(cache, cache.newType('Vehicle').addAttribute(cache, 'power')).size()}", Integer.class) == 1;
+		expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').setValue(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), '123')}");
+		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').getValueHolders(cache, cache.newType('Vehicle').addAttribute(cache, 'power')).size()}", Integer.class) == 1;
 
-		expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').addValue(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), '126')}");
-		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').getValues(cache, cache.newType('Vehicle').addAttribute(cache, 'power')).size()}", Integer.class) == 2;
+		expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').setValue(cache, cache.newType('Vehicle').addAttribute(cache, 'power'), '126')}");
+		assert expressions.evaluateMethodExpression("#{cache.newType('Vehicle').newInstance(cache, 'myVehicle').getValueHolders(cache, cache.newType('Vehicle').addAttribute(cache, 'power')).size()}", Integer.class) == 2;
 	}
 
 	public void testOverrideAttribute() {
