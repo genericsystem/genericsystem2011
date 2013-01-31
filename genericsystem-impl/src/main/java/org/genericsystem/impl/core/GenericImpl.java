@@ -1,5 +1,6 @@
 package org.genericsystem.impl.core;
 
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,11 +20,11 @@ import org.genericsystem.api.annotation.constraints.UniqueConstraint;
 import org.genericsystem.api.annotation.constraints.VirtualConstraint;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Context;
+import org.genericsystem.api.core.EngineSingleton;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.core.Snapshot.Filter;
 import org.genericsystem.api.core.Snapshot.Projector;
-import org.genericsystem.api.exception.SuperRuleConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Node;
@@ -54,9 +55,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unchecked")
-public class GenericImpl implements Generic, Type, Link, Relation, Value, Attribute, Tree, Node {
+public class GenericImpl implements Generic, Type, Link, Relation, Value, Attribute, Tree, Node, Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
+
+	private boolean isToBeSerialized;
+	private long serializedDesignTs;
+
+	Object writeReplace() throws ObjectStreamException {
+		return isToBeSerialized() ? this : new ObjectWrapperToBeSerialized(this.getDesignTs());
+	}
+
+	private static class ObjectWrapperToBeSerialized implements Serializable {
+
+		private static final long serialVersionUID = 1456585802134773338L;
+		private long designTs;
+
+		public ObjectWrapperToBeSerialized(long designTs) {
+			this.designTs = designTs;
+		}
+
+		private Object readResolve() throws ObjectStreamException {
+			return ((EngineImpl) EngineSingleton.getInstance()).findByDesignTs(designTs);
+		}
+	}
 
 	private LifeManager lifeManager;
 
@@ -422,16 +444,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	private <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int metaLevel, int basePos, Generic... targets) {
-		Generic[] additionalInterfaces = Statics.EMPTY_GENERIC_ARRAY;
-		Generic[] components = Statics.insertIntoArray(this, targets, basePos);
-		Generic implicit = relation.getImplicit();
-		if (relation.isConcrete()) {
-			implicit = ((GenericImpl) implicit).directSupers[0];
-			// if (!Objects.equals(relation.getValue(), value))
-			// additionalInterfaces = new Generic[] { relation.getImplicit() };
-
-		}
-		return ((CacheImpl) cache).bind(implicit, relation, value, metaLevel, additionalInterfaces, components);
+		Generic implicit = relation.isConcrete() ? relation.<GenericImpl> getImplicit().directSupers[0] : relation.getImplicit();
+		return ((CacheImpl) cache).bind(implicit, relation, value, metaLevel, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Generic> Iterator<T> mainIterator(Context context, Generic origin, final int metaLevel, final int pos) {
@@ -494,7 +508,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return new Primaries(this);
 	}
 
-	Generic[] getPrimariesArray() {
+	public Generic[] getPrimariesArray() {
 		return getPrimaries().toArray();
 	}
 
@@ -572,12 +586,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			Generic[] truncateInterfaces = Statics.truncate(i, interfaces);
 			Generic[] truncateSubInterfaces = Statics.truncate(i, subInterfaces);
 			if (isConcreteInheritance(interfaces[i], subInterfaces[i]) && !isEquals(truncateInterfaces, components, truncateSubInterfaces, subComponents))
-				return isSuperOf2(truncateInterfaces, components, truncateSubInterfaces, subComponents);
+				return isOverridedBy(truncateInterfaces, components, truncateSubInterfaces, subComponents);
 		} else {
 			Generic[] truncateComponents = Statics.truncate(i, components);
 			Generic[] truncateSubComponents = Statics.truncate(i, subComponents);
 			if (isConcreteInheritance(components[i], subComponents[i]) && !isEquals(interfaces, truncateComponents, subInterfaces, truncateSubComponents))
-				return isSuperOf2(interfaces, truncateComponents, subInterfaces, truncateSubComponents);
+				return isOverridedBy(interfaces, truncateComponents, subInterfaces, truncateSubComponents);
 		}
 		return false;
 	}
@@ -593,30 +607,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return isSuperOf(getPrimariesArray(), getExtendedComponentsArray(), ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).getExtendedComponentsArray());
 	}
 
-	public boolean isSuperOf2(Generic generic) {
+	public boolean isOverridedBy(Generic generic) {
 		assert generic != null;
 		if (equals(generic))
 			return true;
 		if (((GenericImpl) generic).isEngine())
 			return isEngine();
 		if (((GenericImpl) generic).isPrimary())
-			return isSuperOf2(((GenericImpl) generic).directSupers[0]);
-		return isSuperOf2(getPrimariesArray(), components, ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).components);
+			return isOverridedBy(((GenericImpl) generic).directSupers[0]);
+		return isOverridedBy(getPrimariesArray(), components, ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).components);
 	}
 
-	public static boolean isSuperOf2(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents) {
+	public static boolean isOverridedBy(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents) {
 		if (interfaces.length > subInterfaces.length || components.length > subComponents.length)
 			return false;
 
 		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
 			for (int i = 0; i < subInterfaces.length; i++) {
-				if (!((GenericImpl) interfaces[i]).isSuperOf2(subInterfaces[i]))
+				if (!((GenericImpl) interfaces[i]).isOverridedBy(subInterfaces[i]))
 					if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, true))
 						return false;
 			}
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null)
-					if (!((GenericImpl) components[i]).isSuperOf2(subComponents[i]))
+					if (!((GenericImpl) components[i]).isOverridedBy(subComponents[i]))
 						if (!isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, false))
 							return false;
 				if (!manageNullComponents(interfaces, components, subInterfaces, subComponents, i))
@@ -626,11 +640,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		}
 		if (subInterfaces.length > 1 && interfaces.length < subInterfaces.length)
 			for (int i = 0; i < subInterfaces.length; i++)
-				if (isSuperOf2(interfaces, components, Statics.truncate(i, subInterfaces), subComponents))
+				if (isOverridedBy(interfaces, components, Statics.truncate(i, subInterfaces), subComponents))
 					return true;
 		if (components.length < subComponents.length)
 			for (int i = 0; i < subComponents.length; i++)
-				if (isSuperOf2(interfaces, components, subInterfaces, Statics.truncate(i, subComponents)))
+				if (isOverridedBy(interfaces, components, subInterfaces, Statics.truncate(i, subComponents)))
 					return true;
 		return false;
 	}
@@ -1452,10 +1466,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return nullComponents;
 	}
 
-	void checkSuperRule(Generic[] interfaces, Generic[] components) {
-		if (!GenericImpl.isSuperOf2(getPrimariesArray(), this.components, interfaces, components))
-			throw new SuperRuleConstraintViolationException("Interfaces : " + Arrays.toString(interfaces) + " Components : " + Arrays.toString(components) + " should inherits from : " + this);
-	}
+	// TODO KK
+	// void checkSuperRule(Generic[] interfaces, Generic[] components) {
+	// if (!GenericImpl.isSuperOf2(getPrimariesArray(), this.components, interfaces, components))
+	// throw new SuperRuleConstraintViolationException("Interfaces : " + Arrays.toString(interfaces) + " Components : " + Arrays.toString(components) + " should inherits from : " + this);
+	// }
 
 	boolean equiv(Generic[] interfaces, Generic[] components) {
 		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullComponentsArray(), components);
@@ -1463,7 +1478,23 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	public <T extends Generic> T reBind(Cache cache) {
 		// assert !isPrimary();
-		return ((CacheImpl) cache).reBindNode(this);
+		return ((CacheImpl) cache).reBind(this);
+	}
+
+	public boolean isToBeSerialized() {
+		return isToBeSerialized;
+	}
+
+	public void setToBeSerialized(boolean isToBeSerialized) {
+		this.isToBeSerialized = isToBeSerialized;
+	}
+
+	public long getSerializedDesignTs() {
+		return serializedDesignTs;
+	}
+
+	public void setSerializedDesignTs(long serializedDesignTs) {
+		this.serializedDesignTs = serializedDesignTs;
 	}
 
 }
