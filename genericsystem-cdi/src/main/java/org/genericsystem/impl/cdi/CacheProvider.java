@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Engine;
-import org.jboss.solder.servlet.event.Initialized;
 
 /**
  * @author Nicolas Feybesse
@@ -20,7 +19,6 @@ public class CacheProvider implements Serializable {
 	private static final long serialVersionUID = 5201003234496546928L;
 	
 	private Cache cache;
-	@Initialized
 	@Inject
 	private Engine engine;
 	
