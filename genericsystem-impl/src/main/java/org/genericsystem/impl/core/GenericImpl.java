@@ -1,6 +1,5 @@
 package org.genericsystem.impl.core;
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +19,6 @@ import org.genericsystem.api.annotation.constraints.UniqueConstraint;
 import org.genericsystem.api.annotation.constraints.VirtualConstraint;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Context;
-import org.genericsystem.api.core.EngineSingleton;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.core.Snapshot.Filter;
@@ -55,30 +53,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unchecked")
-public class GenericImpl implements Generic, Type, Link, Relation, Value, Attribute, Tree, Node, Serializable {
+public class GenericImpl implements Generic, Type, Link, Relation, Value, Attribute, Tree, Node {
 
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
-
-	private boolean isToBeSerialized;
-	private long serializedDesignTs;
-
-	Object writeReplace() throws ObjectStreamException {
-		return isToBeSerialized() ? this : new ObjectWrapperToBeSerialized(this.getDesignTs());
-	}
-
-	private static class ObjectWrapperToBeSerialized implements Serializable {
-
-		private static final long serialVersionUID = 1456585802134773338L;
-		private long designTs;
-
-		public ObjectWrapperToBeSerialized(long designTs) {
-			this.designTs = designTs;
-		}
-
-		private Object readResolve() throws ObjectStreamException {
-			return ((EngineImpl) EngineSingleton.getInstance()).findByDesignTs(designTs);
-		}
-	}
 
 	private LifeManager lifeManager;
 
@@ -1479,22 +1456,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public <T extends Generic> T reBind(Cache cache) {
 		// assert !isPrimary();
 		return ((CacheImpl) cache).reBind(this);
-	}
-
-	public boolean isToBeSerialized() {
-		return isToBeSerialized;
-	}
-
-	public void setToBeSerialized(boolean isToBeSerialized) {
-		this.isToBeSerialized = isToBeSerialized;
-	}
-
-	public long getSerializedDesignTs() {
-		return serializedDesignTs;
-	}
-
-	public void setSerializedDesignTs(long serializedDesignTs) {
-		this.serializedDesignTs = serializedDesignTs;
 	}
 
 }

@@ -2,7 +2,6 @@ package org.genericsystem.impl.core;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.genericsystem.api.annotation.SystemGeneric;
@@ -30,9 +29,6 @@ import org.genericsystem.impl.constraints.simple.SuperRuleConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.AnonymousReference;
 import org.genericsystem.impl.core.Statics.TsGenerator;
-import org.genericsystem.impl.iterator.AbstractConcateIterator.ConcateIterator;
-import org.genericsystem.impl.iterator.AbstractFilterIterator;
-import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
 import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
 import org.genericsystem.impl.system.MetaAttribute;
 import org.genericsystem.impl.system.MetaRelation;
@@ -180,22 +176,5 @@ public class EngineImpl extends GenericImpl implements Engine {
 	@Override
 	public void close() {
 		archiver.close();
-	}
-
-	public Generic findByDesignTs(final long designTs) {
-		return new AbstractFilterIterator<Generic>(new AbstractPreTreeIterator<Generic>(this) {
-
-			@Override
-			public Iterator<Generic> children(Generic node) {
-				long ts = pickNewTs();
-				return new ConcateIterator<Generic>(((GenericImpl) node).getLifeManager().engineDirectInheritings.iterator(ts), ((GenericImpl) node).getLifeManager().engineComposites.iterator(ts));
-			}
-		}) {
-
-			@Override
-			public boolean isSelected() {
-				return ((GenericImpl) next).getDesignTs() == designTs;
-			}
-		}.next();
 	}
 }
