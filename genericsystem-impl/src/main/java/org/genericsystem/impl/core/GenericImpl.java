@@ -404,14 +404,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
 		// TODO KK
 		// return ((CacheImpl) cache).bind(this.getImplicit(), this, value, getMetaLevel() + 1, getPrimariesArray(), components);
-		return ((CacheImpl) cache).bind(getImplicit(), value, getMetaLevel() + 1, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
+//		return ((CacheImpl) cache).bind(getImplicit(), value, getMetaLevel() + 1, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
+		return ((CacheImpl) cache).bind(((CacheImpl) cache).bindPrimaryByValue(getImplicit(), value, getMetaLevel() + 1), Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
 		// TODO KK
 		// return ((CacheImpl) cache).bind(this.getImplicit(), this, value, SystemGeneric.STRUCTURAL, getPrimariesArray(), components);
-		return ((CacheImpl) cache).bind(getImplicit(), value, SystemGeneric.STRUCTURAL, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
+		// return ((CacheImpl) cache).bind(getImplicit(), value, SystemGeneric.STRUCTURAL, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
+		return ((CacheImpl) cache).bind(((CacheImpl) cache).bindPrimaryByValue(getImplicit(), value, SystemGeneric.STRUCTURAL), Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
 	}
 
 	@Override
@@ -428,7 +430,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		Generic implicit = relation.isConcrete() ? relation.<GenericImpl> getImplicit().directSupers[0] : relation.getImplicit();
 		// TODO KK
 		// return ((CacheImpl) cache).bind(implicit, relation, value, metaLevel, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
-		return ((CacheImpl) cache).bind(implicit, value, metaLevel, new Generic[] { relation }, Statics.insertIntoArray(this, targets, basePos));
+//		return ((CacheImpl) cache).bind(implicit, value, metaLevel, new Generic[] { relation }, Statics.insertIntoArray(this, targets, basePos));
+		return ((CacheImpl) cache).bind(((CacheImpl) cache).bindPrimaryByValue(implicit, value, metaLevel), new Generic[] { relation }, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Generic> Iterator<T> mainIterator(Context context, Generic origin, final int metaLevel, final int pos) {

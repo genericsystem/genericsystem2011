@@ -68,7 +68,7 @@ public class TreeTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
 		tree.disableReferentialIntegrity(cache, Statics.BASE_POSITION);
-		
+
 		root.remove(cache);
 		assert !root.isAlive(cache);
 		assert !child.isAlive(cache);
@@ -120,9 +120,9 @@ public class TreeTest extends AbstractTest {
 	public void testGenealogicTree() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Tree bitree = cache.newTree("Tree");
-		final Node grandFather = bitree.newRoot(cache, "grandFather");
-		final Node grandMother = bitree.newRoot(cache, "grandMother");
-		final Node mother = bitree.newRoot(cache, "mother");
+		Node grandFather = bitree.newRoot(cache, "grandFather");
+		Node grandMother = bitree.newRoot(cache, "grandMother");
+		Node mother = bitree.newRoot(cache, "mother");
 		Node father = grandFather.addNode(cache, "father", grandMother);
 		Node fatherSister = grandFather.addNode(cache, "fatherSister", grandMother);
 		father.addNode(cache, "son", mother);

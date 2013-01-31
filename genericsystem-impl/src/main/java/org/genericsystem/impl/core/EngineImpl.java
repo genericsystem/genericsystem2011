@@ -165,7 +165,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 				if (result == null)
 					result = cache.insert(new GenericImpl().initialize(EngineImpl.ENGINE_VALUE, SystemGeneric.META, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
 			} else
-				result = cache.<T> bind(clazz);
+				result = cache.<T> bind(cache.bindPrimaryByValue(cache.findImplicitSuper(clazz), CacheImpl.findImplictValue(clazz), cache.findMetaLevel(clazz)), cache.findSupers(clazz), cache.findComponents(clazz));
 			put(clazz, result);
 			((GenericImpl) result).mountConstraints(cache, clazz);
 			cache.triggersDependencies(clazz);
