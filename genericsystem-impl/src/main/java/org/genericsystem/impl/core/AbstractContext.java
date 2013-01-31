@@ -110,7 +110,7 @@ public abstract class AbstractContext implements Context, Serializable {
 
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
-				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).getExtendedComponentsArray(), interfaces, components);
+				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).getExtendedComponentsArray(), interfaces, components, false);
 			}
 		};
 	}

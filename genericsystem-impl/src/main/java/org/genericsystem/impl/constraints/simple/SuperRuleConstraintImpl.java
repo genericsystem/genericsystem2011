@@ -29,7 +29,7 @@ public class SuperRuleConstraintImpl extends AbstractSimpleBooleanConstraint {
 		for (Generic directSuper : modified.getSupers()) {
 			Generic[] interfaces = new Primaries(modified).toArray();
 			Generic[] components = ((GenericImpl) modified).components;
-			if (!GenericImpl.isOverridedBy(((GenericImpl) directSuper).getPrimariesArray(), ((GenericImpl) directSuper).components, interfaces, components))
+			if (!GenericImpl.isSuperOf(((GenericImpl) directSuper).getPrimariesArray(), ((GenericImpl) directSuper).components, interfaces, components, true))
 				throw new SuperRuleConstraintViolationException("Interfaces : " + Arrays.toString(interfaces) + " Components : " + Arrays.toString(components) + " should inherits from : " + directSuper);
 		}
 	}
