@@ -210,10 +210,10 @@ public class Statics {
 		return new SimpleDateFormat(Statics.PATTERN).format(new Date(ts / Statics.MILLI_TO_NANOSECONDS)) + "---" + ts;
 	}
 
-	static class Primaries extends TreeSet<Generic> {
+	public static class Primaries extends TreeSet<Generic> {
 		private static final long serialVersionUID = 7222889429002770779L;
 
-		Primaries(Generic... generics) {
+		public Primaries(Generic... generics) {
 			super(new Comparator<Generic>() {
 
 				@Override

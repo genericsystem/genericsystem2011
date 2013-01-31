@@ -15,7 +15,7 @@ import java.nio.channels.OverlappingFileLockException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.NavigableMap;
-import java.util.SortedSet;
+import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Executors;
@@ -115,7 +115,7 @@ public class Archiver {
 	private static void saveSnapshot(AbstractContext context, OutputStream out) {
 		try {
 			ObjectOutputStream oos = new ObjectOutputStream(out);
-			SortedSet<Generic> orderGenerics = context.orderDependencies(context.getEngine());
+			NavigableSet<Generic> orderGenerics = context.orderDependencies(context.getEngine());
 			for (Generic orderGeneric : orderGenerics)
 				writeGeneric(((GenericImpl) orderGeneric), oos);
 			

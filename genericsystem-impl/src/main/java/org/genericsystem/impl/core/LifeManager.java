@@ -11,8 +11,9 @@ import org.genericsystem.api.exception.OptimisticLockConstraintViolationExceptio
 import org.genericsystem.impl.core.AbstractContext.TimestampedDependencies;
 import org.genericsystem.impl.iterator.AbstractGeneralAwareIterator;
 
-public class LifeManager {
+public class LifeManager implements Serializable {
 
+	private static final long serialVersionUID = 1892352491151920755L;
 	private final long designTs;
 	private long birthTs;
 	private long deathTs;
@@ -141,9 +142,8 @@ public class LifeManager {
 		return deathTs != Long.MAX_VALUE;
 	}
 
-	public class EngineDependencies implements TimestampedDependencies, Serializable {
+	public class EngineDependencies implements TimestampedDependencies {
 
-		private static final long serialVersionUID = 8737884947844732434L;
 		private node head = null;
 		private node tail = null;
 
@@ -241,11 +241,7 @@ public class LifeManager {
 		}
 	}
 
-	private static class node implements Serializable {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -2908772989746062209L;
+	private static class node {
 		Generic content;
 		node next;
 

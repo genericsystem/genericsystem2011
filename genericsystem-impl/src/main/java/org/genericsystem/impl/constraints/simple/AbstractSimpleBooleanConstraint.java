@@ -15,19 +15,17 @@ import org.genericsystem.impl.constraints.Constraint;
  * 
  */
 public abstract class AbstractSimpleBooleanConstraint extends Constraint {
-	
+
 	private static final long serialVersionUID = 3553977162062086353L;
-	
+
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		Snapshot<Value> constraintInstances = getConstraintInstances(context, modified, getClass());
 		for (Value constraintValueNode : constraintInstances)
-			t(context, modified, constraintValueNode);
-		// if(constraintInstances.isEmpty())
-		// if(getDefaultValue())
+			check(context, modified, constraintValueNode);
 	}
-	
-	private void t(Context context, Generic modified, Value constraintValueNode) throws ConstraintViolationException {
+
+	private void check(Context context, Generic modified, Value constraintValueNode) throws ConstraintViolationException {
 		if (!(constraintValueNode.getValue() instanceof Boolean))
 			throw new ConstraintViolationException("The constraint " + getClass() + " must be a boolean constraint, the value is " + constraintValueNode.getValue());
 		Boolean value = constraintValueNode.getValue();
@@ -35,7 +33,7 @@ public abstract class AbstractSimpleBooleanConstraint extends Constraint {
 			throw new ConstraintViolationException("The constraint " + getClass() + " must have a not null value");
 		internalCheck(context, modified, constraintValueNode.<Type> getBaseComponent());
 	}
-	
+
 	protected abstract void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException;
-	
+
 }

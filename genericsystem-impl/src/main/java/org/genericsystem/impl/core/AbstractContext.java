@@ -25,6 +25,7 @@ import org.genericsystem.api.exception.ConcurrencyControlException;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
+import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
@@ -108,17 +109,9 @@ public abstract class AbstractContext implements Context, Serializable {
 			
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
-				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).components, interfaces, components);
-				// log.info("super :"+Arrays.toString(((GenericImpl)candidate).interfaces)+Arrays.toString(((GenericImpl)candidate).components));
-				// log.info("sub"+Arrays.toString(interfaces)+Arrays.toString(components));
-				// log.info("result selected : "+result);
-				return result;
+				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).getExtendedComponentsArray(), interfaces, components);
 			}
 		};
-	}
-	
-	protected Generic[] getDirectSupers(Generic generic, Generic[] components) {
-		return (((GenericImpl) generic).isPrimary()) ? new Generic[] { ((GenericImpl) generic).directSupers[0] } : getDirectSupers(((GenericImpl) generic).getPrimariesArray(), components);
 	}
 	
 	protected Generic[] getDirectSupers(final Generic[] interfaces, final Generic[] components) {
@@ -129,6 +122,26 @@ public abstract class AbstractContext implements Context, Serializable {
 		Generic[] result = list.toArray(new Generic[list.size()]);
 		// assert Arrays.equals(new Primaries(result).toArray(), interfaces) : new Primaries(result) + " <---> " + Arrays.toString(interfaces);
 		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends Generic> T reFind(Generic generic) {
+		if (generic.isAlive(this))
+			return (T) generic;
+		if (((GenericImpl) generic).isPrimary())
+			return findPrimaryByValue(((GenericImpl) generic).directSupers[0], generic.getValue(), generic.getMetaLevel());
+		Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
+		Generic[] boundPrimaries = new Generic[primariesArray.length];
+		for (int i = 0; i < primariesArray.length; i++)
+			boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
+		Generic[] extendedComponents = ((GenericImpl) generic).getExtendedComponentsArray();
+		Generic[] extendedBoundComponents = new Generic[((GenericImpl) generic).components.length];
+		for (int i = 0; i < extendedComponents.length; i++)
+			extendedBoundComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
+		Generic[] directSupers = getDirectSupers(boundPrimaries, extendedBoundComponents);
+		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(boundPrimaries, extendedBoundComponents))
+			return (T) directSupers[0];
+		return null;
 	}
 	
 	private static Generic[] transform(Generic[] components, Generic generic) {
@@ -182,7 +195,15 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 	
-	protected Generic[] findComponents(Class<?> clazz) {
+	Generic[] findInterfaces(Class<?> clazz) {
+		int i = 0;
+		Type[] annotedInterfaces = new Type[getAdditionalInterfaceClasses(clazz).size()];
+		for (Class<?> interfaceClasse : getAdditionalInterfaceClasses(clazz))
+			annotedInterfaces[i++] = this.<Type> find(interfaceClasse);
+		return annotedInterfaces;
+	}
+	
+	Generic[] findComponents(Class<?> clazz) {
 		Components componentsAnnotation = clazz.getAnnotation(Components.class);
 		if (componentsAnnotation == null)
 			return Statics.EMPTY_GENERIC_ARRAY;
