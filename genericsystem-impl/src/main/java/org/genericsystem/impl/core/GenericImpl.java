@@ -385,10 +385,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return (T) addSubAttribute(cache, property, value).enablePropertyConstraint(cache);
 	}
 
-	@Override
-	public <T extends Value> T flag(Cache cache, Value value) {
-		return setValue(cache, (Attribute) value, Statics.FLAG);
-	}
+	// TODO KK
+	// @Override
+	// public void flag(Cache cache, Value value) {
+	// setValue(cache, (Attribute) value, Statics.FLAG);
+	// }
 
 	@Override
 	public <T extends Relation> T addRelation(Cache cache, Serializable value, Type... targets) {
@@ -1176,8 +1177,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return getValue(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass));
 	}
 
-	private Value setSystemPropertyValue(Cache cache, Class<?> systemPropertyClass, Serializable value) {
-		return setValue(cache, cache.<Attribute> find(systemPropertyClass), value);
+	private void setSystemPropertyValue(Cache cache, Class<?> systemPropertyClass, Serializable value) {
+		setValue(cache, cache.<Attribute> find(systemPropertyClass), value);
 	}
 
 	@Override
