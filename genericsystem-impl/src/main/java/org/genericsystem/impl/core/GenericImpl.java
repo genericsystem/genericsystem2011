@@ -67,11 +67,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	Serializable value;
 
 	final Generic initPrimary(Serializable value, int metaLevel, Generic primaryAncestor) {
-		return initialize(value, metaLevel, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY);
+		return initializePrimary(value, metaLevel, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY);
 	}
 
-	final GenericImpl initialize(Serializable value, int metaLevel, Generic[] directSupers, Generic[] components) {
+	// TODO KK
+	final GenericImpl initializePrimary(Serializable value, int metaLevel, Generic[] directSupers, Generic[] components) {
 		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
+	}
+
+	final GenericImpl initializeComplex(Generic implicit, Generic[] directSupers, Generic[] components) {
+		return restore(implicit.getValue(), implicit.getMetaLevel(), null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
 	}
 
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
@@ -404,7 +409,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
 		// TODO KK
 		// return ((CacheImpl) cache).bind(this.getImplicit(), this, value, getMetaLevel() + 1, getPrimariesArray(), components);
-//		return ((CacheImpl) cache).bind(getImplicit(), value, getMetaLevel() + 1, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
+		// return ((CacheImpl) cache).bind(getImplicit(), value, getMetaLevel() + 1, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
 		return ((CacheImpl) cache).bind(((CacheImpl) cache).bindPrimaryByValue(getImplicit(), value, getMetaLevel() + 1), Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
 	}
 
@@ -430,7 +435,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		Generic implicit = relation.isConcrete() ? relation.<GenericImpl> getImplicit().directSupers[0] : relation.getImplicit();
 		// TODO KK
 		// return ((CacheImpl) cache).bind(implicit, relation, value, metaLevel, Statics.EMPTY_GENERIC_ARRAY, Statics.insertIntoArray(this, targets, basePos));
-//		return ((CacheImpl) cache).bind(implicit, value, metaLevel, new Generic[] { relation }, Statics.insertIntoArray(this, targets, basePos));
+		// return ((CacheImpl) cache).bind(implicit, value, metaLevel, new Generic[] { relation }, Statics.insertIntoArray(this, targets, basePos));
 		return ((CacheImpl) cache).bind(((CacheImpl) cache).bindPrimaryByValue(implicit, value, metaLevel), new Generic[] { relation }, Statics.insertIntoArray(this, targets, basePos));
 	}
 
