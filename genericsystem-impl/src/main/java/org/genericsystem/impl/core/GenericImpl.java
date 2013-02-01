@@ -645,6 +645,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return interfaces.length == subInterfaces.length && components.length == subComponents.length;
 	}
 
+	// TODO KK
 	// private static boolean ancestorSizeUpper(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents) {
 	// return interfaces.length > subInterfaces.length || components.length > subComponents.length;
 	// }
