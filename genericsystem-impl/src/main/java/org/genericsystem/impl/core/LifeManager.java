@@ -242,9 +242,6 @@ public class LifeManager {
 	}
 
 	private static class node implements Serializable {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -2908772989746062209L;
 		Generic content;
 		node next;

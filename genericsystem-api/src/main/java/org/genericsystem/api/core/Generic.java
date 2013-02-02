@@ -114,7 +114,8 @@ public interface Generic extends Comparable<Generic> {
 	// */
 	// <T extends Value> T addValue(Cache cache, Value attribute, Serializable value);
 
-	<T extends Value> T flag(Cache cache, Value attribute);
+	//TODO KK
+	// void flag(Cache cache, Value attribute);
 
 	// <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int basePos, Generic... targets);
 

@@ -120,9 +120,9 @@ public abstract class AbstractContext implements Context, Serializable {
 		final Iterator<Generic> iterator = getDirectSupersIterator(interfaces, components);
 		while (iterator.hasNext())
 			list.add(iterator.next());
-		Generic[] result = list.toArray(new Generic[list.size()]);
+		// Generic[] result = list.toArray(new Generic[list.size()]);
 		// assert Arrays.equals(new Primaries(result).toArray(), interfaces) : new Primaries(result) + " <---> " + Arrays.toString(interfaces);
-		return result;
+		return list.toArray(new Generic[list.size()]);
 	}
 
 	@SuppressWarnings("unchecked")
