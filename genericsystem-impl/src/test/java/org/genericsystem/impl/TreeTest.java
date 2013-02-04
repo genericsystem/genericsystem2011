@@ -54,7 +54,7 @@ public class TreeTest extends AbstractTest {
 		assert child3.getChildren(cache).isEmpty();
 		cache.flush();
 
-		tree.enableReferentialIntegrity(cache, Statics.BASE_POSITION).log();
+		tree.enableReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert tree.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert root.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert child.inheritsFrom(tree);
@@ -69,6 +69,7 @@ public class TreeTest extends AbstractTest {
 		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
 		tree.disableReferentialIntegrity(cache, Statics.BASE_POSITION);
 
+		assert !tree.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		root.remove(cache);
 		assert !root.isAlive(cache);
 		assert !child.isAlive(cache);
