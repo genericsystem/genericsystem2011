@@ -41,7 +41,7 @@ import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
-import org.genericsystem.impl.iterator.AbstractSelectableLeafInheritedIterator;
+import org.genericsystem.impl.iterator.AbstractSelectableLeaf;
 import org.genericsystem.impl.iterator.ArrayIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
 import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
@@ -432,7 +432,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	public <T extends Generic> Iterator<T> inheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
-		return (Iterator<T>) new AbstractSelectableLeafInheritedIterator(context, origin) {
+		return (Iterator<T>) new AbstractSelectableLeaf(context, origin) {
 			
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
@@ -458,7 +458,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	boolean safeIsEnabled(Context context, Attribute attribute) {
-		Iterator<Generic> iterator = new AbstractSelectableLeafInheritedIterator(context, attribute) {
+		Iterator<Generic> iterator = new AbstractSelectableLeaf(context, attribute) {
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
 				return (candidate.getMetaLevel() <= SystemGeneric.CONCRETE) && candidate.isAttributeOf(GenericImpl.this);
@@ -872,7 +872,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return (Iterator<T>) new AbstractSelectableLeafInheritedIterator(context, GenericImpl.this) {
+				return (Iterator<T>) new AbstractSelectableLeaf(context, GenericImpl.this) {
 					@Override
 					protected boolean isSelected(Generic father, Generic candidate) {
 						return candidate.isInstanceOf(GenericImpl.this);
@@ -902,14 +902,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	private <T extends Generic> Iterator<T> allInheritingsAboveIterator(final Context context, final int metaLevel) {
-		final Set<Generic> alreadySelected = new HashSet<>();
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 			@Override
 			public Iterator<Generic> children(Generic node) {
 				return new AbstractFilterIterator<Generic>(((GenericImpl) node).directInheritingsIterator(context)) {
 					@Override
 					public boolean isSelected() {
-						return next.getMetaLevel() <= metaLevel && alreadySelected.add(next);
+						return next.getMetaLevel() <= metaLevel;
 					}
 				};
 			}
@@ -966,16 +965,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	private <T extends Generic> Iterator<T> allInheritingsIterator(final Context context) {
-		final Set<Generic> sets = new HashSet<>();
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 			@Override
 			public Iterator<Generic> children(Generic node) {
-				return new AbstractFilterIterator<Generic>(((GenericImpl) node).directInheritingsIterator(context)) {
-					@Override
-					public boolean isSelected() {
-						return sets.add(next);
-					}
-				};
+				return (((GenericImpl) node).directInheritingsIterator(context));
 			}
 		};
 	}

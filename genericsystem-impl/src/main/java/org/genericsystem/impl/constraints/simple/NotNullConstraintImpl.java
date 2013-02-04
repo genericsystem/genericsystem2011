@@ -23,7 +23,7 @@ public class NotNullConstraintImpl extends AbstractSimpleBooleanConstraint {
 	@Override
 	protected void internalCheck(Context context, Generic modified, Generic constraintBaseType) throws ConstraintViolationException {
 		if (modified.getValue() == null)
-			throw new NotNullConstraintViolationException("Value should not be null for relation " + ((Value) modified).getMeta());
+			throw new NotNullConstraintViolationException("Value should not be null for : " + ((Value) modified).getMeta());
 	}
 	
 }
