@@ -61,6 +61,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	Generic[] directSupers;
 	
+	// TODO remove components
 	public Generic[] components;
 	
 	int metaLevel;
@@ -1056,16 +1057,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return false;
 	}
 	
-	// // TODO is it useful
-	// public boolean isTree2(int componentPos) {
-	// GenericImpl generic = ((GenericImpl) getComponent(componentPos));
-	// if (generic == null)
-	// return false;
-	// if (equals(generic))
-	// return true;
-	// return generic.isTree2(componentPos);
-	// }
-	
 	@Override
 	public void traverse(Visitor visitor) {
 		visitor.traverse(this);
@@ -1350,12 +1341,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				nullComponents[i] = null;
 		return nullComponents;
 	}
-	
-	// TODO KK
-	// void checkSuperRule(Generic[] interfaces, Generic[] components) {
-	// if (!GenericImpl.isSuperOf2(getPrimariesArray(), this.components, interfaces, components))
-	// throw new SuperRuleConstraintViolationException("Interfaces : " + Arrays.toString(interfaces) + " Components : " + Arrays.toString(components) + " should inherits from : " + this);
-	// }
 	
 	boolean equiv(Generic[] interfaces, Generic[] components) {
 		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullComponentsArray(), components);
