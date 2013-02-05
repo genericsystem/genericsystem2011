@@ -1,6 +1,6 @@
 package org.genericsystem.impl.constraints.simple;
 
-import org.genericsystem.api.annotation.BooleanValue;
+import org.genericsystem.api.annotation.ComponentPosBoolean;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
 import org.genericsystem.api.annotation.Supers;
@@ -30,7 +30,8 @@ public class ConcreteInheritanceConstraintImpl extends AbstractSimpleBooleanCons
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
-	@BooleanValue(true)
+	// @BooleanValue(true)
+	@ComponentPosBoolean(true)
 	@Supers(value = { ConcreteInheritanceConstraintImpl.class }, implicitSuper = ConcreteInheritanceConstraintImpl.class)
 	public static class DefaultValue {
 	}

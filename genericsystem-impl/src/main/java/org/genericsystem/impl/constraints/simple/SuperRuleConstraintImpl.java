@@ -2,7 +2,7 @@ package org.genericsystem.impl.constraints.simple;
 
 import java.util.Arrays;
 
-import org.genericsystem.api.annotation.BooleanValue;
+import org.genericsystem.api.annotation.ComponentPosBoolean;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
 import org.genericsystem.api.annotation.Supers;
@@ -36,7 +36,8 @@ public class SuperRuleConstraintImpl extends AbstractSimpleBooleanConstraint {
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
-	@BooleanValue(true)
+	// @BooleanValue(true)
+	@ComponentPosBoolean(true)
 	@Supers(value = { SuperRuleConstraintImpl.class }, implicitSuper = SuperRuleConstraintImpl.class)
 	public static class DefaultValue {
 	}

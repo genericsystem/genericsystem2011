@@ -1,6 +1,6 @@
 package org.genericsystem.impl.constraints.simple;
 
-import org.genericsystem.api.annotation.BooleanValue;
+import org.genericsystem.api.annotation.ComponentPosBoolean;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
 import org.genericsystem.api.annotation.Priority;
@@ -37,7 +37,8 @@ public class OptimisticLockConstraintImpl extends AbstractSimpleBooleanConstrain
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
-	@BooleanValue(true)
+	// @BooleanValue(true)
+	@ComponentPosBoolean(true)
 	@Supers(value = { OptimisticLockConstraintImpl.class }, implicitSuper = OptimisticLockConstraintImpl.class)
 	public static class DefaultValue {
 	}

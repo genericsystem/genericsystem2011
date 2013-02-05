@@ -56,7 +56,9 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 				return new AbstractFilterIterator<Value>(((GenericImpl) modified).<Value> mainIterator(context, ((AbstractContext) context).find(clazz), SystemGeneric.CONCRETE, Statics.BASE_POSITION)) {
 					@Override
 					public boolean isSelected() {
-						return !Boolean.FALSE.equals((next.getValue() instanceof ComponentPosValue) ? next.<ComponentPosValue<Boolean>> getValue().getValue() : next.getValue());
+						if (next.getValue() instanceof ComponentPosValue)
+							return Boolean.TRUE.equals(next.<ComponentPosValue<Boolean>> getValue().getValue());
+						return !Boolean.FALSE.equals(next.getValue());
 					}
 				};
 			}
