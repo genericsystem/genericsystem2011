@@ -14,6 +14,6 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface SingularConstraint {
 
-	int[] value() default {};
+	int[] value() default { 0 };
 
 }

@@ -1,16 +1,14 @@
 package org.genericsystem.impl.constraints.axed;
 
-import java.util.Iterator;
-
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
-import org.genericsystem.api.annotation.constraints.PropertyConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.RequiredConstraintViolationException;
+import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
@@ -19,7 +17,6 @@ import org.genericsystem.impl.system.ComponentPosValue;
 
 @SystemGeneric
 @Components(Engine.class)
-@PropertyConstraint
 @InstanceClassConstraint(ComponentPosValue.class)
 public class RequiredAxedConstraintImpl extends Constraint {
 
@@ -28,25 +25,19 @@ public class RequiredAxedConstraintImpl extends Constraint {
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		if (modified.isConcrete()) {
-			Iterator<Generic> requiredRelationIterator = ((Type) modified.getMeta()).getComposites(context).iterator();
-			while (requiredRelationIterator.hasNext())
-				checkRequiredRelation(modified, (Relation) requiredRelationIterator.next(), context);
-		}
-	}
-
-	private void checkRequiredRelation(Generic modified, Relation requiredRelation, Context context) throws ConstraintViolationException {
-		for (Value constraintValueNode : getConstraintInstances(context, requiredRelation, RequiredAxedConstraintImpl.class)) {
-			// TODO KK
-			// if (!(constraintValueNode.getValue() instanceof Integer))
-			// throw new ConstraintViolationException("The constraint " + RequiredAxedConstraintImpl.class + " must be axed");
-			if (constraintValueNode.<ComponentPosValue<Boolean>> getValue().getValue()) {
-				Integer componentPos = constraintValueNode.<ComponentPosValue<Boolean>> getValue().getComponentPos();
-				// if (componentPos == null)
-				// throw new ConstraintViolationException("The constraint " + RequiredAxedConstraintImpl.class + " must have a not null value");
-				Generic component = requiredRelation.getComponent(componentPos);
-				if (!((Type) component).getAllInstances(context).isEmpty() && component.getLinks(context, requiredRelation, componentPos).size() < 1)
-					throw new RequiredConstraintViolationException(requiredRelation.getValue() + " is required for new " + modified.getMeta() + " " + modified);
-			}
+			if (!modified.isAlive(context)) {
+				for (Value constraintValueNode : getConstraintValues(context, modified, RequiredAxedConstraintImpl.class)) {
+					int componentPos = constraintValueNode.<ComponentPosValue<Boolean>> getValue().getComponentPos();
+					Generic base = ((Attribute) modified).getComponent(componentPos);
+					if (base != null && base.getLinks(context, modified.<Relation> getMeta(), componentPos).size() < 1)
+						throw new RequiredConstraintViolationException(modified.getMeta().getValue() + " is required for " + base.getMeta() + " " + base);
+				}
+			} else
+				for (Attribute requiredAttribute : ((Type) modified).getAttributes(context)) {
+					for (Value constraintValueNode : getConstraintValues(context, requiredAttribute, RequiredAxedConstraintImpl.class))
+						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent(constraintValueNode.<ComponentPosValue<Boolean>> getValue().getComponentPos())) && modified.getLinks(context, (Relation) requiredAttribute).size() < 1)
+							throw new RequiredConstraintViolationException(requiredAttribute.getValue() + " is required for new " + modified.getMeta() + " " + modified);
+				}
 		}
 	}
 

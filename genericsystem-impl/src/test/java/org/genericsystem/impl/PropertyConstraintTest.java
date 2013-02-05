@@ -15,14 +15,14 @@ import org.testng.annotations.Test;
 
 @Test
 public class PropertyConstraintTest extends AbstractTest {
-	
+
 	private Cache cache;
-	
+
 	@BeforeMethod
 	public void initCache() {
 		cache = GenericSystem.newCacheOnANewInMemoryEngine();
 	}
-	
+
 	public void testSingleValueAttribute() {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.addAttribute(cache, "Equipment");
@@ -30,7 +30,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		myVehicle.setValue(cache, equipment, "ABS");
 	}
-	
+
 	public void testMultipleValuesAttribute() {
 		Type vehicle = cache.newType("Vehicle");
 		final Attribute equipment = vehicle.addAttribute(cache, "Equipment");
@@ -40,7 +40,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		myVehicle.setValue(cache, equipment, "GPS");
 		assert !abs.isAlive(cache);
 	}
-	
+
 	public void testMultipleValuesAttributeWithoutConstraint() {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.addAttribute(cache, "Equipment");
@@ -48,7 +48,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		myVehicle.setValue(cache, equipment, "ABS");
 		myVehicle.setValue(cache, equipment, "GPS");
 	}
-	
+
 	public void testMultipleValuesAttributeWithDisabledConstraint() {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.addAttribute(cache, "Equipment");
@@ -57,7 +57,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		myVehicle.setValue(cache, equipment, "ABS");
 		myVehicle.setValue(cache, equipment, "GPS");
 	}
-	
+
 	public void testBinaryRelationDifferentTarget() {
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
@@ -69,7 +69,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		myVehicle.setLink(cache, vehicleColor, "VehicleColor", red);
 		myVehicle.setLink(cache, vehicleColor, "VehicleColor", blue);
 	}
-	
+
 	public void testBinaryRelationSameTarget() {
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
@@ -82,7 +82,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		assert !myVehicleRed.isAlive(cache);
 		assert myVehicleRedAgain.isAlive(cache);
 	}
-	
+
 	public void testTernaryRelationDifferentTargets() {
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
@@ -96,7 +96,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red, myPilot);
 		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red, anotherPilot);
 	}
-	
+
 	public void testTernaryRelationSameTargets() {
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
@@ -111,7 +111,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		assert !myVehicleRed.isAlive(cache);
 		assert myVehicleRedAgain.isAlive(cache);
 	}
-	
+
 	public void testSingleValueAttributeForSubtype() {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -120,7 +120,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic myCar = car.newInstance(cache, "myCar");
 		myCar.setValue(cache, equipment, "ABS");
 	}
-	
+
 	public void testMultipleValuesAttributeForSubtype() {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -132,7 +132,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		assert !absValue.isAlive(cache);
 		assert gpsValue.isAlive(cache);
 	}
-	
+
 	public void testMultipleValuesAttributeForSubtypeOtherWay() {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = cache.newSubType("Car", vehicle);
@@ -144,7 +144,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		assert !absValue.isAlive(cache);
 		assert gpsValue.isAlive(cache);
 	}
-	
+
 	public void testSameTarget() {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -158,7 +158,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		assert !myVehiclePower.isAlive(cache);
 		assert myVehiclePower2.isAlive(cache);
 	}
-	
+
 	public void testBinaryRelationBetweenSubtypeAndSameTarget() {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -173,35 +173,35 @@ public class PropertyConstraintTest extends AbstractTest {
 		assert !myVehicleRed.isAlive(cache);
 		assert myVehicleRedAgain.isAlive(cache);
 	}
-	
+
 	public void testUniqueInstance() {
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.enablePropertyConstraint(cache);
 		vehicle.newInstance(cache, "myVehicle");
 	}
-	
+
 	public void testMutlipleInstances() {
 		Type vehicle = cache.newType("Vehicle");
 		Generic myVehicle = vehicle.newAnonymousInstance(cache);
 		Generic myVehicle2 = vehicle.newAnonymousInstance(cache);
 		assert myVehicle != myVehicle2 : myVehicle.info() + myVehicle2.info();
 	}
-	
+
 	public void testMutlipleInstancesWithSubclass() {
 		Type vehicle = cache.newType("Vehicle");
 		final Type car = vehicle.newSubType(cache, "Car");
 		vehicle.enablePropertyConstraint(cache);
 		vehicle.newInstance(cache, "myVehicle");
-		
+
 		new RollbackCatcher() {
-			
+
 			@Override
 			public void intercept() {
 				car.newInstance(cache, "myVehicle");
 			}
 		}.assertIsCausedBy(PropertyConstraintViolationException.class);
 	}
-	
+
 	public void testMultipleDefaultValuesAttribute1() {
 		final Type vehicle = cache.newType("Vehicle");
 		final Attribute equipment = vehicle.addAttribute(cache, "Equipment");
@@ -213,19 +213,19 @@ public class PropertyConstraintTest extends AbstractTest {
 		assert absValue.isAlive(cache);
 		assert myVehicle.getValue(cache, equipment).equals(gpsValue.getValue());
 	}
-	
+
 	public void testMultipleDefaultValuesAttribute2() {
 		final Type vehicle = cache.newType("Vehicle");
 		final Attribute equipment = vehicle.addAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		
+
 		final Generic result = myVehicle.setValue(cache, equipment, "ABS");
-		
+
 		assert vehicle.getAllInstances(cache).contains(myVehicle);
-		
+
 		new RollbackCatcher() {
-			
+
 			@Override
 			public void intercept() {
 				vehicle.setValue(cache, equipment, "GPS");
@@ -234,4 +234,19 @@ public class PropertyConstraintTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(PropertyConstraintViolationException.class);
 	}
+
+	public void testOK() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carOutsideColor = car.addRelation(cache, "outside", color);
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic red = color.newInstance(cache, "red");
+		carOutsideColor.enablePropertyConstraint(cache);
+		// carOutsideColor.enableSingularConstraint(cache, Statics.BASE_POSITION);
+		myBmw.setLink(cache, carOutsideColor, "20%", red);
+		myBmw.setLink(cache, carOutsideColor, "40%", red);
+		myBmw.getLink(cache, carOutsideColor, red);
+	}
+
 }

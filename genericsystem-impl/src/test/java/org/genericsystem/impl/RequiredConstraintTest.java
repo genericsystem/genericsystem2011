@@ -20,9 +20,12 @@ public class RequiredConstraintTest extends AbstractTest {
 		Generic myFiat = vehicle.newInstance(cache, "myFiat");
 		Attribute wheel = vehicle.addAttribute(cache, "wheel");
 		wheel.enableRequiredConstraint(cache);
+		assert wheel.isRequiredConstraintEnabled(cache);
 		Value wheelMyFiat = myFiat.setValue(cache, wheel, "BigWheel");
 		cache.flush();
 		wheelMyFiat.remove(cache);
+		assert !wheelMyFiat.isAlive(cache);
+		assert wheel.isRequiredConstraintEnabled(cache);
 
 		new RollbackCatcher() {
 

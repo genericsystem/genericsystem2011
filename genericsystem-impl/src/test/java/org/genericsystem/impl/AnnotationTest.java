@@ -165,8 +165,6 @@ public class AnnotationTest extends AbstractTest {
 		Type human = cache.find(Human.class);
 		Type childrenGames = cache.find(ChildrenGames.class);
 		Type transformer = cache.find(Transformer.class);
-		transformer.log();
-
 		Type transformerChildrenGames = cache.find(TransformerChildrenGames.class);
 
 		assert transformerChildrenGames.inheritsFrom(games);

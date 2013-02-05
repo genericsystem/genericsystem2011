@@ -86,8 +86,6 @@ public class TreeTest extends AbstractTest {
 		Node child2 = root.addSubNode(cache, "Child2");
 		Node child3 = child.addSubNode(cache, "Child3");
 
-		child.log();
-
 		assert root.getMeta().equals(tree);
 		assert root.inheritsFrom(tree);
 		assert root.isInstanceOf(tree);
@@ -165,7 +163,7 @@ public class TreeTest extends AbstractTest {
 
 		assert red.equals(body.getLink(cache, graphicComponentColor).getTargetComponent()) : body.getLinks(cache, graphicComponentColor);
 		assert "Red".equals(body.getLinks(cache, graphicComponentColor).first().getTargetComponent().getValue());
-		header.bind(cache, graphicComponentColor, blue).log();
+		header.bind(cache, graphicComponentColor, blue);
 		cache.flush();
 	}
 
@@ -199,7 +197,6 @@ public class TreeTest extends AbstractTest {
 		assert cache.getMetaAttribute().isMeta();
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
-		root.log();
 		Node child = root.addNode(cache, "Child");
 		root.addNode(cache, "Child2");
 		child.addNode(cache, "Child3");

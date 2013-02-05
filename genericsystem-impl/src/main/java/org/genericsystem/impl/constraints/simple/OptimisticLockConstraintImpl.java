@@ -14,13 +14,12 @@ import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.OptimisticLockConstraintViolationException;
 import org.genericsystem.impl.core.CacheImpl;
 import org.genericsystem.impl.core.GenericImpl;
-import org.genericsystem.impl.core.Statics;
 
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies(OptimisticLockConstraintImpl.DefaultValue.class)
 @Priority(0)
-@SingularConstraint(Statics.BASE_POSITION)
+@SingularConstraint
 public class OptimisticLockConstraintImpl extends AbstractSimpleBooleanConstraint {
 
 	private static final long serialVersionUID = -9140332757904379387L;

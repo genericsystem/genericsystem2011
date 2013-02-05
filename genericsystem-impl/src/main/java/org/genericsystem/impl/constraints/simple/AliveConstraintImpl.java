@@ -4,7 +4,6 @@ import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
 import org.genericsystem.api.annotation.SystemGeneric;
-import org.genericsystem.api.annotation.constraints.PropertyConstraint;
 import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
@@ -12,13 +11,12 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.AliveConstraintViolationException;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.impl.core.GenericImpl;
-import org.genericsystem.impl.core.Statics;
 
 @SystemGeneric
+// (defaultBehavior = true)
 @Components(Engine.class)
 @Dependencies(AliveConstraintImpl.DefaultValue.class)
-@PropertyConstraint
-@SingularConstraint(Statics.BASE_POSITION)
+@SingularConstraint
 public class AliveConstraintImpl extends AbstractSimpleBooleanConstraint {
 
 	private static final long serialVersionUID = -6429972259714036057L;

@@ -7,7 +7,7 @@ import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
 import org.genericsystem.api.annotation.Supers;
 import org.genericsystem.api.annotation.SystemGeneric;
-import org.genericsystem.api.annotation.constraints.PropertyConstraint;
+import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
@@ -19,7 +19,7 @@ import org.genericsystem.impl.core.Statics.Primaries;
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies(SuperRuleConstraintImpl.DefaultValue.class)
-@PropertyConstraint
+@SingularConstraint
 public class SuperRuleConstraintImpl extends AbstractSimpleBooleanConstraint {
 
 	private static final long serialVersionUID = 6874090673594299362L;
