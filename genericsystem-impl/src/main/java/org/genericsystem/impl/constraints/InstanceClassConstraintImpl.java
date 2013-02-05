@@ -10,12 +10,10 @@ import org.genericsystem.api.exception.ClassInstanceConstraintViolationException
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.core.GenericImpl;
-import org.genericsystem.impl.core.Statics;
 
 @SystemGeneric
 @Components(Engine.class)
-@SingularConstraint(Statics.BASE_POSITION)
-// @PropertyConstraint
+@SingularConstraint
 public class InstanceClassConstraintImpl extends Constraint {
 
 	private static final long serialVersionUID = -6429972259714036057L;

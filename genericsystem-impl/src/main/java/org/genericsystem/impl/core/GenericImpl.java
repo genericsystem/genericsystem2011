@@ -30,7 +30,6 @@ import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.impl.constraints.RequiredConstraintImpl;
 import org.genericsystem.impl.constraints.VirtualConstraintImpl;
 import org.genericsystem.impl.constraints.axed.RequiredAxedConstraintImpl;
 import org.genericsystem.impl.constraints.axed.SingularConstraintImpl;
@@ -264,9 +263,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			link.remove(cache);
 			return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
 		}
-		if (!Objects.equals(value, link.getValue()))
-			return update(cache, link, value);
-		return link;
+		if (Objects.equals(value, link.getValue()))
+			return link;
+		return update(cache, link, value);
 	}
 	
 	private <T extends Link> T setToManyLink(Cache cache, Link property, Serializable value, int basePos, Generic... targets) {
@@ -434,7 +433,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	public <T extends Generic> Iterator<T> inheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeaf(context, origin) {
-			
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
 				return candidate.getMetaLevel() <= metaLevel;
@@ -1215,17 +1213,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	@Override
 	public <T extends Type> T enableRequiredConstraint(Cache cache) {
-		return enableSystemProperty(cache, RequiredConstraintImpl.class);
+		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
 	}
 	
 	@Override
 	public <T extends Type> T disableRequiredConstraint(Cache cache) {
-		return disableSystemProperty(cache, RequiredConstraintImpl.class);
+		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
 	}
 	
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class);
+		return isSystemPropertyEnabled(context, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
 	}
 	
 	@Override
@@ -1358,5 +1356,4 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		};
 		
 	}
-	
 }
