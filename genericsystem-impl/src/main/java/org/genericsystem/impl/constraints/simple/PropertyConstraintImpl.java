@@ -16,12 +16,11 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.core.GenericImpl;
-import org.genericsystem.impl.core.Statics;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 
 @SystemGeneric
 @Components(Engine.class)
-@SingularConstraint(Statics.BASE_POSITION)
+@SingularConstraint
 @InstanceClassConstraint(Boolean.class)
 public class PropertyConstraintImpl extends AbstractSimpleBooleanConstraint {
 

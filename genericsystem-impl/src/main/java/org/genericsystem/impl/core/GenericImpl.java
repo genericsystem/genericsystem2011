@@ -40,6 +40,7 @@ import org.genericsystem.impl.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
+import org.genericsystem.impl.iterator.AbstractPostTreeIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
 import org.genericsystem.impl.iterator.AbstractSelectableLeaf;
 import org.genericsystem.impl.iterator.ArrayIterator;
@@ -1340,8 +1341,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	public <T extends Generic> T reBind(Cache cache) {
-		// assert !isPrimary();
 		return ((CacheImpl) cache).reBind(this);
+	}
+	
+	@Override
+	public void induce(final Cache cache) {
+		Iterator<Generic> iterator = new AbstractPostTreeIterator<Generic>(this) {
+			
+			@Override
+			protected Iterator<Generic> children(Generic father) {
+				// if(father.isPseudoStructural())
+				
+				return ((GenericImpl) father).directInheritingsIterator(cache);
+			}
+			
+		};
+		
 	}
 	
 }

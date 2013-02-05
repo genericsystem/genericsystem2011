@@ -5,7 +5,7 @@ import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
 import org.genericsystem.api.annotation.Supers;
 import org.genericsystem.api.annotation.SystemGeneric;
-import org.genericsystem.api.annotation.constraints.PropertyConstraint;
+import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
@@ -15,7 +15,7 @@ import org.genericsystem.api.exception.EngineConsistencyConstraintViolationExcep
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies(EngineConsistencyConstraintImpl.DefaultValue.class)
-@PropertyConstraint
+@SingularConstraint
 public class EngineConsistencyConstraintImpl extends AbstractSimpleBooleanConstraint {
 
 	private static final long serialVersionUID = 8896806730580779746L;
