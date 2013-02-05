@@ -13,6 +13,7 @@ import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.impl.core.GenericImpl;
 
 @SystemGeneric
+// (defaultBehavior = true)
 @Components(Engine.class)
 @Dependencies(AliveConstraintImpl.DefaultValue.class)
 @SingularConstraint

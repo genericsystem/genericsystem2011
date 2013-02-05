@@ -15,6 +15,7 @@ import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
+import org.genericsystem.impl.system.ComponentPosValue;
 
 public abstract class Constraint implements Comparable<Constraint>, Serializable {
 
@@ -47,17 +48,19 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 		return this.getClass().getName().compareTo(otherConstraint.getClass().getName());
 	}
 
-	protected Snapshot<Value> getConstraintInstances(final Context context, final Generic modified, final Class<? extends Constraint> clazz) {
+	// TODO KK
+	protected Snapshot<Value> getConstraintValues(final Context context, final Generic modified, final Class<? extends Constraint> clazz) {
 		return new AbstractSnapshot<Value>() {
 			@Override
 			public Iterator<Value> iterator() {
 				return new AbstractFilterIterator<Value>(((GenericImpl) modified).<Value> mainIterator(context, ((AbstractContext) context).find(clazz), SystemGeneric.CONCRETE, Statics.BASE_POSITION)) {
 					@Override
 					public boolean isSelected() {
-						return !Boolean.FALSE.equals(next.getValue());
+						return !Boolean.FALSE.equals((next.getValue() instanceof ComponentPosValue) ? next.<ComponentPosValue<Boolean>> getValue().getValue() : next.getValue());
 					}
 				};
 			}
 		};
 	}
+
 }

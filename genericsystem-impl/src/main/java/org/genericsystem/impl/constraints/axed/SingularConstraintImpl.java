@@ -25,9 +25,8 @@ public class SingularConstraintImpl extends AbstractAxedIntegerConstraint {
 	protected void internalCheck(final Context context, Generic modified, final Relation constraintType, final Integer basePos) throws ConstraintViolationException {
 		final Generic component = ((Link) modified).getComponent(basePos);
 		Iterator<Generic> it = ((GenericImpl) component).<Generic> mainIterator(context, constraintType, SystemGeneric.CONCRETE, basePos);
-		component.log();
 		if (it.hasNext()) {
-			it.next().log();
+			it.next();
 			if (it.hasNext())
 				throw new SingularConstraintViolationException("Multiple links of type " + constraintType + " on target " + component + " (n° " + basePos + ")." + it.next().info());
 		}

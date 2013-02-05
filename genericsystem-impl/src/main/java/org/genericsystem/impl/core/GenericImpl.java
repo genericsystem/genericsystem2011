@@ -440,14 +440,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			@Override
 			public boolean isSelectable() {
 				return (next.getMetaLevel() == metaLevel)
-						&& (((GenericImpl) next).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) ? next.isAttributeOf(GenericImpl.this) : next.isAttributeOf(GenericImpl.this, pos));
+						&& (((GenericImpl) next).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? next.isAttributeOf(GenericImpl.this) : next
+								.isAttributeOf(GenericImpl.this, pos));
 			}
 		};
 	}
 	
 	public <T extends Generic> Iterator<T> noInheritanceIterator(Context context, final Generic origin, final int metaLevel, final int pos) {
-		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) ? this.<T> compositesIterator(context) : this.<T> compositesIterator(context,
-				pos))) {
+		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? this.<T> compositesIterator(context)
+				: this.<T> compositesIterator(context, pos))) {
 			@Override
 			public boolean isSelected() {
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);

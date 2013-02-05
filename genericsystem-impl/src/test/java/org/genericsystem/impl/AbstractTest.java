@@ -17,8 +17,6 @@ public abstract class AbstractTest {
 					throw new IllegalStateException("Rollback Exception has not any cause", ex);
 				if (!clazz.isAssignableFrom(ex.getCause().getClass()))
 					throw new IllegalStateException("Cause of rollback exception is not of type : " + clazz.getSimpleName(), ex);
-
-				log.info("Caught exception : " + ex.getCause());
 				return;
 			} catch (Exception ex) {
 				if (!clazz.isAssignableFrom(ex.getClass()))
