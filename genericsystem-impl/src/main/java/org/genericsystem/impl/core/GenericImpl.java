@@ -39,7 +39,6 @@ import org.genericsystem.impl.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
-import org.genericsystem.impl.iterator.AbstractPostTreeIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
 import org.genericsystem.impl.iterator.AbstractSelectableLeaf;
 import org.genericsystem.impl.iterator.ArrayIterator;
@@ -1344,16 +1343,34 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	
 	@Override
 	public void induce(final Cache cache) {
-		Iterator<Generic> iterator = new AbstractPostTreeIterator<Generic>(this) {
-			
-			@Override
-			protected Iterator<Generic> children(Generic father) {
-				// if(father.isPseudoStructural())
-				
-				return ((GenericImpl) father).directInheritingsIterator(cache);
+		assert isPseudoStructural();
+		induce(cache, components);
+	}
+	
+	public void induce(final Cache cache, Generic[] components) {
+		boolean isToBind = true;
+		for (int i = 0; i < components.length; i++) {
+			Generic component = components[i];
+			if (component.isStructural()) {
+				isToBind = false;
+				for (Generic generic : ((Type) component).getAllInstances(cache))
+					induce(cache, Statics.replace(i, components, generic));
 			}
-			
-		};
-		
+		}
+		if (!isToBind)
+			return;
+		for (Generic generic : components[0].getComposites(cache))
+			if (Arrays.equals(((GenericImpl) generic).components, components))
+				return;
+		((CacheImpl) cache).bind(getImplicit(), Statics.insertFirstIntoArray(getImplicit(), directSupers), components);
+	}
+	
+	boolean isPseudoStructural() {
+		if (!isConcrete())
+			return false;
+		for (Generic component : components)
+			if (component.isStructural())
+				return true;
+		return false;
 	}
 }
