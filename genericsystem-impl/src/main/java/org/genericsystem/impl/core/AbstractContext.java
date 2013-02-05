@@ -14,6 +14,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.genericsystem.api.annotation.BooleanValue;
+import org.genericsystem.api.annotation.ComponentPosBoolean;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.IntValue;
 import org.genericsystem.api.annotation.StringValue;
@@ -31,8 +32,9 @@ import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
-import org.genericsystem.impl.iterator.AbstractSelectableLeafInheritedIterator;
+import org.genericsystem.impl.iterator.AbstractSelectableLeaf;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
+import org.genericsystem.impl.system.ComponentPosValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +103,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	public abstract boolean isScheduledToRemove(Generic generic);
 
 	Iterator<Generic> getDirectSupersIterator(final Generic[] interfaces, final Generic[] components) {
-		return new AbstractSelectableLeafInheritedIterator(this, getEngine()) {
+		return new AbstractSelectableLeaf(this, getEngine()) {
 
 			@Override
 			protected boolean isSelectable() {
@@ -120,9 +122,9 @@ public abstract class AbstractContext implements Context, Serializable {
 		final Iterator<Generic> iterator = getDirectSupersIterator(interfaces, components);
 		while (iterator.hasNext())
 			list.add(iterator.next());
-		Generic[] result = list.toArray(new Generic[list.size()]);
+		// Generic[] result = list.toArray(new Generic[list.size()]);
 		// assert Arrays.equals(new Primaries(result).toArray(), interfaces) : new Primaries(result) + " <---> " + Arrays.toString(interfaces);
-		return result;
+		return list.toArray(new Generic[list.size()]);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -251,6 +253,9 @@ public abstract class AbstractContext implements Context, Serializable {
 		StringValue stringValue = clazz.getAnnotation(StringValue.class);
 		if (stringValue != null)
 			return stringValue.value();
+		ComponentPosBoolean componentPosBoolean = clazz.getAnnotation(ComponentPosBoolean.class);
+		if (componentPosBoolean != null)
+			return new ComponentPosValue<Boolean>(componentPosBoolean.componentPos(), componentPosBoolean.value());
 		return clazz;
 	}
 

@@ -3,7 +3,6 @@ package org.genericsystem.impl.constraints.simple;
 import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Dependencies;
-import org.genericsystem.api.annotation.Supers;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.PropertyConstraint;
 import org.genericsystem.api.annotation.constraints.SingularConstraint;
@@ -39,8 +38,10 @@ public class AliveConstraintImpl extends AbstractSimpleBooleanConstraint {
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
 	@BooleanValue(true)
-	@Supers(value = { AliveConstraintImpl.class }, implicitSuper = AliveConstraintImpl.class)
-	public static class DefaultValue {
+	// @Supers(value = { AliveConstraintImpl.class }, implicitSuper = AliveConstraintImpl.class)
+	public static class DefaultValue extends AliveConstraintImpl {
+
+		private static final long serialVersionUID = 369915328786791901L;
 	}
 
 }

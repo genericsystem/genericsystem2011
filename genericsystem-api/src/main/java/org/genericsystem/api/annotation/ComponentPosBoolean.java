@@ -5,20 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * 
- * @author Michael Ory
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-public @interface SystemGeneric {
-	int value() default STRUCTURAL;
+public @interface ComponentPosBoolean {
 
-	boolean defaultBehavior() default false;
+	int componentPos() default 0;
 
-	static final int META = 0;
-	static final int STRUCTURAL = 1;
-	static final int CONCRETE = 2;
-	static final int SENSOR = 3;
+	boolean value();
 
 }

@@ -24,25 +24,24 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 public class Archiver {
-	
-	private static final Logger log = LoggerFactory.getLogger(Archiver.class);
+
+	// private static final Logger log = LoggerFactory.getLogger(Archiver.class);
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-	
+
 	private Engine engine;
 	private File directory;
 	private FileOutputStream lockFile;
-	
+
 	public Archiver(Engine engine, String directoryPath) {
 		this.engine = engine;
 		prepareAndLockDirectory(directoryPath);
@@ -52,7 +51,7 @@ public class Archiver {
 		else
 			((EngineImpl) engine).restoreEngine();
 	}
-	
+
 	private void prepareAndLockDirectory(String directoryPath) {
 		if (directoryPath == null)
 			return;
@@ -72,7 +71,7 @@ public class Archiver {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 	private ObjectInputStream getInputStream() {
 		if (lockFile != null) {
 			NavigableMap<Long, File> snapshotsMap = snapshotsMap();
@@ -85,7 +84,7 @@ public class Archiver {
 		}
 		return null;
 	}
-	
+
 	private NavigableMap<Long, File> snapshotsMap() {
 		NavigableMap<Long, File> snapshotsMap = new TreeMap<Long, File>();
 		for (File file : directory.listFiles()) {
@@ -102,30 +101,29 @@ public class Archiver {
 		}
 		return snapshotsMap;
 	}
-	
+
 	private void doSnapshot(Engine engine) {
-		log.info("START SNAPSHOT");
+		// log.info("START SNAPSHOT");
 		long ts = engine.pickNewTs();
-		AbstractContext context = new Transaction(engine);
-		saveSnapshot(context, buildNewTemporarySnapshot(ts));
+		// AbstractContext context = new Transaction(engine);
+		saveSnapshot(new Transaction(engine), buildNewTemporarySnapshot(ts));
 		confirmTemporarySnapshot(ts);
-		log.info("END SNAPSHOT");
+		// log.info("END SNAPSHOT");
 	}
-	
+
 	private static void saveSnapshot(AbstractContext context, OutputStream out) {
 		try {
 			ObjectOutputStream oos = new ObjectOutputStream(out);
 			NavigableSet<Generic> orderGenerics = context.orderDependencies(context.getEngine());
 			for (Generic orderGeneric : orderGenerics)
 				writeGeneric(((GenericImpl) orderGeneric), oos);
-			
 			oos.flush();
 			oos.close();
 		} catch (IOException ioe) {
 			throw new IllegalStateException(ioe);
 		}
 	}
-	
+
 	private static void writeGeneric(GenericImpl generic, ObjectOutputStream out) throws IOException {
 		writeTs(generic, out);
 		if (generic.isEngine())
@@ -135,20 +133,20 @@ public class Archiver {
 		writeAncestors(generic.getSupers(), out);
 		writeAncestors(generic.getComponents(), out);
 	}
-	
+
 	private static void writeTs(Generic generic, ObjectOutputStream out) throws IOException {
 		out.writeLong(((GenericImpl) generic).getDesignTs());
 		out.writeLong(((GenericImpl) generic).getBirthTs());
 		out.writeLong(((GenericImpl) generic).getLastReadTs());
 		out.writeLong(((GenericImpl) generic).getDeathTs());
 	}
-	
+
 	private static void writeAncestors(Snapshot<Generic> dependencies, ObjectOutputStream out) throws IOException {
 		out.writeInt(dependencies.size());
 		for (Generic dependency : dependencies)
 			out.writeLong(((GenericImpl) dependency).getDesignTs());
 	}
-	
+
 	private OutputStream buildNewTemporarySnapshot(long ts) {
 		try {
 			return new SnapshotZipOutputStream(directory.getAbsolutePath(), Statics.getFilename(ts));
@@ -156,13 +154,13 @@ public class Archiver {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 	private void confirmTemporarySnapshot(long ts) {
 		String filename = directory.getAbsolutePath() + File.separator + Statics.getFilename(ts);
 		new File(filename + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(filename + Statics.ZIP_EXTENSION));
 		manageOldSnapshots();
 	}
-	
+
 	private void manageOldSnapshots() {
 		NavigableMap<Long, File> snapshotsMap = snapshotsMap();
 		long lastTs = snapshotsMap.lastKey();
@@ -175,20 +173,20 @@ public class Archiver {
 				else
 					ts = snapshotTs;
 	}
-	
+
 	private static long minInterval(long periodNumber) {
 		return (long) Math.floor(periodNumber / Statics.ARCHIVER_COEFF);
 	}
-	
+
 	private static void removeSnapshot(NavigableMap<Long, File> snapshotsMap, long ts) {
 		snapshotsMap.get(ts).delete();
 		snapshotsMap.remove(ts);
 	}
-	
+
 	private static long getTimestamp(final String filename) throws ParseException {
 		return Long.parseLong(filename.substring(filename.lastIndexOf("---") + 3));
 	}
-	
+
 	public void close() {
 		if (lockFile != null)
 			try {
@@ -200,11 +198,11 @@ public class Archiver {
 				throw new IllegalStateException(e);
 			}
 	}
-	
+
 	public void startScheduler() {
 		if (lockFile != null)
 			if (Statics.SNAPSHOTS_PERIOD > 0L) {
-				log.info("STARTS SCHEDULER : " + Statics.SNAPSHOTS_PERIOD);
+				// log.info("STARTS SCHEDULER : " + Statics.SNAPSHOTS_PERIOD);
 				scheduler.scheduleAtFixedRate(new Runnable() {
 					@Override
 					public void run() {
@@ -213,33 +211,34 @@ public class Archiver {
 				}, Statics.SESSION_TIMEOUT, Statics.SNAPSHOTS_PERIOD, TimeUnit.MILLISECONDS);
 			}
 	}
-	
+
 	private class SnapshotLoader extends HashMap<Long, Generic> {
 		private static final long serialVersionUID = 3139276947667714316L;
-		
+
 		private ObjectInputStream inputstream;
-		
+
 		private SnapshotLoader(ObjectInputStream inputStream) {
 			inputstream = inputStream;
 		}
-		
+
 		private void loadSnapshot() {
 			try {
 				loadEngine();
 				for (;;)
 					loadGeneric();
-			} catch (EOFException ignore) {} catch (Exception e) {
+			} catch (EOFException ignore) {
+			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
-		
+
 		private Engine loadEngine() throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(inputstream);
 			((EngineImpl) engine).restoreEngine(ts[0], ts[1], ts[2], ts[3]);
 			put(ts[0], engine);
 			return engine;
 		}
-		
+
 		private void loadGeneric() throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(inputstream);
 			int metaLevel = inputstream.readInt();
@@ -248,7 +247,7 @@ public class Archiver {
 			Generic[] components = loadAncestors(inputstream);
 			put(ts[0], new GenericImpl().restore(value, metaLevel, ts[0], ts[1], ts[2], ts[3], supers, components).plug());
 		}
-		
+
 		private Generic[] loadAncestors(ObjectInputStream in) throws IOException {
 			int length = in.readInt();
 			Generic[] ancestors = new Generic[length];
@@ -256,7 +255,7 @@ public class Archiver {
 				ancestors[index] = get(in.readLong());
 			return ancestors;
 		}
-		
+
 		private long[] loadTs(ObjectInputStream in) throws IOException {
 			long[] ts = new long[4];
 			ts[0] = in.readLong(); // designTs
@@ -265,13 +264,13 @@ public class Archiver {
 			ts[3] = in.readLong(); // deathTs
 			return ts;
 		}
-		
+
 	}
-	
+
 	private static class SnapshotZipOutputStream extends OutputStream {
-		
+
 		private ZipOutputStream zipOutputStream;
-		
+
 		private SnapshotZipOutputStream(String directoryPath, String fileName) throws FileNotFoundException {
 			zipOutputStream = new ZipOutputStream(new FileOutputStream(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));
 			ZipEntry zipEntry = new ZipEntry(fileName + Statics.SNAPSHOT_EXTENSION);
@@ -281,28 +280,28 @@ public class Archiver {
 				throw new IllegalStateException(e);
 			}
 		}
-		
+
 		@Override
 		public void write(int b) throws IOException {
 			zipOutputStream.write(b);
 		}
-		
+
 		@Override
 		public void flush() throws IOException {
 			zipOutputStream.flush();
 		}
-		
+
 		@Override
 		public void close() throws IOException {
 			zipOutputStream.close();
 		}
-		
+
 	}
-	
+
 	private static class SnapshotZipInputStream extends InputStream {
-		
+
 		private ZipInputStream zipInputStream;
-		
+
 		private SnapshotZipInputStream(String directoryPath, String fileName) throws FileNotFoundException {
 			zipInputStream = new ZipInputStream(new FileInputStream(new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION)));
 			try {
@@ -311,12 +310,12 @@ public class Archiver {
 				throw new IllegalStateException(e);
 			}
 		}
-		
+
 		@Override
 		public int read() throws IOException {
 			return zipInputStream.read();
 		}
-		
+
 		@Override
 		public void close() throws IOException {
 			zipInputStream.close();

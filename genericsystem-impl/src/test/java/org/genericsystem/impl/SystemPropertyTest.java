@@ -137,7 +137,9 @@ public class SystemPropertyTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Relation humanOwnVehicle = human.addRelation(cache, "ownership", vehicle);
 		humanOwnVehicle.enableCascadeRemove(cache, 0);
+		assert humanOwnVehicle.isCascadeRemove(cache, 0);
 		humanOwnVehicle.enableCascadeRemove(cache, 1);
+		assert humanOwnVehicle.isCascadeRemove(cache, 0);
 		humanOwnVehicle.disableCascadeRemove(cache, 1);
 		assert humanOwnVehicle.isCascadeRemove(cache, 0);
 		assert !humanOwnVehicle.isCascadeRemove(cache, 1);

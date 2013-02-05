@@ -94,7 +94,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bindPrimaryByValue(Generic primaryAncestor, Serializable value, int metaLevel) {
 		T implicit = findPrimaryByValue(primaryAncestor, value, metaLevel);
-		return implicit != null ? implicit : this.<T> insert(new GenericImpl().initialize(value, metaLevel, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY));
+		return implicit != null ? implicit : this.<T> insert(new GenericImpl().initializePrimary(value, metaLevel, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY));
 	}
 
 	@Override
@@ -248,22 +248,23 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return (T) updated;
 	}
 
-	private Generic replace(Generic genericToReplace, Generic oldPrimary, GenericImpl newPrimary) {
+	private Generic replace(Generic genericToReplace, Generic oldImplicit, GenericImpl newImplicit) {
+
 		if (((GenericImpl) genericToReplace).isPrimary())
 			return bindPrimaryByValue(((GenericImpl) genericToReplace).directSupers[0], genericToReplace.getValue(), genericToReplace.getMetaLevel());
 
 		Generic[] interfaces = ((GenericImpl) genericToReplace).getPrimariesArray();
 		Generic[] resultInterfaces = new Generic[interfaces.length];
 		for (int i = 0; i < interfaces.length; i++)
-			resultInterfaces[i] = ((GenericImpl) interfaces[i]).isPrimary() ? getNewPrimary(interfaces[i], oldPrimary, newPrimary) : replace(interfaces[i], oldPrimary, newPrimary);
+			resultInterfaces[i] = ((GenericImpl) interfaces[i]).isPrimary() ? getNewPrimary(interfaces[i], oldImplicit, newImplicit) : replace(interfaces[i], oldImplicit, newImplicit);
 		Generic[] components = ((GenericImpl) genericToReplace).components;
 		Generic[] resultComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++)
 			if (genericToReplace.equals(components[i]))
 				resultComponents[i] = null;
 			else
-				resultComponents[i] = ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldPrimary, newPrimary) : replace(components[i], oldPrimary, newPrimary);
-		return bind(newPrimary.getValue(), newPrimary.getMetaLevel(), resultInterfaces, resultComponents);
+				resultComponents[i] = ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldImplicit, newImplicit) : replace(components[i], oldImplicit, newImplicit);
+		return internalBind(newImplicit, resultInterfaces, resultComponents);
 	}
 
 	private Generic getNewPrimary(Generic oldSubPrimary, Generic oldPrimary, Generic newPrimary) {
@@ -298,7 +299,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
 		// TODO KK
 		// return bind(getEngine(), getEngine(), value, SystemGeneric.STRUCTURAL, superTypes, components);
-		return bind(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes, components);
+		// return bind(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes, components);
+		return bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL), superTypes, components);
 	}
 
 	@Override
@@ -306,12 +308,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return newTree(value, 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
 		// TODO KK
 		// return (T) this.<T> bind(getEngine(), getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).disableInheritance(this);
-		return (T) this.<T> bind(getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).disableInheritance(this);
+		// return (T) this.<T> bind(getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).disableInheritance(this);
+		return this.<T> bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL), Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).<T> disableInheritance(this);
 	}
 
 	@Override
@@ -340,25 +342,30 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (int i = 0; i < primariesArray.length; i++)
 			boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
 		Generic[] extendedComponents = ((GenericImpl) generic).getExtendedComponentsArray();
-		Generic[] extendedBoundComponents = new Generic[((GenericImpl) generic).components.length];
 		for (int i = 0; i < extendedComponents.length; i++)
-			extendedBoundComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
-		Generic[] directSupers = getDirectSupers(boundPrimaries, extendedBoundComponents);
-		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(boundPrimaries, extendedBoundComponents))
+			extendedComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
+		Generic[] directSupers = getDirectSupers(boundPrimaries, extendedComponents);
+		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(boundPrimaries, extendedComponents))
 			return (T) directSupers[0];
 		return null;
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
-		return bind(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), findSupers(clazz), findComponents(clazz));
+		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz)), findSupers(clazz), findComponents(clazz));
 	}
 
-	public <T extends Generic> T bind(Generic implicitSuper, Serializable value, int metaLevel, Generic[] supers, Generic[] components) {
-		return bind(value, metaLevel, Statics.insertFirstIntoArray(bindPrimaryByValue(implicitSuper, value, metaLevel), supers), components);
+	//
+	// public <T extends Generic> T bind(Generic implicitSuper, Serializable value, int metaLevel, Generic[] supers, Generic[] components) {
+	// Generic implicit = bindPrimaryByValue(implicitSuper, value, metaLevel);
+	// return internalBind(implicit, Statics.insertFirstIntoArray(implicit, supers), components);
+	// }
+
+	public <T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components) {
+		return internalBind(implicit, Statics.insertFirstIntoArray(implicit, supers), components);
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T bind(Serializable value, int metaLevel, Generic[] supers, Generic[] components) {
+	<T extends Generic> T internalBind(Generic implicit, Generic[] supers, Generic[] components) {
 		final Generic[] interfaces = new Primaries(supers).toArray();
 		final Generic[] extendedComponents = new ExtendedComponents(components).addSupers(supers).toArray();
 
@@ -375,7 +382,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : orderedDependencies.descendingSet())
 			remove(generic);
 
-		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(value, metaLevel, directSupers, components);
+		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex(implicit, directSupers, components);
+
 		T superGeneric = this.<T> insert(newGeneric);
 		new ConnectionMap().reBuild(orderedDependencies);
 		assert superGeneric == find(directSupers, components);
@@ -408,7 +416,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).getExtendedComponentsArray());
 				Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).directSupers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
 				adjust(((GenericImpl) orderedDependency).directSupers[0]);
-				Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initialize(((GenericImpl) orderedDependency).value, ((GenericImpl) orderedDependency).metaLevel, directSupers, newComponents));
+				Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex((orderedDependency), directSupers, newComponents));
 				put(orderedDependency, bind);
 			}
 		}

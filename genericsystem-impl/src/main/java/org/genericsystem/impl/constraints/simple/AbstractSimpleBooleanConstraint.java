@@ -25,6 +25,7 @@ public abstract class AbstractSimpleBooleanConstraint extends Constraint {
 			check(context, modified, constraintValueNode);
 	}
 
+	// TODO KK
 	private void check(Context context, Generic modified, Value constraintValueNode) throws ConstraintViolationException {
 		if (!(constraintValueNode.getValue() instanceof Boolean))
 			throw new ConstraintViolationException("The constraint " + getClass() + " must be a boolean constraint, the value is " + constraintValueNode.getValue());

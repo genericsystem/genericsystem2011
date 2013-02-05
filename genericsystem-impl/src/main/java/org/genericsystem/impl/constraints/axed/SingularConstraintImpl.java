@@ -13,10 +13,11 @@ import org.genericsystem.api.exception.SingularConstraintViolationException;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.impl.core.GenericImpl;
+import org.genericsystem.impl.system.ComponentPosValue;
 
 @SystemGeneric
 @Components(Engine.class)
-@InstanceClassConstraint(Integer.class)
+@InstanceClassConstraint(ComponentPosValue.class)
 public class SingularConstraintImpl extends AbstractAxedIntegerConstraint {
 
 	private static final long serialVersionUID = 8068202813624343936L;
