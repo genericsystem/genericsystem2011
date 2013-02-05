@@ -20,7 +20,7 @@ public class InstanceClassConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
-		for (Value constraintValueNode : getConstraintInstances(context, modified.getMeta(), InstanceClassConstraintImpl.class))
+		for (Value constraintValueNode : getConstraintValues(context, modified.getMeta(), InstanceClassConstraintImpl.class))
 			if (SystemGeneric.CONCRETE == modified.getMetaLevel() && ((GenericImpl) modified.getMeta()).getSystemPropertyValue(context, InstanceClassConstraintImpl.class) != null) {
 				Class<?> clazz = constraintValueNode.getValue();
 				if (modified.getValue() != null && !clazz.isAssignableFrom(modified.getValue().getClass()))

@@ -18,7 +18,6 @@ public class AliveConstraintTest extends AbstractTest {
 		final Relation humanDriveCar = human.addRelation(cache, "Drive", car);
 		final Generic myCar = car.newInstance(cache, "myCar");
 		final Generic myHuman = human.newInstance(cache, "myHuman");
-		myHuman.log();
 		myHuman.remove(cache);
 		assert !myHuman.isAlive(cache);
 

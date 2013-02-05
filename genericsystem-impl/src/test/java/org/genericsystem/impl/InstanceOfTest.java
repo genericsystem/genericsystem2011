@@ -106,8 +106,6 @@ public class InstanceOfTest extends AbstractTest {
 
 		Type canid = cache.newSubType("Canid", animal, mammal);
 		Generic milou = canid.newInstance(cache, "Milou");
-		human.log();
-		michael.log();
 		assert michael.isInstanceOf(human);
 		assert !michael.isInstanceOf(canid);
 		assert michael.isInstanceOf(animal);

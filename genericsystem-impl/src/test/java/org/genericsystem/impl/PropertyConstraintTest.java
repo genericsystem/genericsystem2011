@@ -246,7 +246,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		// carOutsideColor.enableSingularConstraint(cache, Statics.BASE_POSITION);
 		myBmw.setLink(cache, carOutsideColor, "20%", red);
 		myBmw.setLink(cache, carOutsideColor, "40%", red);
-		myBmw.getLink(cache, carOutsideColor, red).log();
+		myBmw.getLink(cache, carOutsideColor, red);
 	}
 
 }

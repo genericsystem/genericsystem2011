@@ -11,8 +11,6 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.impl.core.GenericImpl;
-import org.genericsystem.impl.core.GenericImpl.ExtendedComponents;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
@@ -30,11 +28,7 @@ public class RelationTest extends AbstractTest {
 		Link carRed = car.bind(cache, carColor, red);
 		assert carRed.inheritsFrom(carColor);
 		Link myBmwYellow = myBmw.bind(cache, carRed, yellow);
-		myBmwYellow.log();
 		assert myBmwYellow.inheritsFrom(carRed);
-
-		log.info("zzzzzzzz" + Arrays.toString(new ExtendedComponents(new Generic[] { myBmw, yellow }).addSupers(carRed).toArray()));
-		log.info("yyyyyyyy" + Arrays.toString(((GenericImpl) myBmwYellow).components));
 	}
 
 	public void testToOneOverride() {
@@ -1240,7 +1234,7 @@ public class RelationTest extends AbstractTest {
 		assert human.getRelations(cache).size() == 1;
 		assert human.getRelations(cache).contains(possessVehicle);
 		assert human.getRelation(cache, "HumanPossessVehicle").equals(possessVehicle);
-		assert vehicle.getRelation(cache, "HumanPossessVehicle") == null;
+		assert vehicle.getRelation(cache, "HumanPossessVehicle").equals(possessVehicle);
 	}
 
 	public void testBidirectionalRelation() {
