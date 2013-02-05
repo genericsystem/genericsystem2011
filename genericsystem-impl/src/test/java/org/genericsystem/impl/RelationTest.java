@@ -28,6 +28,7 @@ public class RelationTest extends AbstractTest {
 		Link carRed = car.bind(cache, carColor, red);
 		assert carRed.inheritsFrom(carColor);
 		Link myBmwYellow = myBmw.bind(cache, carRed, yellow);
+		myBmwYellow.log();
 		assert myBmwYellow.inheritsFrom(carRed);
 	}
 

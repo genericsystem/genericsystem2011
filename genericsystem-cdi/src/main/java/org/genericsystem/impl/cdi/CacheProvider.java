@@ -20,7 +20,7 @@ public class CacheProvider implements Serializable {
 	
 	private Cache cache;
 	@Inject
-	private Engine engine;
+	private transient Engine engine;
 	
 	@PostConstruct
 	public void init() {

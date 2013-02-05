@@ -41,7 +41,7 @@ import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
-import org.genericsystem.impl.iterator.AbstractSelectableLeaf;
+import org.genericsystem.impl.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.impl.iterator.ArrayIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
 import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
@@ -60,7 +60,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	private LifeManager lifeManager;
 
 	Generic[] directSupers;
-
+	
 	// TODO remove components
 	public Generic[] components;
 
@@ -432,7 +432,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	public <T extends Generic> Iterator<T> inheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
-		return (Iterator<T>) new AbstractSelectableLeaf(context, origin) {
+		return (Iterator<T>) new AbstractSelectableLeafIterator(context, origin) {
+
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
 				return candidate.getMetaLevel() <= metaLevel;
@@ -441,15 +442,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			@Override
 			public boolean isSelectable() {
 				return (next.getMetaLevel() == metaLevel)
-						&& (((GenericImpl) next).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? next.isAttributeOf(GenericImpl.this) : next
-								.isAttributeOf(GenericImpl.this, pos));
+						&& (((GenericImpl) next).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL? next.isAttributeOf(GenericImpl.this) : next.isAttributeOf(GenericImpl.this, pos));
 			}
 		};
 	}
 
 	public <T extends Generic> Iterator<T> noInheritanceIterator(Context context, final Generic origin, final int metaLevel, final int pos) {
-		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? this.<T> compositesIterator(context)
-				: this.<T> compositesIterator(context, pos))) {
+		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL? this.<T> compositesIterator(context) : this.<T> compositesIterator(context,
+				pos))) {
 			@Override
 			public boolean isSelected() {
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
@@ -458,7 +458,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	boolean safeIsEnabled(Context context, Attribute attribute) {
-		Iterator<Generic> iterator = new AbstractSelectableLeaf(context, attribute) {
+		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(context, attribute) {
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
 				return (candidate.getMetaLevel() <= SystemGeneric.CONCRETE) && candidate.isAttributeOf(GenericImpl.this);
@@ -580,8 +580,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents, boolean override) {
-		if (interfaces.length > subInterfaces.length || components.length > subComponents.length)
-			return false;
 		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
 			for (int i = 0; i < subInterfaces.length; i++) {
 				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i], override))
@@ -872,7 +870,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return (Iterator<T>) new AbstractSelectableLeaf(context, GenericImpl.this) {
+				return (Iterator<T>) new AbstractSelectableLeafIterator(context, GenericImpl.this) {
 					@Override
 					protected boolean isSelected(Generic father, Generic candidate) {
 						return candidate.isInstanceOf(GenericImpl.this);
@@ -1351,7 +1349,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		assert isPseudoStructural();
 		induce(cache, components);
 	}
-	
+
 	public void induce(final Cache cache, Generic[] components) {
 		boolean isToBind = true;
 		for (int i = 0; i < components.length; i++) {
@@ -1369,7 +1367,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return;
 		((CacheImpl) cache).bind(getImplicit(), Statics.insertFirstIntoArray(getImplicit(), directSupers), components);
 	}
-	
+
 	boolean isPseudoStructural() {
 		if (!isConcrete())
 			return false;
