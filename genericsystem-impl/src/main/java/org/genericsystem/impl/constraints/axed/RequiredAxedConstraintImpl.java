@@ -5,7 +5,6 @@ import java.util.Iterator;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
-import org.genericsystem.api.annotation.constraints.PropertyConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
@@ -19,7 +18,6 @@ import org.genericsystem.impl.system.ComponentPosValue;
 
 @SystemGeneric
 @Components(Engine.class)
-@PropertyConstraint
 @InstanceClassConstraint(ComponentPosValue.class)
 public class RequiredAxedConstraintImpl extends Constraint {
 
@@ -36,16 +34,12 @@ public class RequiredAxedConstraintImpl extends Constraint {
 
 	private void checkRequiredRelation(Generic modified, Relation requiredRelation, Context context) throws ConstraintViolationException {
 		for (Value constraintValueNode : getConstraintInstances(context, requiredRelation, RequiredAxedConstraintImpl.class)) {
-			// TODO KK
-			// if (!(constraintValueNode.getValue() instanceof Integer))
-			// throw new ConstraintViolationException("The constraint " + RequiredAxedConstraintImpl.class + " must be axed");
 			if (constraintValueNode.<ComponentPosValue<Boolean>> getValue().getValue()) {
 				Integer componentPos = constraintValueNode.<ComponentPosValue<Boolean>> getValue().getComponentPos();
-				// if (componentPos == null)
-				// throw new ConstraintViolationException("The constraint " + RequiredAxedConstraintImpl.class + " must have a not null value");
-				Generic component = requiredRelation.getComponent(componentPos);
-				if (!((Type) component).getAllInstances(context).isEmpty() && component.getLinks(context, requiredRelation, componentPos).size() < 1)
-					throw new RequiredConstraintViolationException(requiredRelation.getValue() + " is required for new " + modified.getMeta() + " " + modified);
+				for (Generic component : requiredRelation.<Type> getComponent(componentPos).getAllInstances(context)) {
+					if (!((Type) component).getAllInstances(context).isEmpty() && component.getLinks(context, requiredRelation, componentPos).size() < 1)
+						throw new RequiredConstraintViolationException(requiredRelation.getValue() + " is required for new " + modified.getMeta() + " " + modified);
+				}
 			}
 		}
 	}

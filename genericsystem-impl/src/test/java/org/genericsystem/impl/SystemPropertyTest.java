@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
+import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
@@ -18,7 +19,7 @@ public class SystemPropertyTest extends AbstractTest {
 
 	public void multiDirectionalIsProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		assert cache.<Type> find(MultiDirectionalSystemProperty.class).isPropertyConstraintEnabled(cache);
+		assert cache.<Type> find(MultiDirectionalSystemProperty.class).isSingularConstraintEnabled(cache);
 	}
 
 	public void relationMultiDirectionalTest() {
@@ -111,6 +112,7 @@ public class SystemPropertyTest extends AbstractTest {
 		assert humanOwnVehicle.isSystemPropertyEnabled(cache, MultiDirectionalSystemProperty.class);
 		assert humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class, 0);
 		humanOwnVehicle.disableMultiDirectional(cache);
+		assert cache.<Attribute> find(MultiDirectionalSystemProperty.class).isSingularConstraintEnabled(cache);
 		assert !humanOwnVehicle.isSystemPropertyEnabled(cache, MultiDirectionalSystemProperty.class);
 		assert humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class, 0);
 		humanOwnVehicle.disableCascadeRemove(cache, 0);
