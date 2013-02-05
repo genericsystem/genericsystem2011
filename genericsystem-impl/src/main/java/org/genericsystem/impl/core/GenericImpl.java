@@ -30,7 +30,6 @@ import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.impl.constraints.RequiredConstraintImpl;
 import org.genericsystem.impl.constraints.VirtualConstraintImpl;
 import org.genericsystem.impl.constraints.axed.RequiredAxedConstraintImpl;
 import org.genericsystem.impl.constraints.axed.SingularConstraintImpl;
@@ -41,7 +40,7 @@ import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
-import org.genericsystem.impl.iterator.AbstractSelectableLeafInheritedIterator;
+import org.genericsystem.impl.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.impl.iterator.ArrayIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
 import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
@@ -440,7 +439,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	public <T extends Generic> Iterator<T> inheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
-		return (Iterator<T>) new AbstractSelectableLeafInheritedIterator(context, origin) {
+		return (Iterator<T>) new AbstractSelectableLeafIterator(context, origin) {
 			
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
@@ -466,7 +465,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 	
 	boolean safeIsEnabled(Context context, Attribute attribute) {
-		Iterator<Generic> iterator = new AbstractSelectableLeafInheritedIterator(context, attribute) {
+		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(context, attribute) {
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
 				return (candidate.getMetaLevel() <= SystemGeneric.CONCRETE) && candidate.isAttributeOf(GenericImpl.this);
@@ -963,7 +962,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return (Iterator<T>) new AbstractSelectableLeafInheritedIterator(context, GenericImpl.this) {
+				return (Iterator<T>) new AbstractSelectableLeafIterator(context, GenericImpl.this) {
 					@Override
 					protected boolean isSelected(Generic father, Generic candidate) {
 						return candidate.isInstanceOf(GenericImpl.this);
