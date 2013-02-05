@@ -433,7 +433,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	public <T extends Generic> Iterator<T> inheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeaf(context, origin) {
-
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
 				return candidate.getMetaLevel() <= metaLevel;
