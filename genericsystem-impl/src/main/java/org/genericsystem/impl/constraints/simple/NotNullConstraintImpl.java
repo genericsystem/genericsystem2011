@@ -25,7 +25,7 @@ public class NotNullConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (modified.isSystemPropertyEnabled(context, getClass()) && modified.getValue() == null)
+		if (modified.getValue() == null)
 			throw new NotNullConstraintViolationException("Value should not be null for : " + ((Value) modified).getMeta());
 	}
 

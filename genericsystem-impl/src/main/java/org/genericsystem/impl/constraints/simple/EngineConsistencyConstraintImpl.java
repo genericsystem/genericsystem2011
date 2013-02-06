@@ -24,7 +24,7 @@ public class EngineConsistencyConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (modified.isSystemPropertyEnabled(context, getClass()) && !modified.getEngine().equals(context.getEngine()))
+		if (!modified.getEngine().equals(context.getEngine()))
 			throw new EngineConsistencyConstraintViolationException("The Engine of " + modified + " isn't equals at Engine of the Context");
 	}
 

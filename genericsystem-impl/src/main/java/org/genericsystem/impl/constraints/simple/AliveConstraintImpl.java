@@ -25,15 +25,12 @@ public class AliveConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (modified.isSystemPropertyEnabled(context, getClass())) {
-			for (Generic generic : ((GenericImpl) modified).getComponents())
-				if (generic != null && !generic.isAlive(context))
-					throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");
-			for (Generic generic : ((GenericImpl) modified).getSupers())
-				if (!generic.isAlive(context))
-					throw new AliveConstraintViolationException("Super : " + generic + " of added node " + modified + " should be alive.");
-		}
-
+		for (Generic generic : ((GenericImpl) modified).getComponents())
+			if (generic != null && !generic.isAlive(context))
+				throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");
+		for (Generic generic : ((GenericImpl) modified).getSupers())
+			if (!generic.isAlive(context))
+				throw new AliveConstraintViolationException("Super : " + generic + " of added node " + modified + " should be alive.");
 	}
 
 }

@@ -28,9 +28,8 @@ public class OptimisticLockConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (modified.isSystemPropertyEnabled(context, getClass()))
-			if (context instanceof CacheImpl && ((CacheImpl) context).isScheduledToRemove(modified) && (!((CacheImpl) context).getSubContext().isAlive(modified) || ((GenericImpl) modified).getLifeManager().willDie()))
-				throw new OptimisticLockConstraintViolationException("Generic : " + modified + " has already been removed by another thread");
+		if (context instanceof CacheImpl && ((CacheImpl) context).isScheduledToRemove(modified) && (!((CacheImpl) context).getSubContext().isAlive(modified) || ((GenericImpl) modified).getLifeManager().willDie()))
+			throw new OptimisticLockConstraintViolationException("Generic : " + modified + " has already been removed by another thread");
 	}
 
 	@Override

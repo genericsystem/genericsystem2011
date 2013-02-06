@@ -28,13 +28,12 @@ public class SuperRuleConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (modified.isSystemPropertyEnabled(context, getClass()))
-			for (Generic directSuper : modified.getSupers()) {
-				Generic[] interfaces = new Primaries(modified).toArray();
-				Generic[] components = ((GenericImpl) modified).components;
-				if (!GenericImpl.isSuperOf(((GenericImpl) directSuper).getPrimariesArray(), ((GenericImpl) directSuper).components, interfaces, components, true))
-					throw new SuperRuleConstraintViolationException("Interfaces : " + Arrays.toString(interfaces) + " Components : " + Arrays.toString(components) + " should inherits from : " + directSuper);
-			}
+		for (Generic directSuper : modified.getSupers()) {
+			Generic[] interfaces = new Primaries(modified).toArray();
+			Generic[] components = ((GenericImpl) modified).components;
+			if (!GenericImpl.isSuperOf(((GenericImpl) directSuper).getPrimariesArray(), ((GenericImpl) directSuper).components, interfaces, components, true))
+				throw new SuperRuleConstraintViolationException("Interfaces : " + Arrays.toString(interfaces) + " Components : " + Arrays.toString(components) + " should inherits from : " + directSuper);
+		}
 	}
 
 }
