@@ -794,6 +794,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public <T extends Generic> T getMeta() {
 		final int instanciationLevel = getMetaLevel() == 0 ? 0 : getMetaLevel() - 1;
 		return levelFilter(new AbstractPreTreeIterator<T>((T) this) {
+
+			private static final long serialVersionUID = 3838947358131801753L;
+
 			@Override
 			public Iterator<T> children(T node) {
 				return new AbstractFilterIterator<T>(((GenericImpl) node).<T> directSupersIterator()) {
@@ -902,6 +905,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	private <T extends Generic> Iterator<T> allInheritingsAboveIterator(final Context context, final int metaLevel) {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+
+			private static final long serialVersionUID = 7164424160379931253L;
+
 			@Override
 			public Iterator<Generic> children(Generic node) {
 				return new AbstractFilterIterator<Generic>(((GenericImpl) node).directInheritingsIterator(context)) {
@@ -965,6 +971,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	private <T extends Generic> Iterator<T> allInheritingsIterator(final Context context) {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+
+			private static final long serialVersionUID = 4540682035671625893L;
+
 			@Override
 			public Iterator<Generic> children(Generic node) {
 				return (((GenericImpl) node).directInheritingsIterator(context));
@@ -999,6 +1008,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (singularTarget != null)
 			for (int axe : singularTarget.value())
 				enableSingularConstraint(cache, axe);
+	}
+
+	public int getComponentPos(Generic component) {
+		int pos = 0;
+		for (Generic composite : getComponents()) {
+			if (composite.equals(component))
+				return pos;
+			pos++;
+		}
+		return -1;
 	}
 
 	/*********************************************/

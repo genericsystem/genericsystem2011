@@ -11,11 +11,25 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
+import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
 @Test
 public class RelationTest extends AbstractTest {
+
+	public void testReverse() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.addRelation(cache, "carColor", color);
+		assert car.getRelations(cache).contains(carColor);
+		assert color.getRelations(cache).contains(carColor);
+		assert ((GenericImpl) carColor).getComponentPos(color) == 1 : carColor.getComponents();
+		assert ((GenericImpl) carColor).getComponentPos(car) == 0 : carColor.getComponents();
+		assert ((GenericImpl) carColor).getComponentPos(carColor) == -1 : carColor.getComponents();
+		assert ((GenericImpl) car).getComponentPos(carColor) == -1 : car.getComponents();
+	}
 
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
