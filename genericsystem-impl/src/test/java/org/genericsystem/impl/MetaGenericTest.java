@@ -38,9 +38,9 @@ public class MetaGenericTest extends AbstractTest {
 		Attribute metaAttribute = cache.getEngine().getMetaAttribute();
 		Type newType = cache.newType("newType");
 		Type newSubType = newType.newSubType(cache, "newSubType");
-		Attribute newAttribute = newType.addAttribute(cache, "newAttribute");
+		Attribute newAttribute = newType.setAttribute(cache, "newAttribute");
 		assert newAttribute.getMeta().equals(metaAttribute);
-		Attribute newSubAttribute = newSubType.addAttribute(cache, "newAttribute");
+		Attribute newSubAttribute = newSubType.setAttribute(cache, "newAttribute");
 		assert newSubAttribute.getMeta().equals(metaAttribute);
 	}
 
@@ -49,7 +49,7 @@ public class MetaGenericTest extends AbstractTest {
 		Relation metaRelation = cache.getEngine().getMetaRelation();
 		Type newType1 = cache.newType("newType1");
 		Type newType2 = cache.newType("newType2");
-		Relation newRelation = newType1.addRelation(cache, "newType1NewType2", newType2);
+		Relation newRelation = newType1.setRelation(cache, "newType1NewType2", newType2);
 		assert newRelation.getMeta().equals(metaRelation);
 	}
 
@@ -63,7 +63,7 @@ public class MetaGenericTest extends AbstractTest {
 	public void testMetaForValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type newType = cache.newType("newType");
-		Attribute newAttribute = newType.addAttribute(cache, "newAttribute");
+		Attribute newAttribute = newType.setAttribute(cache, "newAttribute");
 		Generic aNewType = newType.newInstance(cache, "aNewType");
 		Value value = aNewType.setValue(cache, newAttribute, "aNewAttribute");
 		assert value.getMeta().equals(newAttribute);
@@ -73,7 +73,7 @@ public class MetaGenericTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type newType1 = cache.newType("newType1");
 		Type newType2 = cache.newType("newType2");
-		Relation newType1NewType2 = newType1.addRelation(cache, "newType1NewType2", newType2);
+		Relation newType1NewType2 = newType1.setRelation(cache, "newType1NewType2", newType2);
 		Generic aNewType1 = newType1.newInstance(cache, "aNewType1");
 		Generic aNewType2 = newType2.newInstance(cache, "aNewType2");
 		Link aNewType1Type2 = aNewType1.setLink(cache, newType1NewType2, "aNewType1NewType2", aNewType2);

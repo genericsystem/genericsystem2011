@@ -75,7 +75,7 @@ public class TypesManager implements Serializable {
 		BMW.addLink(carPilot, "35%", ludo);
 		BMW.addLink(carSize, "456", height);
 		BMW.addLink(carSize, "365", length);
-		Relation carPilotSize = car.addRelation("CarPilotSize", pilot, size);
+		Relation carPilotSize = car.setRelation("CarPilotSize", pilot, size);
 		BMW.addLink(carPilotSize, "2b", vince, height);
 		//
 		//

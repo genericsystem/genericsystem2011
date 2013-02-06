@@ -35,7 +35,7 @@ public class RemoveTest extends AbstractTest {
 	public void testRemoveAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute power = vehicle.addAttribute(cache, "power");
+		Attribute power = vehicle.setAttribute(cache, "power");
 		power.remove(cache);
 		assert !power.isAlive(cache);
 		assert !cache.getEngine().getInheritings(cache).contains(power);
@@ -63,7 +63,7 @@ public class RemoveTest extends AbstractTest {
 	public void testRemoveProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type window = cache.newType("Window");
-		Attribute height = window.addProperty(cache, "Height");
+		Attribute height = window.setProperty(cache, "Height");
 		Generic myWindow = window.newInstance(cache, "MyWindow");
 		Value myHeight1 = ((Attribute) myWindow).setValue(cache, height, 165);
 		myHeight1.remove(cache);

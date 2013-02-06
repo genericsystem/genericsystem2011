@@ -33,7 +33,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.addRelation(cache, "outsideColor", color);
+		Relation carColor = car.setRelation(cache, "outsideColor", color);
 		Generic audi = car.newInstance(cache, "audi");
 		Generic red = color.newInstance(cache, "red");
 		Link audiIsRed = audi.setLink(cache, carColor, "audiRed", red);
@@ -44,7 +44,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.addRelation(cache, "outsideColor", color);
+		Relation carColor = car.setRelation(cache, "outsideColor", color);
 		Generic audi = car.newInstance(cache, "audi");
 		Generic red = color.newInstance(cache, "red");
 		Link audiIsRed = audi.setLink(cache, carColor, "audiRed", red);
@@ -57,7 +57,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Type human = cache.newType("Human");
 		Generic myck = human.newInstance(cache, "myck");
-		Relation possessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
+		Relation possessVehicle = human.setRelation(cache, "HumanPossessVehicle", vehicle);
 		Link myckPossessMyVehicle = myck.setLink(cache, possessVehicle, "myckPossessMyVehicle", myVehicle);
 		assert myckPossessMyVehicle.getTargetComponent().equals(myVehicle);
 	}
@@ -69,7 +69,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Generic myVehicle2 = vehicle.newInstance(cache, "myVehicle2");
 		Type human = cache.newType("Human");
 		Generic myck = human.newInstance(cache, "myck");
-		Relation possessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
+		Relation possessVehicle = human.setRelation(cache, "HumanPossessVehicle", vehicle);
 		Link myckPossessMyVehicle1 = myck.setLink(cache, possessVehicle, "myckPossessMyVehicle1", myVehicle1);
 		Link myckPossessMyVehicle2 = myck.setLink(cache, possessVehicle, "myckPossessMyVehicle2", myVehicle2);
 		assert myckPossessMyVehicle1.getTargetComponent().equals(myVehicle1);
@@ -84,7 +84,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Type human = cache.newType("Human");
 		Generic myck = human.newInstance(cache, "myck");
-		Relation possessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
+		Relation possessVehicle = human.setRelation(cache, "HumanPossessVehicle", vehicle);
 		Link myckPossessMyVehicle = myck.setLink(cache, possessVehicle, "myckPossessMyVehicle", myVehicle);
 		assert myck.getLinks(cache, possessVehicle).size() == 1;
 		assert myck.getLinks(cache, possessVehicle).contains(myckPossessMyVehicle);
@@ -97,7 +97,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Type human = cache.newType("Human");
 		Generic myck = human.newInstance(cache, "myck");
-		Relation possessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
+		Relation possessVehicle = human.setRelation(cache, "HumanPossessVehicle", vehicle);
 		assert !possessVehicle.isMultiDirectional(cache);
 		possessVehicle.enableMultiDirectional(cache);
 		assert possessVehicle.isMultiDirectional(cache);
@@ -117,7 +117,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Type human = cache.newType("Human");
 		Generic myck = human.newInstance(cache, "myck");
 		Generic quentin = human.newInstance(cache, "quentin");
-		Relation brother = human.addRelation(cache, "brother", human);
+		Relation brother = human.setRelation(cache, "brother", human);
 		brother.enableMultiDirectional(cache);
 		Link myBrother = myck.setLink(cache, brother, "myBrother", quentin);
 		assert myck.getLinks(cache, brother).size() == 1;
@@ -131,7 +131,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Type human = cache.newType("Human");
 		Generic myck = human.newInstance(cache, "myck");
 		Generic quentin = human.newInstance(cache, "quentin");
-		Relation littleBrother = human.addRelation(cache, "littleBrother", human);
+		Relation littleBrother = human.setRelation(cache, "littleBrother", human);
 		Link myBrother = myck.setLink(cache, littleBrother, "myLittleBrother", quentin);
 		assert myck.getLinks(cache, littleBrother).size() == 1;
 		assert myck.getLinks(cache, littleBrother).contains(myBrother);
@@ -145,7 +145,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Type pilot = cache.newType("Pilot");
 		Generic myck = pilot.newInstance(cache, "Pilot");
 
-		Relation carPilot = car.addRelation(cache, "CarPilot", pilot);
+		Relation carPilot = car.setRelation(cache, "CarPilot", pilot);
 		Link linkCarPilot = (Link) carPilot.newInstance(cache, "35%", myBMW, myck);
 		assert myBMW.getLinks(cache, carPilot).size() == 1;
 		assert myBMW.getLinks(cache, carPilot).contains(linkCarPilot);
@@ -160,7 +160,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Type element = cache.newType("Element");
 		Generic door = element.newInstance(cache, "Door");
 
-		Relation carElementColor = car.addRelation(cache, "CarElementColor", element, color);
+		Relation carElementColor = car.setRelation(cache, "CarElementColor", element, color);
 		Link myMBWBlueDoor = carElementColor.newInstance(cache, "droite", myBMW, door, blue);
 		assert myBMW.getLinks(cache, carElementColor).size() == 1;
 		assert myBMW.getLinks(cache, carElementColor).contains(myMBWBlueDoor);

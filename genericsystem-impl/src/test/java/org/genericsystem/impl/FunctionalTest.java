@@ -16,7 +16,7 @@ public class FunctionalTest extends AbstractTest {
 	public void getCarInstancesWithPowerHigherThan90HP() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		final Attribute carPower = car.addProperty(cache, "Power");
+		final Attribute carPower = car.setProperty(cache, "Power");
 		Generic myCar = car.newInstance(cache, "myCar");
 		myCar.setValue(cache, carPower, 233);
 		Generic yourCar = car.newInstance(cache, "yourCar");

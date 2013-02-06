@@ -17,7 +17,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog, road);
+		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		road.newInstance(cache, "myRoad");
@@ -36,7 +36,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog, road);
+		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		road.newInstance(cache, "myRoad");
@@ -55,7 +55,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog, road);
+		Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
 		Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		Generic yourDog = dog.newInstance(cache, "yourDog");
 		Generic myRoad = road.newInstance(cache, "myRoad");
@@ -66,7 +66,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
-		final Attribute runs = vehicle.addAttribute(cache, "Runs");
+		final Attribute runs = vehicle.setAttribute(cache, "Runs");
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		

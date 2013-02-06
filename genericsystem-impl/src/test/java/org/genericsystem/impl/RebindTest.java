@@ -18,8 +18,8 @@ public class RebindTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
-		Attribute carPower = car.addAttribute(cache, "Power");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
+		Attribute carPower = car.setAttribute(cache, "Power");
+		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
 		assert !carPower.isAlive(cache);
 
 		assert ((GenericImpl) carPower).reFind(cache).inheritsFrom(vehiclePower);
@@ -30,14 +30,14 @@ public class RebindTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
-		Attribute carPower = car.addAttribute(cache, "Power");
-		Attribute carPowerUnit = carPower.addAttribute(cache, "Unit");
+		Attribute carPower = car.setAttribute(cache, "Power");
+		Attribute carPowerUnit = carPower.setAttribute(cache, "Unit");
 		Generic myCar = car.newInstance(cache, "Audi");
 		Value vPower = myCar.setValue(cache, carPower, "200");
 		Value vUnit = vPower.setValue(cache, carPowerUnit, "HorsePower");
 		assert vPower.getValueHolders(cache, carPowerUnit).contains(vUnit);
 		assert myCar.getValueHolders(cache, carPower).contains(vPower);
-		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
+		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
 		assert ((CacheImpl) cache).reFind(carPower).inheritsFrom(vehiclePower);
 	}
 
@@ -51,11 +51,11 @@ public class RebindTest extends AbstractTest {
 		Type primeColor = color.newSubType(cache, "primeColor");
 		Generic gray = color.newInstance(cache, "gray");
 		Generic yellow = primeColor.newInstance(cache, "yellow");
-		Relation preciousMetalPrimeColor = preciousMetal.addRelation(cache, "metalColor", primeColor);
+		Relation preciousMetalPrimeColor = preciousMetal.setRelation(cache, "metalColor", primeColor);
 		iron.bind(cache, preciousMetalPrimeColor, yellow);
 		iron.setLink(cache, preciousMetalPrimeColor, "almost", yellow);
 		assert zink.inheritsFrom(metal);
-		Relation metalColor = metal.addRelation(cache, "metalColor", color);
+		Relation metalColor = metal.setRelation(cache, "metalColor", color);
 		zink.bind(cache, metalColor, gray);
 		assert metalColor.isAlive(cache);
 	}
@@ -66,7 +66,7 @@ public class RebindTest extends AbstractTest {
 		Type primeColor = color.newSubType(cache, "primeColor");
 
 		Generic red = primeColor.newInstance(cache, "red");
-		Attribute lightness = primeColor.addAttribute(cache, "lightness");
+		Attribute lightness = primeColor.setAttribute(cache, "lightness");
 		Value lightnessValue = red.setValue(cache, lightness, "40");
 		Generic reboundLightness = ((GenericImpl) lightness).reBind(cache);
 		assert !lightness.isAlive(cache);
@@ -82,7 +82,7 @@ public class RebindTest extends AbstractTest {
 		Type color = cache.newType("color");
 		Type primeColor = color.newSubType(cache, "primeColor");
 		Generic red = primeColor.newInstance(cache, "red");
-		Attribute lightness = primeColor.addAttribute(cache, "lightness");
+		Attribute lightness = primeColor.setAttribute(cache, "lightness");
 		red.setValue(cache, lightness, "40");
 		Generic reboundColor = ((GenericImpl) color).reBind(cache);
 		assert !color.isAlive(cache);
@@ -95,7 +95,7 @@ public class RebindTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Generic myFourHorsesCar = car.newInstance(cache, "myFourHorsesCar");
-		Attribute power = car.addAttribute(cache, "Power");
+		Attribute power = car.setAttribute(cache, "Power");
 		power.newInstance(cache, "fourHorses", myFourHorsesCar);
 		Generic yourFourHorsesCar = car.newInstance(cache, "yourFourHorsesCar");
 		yourFourHorsesCar.setValue(cache, power, "tenHorses");

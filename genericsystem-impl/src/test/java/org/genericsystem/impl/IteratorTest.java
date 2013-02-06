@@ -85,7 +85,7 @@ public class IteratorTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type human = cache.newType("Human");
-		Relation humanDriveCar = human.addRelation(cache, "drive", car);
+		Relation humanDriveCar = human.setRelation(cache, "drive", car);
 		Generic audi = car.newInstance(cache, "audi");
 		Generic myck = human.newInstance(cache, "myck");
 		Link link = myck.setLink(cache, humanDriveCar, "myckAudi", audi);

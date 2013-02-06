@@ -37,7 +37,7 @@ public class AppliWebTest extends AbstractTest {
 	
 	public void testAttributeDependency() {
 		Type vehicle1 = expressions.evaluateMethodExpression("#{cache.newType('Vehicle')}", Type.class);
-		Attribute vehiclePower = vehicle1.addAttribute(cache, "power");
+		Attribute vehiclePower = vehicle1.setAttribute(cache, "power");
 		
 		Type power = vehiclePower.getImplicit();
 		assert cache.getEngine().getInheritings(cache).contains(power);
@@ -119,8 +119,8 @@ public class AppliWebTest extends AbstractTest {
 	
 	public void testSimpleReverse() {
 		cache.newType("Person").newInstance(cache, "me")
-				.bind(cache, (Relation) cache.newType("Car").addRelation(cache, "driver", cache.newType("Person")).enableSingularConstraint(cache, Statics.TARGET_POSITION), Statics.TARGET_POSITION, cache.newType("Car").newInstance(cache, "myBmw"));
-		assert cache.newType("Person").newInstance(cache, "me").getLinks(cache, (Relation) cache.newType("Car").addRelation(cache, "driver", cache.newType("Person")).enableSingularConstraint(cache, Statics.TARGET_POSITION), Statics.TARGET_POSITION).size() == 1;
+				.bind(cache, (Relation) cache.newType("Car").setRelation(cache, "driver", cache.newType("Person")).enableSingularConstraint(cache, Statics.TARGET_POSITION), Statics.TARGET_POSITION, cache.newType("Car").newInstance(cache, "myBmw"));
+		assert cache.newType("Person").newInstance(cache, "me").getLinks(cache, (Relation) cache.newType("Car").setRelation(cache, "driver", cache.newType("Person")).enableSingularConstraint(cache, Statics.TARGET_POSITION), Statics.TARGET_POSITION).size() == 1;
 	}
 	
 	// public void testOneToManyManyToManyImpl() {
@@ -152,14 +152,14 @@ public class AppliWebTest extends AbstractTest {
 	
 	public void testToOneSameValue() {
 		
-		cache.newType("Car").addRelation(cache, "CarOwner", cache.newType("Owner")).enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert cache.newType("Car").addRelation(cache, "CarOwner", cache.newType("Owner")).isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		cache.newType("Car").setRelation(cache, "CarOwner", cache.newType("Owner")).enableSingularConstraint(cache, Statics.BASE_POSITION);
+		assert cache.newType("Car").setRelation(cache, "CarOwner", cache.newType("Owner")).isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
 		
-		Link myBmwMe1 = cache.newType("Car").newInstance(cache, "myBmw").setLink(cache, cache.newType("Car").addRelation(cache, "CarOwner", cache.newType("Owner")), "value1", cache.newType("Owner").newInstance(cache, "me"));
-		Link myBmwMe2 = cache.newType("Car").newInstance(cache, "myBmw").setLink(cache, cache.newType("Car").addRelation(cache, "CarOwner", cache.newType("Owner")), "value1", cache.newType("Owner").newInstance(cache, "me"));
+		Link myBmwMe1 = cache.newType("Car").newInstance(cache, "myBmw").setLink(cache, cache.newType("Car").setRelation(cache, "CarOwner", cache.newType("Owner")), "value1", cache.newType("Owner").newInstance(cache, "me"));
+		Link myBmwMe2 = cache.newType("Car").newInstance(cache, "myBmw").setLink(cache, cache.newType("Car").setRelation(cache, "CarOwner", cache.newType("Owner")), "value1", cache.newType("Owner").newInstance(cache, "me"));
 		assert myBmwMe1 == myBmwMe2;
 		
-		assert cache.newType("Car").newInstance(cache, "myBmw").getLinks(cache, cache.newType("Car").addRelation(cache, "CarOwner", cache.newType("Owner"))).size() == 1;
+		assert cache.newType("Car").newInstance(cache, "myBmw").getLinks(cache, cache.newType("Car").setRelation(cache, "CarOwner", cache.newType("Owner"))).size() == 1;
 	}
 	
 	// public void testToOneDifferentValue() {
@@ -262,8 +262,8 @@ public class AppliWebTest extends AbstractTest {
 	
 	public void testTwogetRelationsSnapshot() {
 		assert cache.newType("Car").getRelations(cache).size() == 2 : cache.newType("Car").getRelations(cache);
-		assert cache.newType("Car").getRelations(cache).contains(cache.newType("Car").addRelation(cache, "pilot", cache.newType("Human"))) : cache.newType("Car").getRelations(cache);
-		assert cache.newType("Car").getRelations(cache).contains(cache.newType("Car").addRelation(cache, "passenger", cache.newType("Human"))) : cache.newType("Car").getRelations(cache);
+		assert cache.newType("Car").getRelations(cache).contains(cache.newType("Car").setRelation(cache, "pilot", cache.newType("Human"))) : cache.newType("Car").getRelations(cache);
+		assert cache.newType("Car").getRelations(cache).contains(cache.newType("Car").setRelation(cache, "passenger", cache.newType("Human"))) : cache.newType("Car").getRelations(cache);
 	}
 	
 	// super cache

@@ -67,17 +67,17 @@ public class SerializationTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 
-		Attribute height = window.addProperty(cache, "Height");
+		Attribute height = window.setProperty(cache, "Height");
 		Generic myWindow = window.newInstance(cache, "MyWindow");
 		Value myHeight1 = ((Attribute) myWindow).setValue(cache, height, 165);
 
 		cache.flush();
 
-		man.addAttribute(cache, "Wheels");
+		man.setAttribute(cache, "Wheels");
 
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
+		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 
 		Generic myBmw = vehicle.newInstance(cache, "myBmw");
 		Generic bmw = vehicle.newInstance(cache, "Bmw");
@@ -89,8 +89,8 @@ public class SerializationTest extends AbstractTest {
 
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
 		cache.newSubType("selectableWindow", selectable, window);
-		graphicComponent.addAttribute(cache, "size");
-		selectable.addAttribute(cache, "Selected");
+		graphicComponent.setAttribute(cache, "size");
+		selectable.setAttribute(cache, "Selected");
 
 		myHeight1.remove(cache);
 		myWindow.remove(cache);

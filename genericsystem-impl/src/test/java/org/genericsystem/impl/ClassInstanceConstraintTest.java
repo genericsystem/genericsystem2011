@@ -45,7 +45,7 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class);
 		Type vehicle = cache.newType("Vehicle");
 		Generic myFiat = vehicle.newInstance(cache, "myFiat");
-		Attribute wheelVehcile = vehicle.addAttribute(cache, "wheel");
+		Attribute wheelVehcile = vehicle.setAttribute(cache, "wheel");
 		wheelVehcile.setConstraintClass(cache, Wheel.class);
 		myFiat.setValue(cache, wheelVehcile, new Wheel("bigWheel"));
 	}
@@ -54,7 +54,7 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class);
 		Type vehicle = cache.newType("Vehicle");
 		final Generic myFiat = vehicle.newInstance(cache, "myFiat");
-		final Attribute wheelVehcile = vehicle.addAttribute(cache, "wheel");
+		final Attribute wheelVehcile = vehicle.setAttribute(cache, "wheel");
 		wheelVehcile.setConstraintClass(cache, Wheel.class);
 
 		new RollbackCatcher() {

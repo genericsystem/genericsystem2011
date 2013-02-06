@@ -363,37 +363,36 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Attribute> T addAttribute(Cache cache, Serializable value) {
-		return addSubAttribute(cache, getEngine(), value);
+	public <T extends Attribute> T setAttribute(Cache cache, Serializable value) {
+		return setSubRelation(cache, getEngine(), value);
 	}
 
-	public <T extends Attribute> T addSubAttribute(Cache cache, Attribute attribute, Serializable value) {
-		assert !Objects.equals(value, attribute.getValue());
-		return addLink(cache, (Link) attribute, value, SystemGeneric.STRUCTURAL, 0, Statics.EMPTY_GENERIC_ARRAY);
+	public <T extends Attribute> T setSubAttribute(Cache cache, Attribute attribute, Serializable value) {
+		return setSubRelation(cache, (Relation) attribute, value);
 	}
 
 	@Override
-	public <T extends Attribute> T addProperty(Cache cache, Serializable value) {
-		return (T) addAttribute(cache, value).enablePropertyConstraint(cache);
+	public <T extends Attribute> T setProperty(Cache cache, Serializable value) {
+		return setSubRelation(cache, getEngine(), value).enablePropertyConstraint(cache);
 	}
 
-	public <T extends Attribute> T addSubProperty(Cache cache, Attribute property, Serializable value) {
-		return (T) addSubAttribute(cache, property, value).enablePropertyConstraint(cache);
+	public <T extends Attribute> T setSubProperty(Cache cache, Attribute property, Serializable value) {
+		return setSubRelation(cache, (Relation) property, value).enablePropertyConstraint(cache);
+	}
+
+	@Override
+	public <T extends Relation> T setRelation(Cache cache, Serializable value, Type... targets) {
+		return setSubRelation(cache, getEngine(), value, targets);
+	}
+
+	public <T extends Relation> T setSubRelation(Cache cache, Relation relation, Serializable value, Type... targets) {
+		assert !Objects.equals(value, relation.getValue());
+		return addLink(cache, relation, value, SystemGeneric.STRUCTURAL, 0, targets);
 	}
 
 	@Override
 	public void flag(Cache cache, Value value) {
 		setValue(cache, (Attribute) value, Statics.FLAG);
-	}
-
-	@Override
-	public <T extends Relation> T addRelation(Cache cache, Serializable value, Type... targets) {
-		return addSubRelation(cache, getEngine(), value, targets);
-	}
-
-	public <T extends Relation> T addSubRelation(Cache cache, Relation relation, Serializable value, Type... targets) {
-		assert !Objects.equals(value, relation.getValue());
-		return addLink(cache, getEngine(), value, SystemGeneric.STRUCTURAL, 0, targets);
 	}
 
 	@Override
