@@ -328,9 +328,7 @@ public interface Type extends Generic {
 	 */
 	boolean isInheritanceEnabled(Context context);
 
-	Class<? extends Serializable> getConstraintClass(Context context);
-
-	void setConstraintClass(Cache cache, Class<?> constraintClass);
+	<T extends Type> T setConstraintClass(Cache cache, Class<?> constraintClass);
 
 	<T extends Attribute> Snapshot<T> getStructurals(Context context);
 

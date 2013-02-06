@@ -12,12 +12,14 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.VirtualConstraintException;
 import org.genericsystem.api.generic.Type;
+import org.genericsystem.impl.system.ComponentPosValue;
 
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
 @InheritanceDisabled
-@InstanceClassConstraint(Boolean.class)
+@InstanceClassConstraint(ComponentPosValue.class)
+// (Boolean.class)
 @NotNullConstraint
 public class VirtualConstraintImpl extends Constraint {
 

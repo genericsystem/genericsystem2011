@@ -100,7 +100,6 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Relation possessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
 		assert !possessVehicle.isMultiDirectional(cache);
 		possessVehicle.enableMultiDirectional(cache);
-
 		assert possessVehicle.isMultiDirectional(cache);
 		assert human.getRelations(cache).contains(possessVehicle);
 		assert vehicle.getRelations(cache).contains(possessVehicle) : vehicle.getRelations(cache);

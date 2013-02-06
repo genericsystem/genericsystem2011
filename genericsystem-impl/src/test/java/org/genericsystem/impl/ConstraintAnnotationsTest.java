@@ -19,6 +19,7 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Value;
+import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
@@ -89,7 +90,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 		assert electrikPower.getBaseComponent() != null : electrikPower.info();
 		final Value electrikPowerMyBMW = myBMW.setValue(cache, electrikPower, 106);
 		electrikPowerMyBMW.setValue(cache, unit, "Nm");
-
+		assert unit.isSystemPropertyEnabled(cache, InstanceClassConstraintImpl.class);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {

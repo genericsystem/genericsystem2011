@@ -60,7 +60,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	private LifeManager lifeManager;
 
 	Generic[] directSupers;
-	
+
 	// TODO remove components
 	public Generic[] components;
 
@@ -442,14 +442,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			@Override
 			public boolean isSelectable() {
 				return (next.getMetaLevel() == metaLevel)
-						&& (((GenericImpl) next).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL? next.isAttributeOf(GenericImpl.this) : next.isAttributeOf(GenericImpl.this, pos));
+						&& (((GenericImpl) next).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? next.isAttributeOf(GenericImpl.this) : next
+								.isAttributeOf(GenericImpl.this, pos));
 			}
 		};
 	}
 
 	public <T extends Generic> Iterator<T> noInheritanceIterator(Context context, final Generic origin, final int metaLevel, final int pos) {
-		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL? this.<T> compositesIterator(context) : this.<T> compositesIterator(context,
-				pos))) {
+		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? this.<T> compositesIterator(context)
+				: this.<T> compositesIterator(context, pos))) {
 			@Override
 			public boolean isSelected() {
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
@@ -469,7 +470,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return next.getMetaLevel() == SystemGeneric.CONCRETE;
 			}
 		};
-		return iterator.hasNext() ? Boolean.TRUE.equals(iterator.next().getValue()) : false;
+		return iterator.hasNext() ? Boolean.TRUE.equals(iterator.next().<ComponentPosValue<Boolean>> getValue().getValue()) : false;
 	}
 
 	@Override
@@ -972,31 +973,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	void mountConstraints(Cache cache, Class<?> clazz) {
-		InheritanceDisabled notInheritable = clazz.getAnnotation(InheritanceDisabled.class);
-		if (notInheritable != null)
+		if (clazz.getAnnotation(InheritanceDisabled.class) != null)
 			disableInheritance(cache);
 
-		VirtualConstraint virtualConstraint = clazz.getAnnotation(VirtualConstraint.class);
-		if (virtualConstraint != null)
+		if (clazz.getAnnotation(VirtualConstraint.class) != null)
 			enableVirtualConstraint(cache);
-		UniqueConstraint distinct = clazz.getAnnotation(UniqueConstraint.class);
-		if (distinct != null)
+
+		if (clazz.getAnnotation(UniqueConstraint.class) != null)
 			enableUniqueConstraint(cache);
 
 		InstanceClassConstraint instanceClass = clazz.getAnnotation(InstanceClassConstraint.class);
 		if (instanceClass != null)
 			setConstraintClass(cache, instanceClass.value());
 
-		NotNullConstraint notNull = clazz.getAnnotation(NotNullConstraint.class);
-		if (notNull != null)
+		if (clazz.getAnnotation(NotNullConstraint.class) != null)
 			enableNotNullConstraint(cache);
 
-		PropertyConstraint property = clazz.getAnnotation(PropertyConstraint.class);
-		if (property != null)
+		if (clazz.getAnnotation(PropertyConstraint.class) != null)
 			enablePropertyConstraint(cache);
 
-		SingularInstanceConstraint singularInstance = clazz.getAnnotation(SingularInstanceConstraint.class);
-		if (singularInstance != null)
+		if (clazz.getAnnotation(SingularInstanceConstraint.class) != null)
 			enableSingularInstanceConstraint(cache);
 
 		SingularConstraint singularTarget = clazz.getAnnotation(SingularConstraint.class);
@@ -1057,29 +1053,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
 
-	public Serializable getSystemPropertyValue(Context context, Class<?> systemPropertyClass) {
-		return getValue(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass));
-	}
-
-	private void setSystemPropertyValue(Cache cache, Class<?> systemPropertyClass, Serializable value) {
-		setValue(cache, cache.<Attribute> find(systemPropertyClass), value);
-	}
-
 	private boolean isSystemPropertyDefaultEnabled(Class<?> systemPropertyClass) {
 		return systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
 	}
 
 	@Override
 	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass) {
-		setSystemPropertyValue(cache, systemPropertyClass, Boolean.TRUE);
-		// enableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
+		enableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
 		return (T) this;
 	}
 
 	@Override
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass) {
-		setSystemPropertyValue(cache, systemPropertyClass, Boolean.FALSE);
-		// disableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
+		disableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
 		return (T) this;
 	}
 
@@ -1093,44 +1079,41 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return setSystemProperty(cache, systemPropertyClass, componentPos, Boolean.FALSE);
 	}
 
-	private <T extends Generic> T setSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos, Boolean enabled) {
+	private <T extends Generic> T setSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos, Serializable enabled) {
 		Attribute attribute = cache.<Attribute> find(systemPropertyClass);
 		for (Attribute valueHolder : getValueHolders(cache, attribute))
 			if (Objects.equals(valueHolder.<ComponentPosValue<Boolean>> getValue().getComponentPos(), componentPos)) {
 				if (!this.equals(valueHolder.getComponent(Statics.BASE_POSITION)))
-					addLink(cache, (Link) valueHolder, new ComponentPosValue<Boolean>(componentPos, enabled), SystemGeneric.CONCRETE, Statics.BASE_POSITION);
+					addLink(cache, (Link) valueHolder, new ComponentPosValue<Serializable>(componentPos, enabled), SystemGeneric.CONCRETE, Statics.BASE_POSITION);
 				else
-					update(cache, valueHolder, new ComponentPosValue<Boolean>(componentPos, enabled));
+					update(cache, valueHolder, new ComponentPosValue<Serializable>(componentPos, enabled));
 				return (T) this;
 			}
-		addLink(cache, (Link) attribute, new ComponentPosValue<Boolean>(componentPos, enabled), SystemGeneric.CONCRETE, Statics.BASE_POSITION);
+		addLink(cache, (Link) attribute, new ComponentPosValue<Serializable>(componentPos, enabled), SystemGeneric.CONCRETE, Statics.BASE_POSITION);
 		return (T) this;
 	}
 
 	@Override
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass) {
-		return Boolean.TRUE.equals(getSystemPropertyValue(context, systemPropertyClass));
-		// return isSystemPropertyEnabled(context, systemPropertyClass, Statics.BASE_POSITION);
+		return isSystemPropertyEnabled(context, systemPropertyClass, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos) {
 		for (Value valueHolder : getValueHolders(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)))
-			if (Objects.equals(valueHolder.<ComponentPosValue<Boolean>> getValue().getComponentPos(), componentPos))
-				return valueHolder.<ComponentPosValue<Boolean>> getValue().getValue();
+			if (Objects.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getComponentPos(), componentPos))
+				return !Boolean.FALSE.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getValue());
 		return isSystemPropertyDefaultEnabled(systemPropertyClass);
 	}
 
 	@Override
 	public <T extends Attribute> T enableMultiDirectional(Cache cache) {
-		setSystemPropertyValue(cache, MultiDirectionalSystemProperty.class, Boolean.TRUE);
-		return (T) this;
+		return enableSystemProperty(cache, MultiDirectionalSystemProperty.class, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Attribute> T disableMultiDirectional(Cache cache) {
-		setSystemPropertyValue(cache, MultiDirectionalSystemProperty.class, Boolean.FALSE);
-		return (T) this;
+		return disableSystemProperty(cache, MultiDirectionalSystemProperty.class, Statics.BASE_POSITION);
 	}
 
 	@Override
@@ -1289,13 +1272,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public Class<? extends Serializable> getConstraintClass(Context context) {
-		return (Class<? extends Serializable>) getSystemPropertyValue(context, InstanceClassConstraintImpl.class);
-	}
-
-	@Override
-	public void setConstraintClass(Cache cache, Class<?> constraintClass) {
-		setSystemPropertyValue(cache, InstanceClassConstraintImpl.class, constraintClass);
+	public <T extends Type> T setConstraintClass(Cache cache, Class<?> constraintClass) {
+		return setSystemProperty(cache, InstanceClassConstraintImpl.class, Statics.BASE_POSITION, constraintClass);
 	}
 
 	@Override

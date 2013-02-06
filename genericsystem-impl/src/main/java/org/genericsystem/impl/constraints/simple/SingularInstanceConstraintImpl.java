@@ -11,12 +11,14 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.SingularInstanceConstraintViolationException;
 import org.genericsystem.api.generic.Type;
+import org.genericsystem.impl.system.ComponentPosValue;
 
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
 @Priority(10)
-@InstanceClassConstraint(Boolean.class)
+@InstanceClassConstraint(ComponentPosValue.class)
+// (Boolean.class)
 public class SingularInstanceConstraintImpl extends AbstractSimpleBooleanConstraint {
 
 	private static final long serialVersionUID = -7689576125534105005L;

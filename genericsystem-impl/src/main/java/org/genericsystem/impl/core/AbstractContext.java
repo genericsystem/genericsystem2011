@@ -216,7 +216,10 @@ public abstract class AbstractContext implements Context, Serializable {
 	}
 
 	int findMetaLevel(Class<?> clazz) {
-		return clazz.getAnnotation(SystemGeneric.class).value();
+		SystemGeneric annotation = clazz.getAnnotation(SystemGeneric.class);
+		if (annotation == null)
+			return SystemGeneric.STRUCTURAL;
+		return annotation.value();
 	}
 
 	LinkedHashSet<Class<?>> getSupersClasses(Class<?> clazz) {

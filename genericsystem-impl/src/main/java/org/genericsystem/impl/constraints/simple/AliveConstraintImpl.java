@@ -35,9 +35,7 @@ public class AliveConstraintImpl extends AbstractSimpleBooleanConstraint {
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(Engine.class)
-	// @BooleanValue(true)
 	@ComponentPosBoolean(true)
-	// @Supers(value = { AliveConstraintImpl.class }, implicitSuper = AliveConstraintImpl.class)
 	public static class DefaultValue extends AliveConstraintImpl {
 
 		private static final long serialVersionUID = 369915328786791901L;

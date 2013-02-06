@@ -15,10 +15,8 @@ public abstract class AbstractAxedIntegerConstraint extends Constraint {
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		for (Value constraintValueNode : getConstraintValues(context, modified, getClass()))
-			if (constraintValueNode.getValue() != null) {
-				Integer componentPos = constraintValueNode.<ComponentPosValue<Boolean>> getValue().getComponentPos();
-				internalCheck(context, modified, constraintValueNode.<Relation> getBaseComponent(), componentPos);
-			}
+			if (constraintValueNode.getValue() != null)
+				internalCheck(context, modified, constraintValueNode.<Relation> getBaseComponent(), constraintValueNode.<ComponentPosValue<Boolean>> getValue().getComponentPos());
 	}
 
 	protected abstract void internalCheck(Context context, Generic modified, Relation constraintType, Integer axe) throws ConstraintViolationException;

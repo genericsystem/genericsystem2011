@@ -42,7 +42,7 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 	}
 
 	public void simpleAttributeValueOK() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class);
 		Type vehicle = cache.newType("Vehicle");
 		Generic myFiat = vehicle.newInstance(cache, "myFiat");
 		Attribute wheelVehcile = vehicle.addAttribute(cache, "wheel");
@@ -51,7 +51,7 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 	}
 
 	public void simpleAttributeValueKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class);
 		Type vehicle = cache.newType("Vehicle");
 		final Generic myFiat = vehicle.newInstance(cache, "myFiat");
 		final Attribute wheelVehcile = vehicle.addAttribute(cache, "wheel");
@@ -66,14 +66,14 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 	}
 
 	public void simpleTypeInstanceOK() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class);
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.setConstraintClass(cache, Vehicle.class);
 		vehicle.newInstance(cache, new Vehicle("myVehicle"));
 	}
 
 	public void simpleTypeInstanceKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class);
 		final Type vehicle = cache.newType("Vehicle");
 		vehicle.setConstraintClass(cache, Vehicle.class);
 
