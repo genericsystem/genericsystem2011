@@ -36,5 +36,5 @@ public interface Attribute extends Value, Type {
 	 * 
 	 * @param cache
 	 */
-	void induce(Cache cache);
+	void deduct(Cache cache);
 }

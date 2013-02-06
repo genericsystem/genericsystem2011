@@ -60,7 +60,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	private LifeManager lifeManager;
 
 	Generic[] directSupers;
-	
+
 	// TODO remove components
 	public Generic[] components;
 
@@ -442,14 +442,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			@Override
 			public boolean isSelectable() {
 				return (next.getMetaLevel() == metaLevel)
-						&& (((GenericImpl) next).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL? next.isAttributeOf(GenericImpl.this) : next.isAttributeOf(GenericImpl.this, pos));
+						&& (((GenericImpl) next).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? next.isAttributeOf(GenericImpl.this) : next
+								.isAttributeOf(GenericImpl.this, pos));
 			}
 		};
 	}
 
 	public <T extends Generic> Iterator<T> noInheritanceIterator(Context context, final Generic origin, final int metaLevel, final int pos) {
-		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL? this.<T> compositesIterator(context) : this.<T> compositesIterator(context,
-				pos))) {
+		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? this.<T> compositesIterator(context)
+				: this.<T> compositesIterator(context, pos))) {
 			@Override
 			public boolean isSelected() {
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
@@ -594,7 +595,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				if (components[i] == null) {
 					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
 						return false;
-				} else if (subComponents[i] == null)
+				}
+				else if (subComponents[i] == null)
 					if (!components[i].isEngine() && (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
 						return false;
 			}
@@ -1345,27 +1347,45 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public void induce(final Cache cache) {
-		assert isPseudoStructural();
-		induce(cache, components);
+	public void deduct(final Cache cache) {
+		log.info("deduct : " + this);
+		deduct(cache, components);
 	}
 
-	public void induce(final Cache cache, Generic[] components) {
-		boolean isToBind = true;
+	public void deduct(final Cache cache, Generic[] components) {
+		// boolean isToBind = true;
 		for (int i = 0; i < components.length; i++) {
 			Generic component = components[i];
 			if (component.isStructural()) {
-				isToBind = false;
-				for (Generic generic : ((Type) component).getAllInstances(cache))
-					induce(cache, Statics.replace(i, components, generic));
+				// isToBind = false;
+				Generic[] truncated = Statics.truncate(i, components);
+				for (Generic generic : ((Type) component).getInheritings(cache)) {
+					log.info("Link of : " + i + " subsitute : " + generic);
+					Link link = generic.getLink(cache, this, i);
+					log.info("=======>" + this + " : " + link);
+					log.info("=======> has good substitute : " + link.getComponent(i).equals(generic));
+					log.info("=======> inherits : " + link.inheritsFrom(this));
+
+					if (!link.getComponent(i).equals(generic)) {
+						log.info("No good substitute");
+						if (link.inheritsFrom(this)) {
+							log.info("Add Link before " + link);
+
+							link = (((GenericImpl) generic).addLink(cache, link, link.getValue(), SystemGeneric.CONCRETE, i, truncated));
+							log.info("Add Link after : " + link);
+
+						}
+						((GenericImpl) link).deduct(cache);
+					}
+				}
 			}
 		}
-		if (!isToBind)
-			return;
-		for (Generic generic : components[0].getComposites(cache))
-			if (Arrays.equals(((GenericImpl) generic).components, components))
-				return;
-		((CacheImpl) cache).bind(getImplicit(), Statics.insertFirstIntoArray(getImplicit(), directSupers), components);
+		// if (!isToBind)
+		// return;
+		// for (Generic generic : components[0].getComposites(cache))
+		// if (Arrays.equals(((GenericImpl) generic).components, components))
+		// return;
+		// ((CacheImpl) cache).bind(getImplicit(), Statics.insertFirstIntoArray(getImplicit(), directSupers), components);
 	}
 
 	boolean isPseudoStructural() {
