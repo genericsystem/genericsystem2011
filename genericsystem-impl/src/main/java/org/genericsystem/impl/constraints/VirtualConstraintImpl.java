@@ -19,7 +19,6 @@ import org.genericsystem.impl.system.ComponentPosValue;
 @SingularConstraint
 @InheritanceDisabled
 @InstanceClassConstraint(ComponentPosValue.class)
-// (Boolean.class)
 @NotNullConstraint
 public class VirtualConstraintImpl extends Constraint {
 
