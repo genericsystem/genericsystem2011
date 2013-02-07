@@ -1314,15 +1314,19 @@ public class RelationTest extends AbstractTest {
 		Type car = cache.newType("Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
 		Generic myAudi = car.newInstance(cache, "myAudi");
+		Generic myMercedes = car.newInstance(cache, "myMercedes");
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance(cache, "red");
 		Generic blue = color.newInstance(cache, "blue");
 		Relation carColor = car.setRelation(cache, "carColor", color);
-		car.bind(cache, carColor, red);
+		Link carRed = car.bind(cache, carColor, red);
 		myBmw.bind(cache, carColor, red);
-		myAudi.bind(cache, carColor, blue);
-		assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 3 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
-		assert false : red.getTargets(cache, carColor, Statics.TARGET_POSITION, Statics.BASE_POSITION);
+		myAudi.bind(cache, carRed, blue);
+
+		((Attribute) carRed).deduct(cache);
+
+		assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 2 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
+		assert red.getTargets(cache, carColor, Statics.TARGET_POSITION, Statics.BASE_POSITION).containsAll(Arrays.asList(new Generic[] { myMercedes, myBmw }));
 	}
 
 	public void testDiamantKO() {
