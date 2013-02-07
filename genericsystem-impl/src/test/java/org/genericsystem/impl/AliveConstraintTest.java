@@ -15,7 +15,7 @@ public class AliveConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type human = cache.newType("Human");
-		final Relation humanDriveCar = human.addRelation(cache, "Drive", car);
+		final Relation humanDriveCar = human.setRelation(cache, "Drive", car);
 		final Generic myCar = car.newInstance(cache, "myCar");
 		final Generic myHuman = human.newInstance(cache, "myHuman");
 		myHuman.remove(cache);
@@ -33,7 +33,7 @@ public class AliveConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type human = cache.newType("Human");
-		Relation humanDriveCar = human.addRelation(cache, "Drive", car);
+		Relation humanDriveCar = human.setRelation(cache, "Drive", car);
 		Generic myCar = car.newInstance(cache, "myCar");
 		Generic myHuman = human.newInstance(cache, "myHuman");
 
