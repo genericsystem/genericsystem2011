@@ -13,7 +13,7 @@ public abstract class AbstractAxedIntegerConstraint extends Constraint {
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass()))
-			internalCheck(context, modified, (Relation) constraintValue.getConstraintType(), constraintValue.getValue().getComponentPos());
+			internalCheck(context, modified, (Relation) constraintValue.getConstraintType(), constraintValue.getComponentPosValue().getComponentPos());
 	}
 
 	protected abstract void internalCheck(Context context, Generic modified, Relation constraintType, Integer axe) throws ConstraintViolationException;

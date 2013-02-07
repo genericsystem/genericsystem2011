@@ -24,12 +24,11 @@ public class InstanceClassConstraintImpl extends Constraint {
 
 	private static final long serialVersionUID = -6429972259714036057L;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified.getMeta(), InstanceClassConstraintImpl.class)) {
 			if (SystemGeneric.CONCRETE == modified.getMetaLevel() && ((GenericImpl) modified.getMeta()).getValue(context, ((AbstractContext) context).<Attribute> find(InstanceClassConstraintImpl.class)) != null) {
-				Class<?> clazz = (Class<?>) constraintValue.getValue().getValue();
+				Class<?> clazz = (Class<?>) constraintValue.getComponentPosValue().getValue();
 				if (modified.getValue() != null && !clazz.isAssignableFrom(modified.getValue().getClass()))
 					throw new ClassInstanceConstraintViolationException("Wrong value type for generic " + modified + " : should be " + clazz.getSimpleName() + " but is " + modified.getValue().getClass().getSimpleName() + " for type "
 							+ constraintValue.getConstraintType().getValue());

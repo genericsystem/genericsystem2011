@@ -16,12 +16,6 @@ import org.testng.annotations.Test;
 @Test
 public class PropertyConstraintTest extends AbstractTest {
 
-	public void test() {
-		Type vehicle = cache.newType("Vehicle");
-		vehicle.newInstance(cache, "myVehicle1");
-		vehicle.newInstance(cache, "myVehicle2");
-	}
-
 	private Cache cache;
 
 	@BeforeMethod

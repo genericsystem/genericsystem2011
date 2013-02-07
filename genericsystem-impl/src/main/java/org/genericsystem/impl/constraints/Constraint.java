@@ -51,17 +51,17 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 
 	public class ConstraintValue {
 
-		private ComponentPosValue<Serializable> value;
+		private ComponentPosValue<Serializable> componentPosValue;
 
 		private Generic constraintType;
 
-		public ConstraintValue(ComponentPosValue<Serializable> value, Generic constraintType) {
-			this.value = value;
+		public ConstraintValue(ComponentPosValue<Serializable> componentPosValue, Generic constraintType) {
+			this.componentPosValue = componentPosValue;
 			this.constraintType = constraintType;
 		}
 
-		public ComponentPosValue<Serializable> getValue() {
-			return value;
+		public ComponentPosValue<Serializable> getComponentPosValue() {
+			return componentPosValue;
 		}
 
 		public Generic getConstraintType() {
@@ -70,7 +70,7 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 
 	}
 
-	// TODO KK
+	// TODO it's clean ?
 	protected Snapshot<ConstraintValue> getConstraintValues(final Context context, final Generic modified, final Class<? extends Constraint> clazz) {
 		Snapshot<ConstraintValue> snapshot = new AbstractSnapshot<ConstraintValue>() {
 			@Override
@@ -85,17 +85,8 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 					@Override
 					protected ConstraintValue project() {
 						return new ConstraintValue(next.<ComponentPosValue<Serializable>> getValue(), next.getBaseComponent());
-						// <Serializable>(next.<ComponentPosValue<Serializable>> getValue().getComponentPos(), (Serializable) next.getBaseComponent());//
-						// next.<ComponentPosValue<Serializable>> getValue();
 					}
 				};
-
-				// return new AbstractFilterIterator<Value>(((GenericImpl) modified).<Value> mainIterator(context, ((AbstractContext) context).find(clazz), SystemGeneric.CONCRETE, Statics.BASE_POSITION)) {
-				// @Override
-				// public boolean isSelected() {
-				// return !Boolean.FALSE.equals(next.<ComponentPosValue<Serializable>> getValue().getValue());
-				// }
-				// };
 			}
 		};
 		if (clazz.getAnnotation(SystemGeneric.class).defaultBehavior() && snapshot.isEmpty())

@@ -30,7 +30,7 @@ public class RequiredAxedConstraintImpl extends Constraint {
 		if (modified.isConcrete()) {
 			if (!modified.isAlive(context)) {
 				for (ConstraintValue constraintValue : getConstraintValues(context, modified, RequiredAxedConstraintImpl.class)) {
-					int componentPos = constraintValue.getValue().getComponentPos();
+					int componentPos = constraintValue.getComponentPosValue().getComponentPos();
 					Generic base = ((Attribute) modified).getComponent(componentPos);
 					if (base != null && base.getLinks(context, modified.<Relation> getMeta(), componentPos).size() < 1)
 						throw new RequiredConstraintViolationException(modified.getMeta().getValue() + " is required for " + base.getMeta() + " " + base);
@@ -38,7 +38,7 @@ public class RequiredAxedConstraintImpl extends Constraint {
 			} else
 				for (Attribute requiredAttribute : ((Type) modified).getAttributes(context)) {
 					for (ConstraintValue constraintValue : getConstraintValues(context, requiredAttribute, RequiredAxedConstraintImpl.class))
-						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent(constraintValue.getValue().getComponentPos())) && modified.getLinks(context, (Relation) requiredAttribute).size() < 1)
+						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent(constraintValue.getComponentPosValue().getComponentPos())) && modified.getLinks(context, (Relation) requiredAttribute).size() < 1)
 							throw new RequiredConstraintViolationException(requiredAttribute.getValue() + " is required for new " + modified.getMeta() + " " + modified);
 				}
 		}
