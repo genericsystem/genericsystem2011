@@ -13,7 +13,6 @@ import org.genericsystem.api.exception.RequiredConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.system.ComponentPosValue;
 
@@ -30,16 +29,16 @@ public class RequiredAxedConstraintImpl extends Constraint {
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		if (modified.isConcrete()) {
 			if (!modified.isAlive(context)) {
-				for (Value constraintValueNode : getConstraintValues(context, modified, RequiredAxedConstraintImpl.class)) {
-					int componentPos = constraintValueNode.<ComponentPosValue<Boolean>> getValue().getComponentPos();
+				for (ConstraintValue constraintValue : getConstraintValues(context, modified, RequiredAxedConstraintImpl.class)) {
+					int componentPos = constraintValue.getValue().getComponentPos();
 					Generic base = ((Attribute) modified).getComponent(componentPos);
 					if (base != null && base.getLinks(context, modified.<Relation> getMeta(), componentPos).size() < 1)
 						throw new RequiredConstraintViolationException(modified.getMeta().getValue() + " is required for " + base.getMeta() + " " + base);
 				}
 			} else
 				for (Attribute requiredAttribute : ((Type) modified).getAttributes(context)) {
-					for (Value constraintValueNode : getConstraintValues(context, requiredAttribute, RequiredAxedConstraintImpl.class))
-						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent(constraintValueNode.<ComponentPosValue<Boolean>> getValue().getComponentPos())) && modified.getLinks(context, (Relation) requiredAttribute).size() < 1)
+					for (ConstraintValue constraintValue : getConstraintValues(context, requiredAttribute, RequiredAxedConstraintImpl.class))
+						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent(constraintValue.getValue().getComponentPos())) && modified.getLinks(context, (Relation) requiredAttribute).size() < 1)
 							throw new RequiredConstraintViolationException(requiredAttribute.getValue() + " is required for new " + modified.getMeta() + " " + modified);
 				}
 		}

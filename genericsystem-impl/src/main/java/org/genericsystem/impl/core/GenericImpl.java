@@ -594,8 +594,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				if (components[i] == null) {
 					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
 						return false;
-				}
-				else if (subComponents[i] == null)
+				} else if (subComponents[i] == null)
 					if (!components[i].isEngine() && (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
 						return false;
 			}

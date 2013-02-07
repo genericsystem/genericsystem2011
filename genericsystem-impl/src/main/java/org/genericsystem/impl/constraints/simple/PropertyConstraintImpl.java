@@ -11,7 +11,6 @@ import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.PropertyConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
@@ -34,9 +33,8 @@ public class PropertyConstraintImpl extends Constraint {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
-		Snapshot<Value> constraintInstances = getConstraintValues(context, modified, getClass());
-		for (Value constraintValueNode : constraintInstances) {
-			Type constraintBaseType = constraintValueNode.<Type> getBaseComponent();
+		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
+			Type constraintBaseType = (Type) constraintValue.getConstraintType();
 			if (modified.isAttribute()) {
 				for (final Generic inheriting : ((GenericImpl) ((Value) modified).getBaseComponent()).getAllInheritings(context)) {
 					Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getValueHolders(context, (Attribute) constraintBaseType).iterator()) {
