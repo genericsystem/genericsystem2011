@@ -72,10 +72,11 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 
 	// TODO it's clean ?
 	protected Snapshot<ConstraintValue> getConstraintValues(final Context context, final Generic modified, final Class<? extends Constraint> clazz) {
-		Snapshot<ConstraintValue> snapshot = new AbstractSnapshot<ConstraintValue>() {
+		return new AbstractSnapshot<ConstraintValue>() {
 			@Override
 			public Iterator<ConstraintValue> iterator() {
-				return new AbstractProjectorAndFilterIterator<Value, ConstraintValue>(((GenericImpl) modified).<Value> mainIterator(context, ((AbstractContext) context).find(clazz), SystemGeneric.CONCRETE, Statics.BASE_POSITION)) {
+				Iterator<ConstraintValue> iterator = new AbstractProjectorAndFilterIterator<Value, ConstraintValue>(((GenericImpl) modified).<Value> mainIterator(context, ((AbstractContext) context).find(clazz), SystemGeneric.CONCRETE,
+						Statics.BASE_POSITION)) {
 
 					@Override
 					public boolean isSelected() {
@@ -87,15 +88,10 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 						return new ConstraintValue(next.<ComponentPosValue<Serializable>> getValue(), next.getBaseComponent());
 					}
 				};
+				if (!iterator.hasNext() && clazz.getAnnotation(SystemGeneric.class).defaultBehavior())
+					return new ArrayIterator<ConstraintValue>(new ConstraintValue(new ComponentPosValue<Serializable>(Statics.BASE_POSITION, Boolean.TRUE), modified));
+				return iterator;
 			}
 		};
-		if (clazz.getAnnotation(SystemGeneric.class).defaultBehavior() && snapshot.isEmpty())
-			return new AbstractSnapshot<ConstraintValue>() {
-				@Override
-				public Iterator<ConstraintValue> iterator() {
-					return new ArrayIterator<ConstraintValue>(new ConstraintValue[] { new ConstraintValue(new ComponentPosValue<Serializable>(Statics.BASE_POSITION, Boolean.TRUE), modified) });
-				}
-			};
-		return snapshot;
 	}
 }
