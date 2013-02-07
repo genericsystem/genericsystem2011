@@ -1310,6 +1310,7 @@ public class RelationTest extends AbstractTest {
 	}
 
 	public void testDefaultReverseLinks() {
+
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
