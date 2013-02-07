@@ -1380,12 +1380,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				}
 			}
 		}
-		// if (!isToBind)
-		// return;
-		// for (Generic generic : components[0].getComposites(cache))
-		// if (Arrays.equals(((GenericImpl) generic).components, components))
-		// return;
-		// ((CacheImpl) cache).bind(getImplicit(), Statics.insertFirstIntoArray(getImplicit(), directSupers), components);
 	}
 
 	boolean isPseudoStructural() {
