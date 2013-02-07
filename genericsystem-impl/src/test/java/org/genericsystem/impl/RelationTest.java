@@ -910,7 +910,7 @@ public class RelationTest extends AbstractTest {
 
 		Link yourAudiRed = yourAudi.bind(cache, carColor, red);
 
-		assert yourAudi.getLinks(cache, carColor).size() == 2;
+		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, carColor);
 		assert yourAudi.getLinks(cache, carColor).contains(carRed);
 		assert yourAudi.getLinks(cache, carColor).contains(yourAudiRed);
 	}
@@ -1310,6 +1310,7 @@ public class RelationTest extends AbstractTest {
 	}
 
 	public void testDefaultReverseLinks() {
+
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
