@@ -23,6 +23,7 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.core.Snapshot.Filter;
 import org.genericsystem.api.core.Snapshot.Projector;
+import org.genericsystem.api.exception.ComponentPosExceedsComponentsSizeException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Node;
@@ -216,7 +217,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Value> T setValue(Cache cache, Attribute attribute, Serializable value) {
-		return setLink(cache, (Relation) attribute, value);
+		T link = setLink(cache, (Relation) attribute, value);
+		assert Objects.equals(link.getValue(), value);
+		return link;
 	}
 
 	@Override
@@ -1098,6 +1101,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	private <T extends Generic> T setSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos, Serializable enabled) {
+		if (componentPos + 1 > getComponentsSize())
+			throw new ComponentPosExceedsComponentsSizeException("The component position (" + componentPos + ") exceeds the components size " + this.info());
 		Attribute attribute = cache.<Attribute> find(systemPropertyClass);
 		for (Attribute valueHolder : getValueHolders(cache, attribute))
 			if (Objects.equals(valueHolder.<ComponentPosValue<Boolean>> getValue().getComponentPos(), componentPos)) {

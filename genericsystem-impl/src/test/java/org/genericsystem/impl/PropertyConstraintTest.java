@@ -174,32 +174,11 @@ public class PropertyConstraintTest extends AbstractTest {
 		assert myVehicleRedAgain.isAlive(cache);
 	}
 
-	public void testUniqueInstance() {
-		Type vehicle = cache.newType("Vehicle");
-		vehicle.enablePropertyConstraint(cache);
-		vehicle.newInstance(cache, "myVehicle");
-	}
-
 	public void testMutlipleInstances() {
 		Type vehicle = cache.newType("Vehicle");
 		Generic myVehicle = vehicle.newAnonymousInstance(cache);
 		Generic myVehicle2 = vehicle.newAnonymousInstance(cache);
 		assert myVehicle != myVehicle2 : myVehicle.info() + myVehicle2.info();
-	}
-
-	public void testMutlipleInstancesWithSubclass() {
-		Type vehicle = cache.newType("Vehicle");
-		final Type car = vehicle.newSubType(cache, "Car");
-		vehicle.enablePropertyConstraint(cache);
-		vehicle.newInstance(cache, "myVehicle");
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				car.newInstance(cache, "myVehicle");
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
 	}
 
 	public void testMultipleDefaultValuesAttribute1() {

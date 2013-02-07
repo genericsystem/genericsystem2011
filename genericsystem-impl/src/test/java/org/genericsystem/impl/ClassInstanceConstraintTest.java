@@ -65,24 +65,4 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 		}.assertIsCausedBy(ClassInstanceConstraintViolationException.class);
 	}
 
-	public void simpleTypeInstanceOK() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class);
-		Type vehicle = cache.newType("Vehicle");
-		vehicle.setConstraintClass(cache, Vehicle.class);
-		vehicle.newInstance(cache, new Vehicle("myVehicle"));
-	}
-
-	public void simpleTypeInstanceKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class);
-		final Type vehicle = cache.newType("Vehicle");
-		vehicle.setConstraintClass(cache, Vehicle.class);
-
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				vehicle.newInstance(cache, "myVehicle");
-			}
-		}.assertIsCausedBy(ClassInstanceConstraintViolationException.class);
-	}
-
 }

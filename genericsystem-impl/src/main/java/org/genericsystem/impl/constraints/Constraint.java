@@ -1,7 +1,9 @@
 package org.genericsystem.impl.constraints;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.genericsystem.api.annotation.Priority;
 import org.genericsystem.api.annotation.SystemGeneric;
@@ -14,7 +16,6 @@ import org.genericsystem.impl.core.AbstractContext;
 import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
 import org.genericsystem.impl.iterator.AbstractProjectorAndFilterIterator;
-import org.genericsystem.impl.iterator.ArrayIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
 import org.genericsystem.impl.system.ComponentPosValue;
 
@@ -88,8 +89,12 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 						return new ConstraintValue(next.<ComponentPosValue<Serializable>> getValue(), next.getBaseComponent());
 					}
 				};
-				if (!iterator.hasNext() && clazz.getAnnotation(SystemGeneric.class).defaultBehavior())
-					return new ArrayIterator<ConstraintValue>(new ConstraintValue(new ComponentPosValue<Serializable>(Statics.BASE_POSITION, Boolean.TRUE), modified));
+				if (!iterator.hasNext() && clazz.getAnnotation(SystemGeneric.class).defaultBehavior()) {
+					List<ConstraintValue> constraintValues = new ArrayList<>(modified.getComponentsSize());
+					for (int i = 0; i < modified.getComponentsSize(); i++)
+						constraintValues.add(new ConstraintValue(new ComponentPosValue<Serializable>(i, Boolean.TRUE), modified));
+					return constraintValues.iterator();
+				}
 				return iterator;
 			}
 		};
