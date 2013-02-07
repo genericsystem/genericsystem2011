@@ -27,5 +27,4 @@ public class EngineConsistencyConstraintImpl extends Constraint {
 		if (!modified.getEngine().equals(context.getEngine()))
 			throw new EngineConsistencyConstraintViolationException("The Engine of " + modified + " isn't equals at Engine of the Context");
 	}
-
 }
