@@ -59,7 +59,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carOutsideColor = car.addRelation(cache, "outside", color);
+		Relation carOutsideColor = car.setRelation(cache, "outside", color);
 		assert !carOutsideColor.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 	}
 
@@ -78,7 +78,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	public void testRemoveTypeWithAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		Attribute power = car.addAttribute(cache, "power");
+		Attribute power = car.setAttribute(cache, "power");
 		car.remove(cache);
 		assert !power.isAlive(cache);
 	}
@@ -86,7 +86,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	public void testAttributeIsRefenrentialIntegrity() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		final Type vehicle = cache.newType("Vehicle");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "power");
+		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 
 		assert !vehiclePower.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		vehiclePower.enableReferentialIntegrity(cache, Statics.BASE_POSITION);
@@ -103,7 +103,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type man = cache.newType("Man");
 		Type car = cache.newType("Car");
-		man.addRelation(cache, "drive", car);
+		man.setRelation(cache, "drive", car);
 		man.remove(cache);
 	}
 
@@ -111,7 +111,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		final Type man = cache.newType("Man");
 		Type car = cache.newType("Car");
-		man.addRelation(cache, "drive", car).enableReferentialIntegrity(cache, Statics.BASE_POSITION);
+		man.setRelation(cache, "drive", car).enableReferentialIntegrity(cache, Statics.BASE_POSITION);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
@@ -142,7 +142,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
-		Attribute weight = human.addAttribute(cache, "weight");
+		Attribute weight = human.setAttribute(cache, "weight");
 		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		assert !weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		Generic myck = human.newInstance(cache, "myck");
@@ -155,7 +155,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
-		Attribute weight = human.addAttribute(cache, "weight");
+		Attribute weight = human.setAttribute(cache, "weight");
 		weight.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		assert weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
@@ -170,7 +170,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Human");
-		Relation humanDriveVehicle = human.addRelation(cache, "drive", vehicle);
+		Relation humanDriveVehicle = human.setRelation(cache, "drive", vehicle);
 		assert !humanDriveVehicle.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		assert humanDriveVehicle.getImplicit().isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		Generic myck = human.newInstance(cache, "myck");

@@ -72,7 +72,7 @@ public class InstanceOfTest extends AbstractTest {
 		assert myCar.isInstanceOf(vehicle);
 		assert !myVehicle.isInstanceOf(car);
 
-		Attribute vehiclePower = vehicle.addProperty(cache, "Power");
+		Attribute vehiclePower = vehicle.setProperty(cache, "Power");
 
 		Value v90 = myVehicle.setValue(cache, vehiclePower, 90);
 		Value v235 = myCar.setValue(cache, vehiclePower, 235);

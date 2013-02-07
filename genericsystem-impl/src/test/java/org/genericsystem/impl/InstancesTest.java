@@ -34,7 +34,7 @@ public class InstancesTest extends AbstractTest {
 	public void testAttributeInstances() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type newType = cache.newType("newType");
-		Attribute newAttribute = cache.getEngine().addAttribute(cache, "newAttribute");
+		Attribute newAttribute = cache.getEngine().setAttribute(cache, "newAttribute");
 		Generic aNewType1 = newType.newInstance(cache, "aNewType1");
 		Value value1 = aNewType1.setValue(cache, newAttribute, "value1");
 		assert newAttribute.getInstances(cache).size() == 1;

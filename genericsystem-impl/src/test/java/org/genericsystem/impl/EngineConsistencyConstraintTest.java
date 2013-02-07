@@ -11,7 +11,7 @@ public class EngineConsistencyConstraintTest extends AbstractTest {
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		vehicle.addAttribute(GenericSystem.newCacheOnANewInMemoryEngine(), "Power");
+		vehicle.setAttribute(GenericSystem.newCacheOnANewInMemoryEngine(), "Power");
 	}
 
 }

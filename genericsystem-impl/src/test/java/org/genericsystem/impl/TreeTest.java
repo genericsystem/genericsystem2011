@@ -151,7 +151,7 @@ public class TreeTest extends AbstractTest {
 		Generic blue = color.newInstance(cache, "Blue");
 		Generic yellow = color.newInstance(cache, "Yellow");
 
-		Relation graphicComponentColor = graphicComponent.addRelation(cache, "GraphicComponentColor", color);
+		Relation graphicComponentColor = graphicComponent.setRelation(cache, "GraphicComponentColor", color);
 		graphicComponentColor.enablePropertyConstraint(cache);
 		graphicComponentColor.enableSingularConstraint(cache);
 		assert graphicComponentColor.isPropertyConstraintEnabled(cache);

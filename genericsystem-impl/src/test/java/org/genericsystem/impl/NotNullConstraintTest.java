@@ -15,7 +15,7 @@ public class NotNullConstraintTest extends AbstractTest {
 	public void testPropertySimpleAttributeKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		final Attribute registration = car.addAttribute(cache, "Registration");
+		final Attribute registration = car.setAttribute(cache, "Registration");
 		registration.enableNotNullConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
 
@@ -34,7 +34,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		Type road = cache.newType("Road");
 		Type human = cache.newType("Human");
 
-		final Relation driving = car.addRelation(cache, "DrivingAlong", human, road);
+		final Relation driving = car.setRelation(cache, "DrivingAlong", human, road);
 		driving.enableNotNullConstraint(cache);
 
 		final Generic myCar = car.newInstance(cache, "myCar");

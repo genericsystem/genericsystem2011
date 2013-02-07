@@ -58,7 +58,7 @@ public interface Type extends Generic {
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T addAttribute(Cache cache, Serializable value);
+	<T extends Attribute> T setAttribute(Cache cache, Serializable value);
 
 	/**
 	 * Create a sub attribute
@@ -80,7 +80,7 @@ public interface Type extends Generic {
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T addProperty(Cache cache, Serializable value);
+	<T extends Attribute> T setProperty(Cache cache, Serializable value);
 
 	/**
 	 * Create a property
@@ -102,7 +102,7 @@ public interface Type extends Generic {
 	 * @return the relation
 	 * @see Relation
 	 */
-	<T extends Relation> T addRelation(Cache cache, Serializable value, Type... targets);
+	<T extends Relation> T setRelation(Cache cache, Serializable value, Type... targets);
 
 	/**
 	 * Create a relation
@@ -328,9 +328,7 @@ public interface Type extends Generic {
 	 */
 	boolean isInheritanceEnabled(Context context);
 
-	Class<? extends Serializable> getConstraintClass(Context context);
-
-	void setConstraintClass(Cache cache, Class<?> constraintClass);
+	<T extends Type> T setConstraintClass(Cache cache, Class<?> constraintClass);
 
 	<T extends Attribute> Snapshot<T> getStructurals(Context context);
 

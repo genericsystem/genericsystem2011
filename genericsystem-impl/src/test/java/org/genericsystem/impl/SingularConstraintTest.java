@@ -45,8 +45,8 @@ public class SingularConstraintTest extends AbstractTest {
 	public void testConstraintCheckOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
-		Attribute vehicleDriver = vehicle.addAttribute(cache, "Driver");
+		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
+		Attribute vehicleDriver = vehicle.setAttribute(cache, "Driver");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 
 		vehiclePower.enableSingularConstraint(cache, 0);
@@ -60,7 +60,7 @@ public class SingularConstraintTest extends AbstractTest {
 	public void testConstraintCheckKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		final Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
+		final Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		vehiclePower.enableSingularConstraint(cache, 0);
 		assert vehiclePower.isSingularConstraintEnabled(cache, 0);
@@ -76,7 +76,7 @@ public class SingularConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
-		final Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog);
+		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog);
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		runsOver.enableSingularConstraint(cache, 0);
@@ -92,7 +92,7 @@ public class SingularConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
-		final Relation humanDriveVehicle = human.addRelation(cache, "Drive", vehicle);
+		final Relation humanDriveVehicle = human.setRelation(cache, "Drive", vehicle);
 		final Generic myck = human.newInstance(cache, "myck");
 		final Generic nico = human.newInstance(cache, "nico");
 		final Generic myckVehicle = vehicle.newInstance(cache, "myckVehicle");
@@ -115,7 +115,7 @@ public class SingularConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
-		final Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog);
+		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog);
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 
@@ -135,7 +135,7 @@ public class SingularConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
-		final Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog);
+		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog);
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		final Generic yourSecondDog = dog.newInstance(cache, "yourSecondDog");
@@ -152,7 +152,7 @@ public class SingularConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog, road);
+		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		final Generic yourSecondDog = dog.newInstance(cache, "yourSecondDog");
@@ -170,7 +170,7 @@ public class SingularConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.addRelation(cache, "RunsOver", dog, road);
+		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		final Generic myRoad = road.newInstance(cache, "myRoad");
@@ -193,7 +193,7 @@ public class SingularConstraintTest extends AbstractTest {
 		Type vehicleType = cache.newType("Vehicle");
 		Type dogType = cache.newType("Dog");
 		Type roadType = cache.newType("Road");
-		final Relation runsOver = vehicleType.addRelation(cache, "RunsOver", dogType, roadType);
+		final Relation runsOver = vehicleType.setRelation(cache, "RunsOver", dogType, roadType);
 		final Generic vehicle = vehicleType.newInstance(cache, "myBMW");
 		final Generic dog = dogType.newInstance(cache, "yourDog");
 		final Generic dog2 = dogType.newInstance(cache, "yourSecondDog");
@@ -217,7 +217,7 @@ public class SingularConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		final Generic myBmw = car.newInstance(cache, "myBmw");
-		final Attribute registration = car.addAttribute(cache, "registration");
+		final Attribute registration = car.setAttribute(cache, "registration");
 		registration.enableSingularConstraint(cache);
 		Value myBmwRegistration1 = myBmw.setValue(cache, registration, "AB123CD");
 		Value myBmwRegistration2 = myBmw.setValue(cache, registration, "DC321BA");
@@ -250,7 +250,7 @@ public class SingularConstraintTest extends AbstractTest {
 			public void intercept() {
 				Type mother = cache.newType("mother");
 				Type children = cache.newType("children");
-				Relation myChildren = mother.addRelation(cache, "myChildren", children);
+				Relation myChildren = mother.setRelation(cache, "myChildren", children);
 				myChildren.enableSingularConstraint(cache, Statics.TARGET_POSITION);
 
 				Generic mama1 = mother.newInstance(cache, "mama1");
@@ -271,7 +271,7 @@ public class SingularConstraintTest extends AbstractTest {
 			public void intercept() {
 				Type mother = cache.newType("mother");
 				Type children = cache.newType("children");
-				Relation myChildren = mother.addRelation(cache, "myChildren", children);
+				Relation myChildren = mother.setRelation(cache, "myChildren", children);
 				myChildren.enableSingularConstraint(cache, Statics.TARGET_POSITION);
 
 				Generic mama1 = mother.newInstance(cache, "mama1");

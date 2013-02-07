@@ -15,7 +15,7 @@ public class UniqueConstraintTest extends AbstractTest {
 	public void testPropertySimpleAttributeKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		final Attribute registration = car.addAttribute(cache, "Registration");
+		final Attribute registration = car.setAttribute(cache, "Registration");
 		registration.enableUniqueConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
 		final Generic yourCar = car.newInstance(cache, "yourCar");
@@ -36,7 +36,7 @@ public class UniqueConstraintTest extends AbstractTest {
 		Type road = cache.newType("Road");
 		Type human = cache.newType("Human");
 
-		final Relation driving = car.addRelation(cache, "DrivingAlong", human, road);
+		final Relation driving = car.setRelation(cache, "DrivingAlong", human, road);
 		driving.enableUniqueConstraint(cache);
 
 		final Generic myCar = car.newInstance(cache, "myCar");

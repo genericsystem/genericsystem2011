@@ -51,7 +51,7 @@ public class PersistenceTest {
 
 	public void testCustomTypeAndItsInstance() {
 		Type vehicle = cache.newType("Vehicle");
-		Attribute equipment = vehicle.addAttribute(cache, "Equipment");
+		Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		myVehicle.setValue(cache, equipment, "ABS");
 	}
@@ -67,7 +67,7 @@ public class PersistenceTest {
 	public void testLink() {
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
-		Relation vehicleColor = vehicle.addRelation(cache, "VehicleColor", color);
+		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Generic red = color.newInstance(cache, "red");
 		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
