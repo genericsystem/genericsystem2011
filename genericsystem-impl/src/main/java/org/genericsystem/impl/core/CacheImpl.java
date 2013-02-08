@@ -297,7 +297,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
-		return bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL), superTypes, components);
+		return bind(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes, components);
 	}
 
 	@Override
@@ -307,7 +307,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL), Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).<T> disableInheritance(this);
+		return this.<T> bind(getEngine(), value, SystemGeneric.STRUCTURAL, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).<T> disableInheritance(this);
 	}
 
 	@Override
@@ -345,10 +345,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
-		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz)), findSupers(clazz), findComponents(clazz));
+		return bind(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), findSupers(clazz), findComponents(clazz));
 	}
 
-	public <T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components) {
+	public <T extends Generic> T bind(Generic implicitSuper, Serializable value, int metaLevel, Generic[] supers, Generic[] components) {
+		Generic implicit = bindPrimaryByValue(implicitSuper, value, metaLevel);
 		return internalBind(implicit, Statics.insertFirstIntoArray(implicit, supers), components);
 	}
 

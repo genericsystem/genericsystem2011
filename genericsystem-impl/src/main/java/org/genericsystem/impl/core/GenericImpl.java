@@ -63,7 +63,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	Generic[] directSupers;
 
 	// TODO remove components
-	public Generic[] components;
+	Generic[] components;
 
 	int metaLevel;
 	Serializable value;
@@ -426,12 +426,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).bind(((CacheImpl) cache).bindPrimaryByValue(getImplicit(), value, getMetaLevel() + 1), Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
+		return ((CacheImpl) cache).bind(getImplicit(), value, getMetaLevel() + 1, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).bind(((CacheImpl) cache).bindPrimaryByValue(getImplicit(), value, SystemGeneric.STRUCTURAL), Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
+		return ((CacheImpl) cache).bind(getImplicit(), value, SystemGeneric.STRUCTURAL, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
 	}
 
 	@Override
@@ -446,7 +446,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	private <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int metaLevel, int basePos, Generic... targets) {
 		Generic implicit = relation.isConcrete() ? relation.<GenericImpl> getImplicit().directSupers[0] : relation.getImplicit();
-		return ((CacheImpl) cache).bind(((CacheImpl) cache).bindPrimaryByValue(implicit, value, metaLevel), new Generic[] { relation }, Statics.insertIntoArray(this, targets, basePos));
+		return ((CacheImpl) cache).bind(implicit, value, metaLevel, new Generic[] { relation }, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Generic> Iterator<T> mainIterator(Context context, Generic origin, final int metaLevel, final int pos) {
@@ -603,6 +603,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return isSuperOf(getPrimariesArray(), getExtendedComponentsArray(), ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).getExtendedComponentsArray(), override);
 	}
 
+	public static boolean isSuperOf(Generic generic, Generic subGeneric, boolean override) {
+		return isSuperOf(new Primaries(((GenericImpl) generic).getPrimariesArray()).toArray(), ((GenericImpl) generic).components, new Primaries(subGeneric).toArray(), ((GenericImpl) subGeneric).components, override);
+	}
+
 	public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents, boolean override) {
 		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
 			for (int i = 0; i < subInterfaces.length; i++) {
@@ -683,7 +687,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public <T extends Generic> Snapshot<T> getComponents() {
 		return new AbstractSnapshot<T>() {
-
 			@Override
 			public Iterator<T> iterator() {
 				return componentsIterator();
@@ -884,7 +887,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Generic> Snapshot<T> getInstances(final Context context) {
-		// KK change to a prefixed traversal (see getAllInstances)
+		// TODO KK change to a prefixed traversal (see getAllInstances)
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
