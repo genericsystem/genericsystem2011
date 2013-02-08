@@ -1,12 +1,14 @@
 package org.genericsystem.impl;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.core.Snapshot;
+import org.genericsystem.api.core.Snapshot.Filter;
 import org.genericsystem.api.generic.Type;
 import org.testng.annotations.Test;
 
@@ -30,14 +32,20 @@ public class FlushTest {
 		Type animal = cache.newType("Animal");
 		Snapshot<Generic> snapshot = animal.getInheritings(cache);
 		assert snapshot.isEmpty();
-		Type human = animal.newSubType(cache,"Human");
+		Type human = animal.newSubType(cache, "Human");
 		assert snapshot.size() == 1;
 		assert snapshot.contains(human);
 
 		engine.close();
 
 		cache = engine.newCache();
-		assert engine.getInheritings(cache).findFirst("Animal") == null;
+		assert engine.getInheritings(cache).filter(new Filter<Generic>() {
+
+			@Override
+			public boolean isSelected(Generic element) {
+				return Objects.equals(element.getValue(), "Animal");
+			}
+		}).isEmpty();
 	}
 
 	public void testPartialFlush() {
@@ -61,7 +69,7 @@ public class FlushTest {
 		cache.flush();
 		Snapshot<Generic> snapshot = engine.getInheritings(cache);
 		assert snapshot.contains(human) : snapshot;
-//		cache.deactivate();
+		// cache.deactivate();
 
 		cache = engine.newCache();
 		Type car = cache.newType("Car");

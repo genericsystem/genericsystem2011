@@ -205,8 +205,23 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Value> Snapshot<T> getValueHolders(Context context, final T attribute) {
-		return mainSnapshot(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION);
+	public <T extends Value> Snapshot<T> getValueHolders(final Context context, final T attribute) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return GenericImpl.this.<T> mainIterator(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION);
+			}
+		};
+	}
+
+	@Override
+	public <T extends Serializable> Snapshot<T> getValues(final Context context, final Attribute attribute) {
+		return getValueHolders(context, attribute).project(new Projector<T, Attribute>() {
+			@Override
+			public T project(Attribute element) {
+				return element.getValue();
+			}
+		});
 	}
 
 	@Override
@@ -218,7 +233,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public <T extends Value> T setValue(Cache cache, Attribute attribute, Serializable value) {
 		T link = setLink(cache, (Relation) attribute, value);
-		assert Objects.equals(link.getValue(), value);
+		assert getValues(cache, attribute).contains(value);
 		return link;
 	}
 
@@ -271,7 +286,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return update(cache, link, value);
 	}
 
-	private <T extends Link> T setToManyLink(Cache cache, Link property, Serializable value, int basePos, Generic... targets) {
+	private <T extends Link> T setToManyLink(Cache cache, Link property, final Serializable value, int basePos, Generic... targets) {
 		if (((Type) property).isPropertyConstraintEnabled(cache)) {
 			T link = getLink(cache, (Relation) property, basePos, targets);
 			if (link == null)
@@ -282,7 +297,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return link;
 			return update(cache, link, value);
 		}
-		T link = this.<T> getLinks(cache, (Relation) property, basePos, targets).findFirst(value);
+		Snapshot<Link> snapshot = getLinks(cache, (Relation) property, basePos, targets).filter(new Filter<Link>() {
+			@Override
+			public boolean isSelected(Link element) {
+				return Objects.equals(element.getValue(), value);
+			}
+		});
+		T link = (T) snapshot.get(0);
 		if (link == null)
 			return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
 		if (!this.equals(link.getComponent(basePos)))
@@ -726,15 +747,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return element.getComponent(targetPos);
 			}
 		});
-	}
-
-	public <T extends Value> Snapshot<T> mainSnapshot(final Context context, final T attribute, final int metaLevel, final int pos) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return GenericImpl.this.<T> mainIterator(context, attribute, metaLevel, pos);
-			}
-		};
 	}
 
 	@Override

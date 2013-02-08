@@ -336,6 +336,8 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Value> Snapshot<T> getValueHolders(Context context, T attribute);
 
+	<T extends Serializable> Snapshot<T> getValues(final Context context, final Attribute attribute);
+
 	void log();
 
 	String info();

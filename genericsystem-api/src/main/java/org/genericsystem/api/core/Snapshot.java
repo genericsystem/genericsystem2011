@@ -1,6 +1,5 @@
 package org.genericsystem.api.core;
 
-import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -21,8 +20,6 @@ public interface Snapshot<T> extends Iterable<T> {
 	boolean containsAll(Collection<?> c);
 
 	boolean containsAll(Snapshot<?> c);
-
-	T findFirst(Serializable value);
 
 	Snapshot<T> filter(Filter<T> filter);
 

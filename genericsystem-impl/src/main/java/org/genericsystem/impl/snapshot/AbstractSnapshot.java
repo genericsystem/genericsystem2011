@@ -1,11 +1,9 @@
 package org.genericsystem.impl.snapshot;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Objects;
+
 import org.genericsystem.api.core.Snapshot;
-import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractProjectionIterator;
 import org.slf4j.Logger;
@@ -16,12 +14,12 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public abstract class AbstractSnapshot<T> implements Snapshot<T> {
-	
+
 	protected static Logger log = LoggerFactory.getLogger(AbstractSnapshot.class);
-	
+
 	@Override
 	public abstract Iterator<T> iterator();
-	
+
 	@Override
 	public int size() {
 		int size = 0;
@@ -32,7 +30,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 		}
 		return size;
 	}
-	
+
 	@Override
 	public T get(int pos) {
 		int i = 0;
@@ -44,12 +42,12 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		return !iterator().hasNext();
 	}
-	
+
 	@Override
 	public boolean contains(Object object) {
 		Iterator<T> iterator = iterator();
@@ -58,7 +56,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 				return true;
 		return false;
 	}
-	
+
 	@Override
 	public boolean containsAll(Collection<?> c) {
 		for (Object e : c)
@@ -66,7 +64,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 				return false;
 		return true;
 	}
-	
+
 	@Override
 	public boolean containsAll(Snapshot<?> c) {
 		for (Object e : c)
@@ -76,13 +74,13 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 			}
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		Iterator<T> it = iterator();
 		if (!it.hasNext())
 			return "[]";
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append('[');
 		for (;;) {
@@ -93,7 +91,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 			sb.append(',').append(' ');
 		}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int hashCode = 1;
@@ -101,7 +99,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 			hashCode = 31 * hashCode + (t == null ? 0 : t.hashCode());
 		return hashCode;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object obj) {
@@ -113,15 +111,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 				return false;
 		return !it.hasNext();
 	}
-	
-	@Override
-	public T findFirst(Serializable value) {
-		for (T o : this)
-			if (Objects.equals(value, ((GenericImpl) o).getValue()))
-				return o;
-		return null;
-	}
-	
+
 	@Override
 	public Snapshot<T> filter(final Filter<T> filter) {
 		return new AbstractSnapshot<T>() {
@@ -136,7 +126,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 			}
 		};
 	}
-	
+
 	@Override
 	public <E> Snapshot<E> project(final Projector<E, T> projector) {
 		return new AbstractSnapshot<E>() {
@@ -151,12 +141,12 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 			}
 		};
 	}
-	
+
 	@Override
 	public void log() {
 		log.info(toString());
 	}
-	
+
 	@Override
 	public T first() {
 		Iterator<T> it = iterator();
