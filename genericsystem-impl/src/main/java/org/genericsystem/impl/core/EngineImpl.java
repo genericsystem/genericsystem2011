@@ -22,6 +22,7 @@ import org.genericsystem.impl.constraints.simple.ConcreteInheritanceConstraintIm
 import org.genericsystem.impl.constraints.simple.EngineConsistencyConstraintImpl;
 import org.genericsystem.impl.constraints.simple.NotNullConstraintImpl;
 import org.genericsystem.impl.constraints.simple.OptimisticLockConstraintImpl;
+import org.genericsystem.impl.constraints.simple.PhantomConstraintImpl;
 import org.genericsystem.impl.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.impl.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.impl.constraints.simple.SuperRuleConstraintImpl;
@@ -128,7 +129,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
 					OptimisticLockConstraintImpl.class, RequiredAxedConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, NotNullConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class,
-					AliveConstraintImpl.class, UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class);
+					AliveConstraintImpl.class, UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class);
 			for (Class<?> clazz : classes)
 				if (get(clazz) == null)
 					bind(cache, clazz);

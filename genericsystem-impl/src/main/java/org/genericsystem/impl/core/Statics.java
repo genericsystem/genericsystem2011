@@ -52,6 +52,22 @@ public class Statics {
 	public static final long SESSION_TIMEOUT = 1000L;
 	public static final long ARCHIVER_COEFF = 5L;
 
+	public static final Serializable PHAMTOM = new Phantom();
+
+	private static class Phantom implements Serializable {
+		private static final long serialVersionUID = -5467290057275284040L;
+
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof Phantom;
+		}
+
+		@Override
+		public int hashCode() {
+			return 0;
+		}
+	}
+
 	@SuppressWarnings("rawtypes")
 	private static final Iterator EMPTY_ITERATOR = new Iterator<Object>() {
 

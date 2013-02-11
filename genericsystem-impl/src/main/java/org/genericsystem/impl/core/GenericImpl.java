@@ -471,6 +471,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		};
 	}
 
+	public boolean isPhantom() {
+		return Statics.PHAMTOM.equals(getValue());
+	}
+
 	public <T extends Generic> Iterator<T> noInheritanceIterator(Context context, final Generic origin, final int metaLevel, final int pos) {
 		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? this.<T> compositesIterator(context)
 				: this.<T> compositesIterator(context, pos))) {
@@ -1035,6 +1039,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			pos++;
 		}
 		return -1;
+	}
+
+	/*********************************************/
+	/**************** PHANTOM ********************/
+	/*********************************************/
+
+	public void cancel(Cache cache, Value attribute) {
+		if (equals(attribute.getBaseComponent()))
+			throw new IllegalStateException("Only inherited attributes can be cancelled");
+		((CacheImpl) cache).bind(attribute, Statics.PHAMTOM, attribute.getMetaLevel(), Statics.EMPTY_GENERIC_ARRAY, Statics.replace(Statics.BASE_POSITION, ((GenericImpl) attribute).components, this));
+	}
+
+	public void restore(Cache cache, Attribute attribute) {
+		for (Value nodeValue : getLinks(cache, (Relation) attribute, Statics.BASE_POSITION))
+			if (isValuePhantomOverride(nodeValue, attribute.getValue()))
+				nodeValue.remove(cache);
+	}
+
+	private boolean isValuePhantomOverride(Value nodeValue, Serializable value) {
+		return (equals(nodeValue.getBaseComponent()) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.getImplicit().getSupers().first().getValue(), value));
 	}
 
 	/*********************************************/

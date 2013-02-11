@@ -242,14 +242,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T reInsert(Iterator<Generic> genericsToInsert, Generic oldPrimary, Generic newPrimary) {
-		Generic updated = replace(genericsToInsert.next(), oldPrimary, (GenericImpl) newPrimary);
+		Generic updated = replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary);
 		while (genericsToInsert.hasNext())
-			replace(genericsToInsert.next(), oldPrimary, (GenericImpl) newPrimary);
+			replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary);
 		return (T) updated;
 	}
 
-	private Generic replace(Generic genericToReplace, Generic oldImplicit, GenericImpl newImplicit) {
-
+	private Generic replace(Generic genericToReplace, GenericImpl oldImplicit, GenericImpl newImplicit) {
 		if (((GenericImpl) genericToReplace).isPrimary())
 			return bindPrimaryByValue(((GenericImpl) genericToReplace).directSupers[0], genericToReplace.getValue(), genericToReplace.getMetaLevel());
 
@@ -260,11 +259,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] components = ((GenericImpl) genericToReplace).components;
 		Generic[] resultComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++)
-			if (genericToReplace.equals(components[i]))
-				resultComponents[i] = null;
-			else
-				resultComponents[i] = ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldImplicit, newImplicit) : replace(components[i], oldImplicit, newImplicit);
-		return internalBind(newImplicit, resultInterfaces, resultComponents);
+			resultComponents[i] = genericToReplace.equals(components[i]) ? null : ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldImplicit, newImplicit) : replace(components[i], oldImplicit, newImplicit);
+		return internalBind(genericToReplace.getImplicit().equals(oldImplicit) ? newImplicit : genericToReplace.getImplicit(), resultInterfaces, resultComponents);
 	}
 
 	private Generic getNewPrimary(Generic oldSubPrimary, Generic oldPrimary, Generic newPrimary) {
