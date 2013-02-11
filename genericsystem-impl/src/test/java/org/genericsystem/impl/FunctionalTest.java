@@ -11,11 +11,12 @@ import org.testng.annotations.Test;
 
 @Test
 public class FunctionalTest extends AbstractTest {
-
+	
 	@Test
 	public void getCarInstancesWithPowerHigherThan90HP() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type car = cache.newType("Car");
+		// Type car = cache.newType("Car");
+		Type car = cache.getEngine().newSubType(cache, "Car");
 		final Attribute carPower = car.setProperty(cache, "Power");
 		Generic myCar = car.newInstance(cache, "myCar");
 		myCar.setValue(cache, carPower, 233);
