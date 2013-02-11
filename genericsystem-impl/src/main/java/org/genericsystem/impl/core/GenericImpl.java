@@ -54,7 +54,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unchecked")
-public class GenericImpl implements Generic, Type, Link, Relation, Value, Attribute, Tree, Node {
+/**
+ * @author Nicolas Feybesse
+ * @author Michael Ory
+ */
+public class GenericImpl implements Generic, Type, Link, Relation, Value,
+		Attribute, Tree, Node {
 
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
 
@@ -68,26 +73,34 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	int metaLevel;
 	Serializable value;
 
-	final GenericImpl initializePrimary(Serializable value, int metaLevel, Generic[] directSupers, Generic[] components) {
-		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
+	final GenericImpl initializePrimary(Serializable value, int metaLevel,
+			Generic[] directSupers, Generic[] components) {
+		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L,
+				Long.MAX_VALUE, directSupers, components);
 	}
 
-	final GenericImpl initializeComplex(Generic implicit, Generic[] directSupers, Generic[] components) {
-		return restore(implicit.getValue(), implicit.getMetaLevel(), null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
+	final GenericImpl initializeComplex(Generic implicit,
+			Generic[] directSupers, Generic[] components) {
+		return restore(implicit.getValue(), implicit.getMetaLevel(), null,
+				Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
 	}
 
-	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
+	final GenericImpl restore(Serializable value, int metaLevel, Long designTs,
+			long birthTs, long lastReadTs, long deathTs,
+			Generic[] directSupers, Generic[] components) {
 		this.value = value;
 		this.metaLevel = metaLevel;
 		this.directSupers = directSupers;
 		this.components = components;
 
 		initSelfComponents();
-		lifeManager = new LifeManager(designTs == null ? getEngine().pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
+		lifeManager = new LifeManager(designTs == null ? getEngine()
+				.pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
 		for (Generic g1 : directSupers)
 			for (Generic g2 : directSupers)
 				if (!g1.equals(g2))
-					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
+					assert !g1.inheritsFrom(g2) : ""
+							+ Arrays.toString(directSupers);
 		return this;
 	}
 
@@ -95,12 +108,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		Set<Generic> componentSet = new HashSet<>();
 		for (Generic component : components)
 			if (componentSet.add(component))
-				((GenericImpl) component).lifeManager.engineComposites.add(this);
+				((GenericImpl) component).lifeManager.engineComposites
+						.add(this);
 
 		Set<Generic> effectiveSupersSet = new HashSet<>();
 		for (Generic effectiveSuper : directSupers)
 			if (effectiveSupersSet.add(effectiveSuper))
-				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
+				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings
+						.add(this);
 		return (T) this;
 	}
 
@@ -116,7 +131,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public int compareTo(Generic generic) {
-		return Long.compare(this.getDesignTs(), ((GenericImpl) generic).getDesignTs());
+		return Long.compare(this.getDesignTs(),
+				((GenericImpl) generic).getDesignTs());
 	}
 
 	@Override
@@ -124,7 +140,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (isPrimary())
 			return (T) this;
 		for (Generic superGeneric : directSupers)
-			if (metaLevel == ((GenericImpl) superGeneric).metaLevel && Objects.hashCode(value) == Objects.hashCode(((GenericImpl) superGeneric).value) && Objects.equals(value, ((GenericImpl) superGeneric).value))
+			if (metaLevel == ((GenericImpl) superGeneric).metaLevel
+					&& Objects.hashCode(value) == Objects
+							.hashCode(((GenericImpl) superGeneric).value)
+					&& Objects
+							.equals(value, ((GenericImpl) superGeneric).value))
 				return ((GenericImpl) superGeneric).getImplicit();
 		throw new IllegalStateException(info());
 	}
@@ -141,7 +161,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public boolean isInstanceOf(Generic generic) {
-		return getMetaLevel() - generic.getMetaLevel() == 1 ? this.inheritsFrom(generic) : false;
+		return getMetaLevel() - generic.getMetaLevel() == 1 ? this
+				.inheritsFrom(generic) : false;
 	}
 
 	@Override
@@ -205,50 +226,61 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Value> Snapshot<T> getValueHolders(final Context context, final T attribute) {
+	public <T extends Value> Snapshot<T> getValueHolders(final Context context,
+			final T attribute) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return GenericImpl.this.<T> mainIterator(context, attribute, SystemGeneric.CONCRETE, Statics.BASE_POSITION);
+				return GenericImpl.this.<T> mainIterator(context, attribute,
+						SystemGeneric.CONCRETE, Statics.BASE_POSITION);
 			}
 		};
 	}
 
 	@Override
-	public <T extends Serializable> Snapshot<T> getValues(final Context context, final Attribute attribute) {
-		return getValueHolders(context, attribute).project(new Projector<T, Attribute>() {
-			@Override
-			public T project(Attribute element) {
-				return element.getValue();
-			}
-		});
+	public <T extends Serializable> Snapshot<T> getValues(
+			final Context context, final Attribute attribute) {
+		return getValueHolders(context, attribute).project(
+				new Projector<T, Attribute>() {
+					@Override
+					public T project(Attribute element) {
+						return element.getValue();
+					}
+				});
 	}
 
 	@Override
-	public <T extends Serializable> T getValue(Context context, Attribute attribute) {
+	public <T extends Serializable> T getValue(Context context,
+			Attribute attribute) {
 		Link holder = getLink(context, (Relation) attribute);
 		return holder != null ? holder.<T> getValue() : null;
 	}
 
 	@Override
-	public <T extends Value> T setValue(Cache cache, Attribute attribute, Serializable value) {
+	public <T extends Value> T setValue(Cache cache, Attribute attribute,
+			Serializable value) {
 		T link = setLink(cache, (Relation) attribute, value);
 		assert getValues(cache, attribute).contains(value);
 		return link;
 	}
 
 	@Override
-	public <T extends Link> T getLink(Context context, Relation relation, final Generic... targets) {
+	public <T extends Link> T getLink(Context context, Relation relation,
+			final Generic... targets) {
 		return getLink(context, relation, Statics.BASE_POSITION, targets);
 	}
 
 	@Override
-	public <T extends Link> T getLink(Context context, Relation relation, final int basePos, final Generic... targets) {
-		Iterator<T> valuesIterator = new AbstractFilterIterator<T>(this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE, basePos)) {
+	public <T extends Link> T getLink(Context context, Relation relation,
+			final int basePos, final Generic... targets) {
+		Iterator<T> valuesIterator = new AbstractFilterIterator<T>(
+				this.<T> mainIterator(context, relation,
+						SystemGeneric.CONCRETE, basePos)) {
 			@Override
 			public boolean isSelected() {
 				for (int i = 0; i < targets.length; i++)
-					if (!targets[i].equals(next.getComponent(i + (i >= basePos ? 1 : 0))))
+					if (!targets[i].equals(next.getComponent(i
+							+ (i >= basePos ? 1 : 0))))
 						return false;
 				return true;
 			}
@@ -257,47 +289,64 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			return null;
 		T result = valuesIterator.next();
 		if (valuesIterator.hasNext())
-			throw new IllegalStateException("Ambigous request for relation " + relation + result.info() + " and " + valuesIterator.next().info() + " on : " + this);
+			throw new IllegalStateException("Ambigous request for relation "
+					+ relation + result.info() + " and "
+					+ valuesIterator.next().info() + " on : " + this);
 		return result;
 	}
 
 	@Override
-	public <T extends Link> T setLink(Cache cache, Link property, Serializable value, Generic... targets) {
+	public <T extends Link> T setLink(Cache cache, Link property,
+			Serializable value, Generic... targets) {
 		return setLink(cache, property, value, Statics.BASE_POSITION, targets);
 	}
 
 	@Override
-	public <T extends Link> T setLink(Cache cache, Link property, Serializable value, int basePos, Generic... targets) {
-		return ((Relation) property).isSingularConstraintEnabled(cache, basePos) ? this.<T> setToOneLink(cache, property, value, basePos, targets) : this.<T> setToManyLink(cache, property, value, basePos, targets);
+	public <T extends Link> T setLink(Cache cache, Link property,
+			Serializable value, int basePos, Generic... targets) {
+		return ((Relation) property)
+				.isSingularConstraintEnabled(cache, basePos) ? this
+				.<T> setToOneLink(cache, property, value, basePos, targets)
+				: this.<T> setToManyLink(cache, property, value, basePos,
+						targets);
 	}
 
-	private <T extends Link> T setToOneLink(Cache cache, Link property, Serializable value, int basePos, Generic... targets) {
+	private <T extends Link> T setToOneLink(Cache cache, Link property,
+			Serializable value, int basePos, Generic... targets) {
 		T link = getLink(cache, (Relation) property, basePos);
 		if (link == null)
-			return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
+			return addLink(cache, property, value, SystemGeneric.CONCRETE,
+					basePos, targets);
 		if (!this.equals(link.getComponent(basePos)))
-			return addLink(cache, link, value, SystemGeneric.CONCRETE, basePos, targets);
-		if (!Arrays.equals(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) link).components)) {
+			return addLink(cache, link, value, SystemGeneric.CONCRETE, basePos,
+					targets);
+		if (!Arrays.equals(Statics.insertIntoArray(this, targets, basePos),
+				((GenericImpl) link).components)) {
 			link.remove(cache);
-			return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
+			return addLink(cache, property, value, SystemGeneric.CONCRETE,
+					basePos, targets);
 		}
 		if (Objects.equals(value, link.getValue()))
 			return link;
 		return update(cache, link, value);
 	}
 
-	private <T extends Link> T setToManyLink(Cache cache, Link property, final Serializable value, int basePos, Generic... targets) {
+	private <T extends Link> T setToManyLink(Cache cache, Link property,
+			final Serializable value, int basePos, Generic... targets) {
 		if (((Type) property).isPropertyConstraintEnabled(cache)) {
 			T link = getLink(cache, (Relation) property, basePos, targets);
 			if (link == null)
-				return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
+				return addLink(cache, property, value, SystemGeneric.CONCRETE,
+						basePos, targets);
 			if (!this.equals(link.getComponent(basePos)))
-				return addLink(cache, link, value, SystemGeneric.CONCRETE, basePos, targets);
+				return addLink(cache, link, value, SystemGeneric.CONCRETE,
+						basePos, targets);
 			if (Objects.equals(value, link.getValue()))
 				return link;
 			return update(cache, link, value);
 		}
-		Snapshot<Link> snapshot = getLinks(cache, (Relation) property, basePos, targets).filter(new Filter<Link>() {
+		Snapshot<Link> snapshot = getLinks(cache, (Relation) property, basePos,
+				targets).filter(new Filter<Link>() {
 			@Override
 			public boolean isSelected(Link element) {
 				return Objects.equals(element.getValue(), value);
@@ -305,17 +354,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		});
 		T link = (T) snapshot.get(0);
 		if (link == null)
-			return addLink(cache, property, value, SystemGeneric.CONCRETE, basePos, targets);
+			return addLink(cache, property, value, SystemGeneric.CONCRETE,
+					basePos, targets);
 		if (!this.equals(link.getComponent(basePos)))
-			return addLink(cache, link, value, SystemGeneric.CONCRETE, basePos, targets);
+			return addLink(cache, link, value, SystemGeneric.CONCRETE, basePos,
+					targets);
 		return link;
 	}
 
-	private static <T extends Generic> T update(Cache cache, Generic old, Serializable value) {
+	private static <T extends Generic> T update(Cache cache, Generic old,
+			Serializable value) {
 		return ((CacheImpl) cache).update(old, value);
 	}
 
-	public <T extends Generic> Iterator<T> directInheritingsIterator(Context context) {
+	public <T extends Generic> Iterator<T> directInheritingsIterator(
+			Context context) {
 		return ((AbstractContext) context).directInheritingsIterator(this);
 	}
 
@@ -342,11 +395,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return ((AbstractContext) context).compositesIterator(this);
 	}
 
-	public <T extends Generic> Iterator<T> compositesIterator(Context context, final int pos) {
-		return new AbstractFilterIterator<T>(this.<T> compositesIterator(context)) {
+	public <T extends Generic> Iterator<T> compositesIterator(Context context,
+			final int pos) {
+		return new AbstractFilterIterator<T>(
+				this.<T> compositesIterator(context)) {
 			@Override
 			public boolean isSelected() {
-				return GenericImpl.this.equals(((Value) next).getComponent(pos));
+				return GenericImpl.this
+						.equals(((Value) next).getComponent(pos));
 			}
 		};
 	}
@@ -362,7 +418,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Attribute> T getAttribute(final Context context, final Serializable value) {
+	public <T extends Attribute> T getAttribute(final Context context,
+			final Serializable value) {
 		for (T attribute : this.<T> getAttributes(context))
 			if (Objects.equals(attribute.getValue(), value))
 				return attribute;
@@ -370,7 +427,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Relation> T getRelation(final Context context, final Serializable value) {
+	public <T extends Relation> T getRelation(final Context context,
+			final Serializable value) {
 		for (T relation : this.<T> getRelations(context))
 			if (Objects.equals(relation.getValue(), value))
 				return relation;
@@ -382,7 +440,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Attribute> T getProperty(Context context, Serializable value) {
+	public <T extends Attribute> T getProperty(Context context,
+			Serializable value) {
 		return getAttribute(context, value);
 	}
 
@@ -391,27 +450,34 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return setSubRelation(cache, getEngine(), value);
 	}
 
-	public <T extends Attribute> T setSubAttribute(Cache cache, Attribute attribute, Serializable value) {
+	public <T extends Attribute> T setSubAttribute(Cache cache,
+			Attribute attribute, Serializable value) {
 		return setSubRelation(cache, (Relation) attribute, value);
 	}
 
 	@Override
 	public <T extends Attribute> T setProperty(Cache cache, Serializable value) {
-		return setSubRelation(cache, getEngine(), value).enablePropertyConstraint(cache);
+		return setSubRelation(cache, getEngine(), value)
+				.enablePropertyConstraint(cache);
 	}
 
-	public <T extends Attribute> T setSubProperty(Cache cache, Attribute property, Serializable value) {
-		return setSubRelation(cache, (Relation) property, value).enablePropertyConstraint(cache);
+	public <T extends Attribute> T setSubProperty(Cache cache,
+			Attribute property, Serializable value) {
+		return setSubRelation(cache, (Relation) property, value)
+				.enablePropertyConstraint(cache);
 	}
 
 	@Override
-	public <T extends Relation> T setRelation(Cache cache, Serializable value, Type... targets) {
+	public <T extends Relation> T setRelation(Cache cache, Serializable value,
+			Type... targets) {
 		return setSubRelation(cache, getEngine(), value, targets);
 	}
 
-	public <T extends Relation> T setSubRelation(Cache cache, Relation relation, Serializable value, Type... targets) {
+	public <T extends Relation> T setSubRelation(Cache cache,
+			Relation relation, Serializable value, Type... targets) {
 		assert !Objects.equals(value, relation.getValue());
-		return addLink(cache, relation, value, SystemGeneric.STRUCTURAL, 0, targets);
+		return addLink(cache, relation, value, SystemGeneric.STRUCTURAL, 0,
+				targets);
 	}
 
 	@Override
@@ -420,41 +486,64 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Generic> T newAnonymousInstance(Cache cache, Generic... components) {
-		return newInstance(cache, getEngine().pickNewAnonymousReference(), components);
+	public <T extends Generic> T newAnonymousInstance(Cache cache,
+			Generic... components) {
+		return newInstance(cache, getEngine().pickNewAnonymousReference(),
+				components);
 	}
 
 	@Override
-	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).bind(getImplicit(), value, getMetaLevel() + 1, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
+	public <T extends Generic> T newInstance(Cache cache, Serializable value,
+			Generic... components) {
+		return ((CacheImpl) cache).bind(getImplicit(), value,
+				getMetaLevel() + 1,
+				Statics.insertFirstIntoArray(this, getPrimariesArray()),
+				components);
 	}
 
 	@Override
-	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).bind(getImplicit(), value, SystemGeneric.STRUCTURAL, Statics.insertFirstIntoArray(this, getPrimariesArray()), components);
+	public <T extends Type> T newSubType(Cache cache, Serializable value,
+			Generic... components) {
+		return ((CacheImpl) cache).bind(getImplicit(), value,
+				SystemGeneric.STRUCTURAL,
+				Statics.insertFirstIntoArray(this, getPrimariesArray()),
+				components);
 	}
 
 	@Override
-	public <T extends Link> T bind(Cache cache, Link relation, Generic... targets) {
+	public <T extends Link> T bind(Cache cache, Link relation,
+			Generic... targets) {
 		return setLink(cache, relation, Statics.FLAG, targets);
 	}
 
 	@Override
-	public <T extends Link> T bind(Cache cache, Link relation, int basePos, Generic... targets) {
+	public <T extends Link> T bind(Cache cache, Link relation, int basePos,
+			Generic... targets) {
 		return setLink(cache, relation, Statics.FLAG, basePos, targets);
 	}
 
-	private <T extends Link> T addLink(Cache cache, Link relation, Serializable value, int metaLevel, int basePos, Generic... targets) {
-		Generic implicit = relation.isConcrete() ? relation.<GenericImpl> getImplicit().directSupers[0] : relation.getImplicit();
-		return ((CacheImpl) cache).bind(implicit, value, metaLevel, new Generic[] { relation }, Statics.insertIntoArray(this, targets, basePos));
+	private <T extends Link> T addLink(Cache cache, Link relation,
+			Serializable value, int metaLevel, int basePos, Generic... targets) {
+		Generic implicit = relation.isConcrete() ? relation
+				.<GenericImpl> getImplicit().directSupers[0] : relation
+				.getImplicit();
+		return ((CacheImpl) cache).bind(implicit, value, metaLevel,
+				new Generic[] { relation },
+				Statics.insertIntoArray(this, targets, basePos));
 	}
 
-	public <T extends Generic> Iterator<T> mainIterator(Context context, Generic origin, final int metaLevel, final int pos) {
-		return ((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(NoInheritanceSystemProperty.class)) ? this.<T> noInheritanceIterator(context, origin, metaLevel, pos) : this.<T> inheritanceIterator(context, origin,
-				metaLevel, pos);
+	public <T extends Generic> Iterator<T> mainIterator(Context context,
+			Generic origin, final int metaLevel, final int pos) {
+		return ((GenericImpl) origin).safeIsEnabled(context,
+				((AbstractContext) context)
+						.<Attribute> find(NoInheritanceSystemProperty.class)) ? this
+				.<T> noInheritanceIterator(context, origin, metaLevel, pos)
+				: this.<T> inheritanceIterator(context, origin, metaLevel, pos);
 	}
 
-	public <T extends Generic> Iterator<T> inheritanceIterator(final Context context, final Generic origin, final int metaLevel, final int pos) {
+	public <T extends Generic> Iterator<T> inheritanceIterator(
+			final Context context, final Generic origin, final int metaLevel,
+			final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(context, origin) {
 
 			@Override
@@ -465,7 +554,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			@Override
 			public boolean isSelectable() {
 				return (next.getMetaLevel() == metaLevel)
-						&& (((GenericImpl) next).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? next.isAttributeOf(GenericImpl.this) : next
+						&& (((GenericImpl) next)
+								.safeIsEnabled(
+										context,
+										((AbstractContext) context)
+												.<Attribute> find(MultiDirectionalSystemProperty.class))
+								|| metaLevel == SystemGeneric.STRUCTURAL ? next
+								.isAttributeOf(GenericImpl.this) : next
 								.isAttributeOf(GenericImpl.this, pos));
 			}
 		};
@@ -475,21 +570,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return Statics.PHAMTOM.equals(getValue());
 	}
 
-	public <T extends Generic> Iterator<T> noInheritanceIterator(Context context, final Generic origin, final int metaLevel, final int pos) {
-		return new AbstractFilterIterator<T>((((GenericImpl) origin).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? this.<T> compositesIterator(context)
-				: this.<T> compositesIterator(context, pos))) {
+	public <T extends Generic> Iterator<T> noInheritanceIterator(
+			Context context, final Generic origin, final int metaLevel,
+			final int pos) {
+		return new AbstractFilterIterator<T>(
+				(((GenericImpl) origin).safeIsEnabled(
+						context,
+						((AbstractContext) context)
+								.<Attribute> find(MultiDirectionalSystemProperty.class))
+						|| metaLevel == SystemGeneric.STRUCTURAL ? this
+						.<T> compositesIterator(context) : this
+						.<T> compositesIterator(context, pos))) {
 			@Override
 			public boolean isSelected() {
-				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
+				return next.getMetaLevel() == metaLevel
+						&& next.inheritsFrom(origin);
 			}
 		};
 	}
 
 	boolean safeIsEnabled(Context context, Attribute attribute) {
-		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(context, attribute) {
+		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(
+				context, attribute) {
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
-				return (candidate.getMetaLevel() <= SystemGeneric.CONCRETE) && candidate.isAttributeOf(GenericImpl.this);
+				return (candidate.getMetaLevel() <= SystemGeneric.CONCRETE)
+						&& candidate.isAttributeOf(GenericImpl.this);
 			}
 
 			@Override
@@ -497,16 +603,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 				return next.getMetaLevel() == SystemGeneric.CONCRETE;
 			}
 		};
-		return iterator.hasNext() ? Boolean.TRUE.equals(iterator.next().<ComponentPosValue<Boolean>> getValue().getValue()) : false;
+		return iterator.hasNext() ? Boolean.TRUE.equals(iterator.next()
+				.<ComponentPosValue<Boolean>> getValue().getValue()) : false;
 	}
 
 	@Override
 	public boolean inheritsFrom(Generic generic) {
 		if (generic == null)
 			return false;
-		boolean inheritance = ((GenericImpl) generic).new InheritanceCalculator().isSuperOf(this);
+		boolean inheritance = ((GenericImpl) generic).new InheritanceCalculator()
+				.isSuperOf(this);
 		boolean superOf = ((GenericImpl) generic).isSuperOf(this, false);
-		assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
+		assert inheritance == superOf : "" + this.info() + generic.info()
+				+ " : " + inheritance + " != " + superOf;
 		return superOf;
 	}
 
@@ -519,7 +628,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	Generic[] getExtendedComponentsArray() {
-		return new ExtendedComponents(components).addSupers(directSupers).toArray();
+		return new ExtendedComponents(components).addSupers(directSupers)
+				.toArray();
 	}
 
 	static public class ExtendedComponents extends ArrayList<Generic> {
@@ -534,7 +644,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			if (directSupers.length == 1 && directSupers[0].isEngine())
 				return this;
 			for (Generic directSuper : directSupers) {
-				for (Generic component : ((GenericImpl) directSuper).getExtendedComponentsArray())
+				for (Generic component : ((GenericImpl) directSuper)
+						.getExtendedComponentsArray())
 					restrictedAdd(component);
 			}
 			return this;
@@ -544,9 +655,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			Iterator<Generic> iterator = iterator();
 			while (iterator.hasNext()) {
 				Generic component = iterator.next();
-				if (((GenericImpl) newComponent).new InheritanceCalculator().isSuperOf(component))
+				if (((GenericImpl) newComponent).new InheritanceCalculator()
+						.isSuperOf(component))
 					return false;
-				assert !((GenericImpl) component).new InheritanceCalculator().isSuperOf(newComponent);
+				assert !((GenericImpl) component).new InheritanceCalculator()
+						.isSuperOf(newComponent);
 			}
 			return super.add(newComponent);
 		}
@@ -579,20 +692,35 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	// TODO Pb trees
-	private static boolean isEquals(Generic[] interfaces, Generic[] components, Generic[] subInterfaces, Generic[] subComponents) {
-		return Arrays.equals(interfaces, subInterfaces) && Arrays.equals(components, subComponents);
+	private static boolean isEquals(Generic[] interfaces, Generic[] components,
+			Generic[] subInterfaces, Generic[] subComponents) {
+		return Arrays.equals(interfaces, subInterfaces)
+				&& Arrays.equals(components, subComponents);
 	}
 
-	private static boolean isConcreteInheritance(Generic superGeneric, Generic subGeneric) {
-		return subGeneric.isConcrete() && superGeneric.isConcrete() && subGeneric.getMeta().inheritsFrom(superGeneric.getMeta());
+	private static boolean isConcreteInheritance(Generic superGeneric,
+			Generic subGeneric) {
+		return subGeneric.isConcrete() && superGeneric.isConcrete()
+				&& subGeneric.getMeta().inheritsFrom(superGeneric.getMeta());
 	}
 
-	private static boolean isValidConcreteInheritance(Generic[] interfaces, Generic[] components, Generic[] subInterfaces, Generic[] subComponents, int i, boolean onInterfaces) {
-		Generic[] truncate = Statics.truncate(i, onInterfaces ? interfaces : components);
-		Generic[] subTruncate = Statics.truncate(i, onInterfaces ? subInterfaces : subComponents);
-		if (isConcreteInheritance(onInterfaces ? interfaces[i] : components[i], onInterfaces ? subInterfaces[i] : subComponents[i])
-				&& !isEquals(onInterfaces ? truncate : interfaces, onInterfaces ? components : truncate, onInterfaces ? subTruncate : subInterfaces, onInterfaces ? subComponents : subTruncate))
-			return isSuperOf(onInterfaces ? truncate : interfaces, onInterfaces ? components : truncate, onInterfaces ? subTruncate : subInterfaces, onInterfaces ? subComponents : subTruncate, true);
+	private static boolean isValidConcreteInheritance(Generic[] interfaces,
+			Generic[] components, Generic[] subInterfaces,
+			Generic[] subComponents, int i, boolean onInterfaces) {
+		Generic[] truncate = Statics.truncate(i, onInterfaces ? interfaces
+				: components);
+		Generic[] subTruncate = Statics.truncate(i,
+				onInterfaces ? subInterfaces : subComponents);
+		if (isConcreteInheritance(onInterfaces ? interfaces[i] : components[i],
+				onInterfaces ? subInterfaces[i] : subComponents[i])
+				&& !isEquals(onInterfaces ? truncate : interfaces,
+						onInterfaces ? components : truncate,
+						onInterfaces ? subTruncate : subInterfaces,
+						onInterfaces ? subComponents : subTruncate))
+			return isSuperOf(onInterfaces ? truncate : interfaces,
+					onInterfaces ? components : truncate,
+					onInterfaces ? subTruncate : subInterfaces,
+					onInterfaces ? subComponents : subTruncate, true);
 		return false;
 	}
 
@@ -604,41 +732,74 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 			return isEngine();
 		if (((GenericImpl) generic).isPrimary())
 			return isSuperOf(((GenericImpl) generic).directSupers[0], override);
-		return isSuperOf(getPrimariesArray(), getExtendedComponentsArray(), ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).getExtendedComponentsArray(), override);
+		return isSuperOf(getPrimariesArray(), getExtendedComponentsArray(),
+				((GenericImpl) generic).getPrimariesArray(),
+				((GenericImpl) generic).getExtendedComponentsArray(), override);
 	}
 
-	public static boolean isSuperOf(Generic generic, Generic subGeneric, boolean override) {
-		return isSuperOf(new Primaries(((GenericImpl) generic).getPrimariesArray()).toArray(), ((GenericImpl) generic).components, new Primaries(subGeneric).toArray(), ((GenericImpl) subGeneric).components, override);
+	public static boolean isSuperOf(Generic generic, Generic subGeneric,
+			boolean override) {
+		return isSuperOf(
+				new Primaries(((GenericImpl) generic).getPrimariesArray())
+						.toArray(),
+				((GenericImpl) generic).components, new Primaries(subGeneric)
+						.toArray(), ((GenericImpl) subGeneric).components,
+				override);
 	}
 
-	public static boolean isSuperOf(Generic[] interfaces, Generic[] components, final Generic[] subInterfaces, Generic[] subComponents, boolean override) {
-		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
+	public static boolean isSuperOf(Generic[] interfaces, Generic[] components,
+			final Generic[] subInterfaces, Generic[] subComponents,
+			boolean override) {
+		if (interfaces.length == subInterfaces.length
+				&& components.length == subComponents.length) {
 			for (int i = 0; i < subInterfaces.length; i++) {
-				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i], override))
-					if (!override || !isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, true))
+				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i],
+						override))
+					if (!override
+							|| !isValidConcreteInheritance(interfaces,
+									components, subInterfaces, subComponents,
+									i, true))
 						return false;
 			}
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null)
-					if (!((GenericImpl) components[i]).isSuperOf(subComponents[i], override))
-						if (!override || !isValidConcreteInheritance(interfaces, components, subInterfaces, subComponents, i, false))
+					if (!((GenericImpl) components[i]).isSuperOf(
+							subComponents[i], override))
+						if (!override
+								|| !isValidConcreteInheritance(interfaces,
+										components, subInterfaces,
+										subComponents, i, false))
 							return false;
 				if (components[i] == null) {
-					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
+					if (!Arrays.equals(subInterfaces,
+							((GenericImpl) subComponents[i])
+									.getPrimariesArray())
+							|| !Arrays
+									.equals(subComponents,
+											((GenericImpl) subComponents[i]).components))
 						return false;
 				} else if (subComponents[i] == null)
-					if (!components[i].isEngine() && (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
+					if (!components[i].isEngine()
+							&& (!Arrays.equals(interfaces,
+									((GenericImpl) components[i])
+											.getPrimariesArray()) || !Arrays
+									.equals(components,
+											((GenericImpl) components[i]).components)))
 						return false;
 			}
 			return true;
 		}
-		if (subInterfaces.length > 1 && interfaces.length < subInterfaces.length)
+		if (subInterfaces.length > 1
+				&& interfaces.length < subInterfaces.length)
 			for (int i = 0; i < subInterfaces.length; i++)
-				if (isSuperOf(interfaces, components, Statics.truncate(i, subInterfaces), subComponents, override))
+				if (isSuperOf(interfaces, components,
+						Statics.truncate(i, subInterfaces), subComponents,
+						override))
 					return true;
 		if (components.length < subComponents.length)
 			for (int i = 0; i < subComponents.length; i++)
-				if (isSuperOf(interfaces, components, subInterfaces, Statics.truncate(i, subComponents), override))
+				if (isSuperOf(interfaces, components, subInterfaces,
+						Statics.truncate(i, subComponents), override))
 					return true;
 		return false;
 	}
@@ -713,20 +874,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Link> Snapshot<T> getLinks(Context context, final Relation relation, Generic... targets) {
+	public <T extends Link> Snapshot<T> getLinks(Context context,
+			final Relation relation, Generic... targets) {
 		return getLinks(context, relation, Statics.BASE_POSITION, targets);
 	}
 
 	@Override
-	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final int basePos, final Generic... targets) {
+	public <T extends Link> Snapshot<T> getLinks(final Context context,
+			final Relation relation, final int basePos,
+			final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return new AbstractFilterIterator<T>(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE, basePos)) {
+				return new AbstractFilterIterator<T>(
+						GenericImpl.this.<T> mainIterator(context, relation,
+								SystemGeneric.CONCRETE, basePos)) {
 					@Override
 					public boolean isSelected() {
 						for (int i = 0; i < targets.length; i++)
-							if (!targets[i].equals(next.getComponent(i + (i >= basePos ? 1 : 0))))
+							if (!targets[i].equals(next.getComponent(i
+									+ (i >= basePos ? 1 : 0))))
 								return false;
 						return true;
 					}
@@ -737,7 +904,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Generic> Snapshot<T> getTargets(Context context, Relation relation) {
+	public <T extends Generic> Snapshot<T> getTargets(Context context,
+			Relation relation) {
 		return getLinks(context, relation).project(new Projector<T, Link>() {
 			@Override
 			public T project(Link element) {
@@ -747,13 +915,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Generic> Snapshot<T> getTargets(Context context, Relation relation, int basePos, final int targetPos) {
-		return getLinks(context, relation, basePos).project(new Projector<T, Link>() {
-			@Override
-			public T project(Link element) {
-				return element.getComponent(targetPos);
-			}
-		});
+	public <T extends Generic> Snapshot<T> getTargets(Context context,
+			Relation relation, int basePos, final int targetPos) {
+		return getLinks(context, relation, basePos).project(
+				new Projector<T, Link>() {
+					@Override
+					public T project(Link element) {
+						return element.getComponent(targetPos);
+					}
+				});
 	}
 
 	@Override
@@ -763,17 +933,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public String info() {
-		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
+		String s = "\n******************************"
+				+ System.identityHashCode(this)
+				+ "******************************\n";
 		s += "toString()     : " + this + "\n";
 		s += "Value          : " + value + "\n";
 		s += "getMeta()      : " + getMeta() + "\n";
 		s += "getInstanciationLevel() : " + getMetaLevel() + "\n";
 		for (Generic primary : getPrimaries())
-			s += "Primary #" + "       : " + primary + " (" + System.identityHashCode(primary) + ")\n";
+			s += "Primary #" + "       : " + primary + " ("
+					+ System.identityHashCode(primary) + ")\n";
 		for (Generic component : components)
-			s += "Component #" + "    : " + component + " (" + System.identityHashCode(component) + ")\n";
+			s += "Component #" + "    : " + component + " ("
+					+ System.identityHashCode(component) + ")\n";
 		for (Generic superGeneric : directSupers) {
-			s += "Super #" + "        : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
+			s += "Super #" + "        : " + superGeneric + " ("
+					+ System.identityHashCode(superGeneric) + ")\n";
 		}
 		s += "**********************************************************************\n";
 		return s;
@@ -782,8 +957,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	@Override
 	public String toString() {
 		if (isPrimary())
-			return value instanceof Class ? ((Class<?>) value).getSimpleName() : value != null ? value.toString() : "null";
-		return Arrays.toString(getPrimariesArray()) + "/" + toString(components);
+			return value instanceof Class ? ((Class<?>) value).getSimpleName()
+					: value != null ? value.toString() : "null";
+		return Arrays.toString(getPrimariesArray()) + "/"
+				+ toString(components);
 	}
 
 	private String toString(Object[] a) {
@@ -813,14 +990,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Generic> T getMeta() {
-		final int instanciationLevel = getMetaLevel() == 0 ? 0 : getMetaLevel() - 1;
+		final int instanciationLevel = getMetaLevel() == 0 ? 0
+				: getMetaLevel() - 1;
 		return levelFilter(new AbstractPreTreeIterator<T>((T) this) {
 
 			private static final long serialVersionUID = 3838947358131801753L;
 
 			@Override
 			public Iterator<T> children(T node) {
-				return new AbstractFilterIterator<T>(((GenericImpl) node).<T> directSupersIterator()) {
+				return new AbstractFilterIterator<T>(
+						((GenericImpl) node).<T> directSupersIterator()) {
 					@Override
 					public boolean isSelected() {
 						return instanciationLevel <= next.getMetaLevel();
@@ -842,11 +1021,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Generic> T getComponent(int componentPos) {
-		return components.length <= componentPos ? null : (T) components[componentPos];
+		return components.length <= componentPos ? null
+				: (T) components[componentPos];
 	}
 
 	@Override
-	public <T extends Attribute> Snapshot<T> getStructurals(final Context context) {
+	public <T extends Attribute> Snapshot<T> getStructurals(
+			final Context context) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
@@ -856,7 +1037,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	private <T extends Generic> Iterator<T> structuralIterator(Context context) {
-		return this.<T> mainIterator(context, ((AbstractContext) context).getMetaAttribute(), SystemGeneric.STRUCTURAL, Statics.BASE_POSITION);
+		return this.<T> mainIterator(context,
+				((AbstractContext) context).getMetaAttribute(),
+				SystemGeneric.STRUCTURAL, Statics.BASE_POSITION);
 	}
 
 	@Override
@@ -864,7 +1047,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return new AbstractFilterIterator<T>(GenericImpl.this.<T> structuralIterator(context)) {
+				return new AbstractFilterIterator<T>(
+						GenericImpl.this.<T> structuralIterator(context)) {
 					@Override
 					public boolean isSelected() {
 						return next.isAttribute();
@@ -879,7 +1063,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return new AbstractFilterIterator<T>(GenericImpl.this.<T> structuralIterator(context)) {
+				return new AbstractFilterIterator<T>(
+						GenericImpl.this.<T> structuralIterator(context)) {
 					@Override
 					public boolean isSelected() {
 						return next.isRelation();
@@ -895,9 +1080,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return (Iterator<T>) new AbstractSelectableLeafIterator(context, GenericImpl.this) {
+				return (Iterator<T>) new AbstractSelectableLeafIterator(
+						context, GenericImpl.this) {
 					@Override
-					protected boolean isSelected(Generic father, Generic candidate) {
+					protected boolean isSelected(Generic father,
+							Generic candidate) {
 						return candidate.isInstanceOf(GenericImpl.this);
 					}
 
@@ -921,17 +1108,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	private <T extends Generic> Iterator<T> allInstancesIterator(Context context) {
-		return levelFilter(this.<T> allInheritingsAboveIterator(context, getMetaLevel() + 1), getMetaLevel() + 1);
+		return levelFilter(this.<T> allInheritingsAboveIterator(context,
+				getMetaLevel() + 1), getMetaLevel() + 1);
 	}
 
-	private <T extends Generic> Iterator<T> allInheritingsAboveIterator(final Context context, final int metaLevel) {
-		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+	private <T extends Generic> Iterator<T> allInheritingsAboveIterator(
+			final Context context, final int metaLevel) {
+		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(
+				GenericImpl.this) {
 
 			private static final long serialVersionUID = 7164424160379931253L;
 
 			@Override
 			public Iterator<Generic> children(Generic node) {
-				return new AbstractFilterIterator<Generic>(((GenericImpl) node).directInheritingsIterator(context)) {
+				return new AbstractFilterIterator<Generic>(
+						((GenericImpl) node).directInheritingsIterator(context)) {
 					@Override
 					public boolean isSelected() {
 						return next.getMetaLevel() <= metaLevel;
@@ -952,7 +1143,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	private <T extends Generic> Iterator<T> subTypesIterator(Context context) {
-		return levelFilter(this.<T> directInheritingsIterator(context), getMetaLevel());
+		return levelFilter(this.<T> directInheritingsIterator(context),
+				getMetaLevel());
 	}
 
 	@Override
@@ -967,10 +1159,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	private <T extends Generic> Iterator<T> allSubTypesIterator(Context context) {
-		return levelFilter(this.<T> allInheritingsIterator(context), getMetaLevel());
+		return levelFilter(this.<T> allInheritingsIterator(context),
+				getMetaLevel());
 	}
 
-	private static <T extends Generic> Iterator<T> levelFilter(Iterator<T> iterator, final int instanciationLevel) {
+	private static <T extends Generic> Iterator<T> levelFilter(
+			Iterator<T> iterator, final int instanciationLevel) {
 		return new AbstractFilterIterator<T>(iterator) {
 
 			@Override
@@ -980,7 +1174,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		};
 	}
 
-	public <T extends Generic> Snapshot<T> getAllInheritings(final Context context) {
+	public <T extends Generic> Snapshot<T> getAllInheritings(
+			final Context context) {
 		return new AbstractSnapshot<T>() {
 
 			@Override
@@ -990,8 +1185,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		};
 	}
 
-	private <T extends Generic> Iterator<T> allInheritingsIterator(final Context context) {
-		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+	private <T extends Generic> Iterator<T> allInheritingsIterator(
+			final Context context) {
+		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(
+				GenericImpl.this) {
 
 			private static final long serialVersionUID = 4540682035671625893L;
 
@@ -1012,7 +1209,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (clazz.getAnnotation(UniqueConstraint.class) != null)
 			enableUniqueConstraint(cache);
 
-		InstanceClassConstraint instanceClass = clazz.getAnnotation(InstanceClassConstraint.class);
+		InstanceClassConstraint instanceClass = clazz
+				.getAnnotation(InstanceClassConstraint.class);
 		if (instanceClass != null)
 			setConstraintClass(cache, instanceClass.value());
 
@@ -1025,7 +1223,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (clazz.getAnnotation(SingularInstanceConstraint.class) != null)
 			enableSingularInstanceConstraint(cache);
 
-		SingularConstraint singularTarget = clazz.getAnnotation(SingularConstraint.class);
+		SingularConstraint singularTarget = clazz
+				.getAnnotation(SingularConstraint.class);
 		if (singularTarget != null)
 			for (int axe : singularTarget.value())
 				enableSingularConstraint(cache, axe);
@@ -1047,18 +1246,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	public void cancel(Cache cache, Value attribute) {
 		if (equals(attribute.getBaseComponent()))
-			throw new IllegalStateException("Only inherited attributes can be cancelled");
-		((CacheImpl) cache).bind(attribute, Statics.PHAMTOM, attribute.getMetaLevel(), Statics.EMPTY_GENERIC_ARRAY, Statics.replace(Statics.BASE_POSITION, ((GenericImpl) attribute).components, this));
+			throw new IllegalStateException(
+					"Only inherited attributes can be cancelled");
+		((CacheImpl) cache).bind(attribute, Statics.PHAMTOM, attribute
+				.getMetaLevel(), Statics.EMPTY_GENERIC_ARRAY, Statics.replace(
+				Statics.BASE_POSITION, ((GenericImpl) attribute).components,
+				this));
 	}
 
 	public void restore(Cache cache, Attribute attribute) {
-		for (Value nodeValue : getLinks(cache, (Relation) attribute, Statics.BASE_POSITION))
+		for (Value nodeValue : getLinks(cache, (Relation) attribute,
+				Statics.BASE_POSITION))
 			if (isValuePhantomOverride(nodeValue, attribute.getValue()))
 				nodeValue.remove(cache);
 	}
 
 	private boolean isValuePhantomOverride(Value nodeValue, Serializable value) {
-		return (equals(nodeValue.getBaseComponent()) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.getImplicit().getSupers().first().getValue(), value));
+		return (equals(nodeValue.getBaseComponent())
+				&& ((GenericImpl) nodeValue).isPhantom() && Objects.equals(
+				nodeValue.getImplicit().getSupers().first().getValue(), value));
 	}
 
 	/*********************************************/
@@ -1072,28 +1278,34 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Node> T newRoot(Cache cache, Serializable value, int dim) {
-		return addLink(cache, this.<Link> getImplicit(), value, getMetaLevel() + 1, Statics.BASE_POSITION);
+		return addLink(cache, this.<Link> getImplicit(), value,
+				getMetaLevel() + 1, Statics.BASE_POSITION);
 
 	}
 
 	@Override
-	public <T extends Node> T addNode(Cache cache, Serializable value, Generic... targets) {
-		return addLink(cache, this.<Link> getMeta(), value, SystemGeneric.CONCRETE, Statics.BASE_POSITION, targets);
+	public <T extends Node> T addNode(Cache cache, Serializable value,
+			Generic... targets) {
+		return addLink(cache, this.<Link> getMeta(), value,
+				SystemGeneric.CONCRETE, Statics.BASE_POSITION, targets);
 	}
 
 	@Override
-	public <T extends Node> T addSubNode(Cache cache, Serializable value, Generic... targets) {
-		return addLink(cache, this, value, SystemGeneric.CONCRETE, Statics.BASE_POSITION, targets);
+	public <T extends Node> T addSubNode(Cache cache, Serializable value,
+			Generic... targets) {
+		return addLink(cache, this, value, SystemGeneric.CONCRETE,
+				Statics.BASE_POSITION, targets);
 	}
 
 	@Override
 	public <T extends Node> Snapshot<T> getChildren(Context context) {
-		return this.<T> getValueHolders(context, this.<T> getMeta()).filter(new Filter<T>() {
-			@Override
-			public boolean isSelected(T node) {
-				return !GenericImpl.this.equals(node);
-			}
-		});
+		return this.<T> getValueHolders(context, this.<T> getMeta()).filter(
+				new Filter<T>() {
+					@Override
+					public boolean isSelected(T node) {
+						return !GenericImpl.this.equals(node);
+					}
+				});
 	}
 
 	@Override
@@ -1114,103 +1326,145 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	/*********************************************/
 
 	private boolean isSystemPropertyDefaultEnabled(Class<?> systemPropertyClass) {
-		return systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
+		return systemPropertyClass.getAnnotation(SystemGeneric.class)
+				.defaultBehavior();
 	}
 
 	@Override
-	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass) {
+	public <T extends Generic> T enableSystemProperty(Cache cache,
+			Class<?> systemPropertyClass) {
 		enableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
 		return (T) this;
 	}
 
 	@Override
-	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass) {
+	public <T extends Generic> T disableSystemProperty(Cache cache,
+			Class<?> systemPropertyClass) {
 		disableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
 		return (T) this;
 	}
 
 	@Override
-	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
-		return setSystemProperty(cache, systemPropertyClass, componentPos, Boolean.TRUE);
+	public <T extends Generic> T enableSystemProperty(Cache cache,
+			Class<?> systemPropertyClass, int componentPos) {
+		return setSystemProperty(cache, systemPropertyClass, componentPos,
+				Boolean.TRUE);
 	}
 
 	@Override
-	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
-		return setSystemProperty(cache, systemPropertyClass, componentPos, Boolean.FALSE);
+	public <T extends Generic> T disableSystemProperty(Cache cache,
+			Class<?> systemPropertyClass, int componentPos) {
+		return setSystemProperty(cache, systemPropertyClass, componentPos,
+				Boolean.FALSE);
 	}
 
-	private <T extends Generic> T setSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos, Serializable enabled) {
+	private <T extends Generic> T setSystemProperty(Cache cache,
+			Class<?> systemPropertyClass, int componentPos, Serializable enabled) {
 		if (componentPos + 1 > getComponentsSize())
-			throw new ComponentPosExceedsComponentsSizeException("The component position (" + componentPos + ") exceeds the components size " + this.info());
+			throw new ComponentPosExceedsComponentsSizeException(
+					"The component position (" + componentPos
+							+ ") exceeds the components size " + this.info());
 		Attribute attribute = cache.<Attribute> find(systemPropertyClass);
 		for (Attribute valueHolder : getValueHolders(cache, attribute))
-			if (Objects.equals(valueHolder.<ComponentPosValue<Boolean>> getValue().getComponentPos(), componentPos)) {
-				if (!this.equals(valueHolder.getComponent(Statics.BASE_POSITION)))
-					addLink(cache, (Link) valueHolder, new ComponentPosValue<Serializable>(componentPos, enabled), SystemGeneric.CONCRETE, Statics.BASE_POSITION);
+			if (Objects.equals(valueHolder
+					.<ComponentPosValue<Boolean>> getValue().getComponentPos(),
+					componentPos)) {
+				if (!this.equals(valueHolder
+						.getComponent(Statics.BASE_POSITION)))
+					addLink(cache, (Link) valueHolder,
+							new ComponentPosValue<Serializable>(componentPos,
+									enabled), SystemGeneric.CONCRETE,
+							Statics.BASE_POSITION);
 				else
-					update(cache, valueHolder, new ComponentPosValue<Serializable>(componentPos, enabled));
+					update(cache, valueHolder,
+							new ComponentPosValue<Serializable>(componentPos,
+									enabled));
 				return (T) this;
 			}
-		addLink(cache, (Link) attribute, new ComponentPosValue<Serializable>(componentPos, enabled), SystemGeneric.CONCRETE, Statics.BASE_POSITION);
+		addLink(cache, (Link) attribute, new ComponentPosValue<Serializable>(
+				componentPos, enabled), SystemGeneric.CONCRETE,
+				Statics.BASE_POSITION);
 		return (T) this;
 	}
 
 	@Override
-	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass) {
-		return isSystemPropertyEnabled(context, systemPropertyClass, Statics.BASE_POSITION);
+	public boolean isSystemPropertyEnabled(Context context,
+			Class<?> systemPropertyClass) {
+		return isSystemPropertyEnabled(context, systemPropertyClass,
+				Statics.BASE_POSITION);
 	}
 
 	@Override
-	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos) {
-		for (Value valueHolder : getValueHolders(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)))
-			if (Objects.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getComponentPos(), componentPos))
-				return !Boolean.FALSE.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getValue());
+	public boolean isSystemPropertyEnabled(Context context,
+			Class<?> systemPropertyClass, int componentPos) {
+		for (Value valueHolder : getValueHolders(context,
+				((AbstractContext) context)
+						.<Attribute> find(systemPropertyClass)))
+			if (Objects.equals(valueHolder
+					.<ComponentPosValue<Serializable>> getValue()
+					.getComponentPos(), componentPos))
+				return !Boolean.FALSE.equals(valueHolder
+						.<ComponentPosValue<Serializable>> getValue()
+						.getValue());
 		return isSystemPropertyDefaultEnabled(systemPropertyClass);
 	}
 
 	@Override
 	public <T extends Attribute> T enableMultiDirectional(Cache cache) {
-		return enableSystemProperty(cache, MultiDirectionalSystemProperty.class, Statics.BASE_POSITION);
+		return enableSystemProperty(cache,
+				MultiDirectionalSystemProperty.class, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Attribute> T disableMultiDirectional(Cache cache) {
-		return disableSystemProperty(cache, MultiDirectionalSystemProperty.class, Statics.BASE_POSITION);
+		return disableSystemProperty(cache,
+				MultiDirectionalSystemProperty.class, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public boolean isMultiDirectional(Context context) {
-		return isSystemPropertyEnabled(context, MultiDirectionalSystemProperty.class);
+		return isSystemPropertyEnabled(context,
+				MultiDirectionalSystemProperty.class);
 	}
 
 	@Override
-	public <T extends Relation> T enableCascadeRemove(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, CascadeRemoveSystemProperty.class, componentPos);
+	public <T extends Relation> T enableCascadeRemove(Cache cache,
+			int componentPos) {
+		return enableSystemProperty(cache, CascadeRemoveSystemProperty.class,
+				componentPos);
 	}
 
 	@Override
-	public <T extends Relation> T disableCascadeRemove(Cache cache, int componentPos) {
-		return disableSystemProperty(cache, CascadeRemoveSystemProperty.class, componentPos);
+	public <T extends Relation> T disableCascadeRemove(Cache cache,
+			int componentPos) {
+		return disableSystemProperty(cache, CascadeRemoveSystemProperty.class,
+				componentPos);
 	}
 
 	@Override
 	public boolean isCascadeRemove(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, CascadeRemoveSystemProperty.class, componentPos);
+		return isSystemPropertyEnabled(context,
+				CascadeRemoveSystemProperty.class, componentPos);
 	}
 
 	@Override
-	public <T extends Generic> T enableReferentialIntegrity(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, componentPos);
+	public <T extends Generic> T enableReferentialIntegrity(Cache cache,
+			int componentPos) {
+		return enableSystemProperty(cache,
+				ReferentialIntegritySystemProperty.class, componentPos);
 	}
 
 	@Override
-	public <T extends Generic> T disableReferentialIntegrity(Cache cache, int componentPos) {
-		return disableSystemProperty(cache, ReferentialIntegritySystemProperty.class, componentPos);
+	public <T extends Generic> T disableReferentialIntegrity(Cache cache,
+			int componentPos) {
+		return disableSystemProperty(cache,
+				ReferentialIntegritySystemProperty.class, componentPos);
 	}
 
 	@Override
 	public boolean isReferentialIntegrity(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, ReferentialIntegritySystemProperty.class, componentPos);
+		return isSystemPropertyEnabled(context,
+				ReferentialIntegritySystemProperty.class, componentPos);
 	}
 
 	@Override
@@ -1229,18 +1483,23 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Type> T enableSingularConstraint(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, SingularConstraintImpl.class, componentPos);
+	public <T extends Type> T enableSingularConstraint(Cache cache,
+			int componentPos) {
+		return enableSystemProperty(cache, SingularConstraintImpl.class,
+				componentPos);
 	}
 
 	@Override
-	public <T extends Type> T disableSingularConstraint(Cache cache, int componentPos) {
-		return disableSystemProperty(cache, SingularConstraintImpl.class, componentPos);
+	public <T extends Type> T disableSingularConstraint(Cache cache,
+			int componentPos) {
+		return disableSystemProperty(cache, SingularConstraintImpl.class,
+				componentPos);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, SingularConstraintImpl.class, componentPos);
+		return isSystemPropertyEnabled(context, SingularConstraintImpl.class,
+				componentPos);
 	}
 
 	@Override
@@ -1260,32 +1519,40 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Type> T enableRequiredConstraint(Cache cache) {
-		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
+		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class,
+				Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T disableRequiredConstraint(Cache cache) {
-		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
+		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class,
+				Statics.BASE_POSITION);
 	}
 
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
+		return isSystemPropertyEnabled(context,
+				RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
 	}
 
 	@Override
-	public <T extends Type> T enableRequiredConstraint(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class, componentPos);
+	public <T extends Type> T enableRequiredConstraint(Cache cache,
+			int componentPos) {
+		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class,
+				componentPos);
 	}
 
 	@Override
-	public <T extends Type> T disableRequiredConstraint(Cache cache, int componentPos) {
-		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class, componentPos);
+	public <T extends Type> T disableRequiredConstraint(Cache cache,
+			int componentPos) {
+		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class,
+				componentPos);
 	}
 
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, RequiredAxedConstraintImpl.class, componentPos);
+		return isSystemPropertyEnabled(context,
+				RequiredAxedConstraintImpl.class, componentPos);
 	}
 
 	@Override
@@ -1334,8 +1601,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Type> T setConstraintClass(Cache cache, Class<?> constraintClass) {
-		return setSystemProperty(cache, InstanceClassConstraintImpl.class, Statics.BASE_POSITION, constraintClass);
+	public <T extends Type> T setConstraintClass(Cache cache,
+			Class<?> constraintClass) {
+		return setSystemProperty(cache, InstanceClassConstraintImpl.class,
+				Statics.BASE_POSITION, constraintClass);
 	}
 
 	@Override
@@ -1345,12 +1614,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Type> T disableSingularInstanceConstraint(Cache cache) {
-		return disableSystemProperty(cache, SingularInstanceConstraintImpl.class);
+		return disableSystemProperty(cache,
+				SingularInstanceConstraintImpl.class);
 	}
 
 	@Override
 	public boolean isSingularInstanceConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, SingularInstanceConstraintImpl.class);
+		return isSystemPropertyEnabled(context,
+				SingularInstanceConstraintImpl.class);
 	}
 
 	@Override
@@ -1365,7 +1636,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public boolean isInheritanceEnabled(Context context) {
-		return !isSystemPropertyEnabled(context, NoInheritanceSystemProperty.class);
+		return !isSystemPropertyEnabled(context,
+				NoInheritanceSystemProperty.class);
 	}
 
 	Generic[] nullComponentsArray() {
@@ -1377,7 +1649,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	boolean equiv(Generic[] interfaces, Generic[] components) {
-		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullComponentsArray(), components);
+		return Arrays.equals(getPrimariesArray(), interfaces)
+				&& Arrays.equals(nullComponentsArray(), components);
 	}
 
 	public <T extends Generic> T reBind(Cache cache) {
@@ -1401,7 +1674,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 					log.info("Link of : " + i + " subsitute : " + generic);
 					Link link = generic.getLink(cache, this, i);
 					log.info("=======>" + this + " : " + link);
-					log.info("=======> has good substitute : " + link.getComponent(i).equals(generic));
+					log.info("=======> has good substitute : "
+							+ link.getComponent(i).equals(generic));
 					log.info("=======> inherits : " + link.inheritsFrom(this));
 
 					if (!link.getComponent(i).equals(generic)) {
@@ -1409,7 +1683,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 						if (link.inheritsFrom(this)) {
 							log.info("Add Link before " + link);
 
-							link = (((GenericImpl) generic).addLink(cache, link, link.getValue(), SystemGeneric.CONCRETE, i, truncated));
+							link = (((GenericImpl) generic).addLink(cache,
+									link, link.getValue(),
+									SystemGeneric.CONCRETE, i, truncated));
 							log.info("Add Link after : " + link);
 
 						}
@@ -1423,7 +1699,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		// for (Generic generic : components[0].getComposites(cache))
 		// if (Arrays.equals(((GenericImpl) generic).components, components))
 		// return;
-		// ((CacheImpl) cache).bind(getImplicit(), Statics.insertFirstIntoArray(getImplicit(), directSupers), components);
+		// ((CacheImpl) cache).bind(getImplicit(),
+		// Statics.insertFirstIntoArray(getImplicit(), directSupers),
+		// components);
 	}
 
 	boolean isPseudoStructural() {

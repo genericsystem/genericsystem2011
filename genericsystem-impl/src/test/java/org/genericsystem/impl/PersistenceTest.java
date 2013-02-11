@@ -13,8 +13,6 @@ import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.core.GenericImpl;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test
@@ -22,89 +20,102 @@ public class PersistenceTest {
 
 	private String directoryPath = System.getenv("HOME") + "/test/snapshot_save";
 
-	private Cache cache;
-	private int directoryNumber;
-
-	@BeforeMethod
-	public void initWorkingSpace() {
-		directoryNumber = new Random().nextInt();
-		String path = directoryPath + directoryNumber;
+	private Cache initWorkingSpace() {
+		String path = directoryPath + new Random().nextInt();
 		cleanDirectory(path);
-		cache = GenericSystem.newCacheOnANewPersistentEngine(path);
+		return GenericSystem.newCacheOnANewPersistentEngine(path);
 	}
 
-	@AfterMethod
-	public void closingWorkingSpace() {
+	private void closingWorkingSpace(Cache cache) {
 		cache.flush();
 		Engine engine = cache.getEngine();
 		engine.close();
-//		GenericSystem.activateNewCache(engine);
-		compareGraph(engine, engine);//GenericSystem.newCacheOnANewInMemoryEngine(directoryPath + directoryNumber).getEngine());
+		// GenericSystem.activateNewCache(engine);
+		compareGraph(cache, engine, engine);// GenericSystem.newCacheOnANewInMemoryEngine(directoryPath + directoryNumber).getEngine());
 	}
 
 	public void testDefaultConfiguration() {
+		closingWorkingSpace(initWorkingSpace());
 	}
 
 	public void testOnlyAType() {
+		Cache cache = initWorkingSpace();
 		cache.newType("Vehicle");
+		closingWorkingSpace(cache);
 	}
 
 	public void testCustomTypeAndItsInstance() {
+		Cache cache = initWorkingSpace();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		myVehicle.setValue(cache, equipment, "ABS");
+		closingWorkingSpace(cache);
 	}
 
 	public void testAddAndRemove() {
+		Cache cache = initWorkingSpace();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type truck = vehicle.newSubType(cache, "Truck");
 		truck.newSubType(cache, "Van");
 		car.remove(cache);
+		closingWorkingSpace(cache);
 	}
 
 	public void testLink() {
+		Cache cache = initWorkingSpace();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Generic red = color.newInstance(cache, "red");
 		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
+		closingWorkingSpace(cache);
 	}
 
 	public void testHeritage() {
+		Cache cache = initWorkingSpace();
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.newSubType(cache, "Car");
+		closingWorkingSpace(cache);
 	}
 
 	public void testHeritageMultiple() {
+		Cache cache = initWorkingSpace();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		cache.newSubType("Transformer", vehicle, human);
+		closingWorkingSpace(cache);
 	}
 
 	public void testHeritageMultipleDiamond() {
+		Cache cache = initWorkingSpace();
 		Type movable = cache.newType("Movable");
 		Type vehicle = movable.newSubType(cache, "Vehicle");
 		Type human = movable.newSubType(cache, "Human");
 		cache.newSubType("Transformer", vehicle, human);
+		closingWorkingSpace(cache);
 	}
 
 	public void testTree() {
+		Cache cache = initWorkingSpace();
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
 		Node child = root.addNode(cache, "Child");
 		root.addNode(cache, "Child2");
 		child.addNode(cache, "Child3");
+		closingWorkingSpace(cache);
 	}
 
 	public void testInheritanceTree() {
+		Cache cache = initWorkingSpace();
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
 		Node child = root.addSubNode(cache, "Child");
 		root.addSubNode(cache, "Child2");
 		child.addSubNode(cache, "Child3");
+		closingWorkingSpace(cache);
 	}
 
 	private static void cleanDirectory(String directoryPath) {
@@ -114,27 +125,27 @@ public class PersistenceTest {
 				f.delete();
 	}
 
-	private void compareGraph(Generic persistedNode, Generic readNode) {
-		readByInheritings(persistedNode, readNode);
-		readByComposites(persistedNode, readNode);
+	private void compareGraph(Cache cache, Generic persistedNode, Generic readNode) {
+		readByInheritings(cache, persistedNode, readNode);
+		readByComposites(cache, persistedNode, readNode);
 	}
 
-	private void readByInheritings(Generic persistedNode, Generic readNode) {
+	private void readByInheritings(Cache cache, Generic persistedNode, Generic readNode) {
 		int indexInherintings = 0;
 		assert (persistedNode.getInheritings(cache).size() == readNode.getInheritings(cache).size()) : persistedNode.getInheritings(cache) + " / " + readNode.getInheritings(cache);
 		for (Generic persistedGeneric : persistedNode.getInheritings(cache)) {
 			compareGeneric(persistedGeneric, readNode.getInheritings(cache).get(indexInherintings));
-			readByInheritings(persistedGeneric, readNode.getInheritings(cache).get(indexInherintings));
+			readByInheritings(cache, persistedGeneric, readNode.getInheritings(cache).get(indexInherintings));
 			indexInherintings++;
 		}
 	}
 
-	private void readByComposites(Generic persistedNode, Generic readNode) {
+	private void readByComposites(Cache cache, Generic persistedNode, Generic readNode) {
 		int indexComposites = 0;
 		assert (persistedNode.getComposites(cache).size() == readNode.getComposites(cache).size());
 		for (Generic persistedGeneric : persistedNode.getComposites(cache)) {
 			compareGeneric(persistedGeneric, readNode.getComposites(cache).get(indexComposites));
-			readByComposites(persistedGeneric, readNode.getComposites(cache).get(indexComposites));
+			readByComposites(cache, persistedGeneric, readNode.getComposites(cache).get(indexComposites));
 			indexComposites++;
 		}
 	}
