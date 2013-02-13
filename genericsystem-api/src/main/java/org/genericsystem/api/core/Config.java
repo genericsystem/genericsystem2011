@@ -3,13 +3,20 @@ package org.genericsystem.api.core;
 import org.genericsystem.api.core.Factory.DefaultFactory;
 
 /**
- * @author Nicolas Feybesse
+ * Config.
  * 
+ * @author Nicolas Feybesse
  */
 public class Config {
 
+	/**
+	 * Directory path of the persistence.
+	 */
 	private String directoryPath;
 
+	/**
+	 * The Factory.
+	 */
 	private Factory factory;
 
 	public Config() {

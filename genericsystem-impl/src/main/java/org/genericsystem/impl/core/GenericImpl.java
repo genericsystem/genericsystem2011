@@ -481,8 +481,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value,
 	}
 
 	@Override
-	public void flag(Cache cache, Value value) {
-		setValue(cache, (Attribute) value, Statics.FLAG);
+	public void flag(Cache cache, Attribute attribute) {
+		setValue(cache, attribute, Statics.FLAG);
 	}
 
 	@Override
