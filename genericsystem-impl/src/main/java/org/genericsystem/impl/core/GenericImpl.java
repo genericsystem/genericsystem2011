@@ -64,12 +64,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private LifeManager lifeManager;
 
-	Generic[] directSupers;
+	Generic[] supers;
 
 	Generic[] components;
 
 	int metaLevel;
 	Serializable value;
+
+	public Generic[] getSupersArray() {
+		return supers.clone();
+	}
+
+	public Generic[] getComponentsArray() {
+		return components.clone();
+	}
 
 	final GenericImpl initializePrimary(Serializable value, int metaLevel, Generic[] directSupers, Generic[] components) {
 		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
@@ -82,7 +90,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
 		this.value = value;
 		this.metaLevel = metaLevel;
-		this.directSupers = directSupers;
+		this.supers = directSupers;
 		this.components = components;
 
 		initSelfComponents();
@@ -101,7 +109,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				((GenericImpl) component).lifeManager.engineComposites.add(this);
 
 		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : directSupers)
+		for (Generic effectiveSuper : supers)
 			if (effectiveSupersSet.add(effectiveSuper))
 				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
 		return (T) this;
@@ -126,7 +134,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Generic> T getImplicit() {
 		if (isPrimary())
 			return (T) this;
-		for (Generic superGeneric : directSupers)
+		for (Generic superGeneric : supers)
 			if (metaLevel == ((GenericImpl) superGeneric).metaLevel && Objects.hashCode(value) == Objects.hashCode(((GenericImpl) superGeneric).value) && Objects.equals(value, ((GenericImpl) superGeneric).value))
 				return ((GenericImpl) superGeneric).getImplicit();
 		throw new IllegalStateException(info());
@@ -134,7 +142,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public EngineImpl getEngine() {
-		return (EngineImpl) directSupers[0].getEngine();
+		return (EngineImpl) supers[0].getEngine();
 	}
 
 	@Override
@@ -453,7 +461,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Link> T addLink(Cache cache, Generic directSuper, Serializable value, int metaLevel, int basePos, Generic... targets) {
-		Generic implicitSuper = directSuper.isConcrete() ? directSuper.<GenericImpl> getImplicit().directSupers[0] : directSuper.getImplicit();
+		Generic implicitSuper = directSuper.isConcrete() ? directSuper.<GenericImpl> getImplicit().supers[0] : directSuper.getImplicit();
 		return newInstance(cache, implicitSuper, value, metaLevel, new Generic[] { directSuper }, Statics.insertIntoArray(this, targets, basePos));
 	}
 
@@ -531,7 +539,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	Generic[] getExtendedComponentsArray() {
-		return new ExtendedComponents(components).addSupers(directSupers).toArray();
+		return new ExtendedComponents(components).addSupers(supers).toArray();
 	}
 
 	static public class ExtendedComponents extends ArrayList<Generic> {
@@ -575,7 +583,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		public boolean isSuperOf(Generic subGeneric) {
 			if (GenericImpl.this.equals(subGeneric))
 				return true;
-			for (Generic directSuper : ((GenericImpl) subGeneric).directSupers)
+			for (Generic directSuper : ((GenericImpl) subGeneric).supers)
 				if (add(directSuper) && isSuperOf(directSuper))
 					return true;
 			return false;
@@ -615,7 +623,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (((GenericImpl) generic).isEngine())
 			return isEngine();
 		if (((GenericImpl) generic).isPrimary())
-			return isSuperOf(((GenericImpl) generic).directSupers[0], override);
+			return isSuperOf(((GenericImpl) generic).supers[0], override);
 		return isSuperOf(getPrimariesArray(), getExtendedComponentsArray(), ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).getExtendedComponentsArray(), override);
 	}
 
@@ -697,7 +705,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> directSupersIterator() {
-		return new ArrayIterator<T>((T[]) directSupers);
+		return new ArrayIterator<T>((T[]) supers);
 	}
 
 	@Override
@@ -717,7 +725,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public int getSupersSize() {
-		return directSupers.length;
+		return supers.length;
 	}
 
 	private <T extends Generic> Iterator<T> componentsIterator() {
@@ -784,7 +792,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			s += "Primary #" + "       : " + primary + " (" + System.identityHashCode(primary) + ")\n";
 		for (Generic component : components)
 			s += "Component #" + "    : " + component + " (" + System.identityHashCode(component) + ")\n";
-		for (Generic superGeneric : directSupers) {
+		for (Generic superGeneric : supers) {
 			s += "Super #" + "        : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
 		}
 		s += "**********************************************************************\n";
@@ -820,7 +828,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public boolean isPrimary() {
-		return components.length == 0 && directSupers.length == 1;
+		return components.length == 0 && supers.length == 1;
 	}
 
 	@Override
@@ -1436,7 +1444,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		// if (Arrays.equals(((GenericImpl) generic).components, components))
 		// return;
 		// ((CacheImpl) cache).bind(getImplicit(),
-		// Statics.insertFirstIntoArray(getImplicit(), directSupers),
+		// Statics.insertFirstIntoArray(getImplicit(), supers),
 		// components);
 	}
 

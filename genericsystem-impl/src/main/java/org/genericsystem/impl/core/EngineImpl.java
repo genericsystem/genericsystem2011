@@ -26,6 +26,7 @@ import org.genericsystem.impl.constraints.simple.PhantomConstraintImpl;
 import org.genericsystem.impl.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.impl.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.impl.constraints.simple.SuperRuleConstraintImpl;
+import org.genericsystem.impl.constraints.simple.UnduplicateBindingConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.impl.core.Statics.AnonymousReference;
 import org.genericsystem.impl.core.Statics.TsGenerator;
@@ -63,11 +64,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 		restoreEngine(pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE);
 	}
 
-	final void restoreEngine(long designTs, long birthTs, long lastReadTs,
-			long deathTs) {
-		restore(ENGINE_VALUE, SystemGeneric.META, designTs, birthTs,
-				lastReadTs, deathTs, new Generic[] { this },
-				Statics.EMPTY_GENERIC_ARRAY);
+	final void restoreEngine(long designTs, long birthTs, long lastReadTs, long deathTs) {
+		restore(ENGINE_VALUE, SystemGeneric.META, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
 		assert components.length == 0;
 	}
 
@@ -130,24 +128,10 @@ public class EngineImpl extends GenericImpl implements Engine {
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
 			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
-			List<Class<?>> classes = Arrays.<Class<?>> asList(
-					MetaAttribute.class, MetaRelation.class,
-					NoInheritanceSystemProperty.class,
-					MultiDirectionalSystemProperty.class,
-					PropertyConstraintImpl.class,
-					ReferentialIntegritySystemProperty.class,
-					OptimisticLockConstraintImpl.class,
-					RequiredAxedConstraintImpl.class,
-					SingularInstanceConstraintImpl.class,
-					SingularConstraintImpl.class, NotNullConstraintImpl.class,
-					InstanceClassConstraintImpl.class,
-					VirtualConstraintImpl.class, AliveConstraintImpl.class,
-					UniqueConstraintImpl.class,
-					CascadeRemoveSystemProperty.class,
-					ConcreteInheritanceConstraintImpl.class,
-					SuperRuleConstraintImpl.class,
-					EngineConsistencyConstraintImpl.class,
-					PhantomConstraintImpl.class);
+			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
+					OptimisticLockConstraintImpl.class, RequiredAxedConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, NotNullConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class,
+					AliveConstraintImpl.class, UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
+					UnduplicateBindingConstraintImpl.class);
 			for (Class<?> clazz : classes)
 				if (get(clazz) == null)
 					bind(cache, clazz);
@@ -166,8 +150,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 				return systemProperty;
 			if (startupTime && context instanceof Cache)
 				return bind((CacheImpl) context, clazz);
-			throw new IllegalStateException("Class : " + clazz
-					+ " has not been built at startup");
+			throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
 		}
 
 		@SuppressWarnings("unchecked")
@@ -176,22 +159,13 @@ public class EngineImpl extends GenericImpl implements Engine {
 			if (Engine.class.equals(clazz))
 				result = (T) EngineImpl.this;
 			if (MetaAttribute.class.equals(clazz)) {
-				result = cache.<T> findMeta(new Generic[] { EngineImpl.this },
-						new Generic[] { EngineImpl.this });
+				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this });
 				if (result == null)
-					result = cache.insert(new GenericImpl().initializeComplex(
-							EngineImpl.this, new Generic[] { EngineImpl.this },
-							new Generic[] { EngineImpl.this }));
+					result = cache.insert(new GenericImpl().initializeComplex(EngineImpl.this, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }));
 			} else if (MetaRelation.class.equals(clazz)) {
-				result = cache.<T> findMeta(new Generic[] { EngineImpl.this },
-						new Generic[] { EngineImpl.this, EngineImpl.this });
+				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (result == null)
-					result = cache
-							.insert(new GenericImpl().initializeComplex(
-									get(MetaAttribute.class),
-									new Generic[] { get(MetaAttribute.class) },
-									new Generic[] { EngineImpl.this,
-											EngineImpl.this }));
+					result = cache.insert(new GenericImpl().initializeComplex(get(MetaAttribute.class), new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);

@@ -115,7 +115,7 @@ public class Transaction extends AbstractContext {
 			for (Generic generic : removes)
 				writeLockAndCheckMvcc(lockedLifeManagers, ((GenericImpl) generic).getLifeManager());
 			for (Generic generic : adds) {
-				for (Generic effectiveSuper : ((GenericImpl) generic).directSupers)
+				for (Generic effectiveSuper : ((GenericImpl) generic).supers)
 					writeLockAndCheckMvcc(lockedLifeManagers, ((GenericImpl) effectiveSuper).getLifeManager());
 				for (Generic component : ((GenericImpl) generic).components)
 					writeLockAndCheckMvcc(lockedLifeManagers, ((GenericImpl) component).getLifeManager());

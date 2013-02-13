@@ -237,7 +237,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T update(Generic old, Serializable value) {
-		return reInsert(orderAndRemoveDependencies(old).iterator(), ((GenericImpl) old).getImplicit(), bindPrimaryByValue(old.<GenericImpl> getImplicit().directSupers[0], value, old.getMetaLevel()));
+		return reInsert(orderAndRemoveDependencies(old).iterator(), ((GenericImpl) old).getImplicit(), bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel()));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -250,7 +250,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private Generic replace(Generic genericToReplace, GenericImpl oldImplicit, GenericImpl newImplicit) {
 		if (((GenericImpl) genericToReplace).isPrimary())
-			return bindPrimaryByValue(((GenericImpl) genericToReplace).directSupers[0], genericToReplace.getValue(), genericToReplace.getMetaLevel());
+			return bindPrimaryByValue(((GenericImpl) genericToReplace).supers[0], genericToReplace.getValue(), genericToReplace.getMetaLevel());
 
 		Generic[] interfaces = ((GenericImpl) genericToReplace).getPrimariesArray();
 		Generic[] resultInterfaces = new Generic[interfaces.length];
@@ -268,7 +268,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return oldSubPrimary;
 		if (oldSubPrimary.equals(oldPrimary))
 			return newPrimary;
-		return bindPrimaryByValue(getNewPrimary(((GenericImpl) oldSubPrimary).directSupers[0], oldPrimary, newPrimary), oldSubPrimary.getValue(), oldSubPrimary.getMetaLevel());
+		return bindPrimaryByValue(getNewPrimary(((GenericImpl) oldSubPrimary).supers[0], oldPrimary, newPrimary), oldSubPrimary.getValue(), oldSubPrimary.getMetaLevel());
 	}
 
 	@Override
@@ -326,7 +326,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (generic.isAlive(this))
 			return (T) generic;
 		if (((GenericImpl) generic).isPrimary())
-			return findPrimaryByValue(reFind(((GenericImpl) generic).directSupers[0]), generic.getValue(), generic.getMetaLevel());
+			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue(), generic.getMetaLevel());
 		Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
 		for (int i = 0; i < primariesArray.length; i++)
@@ -389,7 +389,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		ConnectionMap connectionMap = new ConnectionMap();
 		connectionMap.reBuild(orderAndRemoveDependencies(generic));
 		T rebind = (T) connectionMap.get(generic);
-		assert rebind == (((GenericImpl) rebind).isPrimary() ? findPrimaryByValue(((GenericImpl) rebind).directSupers[0], rebind.getValue(), rebind.getMetaLevel()) : find(((GenericImpl) rebind).directSupers, ((GenericImpl) rebind).components));
+		assert rebind == (((GenericImpl) rebind).isPrimary() ? findPrimaryByValue(((GenericImpl) rebind).supers[0], rebind.getValue(), rebind.getMetaLevel()) : find(((GenericImpl) rebind).supers, ((GenericImpl) rebind).components));
 		return rebind;
 	}
 
@@ -399,8 +399,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		private void reBuild(NavigableSet<Generic> orderedDependencies) {
 			for (Generic orderedDependency : orderedDependencies) {
 				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).getExtendedComponentsArray());
-				Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).directSupers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
-				adjust(((GenericImpl) orderedDependency).directSupers[0]);
+				Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).supers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
+				adjust(((GenericImpl) orderedDependency).supers[0]);
 				Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex((orderedDependency), directSupers, newComponents));
 				put(orderedDependency, bind);
 			}

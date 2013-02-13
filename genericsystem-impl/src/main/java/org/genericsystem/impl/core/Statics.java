@@ -259,7 +259,7 @@ public class Statics {
 				public void push(Generic generic) {
 					if (!generic.isEngine()) {
 						super.push(generic);
-						push(((GenericImpl) generic).directSupers[0]);
+						push(((GenericImpl) generic).supers[0]);
 					}
 				}
 			};
@@ -278,7 +278,7 @@ public class Statics {
 			if (((GenericImpl) generic).isPrimary())
 				return restrictedAdd(generic);
 			boolean adds = false;
-			for (Generic directSuper : ((GenericImpl) generic).directSupers)
+			for (Generic directSuper : ((GenericImpl) generic).supers)
 				if (add(directSuper))
 					adds = true;
 			return adds;
