@@ -8,7 +8,7 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.testng.annotations.Test;
 
 @Test
@@ -80,7 +80,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache,"vehiclePower");
 		Generic myVehicle = vehicle.newInstance(cache,"myVehicle");
-		Value valueOfAttribute = myVehicle.setValue(cache,vehiclePower, "233 HP");
+		Holder valueOfAttribute = myVehicle.setValue(cache,vehiclePower, "233 HP");
 		Snapshot<Generic> snapshot = vehiclePower.getInstances(cache);
 		assert snapshot.size() == 1 : snapshot;
 		assert snapshot.contains(valueOfAttribute);
@@ -91,7 +91,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache,"power");
 		Generic myVehicle = vehicle.newInstance(cache,"myVehicle");
-		Value valueOfAttribute = myVehicle.setValue(cache,vehiclePower, "123");
+		Holder valueOfAttribute = myVehicle.setValue(cache,vehiclePower, "123");
 		Snapshot<Generic> snapshot = vehiclePower.getAllInstances(cache);
 		assert snapshot.size() == 1 : snapshot;
 		assert snapshot.contains(valueOfAttribute);

@@ -8,7 +8,7 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
@@ -64,12 +64,12 @@ public class SingularConstraintTest extends AbstractTest {
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		vehiclePower.enableSingularConstraint(cache, 0);
 		assert vehiclePower.isSingularConstraintEnabled(cache, 0);
-		Value myVehiclePowerValue1 = myVehicle.setValue(cache, vehiclePower, "5");
-		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1;
-		assert myVehicle.getValueHolders(cache, vehiclePower).get(0).equals(myVehiclePowerValue1);
-		Value myVehiclePowerValue2 = myVehicle.setValue(cache, vehiclePower, 2);
-		assert myVehicle.getValueHolders(cache, vehiclePower).size() == 1;
-		assert myVehicle.getValueHolders(cache, vehiclePower).get(0).equals(myVehiclePowerValue2);
+		Holder myVehiclePowerValue1 = myVehicle.setValue(cache, vehiclePower, "5");
+		assert myVehicle.getHolders(cache, vehiclePower).size() == 1;
+		assert myVehicle.getHolders(cache, vehiclePower).get(0).equals(myVehiclePowerValue1);
+		Holder myVehiclePowerValue2 = myVehicle.setValue(cache, vehiclePower, 2);
+		assert myVehicle.getHolders(cache, vehiclePower).size() == 1;
+		assert myVehicle.getHolders(cache, vehiclePower).get(0).equals(myVehiclePowerValue2);
 	}
 
 	public void testRelationOK() {
@@ -219,10 +219,10 @@ public class SingularConstraintTest extends AbstractTest {
 		final Generic myBmw = car.newInstance(cache, "myBmw");
 		final Attribute registration = car.setAttribute(cache, "registration");
 		registration.enableSingularConstraint(cache);
-		Value myBmwRegistration1 = myBmw.setValue(cache, registration, "AB123CD");
-		Value myBmwRegistration2 = myBmw.setValue(cache, registration, "DC321BA");
-		assert myBmw.getValueHolders(cache, registration).size() == 1;
-		assert myBmw.getValueHolders(cache, registration).get(0).equals(myBmwRegistration2);
+		Holder myBmwRegistration1 = myBmw.setValue(cache, registration, "AB123CD");
+		Holder myBmwRegistration2 = myBmw.setValue(cache, registration, "DC321BA");
+		assert myBmw.getHolders(cache, registration).size() == 1;
+		assert myBmw.getHolders(cache, registration).get(0).equals(myBmwRegistration2);
 		assert !myBmwRegistration1.isAlive(cache);
 	}
 

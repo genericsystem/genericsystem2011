@@ -15,7 +15,7 @@ import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.exception.ClassInstanceConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
@@ -30,7 +30,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 		Attribute electrikPower = cache.find(ElectrikPower.class);
 		final Generic myBMW = car.newInstance(cache, "myBMW");
 		assert electrikPower.getBaseComponent() != null : electrikPower.info();
-		final Value electrikPowerMyBMW = myBMW.setValue(cache, electrikPower, 106);
+		final Holder electrikPowerMyBMW = myBMW.setValue(cache, electrikPower, 106);
 		electrikPowerMyBMW.setValue(cache, unit, "Nm");
 		assert unit.isSystemPropertyEnabled(cache, InstanceClassConstraintImpl.class);
 		new RollbackCatcher() {

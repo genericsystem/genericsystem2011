@@ -7,7 +7,7 @@ import org.genericsystem.api.exception.RequiredConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
@@ -21,7 +21,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Attribute wheel = vehicle.setAttribute(cache, "wheel");
 		wheel.enableRequiredConstraint(cache);
 		assert wheel.isRequiredConstraintEnabled(cache);
-		Value wheelMyFiat = myFiat.setValue(cache, wheel, "BigWheel");
+		Holder wheelMyFiat = myFiat.setValue(cache, wheel, "BigWheel");
 		cache.flush();
 		wheelMyFiat.remove(cache);
 		assert !wheelMyFiat.isAlive(cache);

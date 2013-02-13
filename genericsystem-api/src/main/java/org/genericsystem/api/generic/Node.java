@@ -13,7 +13,7 @@ import org.genericsystem.api.core.Snapshot;
  * @author Nicolas Feybesse
  * 
  */
-public interface Node extends Value {
+public interface Node extends Holder {
 
 	<T extends Node> T addNode(Cache cache, Serializable value, Generic... targets);
 

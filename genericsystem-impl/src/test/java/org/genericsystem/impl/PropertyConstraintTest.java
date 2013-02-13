@@ -8,7 +8,7 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.Test;
 
@@ -30,7 +30,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Value abs = myVehicle.setValue(cache, equipment, "ABS");
+		Holder abs = myVehicle.setValue(cache, equipment, "ABS");
 		myVehicle.setValue(cache, equipment, "GPS");
 		assert !abs.isAlive(cache);
 	}
@@ -129,8 +129,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
-		Value absValue = myCar.setValue(cache, equipment, "ABS");
-		Value gpsValue = myCar.setValue(cache, equipment, "GPS");
+		Holder absValue = myCar.setValue(cache, equipment, "ABS");
+		Holder gpsValue = myCar.setValue(cache, equipment, "GPS");
 		assert !absValue.isAlive(cache);
 		assert gpsValue.isAlive(cache);
 	}
@@ -142,8 +142,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
-		Value absValue = myCar.setValue(cache, equipment, "ABS");
-		Value gpsValue = myCar.setValue(cache, equipment, "GPS");
+		Holder absValue = myCar.setValue(cache, equipment, "ABS");
+		Holder gpsValue = myCar.setValue(cache, equipment, "GPS");
 		assert !absValue.isAlive(cache);
 		assert gpsValue.isAlive(cache);
 	}
@@ -193,8 +193,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Value absValue = vehicle.setValue(cache, equipment, "ABS");
-		Value gpsValue = myVehicle.setValue(cache, equipment, "GPS");
+		Holder absValue = vehicle.setValue(cache, equipment, "ABS");
+		Holder gpsValue = myVehicle.setValue(cache, equipment, "GPS");
 		// Todo check remove old value
 		assert absValue.isAlive(cache);
 		assert myVehicle.getValue(cache, equipment).equals(gpsValue.getValue());

@@ -8,7 +8,7 @@ import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.testng.annotations.Test;
 
 @Test
@@ -21,10 +21,10 @@ public class InstanceOfTest extends AbstractTest {
 	// Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
 	// Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 	// Generic myCar = car.newInstance(cache, "myCar");
-	// Value myVehiclePower236 = myVehicle.setValue(cache, vehiclePower, 236);
+	// Holder myVehiclePower236 = myVehicle.setValue(cache, vehiclePower, 236);
 	// Attribute carSubPower = car.addSubAttribute(cache, vehiclePower, "subPower");
 	//
-	// Value myCarPower235 = myCar.setValue(cache, carSubPower, 235);
+	// Holder myCarPower235 = myCar.setValue(cache, carSubPower, 235);
 	//
 	// assert myVehiclePower236.getMeta().equals(vehiclePower) : myVehiclePower236.getMeta() + "  " + myVehiclePower236.getSupers();
 	// assert myCarPower235.getMeta().equals(carSubPower) : myCarPower235.getMeta();
@@ -74,8 +74,8 @@ public class InstanceOfTest extends AbstractTest {
 
 		Attribute vehiclePower = vehicle.setProperty(cache, "Power");
 
-		Value v90 = myVehicle.setValue(cache, vehiclePower, 90);
-		Value v235 = myCar.setValue(cache, vehiclePower, 235);
+		Holder v90 = myVehicle.setValue(cache, vehiclePower, 90);
+		Holder v235 = myCar.setValue(cache, vehiclePower, 235);
 
 		assert v90.isInstanceOf(vehiclePower);
 		assert v235.isInstanceOf(vehiclePower);

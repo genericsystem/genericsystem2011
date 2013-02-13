@@ -5,7 +5,7 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.testng.annotations.Test;
 
 @Test
@@ -36,11 +36,11 @@ public class InstancesTest extends AbstractTest {
 		Type newType = cache.newType("newType");
 		Attribute newAttribute = cache.getEngine().setAttribute(cache, "newAttribute");
 		Generic aNewType1 = newType.newInstance(cache, "aNewType1");
-		Value value1 = aNewType1.setValue(cache, newAttribute, "value1");
+		Holder value1 = aNewType1.setValue(cache, newAttribute, "value1");
 		assert newAttribute.getInstances(cache).size() == 1;
 		assert newAttribute.getInstances(cache).contains(value1);
 		Generic aNewType2 = newType.newInstance(cache, "aNewType2");
-		Value value2 = aNewType2.setValue(cache, newAttribute, "value2");
+		Holder value2 = aNewType2.setValue(cache, newAttribute, "value2");
 		assert value1.isAlive(cache);
 		assert newAttribute.getInstances(cache).size() == 2;
 		assert newAttribute.getInstances(cache).contains(value1);

@@ -19,7 +19,7 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.web.qualifiers.DiscardEvent;
 import org.genericsystem.web.qualifiers.TypeChangeEvent;
 import org.richfaces.component.UITree;
@@ -68,7 +68,7 @@ public class TypesManager implements Serializable {
 		car.newInstance("Nissan");
 		car.newInstance("Renault");
 		car.newInstance("Porsche");
-		Value v = BMW.addValue(power, "356");
+		Holder v = BMW.addValue(power, "356");
 		BMW.addValue(power, "427");
 		BMW.addValue(color, "red");
 		Link link = BMW.addLink(carPilot, "35%", vince);

@@ -8,7 +8,7 @@ import org.genericsystem.api.core.Context;
  * 
  * @author Nicolas Feybesse
  */
-public interface Attribute extends Value, Type {
+public interface Attribute extends Holder, Type {
 	
 	/**
 	 * Enable multidirectional

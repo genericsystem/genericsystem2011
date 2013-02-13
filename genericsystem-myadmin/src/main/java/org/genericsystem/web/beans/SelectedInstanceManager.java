@@ -12,7 +12,7 @@ import javax.inject.Named;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.generic.Property;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.web.qualifiers.DiscardEvent;
 import org.genericsystem.web.qualifiers.InstanceDeleteEvent;
 import org.genericsystem.web.qualifiers.TypeChangeEvent;
@@ -76,7 +76,7 @@ public class SelectedInstanceManager implements Serializable {
 
 		public String getValue() {
 			log.info("getValue()");
-			Value valueHolder = selectedInstance.getLink(property);
+			Holder valueHolder = selectedInstance.getLink(property);
 			return valueHolder == null ? "" : "" + valueHolder.getImplicit();
 		}
 

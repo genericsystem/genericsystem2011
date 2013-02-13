@@ -6,7 +6,7 @@ import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.CacheImpl;
 import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.Test;
@@ -33,10 +33,10 @@ public class RebindTest extends AbstractTest {
 		Attribute carPower = car.setAttribute(cache, "Power");
 		Attribute carPowerUnit = carPower.setAttribute(cache, "Unit");
 		Generic myCar = car.newInstance(cache, "Audi");
-		Value vPower = myCar.setValue(cache, carPower, "200");
-		Value vUnit = vPower.setValue(cache, carPowerUnit, "HorsePower");
-		assert vPower.getValueHolders(cache, carPowerUnit).contains(vUnit);
-		assert myCar.getValueHolders(cache, carPower).contains(vPower);
+		Holder vPower = myCar.setValue(cache, carPower, "200");
+		Holder vUnit = vPower.setValue(cache, carPowerUnit, "HorsePower");
+		assert vPower.getHolders(cache, carPowerUnit).contains(vUnit);
+		assert myCar.getHolders(cache, carPower).contains(vPower);
 		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
 		assert ((CacheImpl) cache).reFind(carPower).inheritsFrom(vehiclePower);
 	}
@@ -67,7 +67,7 @@ public class RebindTest extends AbstractTest {
 
 		Generic red = primeColor.newInstance(cache, "red");
 		Attribute lightness = primeColor.setAttribute(cache, "lightness");
-		Value lightnessValue = red.setValue(cache, lightness, "40");
+		Holder lightnessValue = red.setValue(cache, lightness, "40");
 		Generic reboundLightness = ((GenericImpl) lightness).reBind(cache);
 		assert !lightness.isAlive(cache);
 		assert !lightnessValue.isAlive(cache);

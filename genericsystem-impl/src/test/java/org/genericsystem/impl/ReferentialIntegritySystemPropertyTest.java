@@ -8,7 +8,7 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.Statics;
 import org.genericsystem.impl.system.ReferentialIntegritySystemProperty;
 import org.testng.annotations.Test;
@@ -146,7 +146,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		assert !weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		Generic myck = human.newInstance(cache, "myck");
-		Value myckWeight90 = myck.setValue(cache, weight, 90);
+		Holder myckWeight90 = myck.setValue(cache, weight, 90);
 		assert myck.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		assert !myckWeight90.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 	}
@@ -160,7 +160,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		assert weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		Generic myck = human.newInstance(cache, "myck");
-		Value myckWeight90 = myck.setValue(cache, weight, 90);
+		Holder myckWeight90 = myck.setValue(cache, weight, 90);
 		assert myck.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 		assert myckWeight90.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
 	}

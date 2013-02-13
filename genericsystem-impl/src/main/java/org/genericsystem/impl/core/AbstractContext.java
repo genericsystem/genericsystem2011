@@ -28,7 +28,7 @@ import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
@@ -384,7 +384,7 @@ public abstract class AbstractContext implements Context, Serializable {
 								.isImmediatelyCheckable())
 					for (Generic generic : generics)
 						if (generic.isInstanceOf(constraint)) {
-							Generic base = ((Value) generic).getBaseComponent();
+							Generic base = ((Holder) generic).getBaseComponent();
 							if (base != null)
 								for (Generic baseInheriting : ((GenericImpl) base)
 										.getAllInheritings(AbstractContext.this))

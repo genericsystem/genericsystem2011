@@ -25,12 +25,12 @@ import org.genericsystem.api.core.Snapshot.Filter;
 import org.genericsystem.api.core.Snapshot.Projector;
 import org.genericsystem.api.exception.ComponentPosExceedsComponentsSizeException;
 import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Node;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.impl.constraints.VirtualConstraintImpl;
 import org.genericsystem.impl.constraints.axed.RequiredAxedConstraintImpl;
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class GenericImpl implements Generic, Type, Link, Relation, Value, Attribute, Tree, Node {
+public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute, Tree, Node {
 
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
 
@@ -208,7 +208,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Value> Snapshot<T> getValueHolders(final Context context, final T attribute) {
+	public <T extends Holder> Snapshot<T> getHolders(final Context context, final T attribute) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
@@ -218,8 +218,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
+	public <T extends Holder> T getHolder(Context context, Attribute attribute) {
+		return getLink(context, (Relation) attribute);
+	}
+
+	@Override
 	public <T extends Serializable> Snapshot<T> getValues(final Context context, final Attribute attribute) {
-		return getValueHolders(context, attribute).project(new Projector<T, Attribute>() {
+		return getHolders(context, attribute).project(new Projector<T, Attribute>() {
 			@Override
 			public T project(Attribute element) {
 				return element.getValue();
@@ -234,7 +239,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	}
 
 	@Override
-	public <T extends Value> T setValue(Cache cache, Attribute attribute, Serializable value) {
+	public <T extends Holder> T setValue(Cache cache, Attribute attribute, Serializable value) {
 		T link = setLink(cache, (Relation) attribute, value);
 		assert getValues(cache, attribute).contains(value);
 		return link;
@@ -349,7 +354,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		return new AbstractFilterIterator<T>(this.<T> compositesIterator(context)) {
 			@Override
 			public boolean isSelected() {
-				return GenericImpl.this.equals(((Value) next).getComponent(pos));
+				return GenericImpl.this.equals(((Holder) next).getComponent(pos));
 			}
 		};
 	}
@@ -772,7 +777,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
 		s += "toString()     : " + this + "\n";
-		s += "Value          : " + value + "\n";
+		s += "Holder          : " + value + "\n";
 		s += "getMeta()      : " + getMeta() + "\n";
 		s += "getInstanciationLevel() : " + getMetaLevel() + "\n";
 		for (Generic primary : getPrimaries())
@@ -1052,19 +1057,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 	/**************** PHANTOM ********************/
 	/*********************************************/
 
-	public void cancel(Cache cache, Value attribute) {
+	public void cancel(Cache cache, Holder attribute) {
 		if (equals(attribute.getBaseComponent()))
 			throw new IllegalStateException("Only inherited attributes can be cancelled");
 		((CacheImpl) cache).bind(attribute, Statics.PHAMTOM, attribute.getMetaLevel(), Statics.EMPTY_GENERIC_ARRAY, Statics.replace(Statics.BASE_POSITION, ((GenericImpl) attribute).components, this));
 	}
 
 	public void restore(Cache cache, Attribute attribute) {
-		for (Value nodeValue : getLinks(cache, (Relation) attribute, Statics.BASE_POSITION))
+		for (Holder nodeValue : getLinks(cache, (Relation) attribute, Statics.BASE_POSITION))
 			if (isValuePhantomOverride(nodeValue, attribute.getValue()))
 				nodeValue.remove(cache);
 	}
 
-	private boolean isValuePhantomOverride(Value nodeValue, Serializable value) {
+	private boolean isValuePhantomOverride(Holder nodeValue, Serializable value) {
 		return (equals(nodeValue.getBaseComponent()) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.getImplicit().getSupers().first().getValue(), value));
 	}
 
@@ -1095,7 +1100,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public <T extends Node> Snapshot<T> getChildren(Context context) {
-		return this.<T> getValueHolders(context, this.<T> getMeta()).filter(new Filter<T>() {
+		return this.<T> getHolders(context, this.<T> getMeta()).filter(new Filter<T>() {
 			@Override
 			public boolean isSelected(T node) {
 				return !GenericImpl.this.equals(node);
@@ -1150,7 +1155,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 		if (componentPos + 1 > getComponentsSize())
 			throw new ComponentPosExceedsComponentsSizeException("The component position (" + componentPos + ") exceeds the components size " + this.info());
 		Attribute attribute = cache.<Attribute> find(systemPropertyClass);
-		for (Attribute valueHolder : getValueHolders(cache, attribute))
+		for (Attribute valueHolder : getHolders(cache, attribute))
 			if (Objects.equals(valueHolder.<ComponentPosValue<Boolean>> getValue().getComponentPos(), componentPos)) {
 				if (!this.equals(valueHolder.getComponent(Statics.BASE_POSITION)))
 					addLink(cache, valueHolder, new ComponentPosValue<Serializable>(componentPos, enabled), SystemGeneric.CONCRETE, Statics.BASE_POSITION);
@@ -1169,7 +1174,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Value, Attrib
 
 	@Override
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos) {
-		for (Value valueHolder : getValueHolders(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)))
+		for (Holder valueHolder : getHolders(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)))
 			if (Objects.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getComponentPos(), componentPos))
 				return !Boolean.FALSE.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getValue());
 		return isSystemPropertyDefaultEnabled(systemPropertyClass);

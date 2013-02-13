@@ -6,7 +6,7 @@ import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.testng.annotations.Test;
 
 @Test
@@ -65,7 +65,7 @@ public class RemoveTest extends AbstractTest {
 		Type window = cache.newType("Window");
 		Attribute height = window.setProperty(cache, "Height");
 		Generic myWindow = window.newInstance(cache, "MyWindow");
-		Value myHeight1 = ((Attribute) myWindow).setValue(cache, height, 165);
+		Holder myHeight1 = ((Attribute) myWindow).setValue(cache, height, 165);
 		myHeight1.remove(cache);
 		assert cache.getEngine().getInheritings(cache).contains(window);
 		assert cache.getEngine().getInheritings(cache).contains(height.getImplicit());

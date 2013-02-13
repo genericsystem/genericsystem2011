@@ -15,7 +15,7 @@ import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.testng.annotations.Test;
 
 @Test
@@ -69,7 +69,7 @@ public class SerializationTest extends AbstractTest {
 
 		Attribute height = window.setProperty(cache, "Height");
 		Generic myWindow = window.newInstance(cache, "MyWindow");
-		Value myHeight1 = ((Attribute) myWindow).setValue(cache, height, 165);
+		Holder myHeight1 = ((Attribute) myWindow).setValue(cache, height, 165);
 
 		cache.flush();
 

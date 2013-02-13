@@ -30,7 +30,7 @@ public class ValueTest extends AbstractTest {
 	// Attribute carUltraPower = car.addSubAttribute(cache,vehiclePower, "ultraPower");
 	// vehicle.setValue(cache,vehiclePower, 0);
 	// Generic myCar = car.newInstance(cache,"myCar");
-	// Value value = myCar.setValue(cache,carUltraPower, 123);
+	// Holder value = myCar.setValue(cache,carUltraPower, 123);
 	// assert myCar.getValueHolders(cache,carUltraPower).contains(value);
 	// assert myCar.getValueHolders(cache,vehiclePower).contains(value);
 	// }

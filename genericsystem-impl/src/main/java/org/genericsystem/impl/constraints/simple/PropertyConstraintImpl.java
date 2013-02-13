@@ -15,7 +15,7 @@ import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.PropertyConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
@@ -36,12 +36,12 @@ public class PropertyConstraintImpl extends Constraint {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
 			Type constraintBaseType = (Type) constraintValue.getConstraintType();
 			if (modified.isAttribute()) {
-				for (final Generic inheriting : ((GenericImpl) ((Value) modified).getBaseComponent()).getAllInheritings(context)) {
-					Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getValueHolders(context, (Attribute) constraintBaseType).iterator()) {
+				for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings(context)) {
+					Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders(context, (Attribute) constraintBaseType).iterator()) {
 						@Override
 						public boolean isSelected() {
 							for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
-								if (!Objects.equals(((Value) next).getComponent(componentPos), ((Value) modified).getComponent(componentPos)))
+								if (!Objects.equals(((Holder) next).getComponent(componentPos), ((Holder) modified).getComponent(componentPos)))
 									return false;
 							return true;
 						}

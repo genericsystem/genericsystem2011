@@ -6,7 +6,7 @@ import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.Test;
 
@@ -208,15 +208,15 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Attribute selectedSelectable = selectable.setAttribute(cache, "Selected");
 		Generic mySelectableWindow = selectableWindow.newInstance(cache, "mySelectableWindow");
 
-		Value v12 = mySelectableWindow.setValue(cache, size, 12);
-		Value vTrue = mySelectableWindow.setValue(cache, selectedSelectable, true);
+		Holder v12 = mySelectableWindow.setValue(cache, size, 12);
+		Holder vTrue = mySelectableWindow.setValue(cache, selectedSelectable, true);
 
 		assert selectableWindow.getInstances(cache).size() == 1 : selectableWindow.getInstances(cache);
 		assert selectableWindow.getInstances(cache).contains(mySelectableWindow);
-		assert mySelectableWindow.getValueHolders(cache, size).size() == 1 : mySelectableWindow.getValueHolders(cache, size);
-		assert mySelectableWindow.getValueHolders(cache, size).contains(v12);
-		assert mySelectableWindow.getValueHolders(cache, selectedSelectable).size() == 1;
-		assert mySelectableWindow.getValueHolders(cache, selectedSelectable).contains(vTrue);
+		assert mySelectableWindow.getHolders(cache, size).size() == 1 : mySelectableWindow.getHolders(cache, size);
+		assert mySelectableWindow.getHolders(cache, size).contains(v12);
+		assert mySelectableWindow.getHolders(cache, selectedSelectable).size() == 1;
+		assert mySelectableWindow.getHolders(cache, selectedSelectable).contains(vTrue);
 	}
 
 	public void testBaseComponent() {
@@ -226,7 +226,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
 		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
 
-		assert ((Value) selectableWindow).getBaseComponent() == null : ((Value) selectableWindow).getBaseComponent();
+		assert ((Holder) selectableWindow).getBaseComponent() == null : ((Holder) selectableWindow).getBaseComponent();
 	}
 
 	public void testTargetComponent() {

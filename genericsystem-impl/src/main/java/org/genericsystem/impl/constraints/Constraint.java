@@ -11,7 +11,7 @@ import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.exception.ConstraintViolationException;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.AbstractContext;
 import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
@@ -76,7 +76,7 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 		return new AbstractSnapshot<ConstraintValue>() {
 			@Override
 			public Iterator<ConstraintValue> iterator() {
-				Iterator<ConstraintValue> iterator = new AbstractProjectorAndFilterIterator<Value, ConstraintValue>(((GenericImpl) modified).<Value> mainIterator(context, ((AbstractContext) context).find(clazz), SystemGeneric.CONCRETE,
+				Iterator<ConstraintValue> iterator = new AbstractProjectorAndFilterIterator<Holder, ConstraintValue>(((GenericImpl) modified).<Holder> mainIterator(context, ((AbstractContext) context).find(clazz), SystemGeneric.CONCRETE,
 						Statics.BASE_POSITION)) {
 
 					@Override

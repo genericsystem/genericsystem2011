@@ -10,7 +10,7 @@ import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.NotNullConstraintViolationException;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.system.ComponentPosValue;
 
@@ -26,7 +26,7 @@ public class NotNullConstraintImpl extends Constraint {
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		if (modified.getValue() == null)
-			throw new NotNullConstraintViolationException("Value should not be null for : " + ((Value) modified).getMeta());
+			throw new NotNullConstraintViolationException("Holder should not be null for : " + ((Holder) modified).getMeta());
 	}
 
 }

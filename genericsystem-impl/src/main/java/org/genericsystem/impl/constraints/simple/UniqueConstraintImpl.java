@@ -29,7 +29,7 @@ public class UniqueConstraintImpl extends Constraint {
 			Type constraintBaseType = (Type) constraintValue.getConstraintType();
 			for (Generic generic : constraintBaseType.getAllInstances(context))
 				if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
-					throw new UniqueConstraintViolationException("Value " + modified.getValue() + " is duplicate for type " + constraintBaseType + ".");
+					throw new UniqueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + constraintBaseType + ".");
 		}
 	}
 }

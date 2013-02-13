@@ -8,7 +8,7 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Value;
+import org.genericsystem.api.generic.Holder;
 import org.testng.annotations.Test;
 
 @Test
@@ -65,7 +65,7 @@ public class MetaGenericTest extends AbstractTest {
 		Type newType = cache.newType("newType");
 		Attribute newAttribute = newType.setAttribute(cache, "newAttribute");
 		Generic aNewType = newType.newInstance(cache, "aNewType");
-		Value value = aNewType.setValue(cache, newAttribute, "aNewAttribute");
+		Holder value = aNewType.setValue(cache, newAttribute, "aNewAttribute");
 		assert value.getMeta().equals(newAttribute);
 	}
 

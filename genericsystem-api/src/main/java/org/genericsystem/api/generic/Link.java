@@ -8,7 +8,7 @@ import org.genericsystem.api.core.Generic;
  * 
  * @author Nicolas Feybesse
  */
-public interface Link extends Value {
+public interface Link extends Holder {
 
 	<T extends Generic> T getTargetComponent();
 

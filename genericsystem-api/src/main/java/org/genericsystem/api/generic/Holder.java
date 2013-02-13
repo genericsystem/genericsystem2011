@@ -6,7 +6,7 @@ import org.genericsystem.api.core.Generic;
  * @author Nicolas Feybesse
  * 
  */
-public interface Value extends Generic {
+public interface Holder extends Generic {
 
 	<T extends Generic> T getBaseComponent();
 
