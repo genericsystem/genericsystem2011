@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.ComponentPosBoolean;
 import org.genericsystem.api.annotation.Components;
@@ -147,6 +146,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 
+	// TODO mettre dans statics
 	public static Generic[] transform(Generic[] components, Generic generic) {
 		Generic[] result = components.clone();
 		for (int i = 0; i < result.length; i++)

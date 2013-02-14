@@ -3,7 +3,6 @@ package org.genericsystem.impl.constraints.simple;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
-
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
@@ -31,28 +30,16 @@ public class UnduplicateBindingConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
-		if (!((GenericImpl) modified).isPrimary()) {
-			final Generic[] supers = ((GenericImpl) modified).getSupersArray();
-			final Generic[] components = ((GenericImpl) modified).getComponentsArray();
-
-			Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((AbstractContext) context).compositesIterator(components[0]) : ((AbstractContext) context).directInheritingsIterator(supers[0])) {
-				@Override
-				public boolean isSelected() {
-					return Arrays.equals(((GenericImpl) next).getSupersArray(), supers) && Arrays.equals(((GenericImpl) next).getComponentsArray(), AbstractContext.transform(components, next));
-				}
-			};
-			if (iterator.hasNext()) {
-				iterator.next();
-				if (iterator.hasNext())
-					throw new UnduplicateBindingConstraintViolationException();
+		final Generic[] supers = ((GenericImpl) modified).getSupersArray();
+		final Generic[] components = ((GenericImpl) modified).getComponentsArray();
+		Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((AbstractContext) context).compositesIterator(components[0]) : ((AbstractContext) context).directInheritingsIterator(supers[0])) {
+			@Override
+			public boolean isSelected() {
+				return Arrays.equals(((GenericImpl) next).getSupersArray(), supers) && Arrays.equals(((GenericImpl) next).getComponentsArray(), AbstractContext.transform(components, next)) && Objects.equals(modified.getValue(), next.getValue());
 			}
-		} else {
-			Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(((AbstractContext) context).directInheritingsIterator(modified.getMeta())) {
-				@Override
-				public boolean isSelected() {
-					return Objects.equals(next.getValue(), modified.getValue()) && !next.equals(modified);
-				}
-			};
+		};
+		if (iterator.hasNext()) {
+			iterator.next();
 			if (iterator.hasNext())
 				throw new UnduplicateBindingConstraintViolationException();
 		}

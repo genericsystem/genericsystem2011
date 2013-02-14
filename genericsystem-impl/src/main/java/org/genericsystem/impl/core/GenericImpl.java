@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
@@ -90,7 +89,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
 		this.value = value;
 		this.metaLevel = metaLevel;
-		this.supers = directSupers;
+		supers = directSupers;
 		this.components = components;
 
 		initSelfComponents();
@@ -1073,12 +1072,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public void restore(Cache cache, Attribute attribute) {
 		for (Holder nodeValue : getLinks(cache, (Relation) attribute, Statics.BASE_POSITION))
-			if (isValuePhantomOverride(nodeValue, attribute.getValue()))
+			if (equals(nodeValue.getBaseComponent()) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.<GenericImpl> getImplicit().supers[0].getValue(), attribute.getValue()))
 				nodeValue.remove(cache);
-	}
-
-	private boolean isValuePhantomOverride(Holder nodeValue, Serializable value) {
-		return (equals(nodeValue.getBaseComponent()) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.getImplicit().getSupers().first().getValue(), value));
 	}
 
 	/*********************************************/
