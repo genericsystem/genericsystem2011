@@ -146,21 +146,12 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 
-	// TODO mettre dans statics
-	public static Generic[] transform(Generic[] components, Generic generic) {
-		Generic[] result = components.clone();
-		for (int i = 0; i < result.length; i++)
-			if (result[i] == null)
-				result[i] = generic;
-		return result;
-	}
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T find(Generic[] directSupers, Generic[] components) {
 		Iterator<Generic> iterator = components.length > 0 && components[0] != null ? compositesIterator(components[0]) : directInheritingsIterator(directSupers[0]);
 		while (iterator.hasNext()) {
 			Generic directInheriting = iterator.next();
-			if (Arrays.equals(((GenericImpl) directInheriting).supers, directSupers) && Arrays.equals(((GenericImpl) directInheriting).components, transform(components, directInheriting)))
+			if (Arrays.equals(((GenericImpl) directInheriting).supers, directSupers) && Arrays.equals(((GenericImpl) directInheriting).components, ((GenericImpl) directInheriting).transform(components)))
 				return (T) directInheriting;
 		}
 		return null;

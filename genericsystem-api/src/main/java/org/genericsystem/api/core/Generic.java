@@ -1,7 +1,6 @@
 package org.genericsystem.api.core;
 
 import java.io.Serializable;
-
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Link;
@@ -171,6 +170,25 @@ public interface Generic extends Comparable<Generic> {
 	 *             Ambigous request for the Relation.
 	 */
 	<T extends Link> T getLink(Context context, Relation relation, int basePos, Generic... targets);
+
+	/**
+	 * Returns the Link of the Relation for the components and value.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param relation
+	 *            The Relation.
+	 * @param basePos
+	 *            The base component position.
+	 * @param v
+	 *            The base component position.
+	 * @param value
+	 *            The value of link.
+	 * @return A Link.
+	 * @throws IllegalStateException
+	 *             Ambigous request for the Relation.
+	 */
+	public <T extends Link> T getLink(Context context, Relation relation, final int basePos, Serializable value, final Generic... targets);
 
 	/**
 	 * Returns the Link.

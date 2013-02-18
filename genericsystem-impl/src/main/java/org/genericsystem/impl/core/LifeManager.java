@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConcurrencyControlException;
 import org.genericsystem.api.exception.OptimisticLockConstraintViolationException;
@@ -40,7 +39,7 @@ public class LifeManager {
 
 	void cancelBeginLife() {
 		assert isWriteLockedByCurrentThread();
-		this.birthTs = Long.MAX_VALUE;
+		birthTs = Long.MAX_VALUE;
 	}
 
 	public boolean isAlive(long contextTs) {
@@ -83,11 +82,11 @@ public class LifeManager {
 	}
 
 	long getDesignTs() {
-		return this.designTs;
+		return designTs;
 	}
 
 	long getDeathTs() {
-		return this.deathTs;
+		return deathTs;
 	}
 
 	public void atomicAdjustLastReadTs(long contextTs) {
@@ -202,7 +201,7 @@ public class LifeManager {
 			private long ts;
 
 			private InternalIterator(long iterationTs) {
-				this.ts = iterationTs;
+				ts = iterationTs;
 			}
 
 			@Override

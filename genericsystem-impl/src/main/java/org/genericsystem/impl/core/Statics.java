@@ -8,10 +8,12 @@ import java.util.Date;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.genericsystem.api.core.Generic;
+import org.genericsystem.api.generic.Holder;
+import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,8 +150,7 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {
-		}
+		private Flag() {}
 
 		@Override
 		public String toString() {
@@ -306,4 +307,47 @@ public class Statics {
 			return toArray(new Generic[size()]);
 		}
 	}
+
+	static <T extends Generic> Iterator<T> levelFilter(Iterator<T> iterator, final int instanciationLevel) {
+		return new AbstractFilterIterator<T>(iterator) {
+
+			@Override
+			public boolean isSelected() {
+				return instanciationLevel == next.getMetaLevel();
+			}
+		};
+	}
+
+	static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, final int basePos, final Generic... targets) {
+		return new AbstractFilterIterator<T>(iterator) {
+			@Override
+			public boolean isSelected() {
+				for (int i = 0; i < targets.length; i++)
+					if (!targets[i].equals(((Holder) next).getComponent(i + (i >= basePos ? 1 : 0))))
+						return false;
+				return true;
+			}
+		};
+	}
+
+	static <T extends Generic> Iterator<T> valueFilter(Iterator<T> iterator, final Serializable value) {
+		return new AbstractFilterIterator<T>(iterator) {
+
+			@Override
+			public boolean isSelected() {
+				return Objects.equals(value, next.getValue());
+			}
+		};
+	}
+
+	static <T extends Generic> Iterator<T> phantomsFilter(Iterator<T> iterator) {
+		return new AbstractFilterIterator<T>(iterator) {
+
+			@Override
+			public boolean isSelected() {
+				return !((GenericImpl) next).isPhantom();
+			}
+		};
+	}
+
 }

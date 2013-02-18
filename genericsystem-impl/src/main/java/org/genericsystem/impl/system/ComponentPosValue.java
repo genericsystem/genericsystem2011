@@ -40,7 +40,7 @@ public class ComponentPosValue<T extends Serializable> implements Serializable {
 
 	@Override
 	public String toString() {
-		return "componentPos : " + componentPos + ", enabled : " + value;
+		return "(" + componentPos + "|" + value + ")";
 	}
 
 }

@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.api.annotation.Dependencies;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.core.Cache;
@@ -39,23 +38,6 @@ import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
  */
 public class CacheImpl extends AbstractContext implements Cache {
 	private static final long serialVersionUID = 6124326077696104707L;
-
-	// private void readObject(ObjectInputStream in) throws IOException,
-	// ClassNotFoundException {
-	// in.defaultReadObject();
-	// this.reconstructDependencyMap();
-	// }
-	//
-	// private void reconstructDependencyMap() {
-	// compositeDependenciesMap = new HashMap<Generic,
-	// TimestampedDependencies>();
-	// inheritingDependenciesMap = new HashMap<Generic,
-	// TimestampedDependencies>();
-	// for (Generic generic : internalCache.adds)
-	// plug((GenericImpl) generic);
-	// for (Generic generic : internalCache.removes)
-	// unplug((GenericImpl) generic);
-	// }
 
 	private AbstractContext subContext;
 
@@ -379,7 +361,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new AbstractFilterIterator<Generic>(directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
-				return GenericImpl.isSuperOf(interfaces, extendedComponents, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).getExtendedComponentsArray(), false);
+				return !((GenericImpl) next).isPhantom() && GenericImpl.isSuperOf(interfaces, extendedComponents, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).getExtendedComponentsArray(), false);
 			}
 		};
 	}

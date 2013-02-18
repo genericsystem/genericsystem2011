@@ -35,7 +35,7 @@ public class UnduplicateBindingConstraintImpl extends Constraint {
 		Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((AbstractContext) context).compositesIterator(components[0]) : ((AbstractContext) context).directInheritingsIterator(supers[0])) {
 			@Override
 			public boolean isSelected() {
-				return Arrays.equals(((GenericImpl) next).getSupersArray(), supers) && Arrays.equals(((GenericImpl) next).getComponentsArray(), AbstractContext.transform(components, next)) && Objects.equals(modified.getValue(), next.getValue());
+				return Arrays.equals(((GenericImpl) next).getSupersArray(), supers) && Arrays.equals(((GenericImpl) next).getComponentsArray(), components) && Objects.equals(modified.getValue(), next.getValue());
 			}
 		};
 		if (iterator.hasNext()) {

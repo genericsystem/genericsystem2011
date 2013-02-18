@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
@@ -14,6 +13,7 @@ import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
+import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.core.Statics;
 import org.testng.annotations.Test;
 
@@ -45,7 +45,7 @@ public class RelationTest extends AbstractTest {
 		Generic red = color.newInstance(cache, "red");
 		Generic blue = color.newInstance(cache, "blue");
 		car.bind(cache, carColor, red);
-		myBmw.bind(cache, carColor, blue);
+		myBmw.bind(cache, carColor, blue).log();
 		assert car.getLinks(cache, carColor).size() == 1;
 		assert car.getLinks(cache, carColor).first().getTargetComponent().equals(red);
 
@@ -646,6 +646,31 @@ public class RelationTest extends AbstractTest {
 		assert !myBmw.getLinks(cache, carTyres).contains(carCenter) : myBmw.getLinks(cache, carTyres);
 	}
 
+	public void testSingularTargetDefaultColor() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+
+		final Generic myBmw = car.newInstance(cache, "myBmw");
+		final Generic myAudi = car.newInstance(cache, "myAudi");
+		final Generic red = color.newInstance(cache, "red");
+
+		final Relation carColor = car.setRelation(cache, "CarColor", color);
+		carColor.enableSingularConstraint(cache, Statics.TARGET_POSITION);
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				Generic carRed = car.bind(cache, carColor, red);
+				((GenericImpl) carRed).deduct(cache);
+				// assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 2 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
+				// assert red.getTargets(cache, carColor, Statics.TARGET_POSITION, Statics.BASE_POSITION).contains(myBmw);
+				// assert red.getTargets(cache, carColor, Statics.TARGET_POSITION, Statics.BASE_POSITION).contains(myAudi);
+			}
+		}.assertIsCausedBy(SingularConstraintViolationException.class);
+	}
+
 	public void testOneToManyInheritanceReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
@@ -656,6 +681,7 @@ public class RelationTest extends AbstractTest {
 		assert carPerson.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
 
 		Generic myBmw = car.newInstance(cache, "myBmw");
+
 		Generic michael = person.newInstance(cache, "michael");
 		Generic nicolas = person.newInstance(cache, "nicolas");
 		Generic sven = person.newInstance(cache, "sven");
@@ -663,9 +689,12 @@ public class RelationTest extends AbstractTest {
 		Generic pierre = person.newInstance(cache, "pierre");
 
 		Link carPierre = pierre.setLink(cache, carPerson, "defaultPerson", Statics.TARGET_POSITION, car);
-		assert myBmw.getLink(cache, carPerson).getBaseComponent().equals(car);
+		// should throw a singular constraint exception
 
+		assert myBmw.getLink(cache, carPerson).getBaseComponent().equals(car);
+		assert false : "" + michael.getLinks(cache, carPerson, Statics.TARGET_POSITION);
 		Link myBmwMichael = michael.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
+		assert false : carPerson.getAllInstances(cache);
 		Link myBmwNicolas = nicolas.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
 		Link myBmwSven = sven.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
 		Link myBmwSofiane = sofiane.bind(cache, carPerson, Statics.TARGET_POSITION, myBmw);
@@ -1319,10 +1348,15 @@ public class RelationTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance(cache, "red");
 		Generic blue = color.newInstance(cache, "blue");
-		Relation carColor = car.setRelation(cache, "carColor", color);
+		Relation carColor = car.setRelation(cache, "carColor", color)/* .enableSingularConstraint(cache) */;
 		Link carRed = car.bind(cache, carColor, red);
 		myBmw.bind(cache, carColor, red);
+		// assert false : carColor.getAllInstances(cache).get(2);
+		// assert false : myAudi.getLinks(cache, carColor);
+
+		((GenericImpl) myAudi).cancel(cache, carRed);
 		myAudi.bind(cache, carRed, blue);
+		// assert false : carColor.getAllInstances(cache);
 
 		((Attribute) carRed).deduct(cache);
 
