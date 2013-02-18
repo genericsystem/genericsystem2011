@@ -31,13 +31,13 @@ import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.impl.constraints.VirtualConstraintImpl;
-import org.genericsystem.impl.constraints.axed.RequiredAxedConstraintImpl;
+import org.genericsystem.impl.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.impl.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.impl.constraints.simple.NotNullConstraintImpl;
 import org.genericsystem.impl.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.impl.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
+import org.genericsystem.impl.constraints.simple.VirtualConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
@@ -1244,32 +1244,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableRequiredConstraint(Cache cache) {
-		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
+		return enableSystemProperty(cache, RequiredConstraintImpl.class, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T disableRequiredConstraint(Cache cache) {
-		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
+		return disableSystemProperty(cache, RequiredConstraintImpl.class, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
+		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T enableRequiredConstraint(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class, componentPos);
+		return enableSystemProperty(cache, RequiredConstraintImpl.class, componentPos);
 	}
 
 	@Override
 	public <T extends Type> T disableRequiredConstraint(Cache cache, int componentPos) {
-		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class, componentPos);
+		return disableSystemProperty(cache, RequiredConstraintImpl.class, componentPos);
 	}
 
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, RequiredAxedConstraintImpl.class, componentPos);
+		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class, componentPos);
 	}
 
 	@Override

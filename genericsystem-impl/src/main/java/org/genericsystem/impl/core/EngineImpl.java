@@ -14,8 +14,7 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.impl.constraints.VirtualConstraintImpl;
-import org.genericsystem.impl.constraints.axed.RequiredAxedConstraintImpl;
+import org.genericsystem.impl.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.impl.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.impl.constraints.simple.AliveConstraintImpl;
 import org.genericsystem.impl.constraints.simple.ConcreteInheritanceConstraintImpl;
@@ -28,6 +27,7 @@ import org.genericsystem.impl.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.impl.constraints.simple.SuperRuleConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UnduplicateBindingConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
+import org.genericsystem.impl.constraints.simple.VirtualConstraintImpl;
 import org.genericsystem.impl.core.Statics.AnonymousReference;
 import org.genericsystem.impl.core.Statics.TsGenerator;
 import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
@@ -129,7 +129,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			put(Engine.class, EngineImpl.this);
 			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
-					OptimisticLockConstraintImpl.class, RequiredAxedConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, NotNullConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class,
+					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, NotNullConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class,
 					AliveConstraintImpl.class, UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
 					UnduplicateBindingConstraintImpl.class);
 			for (Class<?> clazz : classes)
