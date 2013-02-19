@@ -9,28 +9,37 @@ import org.genericsystem.api.core.Context;
  * @author Nicolas Feybesse
  */
 public interface Attribute extends Holder, Type {
-	
+
 	/**
-	 * Enable multidirectional
+	 * Enable multidirectional.
 	 * 
-	 * @return this
+	 * @param cache
+	 *            The reference Cache.
+	 * 
+	 * @return Return this.
 	 */
 	<T extends Attribute> T enableMultiDirectional(Cache cache);
-	
+
 	/**
-	 * Disable multidirectional
+	 * Disable multidirectional.
 	 * 
-	 * @return this
+	 * @param cache
+	 *            The reference Cache.
+	 * 
+	 * @return Return this.
 	 */
 	<T extends Attribute> T disableMultiDirectional(Cache cache);
-	
+
 	/**
-	 * Returns true if the multidirectional system property enabled
+	 * Returns true if the multidirectional system property enabled.
 	 * 
-	 * @return true if the multidirectional system propertyt enabled
+	 * @param cache
+	 *            The reference Cache.
+	 * 
+	 * @return Return true if the multidirectional system propertyt enabled.
 	 */
 	boolean isMultiDirectional(Context context);
-	
+
 	/**
 	 * Do all necessary inductions on this attribute
 	 * 

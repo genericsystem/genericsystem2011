@@ -35,7 +35,6 @@ public class SingularConstraintImpl extends AbstractAxedIntegerConstraint {
 			if (it.hasNext())
 				throw new SingularConstraintViolationException("Multiple links of type " + constraintType + " on target " + component + " (n° " + basePos + ")." + it.next().info());
 		}
-
 	}
 
 }

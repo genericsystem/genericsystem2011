@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
@@ -31,13 +32,13 @@ import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.impl.constraints.VirtualConstraintImpl;
-import org.genericsystem.impl.constraints.axed.RequiredAxedConstraintImpl;
+import org.genericsystem.impl.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.impl.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.impl.constraints.simple.NotNullConstraintImpl;
 import org.genericsystem.impl.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.impl.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.impl.constraints.simple.UniqueConstraintImpl;
+import org.genericsystem.impl.constraints.simple.VirtualConstraintImpl;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
@@ -456,12 +457,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return newInstance(cache, getImplicit(), value, getMetaLevel() + 1, new Generic[] { this }, components);
+		return newInstance(cache, getImplicit(), value, getMetaLevel() + 1, this, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		return newInstance(cache, getImplicit(), value, SystemGeneric.STRUCTURAL, new Generic[] { this }, components);
+		return newInstance(cache, getImplicit(), value, SystemGeneric.STRUCTURAL, this, components);
 	}
 
 	@Override
@@ -476,11 +477,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private <T extends Link> T addLink(Cache cache, Generic directSuper, Serializable value, int metaLevel, int basePos, Generic... targets) {
 		Generic implicitSuper = directSuper.isConcrete() ? directSuper.<GenericImpl> getImplicit().supers[0] : directSuper.getImplicit();
-		return newInstance(cache, implicitSuper, value, metaLevel, new Generic[] { directSuper }, Statics.insertIntoArray(this, targets, basePos));
+		return newInstance(cache, implicitSuper, value, metaLevel, directSuper, Statics.insertIntoArray(this, targets, basePos));
 	}
 
-	private static <T extends Generic> T newInstance(Cache cache, Generic implicitSuper, Serializable value, int metaLevel, Generic[] supers, Generic... components) {
-		return ((CacheImpl) cache).bind(implicitSuper, value, metaLevel, supers, components);
+	private static <T extends Generic> T newInstance(Cache cache, Generic implicitSuper, Serializable value, int metaLevel, Generic directSuper, Generic... components) {
+		return ((CacheImpl) cache).bind(implicitSuper, value, metaLevel, new Generic[] { directSuper }, components);
 	}
 
 	public <T extends Generic> Iterator<T> mainIterator(Context context, Generic origin, final int metaLevel, final int pos) {
@@ -1154,12 +1155,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Attribute> T enableMultiDirectional(Cache cache) {
-		return enableSystemProperty(cache, MultiDirectionalSystemProperty.class, Statics.BASE_POSITION);
+		return enableSystemProperty(cache, MultiDirectionalSystemProperty.class);
 	}
 
 	@Override
 	public <T extends Attribute> T disableMultiDirectional(Cache cache) {
-		return disableSystemProperty(cache, MultiDirectionalSystemProperty.class, Statics.BASE_POSITION);
+		return disableSystemProperty(cache, MultiDirectionalSystemProperty.class);
 	}
 
 	@Override
@@ -1244,32 +1245,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableRequiredConstraint(Cache cache) {
-		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
+		return enableSystemProperty(cache, RequiredConstraintImpl.class, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T disableRequiredConstraint(Cache cache) {
-		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
+		return disableSystemProperty(cache, RequiredConstraintImpl.class, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, RequiredAxedConstraintImpl.class, Statics.BASE_POSITION);
+		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class, Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T enableRequiredConstraint(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, RequiredAxedConstraintImpl.class, componentPos);
+		return enableSystemProperty(cache, RequiredConstraintImpl.class, componentPos);
 	}
 
 	@Override
 	public <T extends Type> T disableRequiredConstraint(Cache cache, int componentPos) {
-		return disableSystemProperty(cache, RequiredAxedConstraintImpl.class, componentPos);
+		return disableSystemProperty(cache, RequiredConstraintImpl.class, componentPos);
 	}
 
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, RequiredAxedConstraintImpl.class, componentPos);
+		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class, componentPos);
 	}
 
 	@Override

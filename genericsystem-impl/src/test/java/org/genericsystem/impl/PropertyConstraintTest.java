@@ -5,10 +5,10 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.exception.PropertyConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.Test;
 
@@ -63,8 +63,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "MyVehicle");
 		Generic red = color.newInstance(cache, "red");
 		Generic blue = color.newInstance(cache, "blue");
-		myVehicle.setLink(cache, vehicleColor, "VehicleColor", red);
-		myVehicle.setLink(cache, vehicleColor, "VehicleColor", blue);
+		myVehicle.setLink(cache, vehicleColor, "myVehicleColor", red);
+		myVehicle.setLink(cache, vehicleColor, "myVehicleColor", blue);
 	}
 
 	public void testBinaryRelationSameTarget() {

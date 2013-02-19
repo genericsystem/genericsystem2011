@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
@@ -150,7 +151,8 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {}
+		private Flag() {
+		}
 
 		@Override
 		public String toString() {
@@ -308,7 +310,7 @@ public class Statics {
 		}
 	}
 
-	static <T extends Generic> Iterator<T> levelFilter(Iterator<T> iterator, final int instanciationLevel) {
+	public static <T extends Generic> Iterator<T> levelFilter(Iterator<T> iterator, final int instanciationLevel) {
 		return new AbstractFilterIterator<T>(iterator) {
 
 			@Override
@@ -318,7 +320,7 @@ public class Statics {
 		};
 	}
 
-	static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, final int basePos, final Generic... targets) {
+	public static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, final int basePos, final Generic... targets) {
 		return new AbstractFilterIterator<T>(iterator) {
 			@Override
 			public boolean isSelected() {
@@ -330,7 +332,7 @@ public class Statics {
 		};
 	}
 
-	static <T extends Generic> Iterator<T> valueFilter(Iterator<T> iterator, final Serializable value) {
+	public static <T extends Generic> Iterator<T> valueFilter(Iterator<T> iterator, final Serializable value) {
 		return new AbstractFilterIterator<T>(iterator) {
 
 			@Override
@@ -340,7 +342,7 @@ public class Statics {
 		};
 	}
 
-	static <T extends Generic> Iterator<T> phantomsFilter(Iterator<T> iterator) {
+	public static <T extends Generic> Iterator<T> phantomsFilter(Iterator<T> iterator) {
 		return new AbstractFilterIterator<T>(iterator) {
 
 			@Override
