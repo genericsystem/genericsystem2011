@@ -8,72 +8,61 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 
 /**
- * A Type
+ * A Type.
  * 
  * @author Nicolas Feybesse
+ * @author Michael Ory
  */
 public interface Type extends Generic {
 
 	/**
-	 * Find an attribute by value
+	 * Find an attribute by value.
 	 * 
 	 * @param value
-	 *            the attribute value
-	 * @return the attribute or null if not found
+	 *            The attribute value.
+	 * @return The attribute or null if not found.
 	 */
 	<T extends Attribute> T getAttribute(Context context, Serializable value);
 
 	/**
-	 * Find the property by value
+	 * Find the property by value.
 	 * 
 	 * @param value
-	 *            the property value
-	 * @return the property or null if no property find
+	 *            The property value.
+	 * @return Return the property or null if no property find.
 	 */
 	<T extends Attribute> T getProperty(Context context, Serializable value);
 
 	/**
-	 * Find the relation by value
+	 * Find the relation by value.
 	 * 
 	 * @param value
-	 *            the relation value
-	 * @return the relation or null if no relation find
+	 *            The relation value.
+	 * @return Return the relation or null if no relation find.
 	 */
 	<T extends Relation> T getRelation(Context context, Serializable value);
 
 	/**
-	 * Create a subtype
+	 * Create a subtype.
 	 * 
 	 * @param value
-	 *            the type value
-	 * @return the subtype
+	 *            The type value.
+	 * @return Return the subtype.
 	 */
 	<T extends Type> T newSubType(Cache cache, Serializable value, Generic... components);
 
 	/**
-	 * Create an attribute for the type
+	 * Create an attribute for the type.
 	 * 
 	 * @param value
-	 *            the attribute value
-	 * @return the attribute
+	 *            The attribute value.
+	 * @return Return the attribute.
 	 * @see Attribute
 	 */
 	<T extends Attribute> T setAttribute(Cache cache, Serializable value);
 
 	/**
-	 * Create a sub attribute
-	 * 
-	 * @param attribute
-	 *            the super attribute
-	 * @param value
-	 *            the sub attribute value
-	 * @return the attribute
-	 * @see Attribute
-	 */
-	// <T extends Attribute> T addSubAttribute(Cache cache, Attribute attribute, Serializable value);
-
-	/**
-	 * Create a property for the type <br/>
+	 * Create a property for the type.
 	 * 
 	 * @param value
 	 *            the property value
@@ -83,52 +72,28 @@ public interface Type extends Generic {
 	<T extends Attribute> T setProperty(Cache cache, Serializable value);
 
 	/**
-	 * Create a property
+	 * Create a relation.
 	 * 
 	 * @param value
-	 *            the property value
-	 * @return the property
-	 * @see Property
-	 */
-	// <T extends Property> T addSubProperty(Cache cache, Property property, Serializable value);
-
-	/**
-	 * Create a relation
-	 * 
-	 * @param value
-	 *            the relation value
+	 *            The relation value.
 	 * @param targets
-	 *            the targets of the relation
-	 * @return the relation
+	 *            The targets of the relation.
+	 * @return Return the relation.
 	 * @see Relation
 	 */
 	<T extends Relation> T setRelation(Cache cache, Serializable value, Type... targets);
 
 	/**
-	 * Create a relation
+	 * Enable singular constraint.
 	 * 
-	 * @param relation
-	 *            the super relation
-	 * @param value
-	 *            the sub relation value
-	 * @param targets
-	 *            the targets of the relation
-	 * @return the relation
-	 * @see Relation
-	 */
-	// <T extends Relation> T addSubRelation(Cache cache, Relation relation, Serializable value, Type... targets);
-
-	/**
-	 * Enable singular constraint
-	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T enableSingularConstraint(Cache cache);
 
 	/**
-	 * Disable singular constraint
+	 * Disable singular constraint.
 	 * 
-	 * @return this
+	 * @return Return this
 	 */
 	<T extends Type> T disableSingularConstraint(Cache cache);
 
@@ -147,9 +112,9 @@ public interface Type extends Generic {
 	<T extends Type> T enableSingularConstraint(Cache cache, int componentPos);
 
 	/**
-	 * Disable singular constraint for the component position
+	 * Disable singular constraint for the component position.
 	 * 
-	 * @return this
+	 * @return Return this
 	 */
 	<T extends Type> T disableSingularConstraint(Cache cache, int componentPos);
 
@@ -161,16 +126,16 @@ public interface Type extends Generic {
 	boolean isSingularConstraintEnabled(Context context, int componentPos);
 
 	/**
-	 * Enable property constraint
+	 * Enable property constraint.
 	 * 
-	 * @return this
+	 * @return Return this
 	 */
 	<T extends Type> T enablePropertyConstraint(Cache cache);
 
 	/**
-	 * Disable property constraint
+	 * Disable property constraint.
 	 * 
-	 * @return this
+	 * @return Return this
 	 */
 	<T extends Type> T disablePropertyConstraint(Cache cache);
 
@@ -182,9 +147,9 @@ public interface Type extends Generic {
 	boolean isPropertyConstraintEnabled(Context context);
 
 	/**
-	 * Enable not null constraint
+	 * Enable not null constraint.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T enableNotNullConstraint(Cache cache);
 
@@ -203,9 +168,9 @@ public interface Type extends Generic {
 	boolean isNotNullConstraintEnabled(Context context);
 
 	/**
-	 * Enable singular instance constraint
+	 * Enable singular instance constraint.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T enableSingularInstanceConstraint(Cache cache);
 
@@ -224,9 +189,9 @@ public interface Type extends Generic {
 	boolean isSingularInstanceConstraintEnabled(Context context);
 
 	/**
-	 * Enable required constraint
+	 * Enable required constraint.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T enableRequiredConstraint(Cache cache);
 
@@ -245,16 +210,16 @@ public interface Type extends Generic {
 	boolean isRequiredConstraintEnabled(Context context);
 
 	/**
-	 * Enable required constraint for the component position
+	 * Enable required constraint for the component position.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T enableRequiredConstraint(Cache cache, int componentPos);
 
 	/**
-	 * Disable required constraint for the component position
+	 * Disable required constraint for the component position.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T disableRequiredConstraint(Cache cache, int componentPos);
 
@@ -266,16 +231,16 @@ public interface Type extends Generic {
 	boolean isRequiredConstraintEnabled(Context context, int componentPos);
 
 	/**
-	 * Enable distinct constraint
+	 * Enable distinct constraint.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T enableUniqueConstraint(Cache cache);
 
 	/**
-	 * Disable distinct constraint
+	 * Disable distinct constraint.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T disableUniqueConstraint(Cache cache);
 
@@ -287,16 +252,16 @@ public interface Type extends Generic {
 	boolean isUniqueConstraintEnabled(Context context);
 
 	/**
-	 * Enable virtual constraint
+	 * Enable virtual constraint.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T enableVirtualConstraint(Cache cache);
 
 	/**
-	 * Disable virtual constraint
+	 * Disable virtual constraint.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T disableVirtualConstraint(Cache cache);
 
@@ -308,16 +273,16 @@ public interface Type extends Generic {
 	boolean isVirtualConstraintEnabled(Context context);
 
 	/**
-	 * Enable inheritance
+	 * Enable inheritance.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T enableInheritance(Cache cache);
 
 	/**
-	 * Disable inheritance
+	 * Disable inheritance.
 	 * 
-	 * @return this
+	 * @return Return this.
 	 */
 	<T extends Type> T disableInheritance(Cache cache);
 

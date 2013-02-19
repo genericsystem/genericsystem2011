@@ -4,9 +4,10 @@ import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Context;
 
 /**
- * An Attribute
+ * An Attribute.
  * 
  * @author Nicolas Feybesse
+ * @author Michael Ory
  */
 public interface Attribute extends Holder, Type {
 
@@ -41,9 +42,10 @@ public interface Attribute extends Holder, Type {
 	boolean isMultiDirectional(Context context);
 
 	/**
-	 * Do all necessary inductions on this attribute
+	 * Do all necessary inductions on this attribute.
 	 * 
 	 * @param cache
+	 *            The reference Cache.
 	 */
 	void deduct(Cache cache);
 }
