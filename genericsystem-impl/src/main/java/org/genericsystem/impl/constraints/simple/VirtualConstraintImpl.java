@@ -1,4 +1,4 @@
-package org.genericsystem.impl.constraints;
+package org.genericsystem.impl.constraints.simple;
 
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.SystemGeneric;
@@ -12,6 +12,8 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.VirtualConstraintException;
 import org.genericsystem.api.generic.Type;
+import org.genericsystem.impl.constraints.Constraint;
+import org.genericsystem.impl.constraints.Constraint.CheckingType;
 import org.genericsystem.impl.system.ComponentPosValue;
 
 @SystemGeneric

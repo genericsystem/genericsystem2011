@@ -21,7 +21,7 @@ import org.genericsystem.impl.system.ComponentPosValue;
 @SingularConstraint
 @InstanceClassConstraint(ComponentPosValue.class)
 @NotNullConstraint
-public class RequiredAxedConstraintImpl extends Constraint {
+public class RequiredConstraintImpl extends Constraint {
 
 	private static final long serialVersionUID = 2837810754525623146L;
 
@@ -29,7 +29,7 @@ public class RequiredAxedConstraintImpl extends Constraint {
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		if (modified.isConcrete()) {
 			if (!modified.isAlive(context)) {
-				for (ConstraintValue constraintValue : getConstraintValues(context, modified, RequiredAxedConstraintImpl.class)) {
+				for (ConstraintValue constraintValue : getConstraintValues(context, modified, RequiredConstraintImpl.class)) {
 					int componentPos = constraintValue.getComponentPosValue().getComponentPos();
 					Generic base = ((Attribute) modified).getComponent(componentPos);
 					if (base != null && base.getLinks(context, modified.<Relation> getMeta(), componentPos).size() < 1)
@@ -37,7 +37,7 @@ public class RequiredAxedConstraintImpl extends Constraint {
 				}
 			} else
 				for (Attribute requiredAttribute : ((Type) modified).getAttributes(context)) {
-					for (ConstraintValue constraintValue : getConstraintValues(context, requiredAttribute, RequiredAxedConstraintImpl.class))
+					for (ConstraintValue constraintValue : getConstraintValues(context, requiredAttribute, RequiredConstraintImpl.class))
 						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent(constraintValue.getComponentPosValue().getComponentPos())) && modified.getLinks(context, (Relation) requiredAttribute).size() < 1)
 							throw new RequiredConstraintViolationException(requiredAttribute.getValue() + " is required for new " + modified.getMeta() + " " + modified);
 				}

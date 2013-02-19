@@ -15,8 +15,7 @@ public class FunctionalTest extends AbstractTest {
 	@Test
 	public void getCarInstancesWithPowerHigherThan90HP() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		// Type car = cache.newType("Car");
-		Type car = cache.getEngine().newSubType(cache, "Car");
+		Type car = cache.newType("Car");
 		final Attribute carPower = car.setProperty(cache, "Power");
 		Generic myCar = car.newInstance(cache, "myCar");
 		myCar.setValue(cache, carPower, 233);
@@ -32,5 +31,25 @@ public class FunctionalTest extends AbstractTest {
 		assert !carInstancesWithPowerHigherThan90HP.contains(yourCar);
 		assert carInstancesWithPowerHigherThan90HP.size() == 1;
 		carInstancesWithPowerHigherThan90HP.log();
+	}
+	
+	@Test
+	public void testSnaphotIsAware() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		
+		Snapshot<Generic> snapshot = vehicle.getAllSubTypes(cache);
+		assert snapshot.size() == 1;
+		assert snapshot.contains(vehicle);
+		
+		Type car = vehicle.newSubType(cache, "Car");
+		assert snapshot.size() == 2;
+		assert snapshot.contains(vehicle);
+		assert snapshot.contains(car);
+		
+		car.remove(cache);
+		assert snapshot.size() == 1;
+		assert snapshot.contains(vehicle);
+		assert !snapshot.contains(car);
 	}
 }
