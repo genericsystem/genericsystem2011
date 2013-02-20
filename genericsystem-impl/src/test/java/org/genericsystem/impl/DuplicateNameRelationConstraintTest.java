@@ -17,9 +17,7 @@ public class DuplicateNameRelationConstraintTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				System.out.println("@@@@@@@@@@@@@@@@@@@@@");
 				car.setRelation(cache, "carColor", color);
-				System.out.println(car.getComposites(cache));
 			}
 		}.assertIsCausedBy(DuplicateNameRelationConstraintViolationException.class);
 	}
