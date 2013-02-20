@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
@@ -494,9 +493,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
-				return candidate.getMetaLevel() <= metaLevel
+
+				boolean result = candidate.getMetaLevel() <= metaLevel
 						&& (((GenericImpl) candidate).safeIsEnabled(context, ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class)) || metaLevel == SystemGeneric.STRUCTURAL ? candidate.isAttributeOf(GenericImpl.this)
 								: candidate.isAttributeOf(GenericImpl.this, pos));
+				if (result)
+					((GenericImpl) candidate).deduct(context);
+				return result;
 			}
 
 			@Override
@@ -507,6 +510,45 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 		};
 	}
+
+	@Override
+	public void deduct(final Context cache) {
+		if (isStructural())
+			if (!isPseudoStructural())
+				return;
+		for (int i = 0; i < components.length; i++) {
+			Generic component = components[i];
+			if (component.isStructural()) {
+				Generic[] truncated = Statics.truncate(i, components);
+				for (Generic generic : ((Type) component).getInheritings(cache)) {
+					Link link = generic.getLink(cache, this, i);
+					if (!link.getComponent(i).equals(generic)) {
+						assert link.inheritsFrom(this);
+						((GenericImpl) generic).addLink(cache, link, link.getValue(), SystemGeneric.CONCRETE, i, truncated);
+					}
+				}
+			}
+		}
+	}
+
+	// public void deduct(final Context cache, Generic[] components) {
+	// if (isStructural())
+	// if (!isPseudoStructural())
+	// return;
+	// for (int i = 0; i < components.length; i++) {
+	// Generic component = components[i];
+	// if (component.isStructural()) {
+	// Generic[] truncated = Statics.truncate(i, components);
+	// for (Generic generic : ((Type) component).getInheritings(cache)) {
+	// Link link = generic.getLink(cache, this, i);
+	// if (!link.getComponent(i).equals(generic)) {
+	// assert link.inheritsFrom(this);
+	// ((GenericImpl) generic).addLink(cache, link, link.getValue(), SystemGeneric.CONCRETE, i, truncated);
+	// }
+	// }
+	// }
+	// }
+	// }
 
 	public boolean isPhantom() {
 		return Statics.PHAMTOM.equals(getValue());
@@ -1367,46 +1409,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Generic> T reBind(Cache cache) {
 		return ((CacheImpl) cache).reBind(this);
-	}
-
-	@Override
-	public void deduct(final Cache cache) {
-		log.info("deduct : " + this);
-		deduct(cache, components);
-	}
-
-	public void deduct(final Cache cache, Generic[] components) {
-		// boolean isToBind = true;
-		for (int i = 0; i < components.length; i++) {
-			Generic component = components[i];
-			if (component.isStructural()) {
-				// isToBind = false;
-				Generic[] truncated = Statics.truncate(i, components);
-				for (Generic generic : ((Type) component).getInheritings(cache)) {
-					log.info("Link of : " + i + " subsitute : " + generic);
-					Link link = generic.getLink(cache, this, i);
-					log.info("=======>" + this + " : " + link);
-					log.info("=======> has good substitute : " + link.getComponent(i).equals(generic));
-					log.info("=======> inherits : " + link.inheritsFrom(this));
-
-					if (!link.getComponent(i).equals(generic)) {
-						log.info("superlink : " + link);
-						assert link.inheritsFrom(this);
-						link = (((GenericImpl) generic).addLink(cache, link, link.getValue(), SystemGeneric.CONCRETE, i, truncated));
-						log.info("Create sublink : " + link);
-						((GenericImpl) link).deduct(cache);
-					}
-				}
-			}
-		}
-		// if (!isToBind)
-		// return;
-		// for (Generic generic : components[0].getComposites(cache))
-		// if (Arrays.equals(((GenericImpl) generic).components, components))
-		// return;
-		// ((CacheImpl) cache).bind(getImplicit(),
-		// Statics.insertFirstIntoArray(getImplicit(), supers),
-		// components);
 	}
 
 	boolean isPseudoStructural() {
