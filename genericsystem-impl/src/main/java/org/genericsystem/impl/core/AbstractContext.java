@@ -110,7 +110,7 @@ public abstract class AbstractContext implements Context, Serializable {
 
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
-				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).getExtendedComponentsArray(), interfaces, components, false);
+				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).components, interfaces, components, false);
 			}
 		};
 	}
@@ -136,7 +136,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
 		for (int i = 0; i < primariesArray.length; i++)
 			boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
-		Generic[] extendedComponents = ((GenericImpl) generic).getExtendedComponentsArray();
+		Generic[] extendedComponents = ((GenericImpl) generic).components;
 		Generic[] extendedBoundComponents = new Generic[((GenericImpl) generic).components.length];
 		for (int i = 0; i < extendedComponents.length; i++)
 			extendedBoundComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);

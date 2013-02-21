@@ -1,7 +1,6 @@
 package org.genericsystem.impl.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
@@ -252,7 +250,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Holder> T setValue(Cache cache, Attribute attribute, Serializable value) {
 		T link = setLink(cache, (Relation) attribute, value);
-		assert getValues(cache, attribute).contains(value) : link.info();
+		// assert getValues(cache, attribute).contains(value) : link.info();
 		return link;
 	}
 
@@ -339,13 +337,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	private <T extends Link> Iterator<T> linksIterator(Context context, Relation relation, Generic... targets) {
 		Map<Generic, Integer> positions = ((GenericImpl) relation).getPositions(Statics.insertFirstIntoArray(this, targets));
 		return Statics.<T> targetsFilter(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE, positions.get(this)), positions, targets);
-	}
-
-	private Map<Generic, Integer> getPositions(Generic... components) {
-		Map<Generic, Integer> positions = new LinkedHashMap<>();
-		for (Generic component : components)
-			positions.put(component, getComponentPos(component, positions.values()));
-		return positions;
 	}
 
 	@Override
@@ -490,10 +481,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			Generic[] orderComponents = new Generic[components.length];
 			for (int i = 0; i < components.length; i++) {
 				int pos = positions.get(components[i]);
-				if (Statics.NO_POSITION != pos) {
-					assert orderComponents[pos] == null;
-					orderComponents[pos] = components[i];
-				}
+				// if (Statics.NO_POSITION != pos) {
+				assert Statics.NO_POSITION != pos;
+				assert orderComponents[pos] == null;
+				orderComponents[pos] = components[i];
+				// }
+
 			}
 			components = orderComponents;
 		}
@@ -624,48 +617,48 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getPrimaries().toArray();
 	}
 
-	Generic[] getExtendedComponentsArray() {
-		return new ExtendedComponents(components).addSupers(supers).toArray();
-	}
+	// Generic[] getExtendedComponentsArray() {
+	// return new ExtendedComponents(components).addSupers(supers).toArray();
+	// }
 
-	static public class ExtendedComponents extends ArrayList<Generic> {
-
-		private static final long serialVersionUID = 5192296074644405884L;
-
-		public ExtendedComponents(Generic[] components) {
-			addAll(Arrays.asList(components));
-		}
-
-		public ExtendedComponents addSupers(Generic... directSupers) {
-			if (directSupers.length == 1 && directSupers[0].isEngine())
-				return this;
-			for (Generic directSuper : directSupers)
-				for (Generic component : ((GenericImpl) directSuper).getExtendedComponentsArray())
-					restrictedAdd(component);
-			return this;
-		}
-
-		// TODO KK
-		public boolean restrictedAdd(Generic newComponent) {
-			Iterator<Generic> iterator = iterator();
-			while (iterator.hasNext()) {
-				Generic component = iterator.next();
-				if (component != null) {
-					if (((GenericImpl) newComponent).new InheritanceCalculator().isSuperOf(component))
-						return false;
-				} else {
-					continue;
-				}
-				assert component.equals(newComponent) || !((GenericImpl) component).new InheritanceCalculator().isSuperOf(newComponent);
-			}
-			return super.add(newComponent);
-		}
-
-		@Override
-		public Generic[] toArray() {
-			return super.toArray(new Generic[size()]);
-		}
-	}
+	// static public class ExtendedComponents extends ArrayList<Generic> {
+	//
+	// private static final long serialVersionUID = 5192296074644405884L;
+	//
+	// public ExtendedComponents(Generic[] components) {
+	// addAll(Arrays.asList(components));
+	// }
+	//
+	// public ExtendedComponents addSupers(Generic... directSupers) {
+	// if (directSupers.length == 1 && directSupers[0].isEngine())
+	// return this;
+	// for (Generic directSuper : directSupers)
+	// for (Generic component : ((GenericImpl) directSuper).getExtendedComponentsArray())
+	// restrictedAdd(component);
+	// return this;
+	// }
+	//
+	// // TODO KK
+	// public boolean restrictedAdd(Generic newComponent) {
+	// Iterator<Generic> iterator = iterator();
+	// while (iterator.hasNext()) {
+	// Generic component = iterator.next();
+	// if (component != null) {
+	// if (((GenericImpl) newComponent).new InheritanceCalculator().isSuperOf(component))
+	// return false;
+	// } else {
+	// continue;
+	// }
+	// assert component.equals(newComponent) || !((GenericImpl) component).new InheritanceCalculator().isSuperOf(newComponent);
+	// }
+	// return super.add(newComponent);
+	// }
+	//
+	// @Override
+	// public Generic[] toArray() {
+	// return super.toArray(new Generic[size()]);
+	// }
+	// }
 
 	private class InheritanceCalculator extends HashSet<Generic> {
 		private static final long serialVersionUID = -894665449193645526L;
@@ -714,7 +707,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return isEngine();
 		if (((GenericImpl) generic).isPrimary())
 			return isSuperOf(((GenericImpl) generic).supers[0], override);
-		return isSuperOf(getPrimariesArray(), getExtendedComponentsArray(), ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).getExtendedComponentsArray(), override);
+		return isSuperOf(getPrimariesArray(), components, ((GenericImpl) generic).getPrimariesArray(), ((GenericImpl) generic).components, override);
 	}
 
 	public static boolean isSuperOf(Generic generic, Generic subGeneric, boolean override) {
@@ -1088,6 +1081,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (singularTarget != null)
 			for (int axe : singularTarget.value())
 				enableSingularConstraint(cache, axe);
+	}
+
+	private Map<Generic, Integer> getPositions(Generic... components) {
+		Map<Generic, Integer> positions = new LinkedHashMap<>();
+		for (Generic component : components)
+			positions.put(component, getComponentPos(component, positions.values()));
+		return positions;
 	}
 
 	public int getComponentPos(Generic generic, Collection<Integer> forbiddenComponentPos) {

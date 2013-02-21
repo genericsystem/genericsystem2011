@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.api.annotation.Dependencies;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.core.Cache;
@@ -26,7 +25,6 @@ import org.genericsystem.api.exception.RollbackException;
 import org.genericsystem.api.generic.Tree;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
-import org.genericsystem.impl.core.GenericImpl.ExtendedComponents;
 import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractAwareIterator;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
@@ -314,7 +312,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
 		for (int i = 0; i < primariesArray.length; i++)
 			boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
-		Generic[] extendedComponents = ((GenericImpl) generic).getExtendedComponentsArray();
+		Generic[] extendedComponents = ((GenericImpl) generic).components;
 		for (int i = 0; i < extendedComponents.length; i++)
 			extendedComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
 		Generic[] directSupers = getDirectSupers(boundPrimaries, extendedComponents);
@@ -335,7 +333,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(Generic implicit, Generic[] supers, Generic[] components) {
 		final Generic[] interfaces = new Primaries(supers).toArray();
-		final Generic[] extendedComponents = new ExtendedComponents(components).addSupers(supers).toArray();
+		final Generic[] extendedComponents = components;
 
 		Generic[] directSupers = getDirectSupers(interfaces, extendedComponents);
 		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
@@ -362,7 +360,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new AbstractFilterIterator<Generic>(directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
-				return !((GenericImpl) next).isPhantom() && GenericImpl.isSuperOf(interfaces, extendedComponents, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).getExtendedComponentsArray(), false);
+				return !((GenericImpl) next).isPhantom() && GenericImpl.isSuperOf(interfaces, extendedComponents, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components, false);
 			}
 		};
 	}
@@ -381,7 +379,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		private void reBuild(NavigableSet<Generic> orderedDependencies) {
 			for (Generic orderedDependency : orderedDependencies) {
-				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).getExtendedComponentsArray());
+				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).components);
 				Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).supers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
 				adjust(((GenericImpl) orderedDependency).supers[0]);
 				Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex((orderedDependency), directSupers, newComponents));
