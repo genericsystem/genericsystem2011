@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
@@ -31,6 +32,7 @@ public class Statics {
 	public static final Flag FLAG = new Flag();
 	public static final Generic[] EMPTY_GENERIC_ARRAY = new Generic[] {};
 
+	public static final int NO_POSITION = -1;
 	public static final int BASE_POSITION = 0;
 	public static final int TARGET_POSITION = 1;
 	public static final int SECOND_TARGET_POSITION = 2;
@@ -320,12 +322,12 @@ public class Statics {
 		};
 	}
 
-	public static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, final int basePos, final Generic... targets) {
+	public static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, final Map<Generic, Integer> positions, final Generic... targets) {
 		return new AbstractFilterIterator<T>(iterator) {
 			@Override
 			public boolean isSelected() {
-				for (int i = 0; i < targets.length; i++)
-					if (!targets[i].equals(((Holder) next).getComponent(i + (i >= basePos ? 1 : 0))))
+				for (Generic target : targets)
+					if (!target.equals(((Holder) next).getComponent(positions.get(target))))
 						return false;
 				return true;
 			}
