@@ -1,6 +1,7 @@
 package org.genericsystem.api.core;
 
 import java.io.Serializable;
+
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Link;
@@ -125,21 +126,6 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T bind(Cache cache, Link relation, Generic... targets);
 
 	/**
-	 * Bind this with the targets.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @param relation
-	 *            The Relation.
-	 * @param basePos
-	 *            The base component position.
-	 * @param targets
-	 *            The targets.
-	 * @return A new Generic or the existing Generic.
-	 */
-	<T extends Link> T bind(Cache cache, Link relation, int basePos, Generic... targets);
-
-	/**
 	 * Returns the Link of the Relation for the components.
 	 * 
 	 * @param context
@@ -155,40 +141,21 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T getLink(Context context, Relation relation, Generic... targets);
 
 	/**
-	 * Returns the Link of the Relation for the components.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @param relation
-	 *            The Relation.
-	 * @param basePos
-	 *            The base component position.
-	 * @param targets
-	 *            The optional targets.
-	 * @return A Link.
-	 * @throws IllegalStateException
-	 *             Ambigous request for the Relation.
-	 */
-	<T extends Link> T getLink(Context context, Relation relation, int basePos, Generic... targets);
-
-	/**
 	 * Returns the Link of the Relation for the components and value.
 	 * 
 	 * @param context
 	 *            The reference context.
 	 * @param relation
 	 *            The Relation.
-	 * @param basePos
-	 *            The base component position.
-	 * @param v
-	 *            The base component position.
 	 * @param value
 	 *            The value of link.
+	 * @param targets
+	 *            The targets.
 	 * @return A Link.
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
-	public <T extends Link> T getLink(Context context, Relation relation, final int basePos, Serializable value, final Generic... targets);
+	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, Generic... targets);
 
 	/**
 	 * Returns the Link.
@@ -211,14 +178,14 @@ public interface Generic extends Comparable<Generic> {
 	 *            The reference context.
 	 * @param relation
 	 *            The Relation.
-	 * @param basePos
-	 *            The base component position.
+	 * @param componentPos
+	 *            The component position.
 	 * @param targets
 	 *            The targets.
 	 * @see Snapshot
 	 * @return The Link.
 	 */
-	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, int basePos, Generic... targets);
+	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, int componentPos, Generic... targets);
 
 	/**
 	 * Modify or create a Link. <br/>
@@ -235,24 +202,6 @@ public interface Generic extends Comparable<Generic> {
 	 * @return The Link.
 	 */
 	<T extends Link> T setLink(Cache cache, Link property, Serializable value, Generic... targets);
-
-	/**
-	 * Modify or create a Link. <br/>
-	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @param property
-	 *            The property.
-	 * @param value
-	 *            The value Link.
-	 * @param basePos
-	 *            The base component position.
-	 * @param targets
-	 *            The optional targets.
-	 * @return The Link.
-	 */
-	<T extends Link> T setLink(Cache cache, Link property, Serializable value, int basePos, Generic... targets);
 
 	/**
 	 * Returns the targets of the Relation.
@@ -273,15 +222,13 @@ public interface Generic extends Comparable<Generic> {
 	 *            The reference context.
 	 * @param relation
 	 *            The relation.
-	 * @param basePos
-	 *            The base component position.
 	 * @param targetPos
 	 *            The target component position.
 	 * 
 	 * @see Snapshot
 	 * @return The targets.
 	 */
-	<T extends Generic> Snapshot<T> getTargets(Context context, Relation relation, int basePos, int targetPos);
+	<T extends Generic> Snapshot<T> getTargets(Context context, Relation relation, int targetPos);
 
 	/**
 	 * Returns the values holders.

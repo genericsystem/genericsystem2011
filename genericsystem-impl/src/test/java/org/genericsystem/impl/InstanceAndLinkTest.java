@@ -88,7 +88,8 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Link myckPossessMyVehicle = myck.setLink(cache, possessVehicle, "myckPossessMyVehicle", myVehicle);
 		assert myck.getLinks(cache, possessVehicle).size() == 1;
 		assert myck.getLinks(cache, possessVehicle).contains(myckPossessMyVehicle);
-		assert myVehicle.getLinks(cache, possessVehicle).size() == 0;
+		assert myVehicle.getLinks(cache, possessVehicle).size() == 1 : myVehicle.getLinks(cache, possessVehicle);
+		assert myVehicle.getLinks(cache, possessVehicle).contains(myckPossessMyVehicle);
 	}
 
 	public void testBidirectionalRelation() {
@@ -147,7 +148,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 		Relation carPilot = car.setRelation(cache, "CarPilot", pilot);
 		Link linkCarPilot = (Link) carPilot.newInstance(cache, "35%", myBMW, myck);
-		assert myBMW.getLinks(cache, carPilot).size() == 1;
+		assert myBMW.getLinks(cache, carPilot).size() == 1 : myBMW.getLinks(cache, carPilot);
 		assert myBMW.getLinks(cache, carPilot).contains(linkCarPilot);
 	}
 

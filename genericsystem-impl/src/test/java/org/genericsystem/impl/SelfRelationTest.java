@@ -26,12 +26,12 @@ public class SelfRelationTest extends AbstractTest {
 		assert myCar.getTargets(cache, carOutsideColor).contains(red);
 
 		((GenericImpl) defaultOutside).deduct(cache);
-		assert red.getTargets(cache, carOutsideColor, Statics.TARGET_POSITION, Statics.BASE_POSITION).contains(myCar) : red.getTargets(cache, carOutsideColor, Statics.TARGET_POSITION, Statics.BASE_POSITION);
+		assert red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION).contains(myCar) : red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION);
 
 		Generic myBmw = car.newInstance(cache, "myBmw");
 		((GenericImpl) defaultOutside).deduct(cache);
-		assert red.getTargets(cache, carOutsideColor, Statics.TARGET_POSITION, Statics.BASE_POSITION).contains(myCar) : red.getTargets(cache, carOutsideColor, Statics.TARGET_POSITION, Statics.BASE_POSITION);
-		assert red.getTargets(cache, carOutsideColor, Statics.TARGET_POSITION, Statics.BASE_POSITION).contains(myBmw) : red.getTargets(cache, carOutsideColor, Statics.TARGET_POSITION, Statics.BASE_POSITION);
+		assert red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION).contains(myCar) : red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION);
+		assert red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION).contains(myBmw) : red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION);
 	}
 
 	public void paternityRelationTest() {
@@ -60,7 +60,7 @@ public class SelfRelationTest extends AbstractTest {
 		assert theBrother1.getLinks(cache, fraternity).contains(myBrother) : theBrother1.getLinks(cache, fraternity);
 		assert theBrother2.getLinks(cache, fraternity).contains(myBrother) : theBrother2.getLinks(cache, fraternity);
 		assert theBrother1.getTargets(cache, fraternity).contains(theBrother2) : theBrother1.getLinks(cache, fraternity);
-		assert theBrother2.getTargets(cache, fraternity, Statics.TARGET_POSITION, Statics.BASE_POSITION).contains(theBrother1) : theBrother2.getTargets(cache, fraternity, Statics.TARGET_POSITION, Statics.BASE_POSITION);
+		assert theBrother2.getTargets(cache, fraternity, Statics.BASE_POSITION).contains(theBrother1) : theBrother2.getTargets(cache, fraternity, Statics.BASE_POSITION);
 	}
 
 }
