@@ -469,12 +469,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return newInstance(cache, getImplicit(), value, getMetaLevel() + 1, this, components);
+		return bind(cache, getImplicit(), value, getMetaLevel() + 1, this, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		return newInstance(cache, getImplicit(), value, SystemGeneric.STRUCTURAL, this, components);
+		return bind(cache, getImplicit(), value, SystemGeneric.STRUCTURAL, this, components);
 	}
 
 	@Override
@@ -497,16 +497,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 			components = orderComponents;
 		}
-		return newInstance(cache, implicitSuper, value, metaLevel, directSuper, components);
+		return bind(cache, implicitSuper, value, metaLevel, directSuper, components);
 	}
 
 	// TODO KK
 	private <T extends Link> T addLink(Cache cache, Generic directSuper, Serializable value, int metaLevel, int basePos, Generic... targets) {
 		Generic implicitSuper = directSuper.isConcrete() ? directSuper.<GenericImpl> getImplicit().supers[0] : directSuper.getImplicit();
-		return newInstance(cache, implicitSuper, value, metaLevel, directSuper, Statics.insertIntoArray(this, targets, basePos));
+		return bind(cache, implicitSuper, value, metaLevel, directSuper, Statics.insertIntoArray(this, targets, basePos));
 	}
 
-	private static <T extends Generic> T newInstance(Cache cache, Generic implicitSuper, Serializable value, int metaLevel, Generic directSuper, Generic... components) {
+	private static <T extends Generic> T bind(Cache cache, Generic implicitSuper, Serializable value, int metaLevel, Generic directSuper, Generic... components) {
 		return ((CacheImpl) cache).bind(implicitSuper, value, metaLevel, new Generic[] { directSuper }, components);
 	}
 
@@ -1140,7 +1140,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Node> T newRoot(Cache cache, Serializable value, int dim) {
 		// return addLink(cache, this/* .getImplicit() */, value, getMetaLevel() + 1, new Generic[dim]);
 
-		return newInstance(cache, this.getImplicit(), value, SystemGeneric.CONCRETE, this, new Generic[dim]);
+		return bind(cache, this.getImplicit(), value, SystemGeneric.CONCRETE, this, new Generic[dim]);
 	}
 
 	@Override
