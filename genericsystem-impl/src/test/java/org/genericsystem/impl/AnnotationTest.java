@@ -8,9 +8,9 @@ import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.Test;
 
@@ -207,7 +207,7 @@ public class AnnotationTest extends AbstractTest {
 		Generic myTransformerChildrenGames = cache.find(MyTransformerChildrenGames.class);
 
 		assert myTransformerChildrenGames.inheritsFrom(transformerChildrenGames);
-		assert ((GenericImpl) transformerChildrenGames).isSuperOf(myTransformerChildrenGames, false);
+		assert ((GenericImpl) transformerChildrenGames).isSuperOf(myTransformerChildrenGames);
 
 		assert !myTransformerChildrenGames.inheritsFrom(myGames);
 		assert !myTransformerChildrenGames.inheritsFrom(myChildren);

@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.genericsystem.api.annotation.BooleanValue;
 import org.genericsystem.api.annotation.ComponentPosBoolean;
 import org.genericsystem.api.annotation.Components;
@@ -30,6 +31,7 @@ import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.constraints.Constraint.CheckingType;
+import org.genericsystem.impl.core.Statics.Primaries;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.genericsystem.impl.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.impl.snapshot.AbstractSnapshot;
@@ -110,7 +112,7 @@ public abstract class AbstractContext implements Context, Serializable {
 
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
-				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).components, interfaces, components, false);
+				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).components, interfaces, components);
 			}
 		};
 	}
@@ -147,13 +149,11 @@ public abstract class AbstractContext implements Context, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T find(Generic[] directSupers, Generic[] components) {
-		Iterator<Generic> iterator = components.length > 0 && components[0] != null ? compositesIterator(components[0]) : directInheritingsIterator(directSupers[0]);
-		while (iterator.hasNext()) {
-			Generic directInheriting = iterator.next();
-			if (Arrays.equals(((GenericImpl) directInheriting).supers, directSupers) && Arrays.equals(((GenericImpl) directInheriting).components, ((GenericImpl) directInheriting).transform(components)))
-				return (T) directInheriting;
-		}
+	public <T extends Generic> T find(Generic[] supers, Generic[] components) {
+		final Generic[] interfaces = new Primaries(supers).toArray();
+		Generic[] directSupers = getDirectSupers(interfaces, components);
+		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
+			return (T) directSupers[0];
 		return null;
 	}
 

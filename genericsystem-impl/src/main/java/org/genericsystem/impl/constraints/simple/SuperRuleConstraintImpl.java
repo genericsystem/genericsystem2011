@@ -26,8 +26,7 @@ public class SuperRuleConstraintImpl extends Constraint {
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		for (Generic directSuper : modified.getSupers())
-			if (!GenericImpl.isSuperOf(directSuper, modified, false))
-				throw new SuperRuleConstraintViolationException(modified + " should inherits from : " + directSuper);
+			if (!((GenericImpl) directSuper).isSuperOf(modified))
+				throw new SuperRuleConstraintViolationException(modified.info() + " should inherits from : " + directSuper.info());
 	}
-
 }

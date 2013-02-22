@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.generic.Holder;
+import org.genericsystem.api.generic.Relation;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -322,7 +323,8 @@ public class Statics {
 		};
 	}
 
-	public static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, final Map<Generic, Integer> positions, final Generic... targets) {
+	public static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Relation relation, final Generic... targets) {
+		final Map<Generic, Integer> positions = ((GenericImpl) relation).getPositions(targets);
 		return new AbstractFilterIterator<T>(iterator) {
 			@Override
 			public boolean isSelected() {

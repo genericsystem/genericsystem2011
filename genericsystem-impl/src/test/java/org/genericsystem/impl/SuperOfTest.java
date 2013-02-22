@@ -52,8 +52,8 @@ public class SuperOfTest extends AbstractTest {
 	}
 
 	private void internalCompare(Generic superGeneric, Generic inheritingGeneric) {
-		assert inheritingGeneric.inheritsFrom(superGeneric) == ((GenericImpl) superGeneric).isSuperOf(inheritingGeneric, false) : "superGeneric : " + superGeneric + " inheritingGeneric : " + inheritingGeneric + " => "
-				+ inheritingGeneric.inheritsFrom(superGeneric) + " / " + ((GenericImpl) superGeneric).isSuperOf(inheritingGeneric, false);
+		assert inheritingGeneric.inheritsFrom(superGeneric) == ((GenericImpl) superGeneric).isSuperOf(inheritingGeneric) : "superGeneric : " + superGeneric + " inheritingGeneric : " + inheritingGeneric + " => "
+				+ inheritingGeneric.inheritsFrom(superGeneric) + " / " + ((GenericImpl) superGeneric).isSuperOf(inheritingGeneric);
 		for (Generic inheriting : inheritingGeneric.getInheritings(cache))
 			internalCompare(superGeneric, inheriting);
 		for (Generic composite : inheritingGeneric.getComposites(cache))
