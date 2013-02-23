@@ -4,9 +4,9 @@ import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.CacheImpl;
 import org.genericsystem.impl.core.GenericImpl;
 import org.testng.annotations.Test;
@@ -101,13 +101,5 @@ public class RebindTest extends AbstractTest {
 		yourFourHorsesCar.setValue(cache, power, "tenHorses");
 		((GenericImpl) car).reBind(cache);
 		assert myFourHorsesCar.getMeta().equals(yourFourHorsesCar.getMeta());
-	}
-
-	public void rebindInstanceWithComponentTest() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type color = cache.newType("color");
-		color.newInstance(cache, "yellow");
-		color.newInstance(cache, "red", color);
-		((GenericImpl) color).reBind(cache);
 	}
 }
