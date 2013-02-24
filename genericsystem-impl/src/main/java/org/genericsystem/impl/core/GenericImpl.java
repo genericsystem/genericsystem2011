@@ -250,31 +250,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Holder> T setValue(Cache cache, Attribute attribute, Serializable value) {
 		T link = setLink(cache, (Relation) attribute, value);
-		// TODO KK
-		// assert getValues(cache, attribute).contains(value) : link.info();
+		assert getValues(cache, attribute).contains(value) : link.info();
 		return link;
-	}
-
-	@Override
-	public <T extends Link> T getLink(Context context, Relation relation, final Generic... targets) {
-		Iterator<T> valuesIterator = Statics.targetsFilter(this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE), relation, targets);
-		if (!valuesIterator.hasNext())
-			return null;
-		T result = valuesIterator.next();
-		if (valuesIterator.hasNext())
-			throw new IllegalStateException("Ambigous request for relation " + relation + result.info() + " and " + valuesIterator.next().info() + " on : " + this);
-		return result;
-	}
-
-	@Override
-	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, final Generic... targets) {
-		Iterator<T> valuesIterator = Statics.valueFilter(Statics.targetsFilter(this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE), relation, targets), value);
-		if (!valuesIterator.hasNext())
-			return null;
-		T result = valuesIterator.next();
-		if (valuesIterator.hasNext())
-			throw new IllegalStateException("Ambigous request for relation " + relation + result.info() + " and " + valuesIterator.next().info() + " on : " + this);
-		return result;
 	}
 
 	<T extends Generic> T bindPrimary(Cache cache, Serializable value, int metaLevel) {
@@ -311,6 +288,37 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
+	public <T extends Link> T getLink(Context context, Relation relation, final Generic... targets) {
+		Iterator<T> valuesIterator = Statics.targetsFilter(this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE), relation, targets);
+		if (!valuesIterator.hasNext())
+			return null;
+		T result = valuesIterator.next();
+		if (valuesIterator.hasNext())
+			throw new IllegalStateException("Ambigous request for relation " + relation + result.info() + " and " + valuesIterator.next().info() + " on : " + this);
+		return result;
+	}
+
+	@Override
+	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, final Generic... targets) {
+		Iterator<T> valuesIterator = Statics.valueFilter(Statics.targetsFilter(this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE), relation, targets), value);
+		if (!valuesIterator.hasNext())
+			return null;
+		T result = valuesIterator.next();
+		if (valuesIterator.hasNext())
+			throw new IllegalStateException("Ambigous request for relation " + relation + result.info() + " and " + valuesIterator.next().info() + " on : " + this);
+		return result;
+	}
+
+	// TODO KK
+	private <T extends Link> Iterator<T> linksIterator(Context context, Relation relation, int componentPos, Generic... targets) {
+		return Statics.<T> targetsFilter(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE, componentPos), relation, targets);
+	}
+
+	private <T extends Link> Iterator<T> linksIterator(Context context, Relation relation, Generic... targets) {
+		return Statics.<T> targetsFilter(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE), relation, targets);
+	}
+
+	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
@@ -329,16 +337,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return linksIterator(context, relation, componentPos, targets);
 			}
 		};
-	}
-
-	// TODO KK
-	private <T extends Link> Iterator<T> linksIterator(Context context, Relation relation, int componentPos, Generic... targets) {
-		// Map<Generic, Integer> positions = ((GenericImpl) relation).getPositions(Statics.insertIntoArray(this, targets, componentPos));
-		return Statics.<T> targetsFilter(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE, componentPos), relation, targets);
-	}
-
-	private <T extends Link> Iterator<T> linksIterator(Context context, Relation relation, Generic... targets) {
-		return Statics.<T> targetsFilter(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE), relation, targets);
 	}
 
 	@Override
