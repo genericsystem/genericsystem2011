@@ -436,13 +436,13 @@ public interface Type extends Generic {
 	 * 
 	 * @param context
 	 *            The reference context.
-	 * @return The snapshot with all instances of the Generic.
+	 * @return The snapshot with instances of the Generic.
 	 * @see Snapshot
 	 */
 	<T extends Generic> Snapshot<T> getInstances(Context context);
 
 	/**
-	 * Returns the instances of Generic.
+	 * Returns the instances of Generic and the instances of the childrens.
 	 * 
 	 * @param context
 	 *            The reference context.
@@ -456,13 +456,13 @@ public interface Type extends Generic {
 	 * 
 	 * @param context
 	 *            The reference context.
-	 * @return The snapshot with all sub types of the Generic.
+	 * @return The snapshot with sub types of the Generic.
 	 * @see Snapshot
 	 */
 	<T extends Generic> Snapshot<T> getSubTypes(Context context);
 
 	/**
-	 * Returns the sub types of Generic.
+	 * Returns the sub types of Generic and the sub types of the childrens.
 	 * 
 	 * @param context
 	 *            The reference context.

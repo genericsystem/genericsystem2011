@@ -12,13 +12,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.genericsystem.api.annotation.BooleanValue;
+
 import org.genericsystem.api.annotation.ComponentPosBoolean;
 import org.genericsystem.api.annotation.Components;
-import org.genericsystem.api.annotation.IntValue;
-import org.genericsystem.api.annotation.StringValue;
 import org.genericsystem.api.annotation.Supers;
 import org.genericsystem.api.annotation.SystemGeneric;
+import org.genericsystem.api.annotation.value.BooleanValue;
+import org.genericsystem.api.annotation.value.IntValue;
+import org.genericsystem.api.annotation.value.StringValue;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
@@ -42,11 +43,11 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  */
 public abstract class AbstractContext implements Context, Serializable {
-	
+
 	protected static Logger log = LoggerFactory.getLogger(AbstractContext.class);
-	
+
 	private static final long serialVersionUID = -6036571074310729022L;
-	
+
 	<T extends GenericImpl> T plug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
 		for (Generic component : generic.components)
@@ -58,7 +59,7 @@ public abstract class AbstractContext implements Context, Serializable {
 				getDirectInheritingsDependencies(effectiveSuper).add(generic);
 		return generic;
 	}
-	
+
 	<T extends GenericImpl> T unplug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
 		for (Generic component : generic.components)
@@ -70,52 +71,52 @@ public abstract class AbstractContext implements Context, Serializable {
 				getDirectInheritingsDependencies(effectiveSuper).remove(generic);
 		return generic;
 	}
-	
+
 	abstract TimestampedDependencies getDirectInheritingsDependencies(Generic effectiveSuper);
-	
+
 	abstract TimestampedDependencies getCompositeDependencies(Generic component);
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends Generic> Iterator<T> compositesIterator(final Generic component) {
 		return (Iterator<T>) getCompositeDependencies(component).iterator(getTs());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends Generic> Iterator<T> directInheritingsIterator(final Generic component) {
 		return (Iterator<T>) getDirectInheritingsDependencies(component).iterator(getTs());
 	}
-	
+
 	abstract InternalContext<? extends AbstractContext> getInternalContext();
-	
+
 	public abstract long getTs();
-	
+
 	public <T extends Attribute> T getMetaAttribute() {
 		return getEngine().getMetaAttribute();
 	}
-	
+
 	public <T extends Relation> T getMetaRelation() {
 		return getEngine().getMetaRelation();
 	}
-	
+
 	public abstract boolean isScheduledToAdd(Generic generic);
-	
+
 	public abstract boolean isScheduledToRemove(Generic generic);
-	
+
 	Iterator<Generic> getDirectSupersIterator(final Generic[] interfaces, final Generic[] components) {
 		return new AbstractSelectableLeafIterator(this, getEngine()) {
-			
+
 			@Override
 			protected boolean isSelectable() {
 				return true;
 			}
-			
+
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
 				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).components, interfaces, components);
 			}
 		};
 	}
-	
+
 	protected Generic[] getDirectSupers(final Generic[] interfaces, final Generic[] components) {
 		List<Generic> list = new ArrayList<Generic>();
 		final Iterator<Generic> iterator = getDirectSupersIterator(interfaces, components);
@@ -126,7 +127,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		// new Primaries(result) + " <---> " + Arrays.toString(interfaces);
 		return list.toArray(new Generic[list.size()]);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isAlive(this))
@@ -146,7 +147,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			return (T) directSupers[0];
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends Generic> T find(Generic[] supers, Generic[] components) {
 		final Generic[] interfaces = new Primaries(supers).toArray();
@@ -155,14 +156,14 @@ public abstract class AbstractContext implements Context, Serializable {
 			return (T) directSupers[0];
 		return null;
 	}
-	
+
 	<T extends Generic> NavigableSet<T> orderDependencies(final Generic generic) {
 		return new TreeSet<T>() {
 			private static final long serialVersionUID = 1053909994506452123L;
 			{
 				addDependencies(generic);
 			}
-			
+
 			@SuppressWarnings("unchecked")
 			public void addDependencies(Generic g) {
 				if (super.add((T) g)) {// protect from loop
@@ -174,20 +175,20 @@ public abstract class AbstractContext implements Context, Serializable {
 			}
 		};
 	}
-	
+
 	public abstract boolean isAlive(Generic generic);
-	
+
 	public <T extends Generic> T find(Class<?> clazz) {
 		return this.<EngineImpl> getEngine().find(this, clazz);
 	}
-	
+
 	<T extends Generic> T findMeta(Generic[] interfaces, Generic[] components) {
 		for (T composite : getEngine().<T> getComposites(this))
 			if (composite.isMeta() && Arrays.equals(interfaces, ((GenericImpl) composite).getPrimariesArray()) && Arrays.equals(components, ((GenericImpl) composite).components))
 				return composite;
 		return null;
 	}
-	
+
 	Generic[] findSupers(Class<?> clazz) {
 		int i = 0;
 		Type[] supers = new Type[getSupersClasses(clazz).size()];
@@ -195,7 +196,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			supers[i++] = this.<Type> find(superClasse);
 		return supers;
 	}
-	
+
 	Generic findImplicitSuper(Class<?> clazz) {
 		Supers supersAnnotation = clazz.getAnnotation(Supers.class);
 		if (supersAnnotation == null) {
@@ -204,14 +205,14 @@ public abstract class AbstractContext implements Context, Serializable {
 		}
 		return find(supersAnnotation.implicitSuper()).getImplicit();
 	}
-	
+
 	int findMetaLevel(Class<?> clazz) {
 		SystemGeneric annotation = clazz.getAnnotation(SystemGeneric.class);
 		if (annotation == null)
 			return SystemGeneric.STRUCTURAL;
 		return annotation.value();
 	}
-	
+
 	LinkedHashSet<Class<?>> getSupersClasses(Class<?> clazz) {
 		Supers supersAnnotation = clazz.getAnnotation(Supers.class);
 		LinkedHashSet<Class<?>> superClasses = new LinkedHashSet<>(Arrays.asList(supersAnnotation != null ? supersAnnotation.value() : new Class<?>[] {}));
@@ -224,7 +225,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			superClasses.add(javaSuperclass);
 		return superClasses;
 	}
-	
+
 	Generic[] findComponents(Class<?> clazz) {
 		Components componentsAnnotation = clazz.getAnnotation(Components.class);
 		if (componentsAnnotation == null)
@@ -235,7 +236,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			components[index] = find(componentClasses[index]);
 		return components;
 	}
-	
+
 	protected static Serializable findImplictValue(Class<?> clazz) {
 		BooleanValue booleanValue = clazz.getAnnotation(BooleanValue.class);
 		if (booleanValue != null)
@@ -251,7 +252,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			return new ComponentPosValue<Boolean>(componentPosBoolean.componentPos(), componentPosBoolean.value());
 		return clazz;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T findPrimaryByValue(Generic primaryAncestor, Serializable value, int metaLevel) {
 		assert metaLevel - primaryAncestor.getMetaLevel() <= 1;
@@ -264,11 +265,11 @@ public abstract class AbstractContext implements Context, Serializable {
 		}
 		return null;
 	}
-	
+
 	public abstract class InternalContext<T extends AbstractContext> implements Serializable {
-		
+
 		private static final long serialVersionUID = 3961310676895965230L;
-		
+
 		@SuppressWarnings("unchecked")
 		protected SortedSet<Constraint> getSortedConstraints(CheckingType checkingType, boolean immediatlyCheckable) {
 			SortedSet<Constraint> sortedConstraints = new TreeSet<Constraint>();
@@ -283,10 +284,10 @@ public abstract class AbstractContext implements Context, Serializable {
 			}
 			return sortedConstraints;
 		}
-		
+
 		protected Snapshot<Generic> getConstraints() {
 			return new AbstractSnapshot<Generic>() {
-				
+
 				@Override
 				public Iterator<Generic> iterator() {
 					return new AbstractFilterIterator<Generic>(directInheritingsIterator(getEngine())) {
@@ -298,13 +299,13 @@ public abstract class AbstractContext implements Context, Serializable {
 				}
 			};
 		}
-		
+
 		protected void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 			for (Constraint constraint : getSortedConstraints(checkingType, immediatlyCheckable))
 				for (Generic generic : generics)
 					constraint.check(AbstractContext.this, generic);
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		protected void checkConsistency(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 			for (Generic constraint : getConstraints()) {
@@ -321,11 +322,11 @@ public abstract class AbstractContext implements Context, Serializable {
 							if (base != null)
 								for (Generic baseInheriting : ((GenericImpl) base).getAllInheritings(AbstractContext.this))
 									constraintInstance.check(AbstractContext.this, baseInheriting);
-							
+
 						}
 			}
 		}
-		
+
 		protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 			removeAll(removes);
 			addAll(adds);
@@ -345,58 +346,58 @@ public abstract class AbstractContext implements Context, Serializable {
 				throw new IllegalStateException(e);
 			}
 		}
-		
+
 		protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
 			checkConsistency(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 			checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 			checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 		}
-		
+
 		private void addAll(Iterable<Generic> generics) {
 			for (Generic generic : generics)
 				add((GenericImpl) generic);
 		}
-		
+
 		private void removeAll(Iterable<Generic> generics) {
 			for (Generic generic : generics)
 				remove((GenericImpl) generic);
 		}
-		
+
 		private void cancelAddAll(Iterable<Generic> generics) {
 			for (Generic generic : generics)
 				cancelAdd((GenericImpl) generic);
 		}
-		
+
 		private void cancelRemoveAll(Iterable<Generic> generics) {
 			for (Generic generic : generics)
 				cancelRemove((GenericImpl) generic);
 		}
-		
+
 		protected void add(GenericImpl generic) {
 			plug(generic);
 		}
-		
+
 		protected void remove(GenericImpl generic) {
 			unplug(generic);
 		}
-		
+
 		protected void cancelAdd(GenericImpl generic) {
 			unplug(generic);
 		}
-		
+
 		protected void cancelRemove(GenericImpl generic) {
 			plug(generic);
 		}
 	}
-	
+
 	public interface TimestampedDependencies {
-		
+
 		void add(Generic generic);
-		
+
 		void remove(Generic generic);
-		
+
 		Iterator<Generic> iterator(long ts);
 	}
-	
+
 }
