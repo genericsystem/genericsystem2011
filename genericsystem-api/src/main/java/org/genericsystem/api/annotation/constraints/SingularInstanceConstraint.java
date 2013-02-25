@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * This constraint represent the singleton notion.
+ * 
  * @author Nicolas Feybesse
  * @author Michael Ory
  */

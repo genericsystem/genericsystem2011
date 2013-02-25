@@ -2,12 +2,12 @@ package org.genericsystem.impl;
 
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.exception.DuplicateNameRelationConstraintViolationException;
+import org.genericsystem.api.exception.DuplicateStructuralValueConstraintViolationException;
 import org.genericsystem.api.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
-public class DuplicateNameRelationConstraintTest extends AbstractTest {
+public class DuplicateStructuralValueConstraintTest extends AbstractTest {
 
 	public void testKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
@@ -19,6 +19,6 @@ public class DuplicateNameRelationConstraintTest extends AbstractTest {
 			public void intercept() {
 				car.setRelation(cache, "carColor", color);
 			}
-		}.assertIsCausedBy(DuplicateNameRelationConstraintViolationException.class);
+		}.assertIsCausedBy(DuplicateStructuralValueConstraintViolationException.class);
 	}
 }

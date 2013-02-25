@@ -13,7 +13,7 @@ import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.exception.ConstraintViolationException;
-import org.genericsystem.api.exception.DuplicateNameRelationConstraintViolationException;
+import org.genericsystem.api.exception.DuplicateStructuralValueConstraintViolationException;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
@@ -24,7 +24,7 @@ import org.genericsystem.impl.system.ComponentPosValue;
 @SingularConstraint
 @InstanceClassConstraint(ComponentPosValue.class)
 @NotNullConstraint
-public class DuplicateNameRelationConstraintImpl extends Constraint {
+public class DuplicateStructuralValueConstraintImpl extends Constraint {
 
 	private static final long serialVersionUID = -7212219694902616927L;
 
@@ -42,7 +42,7 @@ public class DuplicateNameRelationConstraintImpl extends Constraint {
 					}
 				};
 				if (filterIterator.hasNext())
-					throw new DuplicateNameRelationConstraintViolationException("modified : " + modified.info() + "component : " + component.info() + " composite : " + filterIterator.next().info());
+					throw new DuplicateStructuralValueConstraintViolationException("modified : " + modified.info() + "component : " + component.info() + " composite : " + filterIterator.next().info());
 			}
 		}
 	}

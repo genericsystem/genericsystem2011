@@ -2,8 +2,8 @@ package org.genericsystem.impl;
 
 import java.util.Random;
 
-import org.genericsystem.api.annotation.StringValue;
 import org.genericsystem.api.annotation.SystemGeneric;
+import org.genericsystem.api.annotation.value.StringValue;
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.impl.core.EngineImpl;
