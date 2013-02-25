@@ -171,6 +171,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
+	
 	public <T extends Link> T getValuedLink(Context context, Relation relation, Serializable value, Generic... targets);
 	
 	/**
@@ -190,6 +191,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
+	
 	public <T extends Link> T getValuedLink(Context context, Relation relation, Serializable value, int basePos, final Generic... targets);
 	
 	/**
@@ -374,7 +376,7 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param genericInCacheClass
+	 * @param systemPropertyClass
 	 *            Classe which defines the Generic in Cache.
 	 * @param basePos
 	 *            The component position.
@@ -388,7 +390,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @param cache
 	 *            The reference Cache.
 	 * @param systemPropertyClass
-	 *            The system property class.
+	 *            Classe which defines the Generic in Cache.
 	 * @return This.
 	 */
 	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass);
@@ -399,7 +401,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @param cache
 	 *            The reference Cache.
 	 * @param systemPropertyClass
-	 *            The system property class.
+	 *            Classe which defines the Generic in Cache.
 	 * @param basePos
 	 *            The base position.
 	 * @return This.
@@ -412,7 +414,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @param context
 	 *            The reference context.
 	 * @param systemPropertyClass
-	 *            The system property class
+	 *            Classe which defines the Generic in Cache.
 	 * @return True if the system property is enabled.
 	 */
 	boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass);
@@ -423,7 +425,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @param context
 	 *            The reference context.
 	 * @param systemPropertyClass
-	 *            The system property class.
+	 *            Classe which defines the Generic in Cache.
 	 * @param basePos
 	 *            The base position.
 	 * @return True if the system property is enabled.
@@ -493,6 +495,15 @@ public interface Generic extends Comparable<Generic> {
 	 * @return The size of components.
 	 */
 	int getComponentsSize();
+	
+	/**
+	 * Returns the position of the base component.
+	 * 
+	 * @param attribute
+	 *            The attribute.
+	 * @return The position.
+	 */
+	int getBasePos(Attribute attribute);
 	
 	/**
 	 * Returns the size of supers.
@@ -580,11 +591,19 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	boolean isTree();
 	
+	/**
+	 * Log with slf4j. The log level is debug.<br/>
+	 * Call the info method.
+	 */
 	void log();
 	
+	/**
+	 * Build message.<br/>
+	 * Call the toString to Generic. Poster the Holder, the meta, the meta level, the interfaces, the components and the supers.
+	 * 
+	 * @return The message.
+	 */
 	String info();
-	
-	public int getBasePos(Attribute attribute);
 	
 	void cancel(Cache cache, Holder attribute);
 	

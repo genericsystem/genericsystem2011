@@ -1281,7 +1281,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getSystemPropertyValue(context, systemProperty, getBasePos(systemProperty));
 	}
 	
-	// TODO KK
 	<T extends Serializable> T getSystemPropertyValue(Context context, Attribute systemProperty, int basePos) {
 		for (Holder valueHolder : getHolders(context, systemProperty))
 			if (Objects.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getComponentPos(), basePos))
@@ -1491,7 +1490,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	
 	@Override
 	public Class<?> getConstraintClass(Cache cache) {
-		return getSystemPropertyValue(cache, cache.<Attribute> find(InstanceClassConstraintImpl.class));
+		ComponentPosValue<Class<?>> value = this.<ComponentPosValue<Class<?>>> getValue(cache, cache.<Attribute> find(InstanceClassConstraintImpl.class));
+		return value == null ? Object.class : value.getValue();
 	}
 	
 	@Override
