@@ -256,7 +256,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T findPrimaryByValue(Generic primaryAncestor, Serializable value, int metaLevel) {
 		assert metaLevel - primaryAncestor.getMetaLevel() <= 1;
-		assert metaLevel - primaryAncestor.getMetaLevel() >= 0;
+		assert metaLevel - primaryAncestor.getMetaLevel() >= 0 : metaLevel + " " + primaryAncestor.getMetaLevel();
 		Iterator<Generic> it = directInheritingsIterator(primaryAncestor);
 		while (it.hasNext()) {
 			Generic candidate = it.next();
