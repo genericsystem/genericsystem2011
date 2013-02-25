@@ -24,7 +24,6 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.core.Snapshot.Filter;
 import org.genericsystem.api.core.Snapshot.Projector;
-import org.genericsystem.api.exception.ComponentPosExceedsComponentsSizeException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Link;
@@ -217,13 +216,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Holder> Snapshot<T> getHolders(final Context context, final T attribute) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return GenericImpl.this.<T> mainIterator(context, attribute, SystemGeneric.CONCRETE);
-			}
-		};
+	public <T extends Holder> Snapshot<T> getHolders(final Context context, final Attribute attribute) {
+		return (Snapshot<T>) this.<Link> getLinks(context, (Relation) attribute);
 	}
 
 	@Override
@@ -233,10 +227,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Serializable> Snapshot<T> getValues(final Context context, final Attribute attribute) {
-		return getHolders(context, attribute).project(new Projector<T, Attribute>() {
+		return getHolders(context, attribute).project(new Projector<T, Holder>() {
 			@Override
-			public T project(Attribute element) {
-				return element.getValue();
+			public T project(Holder holder) {
+				return holder.<T> getValue();
 			}
 		});
 	}
@@ -289,24 +283,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Link> T getLink(Context context, Relation relation, final Generic... targets) {
-		Iterator<T> valuesIterator = Statics.targetsFilter(this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE), relation, targets);
-		if (!valuesIterator.hasNext())
-			return null;
-		T result = valuesIterator.next();
-		if (valuesIterator.hasNext())
-			throw new IllegalStateException("Ambigous request for relation " + relation + result.info() + " and " + valuesIterator.next().info() + " on : " + this);
-		return result;
+		return getLink(context, relation, getBasePos(relation), targets);
+	}
+
+	@Override
+	public <T extends Link> T getLink(Context context, Relation relation, int basePos, final Generic... targets) {
+		return Statics.unambigousFirst(this.<T> linksIterator(context, relation, basePos, targets));
 	}
 
 	@Override
 	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, final Generic... targets) {
-		Iterator<T> valuesIterator = Statics.valueFilter(Statics.targetsFilter(this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE), relation, targets), value);
-		if (!valuesIterator.hasNext())
-			return null;
-		T result = valuesIterator.next();
-		if (valuesIterator.hasNext())
-			throw new IllegalStateException("Ambigous request for relation " + relation + result.info() + " and " + valuesIterator.next().info() + " on : " + this);
-		return result;
+		return getLink(context, relation, value, getBasePos(relation), targets);
+	}
+
+	@Override
+	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, int basePos, final Generic... targets) {
+		return Statics.unambigousFirst(Statics.valueFilter(this.<T> linksIterator(context, relation, basePos, targets), value));
+	}
+
+	@Override
+	public int getBasePos(Relation relation) {
+		return ((GenericImpl) relation).getFirstComponentPos(this);
 	}
 
 	// TODO KK
@@ -314,21 +311,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return Statics.<T> targetsFilter(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE, componentPos), relation, targets);
 	}
 
-	private <T extends Link> Iterator<T> linksIterator(Context context, Relation relation, Generic... targets) {
-		return Statics.<T> targetsFilter(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE), relation, targets);
-	}
-
 	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final Generic... targets) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return linksIterator(context, relation, targets);
-			}
-		};
+		return getLinks(context, relation, getBasePos(relation), targets);
 	}
 
-	// TODO KK
 	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final int componentPos, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
@@ -1207,7 +1194,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Node> Snapshot<T> getChildren(Context context) {
-		return this.<T> getHolders(context, this.<T> getMeta()).filter(new Filter<T>() {
+		return this.<T> getHolders(context, this.<Tree> getMeta()).filter(new Filter<T>() {
 			@Override
 			public boolean isSelected(T node) {
 				return !GenericImpl.this.equals(node);
@@ -1258,19 +1245,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return setSystemProperty(cache, systemPropertyClass, componentPos, Boolean.FALSE);
 	}
 
-	private <T extends Generic> T setSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos, Serializable enabled) {
-		if (componentPos + 1 > getComponentsSize())
-			throw new ComponentPosExceedsComponentsSizeException("The component position (" + componentPos + ") exceeds the components size " + this.info());
+	private <T extends Generic> T setSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos, Serializable enabled) {
+		if (basePos + 1 > getComponentsSize())
+			throw new IllegalStateException("The component position (" + basePos + ") exceeds the components size " + this.info());
 		Attribute attribute = cache.<Attribute> find(systemPropertyClass);
-		for (Attribute valueHolder : getHolders(cache, attribute))
-			if (Objects.equals(valueHolder.<ComponentPosValue<Boolean>> getValue().getComponentPos(), componentPos)) {
-				if (!this.equals(valueHolder.getComponent(Statics.BASE_POSITION)))
-					addLink(cache, ((GenericImpl) valueHolder).bindPrimary(cache, new ComponentPosValue<Serializable>(componentPos, enabled), SystemGeneric.CONCRETE), valueHolder);
-				else
-					update(cache, valueHolder, new ComponentPosValue<Serializable>(componentPos, enabled));
+		for (Holder holder : getHolders(cache, attribute))
+			if (Objects.equals(holder.<ComponentPosValue<Boolean>> getValue().getComponentPos(), basePos)) {
+
+				if (!this.equals(holder.getComponent(basePos)))
+					addLink(cache, ((GenericImpl) holder).bindPrimary(cache, new ComponentPosValue<Serializable>(basePos, enabled), SystemGeneric.CONCRETE), holder);
+				else {
+					// holder.remove(cache);
+					// Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, new ComponentPosValue<Serializable>(basePos, enabled), SystemGeneric.CONCRETE);
+					// addLink(cache, implicit, attribute);
+					update(cache, holder, new ComponentPosValue<Serializable>(basePos, enabled));
+				}
 				return (T) this;
 			}
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, new ComponentPosValue<Serializable>(componentPos, enabled), SystemGeneric.CONCRETE);
+		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, new ComponentPosValue<Serializable>(basePos, enabled), SystemGeneric.CONCRETE);
 		addLink(cache, implicit, attribute);
 		return (T) this;
 	}

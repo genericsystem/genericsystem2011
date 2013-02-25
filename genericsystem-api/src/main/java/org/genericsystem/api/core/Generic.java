@@ -1,7 +1,6 @@
 package org.genericsystem.api.core;
 
 import java.io.Serializable;
-
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Link;
@@ -138,6 +137,23 @@ public interface Generic extends Comparable<Generic> {
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
+	<T extends Link> T getLink(Context context, Relation relation, int basePos, Generic... targets);
+
+	/**
+	 * Returns the Link of the Relation for the components.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param relation
+	 *            The Relation.
+	 * @param basePos
+	 *            The basePosition in targets
+	 * @param targets
+	 *            The optional targets.
+	 * @return A Link.
+	 * @throws IllegalStateException
+	 *             Ambigous request for the Relation.
+	 */
 	<T extends Link> T getLink(Context context, Relation relation, Generic... targets);
 
 	/**
@@ -156,6 +172,25 @@ public interface Generic extends Comparable<Generic> {
 	 *             Ambigous request for the Relation.
 	 */
 	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, Generic... targets);
+
+	/**
+	 * Returns the Link of the Relation for the components and value.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param relation
+	 *            The Relation.
+	 * @param value
+	 *            The value of link.
+	 * @param basePos
+	 *            The base position in targets.
+	 * @param targets
+	 *            The targets.
+	 * @return A Link.
+	 * @throws IllegalStateException
+	 *             Ambigous request for the Relation.
+	 */
+	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, int basePos, final Generic... targets);
 
 	/**
 	 * Returns the Link.
@@ -240,7 +275,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 * @return The values holders.
 	 */
-	<T extends Holder> Snapshot<T> getHolders(Context context, T attribute);
+	<T extends Holder> Snapshot<T> getHolders(Context context, Attribute attribute);
 
 	/**
 	 * Returns the Holder of value.
@@ -548,5 +583,7 @@ public interface Generic extends Comparable<Generic> {
 	void log();
 
 	String info();
+
+	public int getBasePos(Relation relation);
 
 }

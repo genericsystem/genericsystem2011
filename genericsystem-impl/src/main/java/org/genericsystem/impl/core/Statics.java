@@ -12,7 +12,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Relation;
@@ -154,8 +153,7 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {
-		}
+		private Flag() {}
 
 		@Override
 		public String toString() {
@@ -354,6 +352,15 @@ public class Statics {
 				return !((GenericImpl) next).isPhantom();
 			}
 		};
+	}
+
+	static <T> T unambigousFirst(Iterator<T> iterator) {
+		if (!iterator.hasNext())
+			return null;
+		T result = iterator.next();
+		if (iterator.hasNext())
+			throw new IllegalStateException("Ambigous reponse : " + result);
+		return result;
 	}
 
 }
