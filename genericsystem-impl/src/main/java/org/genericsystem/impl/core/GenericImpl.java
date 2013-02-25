@@ -200,10 +200,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public boolean isAttributeOf(Generic generic, int componentPos) {
-		if (componentPos >= components.length || componentPos < 0)
+	public boolean isAttributeOf(Generic generic, int basePos) {
+		if (basePos >= components.length || basePos < 0)
 			return false;
-		return generic.inheritsFrom(components[componentPos]);
+		return generic.inheritsFrom(components[basePos]);
 	}
 
 	@Override
@@ -303,13 +303,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public int getBasePos(Relation relation) {
-		return ((GenericImpl) relation).getFirstComponentPos(this);
+	public int getBasePos(Attribute attribute) {
+		return ((GenericImpl) attribute).getFirstComponentPos(this);
 	}
 
 	// TODO KK
-	private <T extends Link> Iterator<T> linksIterator(Context context, Relation relation, int componentPos, Generic... targets) {
-		return Statics.<T> targetsFilter(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE, componentPos), relation, targets);
+	private <T extends Link> Iterator<T> linksIterator(Context context, Relation relation, int basePos, Generic... targets) {
+		return Statics.<T> targetsFilter(GenericImpl.this.<T> mainIterator(context, relation, SystemGeneric.CONCRETE, basePos), relation, targets);
 	}
 
 	@Override
@@ -318,11 +318,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final int componentPos, final Generic... targets) {
+	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final int basePos, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return linksIterator(context, relation, componentPos, targets);
+				return linksIterator(context, relation, basePos, targets);
 			}
 		};
 	}
@@ -1226,59 +1226,82 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass) {
-		enableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
+		setSystemPropertyValue(cache, cache.<Attribute> find(systemPropertyClass), Boolean.TRUE);
 		return (T) this;
 	}
 
 	@Override
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass) {
-		disableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
+		setSystemPropertyValue(cache, cache.<Attribute> find(systemPropertyClass), Boolean.FALSE);
 		return (T) this;
 	}
 
 	@Override
-	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
-		return setSystemProperty(cache, systemPropertyClass, componentPos, Boolean.TRUE);
+	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos) {
+		return setSystemPropertyValue(cache, cache.<Attribute> find(systemPropertyClass), basePos, Boolean.TRUE);
 	}
 
 	@Override
-	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos) {
-		return setSystemProperty(cache, systemPropertyClass, componentPos, Boolean.FALSE);
+	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos) {
+		return setSystemPropertyValue(cache, cache.<Attribute> find(systemPropertyClass), basePos, Boolean.FALSE);
 	}
 
-	private <T extends Generic> T setSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos, Serializable enabled) {
+	<T extends Generic> T setSystemPropertyValue(Cache cache, Attribute systemProperty, Serializable value) {
+		return setSystemPropertyValue(cache, systemProperty, getBasePos(systemProperty), value);
+	}
+
+	// TODO super KK
+	boolean isSystemPropertyEnabled(Context context, Attribute systemProperty, int basePos) {
+		for (Holder valueHolder : getHolders(context, systemProperty))
+			if (Objects.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getComponentPos(), basePos))
+				return !Boolean.FALSE.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getValue());
+		return isSystemPropertyDefaultEnabled(systemProperty.<Class<?>> getValue());
+	}
+
+	<T extends Serializable> T getSystemPropertyValue(Context context, Attribute systemProperty) {
+		return getSystemPropertyValue(context, systemProperty, getBasePos(systemProperty));
+	}
+
+	<T extends Serializable> T getSystemPropertyValue(Context context, Attribute systemProperty, int basePos) {
+		for (Holder valueHolder : getHolders(context, systemProperty))
+			if (Objects.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getComponentPos(), basePos))
+				return valueHolder.<ComponentPosValue<T>> getValue().getValue();
+		return null;
+	}
+
+	<T extends Generic> T setSystemPropertyValue(Cache cache, Attribute systemProperty, int basePos, Serializable value) {
 		if (basePos + 1 > getComponentsSize())
 			throw new IllegalStateException("The component position (" + basePos + ") exceeds the components size " + this.info());
-		Attribute attribute = cache.<Attribute> find(systemPropertyClass);
-		for (Holder holder : getHolders(cache, attribute))
+		for (Holder holder : getHolders(cache, systemProperty))
 			if (Objects.equals(holder.<ComponentPosValue<Boolean>> getValue().getComponentPos(), basePos)) {
 
 				if (!this.equals(holder.getComponent(basePos)))
-					addLink(cache, ((GenericImpl) holder).bindPrimary(cache, new ComponentPosValue<Serializable>(basePos, enabled), SystemGeneric.CONCRETE), holder);
+					addLink(cache, ((GenericImpl) holder).bindPrimary(cache, new ComponentPosValue<Serializable>(basePos, value), SystemGeneric.CONCRETE), holder);
 				else {
 					// holder.remove(cache);
 					// Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, new ComponentPosValue<Serializable>(basePos, enabled), SystemGeneric.CONCRETE);
 					// addLink(cache, implicit, attribute);
-					update(cache, holder, new ComponentPosValue<Serializable>(basePos, enabled));
+					update(cache, holder, new ComponentPosValue<Serializable>(basePos, value));
 				}
 				return (T) this;
 			}
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, new ComponentPosValue<Serializable>(basePos, enabled), SystemGeneric.CONCRETE);
-		addLink(cache, implicit, attribute);
+		Generic implicit = ((GenericImpl) systemProperty).bindPrimary(cache, new ComponentPosValue<Serializable>(basePos, value), SystemGeneric.CONCRETE);
+		addLink(cache, implicit, systemProperty);
 		return (T) this;
 	}
 
 	@Override
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass) {
-		return isSystemPropertyEnabled(context, systemPropertyClass, Statics.BASE_POSITION);
+		return isSystemPropertyEnabled(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass));
 	}
 
 	@Override
-	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos) {
-		for (Holder valueHolder : getHolders(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)))
-			if (Objects.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getComponentPos(), componentPos))
-				return !Boolean.FALSE.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getValue());
-		return isSystemPropertyDefaultEnabled(systemPropertyClass);
+	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int basePos) {
+		return isSystemPropertyEnabled(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos);
+	}
+
+	boolean isSystemPropertyEnabled(Context context, Attribute systemProperty) {
+		return isSystemPropertyEnabled(context, systemProperty, getBasePos(systemProperty));
 	}
 
 	@Override
@@ -1297,23 +1320,23 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Relation> T enableCascadeRemove(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, CascadeRemoveSystemProperty.class, componentPos);
+	public <T extends Relation> T enableCascadeRemove(Cache cache, int basePos) {
+		return enableSystemProperty(cache, CascadeRemoveSystemProperty.class, basePos);
 	}
 
 	@Override
-	public <T extends Relation> T disableCascadeRemove(Cache cache, int componentPos) {
-		return disableSystemProperty(cache, CascadeRemoveSystemProperty.class, componentPos);
+	public <T extends Relation> T disableCascadeRemove(Cache cache, int basePos) {
+		return disableSystemProperty(cache, CascadeRemoveSystemProperty.class, basePos);
 	}
 
 	@Override
-	public boolean isCascadeRemove(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, CascadeRemoveSystemProperty.class, componentPos);
+	public boolean isCascadeRemove(Context context, int basePos) {
+		return isSystemPropertyEnabled(context, CascadeRemoveSystemProperty.class, basePos);
 	}
 
 	@Override
-	public <T extends Generic> T enableReferentialIntegrity(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, componentPos);
+	public <T extends Generic> T enableReferentialIntegrity(Cache cache, int basePos) {
+		return enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, basePos);
 	}
 
 	@Override
@@ -1322,38 +1345,38 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public boolean isReferentialIntegrity(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, ReferentialIntegritySystemProperty.class, componentPos);
+	public boolean isReferentialIntegrity(Context context, int basePos) {
+		return isSystemPropertyEnabled(context, ReferentialIntegritySystemProperty.class, basePos);
 	}
 
 	@Override
 	public <T extends Type> T enableSingularConstraint(Cache cache) {
-		return enableSingularConstraint(cache, Statics.BASE_POSITION);
+		return enableSystemProperty(cache, SingularConstraintImpl.class);
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint(Cache cache) {
-		return disableSingularConstraint(cache, Statics.BASE_POSITION);
+		return disableSystemProperty(cache, SingularConstraintImpl.class);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled(Context context) {
-		return isSingularConstraintEnabled(context, Statics.BASE_POSITION);
+		return isSystemPropertyEnabled(context, SingularConstraintImpl.class);
 	}
 
 	@Override
-	public <T extends Type> T enableSingularConstraint(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, SingularConstraintImpl.class, componentPos);
+	public <T extends Type> T enableSingularConstraint(Cache cache, int basePos) {
+		return enableSystemProperty(cache, SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
-	public <T extends Type> T disableSingularConstraint(Cache cache, int componentPos) {
-		return disableSystemProperty(cache, SingularConstraintImpl.class, componentPos);
+	public <T extends Type> T disableSingularConstraint(Cache cache, int basePos) {
+		return disableSystemProperty(cache, SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
-	public boolean isSingularConstraintEnabled(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, SingularConstraintImpl.class, componentPos);
+	public boolean isSingularConstraintEnabled(Context context, int basePos) {
+		return isSystemPropertyEnabled(context, SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
@@ -1373,32 +1396,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableRequiredConstraint(Cache cache) {
-		return enableSystemProperty(cache, RequiredConstraintImpl.class, Statics.BASE_POSITION);
+		return enableSystemProperty(cache, RequiredConstraintImpl.class);
 	}
 
 	@Override
 	public <T extends Type> T disableRequiredConstraint(Cache cache) {
-		return disableSystemProperty(cache, RequiredConstraintImpl.class, Statics.BASE_POSITION);
+		return disableSystemProperty(cache, RequiredConstraintImpl.class);
 	}
 
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class, Statics.BASE_POSITION);
+		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class);
 	}
 
 	@Override
-	public <T extends Type> T enableRequiredConstraint(Cache cache, int componentPos) {
-		return enableSystemProperty(cache, RequiredConstraintImpl.class, componentPos);
+	public <T extends Type> T enableRequiredConstraint(Cache cache, int basePos) {
+		return enableSystemProperty(cache, RequiredConstraintImpl.class, basePos);
 	}
 
 	@Override
-	public <T extends Type> T disableRequiredConstraint(Cache cache, int componentPos) {
-		return disableSystemProperty(cache, RequiredConstraintImpl.class, componentPos);
+	public <T extends Type> T disableRequiredConstraint(Cache cache, int basePos) {
+		return disableSystemProperty(cache, RequiredConstraintImpl.class, basePos);
 	}
 
 	@Override
-	public boolean isRequiredConstraintEnabled(Context context, int componentPos) {
-		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class, componentPos);
+	public boolean isRequiredConstraintEnabled(Context context, int basePos) {
+		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class, basePos);
 	}
 
 	@Override
@@ -1454,7 +1477,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T setConstraintClass(Cache cache, Class<?> constraintClass) {
-		return setSystemProperty(cache, InstanceClassConstraintImpl.class, Statics.BASE_POSITION, constraintClass);
+		return setSystemPropertyValue(cache, cache.<Attribute> find(InstanceClassConstraintImpl.class), constraintClass);
 	}
 
 	@Override
@@ -1511,4 +1534,5 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return true;
 		return false;
 	}
+
 }

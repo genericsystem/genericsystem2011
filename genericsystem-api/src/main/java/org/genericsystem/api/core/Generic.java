@@ -364,11 +364,11 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param genericInCacheClass
-	 *            Classe which defines the Generic in Cache.
+	 * @param systemPropertyClass
+	 *            The system property class
 	 * @return This.
 	 */
-	<T extends Generic> T enableSystemProperty(Cache cache, Class<?> genericInCacheClass);
+	<T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass);
 
 	/**
 	 * Enable system property for component position.
@@ -498,11 +498,11 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Returns the position of the base component.
 	 * 
-	 * @param relation
-	 *            The relation.
+	 * @param attribute
+	 *            The attribute.
 	 * @return The position.
 	 */
-	int getBasePos(Relation relation);
+	int getBasePos(Attribute attribute);
 
 	/**
 	 * Returns the size of supers.
@@ -603,5 +603,4 @@ public interface Generic extends Comparable<Generic> {
 	 * @return The message.
 	 */
 	String info();
-
 }

@@ -11,38 +11,38 @@ import org.genericsystem.api.core.Context;
  * @author Michael Ory
  */
 public interface Relation extends Attribute, Link {
-
+	
 	/**
 	 * Enable cascade remove for the component position.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param componentPos
+	 * @param basePos
 	 *            The component position.
 	 * @return Return this.
 	 */
-	<T extends Relation> T enableCascadeRemove(Cache cache, int componentPos);
-
+	<T extends Relation> T enableCascadeRemove(Cache cache, int basePos);
+	
 	/**
 	 * Disable cascade remove for the component position
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param componentPos
-	 *            The component position.
+	 * @param basePos
+	 *            The base position.
 	 * @return Return this.
 	 */
-	<T extends Relation> T disableCascadeRemove(Cache cache, int componentPos);
-
+	<T extends Relation> T disableCascadeRemove(Cache cache, int basePos);
+	
 	/**
 	 * Returns true if the cascade remove enabled for the component position
 	 * 
 	 * @param context
 	 *            The reference Context.
-	 * @param componentPos
-	 *            The component position.
+	 * @param basePos
+	 *            The base position.
 	 * @return true if the cascade remove enabled for the component position
 	 */
-	boolean isCascadeRemove(Context context, int componentPos);
-
+	boolean isCascadeRemove(Context context, int basePos);
+	
 }
