@@ -1,6 +1,7 @@
 package org.genericsystem.api.core;
 
 import java.io.Serializable;
+
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Link;
@@ -80,12 +81,12 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param Generic
 	 *            The checked Generic.
-	 * @param componentPos
-	 *            The component position.
+	 * @param basePos
+	 *            The base position.
 	 * 
 	 * @return True if the Generic is an Attribute.
 	 */
-	boolean isAttributeOf(Generic generic, int componentPos);
+	boolean isAttributeOf(Generic generic, int basePos);
 
 	/**
 	 * Returns true if this Generic is an relation.
@@ -213,14 +214,14 @@ public interface Generic extends Comparable<Generic> {
 	 *            The reference context.
 	 * @param relation
 	 *            The Relation.
-	 * @param componentPos
-	 *            The component position.
+	 * @param basePos
+	 *            The base position.
 	 * @param targets
 	 *            The targets.
 	 * @see Snapshot
 	 * @return The Link.
 	 */
-	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, int componentPos, Generic... targets);
+	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, int basePos, Generic... targets);
 
 	/**
 	 * Modify or create a Link. <br/>
@@ -374,95 +375,95 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param genericInCacheClass
+	 * @param systemPropertyClass
 	 *            Classe which defines the Generic in Cache.
-	 * @param componentPos
+	 * @param basePos
 	 *            The component position.
 	 * @return This.
 	 */
-	<T extends Generic> T enableSystemProperty(Cache cache, Class<?> genericInCacheClass, int componentPos);
+	<T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos);
 
 	/**
 	 * Disable system property.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param genericInCacheClass
+	 * @param systemPropertyClass
 	 *            Classe which defines the Generic in Cache.
 	 * @return This.
 	 */
-	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> genericInCacheClass);
+	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass);
 
 	/**
 	 * Disable system property for component position.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param genericInCacheClass
+	 * @param systemPropertyClass
 	 *            Classe which defines the Generic in Cache.
-	 * @param componentPos
-	 *            The component position.
+	 * @param basePos
+	 *            The base position.
 	 * @return This.
 	 */
-	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> genericInCacheClass, int componentPos);
+	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos);
 
 	/**
 	 * Returns true if the system property is enabled.
 	 * 
 	 * @param context
 	 *            The reference context.
-	 * @param genericInCacheClass
+	 * @param systemPropertyClass
 	 *            Classe which defines the Generic in Cache.
 	 * @return True if the system property is enabled.
 	 */
-	boolean isSystemPropertyEnabled(Context context, Class<?> genericInCacheClass);
+	boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass);
 
 	/**
 	 * Returns true if the system property is enabled for component position.
 	 * 
 	 * @param context
 	 *            The reference context.
-	 * @param genericInCacheClass
+	 * @param systemPropertyClass
 	 *            Classe which defines the Generic in Cache.
-	 * @param componentPos
-	 *            The component position.
+	 * @param basePos
+	 *            The base position.
 	 * @return True if the system property is enabled.
 	 */
-	boolean isSystemPropertyEnabled(Context context, Class<?> genericInCacheClass, int componentPos);
+	boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int basePos);
 
 	/**
 	 * Enable referential integrity for component position.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param componentPos
-	 *            The component position.
+	 * @param basePos
+	 *            The base position.
 	 * @return This.
 	 */
-	<T extends Generic> T enableReferentialIntegrity(Cache cache, int componentPos);
+	<T extends Generic> T enableReferentialIntegrity(Cache cache, int basePos);
 
 	/**
 	 * Disable referential integrity for component position.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param componentPos
-	 *            The component position.
+	 * @param basePos
+	 *            The base position.
 	 * 
 	 * @return This.
 	 */
-	<T extends Generic> T disableReferentialIntegrity(Cache cache, int componentPos);
+	<T extends Generic> T disableReferentialIntegrity(Cache cache, int basePos);
 
 	/**
 	 * Returns true if the referential integrity is enabled for component position.
 	 * 
 	 * @param context
 	 *            The reference context.
-	 * @param componentPos
-	 *            The component position.
+	 * @param basePos
+	 *            The base position.
 	 * @return True if the referential integrity is enabled.
 	 */
-	boolean isReferentialIntegrity(Context context, int componentPos);
+	boolean isReferentialIntegrity(Context context, int basePos);
 
 	/**
 	 * Returns the implicit.
@@ -493,6 +494,15 @@ public interface Generic extends Comparable<Generic> {
 	 * @return The size of components.
 	 */
 	int getComponentsSize();
+
+	/**
+	 * Returns the position of the base component.
+	 * 
+	 * @param relation
+	 *            The relation.
+	 * @return The position.
+	 */
+	int getBasePos(Relation relation);
 
 	/**
 	 * Returns the size of supers.
@@ -580,10 +590,18 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	boolean isTree();
 
+	/**
+	 * Log with slf4j. The log level is debug.<br/>
+	 * Call the info method.
+	 */
 	void log();
 
+	/**
+	 * Build message.<br/>
+	 * Call the toString to Generic. Poster the Holder, the meta, the meta level, the interfaces, the components and the supers.
+	 * 
+	 * @return The message.
+	 */
 	String info();
-
-	public int getBasePos(Relation relation);
 
 }

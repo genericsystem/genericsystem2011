@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
@@ -1443,6 +1444,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isVirtualConstraintEnabled(Context context) {
 		return isSystemPropertyEnabled(context, VirtualConstraintImpl.class);
+	}
+
+	@Override
+	public Class<?> getConstraintClass(Cache cache) {
+		ComponentPosValue<Class<?>> value = this.<ComponentPosValue<Class<?>>> getValue(cache, cache.<Attribute> find(InstanceClassConstraintImpl.class));
+		return value == null ? Object.class : value.getValue();
 	}
 
 	@Override
