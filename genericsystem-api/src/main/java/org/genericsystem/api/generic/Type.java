@@ -1,7 +1,6 @@
 package org.genericsystem.api.generic;
 
 import java.io.Serializable;
-
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
@@ -14,7 +13,7 @@ import org.genericsystem.api.core.Snapshot;
  * @author Michael Ory
  */
 public interface Type extends Generic {
-
+	
 	/**
 	 * Find an attribute by value.
 	 * 
@@ -23,7 +22,7 @@ public interface Type extends Generic {
 	 * @return The attribute or null if not found.
 	 */
 	<T extends Attribute> T getAttribute(Context context, Serializable value);
-
+	
 	/**
 	 * Find the property by value.
 	 * 
@@ -32,7 +31,7 @@ public interface Type extends Generic {
 	 * @return Return the property or null if no property find.
 	 */
 	<T extends Attribute> T getProperty(Context context, Serializable value);
-
+	
 	/**
 	 * Find the relation by value.
 	 * 
@@ -41,16 +40,18 @@ public interface Type extends Generic {
 	 * @return Return the relation or null if no relation find.
 	 */
 	<T extends Relation> T getRelation(Context context, Serializable value);
-
+	
 	/**
 	 * Create a subtype.
 	 * 
+	 * @param cache
 	 * @param value
-	 *            The type value.
+	 *            the type value.
+	 * @param components
 	 * @return Return the subtype.
 	 */
 	<T extends Type> T newSubType(Cache cache, Serializable value, Generic... components);
-
+	
 	/**
 	 * Create an attribute for the type.
 	 * 
@@ -60,7 +61,7 @@ public interface Type extends Generic {
 	 * @see Attribute
 	 */
 	<T extends Attribute> T setAttribute(Cache cache, Serializable value);
-
+	
 	/**
 	 * Create a property for the type.
 	 * 
@@ -70,7 +71,7 @@ public interface Type extends Generic {
 	 * @see Attribute
 	 */
 	<T extends Attribute> T setProperty(Cache cache, Serializable value);
-
+	
 	/**
 	 * Create a relation.
 	 * 
@@ -82,231 +83,242 @@ public interface Type extends Generic {
 	 * @see Relation
 	 */
 	<T extends Relation> T setRelation(Cache cache, Serializable value, Type... targets);
-
+	
 	/**
 	 * Enable singular constraint.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T enableSingularConstraint(Cache cache);
-
+	
 	/**
 	 * Disable singular constraint.
 	 * 
 	 * @return Return this
 	 */
 	<T extends Type> T disableSingularConstraint(Cache cache);
-
+	
 	/**
 	 * Returns true if the singular constraint enabled
 	 * 
 	 * @return true if the singular constraint enabled
 	 */
 	boolean isSingularConstraintEnabled(Context context);
-
+	
 	/**
-	 * Enable singular constraint for the component position
+	 * Enable singular constraint for the base position
 	 * 
+	 * @param cache
+	 * @param basePos
 	 * @return this
 	 */
-	<T extends Type> T enableSingularConstraint(Cache cache, int componentPos);
-
+	<T extends Type> T enableSingularConstraint(Cache cache, int basePos);
+	
 	/**
-	 * Disable singular constraint for the component position.
+	 * Disable singular constraint for the base position.
 	 * 
-	 * @return Return this
+	 * @param cache
+	 * @param basePos
+	 * @return this
 	 */
-	<T extends Type> T disableSingularConstraint(Cache cache, int componentPos);
-
+	<T extends Type> T disableSingularConstraint(Cache cache, int basePos);
+	
 	/**
-	 * Returns true if the singular constraint enabled for the component position
+	 * Returns true if the singular constraint enabled for the base position
 	 * 
-	 * @return true if the singular constraint enabled for the component position
+	 * @return true if the singular constraint enabled for the base position
 	 */
-	boolean isSingularConstraintEnabled(Context context, int componentPos);
-
+	boolean isSingularConstraintEnabled(Context context, int basePos);
+	
 	/**
 	 * Enable property constraint.
 	 * 
-	 * @return Return this
+	 * @param cache
+	 * @return this
 	 */
 	<T extends Type> T enablePropertyConstraint(Cache cache);
-
+	
 	/**
 	 * Disable property constraint.
 	 * 
 	 * @return Return this
 	 */
 	<T extends Type> T disablePropertyConstraint(Cache cache);
-
+	
 	/**
 	 * Returns true if the property constraint enabled
 	 * 
 	 * @return true if the property constraint enabled
 	 */
 	boolean isPropertyConstraintEnabled(Context context);
-
+	
 	/**
 	 * Enable not null constraint.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T enableNotNullConstraint(Cache cache);
-
+	
 	/**
 	 * Disable not null constraint
 	 * 
 	 * @return this
 	 */
 	<T extends Type> T disableNotNullConstraint(Cache cache);
-
+	
 	/**
 	 * Returns true if the not null constraint enabled
 	 * 
 	 * @return true if the not null constraint enabled
 	 */
 	boolean isNotNullConstraintEnabled(Context context);
-
+	
 	/**
 	 * Enable singular instance constraint.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T enableSingularInstanceConstraint(Cache cache);
-
+	
 	/**
 	 * Disable singular instance constraint
 	 * 
 	 * @return this
 	 */
 	<T extends Type> T disableSingularInstanceConstraint(Cache cache);
-
+	
 	/**
 	 * Returns true if the singular instance constraint enabled
 	 * 
 	 * @return true if the singular instance constraint enabled
 	 */
 	boolean isSingularInstanceConstraintEnabled(Context context);
-
+	
 	/**
 	 * Enable required constraint.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T enableRequiredConstraint(Cache cache);
-
+	
 	/**
 	 * Disable required constraint
 	 * 
 	 * @return this
 	 */
 	<T extends Type> T disableRequiredConstraint(Cache cache);
-
+	
 	/**
 	 * Returns true if the required constraint enabled
 	 * 
 	 * @return true if the required constraint enabled
 	 */
 	boolean isRequiredConstraintEnabled(Context context);
-
+	
 	/**
-	 * Enable required constraint for the component position.
+	 * Enable required constraint for the base position.
 	 * 
-	 * @return Return this.
+	 * @param cache
+	 * @param basePos
+	 * @return this
 	 */
-	<T extends Type> T enableRequiredConstraint(Cache cache, int componentPos);
-
+	<T extends Type> T enableRequiredConstraint(Cache cache, int basePos);
+	
 	/**
-	 * Disable required constraint for the component position.
+	 * Disable required constraint for the base position.
 	 * 
-	 * @return Return this.
+	 * @param cache
+	 * @param basePos
+	 * @return
 	 */
-	<T extends Type> T disableRequiredConstraint(Cache cache, int componentPos);
-
+	<T extends Type> T disableRequiredConstraint(Cache cache, int basePos);
+	
 	/**
-	 * Returns true if the required constraint enabled for the component position
+	 * Returns true if the required constraint enabled for the base position
 	 * 
-	 * @return true if the required constraint enabled for the component position
+	 * @param context
+	 * @param basePos
+	 * @return
 	 */
-	boolean isRequiredConstraintEnabled(Context context, int componentPos);
-
+	boolean isRequiredConstraintEnabled(Context context, int basePos);
+	
 	/**
 	 * Enable distinct constraint.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T enableUniqueConstraint(Cache cache);
-
+	
 	/**
 	 * Disable distinct constraint.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T disableUniqueConstraint(Cache cache);
-
+	
 	/**
 	 * Returns true if the distinct constraint enabled
 	 * 
 	 * @return true if the distinct constraint enabled
 	 */
 	boolean isUniqueConstraintEnabled(Context context);
-
+	
 	/**
 	 * Enable virtual constraint.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T enableVirtualConstraint(Cache cache);
-
+	
 	/**
 	 * Disable virtual constraint.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T disableVirtualConstraint(Cache cache);
-
+	
 	/**
 	 * Returns true if the virtual constraint enabled
 	 * 
 	 * @return true if the virtual constraint enabled
 	 */
 	boolean isVirtualConstraintEnabled(Context context);
-
+	
 	/**
 	 * Enable inheritance.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T enableInheritance(Cache cache);
-
+	
 	/**
 	 * Disable inheritance.
 	 * 
 	 * @return Return this.
 	 */
 	<T extends Type> T disableInheritance(Cache cache);
-
+	
 	/**
 	 * Returns true if the inheritance enabled
 	 * 
 	 * @return true if the inheritance enabled
 	 */
 	boolean isInheritanceEnabled(Context context);
-
+	
 	<T extends Type> T setConstraintClass(Cache cache, Class<?> constraintClass);
-
+	
 	<T extends Attribute> Snapshot<T> getStructurals(Context context);
-
+	
 	<T extends Attribute> Snapshot<T> getAttributes(Context context);
-
+	
 	<T extends Relation> Snapshot<T> getRelations(Context context);
-
+	
 	<T extends Generic> Snapshot<T> getInstances(Context context);
-
+	
 	<T extends Generic> Snapshot<T> getAllInstances(Context context);
-
+	
 	<T extends Generic> Snapshot<T> getSubTypes(Context context);
-
+	
 	<T extends Generic> Snapshot<T> getAllSubTypes(Context context);
-
+	
 }
