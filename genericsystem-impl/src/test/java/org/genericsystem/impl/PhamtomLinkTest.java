@@ -14,21 +14,21 @@ import org.testng.annotations.Test;
 public class PhamtomLinkTest extends AbstractTest {
 	
 	public void testPhantomAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
+		final Type car = vehicle.newSubType(cache, "Car");
 		
-		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
+		final Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		assert car.getAttributes(cache).contains(vehiclePower);
 		Attribute carPower = car.setAttribute(cache, "power");
 		assert car.getAttributes(cache).contains(carPower);
-		car.cancel(cache, vehiclePower);
-		assert !car.getAttributes(cache).contains(vehiclePower);
-		assert !car.getAttributes(cache).contains(carPower);
-		assert false : carPower.getInheritings(cache);
 		
-		// car.restore(cache, vehiclePower);
-		// assert car.getAttributes(cache).contains(vehiclePower);
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				car.cancel(cache, vehiclePower);
+			}
+		}.assertIsCausedBy(IllegalStateException.class);
 	}
 	
 	public void testPhantomSimpleRelation() {
