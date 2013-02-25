@@ -171,7 +171,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
-	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, Generic... targets);
+	public <T extends Link> T getValuedLink(Context context, Relation relation, Serializable value, Generic... targets);
 	
 	/**
 	 * Returns the Link of the Relation for the components and value.
@@ -190,7 +190,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
-	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, int basePos, final Generic... targets);
+	public <T extends Link> T getValuedLink(Context context, Relation relation, Serializable value, int basePos, final Generic... targets);
 	
 	/**
 	 * Returns the Link.
@@ -585,5 +585,13 @@ public interface Generic extends Comparable<Generic> {
 	String info();
 	
 	public int getBasePos(Attribute attribute);
+	
+	void cancel(Cache cache, Holder attribute);
+	
+	void cancel(Cache cache, Holder attribute, int basePos);
+	
+	void restore(Cache cache, Holder attribute);
+	
+	void restore(Cache cache, Holder attribute, int basePos);
 	
 }

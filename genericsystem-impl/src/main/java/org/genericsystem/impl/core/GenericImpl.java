@@ -261,7 +261,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		else if (((Type) relation).isPropertyConstraintEnabled(cache))
 			link = getLink(cache, (Relation) relation, targets);
 		else
-			link = getLink(cache, (Relation) relation, value, targets);
+			link = getValuedLink(cache, (Relation) relation, value, targets);
 		
 		Generic implicit = ((GenericImpl) relation).bindPrimary(cache, value, SystemGeneric.CONCRETE);
 		if (link == null)
@@ -269,7 +269,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		
 		if (!this.equals(link.getComponent(basePos))) {
 			if (!isSuperOf(((GenericImpl) link).getPrimariesArray(), ((GenericImpl) link).components, new Primaries(implicit, relation).toArray(), Statics.insertIntoArray(this, targets, basePos)))
-				cancel(cache, link, basePos);
+				internalCancel(cache, link, basePos);
 			return addLink(cache, implicit, relation, targets);
 		}
 		
@@ -292,12 +292,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 	
 	@Override
-	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, final Generic... targets) {
-		return getLink(context, relation, value, getBasePos(relation), targets);
+	public <T extends Link> T getValuedLink(Context context, Relation relation, Serializable value, final Generic... targets) {
+		return getValuedLink(context, relation, value, getBasePos(relation), targets);
 	}
 	
 	@Override
-	public <T extends Link> T getLink(Context context, Relation relation, Serializable value, int basePos, final Generic... targets) {
+	public <T extends Link> T getValuedLink(Context context, Relation relation, Serializable value, int basePos, final Generic... targets) {
 		return Statics.unambigousFirst(Statics.valueFilter(this.<T> linksIterator(context, relation, basePos, targets), value));
 	}
 	
@@ -1150,15 +1150,35 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/**************** PHANTOM ********************/
 	/*********************************************/
 	
+	@Override
 	public void cancel(Cache cache, Holder attribute) {
 		cancel(cache, attribute, ((GenericImpl) attribute).getFirstComponentPos(this));
 	}
 	
+	@Override
 	public void cancel(Cache cache, Holder attribute, int basePos) {
 		if (equals(attribute.getComponent(basePos)))
 			throw new IllegalStateException("Only inherited attributes can be cancelled");
 		assert Statics.replace(basePos, ((GenericImpl) attribute).components, this).length != 0;
-		addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE), attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		Link link = attribute.isConcrete() ? getLink(cache, (Relation) attribute, basePos) : (Link) getAttribute(cache, attribute.getValue());
+		if (!link.equals(attribute))
+			throw new IllegalStateException("Attribute " + attribute + " is already override by : " + link);
+		internalCancel(cache, attribute, basePos);
+	}
+	
+	private void internalCancel(Cache cache, Holder attribute, int basePos) {
+		addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, Statics.PHAMTOM, attribute.getMetaLevel()), attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+	}
+	
+	@Override
+	public void restore(Cache cache, Holder attribute) {
+		// TODO
+	}
+	
+	@Override
+	public void restore(Cache cache, Holder attribute, int basePos) {
+		// TODO
+		
 	}
 	
 	// public void restore(Cache cache, Attribute attribute) {
@@ -1261,6 +1281,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getSystemPropertyValue(context, systemProperty, getBasePos(systemProperty));
 	}
 	
+	// TODO KK
 	<T extends Serializable> T getSystemPropertyValue(Context context, Attribute systemProperty, int basePos) {
 		for (Holder valueHolder : getHolders(context, systemProperty))
 			if (Objects.equals(valueHolder.<ComponentPosValue<Serializable>> getValue().getComponentPos(), basePos))
@@ -1532,4 +1553,5 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return true;
 		return false;
 	}
+	
 }
