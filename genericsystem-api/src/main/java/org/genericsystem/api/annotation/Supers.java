@@ -5,15 +5,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Used to declare the Supers of generic. A generic inherits directly of the supers.
+ * 
+ * @author Nicolas Feybesse
+ * @author Michael Ory
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-/**
- * Used to declare the Supers of generic.
- * A generic inherits directly of the supers.
- * 
- * @author Michael Ory
- * @author Nicolas Feybesse
- */
 public @interface Supers {
 
 	Class<?>[] value();

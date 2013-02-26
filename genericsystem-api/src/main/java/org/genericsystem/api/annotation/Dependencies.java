@@ -6,14 +6,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
-@Inherited
 /**
  * Used to declare the dependencies of generic.
  * 
+ * @author Nicolas Feybesse
  * @author Michael Ory
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE })
+@Inherited
 public @interface Dependencies {
 	Class<?>[] value();
 }

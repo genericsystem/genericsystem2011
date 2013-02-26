@@ -13,11 +13,11 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.genericsystem.api.annotation.ComponentPosBoolean;
 import org.genericsystem.api.annotation.Components;
 import org.genericsystem.api.annotation.Supers;
 import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.annotation.value.BooleanValue;
+import org.genericsystem.api.annotation.value.ComponentPosBoolean;
 import org.genericsystem.api.annotation.value.IntValue;
 import org.genericsystem.api.annotation.value.StringValue;
 import org.genericsystem.api.core.Context;

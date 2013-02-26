@@ -5,14 +5,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
 /**
  * The compositions of a generic.
  * 
+ * @author Nicolas Feybesse
  * @author Michael Ory
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE })
 public @interface Components {
-	
+
 	Class<?>[] value();
 }

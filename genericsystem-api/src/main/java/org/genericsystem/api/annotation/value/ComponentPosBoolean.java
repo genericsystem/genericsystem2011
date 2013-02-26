@@ -1,4 +1,4 @@
-package org.genericsystem.api.annotation;
+package org.genericsystem.api.annotation.value;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
