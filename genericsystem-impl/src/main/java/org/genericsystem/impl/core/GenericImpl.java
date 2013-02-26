@@ -1224,15 +1224,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void restore(final Cache cache, final Holder attribute, final int basePos) {
-		log.info("restore " + attribute + " basePos " + basePos);
-		Snapshot<Holder> holders = new AbstractSnapshot<Holder>() {
-			@Override
-			public Iterator<Holder> iterator() {
-				return attribute.isConcrete() ? GenericImpl.this.<Holder> concreteIterator(cache, (Attribute) attribute, basePos, true) : GenericImpl.this.<Holder> structuralIterator(cache, (Attribute) attribute, true);
-			}
-		};
-		for (Holder nodeValue : holders) {
-			log.info("nodeValue " + nodeValue + " nodeValue.getComponent(basePos) " + nodeValue.getComponent(basePos) + " => " + Objects.equals(nodeValue.<GenericImpl> getImplicit().supers[0].getValue(), attribute.getValue()));
+		Iterator<Holder> holders = attribute.isConcrete() ? GenericImpl.this.<Holder> concreteIterator(cache, (Attribute) attribute, basePos, true) : GenericImpl.this.<Holder> structuralIterator(cache, (Attribute) attribute, true);
+		while (holders.hasNext()) {
+			Holder nodeValue = holders.next();
 			if (equals(nodeValue.getComponent(basePos)) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.<GenericImpl> getImplicit().supers[0].getValue(), attribute.getValue()))
 				nodeValue.remove(cache);
 		}
