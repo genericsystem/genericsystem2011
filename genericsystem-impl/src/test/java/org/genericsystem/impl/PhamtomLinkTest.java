@@ -4,6 +4,7 @@ import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.core.Snapshot;
+import org.genericsystem.api.exception.DuplicateStructuralValueConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
@@ -50,14 +51,15 @@ public class PhamtomLinkTest extends AbstractTest {
 
 		assert vehicle.getRelations(cache).size() == 1;
 		assert car.getRelations(cache).size() == 1;
+		assert car.getRelations(cache).contains(vehicleHuman);
 
 		car.cancel(cache, vehicleHuman);
 		assert vehicle.getRelations(cache).size() == 1;
-		assert car.getRelations(cache).size() == 0;
+		assert car.getRelations(cache).isEmpty();
 
 		car.restore(cache, vehicleHuman);
 		assert vehicle.getRelations(cache).size() == 1;
-		assert car.getRelations(cache).size() == 1;
+		assert car.getRelations(cache).size() == 1 : car.getRelations(cache);
 		assert car.getRelations(cache).contains(vehicleHuman);
 	}
 
@@ -115,23 +117,29 @@ public class PhamtomLinkTest extends AbstractTest {
 	}
 
 	public void testRelationsWIthSameName() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Type color = cache.newType("Color");
+		final Type color = cache.newType("Color");
 		Type car = vehicle.newSubType(cache, "Car");
 
 		Relation vehicleHuman = vehicle.setRelation(cache, "VehicleHuman", human);
-		Relation vehicleColor = vehicle.setRelation(cache, "VehicleHuman", color);
-		assert vehicleHuman.getImplicit().equals(vehicleColor.getImplicit());
-		car.cancel(cache, vehicleColor);
-		assert car.getRelations(cache).size() == 1;
-		assert car.getRelations(cache).get(0).getTargetComponent().equals(human);
+		new RollbackCatcher() {
 
-		car.cancel(cache, vehicleHuman);
-		car.restore(cache, vehicleHuman);
-		assert car.getRelations(cache).size() == 1;
-		assert car.getRelations(cache).get(0).getTargetComponent().equals(human);
+			@Override
+			public void intercept() {
+				Relation vehicleColor = vehicle.setRelation(cache, "VehicleHuman", color);
+			}
+		}.assertIsCausedBy(DuplicateStructuralValueConstraintViolationException.class);
+		// assert vehicleHuman.getImplicit().equals(vehicleColor.getImplicit());
+		// car.cancel(cache, vehicleColor);
+		// assert car.getRelations(cache).size() == 1;
+		// assert car.getRelations(cache).get(0).getTargetComponent().equals(human);
+		//
+		// car.cancel(cache, vehicleHuman);
+		// car.restore(cache, vehicleHuman);
+		// assert car.getRelations(cache).size() == 1;
+		// assert car.getRelations(cache).get(0).getTargetComponent().equals(human);
 	}
 
 	public void testAttributeWithGetInstances() {

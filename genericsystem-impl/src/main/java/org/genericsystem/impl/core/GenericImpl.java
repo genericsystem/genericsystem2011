@@ -295,16 +295,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Holder> Snapshot<T> getHolders(final Context context, final Attribute attribute, final Generic... targets) {
-		return getHolders(context, attribute, getBasePos(attribute), targets);
+	public <T extends Holder> Snapshot<T> getHolders(final Context context, final Holder attribute, final Generic... targets) {
+		return getHolders(context, attribute, getBasePos((Attribute) attribute), targets);
 	}
 
 	@Override
-	public <T extends Holder> Snapshot<T> getHolders(final Context context, final Attribute attribute, final int basePos, final Generic... targets) {
+	public <T extends Holder> Snapshot<T> getHolders(final Context context, final Holder attribute, final int basePos, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return concreteIterator(context, attribute, basePos, targets);
+				return concreteIterator(context, (Attribute) attribute, basePos, targets);
 			}
 		};
 	}
@@ -350,7 +350,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Holder> Iterator<T> concreteIterator(Context context, Attribute attribute, int basePos, Generic... targets) {
-		return Statics.<T> targetsFilter(GenericImpl.this.<T> concreteIterator(context, attribute, basePos), attribute, targets);
+		return Statics.<T> targetsFilter(GenericImpl.this.<T> concreteIterator(context, attribute, basePos, false), attribute, targets);
 	}
 
 	@Override
@@ -415,7 +415,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> structuralIterator(Context context) {
-		return this.<T> structuralIterator(context, ((AbstractContext) context).getMetaAttribute());
+		return this.<T> structuralIterator(context, ((AbstractContext) context).getMetaAttribute(), false);
 	}
 
 	@Override
@@ -550,19 +550,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((CacheImpl) cache).bind(implicit, new Generic[] { directSuper }, components);
 	}
 
-	private <T extends Generic> Iterator<T> structuralIterator(Context context, Attribute origin) {
-		return Statics.<T> phantomsFilter(((GenericImpl) origin).safeIsEnabled(context, getNoInheritanceSystemProperty(context)) ? this.<T> noInheritanceStructuralIterator(context, origin) : this.<T> inheritanceStructuralIterator(context, origin));
+	private <T extends Generic> Iterator<T> structuralIterator(Context context, Attribute origin, boolean readPhantom) {
+		Iterator<T> iterator = ((GenericImpl) origin).safeIsEnabled(context, getNoInheritanceSystemProperty(context)) ? this.<T> noInheritanceStructuralIterator(context, origin) : this.<T> inheritanceStructuralIterator(context, origin);
+		return !readPhantom ? Statics.<T> phantomsFilter(iterator) : iterator;
 	}
 
-	private <T extends Generic> Iterator<T> concreteIterator(Context context, Attribute origin, int basePos) {
+	private <T extends Generic> Iterator<T> concreteIterator(Context context, Attribute origin, int basePos, boolean readPhantom) {
+		Iterator<T> iterator = null;
 		boolean noInheritance = ((GenericImpl) origin).safeIsEnabled(context, getNoInheritanceSystemProperty(context));
 		if (((GenericImpl) origin).safeIsEnabled(context, getMultiDirectionalSystemProperty(context))) {
 			Iterator<T>[] iterators = new Iterator[origin.getComponentsSize()];
 			for (basePos = 0; basePos < iterators.length; basePos++)
 				iterators[basePos] = noInheritance ? this.<T> noInheritanceConcreteIterator(context, origin, basePos) : this.<T> inheritanceConcreteIterator(context, origin, basePos);
-			return new ConcateIterator<T>(iterators);
-		}
-		return Statics.<T> phantomsFilter(noInheritance ? this.<T> noInheritanceConcreteIterator(context, origin, basePos) : this.<T> inheritanceConcreteIterator(context, origin, basePos));
+			iterator = new ConcateIterator<T>(iterators);
+		} else
+			iterator = noInheritance ? this.<T> noInheritanceConcreteIterator(context, origin, basePos) : this.<T> inheritanceConcreteIterator(context, origin, basePos);
+		return !readPhantom ? Statics.<T> phantomsFilter(iterator) : iterator;
 	}
 
 	private Attribute getNoInheritanceSystemProperty(Context context) {
@@ -1216,20 +1219,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void restore(Cache cache, Holder attribute) {
-		// TODO
+		restore(cache, attribute, getBasePos((Attribute) attribute));
 	}
 
 	@Override
-	public void restore(Cache cache, Holder attribute, int basePos) {
-		// TODO
-
+	public void restore(final Cache cache, final Holder attribute, final int basePos) {
+		log.info("restore " + attribute + " basePos " + basePos);
+		Snapshot<Holder> holders = new AbstractSnapshot<Holder>() {
+			@Override
+			public Iterator<Holder> iterator() {
+				return attribute.isConcrete() ? GenericImpl.this.<Holder> concreteIterator(cache, (Attribute) attribute, basePos, true) : GenericImpl.this.<Holder> structuralIterator(cache, (Attribute) attribute, true);
+			}
+		};
+		for (Holder nodeValue : holders) {
+			log.info("nodeValue " + nodeValue + " nodeValue.getComponent(basePos) " + nodeValue.getComponent(basePos) + " => " + Objects.equals(nodeValue.<GenericImpl> getImplicit().supers[0].getValue(), attribute.getValue()));
+			if (equals(nodeValue.getComponent(basePos)) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.<GenericImpl> getImplicit().supers[0].getValue(), attribute.getValue()))
+				nodeValue.remove(cache);
+		}
 	}
-
-	// public void restore(Cache cache, Attribute attribute) {
-	// for (Holder nodeValue : getLinks(cache, (Relation) attribute))
-	// if (equals(nodeValue.getBaseComponent()) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.<GenericImpl> getImplicit().supers[0].getValue(), attribute.getValue()))
-	// nodeValue.remove(cache);
-	// }
 
 	/*********************************************/
 	/******************* TREE ********************/

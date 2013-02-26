@@ -303,7 +303,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 * @return The value holders.
 	 */
-	<T extends Holder> Snapshot<T> getHolders(Context context, Attribute attribute, Generic... targets);
+	<T extends Holder> Snapshot<T> getHolders(Context context, Holder attribute, Generic... targets);
 
 	/**
 	 * Returns the values holders.
@@ -319,7 +319,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 * @return The value holders.
 	 */
-	<T extends Holder> Snapshot<T> getHolders(Context context, Attribute attribute, int basePos, Generic... targets);
+	<T extends Holder> Snapshot<T> getHolders(Context context, Holder attribute, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Holder of value.
