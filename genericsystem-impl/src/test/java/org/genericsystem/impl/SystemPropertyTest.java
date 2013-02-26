@@ -97,7 +97,7 @@ public class SystemPropertyTest extends AbstractTest {
 		assert ((GenericImpl) multiDirectionalSystemProperty.getImplicit()).isPrimary();
 		Type vehicle = cache.newType("Vehicle");
 		assert !vehicle.isTree();
-		assert vehicle.getStructurals(cache).contains(multiDirectionalSystemProperty) : vehicle.getStructurals(cache);
+		assert vehicle.getAttributes(cache).contains(multiDirectionalSystemProperty) : vehicle.getAttributes(cache);
 	}
 
 	public void isEnabledSystemPropertyTest() {

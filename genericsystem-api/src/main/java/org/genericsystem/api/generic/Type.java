@@ -1,7 +1,6 @@
 package org.genericsystem.api.generic;
 
 import java.io.Serializable;
-
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
@@ -44,9 +43,11 @@ public interface Type extends Generic {
 	 *            The reference context.
 	 * @param value
 	 *            The relation value.
+	 * @param targets
+	 *            The relation target types
 	 * @return Return the relation or null if no relation find.
 	 */
-	<T extends Relation> T getRelation(Context context, Serializable value);
+	<T extends Relation> T getRelation(Context context, Serializable value, Type... targets);
 
 	/**
 	 * Create a subtype.
@@ -400,16 +401,6 @@ public interface Type extends Generic {
 	 * @return Return this.
 	 */
 	<T extends Type> T setConstraintClass(Cache cache, Class<?> constraintClass);
-
-	/**
-	 * Returns the structure of Generic.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @return The snapshot with all attributes and relations of the Generic.
-	 * @see Snapshot
-	 */
-	<T extends Attribute> Snapshot<T> getStructurals(Context context);
 
 	/**
 	 * Returns the attributes of Generic.

@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
@@ -1204,7 +1203,7 @@ public class RelationTest extends AbstractTest {
 		Type human = cache.newType("Human");
 		Relation humanPilotVehicle = vehicle.setRelation(cache, "pilot", human);
 		Relation humanPilotVehicle2 = vehicle.setRelation(cache, "pilot", human);
-		assert vehicle.getStructurals(cache).contains(humanPilotVehicle);
+		assert vehicle.getAttributes(cache).contains(humanPilotVehicle);
 		assert humanPilotVehicle == humanPilotVehicle2;
 	}
 

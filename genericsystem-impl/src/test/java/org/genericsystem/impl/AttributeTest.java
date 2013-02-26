@@ -269,10 +269,10 @@ public class AttributeTest extends AbstractTest {
 		Relation carHuman = car.setRelation(cache, "carHuman", human);
 		Attribute carPower = car.setAttribute(cache, "power");
 		Attribute carPowerUnit = carPower.setAttribute(cache, "Unit");
-		assert car.getStructurals(cache).contains(carHuman);
-		assert car.getStructurals(cache).contains(carPower);
+		assert car.getAttributes(cache).contains(carHuman);
 		assert car.getAttributes(cache).contains(carPower);
-		assert carPower.getStructurals(cache).contains(carPowerUnit);
+		assert car.getAttributes(cache).contains(carPower);
+		assert carPower.getAttributes(cache).contains(carPowerUnit);
 		assert carPower.getAttributes(cache).contains(carPowerUnit);
 	}
 
