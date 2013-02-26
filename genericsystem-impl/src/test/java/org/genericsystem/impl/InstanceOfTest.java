@@ -6,9 +6,8 @@ import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.generic.Attribute;
-import org.genericsystem.api.generic.Relation;
-import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Holder;
+import org.genericsystem.api.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
@@ -85,13 +84,13 @@ public class InstanceOfTest extends AbstractTest {
 		assert Objects.equals(myVehicle.getValue(cache, vehiclePower), 90);
 		assert Objects.equals(myCar.getValue(cache, vehiclePower), 235);
 
-		assert v90.equals(myVehicle.getLink(cache, (Relation) vehiclePower));
-		assert v235.equals(myCar.getLink(cache, (Relation) vehiclePower));
+		assert v90.equals(myVehicle.getHolder(cache, vehiclePower));
+		assert v235.equals(myCar.getHolder(cache, vehiclePower));
 
 		v90.remove(cache);
 
 		assert myVehicle.getValue(cache, vehiclePower) == null;
-		assert myVehicle.getLink(cache, (Relation) vehiclePower) == null;
+		assert myVehicle.getHolder(cache, vehiclePower) == null;
 
 		cache.flush();
 	}

@@ -1,6 +1,7 @@
 package org.genericsystem.api.generic;
 
 import java.io.Serializable;
+
 import org.genericsystem.api.core.Cache;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
@@ -15,6 +16,16 @@ import org.genericsystem.api.core.Snapshot;
 public interface Type extends Generic {
 
 	/**
+	 * Returns the attributes of Generic.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @return The snapshot with all attributes of the Generic.
+	 * @see Snapshot
+	 */
+	<T extends Attribute> Snapshot<T> getAttributes(Context context);
+
+	/**
 	 * Find an attribute by value.
 	 * 
 	 * @param context
@@ -24,43 +35,6 @@ public interface Type extends Generic {
 	 * @return The attribute or null if not found.
 	 */
 	<T extends Attribute> T getAttribute(Context context, Serializable value);
-
-	/**
-	 * Find the property by value.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @param value
-	 *            The property value.
-	 * @return Return the property or null if no property find.
-	 */
-	<T extends Attribute> T getProperty(Context context, Serializable value);
-
-	/**
-	 * Find the relation by value.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @param value
-	 *            The relation value.
-	 * @param targets
-	 *            The relation target types
-	 * @return Return the relation or null if no relation find.
-	 */
-	<T extends Relation> T getRelation(Context context, Serializable value, Type... targets);
-
-	/**
-	 * Create a subtype.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @param value
-	 *            The type value.
-	 * @param components
-	 *            The components.
-	 * @return Return the subtype.
-	 */
-	<T extends Type> T newSubType(Cache cache, Serializable value, Generic... components);
 
 	/**
 	 * Create an attribute for the type.
@@ -75,16 +49,50 @@ public interface Type extends Generic {
 	<T extends Attribute> T setAttribute(Cache cache, Serializable value);
 
 	/**
+	 * Find the property by value.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param value
+	 *            The property value.
+	 * @return Return the property or null if no property find.
+	 */
+	<T extends Attribute> T getProperty(Context context, Serializable value);
+
+	/**
 	 * Create a property for the type.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
 	 * @param value
 	 *            the property value
+	 * @param targets
+	 *            The target types.
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T setProperty(Cache cache, Serializable value);
+	<T extends Attribute> T setProperty(Cache cache, Serializable value, Type... targets);
+
+	/**
+	 * Returns the relations of Generic.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @return The snapshot with all relations of the Generic.
+	 * @see Snapshot
+	 */
+	<T extends Relation> Snapshot<T> getRelations(Context context);
+
+	/**
+	 * Find the relation by value.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param value
+	 *            The relation value.
+	 * @return Return the relation or null if no relation find.
+	 */
+	<T extends Relation> T getRelation(Context context, Serializable value);
 
 	/**
 	 * Create a relation.
@@ -94,11 +102,64 @@ public interface Type extends Generic {
 	 * @param value
 	 *            The relation value.
 	 * @param targets
-	 *            The targets of the relation.
+	 *            The target types.
 	 * @return Return the relation.
 	 * @see Relation
 	 */
 	<T extends Relation> T setRelation(Cache cache, Serializable value, Type... targets);
+
+	/**
+	 * Returns the instances of Generic.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @return The snapshot with instances of the Generic.
+	 * @see Snapshot
+	 */
+	<T extends Generic> Snapshot<T> getInstances(Context context);
+
+	/**
+	 * Returns the instances of Generic and the instances of the childrens.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @return The snapshot with all instances of the Generic.
+	 * @see Snapshot
+	 */
+	<T extends Generic> Snapshot<T> getAllInstances(Context context);
+
+	/**
+	 * Returns the sub types of Generic.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @return The snapshot with sub types of the Generic.
+	 * @see Snapshot
+	 */
+	<T extends Generic> Snapshot<T> getSubTypes(Context context);
+
+	/**
+	 * Returns the sub types of Generic and the sub types of the childrens.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @return The snapshot with all sub types of the Generic.
+	 * @see Snapshot
+	 */
+	<T extends Generic> Snapshot<T> getAllSubTypes(Context context);
+
+	/**
+	 * Create a subtype.
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param value
+	 *            The type value.
+	 * @param components
+	 *            The components.
+	 * @return Return the subtype.
+	 */
+	<T extends Type> T newSubType(Cache cache, Serializable value, Generic... components);
 
 	/**
 	 * Enable singular constraint.
@@ -401,65 +462,5 @@ public interface Type extends Generic {
 	 * @return Return this.
 	 */
 	<T extends Type> T setConstraintClass(Cache cache, Class<?> constraintClass);
-
-	/**
-	 * Returns the attributes of Generic.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @return The snapshot with all attributes of the Generic.
-	 * @see Snapshot
-	 */
-	<T extends Attribute> Snapshot<T> getAttributes(Context context);
-
-	/**
-	 * Returns the relations of Generic.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @return The snapshot with all relations of the Generic.
-	 * @see Snapshot
-	 */
-	<T extends Relation> Snapshot<T> getRelations(Context context);
-
-	/**
-	 * Returns the instances of Generic.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @return The snapshot with instances of the Generic.
-	 * @see Snapshot
-	 */
-	<T extends Generic> Snapshot<T> getInstances(Context context);
-
-	/**
-	 * Returns the instances of Generic and the instances of the childrens.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @return The snapshot with all instances of the Generic.
-	 * @see Snapshot
-	 */
-	<T extends Generic> Snapshot<T> getAllInstances(Context context);
-
-	/**
-	 * Returns the sub types of Generic.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @return The snapshot with sub types of the Generic.
-	 * @see Snapshot
-	 */
-	<T extends Generic> Snapshot<T> getSubTypes(Context context);
-
-	/**
-	 * Returns the sub types of Generic and the sub types of the childrens.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @return The snapshot with all sub types of the Generic.
-	 * @see Snapshot
-	 */
-	<T extends Generic> Snapshot<T> getAllSubTypes(Context context);
 
 }

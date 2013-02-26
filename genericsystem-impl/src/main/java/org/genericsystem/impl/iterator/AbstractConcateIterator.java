@@ -1,7 +1,9 @@
 package org.genericsystem.impl.iterator;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.genericsystem.impl.core.Statics;
 
@@ -12,6 +14,8 @@ public abstract class AbstractConcateIterator<U, T> extends AbstractAwareIterato
 
 	private Iterator<U> elements;
 	private Iterator<T> iterator = Statics.emptyIterator();
+
+	private Set<T> alreadyAdded = new HashSet<>();
 
 	public AbstractConcateIterator(Iterator<U> elements) {
 		this.elements = elements;
@@ -24,6 +28,8 @@ public abstract class AbstractConcateIterator<U, T> extends AbstractAwareIterato
 		for (;;) {
 			if (iterator.hasNext()) {
 				next = iterator.next();
+				if (!alreadyAdded.add(next))
+					continue;
 				return;
 			}
 			if (!elements.hasNext()) {

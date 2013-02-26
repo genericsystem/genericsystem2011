@@ -38,7 +38,7 @@ public class RequiredConstraintImpl extends Constraint {
 			} else
 				for (Attribute requiredAttribute : ((Type) modified).getAttributes(context)) {
 					for (ConstraintValue constraintValue : getConstraintValues(context, requiredAttribute, RequiredConstraintImpl.class))
-						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent(constraintValue.getComponentPosValue().getComponentPos())) && modified.getLinks(context, (Relation) requiredAttribute).size() < 1)
+						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent(constraintValue.getComponentPosValue().getComponentPos())) && modified.getHolders(context, requiredAttribute).size() < 1)
 							throw new RequiredConstraintViolationException(requiredAttribute.getValue() + " is required for new " + modified.getMeta() + " " + modified);
 				}
 		}
