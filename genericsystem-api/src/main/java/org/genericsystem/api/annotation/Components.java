@@ -15,5 +15,10 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface Components {
 
+	/**
+	 * Returns the class of the components.
+	 * 
+	 * @return An array of class of the components.
+	 */
 	Class<?>[] value();
 }

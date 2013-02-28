@@ -17,6 +17,11 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface InstanceClassConstraint {
 
+	/**
+	 * Returns the class of type constrained.
+	 * 
+	 * @return The class.
+	 */
 	Class<?> value();
 
 }

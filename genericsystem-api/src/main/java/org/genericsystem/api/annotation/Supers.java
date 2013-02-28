@@ -15,7 +15,17 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface Supers {
 
+	/**
+	 * Returns the class of the supers.
+	 * 
+	 * @return An array of class of the supers.
+	 */
 	Class<?>[] value();
 
+	/**
+	 * Returns the class of the implicit super.
+	 * 
+	 * @return The class of the implicit super.
+	 */
 	Class<?> implicitSuper();
 }

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ * The phantom value cancel a another value.
  * 
  * @author Nicolas Feybesse
  * @author Michael Ory

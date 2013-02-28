@@ -15,6 +15,11 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface SingularConstraint {
 
+	/**
+	 * Returns the positions of the components.
+	 * 
+	 * @return An array of component position.
+	 */
 	int[] value() default { 0 };
 
 }

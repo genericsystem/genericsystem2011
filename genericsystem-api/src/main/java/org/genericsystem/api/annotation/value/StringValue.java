@@ -14,5 +14,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface StringValue {
+
+	/**
+	 * 
+	 * @return Return the string.
+	 */
 	String value();
 }

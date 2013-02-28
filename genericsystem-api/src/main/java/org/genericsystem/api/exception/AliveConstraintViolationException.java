@@ -1,8 +1,9 @@
 package org.genericsystem.api.exception;
 
 /**
- * @author Nicolas Feybesse
+ * Check if the Generic is alive in the context.
  * 
+ * @author Nicolas Feybesse
  */
 public class AliveConstraintViolationException extends ConstraintViolationException {
 
