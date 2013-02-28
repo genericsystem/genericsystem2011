@@ -541,7 +541,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	// TODO KK
 	private <T extends Link> T addLink(Cache cache, Generic implicit, Generic directSuper, int basePos, Generic... targets) {
-		return bind(cache, implicit, directSuper, Statics.insertIntoArray(this, targets, basePos));
+		log.info("implicit " + implicit + " => " + System.identityHashCode(implicit) + " # directSuper " + directSuper + " basePos " + basePos + " targets " + Arrays.toString(targets));
+		T bind = bind(cache, implicit, directSuper, Statics.insertIntoArray(this, targets, basePos));
+		log.info("bind " + bind.info());
+		return bind;
 	}
 
 	private static <T extends Generic> T bind(Cache cache, Generic implicit, Generic directSuper, Generic... components) {
@@ -1206,10 +1209,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (equals(attribute.getComponent(basePos)))
 			throw new IllegalStateException("Only inherited attributes can be cancelled");
 		assert Statics.replace(basePos, ((GenericImpl) attribute).components, this).length != 0;
-		// KK
-		Link link = attribute.isConcrete() ? getLink(cache, (Relation) attribute, basePos) : (Link) getAttribute(cache, attribute.getValue());
-		if (!link.equals(attribute))
-			throw new IllegalStateException("Attribute " + attribute + " is already override by : " + link);
+		// TODO KK
+		Holder holder = attribute.isConcrete() ? attribute : getAttribute(cache, attribute.getValue());
+		Holder defaultHolder = getHolder(cache, (Attribute) holder, basePos);
+		if (defaultHolder != null && ((GenericImpl) defaultHolder).isPseudoStructural())
+			holder = defaultHolder;
+		if (!holder.equals(attribute))
+			throw new IllegalStateException("Attribute " + attribute + " is already override by : " + holder);
 		internalCancel(cache, attribute, basePos);
 	}
 
@@ -1227,7 +1233,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Holder> holders = attribute.isConcrete() ? GenericImpl.this.<Holder> concreteIterator(cache, (Attribute) attribute, basePos, true) : GenericImpl.this.<Holder> structuralIterator(cache, (Attribute) attribute, true);
 		while (holders.hasNext()) {
 			Holder nodeValue = holders.next();
-			if (equals(nodeValue.getComponent(basePos)) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(nodeValue.<GenericImpl> getImplicit().supers[0].getValue(), attribute.getValue()))
+			if (equals(nodeValue.getComponent(basePos)) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(((GenericImpl) nodeValue).supers[0].getValue(), attribute.getValue()))
 				nodeValue.remove(cache);
 		}
 	}

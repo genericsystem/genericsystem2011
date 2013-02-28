@@ -318,6 +318,7 @@ public abstract class AbstractContext implements Context, Serializable {
 				if (constraintInstance.isCheckedAt(checkingType) && immediatlyCheckable == constraintInstance.isImmediatelyCheckable())
 					for (Generic generic : generics)
 						if (generic.isInstanceOf(constraint)) {
+							// TODO KK
 							Generic base = ((Holder) generic).getBaseComponent();
 							if (base != null)
 								for (Generic baseInheriting : ((GenericImpl) base).getAllInheritings(AbstractContext.this))

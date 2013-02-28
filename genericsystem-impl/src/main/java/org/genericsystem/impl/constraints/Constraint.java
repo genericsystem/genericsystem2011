@@ -85,6 +85,7 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 
 					@Override
 					protected ConstraintValue project() {
+						// TODO KK
 						return new ConstraintValue(next.<ComponentPosValue<Serializable>> getValue(), next.getBaseComponent());
 					}
 				};

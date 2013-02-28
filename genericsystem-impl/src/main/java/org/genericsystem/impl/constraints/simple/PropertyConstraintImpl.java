@@ -14,8 +14,8 @@ import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConstraintViolationException;
 import org.genericsystem.api.exception.PropertyConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
-import org.genericsystem.api.generic.Type;
 import org.genericsystem.api.generic.Holder;
+import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.iterator.AbstractFilterIterator;
@@ -36,6 +36,7 @@ public class PropertyConstraintImpl extends Constraint {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
 			Type constraintBaseType = (Type) constraintValue.getConstraintType();
 			if (modified.isAttribute()) {
+				// TODO KK
 				for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings(context)) {
 					Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders(context, (Attribute) constraintBaseType).iterator()) {
 						@Override

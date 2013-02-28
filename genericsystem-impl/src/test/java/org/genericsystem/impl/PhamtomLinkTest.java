@@ -6,6 +6,8 @@ import org.genericsystem.api.core.GenericSystem;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.exception.DuplicateStructuralValueConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
+import org.genericsystem.api.generic.Holder;
+import org.genericsystem.api.generic.Link;
 import org.genericsystem.api.generic.Relation;
 import org.genericsystem.api.generic.Type;
 import org.genericsystem.impl.core.GenericImpl;
@@ -14,25 +16,42 @@ import org.testng.annotations.Test;
 @Test
 public class PhamtomLinkTest extends AbstractTest {
 
-	public void testPhantomAttribute() {
+	public void cancelAttribute() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		final Type car = vehicle.newSubType(cache, "Car");
-
+		final Type vehicle = cache.newType("Vehicle");
 		final Attribute vehiclePower = vehicle.setAttribute(cache, "power");
-		assert car.getAttributes(cache).contains(vehiclePower);
-		car.cancel(cache, vehiclePower);
+
+		assert vehicle.getAttributes(cache).contains(vehiclePower);
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				vehicle.cancel(cache, vehiclePower);
+			}
+		}.assertIsCausedBy(IllegalStateException.class);
+		assert vehicle.getAttributes(cache).contains(vehiclePower);
 	}
 
-	public void testPhantomAttribute2() {
+	public void cancelAttributeWithInheritsBase() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
+
+		assert car.getAttributes(cache).contains(vehiclePower);
+		car.cancel(cache, vehiclePower);
+		assert !car.getAttributes(cache).contains(vehiclePower);
+	}
+
+	public void cancelAttributeWithInheritsAttribute() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		final Type car = vehicle.newSubType(cache, "Car");
-
 		final Attribute vehiclePower = vehicle.setAttribute(cache, "power");
+
 		assert car.getAttributes(cache).contains(vehiclePower);
 		Attribute carPower = car.setAttribute(cache, "power");
 		assert car.getAttributes(cache).contains(carPower);
+		assert carPower.inheritsFrom(vehiclePower);
 
 		new RollbackCatcher() {
 			@Override
@@ -42,7 +61,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		}.assertIsCausedBy(IllegalStateException.class);
 	}
 
-	public void testPhantomSimpleRelation() {
+	public void cancelAndRestoreRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
@@ -50,6 +69,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		Type car = vehicle.newSubType(cache, "Car");
 
 		assert vehicle.getRelations(cache).size() == 1;
+		assert vehicle.getRelations(cache).contains(vehicleHuman);
 		assert car.getRelations(cache).size() == 1;
 		assert car.getRelations(cache).contains(vehicleHuman);
 
@@ -59,6 +79,7 @@ public class PhamtomLinkTest extends AbstractTest {
 
 		car.restore(cache, vehicleHuman);
 		assert vehicle.getRelations(cache).size() == 1;
+		assert vehicle.getRelations(cache).contains(vehicleHuman);
 		assert car.getRelations(cache).size() == 1 : car.getRelations(cache);
 		assert car.getRelations(cache).contains(vehicleHuman);
 	}
@@ -121,25 +142,16 @@ public class PhamtomLinkTest extends AbstractTest {
 		final Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		final Type color = cache.newType("Color");
-		Type car = vehicle.newSubType(cache, "Car");
+		vehicle.newSubType(cache, "Car");
 
-		Relation vehicleHuman = vehicle.setRelation(cache, "VehicleHuman", human);
+		vehicle.setRelation(cache, "VehicleHuman", human);
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				Relation vehicleColor = vehicle.setRelation(cache, "VehicleHuman", color);
+				vehicle.setRelation(cache, "VehicleHuman", color);
 			}
 		}.assertIsCausedBy(DuplicateStructuralValueConstraintViolationException.class);
-		// assert vehicleHuman.getImplicit().equals(vehicleColor.getImplicit());
-		// car.cancel(cache, vehicleColor);
-		// assert car.getRelations(cache).size() == 1;
-		// assert car.getRelations(cache).get(0).getTargetComponent().equals(human);
-		//
-		// car.cancel(cache, vehicleHuman);
-		// car.restore(cache, vehicleHuman);
-		// assert car.getRelations(cache).size() == 1;
-		// assert car.getRelations(cache).get(0).getTargetComponent().equals(human);
 	}
 
 	public void testAttributeWithGetInstances() {
@@ -207,4 +219,163 @@ public class PhamtomLinkTest extends AbstractTest {
 		}).isEmpty();
 	}
 
+	public void cancelDefaultAttribute() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Attribute carPower = car.setProperty(cache, "power");
+		Holder defaultPower = car.setValue(cache, carPower, "233");
+		Generic mycar = car.newInstance(cache, "myCar");
+		assert mycar.getValue(cache, carPower).equals("233");
+		mycar.cancel(cache, defaultPower);
+		assert mycar.getValue(cache, carPower) == null : mycar.getValue(cache, carPower);
+	}
+
+	public void cancelDefaultAttributeKo() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		final Attribute carPower = car.setProperty(cache, "power");
+		car.setValue(cache, carPower, "233");
+		final Generic mycar = car.newInstance(cache, "myCar");
+		assert mycar.getValue(cache, carPower).equals("233");
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				mycar.cancel(cache, carPower);
+			}
+		}.assertIsCausedBy(IllegalStateException.class);
+	}
+
+	public void cancelDefaultRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "carColor", color);
+		Generic red = color.newInstance(cache, "red");
+		Link defaultColor = car.setLink(cache, carColor, "defaultColor", red);
+		Generic myCar = car.newInstance(cache, "myCar");
+		assert myCar.getTargets(cache, carColor).contains(red);
+		myCar.cancel(cache, defaultColor);
+		assert myCar.getTargets(cache, carColor).isEmpty();
+	}
+
+	public void cancelDefaultRelationKo() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		final Relation carColor = car.setRelation(cache, "carColor", color);
+		Generic red = color.newInstance(cache, "red");
+		car.setLink(cache, carColor, "defaultColor", red);
+		final Generic myCar = car.newInstance(cache, "myCar");
+		assert myCar.getTargets(cache, carColor).contains(red);
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				myCar.cancel(cache, carColor);
+			}
+		}.assertIsCausedBy(IllegalStateException.class);
+	}
+
+	public void testTwooCancel() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Attribute carPower = car.setProperty(cache, "power");
+		Holder defaultPower = car.setValue(cache, carPower, "233");
+		Generic mycar = car.newInstance(cache, "myCar");
+		assert mycar.getValue(cache, carPower).equals("233");
+		mycar.cancel(cache, defaultPower);
+		assert mycar.getValue(cache, carPower) == null;
+		mycar.cancel(cache, defaultPower);
+		assert mycar.getValue(cache, carPower) == null;
+		mycar.restore(cache, defaultPower);
+		assert mycar.getValue(cache, carPower).equals("233");
+	}
+
+	public void testTwooRestore() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Attribute carPower = car.setProperty(cache, "power");
+		Holder defaultPower = car.setValue(cache, carPower, "233");
+		Generic mycar = car.newInstance(cache, "myCar");
+		assert mycar.getValue(cache, carPower).equals("233");
+		mycar.cancel(cache, defaultPower);
+		assert mycar.getValue(cache, carPower) == null;
+		mycar.restore(cache, defaultPower);
+		assert mycar.getValue(cache, carPower).equals("233");
+		mycar.restore(cache, defaultPower);
+		assert mycar.getValue(cache, carPower).equals("233");
+		mycar.cancel(cache, defaultPower);
+		assert mycar.getValue(cache, carPower) == null;
+	}
+
+	public void testAnyCancelRestore() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Attribute carPower = car.setProperty(cache, "power");
+		Holder defaultPower = car.setValue(cache, carPower, "233");
+		Generic mycar = car.newInstance(cache, "myCar");
+		assert mycar.getValue(cache, carPower).equals("233");
+		mycar.cancel(cache, defaultPower);
+		mycar.restore(cache, defaultPower);
+		mycar.restore(cache, defaultPower);
+		mycar.cancel(cache, defaultPower);
+		mycar.cancel(cache, defaultPower);
+		mycar.restore(cache, defaultPower);
+		assert mycar.getValue(cache, carPower).equals("233");
+	}
+
+	public void testTwooCancelRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Generic red = color.newInstance(cache, "Red");
+		Link defaultCarColor = car.setLink(cache, carColor, "defaultCarColor", red);
+		Generic myCar = car.newInstance(cache, "myCar");
+		assert myCar.getTargets(cache, carColor).contains(red);
+		myCar.cancel(cache, defaultCarColor);
+		assert myCar.getTargets(cache, carColor).isEmpty();
+		myCar.cancel(cache, defaultCarColor);
+		assert myCar.getTargets(cache, carColor).isEmpty();
+		myCar.restore(cache, defaultCarColor);
+		assert myCar.getTargets(cache, carColor).contains(red);
+	}
+
+	public void testTwooRestoreRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Generic red = color.newInstance(cache, "Red");
+		Link defaultCarColor = car.setLink(cache, carColor, "defaultCarColor", red);
+		Generic myCar = car.newInstance(cache, "myCar");
+		assert myCar.getTargets(cache, carColor).contains(red);
+		myCar.cancel(cache, defaultCarColor);
+		assert myCar.getTargets(cache, carColor).isEmpty();
+		myCar.restore(cache, defaultCarColor);
+		assert myCar.getTargets(cache, carColor).contains(red);
+		myCar.restore(cache, defaultCarColor);
+		assert myCar.getTargets(cache, carColor).contains(red);
+		myCar.cancel(cache, defaultCarColor);
+		assert myCar.getTargets(cache, carColor).isEmpty();
+	}
+
+	public void testAnyCancelRestoreRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Generic red = color.newInstance(cache, "Red");
+		Link defaultCarColor = car.setLink(cache, carColor, "defaultCarColor", red);
+		Generic myCar = car.newInstance(cache, "myCar");
+		assert myCar.getTargets(cache, carColor).contains(red);
+		myCar.cancel(cache, defaultCarColor);
+		myCar.restore(cache, defaultCarColor);
+		myCar.restore(cache, defaultCarColor);
+		myCar.cancel(cache, defaultCarColor);
+		myCar.cancel(cache, defaultCarColor);
+		myCar.restore(cache, defaultCarColor);
+		assert myCar.getTargets(cache, carColor).contains(red);
+	}
 }
