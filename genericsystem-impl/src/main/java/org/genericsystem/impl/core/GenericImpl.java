@@ -1605,4 +1605,5 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return false;
 	}
 
+	
 }
