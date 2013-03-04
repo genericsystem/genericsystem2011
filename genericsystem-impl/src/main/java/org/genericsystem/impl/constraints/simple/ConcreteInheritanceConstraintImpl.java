@@ -9,7 +9,7 @@ import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ConcreteInheritanceConstraintViolationException;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.core.GenericImpl;
 import org.genericsystem.impl.system.ComponentPosValue;
@@ -24,7 +24,7 @@ public class ConcreteInheritanceConstraintImpl extends Constraint {
 	private static final long serialVersionUID = -6429972259714036057L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
+	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
 		if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
 			if (((GenericImpl) modified).getSupers().first().isConcrete())
 				throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());

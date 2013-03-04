@@ -20,7 +20,7 @@ import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.AliveConstraintViolationException;
 import org.genericsystem.api.exception.ConcurrencyControlException;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.api.exception.RollbackException;
 import org.genericsystem.api.generic.Tree;
@@ -62,14 +62,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 	<T extends Generic> T insert(Generic generic) throws RollbackException {
 		try {
 			return this.<T> internalInsert(generic);
-		} catch (ConstraintViolationException e) {
+		} catch (AbstractConstraintViolationException e) {
 			rollback(e);
 		}
 		throw new IllegalStateException();// Unreachable;
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends Generic> T internalInsert(Generic generic) throws ConstraintViolationException {
+	private <T extends Generic> T internalInsert(Generic generic) throws AbstractConstraintViolationException {
 		getInternalContext().addGeneric(generic);
 		return (T) generic;
 	}
@@ -109,7 +109,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	private void checkIsAlive(Generic generic) throws ConstraintViolationException {
+	private void checkIsAlive(Generic generic) throws AbstractConstraintViolationException {
 		if (!isAlive(generic))
 			throw new AliveConstraintViolationException(generic + " is not alive");
 	}
@@ -121,12 +121,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 			internalRemove(generic);
 			for (Generic component : componentsForCascadeRemove)
 				internalRemove(component);
-		} catch (ConstraintViolationException e) {
+		} catch (AbstractConstraintViolationException e) {
 			rollback(e);
 		}
 	}
 
-	private List<Generic> getComponentsForCascadeRemove(Generic generic) throws ConstraintViolationException {
+	private List<Generic> getComponentsForCascadeRemove(Generic generic) throws AbstractConstraintViolationException {
 		Generic[] components = ((GenericImpl) generic).components;
 		List<Generic> componentsForCascadeRemove = new ArrayList<>();
 		for (int axe = 0; axe < components.length; axe++)
@@ -135,7 +135,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return componentsForCascadeRemove;
 	}
 
-	private void internalRemove(Generic node) throws ConstraintViolationException {
+	private void internalRemove(Generic node) throws AbstractConstraintViolationException {
 		// assert !node.getValue().equals("Power");
 		checkIsAlive(node);
 		removeDependencies(node);
@@ -143,7 +143,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			internalCache.removeGeneric(node);
 	}
 
-	private void removeDependencies(final Generic node) throws ConstraintViolationException {
+	private void removeDependencies(final Generic node) throws AbstractConstraintViolationException {
 		Iterator<Generic> inheritingsDependeciesIterator = getDirectInheritingsDependencies(node).iterator(getTs());
 		while (inheritingsDependeciesIterator.hasNext()) {
 			Generic inheritingDependency = inheritingsDependeciesIterator.next();
@@ -422,7 +422,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		protected final Set<Generic> adds = new LinkedHashSet<Generic>();
 		protected final Set<Generic> removes = new LinkedHashSet<Generic>();
 
-		public void flush() throws ConstraintViolationException, ConcurrencyControlException {
+		public void flush() throws AbstractConstraintViolationException, ConcurrencyControlException {
 			getSubContext().getInternalContext().apply(adds, removes);
 		}
 
@@ -453,27 +453,27 @@ public class CacheImpl extends AbstractContext implements Cache {
 			super.cancelRemove(generic);
 		}
 
-		public void addGeneric(Generic generic) throws ConstraintViolationException {
+		public void addGeneric(Generic generic) throws AbstractConstraintViolationException {
 			add((GenericImpl) generic);
 			checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
 			checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
 		}
 
-		public void addGenericWithoutCheck(Generic generic) throws ConstraintViolationException {
+		public void addGenericWithoutCheck(Generic generic) throws AbstractConstraintViolationException {
 			add((GenericImpl) generic);
 		}
 
-		public void removeGeneric(Generic generic) throws ConstraintViolationException {
+		public void removeGeneric(Generic generic) throws AbstractConstraintViolationException {
 			removeOrCancelAdd(generic);
 			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
 			checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
 		}
 
-		public void removeGenericWithoutCheck(Generic generic) throws ConstraintViolationException {
+		public void removeGenericWithoutCheck(Generic generic) throws AbstractConstraintViolationException {
 			removeOrCancelAdd(generic);
 		}
 
-		public void removeOrCancelAdd(Generic generic) throws ConstraintViolationException {
+		public void removeOrCancelAdd(Generic generic) throws AbstractConstraintViolationException {
 			if (adds.contains(generic))
 				cancelAdd((GenericImpl) generic);
 			else
@@ -492,7 +492,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return adds.contains(generic);
 		}
 
-		public void checkConstraints() throws ConstraintViolationException {
+		public void checkConstraints() throws AbstractConstraintViolationException {
 			checkConstraints(adds, removes);
 		}
 	}

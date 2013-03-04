@@ -8,7 +8,7 @@ import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.exception.SingularConstraintViolationException;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Link;
@@ -26,7 +26,7 @@ public class SingularConstraintImpl extends AbstractAxedIntegerConstraint {
 	// TODO do the same as PropertyConstraint
 
 	@Override
-	protected void internalCheck(final Context context, Generic modified, final Relation constraintType, final Integer basePos) throws ConstraintViolationException {
+	protected void internalCheck(final Context context, Generic modified, final Relation constraintType, final Integer basePos) throws AbstractConstraintViolationException {
 		final Generic component = ((Link) modified).getComponent(basePos);
 		Snapshot<Holder> holders = component.getHolders(context, constraintType, basePos);
 		if (holders.size() > 1)

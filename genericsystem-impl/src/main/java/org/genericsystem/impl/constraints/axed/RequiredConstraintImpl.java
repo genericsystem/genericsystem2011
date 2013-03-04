@@ -8,7 +8,7 @@ import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.exception.RequiredConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Relation;
@@ -26,7 +26,7 @@ public class RequiredConstraintImpl extends Constraint {
 	private static final long serialVersionUID = 2837810754525623146L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
+	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
 		if (modified.isConcrete()) {
 			if (!modified.isAlive(context)) {
 				for (ConstraintValue constraintValue : getConstraintValues(context, modified, RequiredConstraintImpl.class)) {

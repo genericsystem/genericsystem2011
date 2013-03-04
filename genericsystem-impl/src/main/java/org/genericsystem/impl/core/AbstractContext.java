@@ -24,7 +24,7 @@ import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
 import org.genericsystem.api.exception.ConcurrencyControlException;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.api.generic.Relation;
@@ -300,14 +300,14 @@ public abstract class AbstractContext implements Context, Serializable {
 			};
 		}
 
-		protected void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
+		protected void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws AbstractConstraintViolationException {
 			for (Constraint constraint : getSortedConstraints(checkingType, immediatlyCheckable))
 				for (Generic generic : generics)
 					constraint.check(AbstractContext.this, generic);
 		}
 
 		@SuppressWarnings("unchecked")
-		protected void checkConsistency(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
+		protected void checkConsistency(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws AbstractConstraintViolationException {
 			for (Generic constraint : getConstraints()) {
 				Constraint constraintInstance;
 				try {
@@ -328,7 +328,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			}
 		}
 
-		protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
+		protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, AbstractConstraintViolationException {
 			removeAll(removes);
 			addAll(adds);
 			try {
@@ -337,7 +337,7 @@ public abstract class AbstractContext implements Context, Serializable {
 				cancelAddAll(adds);
 				cancelRemoveAll(removes);
 				throw e;
-			} catch (ConstraintViolationException e) {
+			} catch (AbstractConstraintViolationException e) {
 				cancelAddAll(adds);
 				cancelRemoveAll(removes);
 				throw e;
@@ -348,7 +348,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			}
 		}
 
-		protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
+		protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws AbstractConstraintViolationException {
 			checkConsistency(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 			checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);

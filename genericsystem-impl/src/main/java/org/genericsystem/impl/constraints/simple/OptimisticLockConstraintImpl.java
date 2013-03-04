@@ -9,7 +9,7 @@ import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.exception.OptimisticLockConstraintViolationException;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.core.CacheImpl;
@@ -27,7 +27,7 @@ public class OptimisticLockConstraintImpl extends Constraint {
 	private static final long serialVersionUID = -9140332757904379387L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
+	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
 		if (context instanceof CacheImpl && ((CacheImpl) context).isScheduledToRemove(modified) && (!((CacheImpl) context).getSubContext().isAlive(modified) || ((GenericImpl) modified).getLifeManager().willDie()))
 			throw new OptimisticLockConstraintViolationException("Generic : " + modified + " has already been removed by another thread");
 	}

@@ -9,7 +9,7 @@ import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.exception.ClassInstanceConstraintViolationException;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.impl.core.AbstractContext;
 import org.genericsystem.impl.core.GenericImpl;
@@ -25,7 +25,7 @@ public class InstanceClassConstraintImpl extends Constraint {
 	private static final long serialVersionUID = -6429972259714036057L;
 
 	@Override
-	public void check(Context context, final Generic modified) throws ConstraintViolationException {
+	public void check(Context context, final Generic modified) throws AbstractConstraintViolationException {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified.getMeta(), InstanceClassConstraintImpl.class)) {
 			if (SystemGeneric.CONCRETE == modified.getMetaLevel() && ((GenericImpl) modified.getMeta()).getValue(context, ((AbstractContext) context).<Attribute> find(InstanceClassConstraintImpl.class)) != null) {
 				Class<?> clazz = (Class<?>) constraintValue.getComponentPosValue().getValue();

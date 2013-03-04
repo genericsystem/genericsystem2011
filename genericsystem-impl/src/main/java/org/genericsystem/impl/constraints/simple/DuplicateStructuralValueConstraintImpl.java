@@ -12,7 +12,7 @@ import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.exception.DuplicateStructuralValueConstraintViolationException;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.core.GenericImpl;
@@ -29,7 +29,7 @@ public class DuplicateStructuralValueConstraintImpl extends Constraint {
 	private static final long serialVersionUID = -7212219694902616927L;
 
 	@Override
-	public void check(Context context, final Generic modified) throws ConstraintViolationException {
+	public void check(Context context, final Generic modified) throws AbstractConstraintViolationException {
 		if (modified.isAttribute() && modified.isStructural()) {
 			Snapshot<Generic> components = modified.getComponents();
 			final Generic[] primariesArray = ((GenericImpl) modified).getPrimariesArray();

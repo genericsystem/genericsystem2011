@@ -1,8 +1,9 @@
 package org.genericsystem.api.exception;
 
 /**
- * @author Nicolas Feybesse
+ * The exception is thrown if the user attempts to describe with a timestamp lower than the timestamp of the last read.
  * 
+ * @author Nicolas Feybesse
  */
 public class ConcurrencyControlException extends Exception {
 

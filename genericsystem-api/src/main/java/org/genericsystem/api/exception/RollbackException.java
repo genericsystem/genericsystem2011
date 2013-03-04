@@ -1,8 +1,9 @@
 package org.genericsystem.api.exception;
 
 /**
- * @author Nicolas Feybesse
+ * It's the general runtime exception.
  * 
+ * @author Nicolas Feybesse
  */
 public class RollbackException extends RuntimeException {
 

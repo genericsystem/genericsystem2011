@@ -1,10 +1,11 @@
 package org.genericsystem.api.exception;
 
 /**
- * @author Nicolas Feybesse
+ * Is triggered if you remove a Generic that a alive dependency.
  * 
+ * @author Nicolas Feybesse
  */
-public class ReferentialIntegrityConstraintViolationException extends ConstraintViolationException {
+public class ReferentialIntegrityConstraintViolationException extends AbstractConstraintViolationException {
 
 	private static final long serialVersionUID = 1783386811956942568L;
 

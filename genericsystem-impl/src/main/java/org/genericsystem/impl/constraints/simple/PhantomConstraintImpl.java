@@ -8,7 +8,7 @@ import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.exception.PhantomConstraintViolationException;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.core.GenericImpl;
@@ -23,9 +23,10 @@ public class PhantomConstraintImpl extends Constraint {
 
 	private static final long serialVersionUID = -1175582355395269087L;
 
+	// TODO KK
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (modified.isAlive(context) && ((GenericImpl) modified.getImplicit().getSupers().first()).isPhantom())
+	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
+		if (modified.isAlive(context) && ((GenericImpl) modified.getSupers().first()).isPhantom())
 			throw new PhantomConstraintViolationException(modified.info());
 	}
 

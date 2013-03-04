@@ -8,7 +8,7 @@ import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.exception.NotNullConstraintViolationException;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.constraints.Constraint;
@@ -24,7 +24,7 @@ public class NotNullConstraintImpl extends Constraint {
 	private static final long serialVersionUID = -6429972259714036057L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
+	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
 		if (modified.getValue() == null)
 			throw new NotNullConstraintViolationException("Holder should not be null for : " + ((Holder) modified).getMeta());
 	}

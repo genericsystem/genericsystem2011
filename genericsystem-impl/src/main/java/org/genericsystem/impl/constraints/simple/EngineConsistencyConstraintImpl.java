@@ -8,7 +8,7 @@ import org.genericsystem.api.annotation.constraints.SingularConstraint;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Engine;
 import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.exception.EngineConsistencyConstraintViolationException;
 import org.genericsystem.impl.constraints.Constraint;
 import org.genericsystem.impl.system.ComponentPosValue;
@@ -23,7 +23,7 @@ public class EngineConsistencyConstraintImpl extends Constraint {
 	private static final long serialVersionUID = 8896806730580779746L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
+	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
 		if (!modified.getEngine().equals(context.getEngine()))
 			throw new EngineConsistencyConstraintViolationException("The Engine of " + modified + " isn't equals at Engine of the Context");
 	}

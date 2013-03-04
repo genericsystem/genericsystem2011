@@ -10,7 +10,7 @@ import org.genericsystem.api.annotation.SystemGeneric;
 import org.genericsystem.api.core.Context;
 import org.genericsystem.api.core.Generic;
 import org.genericsystem.api.core.Snapshot;
-import org.genericsystem.api.exception.ConstraintViolationException;
+import org.genericsystem.api.exception.AbstractConstraintViolationException;
 import org.genericsystem.api.generic.Attribute;
 import org.genericsystem.api.generic.Holder;
 import org.genericsystem.impl.core.AbstractContext;
@@ -27,7 +27,7 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 		CHECK_ON_ADD_NODE, CHECK_ON_REMOVE_NODE
 	}
 
-	public abstract void check(Context context, Generic modified) throws ConstraintViolationException;
+	public abstract void check(Context context, Generic modified) throws AbstractConstraintViolationException;
 
 	public final int getPriority() {
 		Priority annotation = getClass().getAnnotation(Priority.class);
