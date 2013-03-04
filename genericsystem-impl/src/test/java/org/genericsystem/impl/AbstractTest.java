@@ -1,6 +1,6 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.api.exception.RollbackException;
+import org.genericsystem.exception.RollbackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

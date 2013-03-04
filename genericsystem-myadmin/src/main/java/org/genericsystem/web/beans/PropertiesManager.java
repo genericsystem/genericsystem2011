@@ -9,8 +9,8 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
-import org.genericsystem.api.generic.Property;
-import org.genericsystem.api.generic.Type;
+import org.genericsystem.generic.Property;
+import org.genericsystem.generic.Type;
 import org.genericsystem.web.qualifiers.TypeChangeEvent;
 import org.genericsystem.web.util.AbstractSequentialList;
 

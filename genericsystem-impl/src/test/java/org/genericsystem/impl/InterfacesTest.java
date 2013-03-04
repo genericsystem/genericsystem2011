@@ -1,8 +1,8 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.generic.Type;
-import org.genericsystem.impl.core.CacheImpl;
+import org.genericsystem.core.CacheImpl;
+import org.genericsystem.core.GenericSystem;
+import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test

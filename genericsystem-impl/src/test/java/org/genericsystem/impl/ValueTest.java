@@ -2,9 +2,9 @@ package org.genericsystem.impl;
 
 import java.io.Serializable;
 
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Engine;
-import org.genericsystem.api.core.GenericSystem;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Engine;
+import org.genericsystem.core.GenericSystem;
 import org.testng.annotations.Test;
 
 @Test

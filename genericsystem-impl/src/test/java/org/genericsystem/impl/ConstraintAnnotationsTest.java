@@ -1,23 +1,23 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.api.annotation.Components;
-import org.genericsystem.api.annotation.Supers;
-import org.genericsystem.api.annotation.SystemGeneric;
-import org.genericsystem.api.annotation.constraints.InstanceClassConstraint;
-import org.genericsystem.api.annotation.constraints.NotNullConstraint;
-import org.genericsystem.api.annotation.constraints.PropertyConstraint;
-import org.genericsystem.api.annotation.constraints.SingularConstraint;
-import org.genericsystem.api.annotation.constraints.SingularInstanceConstraint;
-import org.genericsystem.api.annotation.constraints.UniqueConstraint;
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.exception.ClassInstanceConstraintViolationException;
-import org.genericsystem.api.generic.Attribute;
-import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Holder;
-import org.genericsystem.impl.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.impl.core.Statics;
+import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.Supers;
+import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.annotation.constraints.InstanceClassConstraint;
+import org.genericsystem.annotation.constraints.NotNullConstraint;
+import org.genericsystem.annotation.constraints.PropertyConstraint;
+import org.genericsystem.annotation.constraints.SingularConstraint;
+import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
+import org.genericsystem.annotation.constraints.UniqueConstraint;
+import org.genericsystem.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Statics;
+import org.genericsystem.exception.ClassInstanceConstraintViolationException;
+import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test

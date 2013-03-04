@@ -1,12 +1,12 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Engine;
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.exception.OptimisticLockConstraintViolationException;
-import org.genericsystem.api.generic.Type;
-import org.genericsystem.impl.core.CacheImpl;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.CacheImpl;
+import org.genericsystem.core.Engine;
+import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericSystem;
+import org.genericsystem.exception.OptimisticLockConstraintViolationException;
+import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test

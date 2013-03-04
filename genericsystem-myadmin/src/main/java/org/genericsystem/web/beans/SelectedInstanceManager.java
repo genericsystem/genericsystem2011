@@ -9,10 +9,10 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.generic.Property;
-import org.genericsystem.api.generic.Type;
-import org.genericsystem.api.generic.Holder;
+import org.genericsystem.core.Generic;
+import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Property;
+import org.genericsystem.generic.Type;
 import org.genericsystem.web.qualifiers.DiscardEvent;
 import org.genericsystem.web.qualifiers.InstanceDeleteEvent;
 import org.genericsystem.web.qualifiers.TypeChangeEvent;

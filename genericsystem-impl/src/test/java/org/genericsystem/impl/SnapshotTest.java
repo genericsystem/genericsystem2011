@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.genericsystem.api.core.Snapshot;
-import org.genericsystem.impl.snapshot.AbstractSequentiableSnapshot;
-import org.genericsystem.impl.snapshot.AbstractSnapshot;
+import org.genericsystem.core.Snapshot;
+import org.genericsystem.snapshot.AbstractSequentiableSnapshot;
+import org.genericsystem.snapshot.AbstractSnapshot;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 

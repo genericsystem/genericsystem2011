@@ -3,12 +3,12 @@ package org.genericsystem.cdi;
 import javax.enterprise.context.Conversation;
 import javax.inject.Inject;
 
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Engine;
-import org.genericsystem.api.exception.RollbackException;
-import org.genericsystem.impl.cdi.CacheProvider;
-import org.genericsystem.impl.cdi.EngineProvider;
-import org.genericsystem.impl.cdi.StartupBean;
+import org.genericsystem.cdi.CacheProvider;
+import org.genericsystem.cdi.EngineProvider;
+import org.genericsystem.cdi.StartupBean;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Engine;
+import org.genericsystem.exception.RollbackException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;

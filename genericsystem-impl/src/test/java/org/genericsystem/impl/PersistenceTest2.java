@@ -2,12 +2,12 @@ package org.genericsystem.impl;
 
 import java.util.Random;
 
-import org.genericsystem.api.annotation.SystemGeneric;
-import org.genericsystem.api.annotation.value.StringValue;
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.impl.core.EngineImpl;
-import org.genericsystem.impl.core.GenericImpl;
+import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.annotation.value.StringValue;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.EngineImpl;
+import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.GenericSystem;
 import org.testng.annotations.Test;
 
 @Test

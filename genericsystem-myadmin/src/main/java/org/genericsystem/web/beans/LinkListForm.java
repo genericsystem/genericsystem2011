@@ -7,8 +7,8 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.generic.Link;
+import org.genericsystem.core.Generic;
+import org.genericsystem.generic.Link;
 import org.slf4j.Logger;
 
 @Named

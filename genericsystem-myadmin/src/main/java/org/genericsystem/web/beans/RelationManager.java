@@ -10,8 +10,8 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.api.generic.Relation;
-import org.genericsystem.api.generic.Type;
+import org.genericsystem.generic.Relation;
+import org.genericsystem.generic.Type;
 import org.genericsystem.web.qualifiers.TypeChangeEvent;
 import org.genericsystem.web.util.AbstractSequentialList;
 import org.slf4j.Logger;

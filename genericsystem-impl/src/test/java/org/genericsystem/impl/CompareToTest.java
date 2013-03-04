@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.generic.Type;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericSystem;
+import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test

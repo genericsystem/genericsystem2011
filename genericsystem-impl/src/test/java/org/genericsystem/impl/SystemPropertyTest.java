@@ -1,17 +1,17 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.generic.Attribute;
-import org.genericsystem.api.generic.Link;
-import org.genericsystem.api.generic.Relation;
-import org.genericsystem.api.generic.Type;
-import org.genericsystem.impl.core.GenericImpl;
-import org.genericsystem.impl.core.Statics;
-import org.genericsystem.impl.system.CascadeRemoveSystemProperty;
-import org.genericsystem.impl.system.MultiDirectionalSystemProperty;
-import org.genericsystem.impl.system.ReferentialIntegritySystemProperty;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Statics;
+import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Link;
+import org.genericsystem.generic.Relation;
+import org.genericsystem.generic.Type;
+import org.genericsystem.system.CascadeRemoveSystemProperty;
+import org.genericsystem.system.MultiDirectionalSystemProperty;
+import org.genericsystem.system.ReferentialIntegritySystemProperty;
 import org.testng.annotations.Test;
 
 @Test

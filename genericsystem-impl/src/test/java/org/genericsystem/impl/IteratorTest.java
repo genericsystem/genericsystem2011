@@ -1,17 +1,17 @@
 package org.genericsystem.impl;
 
 import java.util.Iterator;
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.core.Snapshot;
-import org.genericsystem.api.generic.Link;
-import org.genericsystem.api.generic.Relation;
-import org.genericsystem.api.generic.Type;
-import org.genericsystem.impl.core.GenericImpl;
-import org.genericsystem.impl.iterator.AbstractPostTreeIterator;
-import org.genericsystem.impl.iterator.AbstractPreTreeIterator;
-import org.genericsystem.impl.snapshot.AbstractSnapshot;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Snapshot;
+import org.genericsystem.generic.Link;
+import org.genericsystem.generic.Relation;
+import org.genericsystem.generic.Type;
+import org.genericsystem.iterator.AbstractPostTreeIterator;
+import org.genericsystem.iterator.AbstractPreTreeIterator;
+import org.genericsystem.snapshot.AbstractSnapshot;
 import org.testng.annotations.Test;
 
 @Test

@@ -1,15 +1,15 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.exception.PropertyConstraintViolationException;
-import org.genericsystem.api.generic.Attribute;
-import org.genericsystem.api.generic.Holder;
-import org.genericsystem.api.generic.Link;
-import org.genericsystem.api.generic.Relation;
-import org.genericsystem.api.generic.Type;
-import org.genericsystem.impl.core.GenericImpl;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.GenericSystem;
+import org.genericsystem.exception.PropertyConstraintViolationException;
+import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Link;
+import org.genericsystem.generic.Relation;
+import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test

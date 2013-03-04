@@ -1,9 +1,9 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.GenericSystem;
-import org.genericsystem.api.exception.DuplicateStructuralValueConstraintViolationException;
-import org.genericsystem.api.generic.Type;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.GenericSystem;
+import org.genericsystem.exception.DuplicateStructuralValueConstraintViolationException;
+import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test

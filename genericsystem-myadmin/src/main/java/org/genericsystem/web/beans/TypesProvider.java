@@ -11,9 +11,9 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.generic.Type;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Generic;
+import org.genericsystem.generic.Type;
 import org.genericsystem.web.util.AbstractSequentialList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

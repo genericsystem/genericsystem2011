@@ -9,8 +9,8 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.api.core.Generic;
-import org.genericsystem.api.generic.Type;
+import org.genericsystem.core.Generic;
+import org.genericsystem.generic.Type;
 import org.genericsystem.web.qualifiers.TypeChangeEvent;
 import org.slf4j.Logger;
 

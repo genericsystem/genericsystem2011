@@ -10,8 +10,8 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.api.core.Cache;
-import org.genericsystem.api.core.Generic;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Generic;
 import org.genericsystem.web.qualifiers.DiscardEvent;
 import org.slf4j.Logger;
 
