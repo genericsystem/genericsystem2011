@@ -128,6 +128,9 @@ public interface Type extends Generic {
 	 */
 	<T extends Generic> Snapshot<T> getAllInstances(Context context);
 
+	// TODO Javadoc
+	<T extends Generic> T getSubType(Context context, Serializable value);
+
 	/**
 	 * Returns the sub types of Generic.
 	 * 

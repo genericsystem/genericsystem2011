@@ -24,7 +24,8 @@ public class EngineConsistencyConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
-		if (!modified.getEngine().equals(context.getEngine()))
-			throw new EngineConsistencyConstraintViolationException("The Engine of " + modified + " isn't equals at Engine of the Context");
+		if (!getConstraintValues(context, modified, getClass()).isEmpty())
+			if (!modified.getEngine().equals(context.getEngine()))
+				throw new EngineConsistencyConstraintViolationException("The Engine of " + modified + " isn't equals at Engine of the Context");
 	}
 }

@@ -29,9 +29,11 @@ public interface Cache extends Context {
 	 */
 	<T extends Type> T newType(Serializable value);
 
+	// TODO Javadoc
+	<T extends Type> T getType(Serializable value);
+
 	/**
-	 * Create a new subtype or get the subtype with this value if it already
-	 * exists.
+	 * Create a new subtype or get the subtype with this value if it already exists.
 	 * 
 	 * @param value
 	 *            The type name.
@@ -43,8 +45,7 @@ public interface Cache extends Context {
 	<T extends Type> T newSubType(Serializable value, Type... superTypes);
 
 	/**
-	 * Create a new subtype or get the subtype with this value if it already
-	 * exists.
+	 * Create a new subtype or get the subtype with this value if it already exists.
 	 * 
 	 * @param value
 	 *            The type name.
@@ -55,8 +56,7 @@ public interface Cache extends Context {
 	 * 
 	 * @return A new subtype or the existing subtype.
 	 */
-	<T extends Type> T newSubType(Serializable value, Type[] superTypes,
-			Generic... components);
+	<T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components);
 
 	/**
 	 * Flush Cache in the subcontext (that is a another Cache or a transaction).

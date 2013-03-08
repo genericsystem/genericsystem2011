@@ -1,7 +1,6 @@
 package org.genericsystem.web.beans;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.enterprise.context.ConversationScoped;
@@ -13,7 +12,6 @@ import javax.inject.Named;
 import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Type;
 import org.genericsystem.web.qualifiers.InstanceDeleteEvent;
-import org.genericsystem.web.util.AbstractSequentialList;
 import org.slf4j.Logger;
 
 @Named
@@ -40,17 +38,17 @@ public class InstancesManager implements Serializable {
 
 	public void remove(Generic instance) {
 		instanceDeleteEvent.fire(typesManager.getSelectedType());
-		instance.remove();
+		// instance.remove();
 	}
 
 	public void onChangeType(@Observes final Type type) {
-		log.info("onChangeType:" + type);		
-		instances = new AbstractSequentialList<Generic>() {
-			@Override
-			public Iterator<Generic> iterator() {
-				return type.getAllInstances().iterator();
-			}
-		};
+		log.info("onChangeType:" + type);
+		// instances = new AbstractSequentialList<Generic>() {
+		// @Override
+		// public Iterator<Generic> iterator() {
+		// return type.getAllInstances().iterator();
+		// }
+		// };
 	}
 
 	private String newInstance;
@@ -64,8 +62,8 @@ public class InstancesManager implements Serializable {
 	}
 
 	public void add() {
-		if (!"".equals(getNewInstance())) {
-			this.typesManager.getSelectedType().newInstance(getNewInstance());
-		}
+		// if (!"".equals(getNewInstance())) {
+		// this.typesManager.getSelectedType().newInstance(getNewInstance());
+		// }
 	}
 }

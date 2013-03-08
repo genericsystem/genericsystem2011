@@ -27,8 +27,9 @@ public class VirtualConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
-		if (((Type) modified.getMeta()).isVirtualConstraintEnabled(context))
-			throw new VirtualConstraintException(modified.getMeta() + "Problem should not be instanciated");
+		if (!getConstraintValues(context, modified, getClass()).isEmpty())
+			if (((Type) modified.getMeta()).isVirtualConstraintEnabled(context))
+				throw new VirtualConstraintException(modified.getMeta() + "Problem should not be instanciated");
 	}
 
 	@Override

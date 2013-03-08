@@ -72,18 +72,18 @@ public class CreateRelationManager implements Serializable {
 
 	@Inject
 	private TypesManager typesManager;
-	
+
 	@Inject
 	@TypeChangeEvent
 	private Event<Type> typeChangeEvent;
 
 	public void createRelation() {
-		Type selectedType = typesManager.getSelectedType();
-		log.info("selectedType : " + selectedType);
-		if (!"".equals(relationName)) {
-			selectedType.addRelation(relationName, targets.toArray(new Type[targets.size()]));
-			typeChangeEvent.fire(selectedType);
-		}
+		// Type selectedType = typesManager.getSelectedType();
+		// log.info("selectedType : " + selectedType);
+		// if (!"".equals(relationName)) {
+		// selectedType.addRelation(relationName, targets.toArray(new Type[targets.size()]));
+		// typeChangeEvent.fire(selectedType);
+		// }
 	}
 
 }

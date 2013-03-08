@@ -42,16 +42,16 @@ public class LinksList implements Serializable {
 	public List<Relation> makeRelationList() {
 
 		final Type selectedType = typesManager.getSelectedType();
-//		if (selectedType == null) {
-			return null;
-//		}
-//
-//		return new AbstractSequentialList<Relation>() {
-//			@Override
-//			public Iterator<Relation> iterator() {
-//				return selectedType.getStructurals().iterator();
-//			}
-//		};
+		// if (selectedType == null) {
+		return null;
+		// }
+		//
+		// return new AbstractSequentialList<Relation>() {
+		// @Override
+		// public Iterator<Relation> iterator() {
+		// return selectedType.getStructurals().iterator();
+		// }
+		// };
 
 	}
 
@@ -65,7 +65,7 @@ public class LinksList implements Serializable {
 		return new AbstractSequentialList<Link>() {
 			@Override
 			public Iterator<Link> iterator() {
-				return selectedInstance.getLinks(relation).iterator();
+				return null;// selectedInstance.getLinks(relation).iterator();
 			}
 		};
 	}
@@ -191,17 +191,17 @@ public class LinksList implements Serializable {
 
 	public List<Generic> getCompositionComponentsList(final Generic generic) {
 
-//		if (generic == null) {
-			log.info("GENERIC NULL DANS GET COMPOSITION COMPOENENT");
-			return null;
-//		}
-//
-//		return new AbstractSequentialList<Generic>() {
-//			@Override
-//			public Iterator<Generic> iterator() {
-//				return generic.getCompositionComponents().iterator();
-//			}
-//		};
+		// if (generic == null) {
+		log.info("GENERIC NULL DANS GET COMPOSITION COMPOENENT");
+		return null;
+		// }
+		//
+		// return new AbstractSequentialList<Generic>() {
+		// @Override
+		// public Iterator<Generic> iterator() {
+		// return generic.getCompositionComponents().iterator();
+		// }
+		// };
 	}
 
 	public List<Generic> getAllInstances(final Type type) {
@@ -220,12 +220,12 @@ public class LinksList implements Serializable {
 			return;
 		}
 
-//		if (!type.getCompositionComponents().iterator().hasNext()) {
-//			type.newInstance(value);
-//		} else {
-			Generic target = formulaire.getWrapperAdd(type).getTarget();
-			type.newInstance(value, sim.getSelectedInstance(), target);
-//		}
+		// if (!type.getCompositionComponents().iterator().hasNext()) {
+		// type.newInstance(value);
+		// } else {
+		Generic target = formulaire.getWrapperAdd(type).getTarget();
+		type.newInstance(value, sim.getSelectedInstance(), target);
+		// }
 	}
 
 	//

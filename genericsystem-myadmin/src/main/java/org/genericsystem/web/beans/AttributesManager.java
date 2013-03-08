@@ -1,7 +1,6 @@
 package org.genericsystem.web.beans;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.enterprise.context.ConversationScoped;
@@ -12,7 +11,6 @@ import javax.inject.Named;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 import org.genericsystem.web.qualifiers.TypeChangeEvent;
-import org.genericsystem.web.util.AbstractSequentialList;
 
 @Named
 @ConversationScoped
@@ -33,12 +31,12 @@ public class AttributesManager implements Serializable {
 	}
 
 	public void buildAttributes(@Observes @TypeChangeEvent final Type type) {
-		attributes = new AbstractSequentialList<Attribute>() {
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			@Override
-			public Iterator<Attribute> iterator() {
-				return (Iterator) type.getAttributes().iterator();
-			}
-		};
+		// attributes = new AbstractSequentialList<Attribute>() {
+		// @SuppressWarnings({ "unchecked", "rawtypes" })
+		// @Override
+		// public Iterator<Attribute> iterator() {
+		// return (Iterator) type.getAttributes().iterator();
+		// }
+		// };
 	}
 }
