@@ -131,16 +131,43 @@ public class NotNullConstraintTest extends AbstractTest {
 	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateAnAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		car.disableNotNullConstraint(cache);
-		car.setAttribute(cache, null);
+		Attribute registration = car.setAttribute(cache, "Registration");
+
+		Type myBmw = car.newSubType(cache, "myBmw");
+		myBmw.setValue(cache, registration, null);
+
+		assert myBmw.getValue(cache, registration) == null;
 	}
 
 	@Test(groups = "attribute", expectedExceptions = RollbackException.class)
 	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		car.enableNotNullConstraint(cache);
+		Attribute registration = car.setAttribute(cache, "Registration");
+		registration.enableNotNullConstraint(cache);
 
-		car.setAttribute(cache, "Registration");
+		Type myBmw = car.newSubType(cache, "myBmw");
+		myBmw.setValue(cache, registration, null);
+	}
+
+	@Test(groups = "attribute")
+	public void testEnableConstraintOnAComplexeHierarchyOfTypes() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic myBus = vehicle.newInstance(cache, "myBus");
+
+		Attribute carRegistration = car.setAttribute(cache, "carRegistration");
+		Attribute vehicleRegistration = vehicle.setAttribute(cache, "vehicleRegistration");
+		carRegistration.enableNotNullConstraint(cache);
+
+		myBmw.setValue(cache, carRegistration, "AA-BB-CC");
+		myBmw.setValue(cache, vehicleRegistration, null);
+		myBus.setValue(cache, vehicleRegistration, null);
+
+		assert myBmw.getValue(cache, carRegistration).equals("AA-BB-CC");
+		assert myBmw.getValue(cache, vehicleRegistration) == null;
+		assert myBus.getValue(cache, vehicleRegistration) == null;
 	}
 }
