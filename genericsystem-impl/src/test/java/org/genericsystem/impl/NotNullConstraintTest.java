@@ -8,7 +8,6 @@ import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test
@@ -52,36 +51,13 @@ public class NotNullConstraintTest extends AbstractTest {
 		}.assertIsCausedBy(NotNullConstraintViolationException.class);
 	}
 
-	// public void testPropertyInheritedRelationKO() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-	// Type car = cache.newType("Car");
-	// Type road = cache.newType("Road");
-	// Type human = cache.newType("Human");
-	//
-	// final Relation possessing = car.addRelation(cache, "Possessing", human, road);
-	// possessing.enableNotNullConstraint(cache);
-	// final Relation driving = car.addSubRelation(cache, possessing, "DrivingAlong", human, road);
-	//
-	// final Generic myCar = car.newInstance(cache, "myCar");
-	// final Generic myHuman = human.newInstance(cache, "myHuman");
-	// final Generic myRoad = road.newInstance(cache, "myRoad");
-	//
-	// new RollbackCatcher() {
-	//
-	// @Override
-	// public void intercept() {
-	// myCar.setLink(cache, driving, null, myHuman, myRoad);
-	// }
-	// }.assertIsCausedBy(NotNullConstraintViolationException.class);
-	// }
-
 	@Test(groups = "subtyping")
 	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type expected = car.newSubType(cache, null);
 		Generic actual = car.getSubType(cache, null);
-		Assert.assertEquals(expected, actual);
+		assert expected == actual;
 	}
 
 	@Test(groups = "subtyping", expectedExceptions = RollbackException.class)
@@ -101,7 +77,7 @@ public class NotNullConstraintTest extends AbstractTest {
 
 		Type expected = car.newSubType(cache, null);
 		Generic actual = car.getSubType(cache, null);
-		Assert.assertEquals(expected, actual);
+		assert expected == actual;
 	}
 
 	@Test(groups = "subtyping", expectedExceptions = RollbackException.class)
@@ -124,7 +100,7 @@ public class NotNullConstraintTest extends AbstractTest {
 
 		Type expected = car.newSubType(cache, null);
 		Generic actual = car.getSubType(cache, null);
-		Assert.assertEquals(expected, actual);
+		assert expected == actual;
 	}
 
 	@Test(groups = "attribute")
