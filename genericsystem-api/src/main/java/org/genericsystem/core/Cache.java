@@ -29,7 +29,13 @@ public interface Cache extends Context {
 	 */
 	<T extends Type> T newType(Serializable value);
 
-	// TODO Javadoc
+	/**
+	 * Get a type from the current context.
+	 * 
+	 * @param value
+	 *            The type name.
+	 * @return The requested type, or null if it does not exist.
+	 */
 	<T extends Type> T getType(Serializable value);
 
 	/**
