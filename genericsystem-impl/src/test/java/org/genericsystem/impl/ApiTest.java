@@ -1,10 +1,12 @@
 package org.genericsystem.impl;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
@@ -86,6 +88,14 @@ public class ApiTest extends AbstractTest {
 		assert Objects.equals(actual, expected);
 	}
 
+	public void test_get_type_with_hierarchy() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type superCar = car.newSubType(cache, "SuperCar");
+
+		assert cache.getType("SuperCar") == superCar;
+	}
+
 	// getSubType() tests
 
 	public void test_get_existing_subtype() {
@@ -137,5 +147,19 @@ public class ApiTest extends AbstractTest {
 		Generic actual = car.getSubType(cache, null);
 
 		assert Objects.equals(actual, expected);
+	}
+
+	// getAllTypes() tests
+	public void test_get_all_existing_types() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type bus = cache.newType("Bus");
+		Type moto = cache.newType("Moto");
+
+		Type superCar = car.newSubType(cache, "SuperCar");
+
+		Snapshot<Type> types = cache.getTypes();
+		assert types.size() >= 4;
+		assert types.containsAll(Arrays.asList(car, bus, moto, superCar));
 	}
 }

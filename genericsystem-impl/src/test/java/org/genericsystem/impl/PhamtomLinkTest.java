@@ -182,7 +182,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		}).isEmpty();
 	}
 
-	public void testAttributeWithGetSubTypes() {
+	public void testAttributeWithGetDirectSubTypes() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -194,8 +194,8 @@ public class PhamtomLinkTest extends AbstractTest {
 		myVehicle.setValue(cache, vehiclePower, "123");
 		myCar.setValue(cache, vehiclePower, "256");
 
+		assert vehiclePower.getDirectSubTypes(cache).isEmpty();
 		assert vehiclePower.getSubTypes(cache).isEmpty();
-		assert vehiclePower.getAllSubTypes(cache).size() == 1 && vehiclePower.getAllSubTypes(cache).contains(vehiclePower);
 	}
 
 	public void testAttributeWithGetInheritings() {

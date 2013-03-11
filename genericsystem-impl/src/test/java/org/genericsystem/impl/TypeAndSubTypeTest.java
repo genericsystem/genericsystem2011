@@ -25,7 +25,7 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	public void testExplicitAndStructuralForSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicule = cache.newType("Vehicule");
-		Type car = vehicule.newSubType(cache,"Car");
+		Type car = vehicule.newSubType(cache, "Car");
 		assert vehicule.isStructural();
 		assert car.isStructural();
 	}
@@ -40,7 +40,7 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	public void testAncestorOfSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicule = cache.newType("Vehicule");
-		Type car = vehicule.newSubType(cache,"Car");
+		Type car = vehicule.newSubType(cache, "Car");
 		assert car.getSupers().size() == 1;
 		assert car.getSupers().contains(vehicule);
 	}
@@ -55,62 +55,57 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	public void testDependencyForSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicule = cache.newType("Vehicule");
-		Type car = vehicule.newSubType(cache,"Car");
+		Type car = vehicule.newSubType(cache, "Car");
 		assert vehicule.getInheritings(cache).size() == 1;
 		assert vehicule.getInheritings(cache).contains(car);
 	}
 
-	public void testGetSubTypes() {
+	public void testgetDirectSubTypes() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicule = cache.newType("Vehicule");
-		Type car = vehicule.newSubType(cache,"Car");
-		Type audi = car.newSubType(cache,"Audi");
-		Type mercedes = car.newSubType(cache,"Mercedes");
+		Type car = vehicule.newSubType(cache, "Car");
+		Type audi = car.newSubType(cache, "Audi");
+		Type mercedes = car.newSubType(cache, "Mercedes");
 
-		assert vehicule.getSubTypes(cache).size() == 1;
-		assert vehicule.getSubTypes(cache).contains(car);
+		assert vehicule.getDirectSubTypes(cache).size() == 1;
+		assert vehicule.getDirectSubTypes(cache).contains(car);
 
-		assert car.getSubTypes(cache).size() == 2;
-		assert car.getSubTypes(cache).contains(audi);
-		assert car.getSubTypes(cache).contains(mercedes);
+		assert car.getDirectSubTypes(cache).size() == 2;
+		assert car.getDirectSubTypes(cache).contains(audi);
+		assert car.getDirectSubTypes(cache).contains(mercedes);
 
-		assert audi.getSubTypes(cache).size() == 0;
-		assert mercedes.getSubTypes(cache).size() == 0;
+		assert audi.getDirectSubTypes(cache).size() == 0;
+		assert mercedes.getDirectSubTypes(cache).size() == 0;
 	}
 
 	public void testGetAllSubTypes() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicule = cache.newType("Vehicule");
-		Type car = vehicule.newSubType(cache,"Car");
-		Type audi = car.newSubType(cache,"Audi");
-		Type mercedes = car.newSubType(cache,"Mercedes");
+		Type car = vehicule.newSubType(cache, "Car");
+		Type audi = car.newSubType(cache, "Audi");
+		Type mercedes = car.newSubType(cache, "Mercedes");
 
-		Snapshot<Generic> allSubTypes = vehicule.getAllSubTypes(cache);
-		assert allSubTypes.size() == 4;
-		assert allSubTypes.contains(vehicule);
-		assert allSubTypes.contains(car);
-		assert allSubTypes.contains(audi);
-		assert allSubTypes.contains(mercedes);
+		Snapshot<Generic> subTypes = vehicule.getSubTypes(cache);
+		assert subTypes.size() == 3;
+		assert subTypes.contains(car);
+		assert subTypes.contains(audi);
+		assert subTypes.contains(mercedes);
 
-		allSubTypes = car.getAllSubTypes(cache);
-		assert allSubTypes.size() == 3;
-		assert allSubTypes.contains(car);
-		assert allSubTypes.contains(audi);
-		assert allSubTypes.contains(mercedes);
+		subTypes = car.getSubTypes(cache);
+		assert subTypes.size() == 2;
+		assert subTypes.contains(audi);
+		assert subTypes.contains(mercedes);
 
-		assert audi.getAllSubTypes(cache).size() == 1;
-		assert audi.getAllSubTypes(cache).contains(audi);
-
-		assert mercedes.getAllSubTypes(cache).size() == 1;
-		assert mercedes.getAllSubTypes(cache).contains(mercedes);
+		assert audi.getSubTypes(cache).isEmpty();
+		assert mercedes.getSubTypes(cache).isEmpty();
 	}
 
-	public void testGetSubTypesWithImplicit() {
+	public void testgetDirectSubTypesWithImplicit() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicule = cache.newType("Vehicule");
-		Type car = vehicule.newSubType(cache,"Car");
-		Type audi = car.newSubType(cache,"Audi");
-		Type mercedes = car.newSubType(cache,"Mercedes");
+		Type car = vehicule.newSubType(cache, "Car");
+		Type audi = car.newSubType(cache, "Audi");
+		Type mercedes = car.newSubType(cache, "Mercedes");
 
 		assert vehicule.getInheritings(cache).size() == 1;
 		assert vehicule.getInheritings(cache).contains(car);
