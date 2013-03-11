@@ -27,7 +27,6 @@ public class ApiTest extends AbstractTest {
 		myBmw.setValue(cache, power, "123");
 		myBmw.setLink(cache, carColor, "myBmwRed", red);
 
-		Generic yellow = color.newInstance(cache, "yellow");
 		Link carRed = car.setLink(cache, carColor, "CarRed", red);
 
 		Generic myFiat = car.newInstance(cache, "myFiat");
