@@ -2,6 +2,7 @@ package org.genericsystem.snapshot;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.iterator.AbstractFilterIterator;
@@ -52,7 +53,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 	public boolean contains(Object object) {
 		Iterator<T> iterator = iterator();
 		while (iterator.hasNext())
-			if (object.equals(iterator.next()))
+			if (Objects.equals(object, iterator.next()))
 				return true;
 		return false;
 	}
