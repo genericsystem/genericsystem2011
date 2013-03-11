@@ -77,16 +77,6 @@
 			<artifactId>testng</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>el-api</artifactId>
-			<scope>test</scope>
-		</dependency-->
-		<!-- dependency>
-			<groupId>org.glassfish.web</groupId>
-			<artifactId>el-impl</artifactId>
-			<scope>test</scope>
-		</dependency-->
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
@@ -98,6 +88,19 @@
 			<version>${jboss-ejb3-api.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+
+	<!-- <dependency> -->
+	<!-- <groupId>javax.el</groupId> -->
+	<!-- <artifactId>el-api</artifactId> -->
+	<!-- <scope>test</scope> -->
+	<!-- </dependency> -->
+	<!-- <dependency> -->
+	<!-- <groupId>org.glassfish.web</groupId> -->
+	<!-- <artifactId>el-impl</artifactId> -->
+	<!-- <scope>test</scope> -->
+	<!-- </dependency> -->
+		
 		<dependency>
 			<groupId>de.odysseus.juel</groupId>
 			<artifactId>juel-api</artifactId>
