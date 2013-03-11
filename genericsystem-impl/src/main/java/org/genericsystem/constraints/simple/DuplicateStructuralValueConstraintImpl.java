@@ -30,20 +30,21 @@ public class DuplicateStructuralValueConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, final Generic modified) throws AbstractConstraintViolationException {
-		if (modified.isAttribute() && modified.isStructural()) {
-			Snapshot<Generic> components = modified.getComponents();
-			final Generic[] primariesArray = ((GenericImpl) modified).getPrimariesArray();
-			for (int i = 0; i < components.size(); i++) {
-				Generic component = components.get(i);
-				Iterator<Generic> filterIterator = new AbstractFilterIterator<Generic>(((GenericImpl) component).compositesIterator(context, i)) {
-					@Override
-					public boolean isSelected() {
-						return !modified.equals(next) && Arrays.equals(primariesArray, ((GenericImpl) next).getPrimariesArray());
-					}
-				};
-				if (filterIterator.hasNext())
-					throw new DuplicateStructuralValueConstraintViolationException("modified : " + modified.info() + "component : " + component.info() + " composite : " + filterIterator.next().info());
+		if (!getConstraintValues(context, modified, getClass()).isEmpty())
+			if (modified.isAttribute() && modified.isStructural()) {
+				Snapshot<Generic> components = modified.getComponents();
+				final Generic[] primariesArray = ((GenericImpl) modified).getPrimariesArray();
+				for (int i = 0; i < components.size(); i++) {
+					Generic component = components.get(i);
+					Iterator<Generic> filterIterator = new AbstractFilterIterator<Generic>(((GenericImpl) component).compositesIterator(context, i)) {
+						@Override
+						public boolean isSelected() {
+							return !modified.equals(next) && Arrays.equals(primariesArray, ((GenericImpl) next).getPrimariesArray());
+						}
+					};
+					if (filterIterator.hasNext())
+						throw new DuplicateStructuralValueConstraintViolationException("modified : " + modified.info() + "component : " + component.info() + " composite : " + filterIterator.next().info());
+				}
 			}
-		}
 	}
 }

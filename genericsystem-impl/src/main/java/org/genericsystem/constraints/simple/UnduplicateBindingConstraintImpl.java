@@ -31,18 +31,20 @@ public class UnduplicateBindingConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, final Generic modified) throws AbstractConstraintViolationException {
-		final Generic[] supers = ((GenericImpl) modified).getSupersArray();
-		final Generic[] components = ((GenericImpl) modified).getComponentsArray();
-		Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((AbstractContext) context).compositesIterator(components[0]) : ((AbstractContext) context).directInheritingsIterator(supers[0])) {
-			@Override
-			public boolean isSelected() {
-				return Arrays.equals(((GenericImpl) next).getSupersArray(), supers) && Arrays.equals(((GenericImpl) next).getComponentsArray(), components) && Objects.equals(modified.getValue(), next.getValue());
+		if (!getConstraintValues(context, modified, getClass()).isEmpty()) {
+			final Generic[] supers = ((GenericImpl) modified).getSupersArray();
+			final Generic[] components = ((GenericImpl) modified).getComponentsArray();
+			Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((AbstractContext) context).compositesIterator(components[0]) : ((AbstractContext) context).directInheritingsIterator(supers[0])) {
+				@Override
+				public boolean isSelected() {
+					return Arrays.equals(((GenericImpl) next).getSupersArray(), supers) && Arrays.equals(((GenericImpl) next).getComponentsArray(), components) && Objects.equals(modified.getValue(), next.getValue());
+				}
+			};
+			if (iterator.hasNext()) {
+				iterator.next();
+				if (iterator.hasNext())
+					throw new UnduplicateBindingConstraintViolationException();
 			}
-		};
-		if (iterator.hasNext()) {
-			iterator.next();
-			if (iterator.hasNext())
-				throw new UnduplicateBindingConstraintViolationException();
 		}
 	}
 

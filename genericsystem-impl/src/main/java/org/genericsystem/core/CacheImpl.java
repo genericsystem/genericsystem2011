@@ -15,10 +15,6 @@ import java.util.TreeSet;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.Constraint.CheckingType;
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Context;
-import org.genericsystem.core.Engine;
-import org.genericsystem.core.Generic;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AbstractConstraintViolationException;
 import org.genericsystem.exception.AliveConstraintViolationException;
@@ -267,6 +263,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@Override
 	public <T extends Type> T newType(Serializable value) {
 		return this.<T> newSubType(value);
+	}
+
+	@Override
+	public <T extends Type> T getType(Serializable value) {
+		return findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
 	}
 
 	@Override

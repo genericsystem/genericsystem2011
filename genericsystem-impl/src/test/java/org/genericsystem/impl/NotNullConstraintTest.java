@@ -4,9 +4,11 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.NotNullConstraintViolationException;
+import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test
@@ -73,4 +75,72 @@ public class NotNullConstraintTest extends AbstractTest {
 	// }.assertIsCausedBy(NotNullConstraintViolationException.class);
 	// }
 
+	@Test(groups = "subtyping")
+	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateASubtype() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type expected = car.newSubType(cache, null);
+		Generic actual = car.getSubType(cache, null);
+		Assert.assertEquals(expected, actual);
+	}
+
+	@Test(groups = "subtyping", expectedExceptions = RollbackException.class)
+	public void testEnabledConstraintOnASimpleTypeThenCreateASubtype() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		car.enableNotNullConstraint(cache);
+		car.newSubType(cache, null);
+	}
+
+	@Test(groups = "subtyping")
+	public void testEnableThenDisableConstraintOnASimpleTypeThenCreateASubtype() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		car.enableNotNullConstraint(cache);
+		car.disableNotNullConstraint(cache);
+
+		Type expected = car.newSubType(cache, null);
+		Generic actual = car.getSubType(cache, null);
+		Assert.assertEquals(expected, actual);
+	}
+
+	@Test(groups = "subtyping", expectedExceptions = RollbackException.class)
+	public void testEnableSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+
+		car.enableNotNullConstraint(cache);
+		car.enableNotNullConstraint(cache);
+
+		car.newSubType(cache, null);
+	}
+
+	@Test(groups = "subtyping")
+	public void testDisabledSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		car.disableNotNullConstraint(cache);
+		car.disableNotNullConstraint(cache);
+
+		Type expected = car.newSubType(cache, null);
+		Generic actual = car.getSubType(cache, null);
+		Assert.assertEquals(expected, actual);
+	}
+
+	@Test(groups = "attribute")
+	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateAnAttribute() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		car.disableNotNullConstraint(cache);
+		car.setAttribute(cache, null);
+	}
+
+	@Test(groups = "attribute", expectedExceptions = RollbackException.class)
+	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		car.enableNotNullConstraint(cache);
+
+		car.setAttribute(cache, "Registration");
+	}
 }

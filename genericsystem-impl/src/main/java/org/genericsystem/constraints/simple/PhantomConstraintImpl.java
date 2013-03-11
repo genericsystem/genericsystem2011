@@ -26,8 +26,9 @@ public class PhantomConstraintImpl extends Constraint {
 	// TODO KK
 	@Override
 	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
-		if (modified.isAlive(context) && ((GenericImpl) modified.getSupers().first()).isPhantom())
-			throw new PhantomConstraintViolationException(modified.info());
+		if (!getConstraintValues(context, modified, getClass()).isEmpty())
+			if (modified.isAlive(context) && ((GenericImpl) modified.getSupers().first()).isPhantom())
+				throw new PhantomConstraintViolationException(modified.info());
 	}
 
 }

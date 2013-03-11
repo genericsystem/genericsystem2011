@@ -27,10 +27,6 @@ import org.genericsystem.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.constraints.simple.VirtualConstraintImpl;
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Context;
-import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
@@ -41,11 +37,11 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
+import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.iterator.ArrayIterator;
-import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.system.CascadeRemoveSystemProperty;
 import org.genericsystem.system.ComponentPosValue;
@@ -541,10 +537,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	// TODO KK
 	private <T extends Link> T addLink(Cache cache, Generic implicit, Generic directSuper, int basePos, Generic... targets) {
-		log.info("implicit " + implicit + " => " + System.identityHashCode(implicit) + " # directSuper " + directSuper + " basePos " + basePos + " targets " + Arrays.toString(targets));
-		T bind = bind(cache, implicit, directSuper, Statics.insertIntoArray(this, targets, basePos));
-		log.info("bind " + bind.info());
-		return bind;
+		return bind(cache, implicit, directSuper, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	private static <T extends Generic> T bind(Cache cache, Generic implicit, Generic directSuper, Generic... components) {
@@ -1095,6 +1088,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
+	public <T extends Generic> T getSubType(Context context, final Serializable value) {
+		return this.<T> getSubTypes(context).filter(new Filter<T>() {
+			@Override
+			public boolean isSelected(T element) {
+				return Objects.equals(element.getValue(), value);
+			}
+		}).first();
+	}
+
+	@Override
 	public <T extends Generic> Snapshot<T> getSubTypes(final Context context) {
 		return new AbstractSnapshot<T>() {
 			@Override
@@ -1340,7 +1343,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	<T extends Generic> T setSystemPropertyValue(Cache cache, Attribute systemProperty, int basePos, Serializable value) {
-		if (basePos + 1 > getComponentsSize())
+		// TODO basePos +1 ???
+		// if (basePos + 1 > getComponentsSize())
+		if (basePos > getComponentsSize())
 			throw new IllegalStateException("The component position (" + basePos + ") exceeds the components size " + this.info());
 		for (Holder holder : getHolders(cache, systemProperty))
 			if (Objects.equals(holder.<ComponentPosValue<Boolean>> getValue().getComponentPos(), basePos)) {
@@ -1605,5 +1610,4 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return false;
 	}
 
-	
 }

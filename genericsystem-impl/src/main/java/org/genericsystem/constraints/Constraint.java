@@ -91,7 +91,7 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 				};
 				if (!iterator.hasNext() && clazz.getAnnotation(SystemGeneric.class).defaultBehavior()) {
 					List<ConstraintValue> constraintValues = new ArrayList<>(modified.getComponentsSize());
-					for (int i = 0; i < modified.getComponentsSize(); i++)
+					for (int i = 0; i <= modified.getComponentsSize(); i++)
 						constraintValues.add(new ConstraintValue(new ComponentPosValue<Serializable>(i, Boolean.TRUE), modified));
 					return constraintValues.iterator();
 				}

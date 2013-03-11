@@ -24,9 +24,11 @@ public class NotNullConstraintImpl extends Constraint {
 	private static final long serialVersionUID = -6429972259714036057L;
 
 	@Override
+	// TODO KK
 	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
-		if (modified.getValue() == null)
-			throw new NotNullConstraintViolationException("Holder should not be null for : " + ((Holder) modified).getMeta());
+		if (!getConstraintValues(context, modified, getClass()).isEmpty())
+			if (modified.getValue() == null)
+				throw new NotNullConstraintViolationException("Holder should not be null for : " + ((Holder) modified).getMeta());
 	}
 
 }

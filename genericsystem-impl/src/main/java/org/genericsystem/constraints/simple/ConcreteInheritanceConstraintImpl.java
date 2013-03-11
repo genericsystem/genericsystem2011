@@ -25,9 +25,10 @@ public class ConcreteInheritanceConstraintImpl extends Constraint {
 
 	@Override
 	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
-		if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
-			if (((GenericImpl) modified).getSupers().first().isConcrete())
-				throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());
+		if (!getConstraintValues(context, modified, getClass()).isEmpty())
+			if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
+				if (((GenericImpl) modified).getSupers().first().isConcrete())
+					throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());
 	}
 
 }
