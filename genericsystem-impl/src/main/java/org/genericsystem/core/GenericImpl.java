@@ -1098,32 +1098,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> Snapshot<T> getSubTypes(final Context context) {
+	public <T extends Generic> Snapshot<T> getDirectSubTypes(final Context context) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return subTypesIterator(context);
+				return directSubTypesIterator(context);
 			}
 		};
 	}
 
-	private <T extends Generic> Iterator<T> subTypesIterator(Context context) {
+	private <T extends Generic> Iterator<T> directSubTypesIterator(Context context) {
 		return Statics.levelFilter(this.<T> directInheritingsIterator(context), getMetaLevel());
 	}
 
 	@Override
-	public <T extends Generic> Snapshot<T> getAllSubTypes(final Context context) {
+	public <T extends Generic> Snapshot<T> getSubTypes(final Context context) {
 		return new AbstractSnapshot<T>() {
 
 			@Override
 			public Iterator<T> iterator() {
-				return allSubTypesIterator(context);
+				return allSubTypesIteratorWithoutRoot(context);
 			}
 		};
 	}
 
-	private <T extends Generic> Iterator<T> allSubTypesIterator(Context context) {
-		return Statics.levelFilter(this.<T> allInheritingsIterator(context), getMetaLevel());
+	private <T extends Generic> Iterator<T> allSubTypesIteratorWithoutRoot(Context context) {
+		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(context), getMetaLevel());
 	}
 
 	public <T extends Generic> Snapshot<T> getAllInheritings(final Context context) {
@@ -1136,8 +1136,34 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	public <T extends Generic> Snapshot<T> getAllInheritingsWithoutRoot(final Context context) {
+		return new AbstractSnapshot<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				return allInheritingsIteratorWithoutRoot(context);
+			}
+		};
+	}
+
 	private <T extends Generic> Iterator<T> allInheritingsIterator(final Context context) {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+
+			private static final long serialVersionUID = 4540682035671625893L;
+
+			@Override
+			public Iterator<Generic> children(Generic node) {
+				return (((GenericImpl) node).directInheritingsIterator(context));
+			}
+		};
+	}
+
+	private <T extends Generic> Iterator<T> allInheritingsIteratorWithoutRoot(final Context context) {
+		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+
+			{
+				next();
+			}
 
 			private static final long serialVersionUID = 4540682035671625893L;
 

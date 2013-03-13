@@ -33,8 +33,8 @@ public class AnnotationTest extends AbstractTest {
 		Type car = cache.find(Car.class);
 		assert vehicle.isStructural();
 		assert car.isStructural();
-		assert vehicle.getSubTypes(cache).size() == 1;
-		assert vehicle.getSubTypes(cache).contains(car);
+		assert vehicle.getDirectSubTypes(cache).size() == 1;
+		assert vehicle.getDirectSubTypes(cache).contains(car);
 		assert car.getSupers().size() == 1 : car.getSupers();
 		assert car.getSupers().contains(vehicle);
 	}
@@ -108,29 +108,29 @@ public class AnnotationTest extends AbstractTest {
 		assert human.getRelations(cache).contains(possess);
 	}
 
-	public void testGetSubTypesWithDiamondProblem() {
+	public void testgetDirectSubTypesWithDiamondProblem() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(GraphicComponent.class, Window.class, Selectable.class, SelectableWindow.class);
 		Type graphicComponent = cache.find(GraphicComponent.class);
 		Type window = cache.find(Window.class);
 		Type selectable = cache.find(Selectable.class);
 		Type selectableWindow = cache.find(SelectableWindow.class);
 
-		assert graphicComponent.getSubTypes(cache).size() == 2 : graphicComponent.getSubTypes(cache);
+		assert graphicComponent.getDirectSubTypes(cache).size() == 2 : graphicComponent.getDirectSubTypes(cache);
+		assert graphicComponent.getDirectSubTypes(cache).contains(selectable);
+		assert graphicComponent.getDirectSubTypes(cache).contains(window) : graphicComponent.getDirectSubTypes(cache);
+
+		assert graphicComponent.getSubTypes(cache).size() == 3 : graphicComponent.getSubTypes(cache);
 		assert graphicComponent.getSubTypes(cache).contains(selectable);
-		assert graphicComponent.getSubTypes(cache).contains(window) : graphicComponent.getSubTypes(cache);
+		assert graphicComponent.getSubTypes(cache).contains(window);
+		assert graphicComponent.getSubTypes(cache).contains(selectableWindow);
 
-		assert graphicComponent.getAllSubTypes(cache).size() == 4 : graphicComponent.getAllSubTypes(cache);
-		assert graphicComponent.getAllSubTypes(cache).contains(selectable);
-		assert graphicComponent.getAllSubTypes(cache).contains(window);
-		assert graphicComponent.getAllSubTypes(cache).contains(selectableWindow);
+		assert window.getDirectSubTypes(cache).size() == 1 : window.getDirectSubTypes(cache);
+		assert window.getDirectSubTypes(cache).contains(selectableWindow) : window.getDirectSubTypes(cache);
 
-		assert window.getSubTypes(cache).size() == 1 : window.getSubTypes(cache);
-		assert window.getSubTypes(cache).contains(selectableWindow) : window.getSubTypes(cache);
+		assert selectable.getDirectSubTypes(cache).size() == 1 : selectable.getDirectSubTypes(cache);
+		assert selectable.getDirectSubTypes(cache).contains(selectableWindow) : selectable.getDirectSubTypes(cache);
 
-		assert selectable.getSubTypes(cache).size() == 1 : selectable.getSubTypes(cache);
-		assert selectable.getSubTypes(cache).contains(selectableWindow) : selectable.getSubTypes(cache);
-
-		assert selectableWindow.getSubTypes(cache).size() == 0;
+		assert selectableWindow.getDirectSubTypes(cache).size() == 0;
 		assert selectableWindow.inheritsFrom(selectable);
 		assert selectableWindow.inheritsFrom(window);
 		assert selectableWindow.inheritsFrom(graphicComponent);

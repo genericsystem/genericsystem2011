@@ -128,18 +128,26 @@ public interface Type extends Generic {
 	 */
 	<T extends Generic> Snapshot<T> getAllInstances(Context context);
 
-	// TODO Javadoc
-	<T extends Generic> T getSubType(Context context, Serializable value);
-
 	/**
-	 * Returns the sub types of Generic.
+	 * Returns the sub type of Generic.
 	 * 
 	 * @param context
 	 *            The reference context.
-	 * @return The snapshot with sub types of the Generic.
+	 * @param value
+	 *            The sub type name.
+	 * @return The sub type, or null if it does not exist.
+	 */
+	<T extends Generic> T getSubType(Context context, Serializable value);
+
+	/**
+	 * Returns the direct sub types of Generic.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @return The snapshot with the direct sub types of the Generic.
 	 * @see Snapshot
 	 */
-	<T extends Generic> Snapshot<T> getSubTypes(Context context);
+	<T extends Generic> Snapshot<T> getDirectSubTypes(Context context);
 
 	/**
 	 * Returns the sub types of Generic and the sub types of the childrens.
@@ -149,7 +157,7 @@ public interface Type extends Generic {
 	 * @return The snapshot with all sub types of the Generic.
 	 * @see Snapshot
 	 */
-	<T extends Generic> Snapshot<T> getAllSubTypes(Context context);
+	<T extends Generic> Snapshot<T> getSubTypes(Context context);
 
 	/**
 	 * Create a subtype.

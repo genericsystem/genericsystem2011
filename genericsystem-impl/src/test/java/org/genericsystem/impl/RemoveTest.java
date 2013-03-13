@@ -70,7 +70,7 @@ public class RemoveTest extends AbstractTest {
 		assert cache.getEngine().getInheritings(cache).contains(window);
 		assert cache.getEngine().getInheritings(cache).contains(height.getImplicit());
 		assert !cache.getEngine().getInheritings(cache).contains(height);
-		assert !cache.getEngine().getAllSubTypes(cache).contains(myHeight1);
+		assert !cache.getEngine().getSubTypes(cache).contains(myHeight1);
 	}
 
 	// public void testRemoveRelationWithSubRelation() {

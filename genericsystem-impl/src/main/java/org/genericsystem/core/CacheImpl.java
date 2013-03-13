@@ -9,12 +9,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.Constraint.CheckingType;
+import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AbstractConstraintViolationException;
 import org.genericsystem.exception.AliveConstraintViolationException;
@@ -25,6 +27,8 @@ import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
+import org.genericsystem.iterator.AbstractPreTreeIterator;
+import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.system.CascadeRemoveSystemProperty;
 
@@ -265,9 +269,38 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<T> newSubType(value);
 	}
 
+	@SuppressWarnings("unchecked")
+	private <T extends Generic> Iterator<T> allInheritingsIterator(final Context context) {
+		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(context.getEngine()) {
+
+			private static final long serialVersionUID = 8161663636838488529L;
+
+			@Override
+			public Iterator<Generic> children(Generic node) {
+				return (((GenericImpl) node).directInheritingsIterator(context));
+			}
+		};
+	}
+
 	@Override
-	public <T extends Type> T getType(Serializable value) {
-		return findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
+	public <T extends Type> Snapshot<T> getTypes() {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return CacheImpl.this.<T> allInheritingsIterator(CacheImpl.this);
+			}
+		};
+	}
+
+	@Override
+	public <T extends Type> T getType(final Serializable value) {
+		return this.<T> getTypes().filter(new Filter<T>() {
+			@Override
+			public boolean isSelected(T element) {
+				return Objects.equals(element.getValue(), value);
+			}
+
+		}).first();
 	}
 
 	@Override

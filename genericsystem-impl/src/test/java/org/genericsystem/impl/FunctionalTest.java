@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 
 @Test
 public class FunctionalTest extends AbstractTest {
-	
+
 	@Test
 	public void getCarInstancesWithPowerHigherThan90HP() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
@@ -32,24 +32,21 @@ public class FunctionalTest extends AbstractTest {
 		assert carInstancesWithPowerHigherThan90HP.size() == 1;
 		carInstancesWithPowerHigherThan90HP.log();
 	}
-	
+
 	@Test
 	public void testSnaphotIsAware() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		
-		Snapshot<Generic> snapshot = vehicle.getAllSubTypes(cache);
-		assert snapshot.size() == 1;
-		assert snapshot.contains(vehicle);
-		
+
+		Snapshot<Generic> snapshot = vehicle.getSubTypes(cache);
+		assert snapshot.isEmpty();
+
 		Type car = vehicle.newSubType(cache, "Car");
-		assert snapshot.size() == 2;
-		assert snapshot.contains(vehicle);
-		assert snapshot.contains(car);
-		
-		car.remove(cache);
 		assert snapshot.size() == 1;
-		assert snapshot.contains(vehicle);
+		assert snapshot.contains(car);
+
+		car.remove(cache);
+		assert snapshot.isEmpty();
 		assert !snapshot.contains(car);
 	}
 }
