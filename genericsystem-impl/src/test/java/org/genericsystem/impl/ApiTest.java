@@ -163,6 +163,30 @@ public class ApiTest extends AbstractTest {
 		assert types.containsAll(Arrays.asList(car, bus, moto, superCar));
 	}
 
+	// getInstance tests
+	public void test_get_existing_instances() {
+
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic myAudi = car.newInstance(cache, "myAudi");
+		Generic myMercedes = car.newInstance(cache, "myMercedes");
+		Generic myPeugeot = car.newInstance(cache, "myPeugeot");
+
+		assert car.getInstance(cache, "myBmw") == myBmw;
+		assert car.getInstance(cache, "myAudi") == myAudi;
+		assert car.getInstance(cache, "myMercedes") == myMercedes;
+		assert car.getInstance(cache, "myPeugeot") == myPeugeot;
+	}
+
+	public void test_get_non_existing_instances() {
+
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+
+		assert car.getInstance(cache, "myAudi") == null;
+	}
+
 	// getLink() tests
 	@Test(enabled = false)
 	public void test_dummy() {
