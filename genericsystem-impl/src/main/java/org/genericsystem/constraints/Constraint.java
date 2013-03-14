@@ -10,6 +10,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.AbstractContext;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.AbstractConstraintViolationException;
@@ -77,7 +78,7 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 			@Override
 			public Iterator<ConstraintValue> iterator() {
 				// TODO base pos KK
-				Iterator<ConstraintValue> iterator = new AbstractProjectorAndFilterIterator<Holder, ConstraintValue>(modified.getHolders(context, ((AbstractContext) context).<Attribute> find(clazz), Statics.BASE_POSITION).iterator()) {
+				Iterator<ConstraintValue> iterator = new AbstractProjectorAndFilterIterator<Holder, ConstraintValue>(((GenericImpl) modified).getHolders(context, ((AbstractContext) context).<Attribute> find(clazz), Statics.BASE_POSITION).iterator()) {
 					@Override
 					public boolean isSelected() {
 						return !Boolean.FALSE.equals(next.<ComponentPosValue<Serializable>> getValue().getValue());

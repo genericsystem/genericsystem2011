@@ -77,18 +77,6 @@ public interface Generic extends Comparable<Generic> {
 	boolean isAttributeOf(Generic generic);
 
 	/**
-	 * Returns true if this Generic is an Attribute for the checked Generic and the component position.
-	 * 
-	 * @param Generic
-	 *            The checked Generic.
-	 * @param basePos
-	 *            The base position.
-	 * 
-	 * @return True if the Generic is an Attribute.
-	 */
-	boolean isAttributeOf(Generic generic, int basePos);
-
-	/**
 	 * Returns true if this Generic is an relation.
 	 * 
 	 * @return True if the Generic is an Relation.
@@ -131,21 +119,6 @@ public interface Generic extends Comparable<Generic> {
 	 * @return A new Generic or the existing Generic.
 	 */
 	<T extends Link> T bind(Cache cache, Link relation, Generic... targets);
-
-	/**
-	 * Returns the Link of the Relation for the components.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @param relation
-	 *            The Relation.
-	 * @param targets
-	 *            The optional targets.
-	 * @return A Link.
-	 * @throws IllegalStateException
-	 *             Ambigous request for the Relation.
-	 */
-	<T extends Link> T getLink(Context context, Relation relation, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Link of the Relation for the components.
@@ -215,22 +188,6 @@ public interface Generic extends Comparable<Generic> {
 	 * @return The Link.
 	 */
 	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, Generic... targets);
-
-	/**
-	 * Returns the Link.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @param relation
-	 *            The Relation.
-	 * @param basePos
-	 *            The base position.
-	 * @param targets
-	 *            The targets.
-	 * @see Snapshot
-	 * @return The Link.
-	 */
-	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, int basePos, Generic... targets);
 
 	/**
 	 * Modify or create a Link. <br/>
@@ -306,22 +263,6 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> Snapshot<T> getHolders(Context context, Holder attribute, Generic... targets);
 
 	/**
-	 * Returns the values holders.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @param attribute
-	 *            The attribute.
-	 * @param basePos
-	 *            The base position.
-	 * @param targets
-	 *            The targets.
-	 * @see Snapshot
-	 * @return The value holders.
-	 */
-	<T extends Holder> Snapshot<T> getHolders(Context context, Holder attribute, int basePos, Generic... targets);
-
-	/**
 	 * Returns the Holder of value.
 	 * 
 	 * @param context
@@ -331,21 +272,6 @@ public interface Generic extends Comparable<Generic> {
 	 * @return The Holder.
 	 */
 	<T extends Holder> T getHolder(Context context, Attribute attribute, Generic... targets);
-
-	/**
-	 * Returns the Holder of value.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @param attribute
-	 *            The attribute.
-	 * @param basePos
-	 *            The base position.
-	 * @param targets
-	 *            The targets.
-	 * @return The Holder.
-	 */
-	<T extends Holder> T getHolder(Context context, Attribute attribute, int basePos, Generic... targets);
 
 	/**
 	 * Returns the values.
@@ -436,12 +362,12 @@ public interface Generic extends Comparable<Generic> {
 	 * @param cache
 	 *            The reference Cache.
 	 * @param systemPropertyClass
-	 *            Classe which defines the Generic in Cache.
-	 * @param basePos
-	 *            The component position.
+	 *            Class which defines the Generic in Cache.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return This.
 	 */
-	<T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos);
+	<T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos);
 
 	/**
 	 * Disable system property.
@@ -449,7 +375,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @param cache
 	 *            The reference Cache.
 	 * @param systemPropertyClass
-	 *            Classe which defines the Generic in Cache.
+	 *            Class which defines the Generic in Cache.
 	 * @return This.
 	 */
 	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass);
@@ -460,12 +386,12 @@ public interface Generic extends Comparable<Generic> {
 	 * @param cache
 	 *            The reference Cache.
 	 * @param systemPropertyClass
-	 *            Classe which defines the Generic in Cache.
-	 * @param basePos
-	 *            The base position.
+	 *            Class which defines the Generic in Cache.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return This.
 	 */
-	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos);
+	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos);
 
 	/**
 	 * Returns true if the system property is enabled.
@@ -473,7 +399,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @param context
 	 *            The reference context.
 	 * @param systemPropertyClass
-	 *            Classe which defines the Generic in Cache.
+	 *            Class which defines the Generic in Cache.
 	 * @return True if the system property is enabled.
 	 */
 	boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass);
@@ -484,46 +410,48 @@ public interface Generic extends Comparable<Generic> {
 	 * @param context
 	 *            The reference context.
 	 * @param systemPropertyClass
-	 *            Classe which defines the Generic in Cache.
-	 * @param basePos
-	 *            The base position.
+	 *            Class which defines the Generic in Cache.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return True if the system property is enabled.
 	 */
-	boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int basePos);
+	boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos);
 
 	/**
 	 * Enable referential integrity for component position.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param basePos
-	 *            The base position.
+	 * 
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
+	 * 
 	 * @return This.
 	 */
-	<T extends Generic> T enableReferentialIntegrity(Cache cache, int basePos);
+	<T extends Generic> T enableReferentialIntegrity(Cache cache, int componentPos);
 
 	/**
 	 * Disable referential integrity for component position.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param basePos
-	 *            The base position.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * 
 	 * @return This.
 	 */
-	<T extends Generic> T disableReferentialIntegrity(Cache cache, int basePos);
+	<T extends Generic> T disableReferentialIntegrity(Cache cache, int componentPos);
 
 	/**
 	 * Returns true if the referential integrity is enabled for component position.
 	 * 
 	 * @param context
 	 *            The reference context.
-	 * @param basePos
-	 *            The base position.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return True if the referential integrity is enabled.
 	 */
-	boolean isReferentialIntegrity(Context context, int basePos);
+	boolean isReferentialIntegrity(Context context, int componentPos);
 
 	/**
 	 * Returns the implicit.

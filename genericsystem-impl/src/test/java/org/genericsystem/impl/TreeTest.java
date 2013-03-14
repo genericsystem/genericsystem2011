@@ -10,10 +10,10 @@ import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.generic.Node;
+import org.genericsystem.generic.Node.Visitor;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
-import org.genericsystem.generic.Node.Visitor;
 import org.testng.annotations.Test;
 
 @Test
@@ -42,7 +42,7 @@ public class TreeTest extends AbstractTest {
 		assert child.inheritsFrom(tree);
 		assert !child.inheritsFrom(root);
 		assert child.isAttributeOf(root);
-		assert child.isAttributeOf(root, 0);
+		assert child.isAttributeOf(root);
 		assert root.getChildren(cache).contains(child);
 		assert !root.getChildren(cache).contains(root);
 		assert root.getChildren(cache).contains(child2);

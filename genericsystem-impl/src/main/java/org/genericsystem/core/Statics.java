@@ -359,9 +359,12 @@ public class Statics {
 		if (!iterator.hasNext())
 			return null;
 		T result = iterator.next();
-		if (iterator.hasNext())
-			throw new IllegalStateException("Ambigous reponse : " + result);
+		if (iterator.hasNext()) {
+			StringBuilder sb = new StringBuilder(result.toString());
+			while (iterator.hasNext())
+				sb.append(" , " + iterator.next());
+			throw new IllegalStateException("Ambigous reponse : " + sb.toString());
+		}
 		return result;
 	}
-
 }

@@ -9,6 +9,7 @@ import org.genericsystem.constraints.Constraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.AbstractConstraintViolationException;
 import org.genericsystem.exception.RequiredConstraintViolationException;
 import org.genericsystem.generic.Attribute;
@@ -32,7 +33,7 @@ public class RequiredConstraintImpl extends Constraint {
 				for (ConstraintValue constraintValue : getConstraintValues(context, modified, RequiredConstraintImpl.class)) {
 					int componentPos = constraintValue.getComponentPosValue().getComponentPos();
 					Generic base = ((Attribute) modified).getComponent(componentPos);
-					if (base != null && base.getLinks(context, modified.<Relation> getMeta(), componentPos).size() < 1)
+					if (base != null && ((GenericImpl) base).getLinks(context, modified.<Relation> getMeta(), componentPos).size() < 1)
 						throw new RequiredConstraintViolationException(modified.getMeta().getValue() + " is required for " + base.getMeta() + " " + base);
 				}
 			} else

@@ -137,7 +137,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		assert convertible.getRelations(cache).get(0).equals(vehicleColor);
 	}
 
-	public void testRelationsWIthSameName() {
+	public void testRelationsWithSameName() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		final Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
@@ -253,6 +253,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		Relation carColor = car.setRelation(cache, "carColor", color);
 		Generic red = color.newInstance(cache, "red");
 		Link defaultColor = car.setLink(cache, carColor, "defaultColor", red);
+		assert defaultColor.isConcrete();
 		Generic myCar = car.newInstance(cache, "myCar");
 		assert myCar.getTargets(cache, carColor).contains(red);
 		myCar.cancel(cache, defaultColor);
@@ -277,7 +278,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		}.assertIsCausedBy(IllegalStateException.class);
 	}
 
-	public void testTwooCancel() {
+	public void testTwoCancel() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setProperty(cache, "power");
@@ -292,7 +293,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		assert mycar.getValue(cache, carPower).equals("233");
 	}
 
-	public void testTwooRestore() {
+	public void testTwoRestore() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setProperty(cache, "power");
@@ -325,7 +326,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		assert mycar.getValue(cache, carPower).equals("233");
 	}
 
-	public void testTwooCancelRelation() {
+	public void testTwoCancelRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
@@ -342,7 +343,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		assert myCar.getTargets(cache, carColor).contains(red);
 	}
 
-	public void testTwooRestoreRelation() {
+	public void testTwoRestoreRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
@@ -378,4 +379,5 @@ public class PhamtomLinkTest extends AbstractTest {
 		myCar.restore(cache, defaultCarColor);
 		assert myCar.getTargets(cache, carColor).contains(red);
 	}
+
 }

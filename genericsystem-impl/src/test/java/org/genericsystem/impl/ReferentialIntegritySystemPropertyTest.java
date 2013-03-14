@@ -44,12 +44,12 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		assert !metaRelation.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert !metaRelation.isReferentialIntegrity(cache, Statics.TARGET_POSITION);
 
-		metaAttribute.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		metaAttribute.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class);
 		assert metaAttribute.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert metaRelation.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert !metaRelation.isReferentialIntegrity(cache, Statics.TARGET_POSITION);
 
-		metaRelation.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		metaRelation.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class);
 		assert metaAttribute.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert metaRelation.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert !metaRelation.isReferentialIntegrity(cache, Statics.TARGET_POSITION);
@@ -124,9 +124,9 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
-		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 		Generic myObjet = human.newInstance(cache, "myObjet");
-		assert myObjet.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		assert myObjet.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 	}
 
 	public void testComportementValueWithSubType() {
@@ -134,8 +134,8 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
 		Type man = human.newSubType(cache, "man");
-		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
-		assert man.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
+		assert man.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 	}
 
 	public void testComportementValueWithAttribute() {
@@ -143,12 +143,12 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
 		Attribute weight = human.setAttribute(cache, "weight");
-		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
-		assert !weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
+		assert !weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 		Generic myck = human.newInstance(cache, "myck");
 		Holder myckWeight90 = myck.setValue(cache, weight, 90);
-		assert myck.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
-		assert !myckWeight90.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		assert myck.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
+		assert !myckWeight90.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 	}
 
 	public void testComportementValueWithAttribute2() {
@@ -156,13 +156,13 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
 		Attribute weight = human.setAttribute(cache, "weight");
-		weight.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
-		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
-		assert weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		weight.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class);
+		assert human.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
+		assert weight.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 		Generic myck = human.newInstance(cache, "myck");
 		Holder myckWeight90 = myck.setValue(cache, weight, 90);
-		assert myck.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
-		assert myckWeight90.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		assert myck.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
+		assert myckWeight90.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 	}
 
 	public void testComportementValueWithRelation() {
@@ -171,12 +171,12 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Human");
 		Relation humanDriveVehicle = human.setRelation(cache, "drive", vehicle);
-		assert !humanDriveVehicle.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
-		assert humanDriveVehicle.getImplicit().isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		assert !humanDriveVehicle.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
+		assert humanDriveVehicle.getImplicit().isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 		Generic myck = human.newInstance(cache, "myck");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Link myckMyDriveMyVehicle = myck.setLink(cache, humanDriveVehicle, "myDrive", myVehicle);
-		assert !myckMyDriveMyVehicle.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		assert !myckMyDriveMyVehicle.isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 	}
 
 }

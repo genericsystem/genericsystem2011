@@ -204,33 +204,33 @@ public interface Type extends Generic {
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param basePos
-	 *            The base position.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return this
 	 */
-	<T extends Type> T enableSingularConstraint(Cache cache, int basePos);
+	<T extends Type> T enableSingularConstraint(Cache cache, int componentPos);
 
 	/**
 	 * Disable singular constraint for the base position.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param basePos
-	 *            The base position.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return Return this
 	 */
-	<T extends Type> T disableSingularConstraint(Cache cache, int basePos);
+	<T extends Type> T disableSingularConstraint(Cache cache, int componentPos);
 
 	/**
 	 * Returns true if the singular constraint enabled for the base position
 	 * 
 	 * @param context
 	 *            The reference context.
-	 * @param basePos
-	 *            The base position.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return true if the singular constraint enabled for the base position
 	 */
-	boolean isSingularConstraintEnabled(Context context, int basePos);
+	boolean isSingularConstraintEnabled(Context context, int componentPos);
 
 	/**
 	 * Enable property constraint.
@@ -345,33 +345,33 @@ public interface Type extends Generic {
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param basePos
-	 *            The base position.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return Return this.
 	 */
-	<T extends Type> T enableRequiredConstraint(Cache cache, int basePos);
+	<T extends Type> T enableRequiredConstraint(Cache cache, int componentPos);
 
 	/**
 	 * Disable required constraint for the base position.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
-	 * @param basePos
-	 *            The base position.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return Return this.
 	 */
-	<T extends Type> T disableRequiredConstraint(Cache cache, int basePos);
+	<T extends Type> T disableRequiredConstraint(Cache cache, int componentPos);
 
 	/**
 	 * Returns true if the required constraint enabled for the base position
 	 * 
 	 * @param context
 	 *            The reference context.
-	 * @param basePos
-	 *            The component position.
+	 * @param componentPos
+	 *            The component position implicated by the constraint.
 	 * @return true if the required constraint enabled for the base position
 	 */
-	boolean isRequiredConstraintEnabled(Context context, int basePos);
+	boolean isRequiredConstraintEnabled(Context context, int componentPos);
 
 	/**
 	 * Enable distinct constraint.

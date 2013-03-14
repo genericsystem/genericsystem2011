@@ -107,17 +107,17 @@ public class SystemPropertyTest extends AbstractTest {
 		Relation humanOwnVehicle = human.setRelation(cache, "ownership", vehicle);
 		humanOwnVehicle.enableMultiDirectional(cache);
 		assert humanOwnVehicle.isSystemPropertyEnabled(cache, MultiDirectionalSystemProperty.class);
-		assert !humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class, 0);
+		assert !humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class);
 		humanOwnVehicle.enableCascadeRemove(cache, 0);
 		assert humanOwnVehicle.isSystemPropertyEnabled(cache, MultiDirectionalSystemProperty.class);
-		assert humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class, 0);
+		assert humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class);
 		humanOwnVehicle.disableMultiDirectional(cache);
 		assert cache.<Attribute> find(MultiDirectionalSystemProperty.class).isSingularConstraintEnabled(cache);
 		assert !humanOwnVehicle.isSystemPropertyEnabled(cache, MultiDirectionalSystemProperty.class);
-		assert humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class, 0);
+		assert humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class);
 		humanOwnVehicle.disableCascadeRemove(cache, 0);
 		assert !humanOwnVehicle.isSystemPropertyEnabled(cache, MultiDirectionalSystemProperty.class);
-		assert !humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class, 0);
+		assert !humanOwnVehicle.isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class);
 	}
 
 	public void isEnabledSystemPropertyAxedTest() {

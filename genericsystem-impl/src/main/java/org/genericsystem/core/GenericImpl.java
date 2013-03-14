@@ -196,8 +196,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return false;
 	}
 
-	@Override
-	public boolean isAttributeOf(Generic generic, int basePos) {
+	private boolean isAttributeOf(Generic generic, int basePos) {
 		if (basePos >= components.length || basePos < 0)
 			return false;
 		return generic.inheritsFrom(components[basePos]);
@@ -295,7 +294,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getHolders(context, attribute, getBasePos((Attribute) attribute), targets);
 	}
 
-	@Override
 	public <T extends Holder> Snapshot<T> getHolders(final Context context, final Holder attribute, final int basePos, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
@@ -310,7 +308,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getLinks(context, relation, getBasePos(relation), targets);
 	}
 
-	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final int basePos, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
@@ -354,19 +351,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getHolder(context, attribute, getBasePos(attribute), targets);
 	}
 
-	@Override
-	public <T extends Holder> T getHolder(Context context, Attribute attribute, int basePos, Generic... targets) {
+	private <T extends Holder> T getHolder(Context context, Attribute attribute, int basePos, Generic... targets) {
 		return Statics.unambigousFirst(this.<T> concreteIterator(context, attribute, basePos, targets));
 	}
 
 	@Override
 	public <T extends Link> T getLink(Context context, Relation relation, Generic... targets) {
-		return getLink(context, relation, getBasePos(relation), targets);
-	}
-
-	@Override
-	public <T extends Link> T getLink(Context context, Relation relation, int basePos, Generic... targets) {
-		return Statics.unambigousFirst(this.<T> linksIterator(context, relation, basePos, targets));
+		return Statics.unambigousFirst(this.<T> linksIterator(context, relation, getBasePos(relation), targets));
 	}
 
 	private static <T extends Generic> T update(Cache cache, Generic old, Serializable value) {
@@ -572,17 +563,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class);
 	}
 
+	// @Override
+	// public void deduct(final Cache cache) {
+	// if (!isPseudoStructural())
+	// return;
+	// for (int i = 0; i < components.length; i++) {
+	// Generic component = components[i];
+	// if (component.isStructural())
+	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
+	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
+	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
+	// bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
+	// }
+	// }
+	// }
+
 	@Override
 	public void deduct(final Cache cache) {
-		if (!isPseudoStructural())
-			return;
 		for (int i = 0; i < components.length; i++) {
 			Generic component = components[i];
 			if (component.isStructural())
 				for (Generic inherited : ((Type) component).getInheritings(cache)) {
-					Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
+					Generic phantom = ((CacheImpl) cache).findPrimaryByValue(isPseudoStructural() ? ((GenericImpl) getImplicit()).supers[0] : getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE);
 					if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-						bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
+						bind(cache, bindPrimary(cache, value, metaLevel), this, Statics.replace(i, components, inherited));
 				}
 		}
 	}
@@ -627,12 +631,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (Iterator<T>) new AbstractSelectableLeafIterator(context, origin) {
 			@Override
 			protected boolean isSelected(Generic father, Generic candidate) {
-				return candidate.isAttributeOf(GenericImpl.this, pos);
+				return ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos);
 			}
 
 			@Override
 			public boolean isSelectable() {
-				return next.isConcrete() && next.isAttributeOf(GenericImpl.this, pos);
+				return next.isConcrete() && ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
 			}
 		};
 	}
@@ -1237,19 +1241,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public void cancel(Cache cache, Holder attribute, int basePos) {
 		if (equals(attribute.getComponent(basePos)))
 			throw new IllegalStateException("Only inherited attributes can be cancelled");
-		assert Statics.replace(basePos, ((GenericImpl) attribute).components, this).length != 0;
-		// TODO KK
-		Holder holder = attribute.isConcrete() ? attribute : getAttribute(cache, attribute.getValue());
-		Holder defaultHolder = getHolder(cache, (Attribute) holder, basePos);
-		if (defaultHolder != null && ((GenericImpl) defaultHolder).isPseudoStructural())
-			holder = defaultHolder;
-		if (!holder.equals(attribute))
-			throw new IllegalStateException("Attribute " + attribute + " is already override by : " + holder);
+		// TODO ???
+		// assert Statics.replace(basePos, ((GenericImpl) attribute).components, this).length != 0;
+
+		if (isSpecializedAttribute(cache, attribute, basePos))
+			throw new IllegalStateException("Attribute " + attribute + " is already override");
+
+		((GenericImpl) attribute).deduct(cache);
 		internalCancel(cache, attribute, basePos);
 	}
 
+	private boolean isSpecializedAttribute(Context context, Holder attribute, int basePos) {
+		if (attribute.isStructural() && !getAttribute(context, attribute.getValue()).equals(attribute))
+			return true;
+
+		Holder holder = getHolder(context, (Attribute) attribute, basePos);
+		if (holder != null && ((GenericImpl) holder).isPseudoStructural())
+			return !holder.equals(attribute);
+
+		return false;
+	}
+
 	private void internalCancel(Cache cache, Holder attribute, int basePos) {
-		addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, Statics.PHAMTOM, attribute.getMetaLevel()), attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, Statics.PHAMTOM, attribute.getMetaLevel()), attribute.isStructural() ? getAttribute(cache, attribute.getValue()) : attribute, basePos,
+				Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override
@@ -1436,8 +1451,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T enableReferentialIntegrity(Cache cache, int basePos) {
-		return enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, basePos);
+	public <T extends Generic> T enableReferentialIntegrity(Cache cache, int componentPos) {
+		return enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, componentPos);
 	}
 
 	@Override

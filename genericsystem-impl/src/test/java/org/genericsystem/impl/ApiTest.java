@@ -162,4 +162,29 @@ public class ApiTest extends AbstractTest {
 		assert types.size() >= 4;
 		assert types.containsAll(Arrays.asList(car, bus, moto, superCar));
 	}
+
+	// getLink() tests
+	@Test(enabled = false)
+	public void test_dummy() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "CarColor", color);
+
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic red = color.newInstance(cache, "red");
+		Generic yellow = color.newInstance(cache, "yellow");
+
+		Link myBmwYellow = myBmw.setLink(cache, carColor, "myBmwYellow", yellow);
+		Link carRed = car.setLink(cache, carColor, "CarRed", red);
+
+		Generic myFiat = car.newInstance(cache, "myFiat");
+
+		assert myBmw.getLink(cache, carColor) != null;
+		assert myBmw.getLinks(cache, carColor).size() == 2;
+		assert myBmw.getLinks(cache, carColor).contains(myBmwYellow);
+		assert myFiat.getLink(cache, carColor) != null;
+		assert Objects.equals(myFiat.getLink(cache, carColor), carRed);
+		assert myFiat.getTargets(cache, carColor).contains(red);
+	}
 }
