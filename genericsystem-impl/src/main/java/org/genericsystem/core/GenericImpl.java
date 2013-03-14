@@ -1061,6 +1061,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
+	public <T extends Generic> T getInstance(Context context, final Serializable value) {
+		return this.<T> getAllInstances(context).filter(new Filter<T>() {
+			@Override
+			public boolean isSelected(T element) {
+				return Objects.equals(element.getValue(), value);
+			}
+		}).first();
+	}
+
+	@Override
 	public <T extends Generic> Snapshot<T> getAllInstances(final Context context) {
 		return new AbstractSnapshot<T>() {
 			@Override

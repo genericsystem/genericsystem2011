@@ -119,6 +119,17 @@ public interface Type extends Generic {
 	<T extends Generic> Snapshot<T> getInstances(Context context);
 
 	/**
+	 * Returns the instance of Generic.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param value
+	 *            The value of the requested instance.
+	 * @return The requested instance if it exists, null otherwise.
+	 */
+	<T extends Generic> T getInstance(Context context, Serializable value);
+
+	/**
 	 * Returns the instances of Generic and the instances of the childrens.
 	 * 
 	 * @param context
