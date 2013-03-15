@@ -27,7 +27,7 @@ public interface Snapshot<T> extends Iterable<T> {
 	T get(int index);
 
 	/**
-	 * Returns the fisrt element.
+	 * Returns the fisrt element or null is empty.
 	 * 
 	 * @return The element.
 	 */
