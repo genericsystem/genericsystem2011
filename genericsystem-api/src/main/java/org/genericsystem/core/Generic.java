@@ -77,6 +77,18 @@ public interface Generic extends Comparable<Generic> {
 	boolean isAttributeOf(Generic generic);
 
 	/**
+	 * Returns true if this Generic is an Attribute for the checked Generic and the component position.
+	 * 
+	 * @param Generic
+	 *            The checked Generic.
+	 * @param basePos
+	 *            The base position.
+	 * 
+	 * @return True if the Generic is an Attribute.
+	 */
+	boolean isAttributeOf(Generic generic, int basePos);
+
+	/**
 	 * Returns true if this Generic is an relation.
 	 * 
 	 * @return True if the Generic is an Relation.
@@ -121,6 +133,23 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T bind(Cache cache, Link relation, Generic... targets);
 
 	/**
+	 * Returns the Link of the Relation for the components and the component position.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param relation
+	 *            The Relation.
+	 * @param basePos
+	 *            The basePosition in targets
+	 * @param targets
+	 *            The optional targets.
+	 * @return A Link.
+	 * @throws IllegalStateException
+	 *             Ambigous request for the Relation.
+	 */
+	<T extends Link> T getLink(Context context, Relation relation, int basePos, Generic... targets);
+
+	/**
 	 * Returns the Link of the Relation for the components.
 	 * 
 	 * @param context
@@ -137,43 +166,21 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	<T extends Link> T getLink(Context context, Relation relation, Generic... targets);
 
-	// /**
-	// * Returns the Link of the Relation for the components and value.
-	// *
-	// * @param context
-	// * The reference context.
-	// * @param attribute
-	// * The Attribute.
-	// * @param value
-	// * The value of link.
-	// * @param targets
-	// * The targets.
-	// * @return A Link.
-	// * @throws IllegalStateException
-	// * Ambigous request for the Relation.
-	// */
-	//
-	// public <T extends Link> T getValuedHolder(Context context, Attribute attribute, Serializable value, Generic... targets);
-	//
-	// /**
-	// * Returns the Link of the Relation for the components and value.
-	// *
-	// * @param context
-	// * The reference context.
-	// * @param relation
-	// * The Relation.
-	// * @param value
-	// * The value of link.
-	// * @param basePos
-	// * The base position in targets.
-	// * @param targets
-	// * The targets.
-	// * @return A Link.
-	// * @throws IllegalStateException
-	// * Ambigous request for the Relation.
-	// */
-	//
-	// public <T extends Link> T getValuedLink(Context context, Relation relation, Serializable value, int basePos, final Generic... targets);
+	/**
+	 * Returns the Links.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param relation
+	 *            The Relation.
+	 * @param basePos
+	 *            The base position.
+	 * @param targets
+	 *            The targets.
+	 * @see Snapshot
+	 * @return The Link.
+	 */
+	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Link.
@@ -255,12 +262,43 @@ public interface Generic extends Comparable<Generic> {
 	 *            The reference context.
 	 * @param attribute
 	 *            The attribute.
+	 * @param basePos
+	 *            The base position.
+	 * @param targets
+	 *            The targets.
+	 * @see Snapshot
+	 * @return The value holders.
+	 */
+	<T extends Holder> Snapshot<T> getHolders(Context context, Holder attribute, int basePos, Generic... targets);
+
+	/**
+	 * Returns the values holders.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param attribute
+	 *            The attribute.
 	 * @param targets
 	 *            The targets.
 	 * @see Snapshot
 	 * @return The value holders.
 	 */
 	<T extends Holder> Snapshot<T> getHolders(Context context, Holder attribute, Generic... targets);
+
+	/**
+	 * Returns the Holder of value.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param attribute
+	 *            The attribute.
+	 * @param basePos
+	 *            The base position.
+	 * @param targets
+	 *            The targets.
+	 * @return The Holder.
+	 */
+	<T extends Holder> T getHolder(Context context, Attribute attribute, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Holder of value.

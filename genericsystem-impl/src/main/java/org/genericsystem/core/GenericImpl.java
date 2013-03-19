@@ -201,7 +201,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return false;
 	}
 
-	private boolean isAttributeOf(Generic generic, int basePos) {
+	@Override
+	public boolean isAttributeOf(Generic generic, int basePos) {
 		if (basePos >= components.length || basePos < 0)
 			return false;
 		return generic.inheritsFrom(components[basePos]);
@@ -299,6 +300,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getHolders(context, attribute, getBasePos((Attribute) attribute), targets);
 	}
 
+	@Override
 	public <T extends Holder> Snapshot<T> getHolders(final Context context, final Holder attribute, final int basePos, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
@@ -313,6 +315,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getLinks(context, relation, getBasePos(relation), targets);
 	}
 
+	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final int basePos, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
@@ -356,8 +359,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getHolder(context, attribute, getBasePos(attribute), targets);
 	}
 
+	@Override
 	public <T extends Holder> T getHolder(Context context, Attribute attribute, int basePos, Generic... targets) {
 		return Statics.unambigousFirst(this.<T> concreteIterator(context, attribute, basePos, targets));
+	}
+
+	@Override
+	public <T extends Link> T getLink(Context context, Relation relation, int basePos, Generic... targets) {
+		return Statics.unambigousFirst(this.<T> linksIterator(context, relation, basePos, targets));
 	}
 
 	@Override
