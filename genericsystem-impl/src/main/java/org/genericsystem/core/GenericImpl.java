@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -82,6 +81,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	final GenericImpl initializeComplex(Generic implicit, Generic[] directSupers, Generic[] components) {
+		// boolean result = false;
+		// for (Generic candidate : directSupers)
+		// if (candidate.equals(implicit))
+		// result = true;
+		// assert result : implicit.getMeta().info() + directSupers[0].info();
+		// assert implicit.equals(directSupers[0]) : implicit.info() + directSupers[1].info();
 		return restore(implicit.getValue(), implicit.getMetaLevel(), null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
 	}
 
@@ -508,7 +513,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		return bind(cache, bindPrimary(cache, value, SystemGeneric.STRUCTURAL), this, components);
+		Generic implicit = getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL);
+		return bind(cache, implicit, this, components);
 	}
 
 	@Override
@@ -968,7 +974,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
 		s += "toString()     : " + this + "\n";
-		s += "Holder          : " + value + "\n";
+		s += "Value          : " + value + "\n";
 		s += "getMeta()      : " + getMeta() + "\n";
 		s += "getInstanciationLevel() : " + getMetaLevel() + "\n";
 		for (Generic primary : getPrimaries())
@@ -1260,15 +1266,36 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public void cancel(Cache cache, Holder attribute, int basePos) {
 		if (equals(attribute.getComponent(basePos)))
 			throw new IllegalStateException("Only inherited attributes can be cancelled");
-		// TODO ???
-		// assert Statics.replace(basePos, ((GenericImpl) attribute).components, this).length != 0;
 
-		if (isSpecializedAttribute(cache, attribute, basePos))
-			throw new IllegalStateException("Attribute " + attribute + " is already override");
+		// Snapshot<Holder> holders = isConcrete() ? getHolders(cache, (Attribute) attribute, basePos) : (Snapshot) this.getAttributes(cache);
+		//
+		// for (Holder holder : holders) {
+		// if (this.equals(holder.getBaseComponent()))
+		// throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
+		//
+		// }
 
-		((GenericImpl) attribute).deduct(cache);
+		Holder holder = isConcrete() ? getHolder(cache, (Attribute) attribute, basePos) : getAttribute(cache, attribute.getValue());// KK pas de basePos
+
+		log.info("zzzzzz" + this + " " + attribute + "  " + holder);
+		if (holder != null && this.equals(holder.getComponent(basePos)))
+			throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
 		internalCancel(cache, attribute, basePos);
 	}
+
+	// @Override
+	// public void cancel(Cache cache, Holder attribute, int basePos) {
+	// if (equals(attribute.getComponent(basePos)))
+	// throw new IllegalStateException("Only inherited attributes can be cancelled");
+	// // TODO ???
+	// // assert Statics.replace(basePos, ((GenericImpl) attribute).components, this).length != 0;
+	//
+	// if (isSpecializedAttribute(cache, attribute, basePos))
+	// throw new IllegalStateException("Attribute " + attribute + " is already override");
+	//
+	// ((GenericImpl) attribute).deduct(cache);
+	// internalCancel(cache, attribute, basePos);
+	// }
 
 	private boolean isSpecializedAttribute(Context context, Holder attribute, int basePos) {
 		if (attribute.isStructural() && !getAttribute(context, attribute.getValue()).equals(attribute))
@@ -1282,8 +1309,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private void internalCancel(Cache cache, Holder attribute, int basePos) {
-		addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, Statics.PHAMTOM, attribute.getMetaLevel()), attribute.isStructural() ? getAttribute(cache, attribute.getValue()) : attribute, basePos,
-				Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, Statics.PHAMTOM, attribute.getMetaLevel()), attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override

@@ -81,7 +81,7 @@ public class PhamtomLinkTest extends AbstractTest {
 		assert vehicle.getRelations(cache).size() == 1;
 		assert vehicle.getRelations(cache).contains(vehicleHuman);
 		assert car.getRelations(cache).size() == 1 : car.getRelations(cache);
-		assert car.getRelations(cache).contains(vehicleHuman);
+		assert car.getRelations(cache).contains(vehicleHuman) : car.getRelations(cache);
 	}
 
 	public void testPhantomHierarchyRelation() {
