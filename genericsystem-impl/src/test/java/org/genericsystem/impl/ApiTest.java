@@ -211,4 +211,22 @@ public class ApiTest extends AbstractTest {
 		assert Objects.equals(myFiat.getLink(cache, carColor), carRed);
 		assert myFiat.getTargets(cache, carColor).contains(red);
 	}
+
+	public void test_retrieve_a_father_child_relation_by_the_father() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type human = cache.newType("Homme");
+
+		Relation family = human.setRelation(cache, "family", human);
+
+		Generic father = human.newInstance(cache, "father");
+		Generic son = human.newInstance(cache, "son");
+		Generic daughter = human.newInstance(cache, "daughter");
+
+		Link fatherSon = father.setLink(cache, family, "fatherSon", son);
+		Link fatherDaughter = father.setLink(cache, family, "fatherDaughter", daughter);
+
+		// assert father.getLink(cache, family, 0) == fatherSon;
+		assert son.getLink(cache, family, 1) == fatherSon;
+		assert daughter.getLink(cache, family, 1) == fatherDaughter;
+	}
 }
