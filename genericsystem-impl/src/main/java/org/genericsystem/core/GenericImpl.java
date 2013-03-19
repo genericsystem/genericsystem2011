@@ -1266,46 +1266,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public void cancel(Cache cache, Holder attribute, int basePos) {
 		if (equals(attribute.getComponent(basePos)))
 			throw new IllegalStateException("Only inherited attributes can be cancelled");
-
-		// Snapshot<Holder> holders = isConcrete() ? getHolders(cache, (Attribute) attribute, basePos) : (Snapshot) this.getAttributes(cache);
-		//
-		// for (Holder holder : holders) {
-		// if (this.equals(holder.getBaseComponent()))
-		// throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
-		//
-		// }
-
 		Holder holder = isConcrete() ? getHolder(cache, (Attribute) attribute, basePos) : getAttribute(cache, attribute.getValue());// KK pas de basePos
-
-		log.info("zzzzzz" + this + " " + attribute + "  " + holder);
-		if (holder != null && this.equals(holder.getComponent(basePos)))
+		if (holder != null && !attribute.equals(holder))
 			throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
 		internalCancel(cache, attribute, basePos);
-	}
-
-	// @Override
-	// public void cancel(Cache cache, Holder attribute, int basePos) {
-	// if (equals(attribute.getComponent(basePos)))
-	// throw new IllegalStateException("Only inherited attributes can be cancelled");
-	// // TODO ???
-	// // assert Statics.replace(basePos, ((GenericImpl) attribute).components, this).length != 0;
-	//
-	// if (isSpecializedAttribute(cache, attribute, basePos))
-	// throw new IllegalStateException("Attribute " + attribute + " is already override");
-	//
-	// ((GenericImpl) attribute).deduct(cache);
-	// internalCancel(cache, attribute, basePos);
-	// }
-
-	private boolean isSpecializedAttribute(Context context, Holder attribute, int basePos) {
-		if (attribute.isStructural() && !getAttribute(context, attribute.getValue()).equals(attribute))
-			return true;
-
-		Holder holder = getHolder(context, (Attribute) attribute, basePos);
-		if (holder != null && ((GenericImpl) holder).isPseudoStructural())
-			return !holder.equals(attribute);
-
-		return false;
 	}
 
 	private void internalCancel(Cache cache, Holder attribute, int basePos) {
