@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -553,7 +554,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> structuralIterator(Context context, Attribute origin, boolean readPhantom) {
-		Iterator<T> iterator = ((GenericImpl) origin).safeIsEnabled(context, getNoInheritanceSystemProperty(context)) ? this.<T> noInheritanceStructuralIterator(context, origin) : this.<T> inheritanceStructuralIterator(context, origin);
+		Iterator<T> iterator = ((GenericImpl) origin).safeIsEnabled(context, getNoInheritanceSystemProperty(context)) ? this.<T> noInheritanceIterator(context, origin, Statics.NO_POSITION, SystemGeneric.STRUCTURAL) : this
+				.<T> inheritanceStructuralIterator(context, origin);
 		return !readPhantom ? Statics.<T> phantomsFilter(iterator) : iterator;
 	}
 
@@ -563,10 +565,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (((GenericImpl) origin).safeIsEnabled(context, getMultiDirectionalSystemProperty(context))) {
 			Iterator<T>[] iterators = new Iterator[origin.getComponentsSize()];
 			for (basePos = 0; basePos < iterators.length; basePos++)
-				iterators[basePos] = noInheritance ? this.<T> noInheritanceConcreteIterator(context, origin, basePos) : this.<T> inheritanceConcreteIterator(context, origin, basePos);
+				iterators[basePos] = noInheritance ? this.<T> noInheritanceIterator(context, origin, basePos, SystemGeneric.CONCRETE) : this.<T> inheritanceConcreteIterator(context, origin, basePos);
 			iterator = new ConcateIterator<T>(iterators);
 		} else
-			iterator = noInheritance ? this.<T> noInheritanceConcreteIterator(context, origin, basePos) : this.<T> inheritanceConcreteIterator(context, origin, basePos);
+			iterator = noInheritance ? this.<T> noInheritanceIterator(context, origin, basePos, SystemGeneric.CONCRETE) : this.<T> inheritanceConcreteIterator(context, origin, basePos);
 		return !readPhantom ? Statics.<T> phantomsFilter(iterator) : iterator;
 	}
 
@@ -610,20 +612,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return Statics.PHAMTOM.equals(getValue());
 	}
 
-	private <T extends Generic> Iterator<T> noInheritanceStructuralIterator(Context context, final Generic origin) {
-		return new AbstractFilterIterator<T>(this.<T> compositesIterator(context)) {
+	private <T extends Generic> Iterator<T> noInheritanceIterator(Context context, final Generic origin, int pos, final int metaLevel) {
+		return new AbstractFilterIterator<T>(Statics.NO_POSITION == pos ? this.<T> compositesIterator(context) : this.<T> compositesIterator(context, pos)) {
 			@Override
 			public boolean isSelected() {
-				return next.isStructural() && next.inheritsFrom(origin);
-			}
-		};
-	}
-
-	private <T extends Generic> Iterator<T> noInheritanceConcreteIterator(Context context, final Generic origin, int pos) {
-		return new AbstractFilterIterator<T>(this.<T> compositesIterator(context, pos)) {
-			@Override
-			public boolean isSelected() {
-				return next.isConcrete() && next.inheritsFrom(origin);
+				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
 			}
 		};
 	}
