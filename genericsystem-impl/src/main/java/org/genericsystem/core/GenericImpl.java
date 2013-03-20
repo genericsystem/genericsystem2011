@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -1259,9 +1258,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public void cancel(Cache cache, Holder attribute, int basePos) {
 		if (equals(attribute.getComponent(basePos)))
 			throw new IllegalStateException("Only inherited attributes can be cancelled");
-		Holder holder = isConcrete() ? getHolder(cache, (Attribute) attribute, basePos) : getAttribute(cache, attribute.getValue());// KK pas de basePos
-		if (holder != null && !attribute.equals(holder))
-			throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
+
+		Iterator<Holder> holders;
+		if (attribute.isStructural()) {
+			holders = GenericImpl.this.<Holder> structuralIterator(cache, (Attribute) attribute, false);
+			while (holders.hasNext()) {
+				Holder holder = holders.next();
+				if (!holder.equals(attribute))
+					throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
+			}
+		}
+		holders = GenericImpl.this.<Holder> concreteIterator(cache, (Attribute) attribute, basePos, false);
+		while (holders.hasNext()) {
+			Holder holder = holders.next();
+			if (!holder.equals(attribute))
+				throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
+		}
 		internalCancel(cache, attribute, basePos);
 	}
 
@@ -1276,11 +1288,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void restore(final Cache cache, final Holder attribute, final int basePos) {
-		Iterator<Holder> holders = attribute.isConcrete() ? GenericImpl.this.<Holder> concreteIterator(cache, (Attribute) attribute, basePos, true) : GenericImpl.this.<Holder> structuralIterator(cache, (Attribute) attribute, true);
+		Iterator<Holder> holders = attribute.isStructural() ? GenericImpl.this.<Holder> structuralIterator(cache, (Attribute) attribute, true) : GenericImpl.this.<Holder> concreteIterator(cache, (Attribute) attribute, basePos, true);
 		while (holders.hasNext()) {
-			Holder nodeValue = holders.next();
-			if (equals(nodeValue.getComponent(basePos)) && ((GenericImpl) nodeValue).isPhantom() && Objects.equals(((GenericImpl) nodeValue).supers[0].getValue(), attribute.getValue()))
-				nodeValue.remove(cache);
+			Holder holder = holders.next();
+			if (equals(holder.getComponent(basePos)) && ((GenericImpl) holder).isPhantom() && Objects.equals(((GenericImpl) holder).supers[0].getValue(), attribute.getValue()))
+				holder.remove(cache);
 		}
 	}
 
