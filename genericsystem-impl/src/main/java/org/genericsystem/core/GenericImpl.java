@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -1295,7 +1296,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private void internalCancel(Cache cache, Holder attribute, int basePos) {
 		// addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, Statics.PHAMTOM, attribute.getMetaLevel()), attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
-		addLink(cache, getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL), attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		Generic implicit = getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL);
+		if (attribute.isConcrete())
+			implicit = ((GenericImpl) implicit).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE);
+		addLink(cache, implicit, attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override
