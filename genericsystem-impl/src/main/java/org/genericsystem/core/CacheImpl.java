@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.Constraint.CheckingType;
@@ -356,12 +357,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return null;
 	}
 
+	// TODO refactor => subtype complexe
 	<T extends Generic> T bind(Class<?> clazz) {
-		T result = bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz)), findSupers(clazz), findComponents(clazz));
-		// if (InstanceClassConstraintImpl.class.equals(clazz))
-		// result.log();
-
-		return result;
+		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz)), findSupers(clazz), findComponents(clazz));
 	}
 
 	public <T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components) {

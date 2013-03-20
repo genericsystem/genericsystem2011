@@ -22,9 +22,6 @@ import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.constraints.Constraint;
 import org.genericsystem.constraints.Constraint.CheckingType;
-import org.genericsystem.core.Context;
-import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AbstractConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
@@ -198,12 +195,10 @@ public abstract class AbstractContext implements Context, Serializable {
 	}
 
 	Generic findImplicitSuper(Class<?> clazz) {
-		Supers supersAnnotation = clazz.getAnnotation(Supers.class);
-		if (supersAnnotation == null) {
-			Generic[] supers = findSupers(clazz);
-			return supers.length == 0 ? getEngine() : supers[0].getImplicit();
-		}
-		return find(supersAnnotation.implicitSuper()).getImplicit();
+		if (SystemGeneric.STRUCTURAL == clazz.getAnnotation(SystemGeneric.class).value())
+			return getEngine();
+		Generic[] supers = findSupers(clazz);
+		return supers.length == 0 ? getEngine() : supers[0].getImplicit();
 	}
 
 	int findMetaLevel(Class<?> clazz) {

@@ -35,8 +35,10 @@ public class AnnotationTest extends AbstractTest {
 		assert car.isStructural();
 		assert vehicle.getDirectSubTypes(cache).size() == 1;
 		assert vehicle.getDirectSubTypes(cache).contains(car);
-		assert car.getSupers().size() == 1 : car.getSupers();
+		assert car.getSupers().size() == 2 : car.getSupers();
 		assert car.getSupers().contains(vehicle);
+		assert car.getSupers().contains(car.getImplicit());
+		assert !car.equals(car.getImplicit());
 	}
 
 	public void testAttribute() {
