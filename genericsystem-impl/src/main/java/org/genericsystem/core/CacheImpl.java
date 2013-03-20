@@ -337,6 +337,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	// TODO KK
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isEngine())
 			return getEngine();
@@ -359,7 +360,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	// TODO refactor => subtype complexe
 	<T extends Generic> T bind(Class<?> clazz) {
-		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz)), findSupers(clazz), findComponents(clazz));
+		// L'odre de construction des Generic est important pour que l'implicit soit toujours en dernier.
+		// Il faut donc appeler le findSupers avant le bindPrimaryByValue.
+		Generic[] supers = findSupers(clazz);
+		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz)), supers, findComponents(clazz));
 	}
 
 	public <T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components) {
@@ -369,7 +373,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(Generic implicit, Generic[] supers, Generic[] components) {
 		final Generic[] interfaces = new Primaries(supers).toArray();
-
 		Generic[] directSupers = getDirectSupers(interfaces, components);
 		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
 			return (T) directSupers[0];
@@ -423,6 +426,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private class ConnectionMap extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 8257917150315417734L;
 
+		// TODO KK getDirectSupers with implicit
 		private void reBuild(NavigableSet<Generic> orderedDependencies) {
 			for (Generic orderedDependency : orderedDependencies) {
 				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).components);

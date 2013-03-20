@@ -114,6 +114,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		};
 	}
 
+	// TODO clean
 	protected Generic[] getDirectSupers(final Generic[] interfaces, final Generic[] components) {
 		List<Generic> list = new ArrayList<Generic>();
 		final Iterator<Generic> iterator = getDirectSupersIterator(interfaces, components);
@@ -126,6 +127,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
+	// TODO KK
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isAlive(this))
 			return (T) generic;
