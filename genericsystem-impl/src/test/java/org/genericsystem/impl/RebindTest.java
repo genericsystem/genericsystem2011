@@ -79,13 +79,11 @@ public class RebindTest extends AbstractTest {
 
 	public void rebindTypeNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		Type color = cache.newType("color");
 		Type primeColor = color.newSubType(cache, "primeColor");
 		Generic red = primeColor.newInstance(cache, "red");
 		Attribute lightness = primeColor.setAttribute(cache, "lightness");
 		red.setValue(cache, lightness, "40");
-		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		Generic reboundColor = ((GenericImpl) color).reBind(cache);
 		assert !color.isAlive(cache);
 		assert !primeColor.isAlive(cache);

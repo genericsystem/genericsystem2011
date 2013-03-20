@@ -24,7 +24,7 @@ public class AliveConstraintTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				myHuman.setLink(cache, humanDriveCar, "myHumanDriveCar", myCar).log();
+				myHuman.setLink(cache, humanDriveCar, "myHumanDriveCar", myCar);
 			}
 		}.assertIsCausedBy(AliveConstraintViolationException.class);
 	}

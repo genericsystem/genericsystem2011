@@ -106,7 +106,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 
 		// TODO KK
-		log.info("BUILD " + this);
 		assert getMetaLevel() == metaLevel : this + " => " + getMetaLevel() + " / " + metaLevel;
 		if (!isPrimary()) {
 			assert contains(value, directSupers) : value + " directSupers " + Arrays.toString(directSupers);
