@@ -596,33 +596,33 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class);
 	}
 
-	// @Override
-	// public void deduct(final Cache cache) {
-	// if (!isPseudoStructural())
-	// return;
-	// for (int i = 0; i < components.length; i++) {
-	// Generic component = components[i];
-	// if (component.isStructural())
-	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
-	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
-	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-	// bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
-	// }
-	// }
-	// }
-
 	@Override
 	public void deduct(final Cache cache) {
+		if (!isPseudoStructural())
+			return;
 		for (int i = 0; i < components.length; i++) {
 			Generic component = components[i];
 			if (component.isStructural())
 				for (Generic inherited : ((Type) component).getInheritings(cache)) {
-					Generic phantom = ((CacheImpl) cache).findPrimaryByValue(isPseudoStructural() ? ((GenericImpl) getImplicit()).supers[0] : getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE);
+					Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
 					if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-						bind(cache, bindPrimary(cache, value, getMetaLevel()), this, Statics.replace(i, components, inherited));
+						bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
 				}
 		}
 	}
+
+	// @Override
+	// public void deduct(final Cache cache) {
+	// for (int i = 0; i < components.length; i++) {
+	// Generic component = components[i];
+	// if (component.isStructural())
+	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
+	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(isPseudoStructural() ? ((GenericImpl) getImplicit()).supers[0] : getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE);
+	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
+	// bind(cache, bindPrimary(cache, value, getMetaLevel()), this, Statics.replace(i, components, inherited));
+	// }
+	// }
+	// }
 
 	public boolean isPhantom() {
 		return Statics.PHAMTOM.equals(getValue());
@@ -1295,11 +1295,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private void internalCancel(Cache cache, Holder attribute, int basePos) {
-		// addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, Statics.PHAMTOM, attribute.getMetaLevel()), attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
-		Generic implicit = getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL);
-		if (attribute.isConcrete())
-			implicit = ((GenericImpl) implicit).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE);
-		addLink(cache, implicit, attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		addLink(cache, attribute.isStructural() ? getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE), attribute, basePos,
+				Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override

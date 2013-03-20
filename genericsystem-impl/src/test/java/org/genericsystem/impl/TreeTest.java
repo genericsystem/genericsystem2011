@@ -119,7 +119,6 @@ public class TreeTest extends AbstractTest {
 	public void testGenealogicTree() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Tree bitree = cache.newTree("Tree", 2);
-		log.info("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
 		Node grandFather = bitree.newRoot(cache, "grandFather", 2);
 		Node grandMother = bitree.newRoot(cache, "grandMother", 2);
 		assert grandMother.inheritsFrom(bitree) : grandMother.info();

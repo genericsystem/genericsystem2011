@@ -224,7 +224,6 @@ public class PhamtomLinkTest extends AbstractTest {
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setProperty(cache, "power");
 		Holder defaultPower = car.setValue(cache, carPower, "233");
-		defaultPower.log();
 		Generic mycar = car.newInstance(cache, "myCar");
 		assert mycar.getHolder(cache, carPower).equals(defaultPower);
 		mycar.cancel(cache, defaultPower);

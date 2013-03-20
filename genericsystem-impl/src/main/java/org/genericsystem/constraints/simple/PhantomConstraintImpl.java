@@ -9,7 +9,9 @@ import org.genericsystem.constraints.Constraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.PhantomConstraintViolationException;
 import org.genericsystem.system.ComponentPosValue;
 
 @SystemGeneric(defaultBehavior = true)
@@ -24,9 +26,9 @@ public class PhantomConstraintImpl extends Constraint {
 	// TODO KK
 	@Override
 	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
-		// if (!getConstraintValues(context, modified, getClass()).isEmpty())
-		// if (modified.isAlive(context) && ((GenericImpl) modified.getSupers().first()).isPhantom())
-		// throw new PhantomConstraintViolationException(modified.info());
+		if (!getConstraintValues(context, modified, getClass()).isEmpty())
+			if (modified.isAlive(context) && ((GenericImpl) modified.getSupers().first()).isPhantom())
+				throw new PhantomConstraintViolationException(modified.info());
 	}
 
 }
