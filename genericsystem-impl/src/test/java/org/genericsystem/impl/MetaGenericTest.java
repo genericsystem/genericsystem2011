@@ -50,7 +50,7 @@ public class MetaGenericTest extends AbstractTest {
 		Type newType1 = cache.newType("newType1");
 		Type newType2 = cache.newType("newType2");
 		Relation newRelation = newType1.setRelation(cache, "newType1NewType2", newType2);
-		assert newRelation.getMeta().equals(metaRelation);
+		assert newRelation.getMeta().equals(metaRelation) : newRelation.info();
 	}
 
 	public void testMetaForGeneric() {

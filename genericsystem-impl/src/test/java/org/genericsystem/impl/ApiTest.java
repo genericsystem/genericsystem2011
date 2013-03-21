@@ -16,6 +16,14 @@ import org.testng.annotations.Test;
 @Test
 public class ApiTest extends AbstractTest {
 
+	public void test() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type a = cache.newType("A");
+		a.newSubType(cache, "B");
+		Type b = cache.newType("B");
+		b.newSubType(cache, "A");
+	}
+
 	@Test(enabled = false)
 	public void test_simple_api() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();

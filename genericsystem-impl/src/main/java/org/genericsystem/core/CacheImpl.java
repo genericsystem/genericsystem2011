@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+import java.nio.channels.IllegalSelectorException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -374,8 +375,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 	<T extends Generic> T internalBind(Generic implicit, Generic[] supers, Generic[] components) {
 		final Generic[] interfaces = new Primaries(supers).toArray();
 		Generic[] directSupers = getDirectSupers(interfaces, components);
-		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
+		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components)) {
+			if (!implicit.equals(directSupers[0].getImplicit()))
+				throw new IllegalSelectorException();
 			return (T) directSupers[0];
+		}
 
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
@@ -387,10 +391,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 			remove(generic);
 
 		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex(implicit, directSupers, components);
-
 		T superGeneric = this.<T> insert(newGeneric);
 		new ConnectionMap().reBuild(orderedDependencies);
-		assert superGeneric == findByDirectSupers(directSupers, components);
+		// assert superGeneric == findByDirectSupers(((GenericImpl) newGeneric).supers, components);
 		return superGeneric;
 	}
 
@@ -419,7 +422,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		ConnectionMap connectionMap = new ConnectionMap();
 		connectionMap.reBuild(orderAndRemoveDependencies(generic));
 		T rebind = (T) connectionMap.get(generic);
-		assert rebind == (((GenericImpl) rebind).isPrimary() ? findPrimaryByValue(((GenericImpl) rebind).supers[0], rebind.getValue(), rebind.getMetaLevel()) : findByDirectSupers(((GenericImpl) rebind).supers, ((GenericImpl) rebind).components));
+		// TODO clean
+		// assert rebind == (((GenericImpl) rebind).isPrimary() ? findPrimaryByValue(((GenericImpl) rebind).supers[0], rebind.getValue(), rebind.getMetaLevel()) : findByDirectSupers(((GenericImpl) rebind).supers, ((GenericImpl) rebind).components));
 		return rebind;
 	}
 
@@ -432,7 +436,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).components);
 				Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).supers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
 				adjust(((GenericImpl) orderedDependency).supers[0]);
-				Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex((orderedDependency), directSupers, newComponents));
+				Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex(orderedDependency.getImplicit(), directSupers, newComponents));
 				put(orderedDependency, bind);
 			}
 		}

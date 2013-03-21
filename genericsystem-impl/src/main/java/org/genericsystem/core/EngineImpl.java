@@ -165,7 +165,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			} else if (MetaRelation.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (result == null)
-					result = cache.insert(new GenericImpl().initializeComplex(get(MetaAttribute.class), new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
+					result = cache.insert(new GenericImpl().initializeComplex(get(MetaAttribute.class).getImplicit(), new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);
