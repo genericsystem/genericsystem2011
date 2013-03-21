@@ -21,12 +21,6 @@ import org.genericsystem.constraints.simple.SuperRuleConstraintImpl;
 import org.genericsystem.constraints.simple.UnduplicateBindingConstraintImpl;
 import org.genericsystem.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.constraints.simple.VirtualConstraintImpl;
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Config;
-import org.genericsystem.core.Context;
-import org.genericsystem.core.Engine;
-import org.genericsystem.core.Factory;
-import org.genericsystem.core.Generic;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
 import org.genericsystem.generic.Attribute;
@@ -118,6 +112,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 	@Override
 	public boolean inheritsFrom(Generic generic) {
 		return this.equals(generic);
+	}
+
+	@Override
+	public int getMetaLevel() {
+		return SystemGeneric.META;
 	}
 
 	private class SystemCache extends HashMap<Class<?>, Generic> {

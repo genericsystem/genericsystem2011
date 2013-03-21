@@ -106,19 +106,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 
 		// TODO KK
-		assert getMetaLevel() == metaLevel : this + " => " + getMetaLevel() + " / " + metaLevel;
-		if (!isPrimary()) {
-			assert contains(value, directSupers) : value + " directSupers " + Arrays.toString(directSupers);
+		assert getMetaLevel() == metaLevel : this + " => getMetaLevel() : " + getMetaLevel() + " / metaLevel : " + metaLevel;
+		if (!isPrimary())
 			assert Objects.equals(directSupers[directSupers.length - 1].getValue(), value);
-		}
 		return this;
-	}
-
-	private boolean contains(Serializable searchValue, Generic[] generics) {
-		for (int i = 0; i < generics.length; i++)
-			if (Objects.equals(generics[i].getValue(), searchValue))
-				return true;
-		return false;
 	}
 
 	<T extends Generic> T plug() {
@@ -183,13 +174,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public int getMetaLevel() {
-		Generic firstSuper = getImplicit();
-		int metaLevel = 0;
-		while (!firstSuper.equals(getEngine())) {
-			metaLevel++;
-			firstSuper = ((GenericImpl) firstSuper).supers[0];
-		}
-		return metaLevel;
+		return isPrimary() ? supers[0].getMetaLevel() + 1 : getImplicit().getMetaLevel();
 	}
 
 	@Override
