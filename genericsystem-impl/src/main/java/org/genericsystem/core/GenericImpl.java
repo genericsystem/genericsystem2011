@@ -65,7 +65,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	Generic[] components;
 
-	int metaLevel;
+	// TODO clean
+	// int metaLevel;
 	Serializable value;
 
 	public Generic[] getSupersArray() {
@@ -80,6 +81,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
 	}
 
+	// TODO clean
 	final GenericImpl initializeComplex(Generic implicit, Generic[] directSupers, Generic[] components) {
 		// boolean result = false;
 		// for (Generic candidate : directSupers)
@@ -92,8 +94,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
 		this.value = value;
-		this.metaLevel = metaLevel;
-		supers = directSupers;
+		this.supers = directSupers;
 		this.components = components;
 
 		initSelfComponents();
@@ -102,7 +103,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : directSupers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
+
+		// TODO KK
+		assert getMetaLevel() == metaLevel : this + " => " + getMetaLevel() + " / " + metaLevel;
+		if (!isPrimary()) {
+			assert contains(value, directSupers) : value + " directSupers " + Arrays.toString(directSupers);
+			assert Objects.equals(directSupers[directSupers.length - 1].getValue(), value);
+		}
 		return this;
+	}
+
+	private boolean contains(Serializable searchValue, Generic[] generics) {
+		for (int i = 0; i < generics.length; i++)
+			if (Objects.equals(generics[i].getValue(), searchValue))
+				return true;
+		return false;
 	}
 
 	<T extends Generic> T plug() {
@@ -138,7 +153,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (isPrimary())
 			return (T) this;
 		for (Generic superGeneric : supers)
-			if (metaLevel == ((GenericImpl) superGeneric).metaLevel && Objects.hashCode(value) == Objects.hashCode(((GenericImpl) superGeneric).value) && Objects.equals(value, ((GenericImpl) superGeneric).value))
+			// TODO ???
+			if (/* metaLevel == ((GenericImpl) superGeneric).metaLevel && */Objects.hashCode(value) == Objects.hashCode(((GenericImpl) superGeneric).value) && Objects.equals(value, ((GenericImpl) superGeneric).value))
 				return ((GenericImpl) superGeneric).getImplicit();
 		throw new IllegalStateException(info());
 	}
@@ -158,8 +174,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getMetaLevel() - generic.getMetaLevel() == 1 ? this.inheritsFrom(generic) : false;
 	}
 
+	// TODO clean
+	// @Override
+	// public int getMetaLevel() {
+	// return metaLevel;
+	// }
+
 	@Override
 	public int getMetaLevel() {
+		Generic firstSuper = getImplicit();
+		int metaLevel = 0;
+		while (!firstSuper.equals(getEngine())) {
+			metaLevel++;
+			firstSuper = ((GenericImpl) firstSuper).supers[0];
+		}
 		return metaLevel;
 	}
 
@@ -579,33 +607,47 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class);
 	}
 
-	// @Override
-	// public void deduct(final Cache cache) {
-	// if (!isPseudoStructural())
-	// return;
-	// for (int i = 0; i < components.length; i++) {
-	// Generic component = components[i];
-	// if (component.isStructural())
-	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
-	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
-	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-	// bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
-	// }
-	// }
-	// }
-
 	@Override
 	public void deduct(final Cache cache) {
+		if (!isPseudoStructural())
+			return;
 		for (int i = 0; i < components.length; i++) {
 			Generic component = components[i];
 			if (component.isStructural())
 				for (Generic inherited : ((Type) component).getInheritings(cache)) {
-					Generic phantom = ((CacheImpl) cache).findPrimaryByValue(isPseudoStructural() ? ((GenericImpl) getImplicit()).supers[0] : getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE);
+					Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
 					if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-						bind(cache, bindPrimary(cache, value, metaLevel), this, Statics.replace(i, components, inherited));
+						bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
 				}
 		}
 	}
+
+	public void deduct(final Cache cache, int basePos) {
+		for (int i = 0; i < components.length; i++) {
+			if (i != basePos) {
+				Generic component = components[i];
+				if (component.isStructural())
+					for (Generic inherited : ((Type) component).getInheritings(cache)) {
+						Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
+						if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
+							bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
+					}
+			}
+		}
+	}
+
+	// @Override
+	// public void deduct(final Cache cache) {
+	// for (int i = 0; i < components.length; i++) {
+	// Generic component = components[i];
+	// if (component.isStructural())
+	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
+	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(isPseudoStructural() ? ((GenericImpl) getImplicit()).supers[0] : getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE);
+	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
+	// bind(cache, bindPrimary(cache, value, metaLevel), this, Statics.replace(i, components, inherited));
+	// }
+	// }
+	// }
 
 	public boolean isPhantom() {
 		return Statics.PHAMTOM.equals(getValue());
@@ -623,27 +665,45 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	private <T extends Generic> Iterator<T> inheritanceStructuralIterator(final Context context, final Generic origin) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(context, origin) {
 			@Override
-			protected boolean isSelected(Generic father, Generic candidate) {
+			public boolean isSelected(Generic father, Generic candidate) {
 				return candidate.getMetaLevel() <= SystemGeneric.STRUCTURAL && candidate.isAttributeOf(GenericImpl.this);
 			}
 
 			@Override
 			public boolean isSelectable() {
-				return next.isStructural() && next.isAttributeOf(GenericImpl.this);
+				return next.isStructural() /* && next.isAttributeOf(GenericImpl.this) */;
 			}
 		};
 	}
 
 	private <T extends Generic> Iterator<T> inheritanceConcreteIterator(final Context context, final Generic origin, final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(context, origin) {
+
 			@Override
-			protected boolean isSelected(Generic father, Generic candidate) {
-				return ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos);
+			protected Iterator<Generic> children(final Generic father) {
+				return new AbstractFilterIterator<Generic>(((GenericImpl) father).directInheritingsIterator(context)) {
+					@Override
+					public boolean isSelected() {
+						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
+						if (selected) {
+							if (((GenericImpl) next).isPseudoStructural())
+								if (context instanceof Cache)
+									((GenericImpl) next).deduct((Cache) context, pos);
+						}
+						return selected;
+
+					}
+				};
 			}
 
 			@Override
 			public boolean isSelectable() {
-				return next.isConcrete() && ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
+				return next.isConcrete() /* && ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) */;
+			}
+
+			@Override
+			public final boolean isSelected(Generic father, Generic candidate) {
+				throw new IllegalStateException();
 			}
 		};
 	}
@@ -651,7 +711,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	boolean safeIsEnabled(Context context, Attribute attribute) {
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(context, attribute) {
 			@Override
-			protected boolean isSelected(Generic father, Generic candidate) {
+			public boolean isSelected(Generic father, Generic candidate) {
 				return (candidate.getMetaLevel() <= SystemGeneric.CONCRETE) && candidate.isAttributeOf(GenericImpl.this);
 			}
 
@@ -1054,7 +1114,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			public Iterator<T> iterator() {
 				return (Iterator<T>) new AbstractSelectableLeafIterator(context, GenericImpl.this) {
 					@Override
-					protected boolean isSelected(Generic father, Generic candidate) {
+					public boolean isSelected(Generic father, Generic candidate) {
 						return candidate.isInstanceOf(GenericImpl.this);
 					}
 
@@ -1278,7 +1338,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private void internalCancel(Cache cache, Holder attribute, int basePos) {
-		addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, Statics.PHAMTOM, attribute.getMetaLevel()), attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		addLink(cache, attribute.isStructural() ? getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE), attribute, basePos,
+				Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override

@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Supers;
 import org.genericsystem.annotation.SystemGeneric;
@@ -22,9 +21,6 @@ import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.constraints.Constraint;
 import org.genericsystem.constraints.Constraint.CheckingType;
-import org.genericsystem.core.Context;
-import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AbstractConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
@@ -111,12 +107,13 @@ public abstract class AbstractContext implements Context, Serializable {
 			}
 
 			@Override
-			protected boolean isSelected(Generic father, Generic candidate) {
+			public boolean isSelected(Generic father, Generic candidate) {
 				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).components, interfaces, components);
 			}
 		};
 	}
 
+	// TODO clean
 	protected Generic[] getDirectSupers(final Generic[] interfaces, final Generic[] components) {
 		List<Generic> list = new ArrayList<Generic>();
 		final Iterator<Generic> iterator = getDirectSupersIterator(interfaces, components);
@@ -129,6 +126,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
+	// TODO KK
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isAlive(this))
 			return (T) generic;
@@ -198,19 +196,15 @@ public abstract class AbstractContext implements Context, Serializable {
 	}
 
 	Generic findImplicitSuper(Class<?> clazz) {
-		Supers supersAnnotation = clazz.getAnnotation(Supers.class);
-		if (supersAnnotation == null) {
-			Generic[] supers = findSupers(clazz);
-			return supers.length == 0 ? getEngine() : supers[0].getImplicit();
-		}
-		return find(supersAnnotation.implicitSuper()).getImplicit();
+		if (SystemGeneric.STRUCTURAL == clazz.getAnnotation(SystemGeneric.class).value())
+			return getEngine();
+		Generic[] supers = findSupers(clazz);
+		assert supers.length == 1;
+		return supers[0].getImplicit();
 	}
 
 	int findMetaLevel(Class<?> clazz) {
-		SystemGeneric annotation = clazz.getAnnotation(SystemGeneric.class);
-		if (annotation == null)
-			return SystemGeneric.STRUCTURAL;
-		return annotation.value();
+		return clazz.getAnnotation(SystemGeneric.class).value();
 	}
 
 	LinkedHashSet<Class<?>> getSupersClasses(Class<?> clazz) {

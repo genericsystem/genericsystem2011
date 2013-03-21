@@ -692,7 +692,6 @@ public class RelationTest extends AbstractTest {
 
 		Link carPierre = pierre.setLink(cache, carPerson, "defaultPerson", car);
 		Generic myAudi = car.newInstance(cache, "myAudi");
-		log.info("" + pierre.getLinks(cache, carPerson));
 		// should throw a singular constraint exception
 
 		// assert myBmw.getLink(cache, carPerson).getBaseComponent().equals(car);
@@ -880,7 +879,6 @@ public class RelationTest extends AbstractTest {
 		rearLeft.bind(cache, carTyres, myBmw);
 		Link myBmwRearRight1 = rearRight.setLink(cache, carTyres, "value1", myBmw);
 		assert myBmw.getLinks(cache, carTyres).contains(myBmwRearRight1);
-		log.info("zzzzzzzzzzzzzzzzzzzzzzzzz");
 		Link myBmwRearRight2 = rearRight.setLink(cache, carTyres, "value1", myBmw);
 		assert myBmwRearRight1 == myBmwRearRight2;
 
@@ -958,7 +956,6 @@ public class RelationTest extends AbstractTest {
 
 		Relation carColor = car.setRelation(cache, "CarColor", color);
 		Link carRed = red.setLink(cache, carColor, "defaultColor", car);
-		log.info("" + red.getLink(cache, carColor) + " " + carColor.getAllInstances(cache));
 		assert red.getLink(cache, carColor).getBaseComponent().equals(car);
 
 		Link yourAudiRed = red.bind(cache, carColor, yourAudi);
