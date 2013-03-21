@@ -81,7 +81,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				yourDog.setValue(cache, runs, "myDogRuns").log();
+				yourDog.setValue(cache, runs, "myDogRuns");
 			}
 		}.assertIsCausedBy(IllegalStateException.class);
 	}

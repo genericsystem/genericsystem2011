@@ -225,9 +225,9 @@ public class PhamtomLinkTest extends AbstractTest {
 		Attribute carPower = car.setProperty(cache, "power");
 		Holder defaultPower = car.setValue(cache, carPower, "233");
 		Generic mycar = car.newInstance(cache, "myCar");
-		assert mycar.getValue(cache, carPower).equals("233");
+		assert mycar.getHolder(cache, carPower).equals(defaultPower);
 		mycar.cancel(cache, defaultPower);
-		assert mycar.getValue(cache, carPower) == null : mycar.getValue(cache, carPower);
+		assert mycar.getHolder(cache, carPower) == null : mycar.getHolder(cache, carPower);
 	}
 
 	public void cancelDefaultAttributeKo() {

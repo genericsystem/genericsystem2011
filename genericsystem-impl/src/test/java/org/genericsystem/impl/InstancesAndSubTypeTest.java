@@ -14,15 +14,6 @@ import org.testng.annotations.Test;
 @Test
 public class InstancesAndSubTypeTest extends AbstractTest {
 
-	public void testSubTypes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type vehicle = cache.newType("Vehicle");
-		Type car1 = cache.newSubType("Car1", vehicle);
-		Type car2 = vehicle.newSubType(cache, "Car2");
-		car1.log();
-		car2.log();
-	}
-
 	public void testInstancesSnapshotOfType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");

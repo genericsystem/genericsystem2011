@@ -636,19 +636,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	// @Override
-	// public void deduct(final Cache cache) {
-	// for (int i = 0; i < components.length; i++) {
-	// Generic component = components[i];
-	// if (component.isStructural())
-	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
-	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(isPseudoStructural() ? ((GenericImpl) getImplicit()).supers[0] : getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE);
-	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-	// bind(cache, bindPrimary(cache, value, metaLevel), this, Statics.replace(i, components, inherited));
-	// }
-	// }
-	// }
-
 	public boolean isPhantom() {
 		return Statics.PHAMTOM.equals(getValue());
 	}

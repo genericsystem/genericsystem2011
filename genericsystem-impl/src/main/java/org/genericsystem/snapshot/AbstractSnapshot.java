@@ -69,10 +69,8 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 	@Override
 	public boolean containsAll(Snapshot<?> c) {
 		for (Object e : c)
-			if (!contains(e)) {
-				log.info(this + " / " + e);
+			if (!contains(e))
 				return false;
-			}
 		return true;
 	}
 
