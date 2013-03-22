@@ -1,13 +1,11 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -1058,36 +1056,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public Iterator<T> children(T node) {
-				if (GenericImpl.this.toString().equals("[mycar, Vehicle]/[]"))
-					log.info("node " + node + " instanciationLevel " + instanciationLevel);
 				return new AbstractFilterIterator<T>(((GenericImpl) node).<T> directSupersIterator()) {
 					@Override
 					public boolean isSelected() {
-						if (GenericImpl.this.toString().equals("[mycar, Vehicle]/[]"))
-							log.info("next " + next.info() + " next.getMetaLevel() " + next.getMetaLevel() + " ==> " + (instanciationLevel <= next.getMetaLevel()));
 						return instanciationLevel <= next.getMetaLevel();
 					}
 				};
 			}
 		}, instanciationLevel);
-		List<T> list = new ArrayList<>();
-		while (levelFilter.hasNext()) {
-			T next = levelFilter.next();
-			for (int i = 0; i < list.size(); i++)
-				if (next.inheritsFrom(list.get(i)))
-					list.remove(i);
-			if (!list.isEmpty()) {
-				boolean add = true;
-				for (int i = 0; i < list.size(); i++)
-					if (list.get(i).inheritsFrom(next))
-						add = false;
-				if (add)
-					list.add(next);
-			} else
-				list.add(next);
+		return getTheSpecializedGeneric(levelFilter);
+	}
+
+	private <T extends Generic> T getTheSpecializedGeneric(Iterator<T> metaIterator) {
+		T specializedGeneric = null;
+		while (metaIterator.hasNext()) {
+			T generic = metaIterator.next();
+			if (specializedGeneric == null || generic.inheritsFrom(specializedGeneric))
+				specializedGeneric = generic;
 		}
-		assert list.size() == 1 : this + " ambigous meta " + list;
-		return list.get(0);
+		return specializedGeneric;
 	}
 
 	@Override

@@ -84,7 +84,6 @@ public class RebindTest extends AbstractTest {
 		Generic mycar = car.newInstance(cache, "mycar");
 		Attribute carPower = car.setAttribute(cache, "power");
 		mycar.setValue(cache, carPower, "123");
-		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		Generic reboundVehicle = ((GenericImpl) vehicle).reBind(cache);
 		assert !vehicle.isAlive(cache);
 		assert !car.isAlive(cache);
