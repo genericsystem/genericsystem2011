@@ -1050,7 +1050,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Generic> T getMeta() {
 		final int instanciationLevel = getMetaLevel() == 0 ? 0 : getMetaLevel() - 1;
-		final Iterator<T> levelFilter = Statics.levelFilter(new AbstractPreTreeIterator<T>((T) this) {
+		return getTheSpecializedGeneric(Statics.<T> levelFilter(new AbstractPreTreeIterator<T>((T) this) {
 
 			private static final long serialVersionUID = 3838947358131801753L;
 
@@ -1063,8 +1063,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					}
 				};
 			}
-		}, instanciationLevel);
-		return getTheSpecializedGeneric(levelFilter);
+		}, instanciationLevel));
 	}
 
 	private <T extends Generic> T getTheSpecializedGeneric(Iterator<T> metaIterator) {
