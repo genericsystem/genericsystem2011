@@ -1073,6 +1073,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (specializedGeneric == null || generic.inheritsFrom(specializedGeneric))
 				specializedGeneric = generic;
 		}
+		assert specializedGeneric != null;
 		return specializedGeneric;
 	}
 
