@@ -1056,7 +1056,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				int length = ((GenericImpl) father).supers.length;
 				if (father.getMetaLevel() == instanciationLevel)
 					return Statics.emptyIterator();
-				return new SingletonIterator<Generic>((length > 1 ? ((GenericImpl) father).supers[length - 1] : ((GenericImpl) father).supers[0]));
+				return new SingletonIterator<Generic>(((GenericImpl) father).supers[length - 1]);
 			}
 
 			@Override
