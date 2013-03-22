@@ -336,28 +336,30 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return orderedGenerics;
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
+	// @Override
+	// @SuppressWarnings("unchecked")
 	// TODO KK
-	public <T extends Generic> T reFind(Generic generic) {
-		if (generic.isEngine())
-			return getEngine();
-		if (generic.isAlive(this))
-			return (T) generic;
-		if (((GenericImpl) generic).isPrimary())
-			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue(), generic.getMetaLevel());
-		Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
-		Generic[] boundPrimaries = new Generic[primariesArray.length];
-		for (int i = 0; i < primariesArray.length; i++)
-			boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
-		Generic[] extendedComponents = ((GenericImpl) generic).components;
-		for (int i = 0; i < extendedComponents.length; i++)
-			extendedComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
-		Generic[] directSupers = getDirectSupers(boundPrimaries, extendedComponents);
-		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(boundPrimaries, extendedComponents))
-			return (T) directSupers[0];
-		return null;
-	}
+	// public <T extends Generic> T reFind(Generic generic) {
+	// if (generic.isEngine())
+	// return getEngine();
+	// if (generic.isAlive(this))
+	// return (T) generic;
+	// if (((GenericImpl) generic).isPrimary())
+	// return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue(), generic.getMetaLevel());
+	// Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
+	// Generic[] boundPrimaries = new Generic[primariesArray.length];
+	// for (int i = 0; i < primariesArray.length; i++)
+	// boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
+	// Generic[] extendedComponents = ((GenericImpl) generic).components;
+	// // TODO KK
+	// // for (int i = 0; i < extendedComponents.length; i++)
+	// // extendedComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
+	// Generic[] directSupers = getDirectSupers(boundPrimaries, extendedComponents);
+	// for (int i = 0; i < directSupers.length; i++)
+	// if (((GenericImpl) directSupers[i]).equiv(boundPrimaries, extendedComponents))
+	// return (T) directSupers[i];
+	// throw new IllegalStateException();
+	// }
 
 	// TODO refactor => subtype complexe
 	<T extends Generic> T bind(Class<?> clazz) {
@@ -397,16 +399,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return superGeneric;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T extends Generic> T findByDirectSupers(Generic[] directSupers, Generic[] components) {
-		Iterator<Generic> iterator = components.length > 0 && components[0] != null ? compositesIterator(components[0]) : directInheritingsIterator(directSupers[0]);
-		while (iterator.hasNext()) {
-			Generic directInheriting = iterator.next();
-			if (Arrays.equals(((GenericImpl) directInheriting).supers, directSupers) && Arrays.equals(((GenericImpl) directInheriting).components, ((GenericImpl) directInheriting).transform(components)))
-				return (T) directInheriting;
-		}
-		return null;
-	}
+	// TODO clean
+	// @SuppressWarnings("unchecked")
+	// private <T extends Generic> T findByDirectSupers(Generic[] directSupers, Generic[] components) {
+	// Iterator<Generic> iterator = components.length > 0 && components[0] != null ? compositesIterator(components[0]) : directInheritingsIterator(directSupers[0]);
+	// while (iterator.hasNext()) {
+	// Generic directInheriting = iterator.next();
+	// if (Arrays.equals(((GenericImpl) directInheriting).supers, directSupers) && Arrays.equals(((GenericImpl) directInheriting).components, ((GenericImpl) directInheriting).transform(components)))
+	// return (T) directInheriting;
+	// }
+	// return null;
+	// }
 
 	private Iterator<Generic> concernedDependenciesIterator(Generic directSuper, final Generic[] interfaces, final Generic[] extendedComponents) {
 		return new AbstractFilterIterator<Generic>(directInheritingsIterator(directSuper)) {
@@ -430,12 +433,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private class ConnectionMap extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 8257917150315417734L;
 
-		// TODO KK getDirectSupers with implicit
+		// TODO KK getDirectSupers
 		private void reBuild(NavigableSet<Generic> orderedDependencies) {
 			for (Generic orderedDependency : orderedDependencies) {
 				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).components);
-				Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).supers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
-				adjust(((GenericImpl) orderedDependency).supers[0]);
+				// Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).supers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
+				Generic[] directSupers = adjust(((GenericImpl) orderedDependency).supers);
+				// adjust(((GenericImpl) orderedDependency).supers[0]);
 				Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex(orderedDependency.getImplicit(), directSupers, newComponents));
 				put(orderedDependency, bind);
 			}
