@@ -68,7 +68,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	// TODO clean
 	// int metaLevel;
-	Serializable value;
+	// Serializable value;
 
 	public Generic[] getSupersArray() {
 		return supers.clone();
@@ -115,7 +115,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
-		this.value = value;
+		// this.value = value;
 		this.supers = directSupers;
 		this.components = components;
 
@@ -130,6 +130,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		assert getMetaLevel() == metaLevel : this + " => getMetaLevel() : " + getMetaLevel() + " / metaLevel : " + metaLevel;
 		if (!isPrimary())
 			assert Objects.equals(directSupers[0].getValue(), value);
+
+		getEngine().putValue(this, value);
 		return this;
 	}
 
@@ -163,13 +165,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getImplicit() {
-		if (isPrimary())
-			return (T) this;
-		for (Generic superGeneric : supers)
-			// TODO ???
-			if (/* metaLevel == ((GenericImpl) superGeneric).metaLevel && */Objects.hashCode(value) == Objects.hashCode(((GenericImpl) superGeneric).value) && Objects.equals(value, ((GenericImpl) superGeneric).value))
-				return ((GenericImpl) superGeneric).getImplicit();
-		throw new IllegalStateException(info());
+		return isPrimary() ? (T) this : supers[0].<T> getImplicit();
 	}
 
 	@Override
@@ -255,7 +251,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <S extends Serializable> S getValue() {
-		return (S) value;
+		return (S) getEngine().getValue(this);
 	}
 
 	@Override
@@ -624,7 +620,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				for (Generic inherited : ((Type) component).getInheritings(cache)) {
 					Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
 					if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-						bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
+						bind(cache, bindPrimary(cache, getValue(), SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
 				}
 		}
 	}
@@ -1001,8 +997,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
 		s += "toString()     : " + this + "\n";
-		s += "Value          : " + value + "\n";
-		// s += "getMeta()      : " + getMeta() + "\n";
+		s += "Value          : " + getValue() + "\n";
+		s += "getMeta()      : " + getMeta() + "\n";
 		s += "getInstanciationLevel() : " + getMetaLevel() + "\n";
 		for (Generic primary : getPrimaries())
 			s += "Primary #" + "       : " + primary + " (" + System.identityHashCode(primary) + ")\n";
@@ -1017,8 +1013,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public String toString() {
-		if (isPrimary())
+		if (isPrimary()) {
+			Serializable value = getValue();
 			return value instanceof Class ? ((Class<?>) value).getSimpleName() : value != null ? value.toString() : "null";
+		}
 		return Arrays.toString(getPrimariesArray()) + "/" + toString(components);
 	}
 

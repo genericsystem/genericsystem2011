@@ -1,8 +1,10 @@
 package org.genericsystem.core;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.InstanceClassConstraintImpl;
@@ -48,11 +50,21 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	private Archiver archiver;
 
+	private Map<Generic, Serializable> valuesMap = new HashMap<>();
+
 	public EngineImpl(Config config, Class<?>... userClasses) {
 		factory = config.getFactory();
 		archiver = new Archiver(this, config.getDirectoryPath());
 		systemCache.init(userClasses);
 		archiver.startScheduler();
+	}
+
+	public Serializable getValue(Generic generic) {
+		return valuesMap.get(generic);
+	}
+
+	public void putValue(Generic generic, Serializable value) {
+		valuesMap.put(generic, value);
 	}
 
 	void restoreEngine() {
@@ -179,4 +191,5 @@ public class EngineImpl extends GenericImpl implements Engine {
 	public void close() {
 		archiver.close();
 	}
+
 }
