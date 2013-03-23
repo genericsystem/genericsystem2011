@@ -19,9 +19,9 @@ public class RebindTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute carPower = car.setAttribute(cache, "Power");
+		carPower.log();
 		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
 		assert !carPower.isAlive(cache);
-
 		assert ((GenericImpl) carPower).reFind(cache).inheritsFrom(vehiclePower);
 
 	}

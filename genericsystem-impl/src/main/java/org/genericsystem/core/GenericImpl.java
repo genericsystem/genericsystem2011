@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -42,6 +41,7 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.iterator.ArrayIterator;
+import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.system.CascadeRemoveSystemProperty;
 import org.genericsystem.system.ComponentPosValue;
@@ -68,7 +68,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	// TODO clean
 	// int metaLevel;
-	Serializable value;
+	// Serializable value;
 
 	public Generic[] getSupersArray() {
 		return supers.clone();
@@ -84,18 +84,39 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	// TODO clean
 	final GenericImpl initializeComplex(Generic implicit, Generic[] directSupers, Generic[] components) {
-		// boolean result = false;
-		// for (Generic candidate : directSupers)
-		// if (candidate.equals(implicit))
-		// result = true;
-		// assert result : implicit.getMeta().info() + directSupers[0].info();
-		// assert implicit.equals(directSupers[0]) : implicit.info() + directSupers[1].info();
+		assert ((GenericImpl) implicit).isPrimary() : "implicit isn't primary";
+		reorderImplicit(implicit, directSupers);
 		return restore(implicit.getValue(), implicit.getMetaLevel(), null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
 	}
 
+	private void reorderImplicit(Generic implicit, Generic[] directSupers) {
+		int index = 0;
+		for (int i = 0; i < directSupers.length; i++)
+			if (((GenericImpl) directSupers[i]).contains(implicit)) {
+				index = i;
+				break;
+			}
+		if (index != 0) {
+			Generic tmp = directSupers[index];
+			directSupers[index] = directSupers[0];
+			directSupers[0] = tmp;
+		}
+	}
+
+	private boolean contains(Generic search) {
+		if (equals(search))
+			return true;
+		if (isEngine())
+			return false;
+		for (Generic superGeneric : supers)
+			if (((GenericImpl) superGeneric).contains(search))
+				return true;
+		return false;
+	}
+
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
-		this.value = value;
-		this.supers = directSupers;
+		// this.value = value;
+		supers = directSupers;
 		this.components = components;
 
 		initSelfComponents();
@@ -106,19 +127,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 
 		// TODO KK
-		assert getMetaLevel() == metaLevel : this + " => " + getMetaLevel() + " / " + metaLevel;
-		if (!isPrimary()) {
-			assert contains(value, directSupers) : value + " directSupers " + Arrays.toString(directSupers);
-			assert Objects.equals(directSupers[directSupers.length - 1].getValue(), value);
-		}
-		return this;
-	}
+		assert getMetaLevel() == metaLevel : this + " => getMetaLevel() : " + getMetaLevel() + " / metaLevel : " + metaLevel;
+		if (!isPrimary())
+			assert Objects.equals(directSupers[0].getValue(), value);
 
-	private boolean contains(Serializable searchValue, Generic[] generics) {
-		for (int i = 0; i < generics.length; i++)
-			if (Objects.equals(generics[i].getValue(), searchValue))
-				return true;
-		return false;
+		getEngine().putValue(this, value);
+		return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -151,13 +165,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getImplicit() {
-		if (isPrimary())
-			return (T) this;
-		for (Generic superGeneric : supers)
-			// TODO ???
-			if (/* metaLevel == ((GenericImpl) superGeneric).metaLevel && */Objects.hashCode(value) == Objects.hashCode(((GenericImpl) superGeneric).value) && Objects.equals(value, ((GenericImpl) superGeneric).value))
-				return ((GenericImpl) superGeneric).getImplicit();
-		throw new IllegalStateException(info());
+		return isPrimary() ? (T) this : supers[0].<T> getImplicit();
 	}
 
 	@Override
@@ -183,13 +191,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public int getMetaLevel() {
-		Generic firstSuper = getImplicit();
-		int metaLevel = 0;
-		while (!firstSuper.equals(getEngine())) {
-			metaLevel++;
-			firstSuper = ((GenericImpl) firstSuper).supers[0];
-		}
-		return metaLevel;
+		return isPrimary() ? supers[0].getMetaLevel() + 1 : getImplicit().getMetaLevel();
 	}
 
 	@Override
@@ -249,7 +251,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <S extends Serializable> S getValue() {
-		return (S) value;
+		return (S) getEngine().getValue(this);
 	}
 
 	@Override
@@ -444,7 +446,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> structuralIterator(Context context) {
+	public <T extends Generic> Iterator<T> structuralIterator(Context context) {
 		return this.<T> structuralIterator(context, ((AbstractContext) context).getMetaAttribute(), false);
 	}
 
@@ -618,7 +620,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				for (Generic inherited : ((Type) component).getInheritings(cache)) {
 					Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
 					if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-						bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
+						bind(cache, bindPrimary(cache, getValue(), SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
 				}
 		}
 	}
@@ -995,7 +997,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
 		s += "toString()     : " + this + "\n";
-		s += "Value          : " + value + "\n";
+		s += "Value          : " + getValue() + "\n";
 		s += "getMeta()      : " + getMeta() + "\n";
 		s += "getInstanciationLevel() : " + getMetaLevel() + "\n";
 		for (Generic primary : getPrimaries())
@@ -1011,9 +1013,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public String toString() {
-		if (isPrimary())
+		if (isPrimary()) {
+			Serializable value = getValue();
 			return value instanceof Class ? ((Class<?>) value).getSimpleName() : value != null ? value.toString() : "null";
-		return Arrays.toString(getPrimariesArray()) + "/" + toString(components);
+		}
+		return Arrays.toString(getPrimariesArray() /* supers */) + "/" + toString(components);
 	}
 
 	private String toString(Object[] a) {
@@ -1044,20 +1048,29 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Generic> T getMeta() {
 		final int instanciationLevel = getMetaLevel() == 0 ? 0 : getMetaLevel() - 1;
-		return Statics.levelFilter(new AbstractPreTreeIterator<T>((T) this) {
-
-			private static final long serialVersionUID = 3838947358131801753L;
+		Iterator<Generic> leafIterator = new AbstractSelectableLeafIterator(null, this) {
 
 			@Override
-			public Iterator<T> children(T node) {
-				return new AbstractFilterIterator<T>(((GenericImpl) node).<T> directSupersIterator()) {
-					@Override
-					public boolean isSelected() {
-						return instanciationLevel <= next.getMetaLevel();
-					}
-				};
+			protected Iterator<Generic> children(Generic father) {
+				int length = ((GenericImpl) father).supers.length;
+				if (father.getMetaLevel() == instanciationLevel)
+					return Statics.emptyIterator();
+				return new SingletonIterator<Generic>(((GenericImpl) father).supers[length - 1]);
 			}
-		}, instanciationLevel).next();
+
+			@Override
+			protected boolean isSelectable() {
+				return true;
+			}
+
+			@Override
+			protected boolean isSelected(Generic father, Generic candidate) {
+				return true;
+			}
+		};
+		T meta = (T) leafIterator.next();
+		assert !leafIterator.hasNext();
+		return meta;
 	}
 
 	@Override
@@ -1321,7 +1334,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Holder> holders = attribute.isStructural() ? GenericImpl.this.<Holder> structuralIterator(cache, (Attribute) attribute, true) : GenericImpl.this.<Holder> concreteIterator(cache, (Attribute) attribute, basePos, true);
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
-			if (equals(holder.getComponent(basePos)) && ((GenericImpl) holder).isPhantom() && Objects.equals(((GenericImpl) holder).supers[0].getValue(), attribute.getValue()))
+			Generic[] holderSupers = ((GenericImpl) holder).supers;
+			if (equals(holder.getComponent(basePos)) && ((GenericImpl) holder).isPhantom() && Objects.equals(holderSupers[holderSupers.length - 1].getValue(), attribute.getValue()))
 				holder.remove(cache);
 		}
 	}

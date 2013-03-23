@@ -13,7 +13,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.Constraint.CheckingType;
@@ -437,9 +436,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		private void reBuild(NavigableSet<Generic> orderedDependencies) {
 			for (Generic orderedDependency : orderedDependencies) {
 				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).components);
-				// Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).supers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
-				Generic[] directSupers = adjust(((GenericImpl) orderedDependency).supers);
-				// adjust(((GenericImpl) orderedDependency).supers[0]);
+				Generic[] directSupers = ((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).supers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents);
+				// Generic[] directSupers = adjust(((GenericImpl) orderedDependency).supers);
 				Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex(orderedDependency.getImplicit(), directSupers, newComponents));
 				put(orderedDependency, bind);
 			}
