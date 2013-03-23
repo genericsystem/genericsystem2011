@@ -660,7 +660,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public boolean isSelectable() {
-				return next.isStructural() && next.isAttributeOf(GenericImpl.this);
+				return next.isStructural();
 			}
 		};
 	}
@@ -674,7 +674,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public boolean isSelectable() {
-				return next.isConcrete() && ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
+				return next.isConcrete();
 			}
 		};
 	}
@@ -688,7 +688,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public boolean isSelectable() {
-				return next.getMetaLevel() == SystemGeneric.CONCRETE;
+				return next.isConcrete();
 			}
 		};
 		return iterator.hasNext() ? Boolean.TRUE.equals(iterator.next().<ComponentPosValue<Boolean>> getValue().getValue()) : false;
