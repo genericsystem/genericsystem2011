@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -41,7 +42,6 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.iterator.ArrayIterator;
-import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.system.CascadeRemoveSystemProperty;
 import org.genericsystem.system.ComponentPosValue;
@@ -1047,30 +1047,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getMeta() {
-		final int instanciationLevel = getMetaLevel() == 0 ? 0 : getMetaLevel() - 1;
-		Iterator<Generic> leafIterator = new AbstractSelectableLeafIterator(null, this) {
+		return (T) getInternalMeta(this, getMetaLevel() == 0 ? 0 : getMetaLevel() - 1);
+	}
 
-			@Override
-			protected Iterator<Generic> children(Generic father) {
-				int length = ((GenericImpl) father).supers.length;
-				if (father.getMetaLevel() == instanciationLevel)
-					return Statics.emptyIterator();
-				return new SingletonIterator<Generic>(((GenericImpl) father).supers[length - 1]);
-			}
-
-			@Override
-			protected boolean isSelectable() {
-				return true;
-			}
-
-			@Override
-			protected boolean isSelected(Generic father, Generic candidate) {
-				return true;
-			}
-		};
-		T meta = (T) leafIterator.next();
-		assert !leafIterator.hasNext();
-		return meta;
+	private Generic getInternalMeta(GenericImpl generic, int instanciationLevel) {
+		return generic.getMetaLevel() == instanciationLevel ? generic : getInternalMeta((GenericImpl) generic.supers[generic.supers.length - 1], instanciationLevel);
 	}
 
 	@Override
