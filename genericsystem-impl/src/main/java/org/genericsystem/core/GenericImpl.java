@@ -68,7 +68,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	// TODO clean
 	// int metaLevel;
-	// Serializable value;
+	Serializable value;
 
 	public Generic[] getSupersArray() {
 		return supers.clone();
@@ -115,7 +115,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
-		// this.value = value;
+		this.value = value;
 		supers = directSupers;
 		this.components = components;
 
@@ -131,7 +131,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (!isPrimary())
 			assert Objects.equals(directSupers[0].getValue(), value);
 
-		getEngine().putValue(this, value);
+		// getEngine().putValue(this, value);
 		return this;
 	}
 
@@ -251,7 +251,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <S extends Serializable> S getValue() {
-		return (S) getEngine().getValue(this);
+		return (S) value;// (S) getEngine().getValue(this);
 	}
 
 	@Override
