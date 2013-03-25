@@ -673,9 +673,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					public boolean isSelected() {
 						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
 						if (selected) {
-							if (((GenericImpl) next).isPseudoStructural())
-								if (context instanceof Cache)
-									((GenericImpl) next).deduct((Cache) context, pos);
+							// if (((GenericImpl) next).isPseudoStructural(pos))
+							// if (context instanceof Cache)
+							// ((GenericImpl) next).deduct((Cache) context, pos);
 						}
 						return selected;
 
@@ -1702,6 +1702,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return false;
 		for (Generic component : components)
 			if (component.isStructural())
+				return true;
+		return false;
+	}
+
+	boolean isPseudoStructural(int basePos) {
+		if (!isConcrete())
+			return false;
+		for (int i = 0; i < components.length; i++)
+			if (i != basePos && components[i].isStructural())
 				return true;
 		return false;
 	}
