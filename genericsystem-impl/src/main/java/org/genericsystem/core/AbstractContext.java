@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Supers;
 import org.genericsystem.annotation.SystemGeneric;
@@ -127,23 +128,45 @@ public abstract class AbstractContext implements Context, Serializable {
 
 	@SuppressWarnings("unchecked")
 	// TODO KK
+	// public <T extends Generic> T reFind(Generic generic) {
+	// if (generic.isAlive(this))
+	// return (T) generic;
+	// if (((GenericImpl) generic).isPrimary())
+	// return findPrimaryByValue(((GenericImpl) generic).supers[0], generic.getValue(), generic.getMetaLevel());
+	// Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
+	// Generic[] boundPrimaries = new Generic[primariesArray.length];
+	// for (int i = 0; i < primariesArray.length; i++)
+	// boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
+	// Generic[] extendedComponents = ((GenericImpl) generic).components;
+	// Generic[] extendedBoundComponents = new Generic[((GenericImpl) generic).components.length];
+	// for (int i = 0; i < extendedComponents.length; i++)
+	// extendedBoundComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
+	// Generic[] directSupers = getDirectSupers(boundPrimaries, extendedBoundComponents);
+	// if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(boundPrimaries, extendedBoundComponents))
+	// return (T) directSupers[0];
+	// return null;
+	// }
+	//
 	public <T extends Generic> T reFind(Generic generic) {
+		if (generic.isEngine())
+			return getEngine();
 		if (generic.isAlive(this))
 			return (T) generic;
 		if (((GenericImpl) generic).isPrimary())
-			return findPrimaryByValue(((GenericImpl) generic).supers[0], generic.getValue(), generic.getMetaLevel());
+			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue(), generic.getMetaLevel());
 		Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
 		for (int i = 0; i < primariesArray.length; i++)
 			boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
 		Generic[] extendedComponents = ((GenericImpl) generic).components;
-		Generic[] extendedBoundComponents = new Generic[((GenericImpl) generic).components.length];
-		for (int i = 0; i < extendedComponents.length; i++)
-			extendedBoundComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
-		Generic[] directSupers = getDirectSupers(boundPrimaries, extendedBoundComponents);
-		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(boundPrimaries, extendedBoundComponents))
-			return (T) directSupers[0];
-		return null;
+		// TODO KK
+		// for (int i = 0; i < extendedComponents.length; i++)
+		// extendedComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
+		Generic[] directSupers = getDirectSupers(boundPrimaries, extendedComponents);
+		for (int i = 0; i < directSupers.length; i++)
+			if (((GenericImpl) directSupers[i]).equiv(boundPrimaries, extendedComponents))
+				return (T) directSupers[i];
+		throw new IllegalStateException();
 	}
 
 	@SuppressWarnings("unchecked")
