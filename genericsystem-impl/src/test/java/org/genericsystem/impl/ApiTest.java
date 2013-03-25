@@ -1,5 +1,6 @@
 package org.genericsystem.impl;
 
+import java.nio.channels.IllegalSelectorException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -15,6 +16,20 @@ import org.testng.annotations.Test;
 
 @Test
 public class ApiTest extends AbstractTest {
+
+	public void testCyclicInherits() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type a = cache.newType("A");
+		a.newSubType(cache, "B");
+		final Type b = cache.newType("B");
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				b.newSubType(cache, "A");
+			}
+		}.assertIsCausedBy(IllegalSelectorException.class);
+	}
 
 	@Test(enabled = false)
 	public void test_simple_api() {

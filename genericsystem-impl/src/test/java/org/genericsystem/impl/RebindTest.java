@@ -19,9 +19,9 @@ public class RebindTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute carPower = car.setAttribute(cache, "Power");
+		carPower.log();
 		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
 		assert !carPower.isAlive(cache);
-
 		assert ((GenericImpl) carPower).reFind(cache).inheritsFrom(vehiclePower);
 
 	}
@@ -79,16 +79,16 @@ public class RebindTest extends AbstractTest {
 
 	public void rebindTypeNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type color = cache.newType("color");
-		Type primeColor = color.newSubType(cache, "primeColor");
-		Generic red = primeColor.newInstance(cache, "red");
-		Attribute lightness = primeColor.setAttribute(cache, "lightness");
-		red.setValue(cache, lightness, "40");
-		Generic reboundColor = ((GenericImpl) color).reBind(cache);
-		assert !color.isAlive(cache);
-		assert !primeColor.isAlive(cache);
-		assert null != ((CacheImpl) cache).reFind(color);
-		assert reboundColor.isAlive(cache);
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Generic mycar = car.newInstance(cache, "mycar");
+		Attribute carPower = car.setAttribute(cache, "power");
+		mycar.setValue(cache, carPower, "123");
+		Generic reboundVehicle = ((GenericImpl) vehicle).reBind(cache);
+		assert !vehicle.isAlive(cache);
+		assert !car.isAlive(cache);
+		assert null != ((CacheImpl) cache).reFind(vehicle);
+		assert reboundVehicle.isAlive(cache);
 	}
 
 	public void rebindTypeTest() {

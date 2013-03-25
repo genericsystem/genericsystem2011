@@ -122,7 +122,8 @@ public class InstanceOfTest extends AbstractTest {
 		Type car1 = cache.newSubType("Car1", vehicle);
 		Type car2 = vehicle.newSubType(cache, "Car2");
 
-		assert car1.getSupers().first().equals(car2.getSupers().first());
+		// the first super is implicit => Car1 != Car2
+		assert car1.getSupers().get(1).equals(car2.getSupers().get(1));
 	}
 
 	public void testNewSubTypeWithoutSuper() {

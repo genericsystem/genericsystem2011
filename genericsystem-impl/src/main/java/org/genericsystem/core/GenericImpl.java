@@ -129,7 +129,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		assert getMetaLevel() == metaLevel : this + " => getMetaLevel() : " + getMetaLevel() + " / metaLevel : " + metaLevel;
 		if (!isPrimary())
 			assert Objects.equals(directSupers[0].getValue(), value);
-
 		return this;
 	}
 
@@ -249,7 +248,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <S extends Serializable> S getValue() {
-		return (S) value;
+		return (S) value;// (S) getEngine().getValue(this);
 	}
 
 	@Override
@@ -686,7 +685,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public boolean isSelectable() {
-				return next.isConcrete() /* && ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) */;
+				return next.isConcrete();
 			}
 
 			@Override

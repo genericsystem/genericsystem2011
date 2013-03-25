@@ -21,12 +21,6 @@ import org.genericsystem.constraints.simple.SuperRuleConstraintImpl;
 import org.genericsystem.constraints.simple.UnduplicateBindingConstraintImpl;
 import org.genericsystem.constraints.simple.UniqueConstraintImpl;
 import org.genericsystem.constraints.simple.VirtualConstraintImpl;
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Config;
-import org.genericsystem.core.Context;
-import org.genericsystem.core.Engine;
-import org.genericsystem.core.Factory;
-import org.genericsystem.core.Generic;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
 import org.genericsystem.generic.Attribute;
@@ -54,12 +48,22 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	private Archiver archiver;
 
+	// private Map<Generic, Serializable> valuesMap = new HashMap<>();
+
 	public EngineImpl(Config config, Class<?>... userClasses) {
 		factory = config.getFactory();
 		archiver = new Archiver(this, config.getDirectoryPath());
 		systemCache.init(userClasses);
 		archiver.startScheduler();
 	}
+
+	// public Serializable getValue(Generic generic) {
+	// return valuesMap.get(generic);
+	// }
+	//
+	// public void putValue(Generic generic, Serializable value) {
+	// valuesMap.put(generic, value);
+	// }
 
 	void restoreEngine() {
 		restoreEngine(pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE);
@@ -120,6 +124,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 		return this.equals(generic);
 	}
 
+	@Override
+	public int getMetaLevel() {
+		return SystemGeneric.META;
+	}
+
 	private class SystemCache extends HashMap<Class<?>, Generic> {
 
 		private static final long serialVersionUID = 1150085123612887245L;
@@ -166,7 +175,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			} else if (MetaRelation.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (result == null)
-					result = cache.insert(new GenericImpl().initializeComplex(get(MetaAttribute.class), new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
+					result = cache.insert(new GenericImpl().initializeComplex(get(MetaAttribute.class).getImplicit(), new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);
@@ -180,4 +189,5 @@ public class EngineImpl extends GenericImpl implements Engine {
 	public void close() {
 		archiver.close();
 	}
+
 }
