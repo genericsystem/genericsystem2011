@@ -1047,11 +1047,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getMeta() {
-		return (T) getInternalMeta(this, getMetaLevel() == 0 ? 0 : getMetaLevel() - 1);
+		return (T) getInternalMeta(getMetaLevel() == 0 ? 0 : getMetaLevel() - 1);
 	}
 
-	private Generic getInternalMeta(GenericImpl generic, int instanciationLevel) {
-		return generic.getMetaLevel() == instanciationLevel ? generic : getInternalMeta((GenericImpl) generic.supers[generic.supers.length - 1], instanciationLevel);
+	private Generic getInternalMeta(int instanciationLevel) {
+		return getMetaLevel() == instanciationLevel ? this : ((GenericImpl) supers[supers.length - 1]).getInternalMeta(instanciationLevel);
 	}
 
 	@Override
