@@ -23,6 +23,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 
 		assert !cache.getMetaRelation().isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert cache.getMetaRelation().isReferentialIntegrity(cache, Statics.TARGET_POSITION);
+		assert cache.getMetaRelation().isReferentialIntegrity(cache, Statics.SECOND_TARGET_POSITION);
 	}
 
 	public void testAttribute2() {

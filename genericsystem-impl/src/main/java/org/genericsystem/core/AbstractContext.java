@@ -17,7 +17,6 @@ import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Supers;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.BooleanValue;
-import org.genericsystem.annotation.value.ComponentPosBoolean;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.constraints.Constraint;
@@ -32,7 +31,6 @@ import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
-import org.genericsystem.system.ComponentPosValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,9 +262,6 @@ public abstract class AbstractContext implements Context, Serializable {
 		StringValue stringValue = clazz.getAnnotation(StringValue.class);
 		if (stringValue != null)
 			return stringValue.value();
-		ComponentPosBoolean componentPosBoolean = clazz.getAnnotation(ComponentPosBoolean.class);
-		if (componentPosBoolean != null)
-			return new ComponentPosValue<Boolean>(componentPosBoolean.componentPos(), componentPosBoolean.value());
 		return clazz;
 	}
 

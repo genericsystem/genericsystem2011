@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InstanceClassConstraint;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.constraints.Constraint;
@@ -19,12 +18,10 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractFilterIterator;
-import org.genericsystem.system.ComponentPosValue;
 
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
-@InstanceClassConstraint(ComponentPosValue.class)
 @NotNullConstraint
 public class PropertyConstraintImpl extends Constraint {
 

@@ -16,9 +16,8 @@ import org.genericsystem.core.Statics;
 import org.genericsystem.exception.AbstractConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
+import org.genericsystem.iterator.AbstractProjectionIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
-import org.genericsystem.system.ComponentPosValue;
 
 public abstract class Constraint implements Comparable<Constraint>, Serializable {
 
@@ -53,17 +52,17 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 
 	public class ConstraintValue {
 
-		private ComponentPosValue<Serializable> componentPosValue;
+		private Serializable value;
 
 		private Generic constraintType;
 
-		public ConstraintValue(ComponentPosValue<Serializable> componentPosValue, Generic constraintType) {
-			this.componentPosValue = componentPosValue;
+		public ConstraintValue(Serializable value, Generic constraintType) {
+			this.value = value;
 			this.constraintType = constraintType;
 		}
 
-		public ComponentPosValue<Serializable> getComponentPosValue() {
-			return componentPosValue;
+		public Serializable getValue() {
+			return value;
 		}
 
 		public Generic getConstraintType() {
@@ -78,22 +77,16 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 			@Override
 			public Iterator<ConstraintValue> iterator() {
 				// TODO base pos KK
-				Iterator<ConstraintValue> iterator = new AbstractProjectorAndFilterIterator<Holder, ConstraintValue>(((GenericImpl) modified).getHolders(context, ((AbstractContext) context).<Attribute> find(clazz), Statics.BASE_POSITION).iterator()) {
+				Iterator<ConstraintValue> iterator = new AbstractProjectionIterator<Holder, ConstraintValue>(((GenericImpl) modified).getHolders(context, ((AbstractContext) context).<Attribute> find(clazz), Statics.BASE_POSITION).iterator()) {
 					@Override
-					public boolean isSelected() {
-						return !Boolean.FALSE.equals(next.<ComponentPosValue<Serializable>> getValue().getValue());
-					}
-
-					@Override
-					protected ConstraintValue project() {
-						// TODO KK
-						return new ConstraintValue(next.<ComponentPosValue<Serializable>> getValue(), next.getBaseComponent());
-					}
+					public ConstraintValue project(Holder generic) {
+						return new ConstraintValue(generic.getValue(), generic.getBaseComponent());
+					};
 				};
 				if (!iterator.hasNext() && clazz.getAnnotation(SystemGeneric.class).defaultBehavior()) {
 					List<ConstraintValue> constraintValues = new ArrayList<>(modified.getComponentsSize());
 					for (int i = 0; i <= modified.getComponentsSize(); i++)
-						constraintValues.add(new ConstraintValue(new ComponentPosValue<Serializable>(i, Boolean.TRUE), modified));
+						constraintValues.add(new ConstraintValue(i, modified));
 					return constraintValues.iterator();
 				}
 				return iterator;

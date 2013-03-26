@@ -2,7 +2,6 @@ package org.genericsystem.constraints.axed;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InstanceClassConstraint;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
@@ -14,11 +13,9 @@ import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
-import org.genericsystem.system.ComponentPosValue;
 
 @SystemGeneric
 @Components(Engine.class)
-@InstanceClassConstraint(ComponentPosValue.class)
 @NotNullConstraint
 public class SingularConstraintImpl extends AbstractAxedIntegerConstraint {
 

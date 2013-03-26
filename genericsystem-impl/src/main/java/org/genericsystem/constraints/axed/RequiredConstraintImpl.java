@@ -2,7 +2,6 @@ package org.genericsystem.constraints.axed;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InstanceClassConstraint;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.constraints.Constraint;
@@ -15,12 +14,10 @@ import org.genericsystem.exception.RequiredConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.system.ComponentPosValue;
 
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
-@InstanceClassConstraint(ComponentPosValue.class)
 @NotNullConstraint
 public class RequiredConstraintImpl extends Constraint {
 
@@ -31,7 +28,7 @@ public class RequiredConstraintImpl extends Constraint {
 		if (modified.isConcrete()) {
 			if (!modified.isAlive(context)) {
 				for (ConstraintValue constraintValue : getConstraintValues(context, modified, RequiredConstraintImpl.class)) {
-					int componentPos = constraintValue.getComponentPosValue().getComponentPos();
+					Integer componentPos = (Integer) constraintValue.getValue();
 					Generic base = ((Attribute) modified).getComponent(componentPos);
 					if (base != null && ((GenericImpl) base).getLinks(context, modified.<Relation> getMeta(), componentPos).size() < 1)
 						throw new RequiredConstraintViolationException(modified.getMeta().getValue() + " is required for " + base.getMeta() + " " + base);
@@ -39,7 +36,8 @@ public class RequiredConstraintImpl extends Constraint {
 			} else
 				for (Attribute requiredAttribute : ((Type) modified).getAttributes(context)) {
 					for (ConstraintValue constraintValue : getConstraintValues(context, requiredAttribute, RequiredConstraintImpl.class))
-						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent(constraintValue.getComponentPosValue().getComponentPos())) && modified.getHolders(context, requiredAttribute).size() < 1)
+						// TODO KK getComponent(int pos) <= (Integer) constraintValue.getValue() : autoboxing !!!
+						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent((Integer) constraintValue.getValue())) && modified.getHolders(context, requiredAttribute).size() < 1)
 							throw new RequiredConstraintViolationException(requiredAttribute.getValue() + " is required for new " + modified.getMeta() + " " + modified);
 				}
 		}
