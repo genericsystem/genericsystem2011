@@ -283,6 +283,54 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return setHolder(cache, relation, value, targets);
 	}
 
+	@Override
+	public <T extends Link> T setHolder(Cache cache, Holder relation, Serializable value, Generic... targets) {
+		return setInternalHolder(cache, relation, value, false, true, targets);
+	}
+
+	public <T extends Link> T setInternalHolder(Cache cache, Holder relation, Serializable value, boolean defaultBehavior, boolean add, Generic... targets) {
+		int basePos = ((GenericImpl) relation).getFirstComponentPos(this);
+		T holder;
+		if (((Relation) relation).isSingularConstraintEnabled(cache, basePos))
+			holder = getHolder(cache, (Attribute) relation);
+		else if (((Type) relation).isPropertyConstraintEnabled(cache))
+			holder = getHolder(cache, (Attribute) relation, targets);
+		else
+			holder = getValuedHolder(cache, (Attribute) relation, value, targets);
+
+		Generic implicit = ((GenericImpl) relation).bindPrimary(cache, value, SystemGeneric.CONCRETE);
+		if (holder == null)
+			if ((add && !defaultBehavior) || (!add && defaultBehavior))
+				return addLink(cache, implicit, relation, targets);
+			else
+				// TODO KK
+				return null;
+		if (!this.equals(holder.getComponent(basePos))) {
+			if (!isSuperOf(((GenericImpl) holder).getPrimariesArray(), ((GenericImpl) holder).components, new Primaries(implicit, relation).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+				internalCancel(cache, holder, basePos);
+			if ((add && !defaultBehavior) || (!add && defaultBehavior))
+				return addLink(cache, implicit, relation, targets);
+			else {
+				internalCancel(cache, holder, basePos);
+				// TODO KK
+				return null;
+			}
+		}
+		if (!((GenericImpl) holder).equiv(new Primaries(implicit, relation).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
+			holder.remove(cache);
+			return setHolder(cache, relation, value, targets);
+		}
+		if (Objects.equals(holder.getValue(), value)) {
+			if ((add && defaultBehavior) || (!add && !defaultBehavior)) {
+				holder.remove(cache);
+				return setInternalHolder(cache, relation, value, defaultBehavior, add, targets);
+			} else
+				return holder;
+		}
+		assert false;
+		return null;
+	}
+
 	public <T extends Link> T getValuedHolder(Context context, Attribute attribute, Serializable value, final Generic... targets) {
 		return getValuedHolder(context, attribute, value, getBasePos(attribute), targets);
 	}
@@ -1374,67 +1422,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos) {
-		Attribute systemProperty = cache.<Attribute> find(systemPropertyClass);
-		boolean defaultBehavior = systemProperty.<Class<?>> getValue().getAnnotation(SystemGeneric.class).defaultBehavior();
-		Iterator<Generic> concreteIterator = concreteIterator(cache, systemProperty, getBasePos(systemProperty), true);
-		while (concreteIterator.hasNext()) {
-			Generic next = concreteIterator.next();
-			if (Objects.equals(next.getValue(), basePos))
-				if (defaultBehavior)
-					next.remove(cache);
-				else
-					return (T) this;
-		}
-		if (!defaultBehavior)
-			setHolder(cache, systemProperty, basePos);
+		setInternalHolder(cache, cache.<Attribute> find(systemPropertyClass), basePos, systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior(), true);
 		return (T) this;
 	}
 
 	@Override
-	// TODO use getValuedHolder
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos) {
-		// return setSystemPropertyValue(cache, cache.<Attribute> find(systemPropertyClass), basePos);
-		Attribute systemProperty = cache.<Attribute> find(systemPropertyClass);
-		boolean defaultBehavior = systemProperty.<Class<?>> getValue().getAnnotation(SystemGeneric.class).defaultBehavior();
-		Iterator<Generic> concreteIterator = concreteIterator(cache, systemProperty, getBasePos(systemProperty), true);
-		while (concreteIterator.hasNext()) {
-			Generic next = concreteIterator.next();
-			if (Objects.equals(next.getValue(), basePos))
-				if (!defaultBehavior)
-					next.remove(cache);
-				else
-					return (T) this;
-		}
-		if (defaultBehavior)
-			setHolder(cache, systemProperty, basePos);
+		setInternalHolder(cache, cache.<Attribute> find(systemPropertyClass), basePos, systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior(), false);
 		return (T) this;
-	}
-
-	@Override
-	public <T extends Link> T setHolder(Cache cache, Holder relation, Serializable value, Generic... targets) {
-		int basePos = ((GenericImpl) relation).getFirstComponentPos(this);
-		T holder;
-		if (((Relation) relation).isSingularConstraintEnabled(cache, basePos))
-			holder = getHolder(cache, (Attribute) relation);
-		else if (((Type) relation).isPropertyConstraintEnabled(cache))
-			holder = getHolder(cache, (Attribute) relation, targets);
-		else
-			holder = getValuedHolder(cache, (Attribute) relation, value, targets);
-
-		Generic implicit = ((GenericImpl) relation).bindPrimary(cache, value, SystemGeneric.CONCRETE);
-		if (holder == null)
-			return addLink(cache, implicit, relation, targets);
-
-		if (!this.equals(holder.getComponent(basePos))) {
-			if (!isSuperOf(((GenericImpl) holder).getPrimariesArray(), ((GenericImpl) holder).components, new Primaries(implicit, relation).toArray(), Statics.insertIntoArray(this, targets, basePos)))
-				internalCancel(cache, holder, basePos);
-			return addLink(cache, implicit, relation, targets);
-		}
-		if (!((GenericImpl) holder).equiv(new Primaries(implicit, relation).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
-			holder.remove(cache);
-			return setHolder(cache, relation, value, targets);
-		}
-		return holder;
 	}
 
 	@Override
@@ -1443,18 +1438,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	// TODO use getHolder
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int basePos) {
-		Attribute systemProperty = ((AbstractContext) context).<Attribute> find(systemPropertyClass);
-		boolean defaultBehavior = systemProperty.<Class<?>> getValue().getAnnotation(SystemGeneric.class).defaultBehavior();
-		Iterator<Generic> concreteIterator = concreteIterator(context, systemProperty, getBasePos(systemProperty), true);
-		while (concreteIterator.hasNext()) {
-			Generic next = concreteIterator.next();
-			if (Objects.equals(next.getValue(), basePos))
-				return !defaultBehavior;
-		}
-		return defaultBehavior;
-		// return getValuedHolder(context, systemProperty, basePos) != null ? true : systemProperty.<Class<?>> getValue().getAnnotation(SystemGeneric.class).defaultBehavior();
+		boolean defaultBehavior = systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
+		return getValuedHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
 	}
 
 	@Override

@@ -45,15 +45,21 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		assert !metaRelation.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert !metaRelation.isReferentialIntegrity(cache, Statics.TARGET_POSITION);
 
+		metaRelation.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, Statics.TARGET_POSITION);
+		metaRelation.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class, Statics.BASE_POSITION);
+		assert !metaAttribute.isReferentialIntegrity(cache, Statics.BASE_POSITION);
+		assert metaRelation.isReferentialIntegrity(cache, Statics.BASE_POSITION);
+		assert metaRelation.isReferentialIntegrity(cache, Statics.TARGET_POSITION);
+
 		metaAttribute.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class);
 		assert metaAttribute.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert metaRelation.isReferentialIntegrity(cache, Statics.BASE_POSITION);
-		assert !metaRelation.isReferentialIntegrity(cache, Statics.TARGET_POSITION);
+		assert metaRelation.isReferentialIntegrity(cache, Statics.TARGET_POSITION);
 
 		metaRelation.enableSystemProperty(cache, ReferentialIntegritySystemProperty.class);
 		assert metaAttribute.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 		assert metaRelation.isReferentialIntegrity(cache, Statics.BASE_POSITION);
-		assert !metaRelation.isReferentialIntegrity(cache, Statics.TARGET_POSITION);
+		assert metaRelation.isReferentialIntegrity(cache, Statics.TARGET_POSITION);
 	}
 
 	public void testRelation() {

@@ -13,6 +13,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.Constraint.CheckingType;
@@ -147,7 +148,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Iterator<Generic> inheritingsDependeciesIterator = getDirectInheritingsDependencies(node).iterator(getTs());
 		while (inheritingsDependeciesIterator.hasNext()) {
 			Generic inheritingDependency = inheritingsDependeciesIterator.next();
-			if (isAlive(inheritingDependency))
+			if (isAlive(inheritingDependency) && !((GenericImpl) inheritingDependency).isPhantom())
 				throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + node);
 		}
 		Iterator<Generic> compositeDependenciesIterator = getCompositeDependencies(node).iterator(getTs());
