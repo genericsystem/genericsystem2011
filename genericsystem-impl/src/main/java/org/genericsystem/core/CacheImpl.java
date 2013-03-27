@@ -118,7 +118,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	void remove(Generic generic) throws RollbackException {
 		try {
 			checkIsAlive(generic);
-			List<Generic> componentsForCascadeRemove = getComponentsForCascadeRemove(generic);
+			List<Generic> componentsForCascadeRemove = getComponentsForCascadeRemove((GenericImpl) generic);
 			internalRemove(generic);
 			for (Generic component : componentsForCascadeRemove)
 				internalRemove(component);
@@ -127,17 +127,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	private List<Generic> getComponentsForCascadeRemove(Generic generic) throws AbstractConstraintViolationException {
-		Generic[] components = ((GenericImpl) generic).components;
+	private List<Generic> getComponentsForCascadeRemove(GenericImpl generic) throws AbstractConstraintViolationException {
 		List<Generic> componentsForCascadeRemove = new ArrayList<>();
-		for (int axe = 0; axe < components.length; axe++)
-			if (((GenericImpl) generic).isSystemPropertyEnabled(this, CascadeRemoveSystemProperty.class, axe))
-				componentsForCascadeRemove.add(components[axe]);
+		for (int axe = 0; axe < generic.components.length; axe++)
+			if (generic.isSystemPropertyEnabled(this, CascadeRemoveSystemProperty.class, axe))
+				componentsForCascadeRemove.add(generic.components[axe]);
 		return componentsForCascadeRemove;
 	}
 
 	private void internalRemove(Generic node) throws AbstractConstraintViolationException {
-		// assert !node.getValue().equals("Power");
 		checkIsAlive(node);
 		removeDependencies(node);
 		if (isAlive(node))
@@ -148,8 +146,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Iterator<Generic> inheritingsDependeciesIterator = getDirectInheritingsDependencies(node).iterator(getTs());
 		while (inheritingsDependeciesIterator.hasNext()) {
 			Generic inheritingDependency = inheritingsDependeciesIterator.next();
-			if (isAlive(inheritingDependency) && !((GenericImpl) inheritingDependency).isPhantom())
-				throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + node);
+			if (isAlive(inheritingDependency))
+				if (((GenericImpl) inheritingDependency).isPhantom())
+					inheritingDependency.remove(this);
+				else
+					throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + node);
 		}
 		Iterator<Generic> compositeDependenciesIterator = getCompositeDependencies(node).iterator(getTs());
 		while (compositeDependenciesIterator.hasNext()) {

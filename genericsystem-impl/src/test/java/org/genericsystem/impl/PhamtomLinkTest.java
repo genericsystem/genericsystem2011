@@ -1,10 +1,13 @@
 package org.genericsystem.impl;
 
+import java.util.Iterator;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
+import org.genericsystem.core.Statics;
 import org.genericsystem.exception.DuplicateStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -15,6 +18,35 @@ import org.testng.annotations.Test;
 
 @Test
 public class PhamtomLinkTest extends AbstractTest {
+
+	public void testAliveWithStructural() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
+
+		assert car.getAttributes(cache).contains(vehiclePower);
+		car.cancel(cache, vehiclePower);
+		Iterator<Generic> iterator = ((GenericImpl) car).structuralIterator(cache, vehiclePower, true);
+		Generic phantom = iterator.next();
+		car.restore(cache, vehiclePower);
+		assert !phantom.isAlive(cache);
+	}
+
+	public void testAliveWithConcrete() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
+		Holder defaultPower = vehicle.setValue(cache, vehiclePower, "123");
+		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
+
+		assert myVehicle.getValue(cache, vehiclePower) == "123";
+		myVehicle.cancel(cache, defaultPower);
+		Iterator<Generic> iterator = ((GenericImpl) myVehicle).concreteIterator(cache, vehiclePower, Statics.BASE_POSITION, true);
+		Generic phantom = iterator.next();
+		myVehicle.restore(cache, defaultPower);
+		assert !phantom.isAlive(cache);
+	}
 
 	public void cancelAttribute() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
