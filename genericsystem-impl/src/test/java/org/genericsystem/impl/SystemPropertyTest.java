@@ -157,22 +157,22 @@ public class SystemPropertyTest extends AbstractTest {
 	public void cascadeRemoveProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		Type motor = cache.newType("Motor");
-		Relation powered = car.setRelation(cache, "powered by", motor);
-		powered.enableCascadeRemove(cache, Statics.TARGET_POSITION);
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "carColor", color);
+		carColor.enableCascadeRemove(cache, Statics.TARGET_POSITION);
 
 		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic myMotor = motor.newInstance(cache, "myMotor");
-		Link myBmwPoweredMyMotor = myBmw.setLink(cache, powered, "myBmwPoweredMyMotor", myMotor);
+		Generic red = color.newInstance(cache, "red");
+		Link myBmwRed = myBmw.setLink(cache, carColor, "myBmwRed", red);
 
-		myBmwPoweredMyMotor.remove(cache);
+		myBmwRed.remove(cache);
 
-		assert !myBmwPoweredMyMotor.isAlive(cache);
-		assert !myMotor.isAlive(cache);
+		assert !myBmwRed.isAlive(cache);
+		assert !red.isAlive(cache);
 		assert myBmw.isAlive(cache);
 		assert car.isAlive(cache);
-		assert motor.isAlive(cache);
-		assert powered.isAlive(cache);
+		assert color.isAlive(cache);
+		assert carColor.isAlive(cache);
 	}
 
 	public void cascadeRemovePropertyDisabled() {

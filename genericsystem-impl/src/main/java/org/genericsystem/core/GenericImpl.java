@@ -157,7 +157,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public int compareTo(Generic generic) {
-		return Long.compare(this.getDesignTs(), ((GenericImpl) generic).getDesignTs());
+		// long time1 = Long.MAX_VALUE != getBirthTs() ? getBirthTs() : (getDesignTs() != ((GenericImpl) generic).getDesignTs() ? getDesignTs() : getBirthTs());
+		// long time2 = Long.MAX_VALUE != ((GenericImpl) generic).getBirthTs() ? ((GenericImpl) generic).getBirthTs() : (getDesignTs() != ((GenericImpl) generic).getDesignTs() ? ((GenericImpl) generic).getDesignTs() : ((GenericImpl) generic).getBirthTs());
+
+		return Long.compare(getDesignTs(), ((GenericImpl) generic).getDesignTs());
 	}
 
 	@Override
@@ -1287,6 +1290,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (component.inheritsFrom(getComponent(i)))
 				return i;
 		return Statics.NO_POSITION;
+	}
+
+	@Override
+	public boolean isRemovable(Cache cache) {
+		return cache.isRemovable(this);
+	}
+
+	@Override
+	public Snapshot<Generic> getRefenrentialIntegrities(Cache cache) {
+		return cache.getRefenrentialIntegrities(this);
 	}
 
 	/*********************************************/

@@ -147,4 +147,23 @@ public interface Cache extends Context {
 	 */
 	<T extends Relation> T getMetaRelation();
 
+	/**
+	 * Returns true if the Generic is removable.
+	 * 
+	 * @param generic
+	 *            The remove Generic.
+	 * 
+	 * @return True if the Generic is removable.
+	 */
+	boolean isRemovable(Generic generic);
+
+	/**
+	 * Returns the referential integrity for the Generic.
+	 * 
+	 * @param generic
+	 *            The Generic.
+	 * @return Return a snapshot referential dependencies.
+	 */
+	Snapshot<Generic> getRefenrentialIntegrities(Generic generic);
+
 }

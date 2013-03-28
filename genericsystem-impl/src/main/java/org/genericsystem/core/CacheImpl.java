@@ -2,12 +2,11 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.nio.channels.IllegalSelectorException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Objects;
@@ -110,59 +109,99 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	private void checkIsAlive(Generic generic) throws AbstractConstraintViolationException {
-		if (!isAlive(generic))
-			throw new AliveConstraintViolationException(generic + " is not alive");
+	@Override
+	public boolean isRemovable(Generic generic) {
+		try {
+			orderRemoves(generic);
+		} catch (ReferentialIntegrityConstraintViolationException e) {
+			return false;
+		}
+		return true;
 	}
 
 	void remove(Generic generic) throws RollbackException {
 		try {
-			checkIsAlive(generic);
-			List<Generic> componentsForCascadeRemove = getComponentsForCascadeRemove((GenericImpl) generic);
 			internalRemove(generic);
-			for (Generic component : componentsForCascadeRemove)
-				internalRemove(component);
 		} catch (AbstractConstraintViolationException e) {
 			rollback(e);
 		}
 	}
 
-	private List<Generic> getComponentsForCascadeRemove(GenericImpl generic) throws AbstractConstraintViolationException {
-		List<Generic> componentsForCascadeRemove = new ArrayList<>();
-		for (int axe = 0; axe < generic.components.length; axe++)
-			if (generic.isSystemPropertyEnabled(this, CascadeRemoveSystemProperty.class, axe))
-				componentsForCascadeRemove.add(generic.components[axe]);
-		return componentsForCascadeRemove;
-	}
-
 	private void internalRemove(Generic node) throws AbstractConstraintViolationException {
-		checkIsAlive(node);
-		removeDependencies(node);
-		if (isAlive(node))
-			internalCache.removeGeneric(node);
+		if (!isAlive(node))
+			throw new AliveConstraintViolationException(node + " is not alive");
+		for (Generic generic : orderRemoves(node).descendingSet()) {
+			internalCache.removeGeneric(generic);
+			for (int axe = 0; axe < ((GenericImpl) generic).components.length; axe++)
+				if (generic.isSystemPropertyEnabled(this, CascadeRemoveSystemProperty.class, axe))
+					internalRemove(((GenericImpl) generic).components[axe]);
+		}
 	}
 
-	private void removeDependencies(final Generic node) throws AbstractConstraintViolationException {
-		Iterator<Generic> inheritingsDependeciesIterator = getDirectInheritingsDependencies(node).iterator(getTs());
-		while (inheritingsDependeciesIterator.hasNext()) {
-			Generic inheritingDependency = inheritingsDependeciesIterator.next();
-			if (isAlive(inheritingDependency))
-				if (((GenericImpl) inheritingDependency).isPhantom())
-					inheritingDependency.remove(this);
-				else
-					throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + node);
-		}
-		Iterator<Generic> compositeDependenciesIterator = getCompositeDependencies(node).iterator(getTs());
-		while (compositeDependenciesIterator.hasNext()) {
-			Generic compositeDependency = compositeDependenciesIterator.next();
-			if (!node.equals(compositeDependency)) {
-				Generic[] compositionComponents = ((GenericImpl) compositeDependency).components;
-				for (int componentPos = 0; componentPos < compositionComponents.length; componentPos++)
-					if (compositionComponents[componentPos].equals(node) && compositeDependency.isReferentialIntegrity(this, componentPos))
-						throw new ReferentialIntegrityConstraintViolationException(compositeDependency + " is Referential Integrity for ancestor " + node + " by component position : " + componentPos);
-				internalRemove(compositeDependency);
+	private <T extends Generic> NavigableSet<T> orderRemoves(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
+		return new TreeSet<T>() {
+			private static final long serialVersionUID = 1053909994506452123L;
+			{
+				addDependencies(generic);
 			}
-		}
+
+			@SuppressWarnings("unchecked")
+			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
+				if (super.add((T) generic)) {// protect from loop
+					for (T inheritingDependency : generic.<T> getInheritings(CacheImpl.this))
+						if (((GenericImpl) inheritingDependency).isPhantom())
+							addDependencies(inheritingDependency);
+						else
+							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
+					for (T compositeDependency : generic.<T> getComposites(CacheImpl.this))
+						if (!generic.equals(compositeDependency)) {
+							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components.length; componentPos++)
+								if (((GenericImpl) compositeDependency).components[componentPos].equals(generic) && compositeDependency.isReferentialIntegrity(CacheImpl.this, componentPos))
+									throw new ReferentialIntegrityConstraintViolationException(compositeDependency + " is Referential Integrity for ancestor " + generic + " by component position : " + componentPos);
+							addDependencies(compositeDependency);
+						}
+				}
+			}
+		};
+	}
+
+	@Override
+	public Snapshot<Generic> getRefenrentialIntegrities(final Generic generic) {
+		return new AbstractSnapshot<Generic>() {
+
+			@Override
+			public Iterator<Generic> iterator() {
+				return getInternalRefenrentialIntegrities(generic).iterator();
+			}
+		};
+	}
+
+	private <T extends Generic> NavigableSet<T> getInternalRefenrentialIntegrities(final Generic generic) {
+		return new TreeSet<T>() {
+			private static final long serialVersionUID = 1053909994506452123L;
+
+			private Set<Generic> visited = new HashSet<>();
+
+			{
+				addDependencies(generic);
+			}
+
+			public void addDependencies(Generic generic) {
+				if (visited.add(generic)) {// protect from loop
+					for (T inheritingDependency : generic.<T> getInheritings(CacheImpl.this)) {
+						add(inheritingDependency);
+						addDependencies(inheritingDependency);
+					}
+					for (T compositeDependency : generic.<T> getComposites(CacheImpl.this))
+						if (!generic.equals(compositeDependency)) {
+							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components.length; componentPos++)
+								if (((GenericImpl) compositeDependency).components[componentPos].equals(generic) && compositeDependency.isReferentialIntegrity(CacheImpl.this, componentPos))
+									add(compositeDependency);
+							addDependencies(compositeDependency);
+						}
+				}
+			}
+		};
 	}
 
 	@Override

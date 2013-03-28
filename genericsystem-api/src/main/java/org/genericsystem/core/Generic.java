@@ -617,6 +617,25 @@ public interface Generic extends Comparable<Generic> {
 	boolean isTree();
 
 	/**
+	 * Returns true if the Generic is removable.
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * 
+	 * @return True if the Generic is removable.
+	 */
+	boolean isRemovable(Cache cache);
+
+	/**
+	 * Returns the referential integrity for the Generic.
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @return Return a snapshot referential dependencies.
+	 */
+	Snapshot<Generic> getRefenrentialIntegrities(Cache cache);
+
+	/**
 	 * Log with slf4j. The log level is debug.<br/>
 	 * Call the info method.
 	 */
