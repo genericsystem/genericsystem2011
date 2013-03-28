@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 /**
  * @author Nicolas Feybesse
  * 
+ * @param <T>
  */
 public class SingletonIterator<T> implements Iterator<T> {
 

@@ -7,6 +7,10 @@ import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.core.Engine;
 import org.genericsystem.system.ReferentialIntegritySystemProperty.DefaultValue;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 @SystemGeneric(defaultBehavior = true)
 @Components(Engine.class)
 @Dependencies(DefaultValue.class)
@@ -15,7 +19,6 @@ public class ReferentialIntegritySystemProperty {
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(MetaAttribute.class)
 	@IntValue(0)
-	public static class DefaultValue extends ReferentialIntegritySystemProperty {
-	}
+	public static class DefaultValue extends ReferentialIntegritySystemProperty {}
 
 }

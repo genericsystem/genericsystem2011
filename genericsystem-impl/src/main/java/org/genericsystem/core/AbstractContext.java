@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Supers;
 import org.genericsystem.annotation.SystemGeneric;
@@ -22,7 +21,7 @@ import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.constraints.Constraint;
 import org.genericsystem.constraints.Constraint.CheckingType;
 import org.genericsystem.core.Statics.Primaries;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -36,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
+ * 
  */
 public abstract class AbstractContext implements Context, Serializable {
 
@@ -312,14 +312,14 @@ public abstract class AbstractContext implements Context, Serializable {
 			};
 		}
 
-		protected void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws AbstractConstraintViolationException {
+		protected void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 			for (Constraint constraint : getSortedConstraints(checkingType, immediatlyCheckable))
 				for (Generic generic : generics)
 					constraint.check(AbstractContext.this, generic);
 		}
 
 		@SuppressWarnings("unchecked")
-		protected void checkConsistency(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws AbstractConstraintViolationException {
+		protected void checkConsistency(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 			for (Generic constraint : getConstraints()) {
 				Constraint constraintInstance;
 				try {
@@ -340,7 +340,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			}
 		}
 
-		protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, AbstractConstraintViolationException {
+		protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 			removeAll(removes);
 			addAll(adds);
 			try {
@@ -349,7 +349,7 @@ public abstract class AbstractContext implements Context, Serializable {
 				cancelAddAll(adds);
 				cancelRemoveAll(removes);
 				throw e;
-			} catch (AbstractConstraintViolationException e) {
+			} catch (ConstraintViolationException e) {
 				cancelAddAll(adds);
 				cancelRemoveAll(removes);
 				throw e;
@@ -360,7 +360,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			}
 		}
 
-		protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws AbstractConstraintViolationException {
+		protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
 			checkConsistency(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 			checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);

@@ -9,9 +9,13 @@ import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SuperRuleConstraintViolationException;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 @SystemGeneric(defaultBehavior = true)
 @Components(Engine.class)
 @SingularConstraint
@@ -21,7 +25,7 @@ public class SuperRuleConstraintImpl extends Constraint {
 	private static final long serialVersionUID = 6874090673594299362L;
 
 	@Override
-	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
+	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		if (!getConstraintValues(context, modified, getClass()).isEmpty())
 			for (Generic directSuper : modified.getSupers())
 				if (!((GenericImpl) directSuper).isSuperOf(modified))

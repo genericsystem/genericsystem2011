@@ -6,7 +6,7 @@ package org.genericsystem.exception;
  * 
  * @author Nicolas Feybesse
  */
-public class VirtualConstraintException extends AbstractConstraintViolationException {
+public class VirtualConstraintException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = -372566533541440420L;
 

@@ -1,19 +1,22 @@
 package org.genericsystem.constraints.axed;
 
 import java.io.Serializable;
-
 import org.genericsystem.constraints.Constraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Relation;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 public abstract class AbstractAxedIntegerConstraint extends Constraint {
 
 	private static final long serialVersionUID = 3553977162062086353L;
 
 	@Override
-	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
+	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
 			// TODO KK because InstanceClassConstraint, see GenericImpl::setConstraintClass
 			Serializable value = constraintValue.getValue();
@@ -22,6 +25,6 @@ public abstract class AbstractAxedIntegerConstraint extends Constraint {
 		}
 	}
 
-	protected abstract void internalCheck(Context context, Generic modified, Relation constraintType, Integer axe) throws AbstractConstraintViolationException;
+	protected abstract void internalCheck(Context context, Generic modified, Relation constraintType, Integer axe) throws ConstraintViolationException;
 
 }

@@ -8,9 +8,13 @@ import org.genericsystem.constraints.Constraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.EngineConsistencyConstraintViolationException;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 @SystemGeneric(defaultBehavior = true)
 @Components(Engine.class)
 @SingularConstraint
@@ -20,7 +24,7 @@ public class EngineConsistencyConstraintImpl extends Constraint {
 	private static final long serialVersionUID = 8896806730580779746L;
 
 	@Override
-	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
+	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		if (!getConstraintValues(context, modified, getClass()).isEmpty())
 			if (!modified.getEngine().equals(context.getEngine()))
 				throw new EngineConsistencyConstraintViolationException("The Engine of " + modified + " isn't equals at Engine of the Context");

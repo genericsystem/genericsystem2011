@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
 
@@ -77,7 +77,7 @@ public class Transaction extends AbstractContext {
 		private static final long serialVersionUID = -85246881502473857L;
 		
 		@Override
-		protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, AbstractConstraintViolationException {
+		protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 			synchronized (getEngine()) {
 				Set<LifeManager> lockedLifeManagers = new HashSet<LifeManager>();
 				try {

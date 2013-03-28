@@ -8,10 +8,14 @@ import org.genericsystem.constraints.Constraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UniqueConstraintViolationException;
 import org.genericsystem.generic.Type;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
@@ -21,7 +25,7 @@ public class UniqueConstraintImpl extends Constraint {
 	private static final long serialVersionUID = -6429972259714036057L;
 
 	@Override
-	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
+	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
 			Type constraintBaseType = (Type) constraintValue.getConstraintType();
 			for (Generic generic : constraintBaseType.getAllInstances(context))

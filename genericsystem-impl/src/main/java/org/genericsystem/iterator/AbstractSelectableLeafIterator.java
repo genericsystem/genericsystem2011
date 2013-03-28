@@ -5,7 +5,10 @@ import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 
-//TODO KK
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 public abstract class AbstractSelectableLeafIterator extends AbstractSelectablePostTreeIterator<Generic> {
 
 	private final Context context;

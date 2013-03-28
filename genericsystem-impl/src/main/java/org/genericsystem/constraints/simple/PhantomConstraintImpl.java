@@ -9,9 +9,13 @@ import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.PhantomConstraintViolationException;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 @SystemGeneric(defaultBehavior = true)
 @Components(Engine.class)
 @SingularConstraint
@@ -22,7 +26,7 @@ public class PhantomConstraintImpl extends Constraint {
 
 	// TODO KK
 	@Override
-	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
+	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		if (!getConstraintValues(context, modified, getClass()).isEmpty())
 			if (modified.isAlive(context) && ((GenericImpl) modified.getImplicit().getSupers().first()).isPhantom())
 				throw new PhantomConstraintViolationException(modified.info());

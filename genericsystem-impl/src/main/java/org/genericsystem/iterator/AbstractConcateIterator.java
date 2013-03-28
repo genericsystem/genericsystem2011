@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.genericsystem.core.Statics;
 
 /**
  * @author Nicolas Feybesse
+ * 
+ * @param <U>
+ * @param <T>
  */
 public abstract class AbstractConcateIterator<U, T> extends AbstractAwareIterator<T> implements Iterator<T> {
 

@@ -6,7 +6,7 @@ package org.genericsystem.exception;
  * 
  * @author Nicolas Feybesse
  */
-public class OptimisticLockConstraintViolationException extends AbstractConstraintViolationException {
+public class OptimisticLockConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = 6347098699041855226L;
 

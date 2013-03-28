@@ -9,10 +9,14 @@ import org.genericsystem.constraints.Constraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.VirtualConstraintException;
 import org.genericsystem.generic.Type;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
@@ -23,7 +27,7 @@ public class VirtualConstraintImpl extends Constraint {
 	private static final long serialVersionUID = -5162099352671967024L;
 
 	@Override
-	public void check(Context context, Generic modified) throws AbstractConstraintViolationException {
+	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		if (!getConstraintValues(context, modified, getClass()).isEmpty())
 			if (((Type) modified.getMeta()).isVirtualConstraintEnabled(context))
 				throw new VirtualConstraintException(modified.getMeta() + "Problem should not be instanciated");

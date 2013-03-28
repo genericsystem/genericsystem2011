@@ -2,7 +2,6 @@ package org.genericsystem.constraints.simple;
 
 import java.util.Iterator;
 import java.util.Objects;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
@@ -12,13 +11,17 @@ import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.PropertyConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractFilterIterator;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
@@ -29,7 +32,7 @@ public class PropertyConstraintImpl extends Constraint {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void check(Context context, final Generic modified) throws AbstractConstraintViolationException {
+	public void check(Context context, final Generic modified) throws ConstraintViolationException {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
 			Type constraintBaseType = (Type) constraintValue.getConstraintType();
 			if (modified.isAttribute()) {

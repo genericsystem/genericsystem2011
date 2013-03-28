@@ -4,12 +4,15 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.genericsystem.core.Generic;
 import org.genericsystem.core.AbstractContext.TimestampedDependencies;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
 import org.genericsystem.iterator.AbstractGeneralAwareIterator;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 public class LifeManager {
 
 	private final long designTs;

@@ -6,7 +6,7 @@ package org.genericsystem.exception;
  * 
  * @author Nicolas Feybesse
  */
-public class PropertyConstraintViolationException extends AbstractConstraintViolationException {
+public class PropertyConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = -7308284483020917510L;
 

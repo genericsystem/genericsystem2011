@@ -2,7 +2,6 @@ package org.genericsystem.constraints.simple;
 
 import java.util.Arrays;
 import java.util.Iterator;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
@@ -13,10 +12,14 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.exception.AbstractConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.DuplicateStructuralValueConstraintViolationException;
 import org.genericsystem.iterator.AbstractFilterIterator;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 @SystemGeneric(defaultBehavior = true)
 @Components(Engine.class)
 @SingularConstraint
@@ -26,7 +29,7 @@ public class DuplicateStructuralValueConstraintImpl extends Constraint {
 	private static final long serialVersionUID = -7212219694902616927L;
 
 	@Override
-	public void check(Context context, final Generic modified) throws AbstractConstraintViolationException {
+	public void check(Context context, final Generic modified) throws ConstraintViolationException {
 		if (!getConstraintValues(context, modified, getClass()).isEmpty())
 			if (modified.isAttribute() && modified.isStructural()) {
 				Snapshot<Generic> components = modified.getComponents();

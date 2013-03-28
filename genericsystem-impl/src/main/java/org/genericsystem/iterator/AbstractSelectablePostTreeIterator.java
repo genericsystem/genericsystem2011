@@ -4,10 +4,14 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ * @param <T>
+ */
 public abstract class AbstractSelectablePostTreeIterator<T> extends AbstractAwareIterator<T> {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractSelectablePostTreeIterator.class);
@@ -34,8 +38,7 @@ public abstract class AbstractSelectablePostTreeIterator<T> extends AbstractAwar
 					iterators.unselect(stack.peek());
 					return;
 				}
-			}
-			else
+			} else
 				stack.push(iterator.next());
 		}
 		next = null;
