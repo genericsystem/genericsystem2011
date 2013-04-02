@@ -22,6 +22,21 @@ import org.testng.annotations.Test;
 @Test
 public class ApiTest extends AbstractTest {
 
+	public void testRelation() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "CarColor", color);
+		carColor.enableSingularConstraint(cache);
+		Generic myAudi = car.newInstance(cache, "myAudi");
+		Generic red = color.newInstance(cache, "red");
+		Link carRed = car.setLink(cache, carColor, "carRed", red);
+		Link myAudiRed = myAudi.setLink(cache, carColor, "myAudiRed", red);
+		assert myAudiRed.inheritsFrom(carRed);
+		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
+		log.info("" + red.getLink(cache, carColor));
+	}
+
 	public void testOrderedGenerics() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle1 = cache.newType("Vehicle1");
