@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -107,12 +106,15 @@ public class RelationTest extends AbstractTest {
 		Generic yesterday = time.newInstance(cache, "yesterday");
 		Generic yourAudi = car.newInstance(cache, "yourAudi");
 
-		michael.bind(cache, carPassengerTime, myBmw, today);
+		michael.bind(cache, carPassengerTime, myBmw, today).log();
+		// assert false : myBmw.getLinks(cache, carPassengerTime, ((GenericImpl) myBmw).getBasePos(carPassengerTime));
+		// assert false : myBmw.getLinks(cache, carPassengerTime);
+
 		assert michael.getLinks(cache, carPassengerTime).size() == 1;
 		michael.bind(cache, carPassengerTime, yourAudi, today);
 		assert michael.getLinks(cache, carPassengerTime).size() == 1;
-
 		yesterday.bind(cache, carPassengerTime, myBmw, passenger);
+		// assert false : myBmw.getLinks(cache, carPassengerTime);
 		assert yesterday.getLinks(cache, carPassengerTime).size() == 1;
 
 	}

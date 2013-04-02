@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -681,9 +680,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					public boolean isSelected() {
 						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
 						if (selected) {
-							// if (((GenericImpl) next).isPseudoStructural(pos))
+							// if (((GenericImpl) next).isPseudoStructural(pos)) {
 							// if (context instanceof Cache)
 							// ((GenericImpl) next).deduct((Cache) context, pos);
+							// }
 						}
 						return selected;
 

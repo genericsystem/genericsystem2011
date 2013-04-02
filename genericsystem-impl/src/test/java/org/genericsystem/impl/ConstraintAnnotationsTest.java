@@ -26,6 +26,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 	public void instanceClass() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Unit.class, Car.class, ElectrikPower.class);
 		final Attribute unit = cache.find(Unit.class);
+		assert String.class.equals(unit.getConstraintClass(cache));
 		Type car = cache.find(Car.class);
 		Attribute electrikPower = cache.find(ElectrikPower.class);
 		final Generic myBMW = car.newInstance(cache, "myBMW");
@@ -117,38 +118,31 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 	@SystemGeneric
 	// Everyone is unique !
 	@UniqueConstraint
-	public static class Human {
-	}
+	public static class Human {}
 
 	@SystemGeneric
-	public static class Man extends Human {
-	}
+	public static class Man extends Human {}
 
 	@SystemGeneric
 	// There can be only one time...
 	@SingularInstanceConstraint
-	public static class Time {
-	}
+	public static class Time {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class })
 	@SingularConstraint(Statics.TARGET_POSITION)
-	public static class HumanPossessVehicle {
-	}
+	public static class HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Car.class })
-	public static class HumanPossessCar extends HumanPossessVehicle {
-	}
+	public static class HumanPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Man.class, Car.class })
 	@SingularConstraint(Statics.BASE_POSITION)
-	public static class ManPossessCar extends HumanPossessVehicle {
-	}
+	public static class ManPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class, Time.class })
-	public static class HumanPossessVehicleTime {
-	}
+	public static class HumanPossessVehicleTime {}
 }
