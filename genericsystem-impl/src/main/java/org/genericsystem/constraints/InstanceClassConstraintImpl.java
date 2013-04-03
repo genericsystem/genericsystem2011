@@ -9,9 +9,10 @@ import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ClassInstanceConstraintViolationException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.system.NoBooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -21,7 +22,7 @@ import org.genericsystem.generic.Attribute;
 @Components(Engine.class)
 @SingularConstraint
 @NotNullConstraint
-public class InstanceClassConstraintImpl extends Constraint {
+public class InstanceClassConstraintImpl extends Constraint implements NoBooleanSystemProperty {
 
 	private static final long serialVersionUID = -6429972259714036057L;
 

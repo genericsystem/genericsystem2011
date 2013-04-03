@@ -48,6 +48,7 @@ import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.system.CascadeRemoveSystemProperty;
 import org.genericsystem.system.MultiDirectionalSystemProperty;
+import org.genericsystem.system.NoBooleanSystemProperty;
 import org.genericsystem.system.NoInheritanceSystemProperty;
 import org.genericsystem.system.ReferentialIntegritySystemProperty;
 import org.slf4j.Logger;
@@ -1525,7 +1526,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int basePos) {
 		boolean defaultBehavior = systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
-		return getValuedHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
+		if ((NoBooleanSystemProperty.class).isAssignableFrom(NoBooleanSystemProperty.class))
+			return getHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)) != null;
+		else
+			return getValuedHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
 	}
 
 	@Override
