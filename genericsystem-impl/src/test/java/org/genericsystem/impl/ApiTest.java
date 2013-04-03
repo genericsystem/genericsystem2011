@@ -23,18 +23,99 @@ import org.testng.annotations.Test;
 public class ApiTest extends AbstractTest {
 
 	public void testRelation() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
-		carColor.enableSingularConstraint(cache);
 		Generic myAudi = car.newInstance(cache, "myAudi");
 		Generic red = color.newInstance(cache, "red");
-		Link carRed = car.setLink(cache, carColor, "carRed", red);
-		Link myAudiRed = myAudi.setLink(cache, carColor, "myAudiRed", red);
+		Link carRed = car.bind(cache, carColor, red);
+		Link myAudiRed = myAudi.bind(cache, carColor, red);
 		assert myAudiRed.inheritsFrom(carRed);
 		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
-		log.info("" + red.getLink(cache, carColor));
+	}
+
+	public void deduct() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "CarColor", color);
+		car.newInstance(cache, "myAudi");
+		Generic red = color.newInstance(cache, "red");
+		Link carRed = car.setLink(cache, carColor, "carRed", red);
+		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
+	}
+
+	public void ternaryDeduct() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Type time = cache.newType("Time");
+		Relation carColorTime = car.setRelation(cache, "CarColorTime", color, time);
+		car.newInstance(cache, "myAudi");
+		Generic red = color.newInstance(cache, "red");
+		time.newInstance(cache, "today");
+		time.newInstance(cache, "tomorrow");
+		Link carRed = car.setLink(cache, carColorTime, "carRed", red, time);
+		assert !red.getLinks(cache, carColorTime).contains(carRed) : red.getLinks(cache, carColorTime);
+	}
+
+	public void deductWithInherits() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Type color = cache.newType("Color");
+		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
+		car.newInstance(cache, "myAudi");
+		Generic red = color.newInstance(cache, "red");
+		Link vehicleRed = vehicle.setLink(cache, vehicleColor, "vehicleRed", red);
+		assert !red.getLinks(cache, vehicleColor).contains(vehicleRed) : red.getLinks(cache, vehicleColor);
+	}
+
+	public void ternaryDeductWithInherits() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Type color = cache.newType("Color");
+		Type time = cache.newType("Time");
+		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color, time);
+		car.newInstance(cache, "myAudi");
+		Generic red = color.newInstance(cache, "red");
+		time.newInstance(cache, "today");
+		time.newInstance(cache, "tomorrow");
+		Link vehicleRed = vehicle.setLink(cache, vehicleColor, "vehicleRed", red, time);
+		assert !red.getLinks(cache, vehicleColor).contains(vehicleRed) : red.getLinks(cache, vehicleColor);
+	}
+
+	public void deductWithTwoInstances() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "CarColor", color);
+		car.newInstance(cache, "myAudi");
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic red = color.newInstance(cache, "red");
+		Link carRed = car.bind(cache, carColor, red);
+		Link myBmwRed = myBmw.bind(cache, carRed, red);
+		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
+		assert red.getLinks(cache, carColor).contains(myBmwRed) : red.getLinks(cache, carColor);
+	}
+
+	public void ternaryDeductWithTwoInstances() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Type time = cache.newType("Time");
+		Relation carColorTime = car.setRelation(cache, "CarColorTime", color, time);
+		car.newInstance(cache, "myAudi");
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic red = color.newInstance(cache, "red");
+		Generic today = time.newInstance(cache, "today");
+		time.newInstance(cache, "tomorrow");
+		Link carRedTime = car.bind(cache, carColorTime, red, time);
+		Link myBmwRed = myBmw.bind(cache, carRedTime, red, today);
+		assert !red.getLinks(cache, carColorTime).contains(carRedTime);
+		assert red.getLinks(cache, carColorTime).contains(myBmwRed) : red.getLinks(cache, carColorTime);
 	}
 
 	public void testOrderedGenerics() {

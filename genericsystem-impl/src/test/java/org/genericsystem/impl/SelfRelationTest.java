@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Link;
@@ -25,11 +24,9 @@ public class SelfRelationTest extends AbstractTest {
 		Generic myCar = car.newInstance(cache, "myCar");
 		assert myCar.getTargets(cache, carOutsideColor).contains(red);
 
-		((GenericImpl) defaultOutside).deduct(cache);
 		assert red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION).contains(myCar) : red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION);
 
 		Generic myBmw = car.newInstance(cache, "myBmw");
-		((GenericImpl) defaultOutside).deduct(cache);
 		assert red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION).contains(myCar) : red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION);
 		assert red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION).contains(myBmw) : red.getTargets(cache, carOutsideColor, Statics.BASE_POSITION);
 	}

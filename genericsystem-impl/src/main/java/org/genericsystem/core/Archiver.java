@@ -25,10 +25,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.genericsystem.core.Engine;
-import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot;
-
 /**
  * @author Nicolas Feybesse
  * 
@@ -245,7 +241,7 @@ public class Archiver {
 			Serializable value = (Serializable) inputstream.readObject();
 			Generic[] supers = loadAncestors(inputstream);
 			Generic[] components = loadAncestors(inputstream);
-			put(ts[0], new GenericImpl().restore(value, metaLevel, ts[0], ts[1], ts[2], ts[3], supers, components).plug());
+			put(ts[0], new GenericImpl().restore(value, metaLevel, ts[0], ts[1], ts[2], ts[3], supers, components, false).plug());
 		}
 
 		private Generic[] loadAncestors(ObjectInputStream in) throws IOException {
