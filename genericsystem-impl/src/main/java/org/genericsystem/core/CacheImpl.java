@@ -119,6 +119,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return true;
 	}
 
+	@Override
+	public boolean isFlushable(Generic generic) {
+		if (!generic.isAutomatic())
+			return true;
+		for (Generic inherit : generic.getInheritings(this))
+			if (((GenericImpl) inherit).isFlushable(this))
+				return true;
+		return false;
+	}
+
 	void remove(Generic generic) throws RollbackException {
 		try {
 			internalRemove(generic);
@@ -352,7 +362,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
-		return bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, true), superTypes, components, false);
+		return bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0), superTypes, components, false);
 	}
 
 	@Override
@@ -515,14 +525,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		@Override
 		protected void add(GenericImpl generic) {
+			// if (CacheImpl.this.isFlushable(generic))
 			adds.add(generic);
 			super.add(generic);
 		}
 
 		@Override
 		protected void remove(GenericImpl generic) {
-			boolean result = removes.add(generic);
-			assert result == true;
+			// if (CacheImpl.this.isFlushable(generic))
+			removes.add(generic);
 			super.remove(generic);
 		}
 

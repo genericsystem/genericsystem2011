@@ -148,6 +148,15 @@ public interface Cache extends Context {
 	<T extends Relation> T getMetaRelation();
 
 	/**
+	 * Returns true if this Generic has been generated automaticly by the bindDeduc.
+	 * 
+	 * @param generic
+	 * 
+	 * @return True if this Generic has been generated automaticly by the bindDeduc.
+	 */
+	boolean isFlushable(Generic generic);
+
+	/**
 	 * Returns true if the Generic is removable.
 	 * 
 	 * @param generic
