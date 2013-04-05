@@ -1,13 +1,11 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -700,13 +698,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					@Override
 					public boolean isSelected() {
 						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
-						if (selected) {
-							List<Snapshot<Generic>> deductComponents = ((GenericImpl) next).getDeductComponents(context, pos);
-							if (deductComponents.size() > 0) {
-								Generic phantom = ((CacheImpl) context).findPrimaryByValue(next.getMeta().getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE);
-								bindDeduct((Cache) context, next, phantom, deductComponents, 0, new Generic[deductComponents.size()]);
-							}
-						}
+						if (selected && ((GenericImpl) next).isPseudoStructural(pos))
+							((GenericImpl) next).bindDeduct(context, pos, ((CacheImpl) context).findPrimaryByValue(next.getMeta().getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE));
 						return selected;
 					}
 				};
@@ -724,70 +717,23 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	public void bindDeduct(Cache cache, Generic generic, Generic phantom, List<Snapshot<Generic>> deductComponents, int column, Generic[] components) {
-		for (int i = 0; i < deductComponents.get(column).size(); i++) {
-			components[column] = deductComponents.get(column).get(i);
-			if (column + 1 < deductComponents.size())
-				bindDeduct(cache, generic, phantom, deductComponents, column + 1, components);
-			else if (phantom == null || ((CacheImpl) cache).find(new Generic[] { generic.getImplicit(), phantom }, components) == null)
-				bind(cache, generic.getImplicit(), true, generic, components);
+	private void bindDeduct(Context context, int pos, Generic phantom) {
+		bindDeductInternal(context, phantom, getDeductComponent(context, pos, 0), pos, 0, new Generic[components.length]);
+	}
+
+	private void bindDeductInternal(Context context, Generic phantom, Iterator<Generic> deductComponent, int pos, int column, Generic[] components) {
+		while (deductComponent.hasNext()) {
+			components[column] = deductComponent.next();
+			if (column + 1 < components.length)
+				bindDeductInternal(context, phantom, getDeductComponent(context, pos, column + 1), pos, column + 1, components);
+			else if (phantom == null || ((CacheImpl) context).find(new Generic[] { getImplicit(), phantom }, components) == null)
+				bind((Cache) context, getImplicit(), true, this, components);
 		}
 	}
 
-	private List<Snapshot<Generic>> getDeductComponents(Context context, int pos) {
-		List<Snapshot<Generic>> deductComponents = new ArrayList<>();
-		if (!isPseudoStructural(pos))
-			return deductComponents;
-		if (context instanceof Cache) {
-			for (int i = 0; i < components.length; i++) {
-				if (pos != i && components[i].isStructural())
-					deductComponents.add(((Type) components[i]).getAllInstances(context));
-				else {
-					final Generic generic = components[i];
-					deductComponents.add(new AbstractSnapshot<Generic>() {
-						@Override
-						public Iterator<Generic> iterator() {
-							return new SingletonIterator<Generic>(generic);
-						}
-					});
-				}
-			}
-		}
-		return deductComponents;
+	private Iterator<Generic> getDeductComponent(Context context, int pos, final int column) {
+		return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
 	}
-
-	// private <T extends Generic> Iterator<T> inheritanceConcreteIterator(final Context context, final Generic origin, final int pos) {
-	// return (Iterator<T>) new AbstractSelectableLeafIterator(context, origin) {
-	//
-	// @Override
-	// protected Iterator<Generic> children(final Generic father) {
-	// return new AbstractFilterIterator<Generic>(((GenericImpl) father).directInheritingsIterator(context)) {
-	// @Override
-	// public boolean isSelected() {
-	// boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
-	// if (selected) {
-	// // if (((GenericImpl) next).isPseudoStructural(pos)) {
-	// // if (context instanceof Cache)
-	// // ((GenericImpl) next).deduct((Cache) context, pos);
-	// // }
-	// }
-	// return selected;
-	//
-	// }
-	// };
-	// }
-	//
-	// @Override
-	// public boolean isSelectable() {
-	// return next.isConcrete();
-	// }
-	//
-	// @Override
-	// public final boolean isSelected(Generic father, Generic candidate) {
-	// throw new IllegalStateException();
-	// }
-	// };
-	// }
 
 	boolean safeIsEnabled(Context context, Attribute attribute) {
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(context, attribute) {
