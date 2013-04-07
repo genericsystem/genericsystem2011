@@ -3,7 +3,7 @@ package org.genericsystem.core;
 import java.util.Collection;
 
 /**
- * The Snaphot is a conscious iterable.
+ * The Snaphot is an aware iterable of the graphe.
  * 
  * @author Nicolas Feybesse
  * 

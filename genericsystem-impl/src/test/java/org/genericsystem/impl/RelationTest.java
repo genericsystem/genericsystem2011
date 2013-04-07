@@ -50,50 +50,36 @@ public class RelationTest extends AbstractTest {
 		carColor.enableSingularConstraint(cache);
 
 		car.setLink(cache, carColor, "defaultColor", red);
-		// Link carRed = car.bind(cache, carColor, red);
-
-		// assert carRed.inheritsFrom(carColor);
-
 		myBmw.setLink(cache, carColor, "myBmwYellow", yellow);
-		// Link myBmwYellow = myBmw.bind(cache, carColor, yellow);
-
-		// assert !myBmwYellow.inheritsFrom(carRed);
-		// assert myBmw.getLinks(cache, carColor).size() == 1;
-		// assert myBmw.getLinks(cache, carColor).contains(myBmwYellow);
-		// assert !myBmw.getLinks(cache, carColor).contains(carRed);
 	}
 
 	public void testToOneOverride() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "driver", color);
+		final Relation carColor = car.setRelation(cache, "driver", color);
 		carColor.enableSingularConstraint(cache);
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic myAudi = car.newInstance(cache, "myAudi");
+		final Generic myBmw = car.newInstance(cache, "myBmw");
+		car.newInstance(cache, "myAudi");
 		Generic red = color.newInstance(cache, "red");
-		Generic blue = color.newInstance(cache, "blue");
-		Link carRed = car.bind(cache, carColor, red);
-		((GenericImpl) carRed).deduct(cache);
+		final Generic blue = color.newInstance(cache, "blue");
+		car.bind(cache, carColor, red);
 		assert myBmw.getTargets(cache, carColor).contains(red) : myBmw.getTargets(cache, carColor);
-		assert myAudi.getTargets(cache, carColor).contains(red);
-		myBmw.bind(cache, carColor, blue);
-		assert car.getLinks(cache, carColor).size() == 1;
-		assert car.getLinks(cache, carColor).first().getTargetComponent().equals(red);
 
-		assert myBmw.getLinks(cache, carColor).size() == 1;
-		assert myBmw.getLinks(cache, carColor).first().getTargetComponent().equals(blue);
-		assert blue.getLinks(cache, carColor).size() == 1;
-		assert myBmw.equals(blue.getLinks(cache, carColor).first().getBaseComponent());
-		assert red.getLinks(cache, carColor).size() == 1 : red.getLinks(cache, carColor);
-		assert myAudi.equals(red.getLinks(cache, carColor).first().getBaseComponent()) : red.getLinks(cache, carColor);
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				myBmw.bind(cache, carColor, blue);
+			}
+		};
 	}
 
 	public void testReverseTernaryAccess() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 
 		Type car = cache.newType("Car");
-		Type passenger = cache.newType("Passenger");
+		final Type passenger = cache.newType("Passenger");
 		Type time = cache.newType("time");
 
 		final Relation carPassengerTime = car.setRelation(cache, "CarPassengerTime", passenger, time);
@@ -104,16 +90,23 @@ public class RelationTest extends AbstractTest {
 		final Generic michael = passenger.newInstance(cache, "michael");
 		passenger.newInstance(cache, "nicolas");
 		Generic today = time.newInstance(cache, "today");
-		Generic yesterday = time.newInstance(cache, "yesterday");
+		final Generic yesterday = time.newInstance(cache, "yesterday");
 		Generic yourAudi = car.newInstance(cache, "yourAudi");
 
 		michael.bind(cache, carPassengerTime, myBmw, today);
+
 		assert michael.getLinks(cache, carPassengerTime).size() == 1;
 		michael.bind(cache, carPassengerTime, yourAudi, today);
 		assert michael.getLinks(cache, carPassengerTime).size() == 1;
+		new RollbackCatcher() {
 
-		yesterday.bind(cache, carPassengerTime, myBmw, passenger);
-		assert yesterday.getLinks(cache, carPassengerTime).size() == 1;
+			@Override
+			public void intercept() {
+				yesterday.bind(cache, carPassengerTime, myBmw, passenger);
+				assert yesterday.getLinks(cache, carPassengerTime).size() == 1;
+
+			}
+		}.assertIsCausedBy(SingularConstraintViolationException.class);
 
 	}
 
@@ -644,7 +637,7 @@ public class RelationTest extends AbstractTest {
 		Generic center = tyre.newInstance(cache, "center");
 
 		car.setLink(cache, carTyres, "defaultTyre", center);
-		assert myBmw.getLink(cache, carTyres).getBaseComponent().equals(car);
+		assert myBmw.getLink(cache, carTyres).getBaseComponent().equals(myBmw);
 
 		myBmw.bind(cache, carTyres, frontLeft);
 		myBmw.bind(cache, carTyres, frontRight);
@@ -659,8 +652,8 @@ public class RelationTest extends AbstractTest {
 		final Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		final Generic myAudi = car.newInstance(cache, "myAudi");
+		car.newInstance(cache, "myBmw");
+		car.newInstance(cache, "myAudi");
 		final Generic red = color.newInstance(cache, "red");
 
 		final Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -670,11 +663,8 @@ public class RelationTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				Generic carRed = car.bind(cache, carColor, red);
-				((GenericImpl) carRed).deduct(cache);
-				// assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 2 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
-				// assert red.getTargets(cache, carColor, Statics.BASE_POSITION).contains(myBmw);
-				// assert red.getTargets(cache, carColor, Statics.BASE_POSITION).contains(myAudi);
+				car.bind(cache, carColor, red);
+				assert red.getLinks(cache, carColor).size() == 2 : red.getLinks(cache, carColor);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
@@ -737,7 +727,7 @@ public class RelationTest extends AbstractTest {
 		Generic pierre = person.newInstance(cache, "pierre");
 
 		Link carPierre = pierre.setLink(cache, carPerson, "defaultPerson", car);
-		assert myBmw.getLink(cache, carPerson).getBaseComponent().equals(car);
+		assert myBmw.getLink(cache, carPerson).getBaseComponent().equals(myBmw);
 
 		Link myBmwMichael = michael.bind(cache, carPerson, myBmw);
 		Link myBmwNicolas = nicolas.bind(cache, carPerson, myBmw);
@@ -749,7 +739,7 @@ public class RelationTest extends AbstractTest {
 		assert sven.getLinks(cache, carPerson).size() == 1 : sven.getLinks(cache, carPerson);
 		assert sofiane.getLinks(cache, carPerson).size() == 1 : sofiane.getLinks(cache, carPerson);
 
-		assert myBmw.getLinks(cache, carPerson).contains(carPierre) : myBmw.getLinks(cache, carPerson);
+		assert !myBmw.getLinks(cache, carPerson).contains(carPierre) : myBmw.getLinks(cache, carPerson);
 		assert myBmw.getLinks(cache, carPerson).contains(myBmwMichael) : myBmw.getLinks(cache, carPerson);
 		assert myBmw.getLinks(cache, carPerson).contains(myBmwNicolas) : myBmw.getLinks(cache, carPerson);
 		assert myBmw.getLinks(cache, carPerson).contains(myBmwSven) : myBmw.getLinks(cache, carPerson);
@@ -961,13 +951,12 @@ public class RelationTest extends AbstractTest {
 		Generic red = color.newInstance(cache, "red");
 
 		Relation carColor = car.setRelation(cache, "CarColor", color);
-		Link carRed = red.setLink(cache, carColor, "defaultColor", car);
-		assert red.getLink(cache, carColor).getBaseComponent().equals(car);
+		red.setLink(cache, carColor, "defaultColor", car);
+		assert red.getLink(cache, carColor).getBaseComponent().equals(yourAudi);
 
 		Link yourAudiRed = red.bind(cache, carColor, yourAudi);
 
 		assert yourAudi.getLinks(cache, carColor).size() == 2;
-		assert yourAudi.getLinks(cache, carColor).contains(carRed);
 		assert yourAudi.getLinks(cache, carColor).contains(yourAudiRed);
 	}
 
@@ -1357,9 +1346,7 @@ public class RelationTest extends AbstractTest {
 		Generic red = color.newInstance(cache, "red");
 
 		Relation carColor = car.setRelation(cache, "carColor", color);
-		Link carRed = car.bind(cache, carColor, red);
-
-		((Attribute) carRed).deduct(cache);
+		car.bind(cache, carColor, red);
 
 		assert red.getLinks(cache, carColor).size() == 3 : red.getLinks(cache, carColor);
 		assert red.getTargets(cache, carColor, Statics.BASE_POSITION).containsAll(Arrays.asList(new Generic[] { myBmw, myAudi, myMercedes }));
@@ -1380,7 +1367,6 @@ public class RelationTest extends AbstractTest {
 		((GenericImpl) myAudi).cancel(cache, carRed);
 		myAudi.bind(cache, carColor, blue);
 
-		((Attribute) carRed).deduct(cache);
 		assert red.getLinks(cache, carColor).size() == 2 : red.getLinks(cache, carColor);
 		assert red.getTargets(cache, carColor, Statics.BASE_POSITION).containsAll(Arrays.asList(new Generic[] { myMercedes, myBmw }));
 	}

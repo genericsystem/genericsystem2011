@@ -41,11 +41,12 @@ public interface Attribute extends Holder, Type {
 	 */
 	boolean isMultiDirectional(Context context);
 
-	/**
-	 * Do all necessary inductions on this attribute.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 */
-	void deduct(Cache cache);
+	// TODO clean
+	// /**
+	// * Do all necessary inductions on this attribute.
+	// *
+	// * @param cache
+	// * The reference Cache.
+	// */
+	// void deduct(Cache cache);
 }

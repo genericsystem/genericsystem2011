@@ -128,7 +128,6 @@ public class SystemPropertyTest extends AbstractTest {
 		humanOwnVehicle.enableCascadeRemove(cache, 0);
 		assert humanOwnVehicle.isCascadeRemove(cache, 0);
 		assert !humanOwnVehicle.isCascadeRemove(cache, 2);
-		log.info("@@@@@@@@@@@@@@@@@");
 		humanOwnVehicle.disableCascadeRemove(cache, 0);
 		assert !humanOwnVehicle.isCascadeRemove(cache, 0);
 		assert !humanOwnVehicle.isCascadeRemove(cache, 2);

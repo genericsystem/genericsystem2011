@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -42,9 +41,11 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.iterator.ArrayIterator;
+import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.system.CascadeRemoveSystemProperty;
 import org.genericsystem.system.MultiDirectionalSystemProperty;
+import org.genericsystem.system.NoBooleanSystemProperty;
 import org.genericsystem.system.NoInheritanceSystemProperty;
 import org.genericsystem.system.ReferentialIntegritySystemProperty;
 import org.slf4j.Logger;
@@ -65,9 +66,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	Generic[] components;
 
-	// TODO clean
-	// int metaLevel;
 	Serializable value;
+
+	boolean automatic;
 
 	public Generic[] getSupersArray() {
 		return supers.clone();
@@ -77,15 +78,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return components.clone();
 	}
 
-	final GenericImpl initializePrimary(Serializable value, int metaLevel, Generic[] directSupers, Generic[] components) {
-		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
+	@Override
+	public boolean isAutomatic() {
+		return automatic;
+	}
+
+	@Override
+	public boolean isFlushable(Cache cache) {
+		return cache.isFlushable(this);
+	}
+
+	final GenericImpl initializePrimary(Serializable value, int metaLevel, Generic[] directSupers, Generic[] components, boolean automatic) {
+		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components, automatic);
 	}
 
 	// TODO clean
-	final GenericImpl initializeComplex(Generic implicit, Generic[] directSupers, Generic[] components) {
+	final GenericImpl initializeComplex(Generic implicit, Generic[] directSupers, Generic[] components, boolean automatic) {
 		assert ((GenericImpl) implicit).isPrimary() : "implicit isn't primary";
 		reorderImplicit(implicit, directSupers);
-		return restore(implicit.getValue(), implicit.getMetaLevel(), null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
+		return restore(implicit.getValue(), implicit.getMetaLevel(), null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components, automatic);
 	}
 
 	private void reorderImplicit(Generic implicit, Generic[] directSupers) {
@@ -113,10 +124,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return false;
 	}
 
-	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components) {
+	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components, boolean automatic) {
 		this.value = value;
 		supers = directSupers;
 		this.components = components;
+		this.automatic = automatic;
 
 		initSelfComponents();
 		lifeManager = new LifeManager(designTs == null ? getEngine().pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
@@ -277,8 +289,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return holder;
 	}
 
-	<T extends Generic> T bindPrimary(Cache cache, Serializable value, int metaLevel) {
-		return ((CacheImpl) cache).bindPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel);
+	<T extends Generic> T bindPrimary(Cache cache, Serializable value, int metaLevel, boolean automatic) {
+		return ((CacheImpl) cache).bindPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel, automatic);
 	}
 
 	@Override
@@ -303,7 +315,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		else
 			holder = getValuedHolder(cache, (Attribute) relation, value, targets);
 
-		Generic implicit = ((GenericImpl) relation).bindPrimary(cache, value, SystemGeneric.CONCRETE);
+		Generic implicit = ((GenericImpl) relation).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
 			return addLink(cache, implicit, relation, targets);
 		if (!this.equals(holder.getComponent(basePos))) {
@@ -410,9 +422,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return Statics.unambigousFirst(this.<T> linksIterator(context, relation, getBasePos(relation), targets));
 	}
 
-	private static <T extends Generic> T update(Cache cache, Generic old, Serializable value) {
-		return ((CacheImpl) cache).update(old, value);
-	}
+	// TODO clean
+	// private static <T extends Generic> T update(Cache cache, Generic old, Serializable value) {
+	// return ((CacheImpl) cache).update(old, value);
+	// }
 
 	public <T extends Generic> Iterator<T> directInheritingsIterator(Context context) {
 		return ((AbstractContext) context).directInheritingsIterator(this);
@@ -529,7 +542,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private <T extends Relation> T setSubAttribute(Cache cache, Attribute attribute, Serializable value, Type... targets) {
 		assert !Objects.equals(value, attribute.getValue());
-		return addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.STRUCTURAL), attribute, targets);
+		return addLink(cache, ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.STRUCTURAL, true), attribute, targets);
 	}
 
 	@Override
@@ -544,13 +557,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return bind(cache, bindPrimary(cache, value, getMetaLevel() + 1), this, components);
+		return bind(cache, bindPrimary(cache, value, getMetaLevel() + 1, false), false, this, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		Generic implicit = getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL);
-		return bind(cache, implicit, this, components);
+		Generic implicit = getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL, true);
+		return bind(cache, implicit, false, this, components);
 	}
 
 	@Override
@@ -574,18 +587,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private <T extends Link> T addLink(Cache cache, Generic implicit, Generic directSuper, Generic... targets) {
 		Generic[] components = Statics.insertFirstIntoArray(this, targets);
-		return bind(cache, implicit, directSuper, components);
+		return bind(cache, implicit, false, directSuper, components);
 	}
 
 	// TODO KK
 	private <T extends Link> T addLink(Cache cache, Generic implicit, Generic directSuper, int basePos, Generic... targets) {
-		return bind(cache, implicit, directSuper, Statics.insertIntoArray(this, targets, basePos));
+		return bind(cache, implicit, false, directSuper, Statics.insertIntoArray(this, targets, basePos));
 	}
 
-	private static <T extends Generic> T bind(Cache cache, Generic implicit, Generic directSuper, Generic... components) {
+	// TODO order param automatic !!!
+	private static <T extends Generic> T bind(Cache cache, Generic implicit, boolean automatic, Generic directSuper, Generic... components) {
 		if (implicit.isConcrete())
 			components = ((GenericImpl) directSuper).sortAndCheck(components);
-		return ((CacheImpl) cache).bind(implicit, new Generic[] { directSuper }, components);
+		return ((CacheImpl) cache).bind(implicit, new Generic[] { directSuper }, components, automatic);
 	}
 
 	public <T extends Generic> Iterator<T> structuralIterator(Context context, Attribute origin, boolean readPhantom) {
@@ -615,34 +629,35 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class);
 	}
 
-	@Override
-	public void deduct(final Cache cache) {
-		if (!isPseudoStructural())
-			return;
-		for (int i = 0; i < components.length; i++) {
-			Generic component = components[i];
-			if (component.isStructural())
-				for (Generic inherited : ((Type) component).getInheritings(cache)) {
-					Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
-					if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-						bind(cache, bindPrimary(cache, getValue(), SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
-				}
-		}
-	}
+	// TODO clean
+	// @Override
+	// public void deduct(final Cache cache) {
+	// if (!isPseudoStructural())
+	// return;
+	// for (int i = 0; i < components.length; i++) {
+	// Generic component = components[i];
+	// if (component.isStructural())
+	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
+	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
+	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
+	// bind(cache, bindPrimary(cache, getValue(), SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
+	// }
+	// }
+	// }
 
-	public void deduct(final Cache cache, int basePos) {
-		for (int i = 0; i < components.length; i++) {
-			if (i != basePos) {
-				Generic component = components[i];
-				if (component.isStructural())
-					for (Generic inherited : ((Type) component).getInheritings(cache)) {
-						Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
-						if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-							bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
-					}
-			}
-		}
-	}
+	// public void deduct(final Cache cache, int basePos) {
+	// for (int i = 0; i < components.length; i++) {
+	// if (i != basePos) {
+	// Generic component = components[i];
+	// if (component.isStructural())
+	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
+	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
+	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
+	// bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
+	// }
+	// }
+	// }
+	// }
 
 	public boolean isPhantom() {
 		return Statics.PHAMTOM.equals(getValue());
@@ -680,13 +695,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					@Override
 					public boolean isSelected() {
 						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
-						if (selected) {
-							// if (((GenericImpl) next).isPseudoStructural(pos))
-							// if (context instanceof Cache)
-							// ((GenericImpl) next).deduct((Cache) context, pos);
-						}
+						if (selected && ((GenericImpl) next).isPseudoStructural(pos))
+							((GenericImpl) next).bindDeduct(context, pos, ((CacheImpl) context).findPrimaryByValue(next.getMeta().getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE));
 						return selected;
-
 					}
 				};
 			}
@@ -701,6 +712,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				throw new IllegalStateException();
 			}
 		};
+	}
+
+	private void bindDeduct(Context context, int pos, Generic phantom) {
+		bindDeductInternal(context, phantom, getDeductComponent(context, pos, 0), pos, 0, new Generic[components.length]);
+	}
+
+	private void bindDeductInternal(Context context, Generic phantom, Iterator<Generic> deductComponent, int pos, int column, Generic[] components) {
+		while (deductComponent.hasNext()) {
+			components[column] = deductComponent.next();
+			if (column + 1 < components.length)
+				bindDeductInternal(context, phantom, getDeductComponent(context, pos, column + 1), pos, column + 1, components);
+			else if (phantom == null || ((CacheImpl) context).find(new Generic[] { getImplicit(), phantom }, components) == null)
+				bind((Cache) context, getImplicit(), true, this, components);
+		}
+	}
+
+	private Iterator<Generic> getDeductComponent(Context context, int pos, final int column) {
+		return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
 	}
 
 	boolean safeIsEnabled(Context context, Attribute attribute) {
@@ -1335,7 +1364,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private void internalCancel(Cache cache, Holder attribute, int basePos) {
-		addLink(cache, attribute.isStructural() ? getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE), attribute, basePos,
+		addLink(cache, attribute.isStructural() ? getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL, true) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE, true), attribute, basePos,
 				Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
@@ -1367,17 +1396,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	// TODO KK
 	@Override
 	public <T extends Node> T newRoot(Cache cache, Serializable value, int dim) {
-		return bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, new Generic[dim]);
+		return bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE, true), false, this, new Generic[dim]);
 	}
 
 	@Override
 	public <T extends Node> T addNode(Cache cache, Serializable value, Generic... targets) {
-		return addLink(cache, this.<GenericImpl> getMeta().bindPrimary(cache, value, SystemGeneric.CONCRETE), getMeta(), targets);
+		return addLink(cache, this.<GenericImpl> getMeta().bindPrimary(cache, value, SystemGeneric.CONCRETE, true), getMeta(), targets);
 	}
 
 	@Override
 	public <T extends Node> T addSubNode(Cache cache, Serializable value, Generic... targets) {
-		return addLink(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, targets);
+		return addLink(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE, true), this, targets);
 	}
 
 	@Override
@@ -1450,7 +1479,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int basePos) {
 		boolean defaultBehavior = systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
-		return getValuedHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
+		if (NoBooleanSystemProperty.class.isAssignableFrom(systemPropertyClass))
+			return getHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)) != null;
+		else
+			return getValuedHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
 	}
 
 	@Override

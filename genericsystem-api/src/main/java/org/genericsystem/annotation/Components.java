@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The compositions of a generic.
+ * The components of a generic.
  * 
  * @author Nicolas Feybesse
  * @author Michael Ory
