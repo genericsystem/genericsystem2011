@@ -6,6 +6,8 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
+import org.genericsystem.core.Statics;
+import org.genericsystem.core.Transaction;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -148,6 +150,21 @@ public class AutomaticTest extends AbstractTest {
 		assert ((GenericImpl) children.getImplicit()).isAutomatic();
 	}
 
+	public void deduct() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Generic myAudi = car.newInstance(cache, "myAudi");
+		Generic red = color.newInstance(cache, "red");
+		car.setLink(cache, carColor, "carRed", red);
+
+		assert myAudi.getTargets(cache, carColor).size() == 1;
+		assert myAudi.getTargets(cache, carColor).contains(red);
+		assert red.getTargets(cache, carColor, Statics.BASE_POSITION).size() == 1;
+		assert red.getTargets(cache, carColor, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(cache, carColor, Statics.BASE_POSITION);
+	}
+
 	public void ternaryDeduct() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
@@ -189,24 +206,33 @@ public class AutomaticTest extends AbstractTest {
 
 	public void ternaryFlush() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		// Type car = cache.newType("Car");
-		// Type color = cache.newType("Color");
-		// Type time = cache.newType("Time");
-		// Relation carColorTime = car.setRelation(cache, "CarColorTime", color, time);
-		// car.newInstance(cache, "myAudi");
-		// Generic red = color.newInstance(cache, "red");
-		// time.newInstance(cache, "today");
-		// time.newInstance(cache, "tomorrow");
-		// car.setLink(cache, carColorTime, "carRed", red, time);
-		//
-		// cache.flush();
-		//
-		// Snapshot<Link> links = red.getLinks(new Transaction(cache.getEngine()), carColorTime);
-		// assert links.filter(new Filter<Link>() {
-		// @Override
-		// public boolean isSelected(Link element) {
-		// return ((GenericImpl) element).isAutomatic();
-		// }
-		// }).isEmpty();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Type time = cache.newType("Time");
+		Relation carColorTime = car.setRelation(cache, "CarColorTime", color, time);
+		Generic myAudi = car.newInstance(cache, "myAudi");
+		Generic red = color.newInstance(cache, "red");
+		time.newInstance(cache, "today");
+		time.newInstance(cache, "tomorrow");
+		car.setLink(cache, carColorTime, "carRed", red, time);
+
+		assert myAudi.getTargets(cache, carColorTime).contains(red);
+		assert red.getTargets(cache, carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(cache, carColorTime, Statics.BASE_POSITION);
+
+		// assert myAudi.getComposites(cache).isEmpty() : myAudi.getComposites(cache);
+
+		cache.flush();
+
+		assert red.getLinks(new Transaction(cache.getEngine()), carColorTime).filter(new Filter<Link>() {
+			@Override
+			public boolean isSelected(Link element) {
+				return ((GenericImpl) element).isAutomatic();
+			}
+		}).isEmpty();
+		assert red.getTargets(new Transaction(cache.getEngine()), carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(new Transaction(cache.getEngine()), carColorTime, Statics.BASE_POSITION);
+
+		assert myAudi.getComposites(cache).isEmpty() : myAudi.getComposites(cache);
+
+		cache.getEngine().close();
 	}
 }

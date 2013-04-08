@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -695,7 +696,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					@Override
 					public boolean isSelected() {
 						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
-						if (selected && ((GenericImpl) next).isPseudoStructural(pos))
+						if (selected && ((GenericImpl) next).isPseudoStructural(pos) && !GenericImpl.this.inheritsFrom(((GenericImpl) next).components[Statics.BASE_POSITION]) && context instanceof CacheImpl)
 							((GenericImpl) next).bindDeduct(context, pos, ((CacheImpl) context).findPrimaryByValue(next.getMeta().getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE));
 						return selected;
 					}

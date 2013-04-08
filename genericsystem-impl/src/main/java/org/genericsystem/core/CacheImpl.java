@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.Constraint.CheckingType;
@@ -518,6 +519,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		protected final Set<Generic> removes = new LinkedHashSet<Generic>();
 
 		public void flush() throws ConstraintViolationException, ConcurrencyControlException {
+			// TODO KK
+			for (Generic add : new LinkedHashSet<Generic>(adds)) {
+				if (!CacheImpl.this.isFlushable(add)) {
+					adds.remove(add);
+				}
+			}
 			getSubContext().getInternalContext().apply(adds, removes);
 		}
 
