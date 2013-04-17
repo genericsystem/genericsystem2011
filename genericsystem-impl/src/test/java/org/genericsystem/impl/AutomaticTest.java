@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
@@ -23,17 +24,17 @@ public class AutomaticTest extends AbstractTest {
 
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		assert !((GenericImpl) cache.getEngine()).isAutomatic();
-		assert ((GenericImpl) cache.getEngine()).isFlushable(cache);
-		assert !((GenericImpl) cache.getEngine().getMetaAttribute()).isAutomatic();
-		assert ((GenericImpl) cache.getEngine().getMetaAttribute()).isFlushable(cache);
-		assert !((GenericImpl) cache.getEngine().getMetaRelation()).isAutomatic();
-		assert ((GenericImpl) cache.getEngine().getMetaRelation()).isFlushable(cache);
+		assert ((GenericImpl) cache.getEngine()).isAutomatic();
+		assert ((CacheImpl) cache).isFlushable(cache.getEngine());
+		assert ((GenericImpl) cache.getEngine().getMetaAttribute()).isAutomatic();
+		assert ((CacheImpl) cache).isFlushable(cache.getEngine());
+		assert ((GenericImpl) cache.getEngine().getMetaRelation()).isAutomatic();
+		assert ((CacheImpl) cache).isFlushable(cache.getEngine());
 		Generic multiDirectional = cache.find(MultiDirectionalSystemProperty.class);
 		assert !((GenericImpl) multiDirectional).isAutomatic();
-		assert ((GenericImpl) multiDirectional).isFlushable(cache);
-		assert ((GenericImpl) multiDirectional.getImplicit()).isAutomatic();
+		assert ((CacheImpl) cache).isFlushable(multiDirectional);
 		assert ((GenericImpl) multiDirectional.getImplicit()).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(multiDirectional.getImplicit());
 	}
 
 	public void testAttribut() {
@@ -42,11 +43,30 @@ public class AutomaticTest extends AbstractTest {
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 
 		assert !((GenericImpl) vehicle).isAutomatic();
-		assert ((GenericImpl) vehicle).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(vehicle);
 		assert !((GenericImpl) vehiclePower).isAutomatic();
-		assert ((GenericImpl) vehiclePower).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(vehiclePower);
 		assert ((GenericImpl) vehiclePower.getImplicit()).isAutomatic();
-		assert ((GenericImpl) vehiclePower.getImplicit()).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(vehiclePower.getImplicit());
+	}
+
+	public void testRemoveAttribute() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
+		Generic power = vehiclePower.getImplicit();
+
+		assert !((GenericImpl) vehicle).isAutomatic();
+		assert ((CacheImpl) cache).isFlushable(vehicle);
+		assert !((GenericImpl) vehiclePower).isAutomatic();
+		assert ((CacheImpl) cache).isFlushable(vehiclePower);
+		assert ((GenericImpl) power).isAutomatic();
+		assert ((CacheImpl) cache).isFlushable(power);
+
+		vehiclePower.remove(cache);
+
+		assert ((GenericImpl) power).isAutomatic();
+		assert !((CacheImpl) cache).isFlushable(power);
 	}
 
 	public void testSubType() {
@@ -55,11 +75,11 @@ public class AutomaticTest extends AbstractTest {
 		Type car = vehicle.newSubType(cache, "car");
 
 		assert !((GenericImpl) vehicle).isAutomatic();
-		assert ((GenericImpl) vehicle).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(vehicle);
 		assert !((GenericImpl) car).isAutomatic();
-		assert ((GenericImpl) car).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(car);
 		assert ((GenericImpl) car.getImplicit()).isAutomatic();
-		assert ((GenericImpl) car.getImplicit()).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(car.getImplicit());
 	}
 
 	public void testMutipleInheritance() {
@@ -70,19 +90,19 @@ public class AutomaticTest extends AbstractTest {
 		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
 
 		assert !((GenericImpl) graphicComponent).isAutomatic();
-		assert ((GenericImpl) graphicComponent).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(graphicComponent);
 		assert !((GenericImpl) window).isAutomatic();
-		assert ((GenericImpl) window).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(window);
 		assert ((GenericImpl) window.getImplicit()).isAutomatic();
-		assert ((GenericImpl) window.getImplicit()).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(window.getImplicit());
 		assert !((GenericImpl) selectable).isAutomatic();
-		assert ((GenericImpl) selectable).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(selectable);
 		assert ((GenericImpl) selectable.getImplicit()).isAutomatic();
-		assert ((GenericImpl) selectable.getImplicit()).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(selectable.getImplicit());
 		assert !((GenericImpl) selectableWindow).isAutomatic();
-		assert ((GenericImpl) selectableWindow).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(selectableWindow);
 		assert ((GenericImpl) selectableWindow.getImplicit()).isAutomatic();
-		assert ((GenericImpl) selectableWindow.getImplicit()).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(selectableWindow.getImplicit());
 	}
 
 	public void testAttributWithValue() {
@@ -182,7 +202,7 @@ public class AutomaticTest extends AbstractTest {
 
 			@Override
 			public boolean isSelected(Link element) {
-				assert !((GenericImpl) element).isFlushable(cache);
+				assert !((CacheImpl) cache).isFlushable(element);
 				return !((GenericImpl) element).isAutomatic();
 			}
 		}).isEmpty();
@@ -200,8 +220,8 @@ public class AutomaticTest extends AbstractTest {
 		assert filter.size() == 2 : filter;
 		assert filter.contains(myBmwRedToday);
 		assert filter.contains(myBmwRedTomorrow);
-		assert ((GenericImpl) myBmwRedToday).isFlushable(cache);
-		assert ((GenericImpl) myBmwRedTomorrow).isFlushable(cache);
+		assert ((CacheImpl) cache).isFlushable(myBmwRedToday);
+		assert ((CacheImpl) cache).isFlushable(myBmwRedTomorrow);
 	}
 
 	public void ternaryFlush() {
@@ -231,8 +251,8 @@ public class AutomaticTest extends AbstractTest {
 		}).isEmpty();
 		assert red.getTargets(new Transaction(cache.getEngine()), carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(new Transaction(cache.getEngine()), carColorTime, Statics.BASE_POSITION);
 
-		assert myAudi.getComposites(cache).isEmpty() : myAudi.getComposites(cache);
+		assert myAudi.getTargets(cache, carColorTime).contains(red);
+		assert red.getTargets(cache, carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(cache, carColorTime, Statics.BASE_POSITION);
 
-		cache.getEngine().close();
 	}
 }

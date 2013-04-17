@@ -109,6 +109,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
+	public boolean isFlushable(Generic generic) {
+		return internalCache.isFlushable(generic);
+	}
+
 	@Override
 	public boolean isRemovable(Generic generic) {
 		try {
@@ -117,16 +121,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return false;
 		}
 		return true;
-	}
-
-	@Override
-	public boolean isFlushable(Generic generic) {
-		if (!generic.isAutomatic())
-			return true;
-		for (Generic inherit : generic.getInheritings(this))
-			if (((GenericImpl) inherit).isFlushable(this))
-				return true;
-		return false;
 	}
 
 	void remove(Generic generic) throws RollbackException {
@@ -176,17 +170,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	public Snapshot<Generic> getRefenrentialIntegrities(final Generic generic) {
+	public Snapshot<Generic> getReferentialIntegrities(final Generic generic) {
 		return new AbstractSnapshot<Generic>() {
 
 			@Override
 			public Iterator<Generic> iterator() {
-				return getInternalRefenrentialIntegrities(generic).iterator();
+				return getInternalReferentialIntegrities(generic).iterator();
 			}
 		};
 	}
 
-	private <T extends Generic> NavigableSet<T> getInternalRefenrentialIntegrities(final Generic generic) {
+	private <T extends Generic> NavigableSet<T> getInternalReferentialIntegrities(final Generic generic) {
 		return new TreeSet<T>() {
 			private static final long serialVersionUID = 1053909994506452123L;
 
@@ -518,26 +512,44 @@ public class CacheImpl extends AbstractContext implements Cache {
 		protected final Set<Generic> adds = new LinkedHashSet<Generic>();
 		protected final Set<Generic> removes = new LinkedHashSet<Generic>();
 
+		private final Set<Generic> noFlushables = new HashSet<Generic>();
+
 		public void flush() throws ConstraintViolationException, ConcurrencyControlException {
-			// TODO KK
-			for (Generic add : new LinkedHashSet<Generic>(adds)) {
-				if (!CacheImpl.this.isFlushable(add)) {
-					adds.remove(add);
-				}
-			}
+			// // TODO KK
+			// for (Generic add : new LinkedHashSet<Generic>(adds)) {
+			// if (!CacheImpl.this.isFlushable(add)) {
+			// adds.remove(add);
+			// }
+			// }
 			getSubContext().getInternalContext().apply(adds, removes);
+		}
+
+		public boolean isFlushable(Generic generic) {
+			return !noFlushables.contains(generic);
 		}
 
 		@Override
 		protected void add(GenericImpl generic) {
-			// if (CacheImpl.this.isFlushable(generic))
+			if (generic.isAutomatic())
+				noFlushables.add(generic);
+			else
+				makeFlushable(generic);
 			adds.add(generic);
 			super.add(generic);
 		}
 
+		private void makeFlushable(GenericImpl generic) {
+			for (Generic superGeneric : generic.supers)
+				if (noFlushables.contains(superGeneric))
+					makeFlushable((GenericImpl) superGeneric);
+			for (Generic component : generic.components)
+				if (noFlushables.contains(component))
+					makeFlushable((GenericImpl) component);
+			noFlushables.remove(generic);
+		}
+
 		@Override
 		protected void remove(GenericImpl generic) {
-			// if (CacheImpl.this.isFlushable(generic))
 			removes.add(generic);
 			super.remove(generic);
 		}
@@ -560,10 +572,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			add((GenericImpl) generic);
 			checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
 			checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
-		}
-
-		public void addGenericWithoutCheck(Generic generic) throws ConstraintViolationException {
-			add((GenericImpl) generic);
 		}
 
 		public void removeGeneric(Generic generic) throws ConstraintViolationException {

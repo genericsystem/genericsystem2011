@@ -103,16 +103,11 @@ public interface Generic extends Comparable<Generic> {
 	boolean isLink();
 
 	/**
-	 * Returns true if this Generic has been generated automaticly by the bindDeduc.
+	 * Returns true if this Generic is flushable.
 	 * 
-	 * @return True if the Generic has been generated automaticly by the bindDeduc.
-	 */
-	boolean isAutomatic();
-
-	/**
-	 * Returns true if this Generic is flushable on the engine
-	 * 
-	 * @return True if the Generic s flushable on the engine.
+	 * @param cache
+	 *            The reference Cache.
+	 * @return True if the Generic s flushable.
 	 */
 	boolean isFlushable(Cache cache);
 

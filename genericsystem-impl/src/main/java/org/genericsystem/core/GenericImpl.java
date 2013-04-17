@@ -80,13 +80,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public boolean isAutomatic() {
-		return automatic;
+	public boolean isFlushable(Cache cache) {
+		return ((CacheImpl) cache).isFlushable(this);
 	}
 
-	@Override
-	public boolean isFlushable(Cache cache) {
-		return cache.isFlushable(this);
+	public boolean isAutomatic() {
+		return automatic;
 	}
 
 	final GenericImpl initializePrimary(Serializable value, int metaLevel, Generic[] directSupers, Generic[] components, boolean automatic) {
@@ -696,8 +695,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					@Override
 					public boolean isSelected() {
 						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
-						if (selected && ((GenericImpl) next).isPseudoStructural(pos) && !GenericImpl.this.inheritsFrom(((GenericImpl) next).components[Statics.BASE_POSITION]) && context instanceof CacheImpl)
-							((GenericImpl) next).bindDeduct(context, pos, ((CacheImpl) context).findPrimaryByValue(next.getMeta().getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE));
+						if (selected && ((GenericImpl) next).isPseudoStructural(pos))
+							if (context instanceof CacheImpl)
+								((GenericImpl) next).bindDeduct(context, pos, ((CacheImpl) context).findPrimaryByValue(next.getMeta().getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE));
 						return selected;
 					}
 				};
@@ -1329,7 +1329,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public Snapshot<Generic> getRefenrentialIntegrities(Cache cache) {
-		return cache.getRefenrentialIntegrities(this);
+		return cache.getReferentialIntegrities(this);
 	}
 
 	/*********************************************/

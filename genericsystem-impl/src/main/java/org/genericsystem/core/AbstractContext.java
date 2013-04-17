@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Supers;
 import org.genericsystem.annotation.SystemGeneric;
@@ -21,8 +22,8 @@ import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.constraints.Constraint;
 import org.genericsystem.constraints.Constraint.CheckingType;
 import org.genericsystem.core.Statics.Primaries;
-import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
