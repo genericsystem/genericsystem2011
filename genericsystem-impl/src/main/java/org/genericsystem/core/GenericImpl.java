@@ -169,10 +169,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public int compareTo(Generic generic) {
-		// long time1 = Long.MAX_VALUE != getBirthTs() ? getBirthTs() : (getDesignTs() != ((GenericImpl) generic).getDesignTs() ? getDesignTs() : getBirthTs());
-		// long time2 = Long.MAX_VALUE != ((GenericImpl) generic).getBirthTs() ? ((GenericImpl) generic).getBirthTs() : (getDesignTs() != ((GenericImpl) generic).getDesignTs() ? ((GenericImpl) generic).getDesignTs() : ((GenericImpl) generic).getBirthTs());
-
-		return Long.compare(getDesignTs(), ((GenericImpl) generic).getDesignTs());
+		long birthTs = getBirthTs();
+		long compareBirthTs = ((GenericImpl) generic).getBirthTs();
+		return birthTs == compareBirthTs ? Long.compare(getDesignTs(), ((GenericImpl) generic).getDesignTs()) : Long.compare(birthTs, compareBirthTs);
 	}
 
 	@Override

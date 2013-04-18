@@ -140,8 +140,8 @@ public class ApiTest extends AbstractTest {
 		Type vehicle2 = otherCache.newType("Vehicle2");
 		otherCache.flush();
 		Set<Generic> orderedGenerics = new TreeSet<>();
-		orderedGenerics.add(vehicle2);
 		orderedGenerics.add(vehicle1);
+		orderedGenerics.add(vehicle2);
 		Iterator<Generic> iterator = orderedGenerics.iterator();
 		assert iterator.next().equals(vehicle2);
 		assert iterator.next().equals(vehicle1);
