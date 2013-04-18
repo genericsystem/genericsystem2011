@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabledConstraint;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -696,7 +697,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
 						if (selected && ((GenericImpl) next).isPseudoStructural(pos))
 							if (context instanceof CacheImpl)
-								((GenericImpl) next).bindDeduct(context, pos, ((CacheImpl) context).findPrimaryByValue(next.getMeta().getImplicit(), Statics.PHAMTOM, SystemGeneric.CONCRETE));
+								((GenericImpl) next).project((Cache) context, pos, ((CacheImpl) context).findPrimaryByValue(((GenericImpl) next.getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE));
 						return selected;
 					}
 				};
@@ -714,21 +715,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private void bindDeduct(Context context, int pos, Generic phantom) {
-		bindDeductInternal(context, phantom, getDeductComponent(context, pos, 0), pos, 0, new Generic[components.length]);
+	private void project(Cache cache, int pos, Generic phantom) {
+		internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, 0), 0, new Generic[components.length]);
 	}
 
-	private void bindDeductInternal(Context context, Generic phantom, Iterator<Generic> deductComponent, int pos, int column, Generic[] components) {
-		while (deductComponent.hasNext()) {
-			components[column] = deductComponent.next();
+	private void internalProject(Cache cache, int pos, Generic phantom, Iterator<Generic> targetProjectionIterator, int column, Generic[] components) {
+		while (targetProjectionIterator.hasNext()) {
+			components[column] = targetProjectionIterator.next();
 			if (column + 1 < components.length)
-				bindDeductInternal(context, phantom, getDeductComponent(context, pos, column + 1), pos, column + 1, components);
-			else if (phantom == null || ((CacheImpl) context).find(new Generic[] { getImplicit(), phantom }, components) == null)
-				bind((Cache) context, getImplicit(), true, this, components);
+				internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, column + 1), column + 1, components);
+			else if (!findPhantom(cache, phantom, components))
+				bind(cache, getImplicit(), true, this, components);
 		}
 	}
 
-	private Iterator<Generic> getDeductComponent(Context context, int pos, final int column) {
+	private boolean findPhantom(Cache cache, Generic phantom, Generic[] components) {
+		return phantom != null && ((CacheImpl) cache).find(new Generic[] { getImplicit(), phantom }, components) != null;
+	}
+
+	private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
 		return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
 	}
 
