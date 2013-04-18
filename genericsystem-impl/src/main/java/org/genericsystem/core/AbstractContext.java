@@ -94,6 +94,18 @@ public abstract class AbstractContext implements Context, Serializable {
 		return getEngine().getMetaRelation();
 	}
 
+	public boolean isFlushable(Generic generic) {
+		if (!generic.isAutomatic())
+			return true;
+		for (Generic inheriting : generic.getInheritings(this))
+			if (isFlushable(inheriting))
+				return true;
+		for (Generic composite : generic.getComposites(this))
+			if (isFlushable((composite)))
+				return true;
+		return false;
+	}
+
 	public abstract boolean isScheduledToAdd(Generic generic);
 
 	public abstract boolean isScheduledToRemove(Generic generic);
@@ -289,7 +301,10 @@ public abstract class AbstractContext implements Context, Serializable {
 			try {
 				for (Generic constraint : getConstraints()) {
 					Constraint constraintInstance = ((Class<? extends Constraint>) constraint.getValue()).newInstance();
-					if (immediatlyCheckable == constraintInstance.isImmediatelyCheckable() && constraintInstance.isCheckedAt(checkingType))
+					if (immediatlyCheckable) {
+						if (constraintInstance.isImmediatelyCheckable() && constraintInstance.isCheckedAt(checkingType))
+							sortedConstraints.add(constraintInstance);
+					} else if (constraintInstance.isCheckedAt(checkingType))
 						sortedConstraints.add(constraintInstance);
 				}
 			} catch (InstantiationException | IllegalAccessException e) {

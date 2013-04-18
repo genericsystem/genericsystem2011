@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InheritanceDisabled;
+import org.genericsystem.annotation.constraints.InheritanceDisabledConstraint;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -1272,7 +1272,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	void mountConstraints(Cache cache, Class<?> clazz) {
-		if (clazz.getAnnotation(InheritanceDisabled.class) != null)
+		if (clazz.getAnnotation(InheritanceDisabledConstraint.class) != null)
 			disableInheritance(cache);
 
 		if (clazz.getAnnotation(VirtualConstraint.class) != null)

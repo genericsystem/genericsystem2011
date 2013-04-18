@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This constraint represent the abstract notion.
+ * This constraint represent the abstract.
  * 
  * @author Nicolas Feybesse
  * @author Michael Ory

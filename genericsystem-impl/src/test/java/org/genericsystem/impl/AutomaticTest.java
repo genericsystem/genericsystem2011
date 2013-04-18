@@ -24,11 +24,11 @@ public class AutomaticTest extends AbstractTest {
 
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		assert ((GenericImpl) cache.getEngine()).isAutomatic();
+		assert !((GenericImpl) cache.getEngine()).isAutomatic();
 		assert ((CacheImpl) cache).isFlushable(cache.getEngine());
-		assert ((GenericImpl) cache.getEngine().getMetaAttribute()).isAutomatic();
+		assert !((GenericImpl) cache.getEngine().getMetaAttribute()).isAutomatic();
 		assert ((CacheImpl) cache).isFlushable(cache.getEngine());
-		assert ((GenericImpl) cache.getEngine().getMetaRelation()).isAutomatic();
+		assert !((GenericImpl) cache.getEngine().getMetaRelation()).isAutomatic();
 		assert ((CacheImpl) cache).isFlushable(cache.getEngine());
 		Generic multiDirectional = cache.find(MultiDirectionalSystemProperty.class);
 		assert !((GenericImpl) multiDirectional).isAutomatic();
@@ -251,6 +251,15 @@ public class AutomaticTest extends AbstractTest {
 		assert red.getTargets(cache.getEngine().newCache(), carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(new Transaction(cache.getEngine()), carColorTime, Statics.BASE_POSITION);
 		assert myAudi.getTargets(cache, carColorTime).contains(red);
 		assert red.getTargets(cache, carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(cache, carColorTime, Statics.BASE_POSITION);
+	}
 
+	public void test2() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Generic myAudi = car.newInstance(cache, "myAudi");
+		Generic red = color.newInstance(cache, "red");
+		carColor.enableRequiredConstraint(cache);
 	}
 }

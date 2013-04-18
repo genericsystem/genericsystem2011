@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.Constraint.CheckingType;
@@ -106,18 +107,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			subContext = new Transaction(getEngine());
 			assert getTs() > ts;
 		}
-	}
-
-	public boolean isFlushable(Generic generic) {
-		if (!generic.isAutomatic())
-			return true;
-		for (Generic inheriting : generic.getInheritings(this))
-			if (isFlushable(inheriting))
-				return true;
-		for (Generic composite : generic.getComposites(this))
-			if (isFlushable((composite)))
-				return true;
-		return false;
 	}
 
 	@Override
