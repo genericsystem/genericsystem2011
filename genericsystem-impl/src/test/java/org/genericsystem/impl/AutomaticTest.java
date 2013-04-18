@@ -33,7 +33,6 @@ public class AutomaticTest extends AbstractTest {
 		Generic multiDirectional = cache.find(MultiDirectionalSystemProperty.class);
 		assert !((GenericImpl) multiDirectional).isAutomatic();
 		assert ((CacheImpl) cache).isFlushable(multiDirectional);
-		assert ((GenericImpl) multiDirectional.getImplicit()).isFlushable(cache);
 		assert ((CacheImpl) cache).isFlushable(multiDirectional.getImplicit());
 	}
 
@@ -249,8 +248,7 @@ public class AutomaticTest extends AbstractTest {
 				return ((GenericImpl) element).isAutomatic();
 			}
 		}).isEmpty();
-		assert red.getTargets(new Transaction(cache.getEngine()), carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(new Transaction(cache.getEngine()), carColorTime, Statics.BASE_POSITION);
-
+		assert red.getTargets(cache.getEngine().newCache(), carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(new Transaction(cache.getEngine()), carColorTime, Statics.BASE_POSITION);
 		assert myAudi.getTargets(cache, carColorTime).contains(red);
 		assert red.getTargets(cache, carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(cache, carColorTime, Statics.BASE_POSITION);
 

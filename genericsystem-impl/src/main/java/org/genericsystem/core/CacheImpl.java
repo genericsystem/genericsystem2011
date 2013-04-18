@@ -12,7 +12,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.Constraint.CheckingType;
@@ -110,7 +109,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	public boolean isFlushable(Generic generic) {
-		return internalCache.isFlushable(generic);
+		if (!generic.isAutomatic())
+			return true;
+		for (Generic inheriting : generic.getInheritings(this))
+			if (isFlushable(inheriting))
+				return true;
+		for (Generic composite : generic.getComposites(this))
+			if (isFlushable((composite)))
+				return true;
+		return false;
 	}
 
 	@Override
@@ -509,43 +516,27 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		private static final long serialVersionUID = 21372907392620336L;
 
-		protected final Set<Generic> adds = new LinkedHashSet<Generic>();
-		protected final Set<Generic> removes = new LinkedHashSet<Generic>();
-
-		private final Set<Generic> noFlushables = new HashSet<Generic>();
+		private final Set<Generic> adds = new LinkedHashSet<Generic>();
+		private final Set<Generic> removes = new LinkedHashSet<Generic>();
 
 		public void flush() throws ConstraintViolationException, ConcurrencyControlException {
-			// // TODO KK
-			// for (Generic add : new LinkedHashSet<Generic>(adds)) {
-			// if (!CacheImpl.this.isFlushable(add)) {
-			// adds.remove(add);
-			// }
-			// }
-			getSubContext().getInternalContext().apply(adds, removes);
-		}
-
-		public boolean isFlushable(Generic generic) {
-			return !noFlushables.contains(generic);
+			getSubContext().getInternalContext().apply(new Iterable<Generic>() {
+				@Override
+				public Iterator<Generic> iterator() {
+					return new AbstractFilterIterator<Generic>(adds.iterator()) {
+						@Override
+						public boolean isSelected() {
+							return isFlushable(next);
+						}
+					};
+				}
+			}, removes);
 		}
 
 		@Override
 		protected void add(GenericImpl generic) {
-			if (generic.isAutomatic())
-				noFlushables.add(generic);
-			else
-				makeFlushable(generic);
 			adds.add(generic);
 			super.add(generic);
-		}
-
-		private void makeFlushable(GenericImpl generic) {
-			for (Generic superGeneric : generic.supers)
-				if (noFlushables.contains(superGeneric))
-					makeFlushable((GenericImpl) superGeneric);
-			for (Generic component : generic.components)
-				if (noFlushables.contains(component))
-					makeFlushable((GenericImpl) component);
-			noFlushables.remove(generic);
 		}
 
 		@Override

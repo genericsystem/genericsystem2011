@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -103,13 +102,11 @@ public interface Generic extends Comparable<Generic> {
 	boolean isLink();
 
 	/**
-	 * Returns true if this Generic is flushable.
+	 * Returns true if this Generic has been automatically created.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @return True if the Generic s flushable.
+	 * @return Trueif this Generic has been automatically created.
 	 */
-	boolean isFlushable(Cache cache);
+	boolean isAutomatic();
 
 	/**
 	 * Returns the value of this Generic.

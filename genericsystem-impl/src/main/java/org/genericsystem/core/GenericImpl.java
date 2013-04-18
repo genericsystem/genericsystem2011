@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -79,11 +78,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return components.clone();
 	}
 
-	@Override
-	public boolean isFlushable(Cache cache) {
-		return ((CacheImpl) cache).isFlushable(this);
-	}
+	// public boolean isFlushable(Cache cache) {
+	// return ((CacheImpl) cache).isFlushable(this);
+	// }
 
+	@Override
 	public boolean isAutomatic() {
 		return automatic;
 	}
