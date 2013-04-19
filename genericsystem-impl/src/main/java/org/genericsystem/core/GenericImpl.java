@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabledConstraint;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -37,6 +36,7 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
+import org.genericsystem.iterator.AbstractCartesianIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
@@ -572,7 +572,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private Generic[] sortAndCheck(Generic... components) {
 		if (getComponentsSize() != components.length)
-			throw new IllegalStateException("Illegal components size");
+			throw new IllegalStateException("Illegal components iterablesSize");
 		Map<Generic, Integer> positions = getPositions(components);
 		Generic[] orderedComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++) {
@@ -627,36 +627,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	private Attribute getMultiDirectionalSystemProperty(Context context) {
 		return ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class);
 	}
-
-	// TODO clean
-	// @Override
-	// public void deduct(final Cache cache) {
-	// if (!isPseudoStructural())
-	// return;
-	// for (int i = 0; i < components.length; i++) {
-	// Generic component = components[i];
-	// if (component.isStructural())
-	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
-	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
-	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-	// bind(cache, bindPrimary(cache, getValue(), SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
-	// }
-	// }
-	// }
-
-	// public void deduct(final Cache cache, int basePos) {
-	// for (int i = 0; i < components.length; i++) {
-	// if (i != basePos) {
-	// Generic component = components[i];
-	// if (component.isStructural())
-	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
-	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
-	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-	// bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
-	// }
-	// }
-	// }
-	// }
 
 	public boolean isPhantom() {
 		return Statics.PHAMTOM.equals(getValue());
@@ -714,27 +684,58 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private void project(Cache cache, int pos, Generic phantom) {
-		internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, 0), 0, new Generic[components.length]);
-	}
+	private void project(final Cache cache, final int pos, Generic phantom) {
+		final Iterable<Generic>[] targetProjectionIterable = new Iterable[components.length];
+		Iterator<Generic[]> cartesianIterator = new AbstractCartesianIterator<Generic>() {
 
-	private void internalProject(Cache cache, int pos, Generic phantom, Iterator<Generic> targetProjectionIterator, int column, Generic[] components) {
-		while (targetProjectionIterator.hasNext()) {
-			components[column] = targetProjectionIterator.next();
-			if (column + 1 < components.length)
-				internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, column + 1), column + 1, components);
-			else if (!findPhantom(cache, phantom, components))
+			@Override
+			public Generic[] initValues() {
+				return new Generic[targetProjectionIterable.length];
+			}
+
+			@Override
+			public Iterable<Generic>[] iterables() {
+				for (int i = 0; i < components.length; i++) {
+					final int column = i;
+					targetProjectionIterable[i] = new Iterable<Generic>() {
+						@Override
+						public Iterator<Generic> iterator() {
+							return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(cache) : new SingletonIterator<Generic>(components[column]);
+						}
+					};
+				}
+				return targetProjectionIterable;
+			}
+
+		};
+		while (cartesianIterator.hasNext()) {
+			Generic[] components = cartesianIterator.next();
+			if (!findPhantom(cache, phantom, components))
 				bind(cache, getImplicit(), true, this, components);
 		}
 	}
 
+	// private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
+	// return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
+	// }
+
 	private boolean findPhantom(Cache cache, Generic phantom, Generic[] components) {
-		return phantom != null && ((CacheImpl) cache).find(new Generic[] { getImplicit(), phantom }, components) != null;
+		return phantom != null && ((CacheImpl) cache).fastFind(phantom, new Generic[] { getImplicit(), phantom }, components) != null;
 	}
 
-	private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
-		return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
-	}
+	// private void project(Cache cache, int pos, Generic phantom) {
+	// internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, 0), 0, new Generic[components.length]);
+	// }
+
+	// private void internalProject(Cache cache, int pos, Generic phantom, Iterator<Generic> targetProjectionIterator, int column, Generic[] components) {
+	// while (targetProjectionIterator.hasNext()) {
+	// components[column] = targetProjectionIterator.next();
+	// if (column + 1 < components.length)
+	// internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, column + 1), column + 1, components);
+	// else if (!findPhantom(cache, phantom, components))
+	// bind(cache, getImplicit(), true, this, components);
+	// }
+	// }
 
 	boolean safeIsEnabled(Context context, Attribute attribute) {
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(context, attribute) {
@@ -809,7 +810,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	//
 	// @Override
 	// public Generic[] toArray() {
-	// return super.toArray(new Generic[size()]);
+	// return super.toArray(new Generic[iterablesSize()]);
 	// }
 	// }
 
