@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Supers;
 import org.genericsystem.annotation.SystemGeneric;
@@ -169,23 +168,35 @@ public abstract class AbstractContext implements Context, Serializable {
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
 		for (int i = 0; i < primariesArray.length; i++)
 			boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
-		Generic[] extendedComponents = ((GenericImpl) generic).components;
-		// TODO KK
-		// for (int i = 0; i < extendedComponents.length; i++)
-		// extendedComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
-		Generic[] directSupers = getDirectSupers(boundPrimaries, extendedComponents);
-		for (int i = 0; i < directSupers.length; i++)
-			if (((GenericImpl) directSupers[i]).equiv(boundPrimaries, extendedComponents))
-				return (T) directSupers[i];
+		Generic[] components = ((GenericImpl) generic).components;
+		Generic[] boundComponents = new Generic[components.length];
+		for (int i = 0; i < components.length; i++)
+			boundComponents[i] = reFind(((GenericImpl) components[i]));
+
+		T result = fastFind(reFind(generic.getImplicit()), boundPrimaries, boundComponents);
+		if (result != null)
+			return result;
 		throw new IllegalStateException();
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T find(Generic[] supers, Generic[] components) {
+	<T extends Generic> T find(Generic[] supers, Generic[] components) {
 		final Generic[] interfaces = new Primaries(supers).toArray();
 		Generic[] directSupers = getDirectSupers(interfaces, components);
 		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
 			return (T) directSupers[0];
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	<T extends Generic> T fastFind(Generic implicit, Generic[] supers, Generic[] components) {
+		final Generic[] interfaces = new Primaries(supers).toArray();
+		for (Generic generic : components.length == 0 ? implicit.getInheritings(this) : components[0].getComposites(this))
+			if (((GenericImpl) generic).equiv(interfaces, components)) {
+				// assert generic == find(supers, components);
+				return (T) generic;
+			}
+		// assert find(supers, components) == null;
 		return null;
 	}
 

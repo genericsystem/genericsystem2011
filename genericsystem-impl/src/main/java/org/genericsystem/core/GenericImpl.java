@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabledConstraint;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -629,36 +628,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class);
 	}
 
-	// TODO clean
-	// @Override
-	// public void deduct(final Cache cache) {
-	// if (!isPseudoStructural())
-	// return;
-	// for (int i = 0; i < components.length; i++) {
-	// Generic component = components[i];
-	// if (component.isStructural())
-	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
-	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
-	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-	// bind(cache, bindPrimary(cache, getValue(), SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
-	// }
-	// }
-	// }
-
-	// public void deduct(final Cache cache, int basePos) {
-	// for (int i = 0; i < components.length; i++) {
-	// if (i != basePos) {
-	// Generic component = components[i];
-	// if (component.isStructural())
-	// for (Generic inherited : ((Type) component).getInheritings(cache)) {
-	// Generic phantom = ((CacheImpl) cache).findPrimaryByValue(((GenericImpl) getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE);
-	// if (phantom == null || ((CacheImpl) cache).find(Statics.insertFirstIntoArray(phantom, this), Statics.replace(i, components, inherited)) == null)
-	// bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE), this, Statics.replace(i, components, inherited));
-	// }
-	// }
-	// }
-	// }
-
 	public boolean isPhantom() {
 		return Statics.PHAMTOM.equals(getValue());
 	}
@@ -743,8 +712,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	// return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
 	// }
 
+	// private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
+	// return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
+	// }
+
 	private boolean findPhantom(Cache cache, Generic phantom, Generic[] components) {
-		return phantom != null && ((CacheImpl) cache).find(new Generic[] { getImplicit(), phantom }, components) != null;
+		return phantom != null && ((CacheImpl) cache).fastFind(phantom, new Generic[] { getImplicit(), phantom }, components) != null;
 	}
 
 	// private void project(Cache cache, int pos, Generic phantom) {
