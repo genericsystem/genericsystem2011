@@ -8,6 +8,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.constraints.axed.SingularConstraintImpl;
+import org.genericsystem.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.constraints.simple.AliveConstraintImpl;
 import org.genericsystem.constraints.simple.ConcreteInheritanceConstraintImpl;
 import org.genericsystem.constraints.simple.DuplicateStructuralValueConstraintImpl;
@@ -141,7 +142,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
 					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, NotNullConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class,
 					AliveConstraintImpl.class, UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
-					UnduplicateBindingConstraintImpl.class, DuplicateStructuralValueConstraintImpl.class, FlushableConstraintImpl.class);
+					UnduplicateBindingConstraintImpl.class, DuplicateStructuralValueConstraintImpl.class, FlushableConstraintImpl.class, SizeConstraintImpl.class);
 
 			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
 			for (Class<?> clazz : classes)

@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabledConstraint;
 import org.genericsystem.annotation.constraints.InstanceClassConstraint;
@@ -21,6 +22,7 @@ import org.genericsystem.annotation.constraints.VirtualConstraint;
 import org.genericsystem.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.constraints.axed.SingularConstraintImpl;
+import org.genericsystem.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.constraints.simple.NotNullConstraintImpl;
 import org.genericsystem.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.constraints.simple.SingularInstanceConstraintImpl;
@@ -1530,6 +1532,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isReferentialIntegrity(Context context, int basePos) {
 		return isSystemPropertyEnabled(context, ReferentialIntegritySystemProperty.class, basePos);
+	}
+
+	// TODO work
+	public <T extends Relation> T enableSizeConstraint(Cache cache, int basePos, int size) {
+		Attribute sizeConstraint = cache.<Attribute> find(SizeConstraintImpl.class);
+		T generic = setSystemProperty(cache, sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
+		getHolder(cache, sizeConstraint).setHolder(cache, sizeConstraint.getAttribute(cache, "Size"), size).log();
+		return generic;
+	}
+
+	public <T extends Relation> T disableSizeConstraint(Cache cache, int basePos, int size) {
+		Attribute sizeConstraint = cache.<Attribute> find(SizeConstraintImpl.class);
+		T generic = setSystemProperty(cache, sizeConstraint, basePos, SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
+		// getHolder(cache, sizeConstraint).setHolder(cache, sizeConstraint.getAttribute(cache, "Size"), size).log();
+		return generic;
+	}
+
+	public boolean isSizeConstraintEnabled(Context context, int basePos) {
+		return isSystemPropertyEnabled(context, SizeConstraintImpl.class, basePos);
 	}
 
 	@Override
