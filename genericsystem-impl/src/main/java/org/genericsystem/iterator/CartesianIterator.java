@@ -2,19 +2,21 @@ package org.genericsystem.iterator;
 
 import java.util.Iterator;
 
-public abstract class AbstractCartesianIterator<T> implements Iterator<T[]> {
+import org.genericsystem.core.Generic;
 
-	private final Iterable<T>[] iterables;
+public class CartesianIterator implements Iterator<Object[]> {
+
+	private final Iterable<Object>[] iterables;
 	private int iterablesSize;
 
-	private final Iterator<T>[] iterators;
+	private final Iterator<Object>[] iterators;
 
-	private T[] values;
+	private Object[] values;
 	private boolean empty;
 
-	@SuppressWarnings("unchecked")
-	public AbstractCartesianIterator() {
-		this.iterables = iterables();
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public CartesianIterator(Iterable... iterables) {
+		this.iterables = iterables;
 		this.iterablesSize = iterables.length;
 		this.iterators = new Iterator[iterablesSize];
 
@@ -27,15 +29,11 @@ public abstract class AbstractCartesianIterator<T> implements Iterator<T[]> {
 		}
 
 		if (!empty) {
-			values = initValues();
+			values = new Generic[iterablesSize];
 			for (int i = 0; i < iterablesSize - 1; i++)
 				setNextValue(i);
 		}
 	}
-
-	public abstract T[] initValues();
-
-	public abstract Iterable<T>[] iterables();
 
 	@Override
 	public boolean hasNext() {
@@ -48,7 +46,7 @@ public abstract class AbstractCartesianIterator<T> implements Iterator<T[]> {
 	}
 
 	@Override
-	public T[] next() {
+	public Object[] next() {
 		int cursor;
 		for (cursor = iterablesSize - 1; cursor >= 0; cursor--)
 			if (iterators[cursor].hasNext())
@@ -64,7 +62,7 @@ public abstract class AbstractCartesianIterator<T> implements Iterator<T[]> {
 	}
 
 	private void setNextValue(int index) {
-		Iterator<T> it = iterators[index];
+		Iterator<Object> it = iterators[index];
 		if (it.hasNext())
 			values[index] = it.next();
 	}
@@ -73,4 +71,5 @@ public abstract class AbstractCartesianIterator<T> implements Iterator<T[]> {
 	public void remove() {
 		throw new UnsupportedOperationException();
 	}
+
 }

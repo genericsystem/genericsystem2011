@@ -37,12 +37,12 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
-import org.genericsystem.iterator.AbstractCartesianIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.iterator.ArrayIterator;
+import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.system.CascadeRemoveSystemProperty;
@@ -716,34 +716,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private void project(final Cache cache, final int pos, Generic phantom) {
-		final Iterable<Generic>[] targetProjectionIterable = new Iterable[components.length];
-		Iterator<Generic[]> cartesianIterator = new AbstractCartesianIterator<Generic>() {
-
-			@Override
-			public Generic[] initValues() {
-				return new Generic[targetProjectionIterable.length];
-			}
-
-			@Override
-			public Iterable<Generic>[] iterables() {
-				for (int i = 0; i < components.length; i++) {
-					final int column = i;
-					targetProjectionIterable[i] = new Iterable<Generic>() {
-						@Override
-						public Iterator<Generic> iterator() {
-							return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(cache) : new SingletonIterator<Generic>(components[column]);
-						}
-					};
-				}
-				return targetProjectionIterable;
-			}
-
-		};
+		Iterator<Object[]> cartesianIterator = new CartesianIterator(iterables(cache, pos));
 		while (cartesianIterator.hasNext()) {
-			Generic[] components = cartesianIterator.next();
+			Generic[] components = (Generic[]) cartesianIterator.next();
 			if (!findPhantom(cache, phantom, components))
 				bind(cache, getImplicit(), true, this, components);
 		}
+	}
+
+	private Iterable<Generic>[] iterables(final Cache cache, final int pos) {
+		final Iterable<Generic>[] targetProjectionIterable = new Iterable[components.length];
+		for (int i = 0; i < components.length; i++) {
+			final int column = i;
+			targetProjectionIterable[i] = new Iterable<Generic>() {
+				@Override
+				public Iterator<Generic> iterator() {
+					return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(cache) : new SingletonIterator<Generic>(components[column]);
+				}
+			};
+		}
+		return targetProjectionIterable;
+
 	}
 
 	// private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
