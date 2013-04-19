@@ -719,6 +719,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	// return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
 	// }
 
+	// private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
+	// return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
+	// }
+
 	private boolean findPhantom(Cache cache, Generic phantom, Generic[] components) {
 		return phantom != null && ((CacheImpl) cache).fastFind(phantom, new Generic[] { getImplicit(), phantom }, components) != null;
 	}

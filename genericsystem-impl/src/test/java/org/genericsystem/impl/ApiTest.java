@@ -53,6 +53,7 @@ public class ApiTest extends AbstractTest {
 		Type time = cache.newType("Time");
 		Relation carColorTime = car.setRelation(cache, "CarColorTime", color, time);
 		car.newInstance(cache, "myAudi");
+		car.newInstance(cache, "myBmw");
 		Generic red = color.newInstance(cache, "red");
 		time.newInstance(cache, "today");
 		time.newInstance(cache, "tomorrow");

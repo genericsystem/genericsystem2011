@@ -18,7 +18,7 @@ public class SelfRelationTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance(cache, "red");
 		Relation carOutsideColor = car.setRelation(cache, "outside", color);
-		Link defaultOutside = car.setLink(cache, carOutsideColor, "defaultOutside", red);
+		car.setLink(cache, carOutsideColor, "defaultOutside", red);
 		assert car.getTargets(cache, carOutsideColor).contains(red);
 
 		Generic myCar = car.newInstance(cache, "myCar");
