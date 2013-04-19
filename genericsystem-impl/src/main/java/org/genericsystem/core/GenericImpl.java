@@ -37,6 +37,7 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
+import org.genericsystem.iterator.AbstractCartesianIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
@@ -572,7 +573,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private Generic[] sortAndCheck(Generic... components) {
 		if (getComponentsSize() != components.length)
-			throw new IllegalStateException("Illegal components size");
+			throw new IllegalStateException("Illegal components iterablesSize");
 		Map<Generic, Integer> positions = getPositions(components);
 		Generic[] orderedComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++) {
@@ -714,11 +715,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private void project(Cache cache, int pos, Generic phantom) {
-		Iterator<Generic>[] allTargetProjectionIterator = new Iterator[components.length];
-		for (int i = 0; i < components.length; i++)
-			allTargetProjectionIterator[i] = targetProjectionIterator(cache, pos, i);
-		CartesianIterator<Generic> cartesianIterator = new CartesianIterator<>(allTargetProjectionIterator);
+	private void project(final Cache cache, final int pos, Generic phantom) {
+		final Iterable<Generic>[] targetProjectionIterable = new Iterable[components.length];
+		Iterator<Generic[]> cartesianIterator = new AbstractCartesianIterator<Generic>() {
+
+			@Override
+			public Generic[] initValues() {
+				return new Generic[targetProjectionIterable.length];
+			}
+
+			@Override
+			public Iterable<Generic>[] iterables() {
+				for (int i = 0; i < components.length; i++) {
+					final int column = i;
+					targetProjectionIterable[i] = new Iterable<Generic>() {
+						@Override
+						public Iterator<Generic> iterator() {
+							return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(cache) : new SingletonIterator<Generic>(components[column]);
+						}
+					};
+				}
+				return targetProjectionIterable;
+			}
+
+		};
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = cartesianIterator.next();
 			if (!findPhantom(cache, phantom, components))
@@ -726,55 +746,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
-		return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
-	}
+	// private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
+	// return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
+	// }
 
 	private boolean findPhantom(Cache cache, Generic phantom, Generic[] components) {
 		return phantom != null && ((CacheImpl) cache).find(new Generic[] { getImplicit(), phantom }, components) != null;
-	}
-
-	private class CartesianIterator<T extends Generic> implements Iterator<T[]> {
-
-		private final Iterator<T>[] iterators;
-		private T[] values;
-
-		public CartesianIterator(Iterator<T>[] iterators) {
-			this.iterators = iterators;
-			values = (T[]) new Generic[iterators.length];
-			for (int i = 0; i < iterators.length - 1; i++)
-				setNextValue(i);
-		}
-
-		@Override
-		public boolean hasNext() {
-			for (int i = 0; i < iterators.length; i++)
-				if (iterators[i].hasNext())
-					return true;
-			return false;
-		}
-
-		@Override
-		public T[] next() {
-			int cursor;
-			for (cursor = iterators.length - 1; cursor >= 0; cursor--)
-				if (iterators[cursor].hasNext())
-					break;
-			for (int i = cursor; i < iterators.length; i++)
-				setNextValue(i);
-			return values.clone();
-		}
-
-		private void setNextValue(int index) {
-			Iterator<T> it = iterators[index];
-			if (it.hasNext())
-				values[index] = it.next();
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
 	}
 
 	// private void project(Cache cache, int pos, Generic phantom) {
@@ -864,7 +841,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	//
 	// @Override
 	// public Generic[] toArray() {
-	// return super.toArray(new Generic[size()]);
+	// return super.toArray(new Generic[iterablesSize()]);
 	// }
 	// }
 
