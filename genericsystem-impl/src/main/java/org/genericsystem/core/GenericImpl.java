@@ -715,26 +715,81 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private void project(Cache cache, int pos, Generic phantom) {
-		internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, 0), 0, new Generic[components.length]);
-	}
-
-	private void internalProject(Cache cache, int pos, Generic phantom, Iterator<Generic> targetProjectionIterator, int column, Generic[] components) {
-		while (targetProjectionIterator.hasNext()) {
-			components[column] = targetProjectionIterator.next();
-			if (column + 1 < components.length)
-				internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, column + 1), column + 1, components);
-			else if (!findPhantom(cache, phantom, components))
+		Iterator<Generic>[] allTargetProjectionIterator = new Iterator[components.length];
+		for (int i = 0; i < components.length; i++)
+			allTargetProjectionIterator[i] = targetProjectionIterator(cache, pos, i);
+		CartesianIterator<Generic> cartesianIterator = new CartesianIterator<>(allTargetProjectionIterator);
+		while (cartesianIterator.hasNext()) {
+			Generic[] components = cartesianIterator.next();
+			if (!findPhantom(cache, phantom, components))
 				bind(cache, getImplicit(), true, this, components);
 		}
+	}
+
+	private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
+		return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
 	}
 
 	private boolean findPhantom(Cache cache, Generic phantom, Generic[] components) {
 		return phantom != null && ((CacheImpl) cache).find(new Generic[] { getImplicit(), phantom }, components) != null;
 	}
 
-	private Iterator<Generic> targetProjectionIterator(Context context, int pos, int column) {
-		return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(context) : new SingletonIterator<Generic>(components[column]);
+	private class CartesianIterator<T extends Generic> implements Iterator<T[]> {
+
+		private final Iterator<T>[] iterators;
+		private T[] values;
+
+		public CartesianIterator(Iterator<T>[] iterators) {
+			this.iterators = iterators;
+			values = (T[]) new Generic[iterators.length];
+			for (int i = 0; i < iterators.length - 1; i++)
+				setNextValue(i);
+		}
+
+		@Override
+		public boolean hasNext() {
+			for (int i = 0; i < iterators.length; i++)
+				if (iterators[i].hasNext())
+					return true;
+			return false;
+		}
+
+		@Override
+		public T[] next() {
+			int cursor;
+			for (cursor = iterators.length - 1; cursor >= 0; cursor--)
+				if (iterators[cursor].hasNext())
+					break;
+			for (int i = cursor; i < iterators.length; i++)
+				setNextValue(i);
+			return values.clone();
+		}
+
+		private void setNextValue(int index) {
+			Iterator<T> it = iterators[index];
+			if (it.hasNext())
+				values[index] = it.next();
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
 	}
+
+	// private void project(Cache cache, int pos, Generic phantom) {
+	// internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, 0), 0, new Generic[components.length]);
+	// }
+
+	// private void internalProject(Cache cache, int pos, Generic phantom, Iterator<Generic> targetProjectionIterator, int column, Generic[] components) {
+	// while (targetProjectionIterator.hasNext()) {
+	// components[column] = targetProjectionIterator.next();
+	// if (column + 1 < components.length)
+	// internalProject(cache, pos, phantom, targetProjectionIterator(cache, pos, column + 1), column + 1, components);
+	// else if (!findPhantom(cache, phantom, components))
+	// bind(cache, getImplicit(), true, this, components);
+	// }
+	// }
 
 	boolean safeIsEnabled(Context context, Attribute attribute) {
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(context, attribute) {
