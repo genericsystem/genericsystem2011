@@ -17,7 +17,6 @@ import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
 import org.testng.annotations.Test;
 
 @Test
@@ -33,7 +32,6 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 		assert electrikPower.getBaseComponent() != null : electrikPower.info();
 		final Holder electrikPowerMyBMW = myBMW.setValue(cache, electrikPower, 106);
 		electrikPowerMyBMW.setValue(cache, unit, "Nm");
-		assert unit.isSystemPropertyEnabled(cache, InstanceClassConstraintImpl.class);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
@@ -118,31 +116,38 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 	@SystemGeneric
 	// Everyone is unique !
 	@UniqueConstraint
-	public static class Human {}
+	public static class Human {
+	}
 
 	@SystemGeneric
-	public static class Man extends Human {}
+	public static class Man extends Human {
+	}
 
 	@SystemGeneric
 	// There can be only one time...
 	@SingularInstanceConstraint
-	public static class Time {}
+	public static class Time {
+	}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class })
 	@SingularConstraint(Statics.TARGET_POSITION)
-	public static class HumanPossessVehicle {}
+	public static class HumanPossessVehicle {
+	}
 
 	@SystemGeneric
 	@Components({ Human.class, Car.class })
-	public static class HumanPossessCar extends HumanPossessVehicle {}
+	public static class HumanPossessCar extends HumanPossessVehicle {
+	}
 
 	@SystemGeneric
 	@Components({ Man.class, Car.class })
 	@SingularConstraint(Statics.BASE_POSITION)
-	public static class ManPossessCar extends HumanPossessVehicle {}
+	public static class ManPossessCar extends HumanPossessVehicle {
+	}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class, Time.class })
-	public static class HumanPossessVehicleTime {}
+	public static class HumanPossessVehicleTime {
+	}
 }

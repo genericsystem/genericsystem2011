@@ -657,9 +657,9 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	String info();
 
-	void cancel(Cache cache, Holder attribute);
+	<T extends Generic> T cancel(Cache cache, Holder attribute);
 
-	void cancel(Cache cache, Holder attribute, int basePos);
+	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos);
 
 	void restore(Cache cache, Holder attribute);
 

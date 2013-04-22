@@ -466,7 +466,7 @@ public interface Type extends Generic {
 	boolean isInheritanceEnabled(Context context);
 
 	/**
-	 * Returns the type constraint imposed by the InstanceClass. By default is Object.
+	 * Returns the type constraint imposed by the InstanceClassConstraint. By default is Object.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
@@ -475,7 +475,7 @@ public interface Type extends Generic {
 	Class<?> getConstraintClass(Cache cache);
 
 	/**
-	 * Modify the type constraint imposed by the InstanceClass.
+	 * Modify the type constraint imposed by the InstanceClassConstraint.
 	 * 
 	 * @param cache
 	 *            The reference Cache.

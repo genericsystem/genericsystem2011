@@ -1340,12 +1340,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/*********************************************/
 
 	@Override
-	public void cancel(Cache cache, Holder attribute) {
-		cancel(cache, attribute, ((GenericImpl) attribute).getFirstComponentPos(this));
+	public <T extends Generic> T cancel(Cache cache, Holder attribute) {
+		return cancel(cache, attribute, ((GenericImpl) attribute).getFirstComponentPos(this));
 	}
 
 	@Override
-	public void cancel(Cache cache, Holder attribute, int basePos) {
+	public <T extends Generic> T cancel(Cache cache, Holder attribute, int basePos) {
 		if (equals(attribute.getComponent(basePos)))
 			throw new IllegalStateException("Only inherited attributes can be cancelled");
 
@@ -1364,12 +1364,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (!holder.equals(attribute))
 				throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
 		}
-		internalCancel(cache, attribute, basePos);
+		return internalCancel(cache, attribute, basePos);
 	}
 
-	private void internalCancel(Cache cache, Holder attribute, int basePos) {
-		addLink(cache, attribute.isStructural() ? getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL, true) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE, true), attribute, basePos,
-				Statics.truncate(basePos, ((GenericImpl) attribute).components));
+	private <T extends Generic> T internalCancel(Cache cache, Holder attribute, int basePos) {
+		return addLink(cache, attribute.isStructural() ? getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL, true) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE, true), attribute,
+				basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override
@@ -1449,38 +1449,36 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos) {
-		return setSystemProperty(cache, cache.<Attribute> find(systemPropertyClass), basePos, !systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
+		setSystemProperty(cache, cache.<Attribute> find(systemPropertyClass), basePos, !systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
+		return (T) this;
 	}
 
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos) {
-		return setSystemProperty(cache, cache.<Attribute> find(systemPropertyClass), basePos, systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
+		setSystemProperty(cache, cache.<Attribute> find(systemPropertyClass), basePos, systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
+		return (T) this;
 	}
 
 	private <T extends Generic> T setSystemProperty(Cache cache, Attribute systemProperty, int basePos, boolean defaultBehavior) {
 		if (defaultBehavior)
-			setInternalHolder(cache, systemProperty, basePos);
+			return setInternalHolder(cache, systemProperty, basePos);
 		else {
 			Link holder = getValuedHolder(cache, systemProperty, basePos);
 			if (holder != null)
 				if (equals(holder.getBaseComponent())) {
 					holder.remove(cache);
-					setSystemProperty(cache, systemProperty, basePos, defaultBehavior);
+					return setSystemProperty(cache, systemProperty, basePos, defaultBehavior);
 				} else
-					cancel(cache, holder, basePos);
+					return cancel(cache, holder, basePos);
 		}
-		return (T) this;
+		return null;
 	}
 
 	public boolean isSystemPropertyEnabled(Context context, Class<? extends BooleanSystemProperty> systemPropertyClass) {
 		return isSystemPropertyEnabled(context, systemPropertyClass, Statics.BASE_POSITION);
 	}
 
-	// TODO
 	public boolean isSystemPropertyEnabled(Context context, Class<? extends BooleanSystemProperty> systemPropertyClass, int basePos) {
 		boolean defaultBehavior = systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
-		// if (NoBooleanSystemProperty.class.isAssignableFrom(systemPropertyClass))
-		// return getHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)) != null;
-		// else
 		return getValuedHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
 	}
 
@@ -1529,25 +1527,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isSystemPropertyEnabled(context, ReferentialIntegritySystemProperty.class, basePos);
 	}
 
-	// TODO work
-	public <T extends Relation> T enableSizeConstraint(Cache cache, int basePos, int size) {
-		Attribute sizeConstraint = cache.<Attribute> find(SizeConstraintImpl.class);
-		T generic = setSystemProperty(cache, sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
-		getHolder(cache, sizeConstraint).setHolder(cache, sizeConstraint.getAttribute(cache, "Size"), size).log();
-		return generic;
-	}
-
-	public <T extends Relation> T disableSizeConstraint(Cache cache, int basePos, int size) {
-		Attribute sizeConstraint = cache.<Attribute> find(SizeConstraintImpl.class);
-		T generic = setSystemProperty(cache, sizeConstraint, basePos, SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
-		// getHolder(cache, sizeConstraint).setHolder(cache, sizeConstraint.getAttribute(cache, "Size"), size).log();
-		return generic;
-	}
-
-	public boolean isSizeConstraintEnabled(Context context, int basePos) {
-		return isSystemPropertyEnabled(context, SizeConstraintImpl.class, basePos);
-	}
-
 	@Override
 	public <T extends Type> T enableSingularConstraint(Cache cache) {
 		return enableSystemProperty(cache, SingularConstraintImpl.class);
@@ -1576,6 +1555,28 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isSingularConstraintEnabled(Context context, int basePos) {
 		return isSystemPropertyEnabled(context, SingularConstraintImpl.class, basePos);
+	}
+
+	@Override
+	public <T extends Generic> T enableSizeConstraint(Cache cache, final int basePos, Integer size) {
+		Attribute sizeConstraint = cache.<Attribute> find(SizeConstraintImpl.class);
+		T holder = setSystemProperty(cache, sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
+		holder.setHolder(cache, sizeConstraint.getAttribute(cache, SizeConstraintImpl.SIZE), size);
+		return (T) this;
+	}
+
+	@Override
+	public <T extends Generic> T disableSizeConstraint(Cache cache, final int basePos) {
+		return disableSystemProperty(cache, SizeConstraintImpl.class, basePos);
+	}
+
+	@Override
+	public Integer getSizeConstraint(Cache cache, final int basePos) {
+		Attribute sizeConstraint = cache.<Attribute> find(SizeConstraintImpl.class);
+		Link valuedHolder = getValuedHolder(cache, sizeConstraint, basePos);
+		if (valuedHolder == null)
+			return null;
+		return valuedHolder.getValue(cache, sizeConstraint.getAttribute(cache, SizeConstraintImpl.SIZE));
 	}
 
 	@Override

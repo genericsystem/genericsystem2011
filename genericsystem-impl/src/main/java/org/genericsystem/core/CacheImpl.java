@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Snapshot.Filter;
@@ -28,7 +29,6 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
-import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 /**
@@ -132,7 +132,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : orderRemoves(node).descendingSet()) {
 			internalCache.removeGeneric(generic);
 			for (int axe = 0; axe < ((GenericImpl) generic).components.length; axe++)
-				if (generic.isSystemPropertyEnabled(this, CascadeRemoveSystemProperty.class, axe))
+				if (((GenericImpl) generic).isCascadeRemove(this, axe))
 					internalRemove(((GenericImpl) generic).components[axe]);
 		}
 	}
