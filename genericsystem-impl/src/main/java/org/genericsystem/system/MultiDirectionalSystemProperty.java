@@ -12,4 +12,5 @@ import org.genericsystem.core.Engine;
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
-public class MultiDirectionalSystemProperty {}
+public class MultiDirectionalSystemProperty implements BooleanSystemProperty {
+}

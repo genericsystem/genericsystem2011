@@ -2,6 +2,7 @@ package org.genericsystem.constraints.simple;
 
 import java.util.Arrays;
 import java.util.Iterator;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
@@ -15,6 +16,7 @@ import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.DuplicateStructuralValueConstraintViolationException;
 import org.genericsystem.iterator.AbstractFilterIterator;
+import org.genericsystem.system.BooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -24,7 +26,7 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 @Components(Engine.class)
 @SingularConstraint
 @NotNullConstraint
-public class DuplicateStructuralValueConstraintImpl extends Constraint {
+public class DuplicateStructuralValueConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -7212219694902616927L;
 

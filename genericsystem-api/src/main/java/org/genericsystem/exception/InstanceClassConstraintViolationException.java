@@ -6,11 +6,11 @@ package org.genericsystem.exception;
  * 
  * @author Nicolas Feybessek
  */
-public class ClassInstanceConstraintViolationException extends ConstraintViolationException {
+public class InstanceClassConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = -3180066263166409718L;
 
-	public ClassInstanceConstraintViolationException(String msg) {
+	public InstanceClassConstraintViolationException(String msg) {
 		super(msg);
 	}
 

@@ -11,6 +11,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.PhantomConstraintViolationException;
+import org.genericsystem.system.BooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -20,7 +21,7 @@ import org.genericsystem.exception.PhantomConstraintViolationException;
 @Components(Engine.class)
 @SingularConstraint
 @NotNullConstraint
-public class PhantomConstraintImpl extends Constraint {
+public class PhantomConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -1175582355395269087L;
 

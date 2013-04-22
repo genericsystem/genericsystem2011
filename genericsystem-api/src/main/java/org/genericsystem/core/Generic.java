@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -389,77 +390,78 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	boolean isAlive(Context context);
 
-	/**
-	 * Enable system property.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @param systemPropertyClass
-	 *            The system property class
-	 * @return This.
-	 */
-	<T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass);
+	// TODO
+	// /**
+	// * Enable system property.
+	// *
+	// * @param cache
+	// * The reference Cache.
+	// * @param systemPropertyClass
+	// * The system property class
+	// * @return This.
+	// */
+	// <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass);
 
-	/**
-	 * Enable system property for component position.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @param systemPropertyClass
-	 *            Class which defines the Generic in Cache.
-	 * @param componentPos
-	 *            The component position implicated by the constraint.
-	 * @return This.
-	 */
-	<T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos);
+	// /**
+	// * Enable system property for component position.
+	// *
+	// * @param cache
+	// * The reference Cache.
+	// * @param systemPropertyClass
+	// * Class which defines the Generic in Cache.
+	// * @param componentPos
+	// * The component position implicated by the constraint.
+	// * @return This.
+	// */
+	// <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos);
 
-	/**
-	 * Disable system property.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @param systemPropertyClass
-	 *            Class which defines the Generic in Cache.
-	 * @return This.
-	 */
-	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass);
+	// /**
+	// * Disable system property.
+	// *
+	// * @param cache
+	// * The reference Cache.
+	// * @param systemPropertyClass
+	// * Class which defines the Generic in Cache.
+	// * @return This.
+	// */
+	// <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass);
 
-	/**
-	 * Disable system property for component position.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @param systemPropertyClass
-	 *            Class which defines the Generic in Cache.
-	 * @param componentPos
-	 *            The component position implicated by the constraint.
-	 * @return This.
-	 */
-	<T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos);
+	// /**
+	// * Disable system property for component position.
+	// *
+	// * @param cache
+	// * The reference Cache.
+	// * @param systemPropertyClass
+	// * Class which defines the Generic in Cache.
+	// * @param componentPos
+	// * The component position implicated by the constraint.
+	// * @return This.
+	// */
+	// <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int componentPos);
 
-	/**
-	 * Returns true if the system property is enabled.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @param systemPropertyClass
-	 *            Class which defines the Generic in Cache.
-	 * @return True if the system property is enabled.
-	 */
-	boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass);
+	// /**
+	// * Returns true if the system property is enabled.
+	// *
+	// * @param context
+	// * The reference context.
+	// * @param systemPropertyClass
+	// * Class which defines the Generic in Cache.
+	// * @return True if the system property is enabled.
+	// */
+	// boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass);
 
-	/**
-	 * Returns true if the system property is enabled for component position.
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @param systemPropertyClass
-	 *            Class which defines the Generic in Cache.
-	 * @param componentPos
-	 *            The component position implicated by the constraint.
-	 * @return True if the system property is enabled.
-	 */
-	boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos);
+	// /**
+	// * Returns true if the system property is enabled for component position.
+	// *
+	// * @param context
+	// * The reference context.
+	// * @param systemPropertyClass
+	// * Class which defines the Generic in Cache.
+	// * @param componentPos
+	// * The component position implicated by the constraint.
+	// * @return True if the system property is enabled.
+	// */
+	// boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int componentPos);
 
 	/**
 	 * Enable referential integrity for component position.

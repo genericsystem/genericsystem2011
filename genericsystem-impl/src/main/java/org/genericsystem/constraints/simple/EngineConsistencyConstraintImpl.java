@@ -10,6 +10,7 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.EngineConsistencyConstraintViolationException;
+import org.genericsystem.system.BooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -19,7 +20,7 @@ import org.genericsystem.exception.EngineConsistencyConstraintViolationException
 @Components(Engine.class)
 @SingularConstraint
 @NotNullConstraint
-public class EngineConsistencyConstraintImpl extends Constraint {
+public class EngineConsistencyConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = 8896806730580779746L;
 

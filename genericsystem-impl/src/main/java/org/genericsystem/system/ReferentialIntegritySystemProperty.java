@@ -14,11 +14,12 @@ import org.genericsystem.system.ReferentialIntegritySystemProperty.DefaultValue;
 @SystemGeneric(defaultBehavior = true)
 @Components(Engine.class)
 @Dependencies(DefaultValue.class)
-public class ReferentialIntegritySystemProperty {
+public class ReferentialIntegritySystemProperty implements BooleanSystemProperty {
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(MetaAttribute.class)
 	@IntValue(0)
-	public static class DefaultValue extends ReferentialIntegritySystemProperty {}
+	public static class DefaultValue extends ReferentialIntegritySystemProperty {
+	}
 
 }

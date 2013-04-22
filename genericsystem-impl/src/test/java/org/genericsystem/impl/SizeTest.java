@@ -13,14 +13,14 @@ import org.testng.annotations.Test;
 public class SizeTest extends AbstractTest {
 
 	public void mountSize() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type sizeConstraint = cache.find(SizeConstraintImpl.class);
 		assert sizeConstraint != null;
 		assert sizeConstraint.getAttribute(cache, "Size") != null : sizeConstraint.info() + " " + sizeConstraint.getAttributes(cache);
 	}
 
 	public void enableSize() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);

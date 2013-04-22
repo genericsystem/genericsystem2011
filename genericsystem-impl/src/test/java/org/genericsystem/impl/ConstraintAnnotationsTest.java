@@ -14,7 +14,7 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.ClassInstanceConstraintViolationException;
+import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
@@ -39,7 +39,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 			public void intercept() {
 				electrikPowerMyBMW.setValue(cache, unit, 27);
 			}
-		}.assertIsCausedBy(ClassInstanceConstraintViolationException.class);
+		}.assertIsCausedBy(InstanceClassConstraintViolationException.class);
 	}
 
 	@SystemGeneric

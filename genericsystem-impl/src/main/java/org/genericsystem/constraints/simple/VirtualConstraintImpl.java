@@ -12,6 +12,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.VirtualConstraintException;
 import org.genericsystem.generic.Type;
+import org.genericsystem.system.BooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -22,7 +23,7 @@ import org.genericsystem.generic.Type;
 @SingularConstraint
 @InheritanceDisabledConstraint
 @NotNullConstraint
-public class VirtualConstraintImpl extends Constraint {
+public class VirtualConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -5162099352671967024L;
 

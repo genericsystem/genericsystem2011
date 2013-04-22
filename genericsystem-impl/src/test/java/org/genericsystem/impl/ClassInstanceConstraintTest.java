@@ -6,7 +6,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.exception.ClassInstanceConstraintViolationException;
+import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -56,7 +56,7 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 			public void intercept() {
 				myFiat.setValue(cache, wheelVehcile, 23);
 			}
-		}.assertIsCausedBy(ClassInstanceConstraintViolationException.class);
+		}.assertIsCausedBy(InstanceClassConstraintViolationException.class);
 	}
 
 }

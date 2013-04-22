@@ -1,5 +1,6 @@
-package org.genericsystem.system;
-
-public interface NoBooleanSystemProperty {
-
-}
+//TODO clean
+//package org.genericsystem.system;
+//
+//public interface NoBooleanSystemProperty {
+//
+// }

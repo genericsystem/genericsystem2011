@@ -14,6 +14,7 @@ import org.genericsystem.exception.RequiredConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.system.BooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -23,7 +24,7 @@ import org.genericsystem.generic.Type;
 @Components(Engine.class)
 @SingularConstraint
 @NotNullConstraint
-public class RequiredConstraintImpl extends Constraint {
+public class RequiredConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = 2837810754525623146L;
 

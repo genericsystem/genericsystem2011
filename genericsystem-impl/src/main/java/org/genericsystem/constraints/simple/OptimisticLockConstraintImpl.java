@@ -13,6 +13,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
+import org.genericsystem.system.BooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -23,7 +24,7 @@ import org.genericsystem.exception.OptimisticLockConstraintViolationException;
 @SingularConstraint
 @Priority(0)
 @NotNullConstraint
-public class OptimisticLockConstraintImpl extends Constraint {
+public class OptimisticLockConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -9140332757904379387L;
 

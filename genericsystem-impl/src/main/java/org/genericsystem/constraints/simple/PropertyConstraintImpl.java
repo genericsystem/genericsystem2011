@@ -2,6 +2,7 @@ package org.genericsystem.constraints.simple;
 
 import java.util.Iterator;
 import java.util.Objects;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
@@ -17,6 +18,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractFilterIterator;
+import org.genericsystem.system.BooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -26,7 +28,7 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 @Components(Engine.class)
 @SingularConstraint
 @NotNullConstraint
-public class PropertyConstraintImpl extends Constraint {
+public class PropertyConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -6429972259714036057L;
 

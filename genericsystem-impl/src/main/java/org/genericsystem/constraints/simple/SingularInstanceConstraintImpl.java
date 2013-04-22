@@ -12,6 +12,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularInstanceConstraintViolationException;
 import org.genericsystem.generic.Type;
+import org.genericsystem.system.BooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -22,7 +23,7 @@ import org.genericsystem.generic.Type;
 @SingularConstraint
 @Priority(10)
 @NotNullConstraint
-public class SingularInstanceConstraintImpl extends Constraint {
+public class SingularInstanceConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -7689576125534105005L;
 

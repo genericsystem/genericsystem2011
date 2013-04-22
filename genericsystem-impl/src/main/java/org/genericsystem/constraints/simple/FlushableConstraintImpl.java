@@ -10,6 +10,7 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Transaction;
 import org.genericsystem.exception.ConstraintViolationException;
+import org.genericsystem.system.BooleanSystemProperty;
 
 /**
  * @author Nicolas Feybesse
@@ -19,7 +20,7 @@ import org.genericsystem.exception.ConstraintViolationException;
 @Components(Engine.class)
 @SingularConstraint
 @NotNullConstraint
-public class FlushableConstraintImpl extends Constraint {
+public class FlushableConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -6429972259714036057L;
 
@@ -28,6 +29,7 @@ public class FlushableConstraintImpl extends Constraint {
 		if (context instanceof Transaction)
 			if (!((Transaction) context).isFlushable(modified))
 				assert false;
+		// TODO implements !?
 		// throw new AliveConstraintViolationException("Super : " + generic + " of added node " + modified + " should be alive.");
 	}
 

@@ -46,9 +46,9 @@ import org.genericsystem.iterator.ArrayIterator;
 import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.system.BooleanSystemProperty;
 import org.genericsystem.system.CascadeRemoveSystemProperty;
 import org.genericsystem.system.MultiDirectionalSystemProperty;
-import org.genericsystem.system.NoBooleanSystemProperty;
 import org.genericsystem.system.NoInheritanceSystemProperty;
 import org.genericsystem.system.ReferentialIntegritySystemProperty;
 import org.slf4j.Logger;
@@ -1440,22 +1440,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
 
-	@Override
 	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass) {
 		return enableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
 	}
 
-	@Override
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass) {
 		return disableSystemProperty(cache, systemPropertyClass, Statics.BASE_POSITION);
 	}
 
-	@Override
 	public <T extends Generic> T enableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos) {
 		return setSystemProperty(cache, cache.<Attribute> find(systemPropertyClass), basePos, !systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
 	}
 
-	@Override
 	public <T extends Generic> T disableSystemProperty(Cache cache, Class<?> systemPropertyClass, int basePos) {
 		return setSystemProperty(cache, cache.<Attribute> find(systemPropertyClass), basePos, systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
 	}
@@ -1475,18 +1471,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (T) this;
 	}
 
-	@Override
-	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass) {
+	public boolean isSystemPropertyEnabled(Context context, Class<? extends BooleanSystemProperty> systemPropertyClass) {
 		return isSystemPropertyEnabled(context, systemPropertyClass, Statics.BASE_POSITION);
 	}
 
-	@Override
-	public boolean isSystemPropertyEnabled(Context context, Class<?> systemPropertyClass, int basePos) {
+	// TODO
+	public boolean isSystemPropertyEnabled(Context context, Class<? extends BooleanSystemProperty> systemPropertyClass, int basePos) {
 		boolean defaultBehavior = systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
-		if (NoBooleanSystemProperty.class.isAssignableFrom(systemPropertyClass))
-			return getHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)) != null;
-		else
-			return getValuedHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
+		// if (NoBooleanSystemProperty.class.isAssignableFrom(systemPropertyClass))
+		// return getHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass)) != null;
+		// else
+		return getValuedHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
 	}
 
 	@Override

@@ -10,6 +10,6 @@ import org.genericsystem.core.Engine;
  */
 @SystemGeneric
 @Components(Engine.class)
-public class NoInheritanceSystemProperty {
+public class NoInheritanceSystemProperty implements BooleanSystemProperty {
 
 }
