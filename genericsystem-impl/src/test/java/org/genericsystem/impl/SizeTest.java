@@ -1,12 +1,12 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
 import org.testng.annotations.Test;
 
 @Test

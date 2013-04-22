@@ -9,7 +9,6 @@ import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
 import org.genericsystem.annotation.constraints.UniqueConstraint;
-import org.genericsystem.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -18,6 +17,7 @@ import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
 import org.testng.annotations.Test;
 
 @Test

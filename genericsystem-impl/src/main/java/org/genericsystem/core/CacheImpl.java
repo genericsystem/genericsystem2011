@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.constraints.Constraint.CheckingType;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
@@ -29,7 +28,8 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
-import org.genericsystem.system.CascadeRemoveSystemProperty;
+import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
+import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 /**
  * @author Nicolas Feybesse

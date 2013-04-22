@@ -10,7 +10,7 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.system.ReferentialIntegritySystemProperty;
+import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
 import org.testng.annotations.Test;
 
 @Test

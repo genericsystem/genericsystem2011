@@ -9,9 +9,9 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.system.CascadeRemoveSystemProperty;
-import org.genericsystem.system.MultiDirectionalSystemProperty;
-import org.genericsystem.system.ReferentialIntegritySystemProperty;
+import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
+import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
+import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
 import org.testng.annotations.Test;
 
 @Test

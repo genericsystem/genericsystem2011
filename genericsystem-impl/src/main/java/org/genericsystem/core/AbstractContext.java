@@ -18,8 +18,6 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
-import org.genericsystem.constraints.Constraint;
-import org.genericsystem.constraints.Constraint.CheckingType;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -30,6 +28,8 @@ import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.systemproperties.constraints.Constraint;
+import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

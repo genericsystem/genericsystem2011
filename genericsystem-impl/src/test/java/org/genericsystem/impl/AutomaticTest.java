@@ -16,7 +16,7 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
-import org.genericsystem.system.MultiDirectionalSystemProperty;
+import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.testng.annotations.Test;
 
 @Test
