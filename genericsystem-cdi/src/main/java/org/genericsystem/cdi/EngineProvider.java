@@ -1,10 +1,9 @@
 package org.genericsystem.cdi;
 
 import java.io.Serializable;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-
+import javax.enterprise.inject.Produces;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericSystem;
 
@@ -20,6 +19,7 @@ public class EngineProvider implements Serializable {
 		engine = GenericSystem.newInMemoryEngine();
 	}
 
+	@Produces
 	public Engine getEngine() {
 		return engine;
 	}
