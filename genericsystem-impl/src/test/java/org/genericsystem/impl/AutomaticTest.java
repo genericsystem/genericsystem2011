@@ -160,7 +160,7 @@ public class AutomaticTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Tree tree = cache.newTree("tree");
 		Node root = tree.newRoot(cache, "root");
-		Node children = root.addNode(cache, "children");
+		Node children = root.setNode(cache, "children");
 		assert !((GenericImpl) tree).isAutomatic();
 		assert ((GenericImpl) tree.getImplicit()).isAutomatic();
 		assert !((GenericImpl) root).isAutomatic();

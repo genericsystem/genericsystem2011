@@ -272,7 +272,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		Class<?>[] componentClasses = componentsAnnotation.value();
 		Generic[] components = new Generic[componentClasses.length];
 		for (int index = 0; index < componentClasses.length; index++)
-			components[index] = find(componentClasses[index]);
+			components[index] = !clazz.equals(componentClasses[index]) ? find(componentClasses[index]) : null;
 		return components;
 	}
 

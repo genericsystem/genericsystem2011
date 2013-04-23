@@ -24,7 +24,7 @@ public @interface SystemGeneric {
 
 	/**
 	 * The default behavior defined the nature of the position values of the SystemProperty.<br/>
-	 * he defined if the positioning activates or deactivates the SystemProperty.<br/>
+	 * it defines if the positioning activates or deactivates the SystemProperty.<br/>
 	 * By default it's false. The positioning activates the SystemProperty.
 	 * 
 	 * @return The default behavior.
@@ -32,17 +32,17 @@ public @interface SystemGeneric {
 	boolean defaultBehavior() default false;
 
 	/**
-	 * Meta it's for meta system. Actualy it's for Engine.
+	 * for engine, meta-attribute.
 	 */
 	static final int META = 0;
 
 	/**
-	 * Structural it's for the structure (types, attributes, relationships ...).
+	 * for types, attributes, relations...
 	 */
 	static final int STRUCTURAL = 1;
 
 	/**
-	 * Concrete it's instanciation level.
+	 * for instances, holders, links...
 	 */
 	static final int CONCRETE = 2;
 

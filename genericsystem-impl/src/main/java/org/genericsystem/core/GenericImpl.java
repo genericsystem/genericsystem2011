@@ -1404,12 +1404,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Node> T addNode(Cache cache, Serializable value, Generic... targets) {
+	public <T extends Node> T setNode(Cache cache, Serializable value, Generic... targets) {
 		return addLink(cache, this.<GenericImpl> getMeta().bindPrimary(cache, value, SystemGeneric.CONCRETE, true), getMeta(), targets);
 	}
 
 	@Override
-	public <T extends Node> T addSubNode(Cache cache, Serializable value, Generic... targets) {
+	public <T extends Node> T setSubNode(Cache cache, Serializable value, Generic... targets) {
 		return addLink(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE, true), this, targets);
 	}
 

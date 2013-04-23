@@ -102,9 +102,9 @@ public class PersistenceTest {
 		Cache cache = initWorkingSpace();
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
-		Node child = root.addNode(cache, "Child");
-		root.addNode(cache, "Child2");
-		child.addNode(cache, "Child3");
+		Node child = root.setNode(cache, "Child");
+		root.setNode(cache, "Child2");
+		child.setNode(cache, "Child3");
 		closingWorkingSpace(cache);
 	}
 
@@ -112,9 +112,9 @@ public class PersistenceTest {
 		Cache cache = initWorkingSpace();
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
-		Node child = root.addSubNode(cache, "Child");
-		root.addSubNode(cache, "Child2");
-		child.addSubNode(cache, "Child3");
+		Node child = root.setSubNode(cache, "Child");
+		root.setSubNode(cache, "Child2");
+		child.setSubNode(cache, "Child3");
 		closingWorkingSpace(cache);
 	}
 

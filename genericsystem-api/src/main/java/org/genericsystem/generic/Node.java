@@ -3,7 +3,6 @@ package org.genericsystem.generic;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
@@ -17,7 +16,7 @@ import org.genericsystem.core.Snapshot;
 public interface Node extends Holder {
 
 	/**
-	 * Add a Node.
+	 * Add a Node if not exists, return existent node otherwise.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
@@ -27,10 +26,10 @@ public interface Node extends Holder {
 	 *            The targets.
 	 * @return Return the Node.
 	 */
-	<T extends Node> T addNode(Cache cache, Serializable value, Generic... targets);
+	<T extends Node> T setNode(Cache cache, Serializable value, Generic... targets);
 
 	/**
-	 * Add a Node that inherits of this.
+	 * Add an inheriting subNode if not exists, return existent inheriting subNode otherwise.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
@@ -40,7 +39,7 @@ public interface Node extends Holder {
 	 *            The targets.
 	 * @return Return the subNode.
 	 */
-	<T extends Node> T addSubNode(Cache cache, Serializable value, Generic... targets);
+	<T extends Node> T setSubNode(Cache cache, Serializable value, Generic... targets);
 
 	/**
 	 * Returns the children of this.

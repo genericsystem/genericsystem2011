@@ -23,9 +23,9 @@ public class TreeTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Tree tree = cache.newTree("Tree");
 		final Node root = tree.newRoot(cache, "Root");
-		Node child = root.addNode(cache, "Child");
-		Node child2 = root.addNode(cache, "Child2");
-		Node child3 = child.addNode(cache, "Child3");
+		Node child = root.setNode(cache, "Child");
+		Node child2 = root.setNode(cache, "Child2");
+		Node child3 = child.setNode(cache, "Child3");
 
 		assert root.getMeta().equals(tree);
 		assert root.inheritsFrom(tree);
@@ -82,9 +82,9 @@ public class TreeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Tree tree = cache.newTree("Tree");
 		final Node root = tree.newRoot(cache, "Root");
-		Node child = root.addSubNode(cache, "Child");
-		Node child2 = root.addSubNode(cache, "Child2");
-		Node child3 = child.addSubNode(cache, "Child3");
+		Node child = root.setSubNode(cache, "Child");
+		Node child2 = root.setSubNode(cache, "Child2");
+		Node child3 = child.setSubNode(cache, "Child3");
 
 		assert root.getMeta().equals(tree);
 		assert root.inheritsFrom(tree);
@@ -123,9 +123,9 @@ public class TreeTest extends AbstractTest {
 		Node grandMother = bitree.newRoot(cache, "grandMother", 2);
 		assert grandMother.inheritsFrom(bitree) : grandMother.info();
 		Node mother = bitree.newRoot(cache, "mother", 2);
-		Node father = grandFather.addNode(cache, "father", grandMother);
-		Node fatherSister = grandFather.addNode(cache, "fatherSister", grandMother);
-		father.addNode(cache, "son", mother);
+		Node father = grandFather.setNode(cache, "father", grandMother);
+		Node fatherSister = grandFather.setNode(cache, "fatherSister", grandMother);
+		father.setNode(cache, "son", mother);
 		assert grandFather.getChildren(cache).contains(father);
 		assert grandFather.getChildren(cache).contains(fatherSister);
 		bitree.enableMultiDirectional(cache);
@@ -141,11 +141,11 @@ public class TreeTest extends AbstractTest {
 
 		Tree graphicComponent = cache.newTree("GraphicComponent");
 		Node webPage = graphicComponent.newRoot(cache, "webPage");
-		Node header = webPage.addSubNode(cache, "header");
-		Node body = webPage.addSubNode(cache, "body");
-		Node footer = webPage.addSubNode(cache, "footer");
-		body.addSubNode(cache, "message1");
-		body.addSubNode(cache, "message2");
+		Node header = webPage.setSubNode(cache, "header");
+		Node body = webPage.setSubNode(cache, "body");
+		Node footer = webPage.setSubNode(cache, "footer");
+		body.setSubNode(cache, "message1");
+		body.setSubNode(cache, "message2");
 
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance(cache, "Red");
@@ -173,9 +173,9 @@ public class TreeTest extends AbstractTest {
 		Tree tree = cache.newTree("Tree");
 		final Node root = tree.newRoot(cache, "Root");
 
-		Node child = root.addNode(cache, "Child");
-		root.addNode(cache, "Child2");
-		child.addNode(cache, "Child3");
+		Node child = root.setNode(cache, "Child");
+		root.setNode(cache, "Child2");
+		child.setNode(cache, "Child3");
 
 		root.traverse(new Visitor(cache) {
 			@Override
@@ -198,9 +198,9 @@ public class TreeTest extends AbstractTest {
 		assert cache.getMetaAttribute().isMeta();
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
-		Node child = root.addNode(cache, "Child");
-		root.addNode(cache, "Child2");
-		child.addNode(cache, "Child3");
+		Node child = root.setNode(cache, "Child");
+		root.setNode(cache, "Child2");
+		child.setNode(cache, "Child3");
 		cache.flush();
 		cache.getEngine().close();
 		cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath);
@@ -212,9 +212,9 @@ public class TreeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath);
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
-		Node child = root.addSubNode(cache, "Child");
-		root.addSubNode(cache, "Child2");
-		child.addSubNode(cache, "Child3");
+		Node child = root.setSubNode(cache, "Child");
+		root.setSubNode(cache, "Child2");
+		child.setSubNode(cache, "Child3");
 		cache.flush();
 		cache.getEngine().close();
 
