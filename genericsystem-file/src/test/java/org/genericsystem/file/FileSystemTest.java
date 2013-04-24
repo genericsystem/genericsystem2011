@@ -39,6 +39,7 @@ public class FileSystemTest {
 		}.assertIsCausedBy(IllegalStateException.class);
 		directory1.addFile(cache, "fileName", new byte[] { Byte.MAX_VALUE });
 		assert Arrays.equals(directory1.getFile(cache, "fileName").getContent(cache), new byte[] { Byte.MAX_VALUE });
+		directory1.getFile(cache, "fileName").remove(cache);
 	}
 
 	// public void testDirectoryNameValueClassViolation() {
