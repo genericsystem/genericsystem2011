@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
@@ -12,6 +13,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.util.AnnotationLiteral;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
@@ -28,6 +30,7 @@ public class StartupBean implements Extension {
 
 	private Logger log = LoggerFactory.getLogger(StartupBean.class);
 
+	// public void onStartup(@Observes ContainerInitialized init) {
 	@SuppressWarnings("unchecked")
 	public void onStartup(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
 
@@ -41,7 +44,8 @@ public class StartupBean implements Extension {
 		Cache cache = engine.newCache();
 
 		@SuppressWarnings("serial")
-		Set<Bean<?>> beans = beanManager.getBeans(Generic.class, new AnnotationLiteral<Any>() {});
+		Set<Bean<?>> beans = beanManager.getBeans(Generic.class, new AnnotationLiteral<Any>() {
+		});
 		for (Bean<?> bean : beans) {
 			Type clazz = (bean instanceof ProducerMethod) ? ((ProducerMethod<?, ?>) bean).getWeldAnnotated().getBaseType() : bean.getBeanClass();
 			if (clazz instanceof Class) {
