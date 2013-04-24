@@ -1,5 +1,7 @@
 package org.genericsystem.core;
 
+import org.genericsystem.annotation.SystemGeneric;
+
 /**
  * A Context.
  * 
@@ -13,5 +15,17 @@ public interface Context {
 	 * @return The Engine.
 	 */
 	<T extends Engine> T getEngine();
+
+	/**
+	 * Find the Generic defined by class param. the generic must have been be built at startup<br/>
+	 * This class must be @SystemGeneric annotated.
+	 * 
+	 * @see SystemGeneric
+	 * 
+	 * @param clazz
+	 *            The class must be @SystemGeneric annotated.
+	 * @return A new Generic or the existing Generic.
+	 */
+	<T extends Generic> T find(Class<?> clazz);
 
 }

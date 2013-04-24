@@ -3,7 +3,6 @@ package org.genericsystem.snapshot;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
-
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractProjectionIterator;

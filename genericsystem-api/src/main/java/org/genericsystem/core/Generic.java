@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -664,5 +663,4 @@ public interface Generic extends Comparable<Generic> {
 	void restore(Cache cache, Holder attribute);
 
 	void restore(Cache cache, Holder attribute, int basePos);
-
 }

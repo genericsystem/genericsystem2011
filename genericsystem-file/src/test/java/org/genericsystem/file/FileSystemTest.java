@@ -1,15 +1,16 @@
 package org.genericsystem.file;
 
+import java.util.Arrays;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.file.AbstractTest.RollbackCatcher;
+import org.genericsystem.file.DirectoryTree.Directory;
 import org.genericsystem.file.DirectoryTree.FileType;
+import org.genericsystem.file.DirectoryTree.FileType.File;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Tree;
-import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
@@ -18,48 +19,40 @@ public class FileSystemTest {
 	@Test
 	public void testFileSystemAndDirectoryTree() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-		Type fileSystem = cache.find(FileType.class);
 		Tree directoryTree = cache.find(DirectoryTree.class);
-		assert cache.isAlive(fileSystem);
 		assert cache.isAlive(directoryTree);
 	}
 
-	// // Constraint order problem: NotDuplicated vs Unique
-	// public void testDirectoryNameUniqueInASameDirectory() {
+	public void testDirectoryNameNotUniqueInDifferentDirectories() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
+		DirectoryTree directoryTree = cache.find(DirectoryTree.class);
+		Directory rootDirectory = directoryTree.addRootDirectory(cache, "rootDirectory");
+		Directory directory1 = rootDirectory.addDirectory(cache, "directory1");
+		final Directory directory2 = rootDirectory.addDirectory(cache, "directory2");
+		directory2.addDirectory(cache, "directory1"); // No Exception
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				directory2.addDirectory(cache, "directory1"); // Exception
+			}
+		}.assertIsCausedBy(IllegalStateException.class);
+		directory1.addFile(cache, "fileName", new byte[] { Byte.MAX_VALUE });
+		assert Arrays.equals(directory1.getFile(cache, "fileName").getContent(cache), new byte[] { Byte.MAX_VALUE });
+	}
+
+	// public void testDirectoryNameValueClassViolation() {
 	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-	// Tree directoryTree = cache.find(DirectoryTree.class);
-	// final Node rootDirectory = directoryTree.newRoot(cache, "rootDirectory");
-	// rootDirectory.setNode(cache, "middleware1");
+	// DirectoryTree directoryTree = cache.find(DirectoryTree.class);
+	// assert directoryTree.getConstraintClass(cache) != null;
+	// final Directory rootDirectory = directoryTree.addRootDirectory(cache, "rootDirectory");
 	// new RollbackCatcher() {
 	// @Override
 	// public void intercept() {
-	// rootDirectory.setNode(cache, "middleware1");
+	// rootDirectory.addDirectory(cache, 2L);
 	// }
-	// }.assertIsCausedBy(UniqueConstraintViolationException.class);
+	// }.assertIsCausedBy(InstanceClassConstraintViolationException.class);
 	// }
-
-	@SuppressWarnings("unused")
-	public void testDirectoryNameNotUniqueInDifferentDirectories() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-		Tree directoryTree = cache.find(DirectoryTree.class);
-		Node rootDirectory = directoryTree.newRoot(cache, "rootDirectory");
-		Node directory1 = rootDirectory.setNode(cache, "directory1");
-		Node directory2 = rootDirectory.setNode(cache, "directory2");
-		directory2.setNode(cache, "directory1"); // No Exception
-	}
-
-	public void testDirectoryNameValueClassViolation() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-		Tree directoryTree = cache.find(DirectoryTree.class);
-		assert directoryTree.getConstraintClass(cache) != null;
-		final Node rootDirectory = directoryTree.newRoot(cache, "rootDirectory");
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				rootDirectory.setNode(cache, 2L);
-			}
-		}.assertIsCausedBy(InstanceClassConstraintViolationException.class);
-	}
 
 	// //
 	// // // Constraint order problem: NotDuplicated vs Unique
@@ -80,13 +73,12 @@ public class FileSystemTest {
 
 	public void testFileNameNotUniqueInDifferentDirectories() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-		Tree directoryTree = cache.find(DirectoryTree.class);
-		Node rootDirectory = directoryTree.newRoot(cache, "rootDirectory");
-		Node directory1 = rootDirectory.setNode(cache, "directory1");
-		Node directory2 = rootDirectory.setNode(cache, "directory2");
-		final Attribute file = cache.find(FileType.class);
-		Holder file1 = directory1.setValue(cache, file, "test.hmtl");
-		Holder file2 = directory2.setValue(cache, file, "test.hmtl");// No Exception
+		DirectoryTree directoryTree = cache.find(DirectoryTree.class);
+		Directory rootDirectory = directoryTree.addRootDirectory(cache, "rootDirectory");
+		Directory directory1 = rootDirectory.addDirectory(cache, "directory1");
+		Directory directory2 = rootDirectory.addDirectory(cache, "directory2");
+		File file1 = directory1.addFile(cache, "test.hmtl", "<html/>".getBytes());
+		File file2 = directory2.addFile(cache, "test.hmtl", "<html/>".getBytes());// No Exception
 		assert file1 != file2;
 	}
 

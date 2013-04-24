@@ -1,8 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-
-import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -91,18 +89,6 @@ public interface Cache extends Context {
 	 * @return True if Generic is alive.
 	 */
 	boolean isAlive(Generic generic);
-
-	/**
-	 * Find the Generic defined by class param or create it if it doesn't exist.<br/>
-	 * This class must be @SystemGeneric annotated.
-	 * 
-	 * @see SystemGeneric
-	 * 
-	 * @param clazz
-	 *            The class must be @SystemGeneric annotated.
-	 * @return A new Generic or the existing Generic.
-	 */
-	<T extends Generic> T find(Class<?> clazz);
 
 	/**
 	 * Create a new tree or get the tree with this value if it already exists.

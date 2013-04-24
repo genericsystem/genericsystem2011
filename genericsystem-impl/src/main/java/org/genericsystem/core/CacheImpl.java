@@ -12,8 +12,8 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
+import org.genericsystem.annotation.InstanceClass;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics.Primaries;
@@ -351,7 +351,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
-		return bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0), superTypes, components, false);
+		return bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0), superTypes, components, false, null);
 	}
 
 	@Override
@@ -361,7 +361,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, true), Statics.EMPTY_GENERIC_ARRAY, new Generic[dim], false).<T> disableInheritance(this);
+		return this.<T> bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, true), Statics.EMPTY_GENERIC_ARRAY, new Generic[dim], false, null).<T> disableInheritance(this);
 	}
 
 	@Override
@@ -378,14 +378,23 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	// TODO refactor => subtype complexe
 	<T extends Generic> T bind(Class<?> clazz) {
-		// L'odre de construction des Generic est important pour que l'implicit soit toujours en dernier.
-		// Il faut donc appeler le findSupers avant le bindPrimaryByValue.
 		Generic[] supers = findSupers(clazz);
-		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), true), supers, findComponents(clazz), false);
+		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), true), supers, findComponents(clazz), false, clazz);
+	}
+
+	<T extends Generic> T bind(Generic implicit, boolean automatic, Generic directSuper, Generic... components) {
+		Class<?> clazz = null;
+		if (implicit.isConcrete()) {
+			components = ((GenericImpl) directSuper).sortAndCheck(components);
+			InstanceClass instanceClass = directSuper.getClass().getAnnotation(InstanceClass.class);
+			if (instanceClass != null)
+				clazz = instanceClass.value();
+		}
+		return bind(implicit, new Generic[] { directSuper }, components, automatic, clazz);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
+	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz) {
 		final Generic[] interfaces = new Primaries(Statics.insertFirstIntoArray(implicit, supers)).toArray();
 		Generic[] directSupers = getDirectSupers(interfaces, components);
 		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components)) {
@@ -403,7 +412,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : orderedDependencies.descendingSet())
 			remove(generic);
 
-		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex(implicit, directSupers, components, automatic);
+		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric(clazz)).initializeComplex(implicit, directSupers, components, automatic);
 		T superGeneric = this.<T> insert(newGeneric);
 		new ConnectionMap().reBuild(orderedDependencies);
 		return superGeneric;
@@ -440,7 +449,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		private void build(Generic oldGeneric, Generic[] supers, Generic[] components) {
-			Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric()).initializeComplex(oldGeneric.getImplicit(), supers, components, ((GenericImpl) oldGeneric).automatic));
+			Generic bind = insert(((GenericImpl) CacheImpl.this.<EngineImpl> getEngine().getFactory().newGeneric(oldGeneric.getClass())).initializeComplex(oldGeneric.getImplicit(), supers, components, ((GenericImpl) oldGeneric).automatic));
 			put(oldGeneric, bind);
 		}
 

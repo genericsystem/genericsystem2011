@@ -27,7 +27,7 @@ public interface Factory extends Serializable {
 	 * 
 	 * @return The new Generic.
 	 */
-	Generic newGeneric();
+	Generic newGeneric(Class<?> clazz);
 
 	/**
 	 * Create a new Cache.
@@ -84,9 +84,9 @@ public interface Factory extends Serializable {
 		}
 
 		@Override
-		public Generic newGeneric() {
+		public Generic newGeneric(Class<?> clazz) {
 			try {
-				return genericClass.newInstance();
+				return (Generic) (clazz != null && genericClass.isAssignableFrom(clazz) ? clazz.newInstance() : genericClass.newInstance());
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
 				throw new IllegalStateException(e);
 			}

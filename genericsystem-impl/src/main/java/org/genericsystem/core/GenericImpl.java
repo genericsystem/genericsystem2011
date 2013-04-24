@@ -9,10 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabledConstraint;
-import org.genericsystem.annotation.constraints.InstanceClassConstraint;
+import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
@@ -300,8 +299,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Link> T setHolder(Cache cache, Holder relation, Serializable value, Generic... targets) {
-		T holder = setInternalHolder(cache, relation, value, targets);
+	public <T extends Link> T setHolder(Cache cache, Holder attribute, Serializable value, Generic... targets) {
+		T holder = setInternalHolder(cache, attribute, value, targets);
 		assert Objects.equals(holder.getValue(), value);
 		return holder;
 	}
@@ -558,13 +557,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return bind(cache, bindPrimary(cache, value, getMetaLevel() + 1, false), false, this, components);
+		return ((CacheImpl) cache).bind(bindPrimary(cache, value, getMetaLevel() + 1, false), false, this, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
 		Generic implicit = getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL, true);
-		return bind(cache, implicit, false, this, components);
+		return ((CacheImpl) cache).bind(implicit, false, this, components);
 	}
 
 	@Override
@@ -572,7 +571,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return setLink(cache, relation, Statics.FLAG, targets);
 	}
 
-	private Generic[] sortAndCheck(Generic... components) {
+	Generic[] sortAndCheck(Generic... components) {
 		if (getComponentsSize() != components.length)
 			throw new IllegalStateException("Illegal components iterablesSize");
 		Map<Generic, Integer> positions = getPositions(components);
@@ -588,19 +587,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private <T extends Link> T addLink(Cache cache, Generic implicit, Generic directSuper, Generic... targets) {
 		Generic[] components = Statics.insertFirstIntoArray(this, targets);
-		return bind(cache, implicit, false, directSuper, components);
+		return ((CacheImpl) cache).bind(implicit, false, directSuper, components);
 	}
 
 	// TODO KK
 	private <T extends Link> T addLink(Cache cache, Generic implicit, Generic directSuper, int basePos, Generic... targets) {
-		return bind(cache, implicit, false, directSuper, Statics.insertIntoArray(this, targets, basePos));
-	}
-
-	// TODO order param automatic !!!
-	private static <T extends Generic> T bind(Cache cache, Generic implicit, boolean automatic, Generic directSuper, Generic... components) {
-		if (implicit.isConcrete())
-			components = ((GenericImpl) directSuper).sortAndCheck(components);
-		return ((CacheImpl) cache).bind(implicit, new Generic[] { directSuper }, components, automatic);
+		return ((CacheImpl) cache).bind(implicit, false, directSuper, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Generic> Iterator<T> structuralIterator(Context context, Attribute origin, boolean readPhantom) {
@@ -691,7 +683,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = (Generic[]) cartesianIterator.next();
 			if (!findPhantom(cache, phantom, components))
-				bind(cache, getImplicit(), true, this, components);
+				((CacheImpl) cache).bind(getImplicit(), true, this, components);
 		}
 	}
 
@@ -1285,7 +1277,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (clazz.getAnnotation(UniqueConstraint.class) != null)
 			enableUniqueConstraint(cache);
 
-		InstanceClassConstraint instanceClass = clazz.getAnnotation(InstanceClassConstraint.class);
+		InstanceValueClassConstraint instanceClass = clazz.getAnnotation(InstanceValueClassConstraint.class);
 		if (instanceClass != null)
 			setConstraintClass(cache, instanceClass.value());
 
@@ -1400,7 +1392,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	// TODO KK
 	@Override
 	public <T extends Node> T newRoot(Cache cache, Serializable value, int dim) {
-		return bind(cache, bindPrimary(cache, value, SystemGeneric.CONCRETE, true), false, this, new Generic[dim]);
+		return ((CacheImpl) cache).bind(bindPrimary(cache, value, SystemGeneric.CONCRETE, true), false, this, new Generic[dim]);
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package org.genericsystem.impl;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Supers;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InstanceClassConstraint;
+import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
@@ -108,7 +108,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 
 	@SystemGeneric
 	@Components(ElectrikPower.class)
-	@InstanceClassConstraint(String.class)
+	@InstanceValueClassConstraint(String.class)
 	public static class Unit {
 
 	}
