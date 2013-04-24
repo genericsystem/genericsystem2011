@@ -84,8 +84,8 @@ public class FileSystemTest {
 
 	public void testFileNameValueClassViolation() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-		Tree directoryTree = cache.find(DirectoryTree.class);
-		final Node rootDirectory = directoryTree.newRoot(cache, "rootDirectory");
+		DirectoryTree directoryTree = cache.find(DirectoryTree.class);
+		final Node rootDirectory = directoryTree.addRootDirectory(cache, "rootDirectory");
 		final Attribute fileSystem = cache.find(FileType.class);
 		new RollbackCatcher() {
 			@Override

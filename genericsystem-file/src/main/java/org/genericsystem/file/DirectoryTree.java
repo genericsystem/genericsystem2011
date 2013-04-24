@@ -109,7 +109,6 @@ public class DirectoryTree extends GenericImpl {
 	public <T extends Directory> T addRootDirectory(Cache cache, String name) {
 		if (getRootDirectory(cache, name) != null)
 			throw new IllegalStateException("Root directory : " + name + " already exists");
-		T result = this.newRoot(cache, name);
-		return result;
+		return newRoot(cache, name);
 	}
 }
