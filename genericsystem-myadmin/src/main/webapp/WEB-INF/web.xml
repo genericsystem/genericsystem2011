@@ -35,10 +35,11 @@
 		<param-value>true</param-value>
 	</context-param>
 
-	<context-param>
-		<param-name>com.sun.faces.expressionFactory</param-name>
-		<param-value>com.sun.el.ExpressionFactoryImpl</param-value>
-	</context-param>
+<!-- 	<context-param> -->
+<!-- 		<param-name>com.sun.faces.expressionFactory</param-name> -->
+<!-- 		<param-value>de.odysseus.el.ExpressionFactoryImpl</param-value> -->
+ <!-- 		<param-value>com.sun.el.ExpressionFactoryImpl</param-value> -->
+<!-- 	</context-param> -->
 
 
 	<listener>
@@ -48,6 +49,10 @@
 	<listener>
 		<listener-class>org.jboss.solder.resourceLoader.servlet.ResourceListener</listener-class>
 	</listener>
+
+	<!-- <listener> -->
+	<!-- <listener-class>org.jboss.seam.faces.beanManager.BeanManagerServletContextListener</listener-class> -->
+	<!-- </listener> -->
 
 	<resource-env-ref>
 		<description>Object factory for the CDI Bean Manager</description>
@@ -86,10 +91,6 @@
 	<!-- <param-value>0</param-value> -->
 	<!-- </context-param> -->
 
-
-	<!-- <listener> -->
-	<!-- <listener-class>org.jboss.seam.faces.beanManager.BeanManagerServletContextListener</listener-class> -->
-	<!-- </listener> -->
 
 	<!-- <mime-mapping> -->
 	<!-- <extension>ecss</extension> -->

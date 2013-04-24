@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -13,12 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
-import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
-import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Link;
-import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.web.qualifiers.DiscardEvent;
 import org.genericsystem.web.qualifiers.TypeChangeEvent;
@@ -46,61 +40,6 @@ public class TypesManager implements Serializable {
 	private TypesProvider typesProvider;
 
 	private Type selectedType;
-
-	@PostConstruct
-	public void init() {
-
-		Engine engine = cacheContext.getEngine();
-		Type car = engine.newSubType("Car");
-		Type pilot = engine.newSubType("Pilot");
-		Type size = engine.newSubType("Size");
-		Attribute power = car.addAttribute("Power");
-		Attribute color = car.addAttribute("Color");
-		Relation carPilot = car.addRelation("PilotRelation", pilot);
-		Relation copilot = car.addRelation("Co-pilot", pilot);
-		Relation carSize = car.addRelation("SizeCar", size);
-		Generic height = size.newInstance("Height");
-		Generic length = size.newInstance("Length");
-		Generic vince = pilot.newInstance("Vincent");
-		Generic ludo = pilot.newInstance("Ludovic");
-		Generic BMW = car.newInstance("BMW");
-		car.newInstance("Mercedes");
-		car.newInstance("Nissan");
-		car.newInstance("Renault");
-		car.newInstance("Porsche");
-		Holder v = BMW.addValue(power, "356");
-		BMW.addValue(power, "427");
-		BMW.addValue(color, "red");
-		Link link = BMW.addLink(carPilot, "35%", vince);
-		BMW.addLink(carPilot, "35%", ludo);
-		BMW.addLink(carSize, "456", height);
-		BMW.addLink(carSize, "365", length);
-		Relation carPilotSize = car.setRelation("CarPilotSize", pilot, size);
-		BMW.addLink(carPilotSize, "2b", vince, height);
-		//
-		//
-		//
-		// log.info("GET COMPOSITION COMPONENT ON RELATION");
-		// for (Generic g : carPilot.getCompositionComponents()) {
-		// log.info("\t- " + g.getValue());
-		// }
-		//
-
-		// log.info("GET COMPOSITION COMPONENT ON power");
-		// for (Generic g : power.getCompositionComponents()) {
-		// log.info("\t- " + g.getValue());
-		// }
-		//
-
-		// log.info("REMOVE RELATON CAR PILOT BEGIN");
-		// carPilot.remove();
-		// log.info("LINK ALIVE : " + link.isAlive());
-		//
-		// log.info("REMOVE RELATON CAR PILOT END");
-		// selectedType = car;
-		// currentType = car;
-		// currentInstance = BMW;
-	}
 
 	public void onDiscardEvent(@Observes @DiscardEvent Generic generic) {
 		this.selectedType = null;
@@ -215,7 +154,7 @@ public class TypesManager implements Serializable {
 	public void createSubType() {
 		if (!"".equals(getSubType())) {
 			log.info("createType: " + this.subType + ", extends:" + this.selectedType);
-			this.selectedType.newSubType(getSubType());
+			this.selectedType.newSubType(cacheContext, getSubType());
 		}
 	}
 
@@ -232,7 +171,7 @@ public class TypesManager implements Serializable {
 	public void createProperty() {
 		if (!"".equals(getProperty())) {
 			log.info("createProperty: " + this.property + ", of:" + this.selectedType);
-			this.selectedType.addProperty(getProperty());
+			this.selectedType.setProperty(cacheContext, getProperty());
 			typeChangeEvent.fire(selectedType);
 		}
 	}
@@ -250,7 +189,7 @@ public class TypesManager implements Serializable {
 	public void createAttribute() {
 		if (!"".equals(getAttribute())) {
 			log.info("createAttribute: " + this.attribute + ", of:" + this.selectedType);
-			this.selectedType.addAttribute(getAttribute());
+			this.selectedType.setAttribute(cacheContext, getAttribute());
 			typeChangeEvent.fire(selectedType);
 		}
 	}

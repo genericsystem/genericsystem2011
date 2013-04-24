@@ -35,7 +35,7 @@ public class TypesProvider implements Serializable {
 
 			@Override
 			public Iterator<Generic> iterator() {
-				return cacheContext.getEngine().getAllSubTypes().iterator();
+				return cacheContext.getEngine().getSubTypes(cacheContext).iterator();
 			}
 		};
 	}
@@ -49,7 +49,7 @@ public class TypesProvider implements Serializable {
 		return new AbstractSequentialList<Generic>() {
 			@Override
 			public Iterator<Generic> iterator() {
-				return ((Type) generic).getSubTypes().iterator();
+				return ((Type) generic).getSubTypes(cacheContext).iterator();
 			}
 		};
 	}

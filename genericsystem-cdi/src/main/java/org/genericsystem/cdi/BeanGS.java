@@ -1,9 +1,11 @@
 package org.genericsystem.cdi;
 
 import java.io.Serializable;
+
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
@@ -44,6 +46,10 @@ public class BeanGS implements Serializable {
 		editInstance = getInstance(instanceValue);
 		if (editInstance == null)
 			throw new IllegalStateException("not find the instance " + instanceValue + " for the type " + editType.info());
+	}
+
+	public void save() {
+		cache.flush();
 	}
 
 	public Type getType(Serializable typeValue) {
