@@ -82,8 +82,10 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Holder valueOfAttribute = myVehicle.setValue(cache, vehiclePower, "233 HP");
 		Snapshot<Generic> snapshot = vehiclePower.getInstances(cache);
-		assert snapshot.size() == 1 : snapshot;
+		assert snapshot.size() == 1 : valueOfAttribute.info();
 		assert snapshot.contains(valueOfAttribute);
+		valueOfAttribute.remove(cache);
+		assert snapshot.size() == 0;
 	}
 
 	public void testAllInstancesSnapshotOfAttribute() {

@@ -13,7 +13,7 @@ import org.genericsystem.core.Generic;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-public @interface InstanceClass {
+public @interface InstanceGenericClass {
 
 	/**
 	 * Define the class of the instance.

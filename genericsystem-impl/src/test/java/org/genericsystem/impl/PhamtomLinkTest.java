@@ -8,7 +8,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.DuplicateStructuralValueConstraintViolationException;
+import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -183,7 +183,7 @@ public class PhamtomLinkTest extends AbstractTest {
 			public void intercept() {
 				vehicle.setRelation(cache, "VehicleHuman", color);
 			}
-		}.assertIsCausedBy(DuplicateStructuralValueConstraintViolationException.class);
+		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
 	}
 
 	public void testAttributeWithGetInstances() {

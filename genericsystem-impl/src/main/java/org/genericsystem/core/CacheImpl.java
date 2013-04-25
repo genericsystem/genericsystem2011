@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import org.genericsystem.annotation.Dependencies;
-import org.genericsystem.annotation.InstanceClass;
+import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics.Primaries;
@@ -386,7 +386,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Class<?> clazz = null;
 		if (implicit.isConcrete()) {
 			components = ((GenericImpl) directSuper).sortAndCheck(components);
-			InstanceClass instanceClass = directSuper.getClass().getAnnotation(InstanceClass.class);
+			InstanceGenericClass instanceClass = directSuper.getClass().getAnnotation(InstanceGenericClass.class);
 			if (instanceClass != null)
 				clazz = instanceClass.value();
 		}

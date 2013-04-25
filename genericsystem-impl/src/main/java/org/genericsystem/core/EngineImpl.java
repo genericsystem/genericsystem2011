@@ -21,7 +21,7 @@ import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImp
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.DuplicateStructuralValueConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.UniqueStructuralValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.EngineConsistencyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.FlushableConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.NotNullConstraintImpl;
@@ -142,7 +142,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
 					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, NotNullConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class,
 					AliveConstraintImpl.class, UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
-					UnduplicateBindingConstraintImpl.class, DuplicateStructuralValueConstraintImpl.class, FlushableConstraintImpl.class, SizeConstraintImpl.class);
+					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, FlushableConstraintImpl.class, SizeConstraintImpl.class);
 
 			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
 			for (Class<?> clazz : classes)

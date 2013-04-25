@@ -313,7 +313,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		else if (((Type) relation).isPropertyConstraintEnabled(cache))
 			holder = getHolder(cache, (Attribute) relation, targets);
 		else
-			holder = getValuedHolder(cache, (Attribute) relation, value, targets);
+			holder = getHolderByValue(cache, (Attribute) relation, value, targets);
 
 		Generic implicit = ((GenericImpl) relation).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
@@ -330,11 +330,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return holder;
 	}
 
-	public <T extends Link> T getValuedHolder(Context context, Attribute attribute, Serializable value, final Generic... targets) {
-		return getValuedHolder(context, attribute, value, getBasePos(attribute), targets);
+	public <T extends Link> T getHolderByValue(Context context, Attribute attribute, Serializable value, final Generic... targets) {
+		return getHolderByValue(context, attribute, value, getBasePos(attribute), targets);
 	}
 
-	public <T extends Link> T getValuedHolder(Context context, Attribute attribute, Serializable value, int basePos, final Generic... targets) {
+	public <T extends Link> T getHolderByValue(Context context, Attribute attribute, Serializable value, int basePos, final Generic... targets) {
 		return Statics.unambigousFirst(Statics.valueFilter(this.<T> concreteIterator(context, attribute, basePos, targets), value));
 	}
 
@@ -638,7 +638,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	private <T extends Generic> Iterator<T> inheritanceStructuralIterator(final Context context, final Generic origin) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(context, origin) {
 			@Override
-			public boolean isSelected(Generic father, Generic candidate) {
+			public boolean isSelected(Generic candidate) {
 				return candidate.getMetaLevel() <= SystemGeneric.STRUCTURAL && candidate.isAttributeOf(GenericImpl.this);
 			}
 
@@ -672,7 +672,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 
 			@Override
-			public final boolean isSelected(Generic father, Generic candidate) {
+			public final boolean isSelected(Generic candidate) {
 				throw new IllegalStateException();
 			}
 		};
@@ -731,7 +731,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	boolean safeIsEnabled(Context context, Attribute attribute) {
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(context, attribute) {
 			@Override
-			public boolean isSelected(Generic father, Generic candidate) {
+			public boolean isSelected(Generic candidate) {
 				return (candidate.getMetaLevel() <= SystemGeneric.CONCRETE) && candidate.isAttributeOf(GenericImpl.this);
 			}
 
@@ -1120,28 +1120,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> Snapshot<T> getInstances(final Context context) {
-		// TODO KK change to a prefixed traversal (see getAllInstances)
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return (Iterator<T>) new AbstractSelectableLeafIterator(context, GenericImpl.this) {
-					@Override
-					public boolean isSelected(Generic father, Generic candidate) {
-						return candidate.isInstanceOf(GenericImpl.this);
-					}
-
-					@Override
-					public boolean isSelectable() {
-						return next.isInstanceOf(GenericImpl.this);
-					}
-				};
+				return Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(context), SystemGeneric.CONCRETE);
 			}
 		};
 	}
 
 	@Override
-	public <T extends Generic> T getInstance(Context context, final Serializable value) {
-		return this.<T> getAllInstances(context).filter(new Filter<T>() {
+	public <T extends Generic> T getInstanceByValue(Context context, final Serializable value) {
+		return this.<T> getInstances(context).filter(new Filter<T>() {
 			@Override
 			public boolean isSelected(T element) {
 				return Objects.equals(element.getValue(), value);
@@ -1454,7 +1443,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (defaultBehavior)
 			return setInternalHolder(cache, systemProperty, basePos);
 		else {
-			Link holder = getValuedHolder(cache, systemProperty, basePos);
+			Link holder = getHolderByValue(cache, systemProperty, basePos);
 			if (holder != null)
 				if (equals(holder.getBaseComponent())) {
 					holder.remove(cache);
@@ -1471,7 +1460,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public boolean isSystemPropertyEnabled(Context context, Class<? extends BooleanSystemProperty> systemPropertyClass, int basePos) {
 		boolean defaultBehavior = systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
-		return getValuedHolder(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
+		return getHolderByValue(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
 	}
 
 	@Override
@@ -1565,7 +1554,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public Integer getSizeConstraint(Cache cache, final int basePos) {
 		Attribute sizeConstraint = cache.<Attribute> find(SizeConstraintImpl.class);
-		Link valuedHolder = getValuedHolder(cache, sizeConstraint, basePos);
+		Link valuedHolder = getHolderByValue(cache, sizeConstraint, basePos);
 		if (valuedHolder == null)
 			return null;
 		return valuedHolder.getValue(cache, sizeConstraint.getAttribute(cache, SizeConstraintImpl.SIZE));

@@ -13,7 +13,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.exception.DuplicateStructuralValueConstraintViolationException;
+import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.Constraint;
@@ -26,7 +26,7 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @Components(Engine.class)
 @SingularConstraint
 @NotNullConstraint
-public class DuplicateStructuralValueConstraintImpl extends Constraint implements BooleanSystemProperty {
+public class UniqueStructuralValueConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -7212219694902616927L;
 
@@ -45,7 +45,7 @@ public class DuplicateStructuralValueConstraintImpl extends Constraint implement
 						}
 					};
 					if (filterIterator.hasNext())
-						throw new DuplicateStructuralValueConstraintViolationException("modified : " + modified.info() + "component : " + component.info() + " composite : " + filterIterator.next().info());
+						throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info() + "component : " + component.info() + " composite : " + filterIterator.next().info());
 				}
 			}
 	}

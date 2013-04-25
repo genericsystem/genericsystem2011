@@ -8,15 +8,15 @@ package org.genericsystem.exception;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class DuplicateStructuralValueConstraintViolationException extends RuntimeException {
+public class UniqueStructuralValueConstraintViolationException extends RuntimeException {
 
 	private static final long serialVersionUID = 4617646668336129382L;
 
-	public DuplicateStructuralValueConstraintViolationException() {
+	public UniqueStructuralValueConstraintViolationException() {
 		super();
 	}
 
-	public DuplicateStructuralValueConstraintViolationException(String msg) {
+	public UniqueStructuralValueConstraintViolationException(String msg) {
 		super(msg);
 	}
 }

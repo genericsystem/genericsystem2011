@@ -23,11 +23,11 @@ public abstract class AbstractSelectableLeafIterator extends AbstractSelectableP
 		return new AbstractFilterIterator<Generic>(((GenericImpl) father).directInheritingsIterator(context)) {
 			@Override
 			public boolean isSelected() {
-				return AbstractSelectableLeafIterator.this.isSelected(father, next);
+				return AbstractSelectableLeafIterator.this.isSelected(next);
 			}
 		};
 	}
 
-	public abstract boolean isSelected(Generic father, Generic candidate);
+	public abstract boolean isSelected(Generic candidate);
 
 }

@@ -362,10 +362,10 @@ public class ApiTest extends AbstractTest {
 		Generic myMercedes = car.newInstance(cache, "myMercedes");
 		Generic myPeugeot = car.newInstance(cache, "myPeugeot");
 
-		assert car.getInstance(cache, "myBmw") == myBmw;
-		assert car.getInstance(cache, "myAudi") == myAudi;
-		assert car.getInstance(cache, "myMercedes") == myMercedes;
-		assert car.getInstance(cache, "myPeugeot") == myPeugeot;
+		assert car.getInstanceByValue(cache, "myBmw") == myBmw;
+		assert car.getInstanceByValue(cache, "myAudi") == myAudi;
+		assert car.getInstanceByValue(cache, "myMercedes") == myMercedes;
+		assert car.getInstanceByValue(cache, "myPeugeot") == myPeugeot;
 	}
 
 	public void test_get_non_existing_instances() {
@@ -373,7 +373,7 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 
-		assert car.getInstance(cache, "myAudi") == null;
+		assert car.getInstanceByValue(cache, "myAudi") == null;
 	}
 
 	// getLink() tests

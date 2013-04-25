@@ -127,7 +127,7 @@ public interface Type extends Generic {
 	 *            The value of the requested instance.
 	 * @return The requested instance if it exists, null otherwise.
 	 */
-	<T extends Generic> T getInstance(Context context, Serializable value);
+	<T extends Generic> T getInstanceByValue(Context context, Serializable value);
 
 	/**
 	 * Returns the instances of Generic and the instances of the childrens.
