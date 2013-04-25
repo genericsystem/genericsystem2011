@@ -1,10 +1,5 @@
 package org.genericsystem.file;
 
-<<<<<<< HEAD
-=======
-import java.util.Objects;
->>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
