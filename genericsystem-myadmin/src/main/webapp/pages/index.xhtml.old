@@ -9,6 +9,20 @@
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:rich="http://richfaces.org/rich">
 
-<h:outputText value="Default index" />
+	<ui:composition template="/pages/template.xhtml">
 
+		<ui:define name="bodySection">
+
+			<h:panelGrid columns="1">
+
+<!-- 				<ui:include src="body/instances.xhtml" /> -->
+
+<!-- 				<ui:include src="/pages/popup/createGenericPopup.xhtml" /> -->
+				
+			</h:panelGrid>
+
+		</ui:define>
+
+	</ui:composition>
+	
 </html>

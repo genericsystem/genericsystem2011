@@ -11,7 +11,9 @@ import java.net.URLStreamHandler;
 import javax.enterprise.inject.spi.BeanManager;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.Engine;
 import org.genericsystem.file.DirectoryTree;
+import org.genericsystem.file.DirectoryTree.Directory;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
@@ -24,6 +26,25 @@ public class GsResolver extends DefaultResourceResolver {
 	protected static Logger log = LoggerFactory.getLogger(GsResolver.class);
 
 	private BeanManager beanManager = new BeanManagerLocator().getBeanManager();
+
+	public GsResolver() {
+		// BoundSessionContext ctx = Container.instance().deploymentManager().instance().select(BoundSessionContext.class).get();
+		// Map<String, Object> map = new HashMap<>();
+		// ctx.associate(map);
+		// ctx.activate();
+
+		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
+		Cache cache = engine.newCache();
+		DirectoryTree directoryTree = cache.<DirectoryTree> find(DirectoryTree.class);
+
+		Directory directory = directoryTree.touchRootDirectory(cache, "pages");
+		directory.touchFile(cache, "index2.xhtml", "<html><body>coucou Nicolas</body></html>".getBytes());
+		directory.touchFile(cache, "index3.xhtml", "<html><body>coucou Michaël</body></html>".getBytes());
+
+		cache.flush();
+		// ctx.deactivate();
+		// ctx.dissociate(map);
+	}
 
 	@Override
 	public URL resolveUrl(String resource) {
@@ -48,17 +69,11 @@ public class GsResolver extends DefaultResourceResolver {
 			public GsURLConnection(String resource) {
 				super(null);
 				this.resource = resource;
-
-				Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
-				DirectoryTree directoryTree = cache.<DirectoryTree> find(DirectoryTree.class);
-
-				byte[] content = "<html><body>coucou 2</body></html>".getBytes();
-				directoryTree.addRootDirectory(cache, "pages").addFile(cache, "index.xhtml", content);
 			}
 
 			@Override
 			public synchronized InputStream getInputStream() throws IOException {
-				log.info("CALL getInputStream, resource : " + resource);
+				log.info("getInputStream");
 				Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
 				return new ByteArrayInputStream(cache.<DirectoryTree> find(DirectoryTree.class).getFileContent(cache, resource));
 			}

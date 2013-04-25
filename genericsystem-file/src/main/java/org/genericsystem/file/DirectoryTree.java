@@ -16,6 +16,8 @@ import org.genericsystem.file.DirectoryTree.FileType;
 import org.genericsystem.file.DirectoryTree.FileType.File;
 import org.genericsystem.file.DirectoryTree.FileType.FileContent;
 import org.genericsystem.generic.Attribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SystemGeneric
 @InstanceValueClassConstraint(String.class)
@@ -23,6 +25,7 @@ import org.genericsystem.generic.Attribute;
 @Dependencies(FileType.class)
 @InstanceGenericClass(Directory.class)
 public class DirectoryTree extends GenericImpl {
+	protected static Logger log = LoggerFactory.getLogger(DirectoryTree.class);
 
 	public static class Directory extends GenericImpl {
 		public <T extends File> Snapshot<T> getFiles(Context context) {
@@ -36,6 +39,10 @@ public class DirectoryTree extends GenericImpl {
 		public <T extends File> T addFile(Cache cache, String name, byte[] content) {
 			if (getFile(cache, name) != null)
 				throw new IllegalStateException("File : " + name + " already exists");
+			return touchFile(cache, name, content);
+		}
+
+		public <T extends File> T touchFile(Cache cache, String name, byte[] content) {
 			T result = setHolder(cache, cache.<Attribute> find(FileType.class), name);
 			result.setContent(cache, content);
 			return result;
@@ -52,6 +59,10 @@ public class DirectoryTree extends GenericImpl {
 		public <T extends Directory> T addDirectory(Cache cache, String name) {
 			if (getDirectory(cache, name) != null)
 				throw new IllegalStateException("Directory : " + name + " already exists");
+			return touchDirectory(cache, name);
+		}
+
+		public <T extends Directory> T touchDirectory(Cache cache, String name) {
 			return setHolder(cache, cache.<Attribute> find(DirectoryTree.class), name);
 		}
 	}
@@ -92,12 +103,21 @@ public class DirectoryTree extends GenericImpl {
 	public <T extends Directory> T addRootDirectory(Cache cache, String name) {
 		if (getRootDirectory(cache, name) != null)
 			throw new IllegalStateException("Root directory : " + name + " already exists");
+		return touchRootDirectory(cache, name);
+	}
+
+	public <T extends Directory> T touchRootDirectory(Cache cache, String name) {
 		return newRoot(cache, name);
 	}
 
 	public byte[] getFileContent(Cache cache, String resource) {
+		log.info("a resource : " + resource);
+		if (resource.startsWith("/"))
+			resource = resource.substring(1);
+		log.info("b resource : " + resource);
 		String[] files = resource.split("/");
 		Directory directory = getRootDirectory(cache, files[0]);
+		log.info("directory : " + directory);
 		for (int i = 1; i < files.length - 1; i++)
 			directory = directory.getDirectory(cache, files[i]);
 		return directory.getFile(cache, files[files.length - 1]).getContent(cache);
