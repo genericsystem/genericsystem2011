@@ -44,6 +44,11 @@
 			<groupId>org.jboss.solder</groupId>
 			<artifactId>solder-api</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.jboss.solder</groupId>
+			<artifactId>solder-impl</artifactId>
+			<scope>compile</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jboss.weld</groupId>
@@ -56,11 +61,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.jboss.solder</groupId>
-			<artifactId>solder-impl</artifactId>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.jboss.arquillian.testng</groupId>
 			<artifactId>arquillian-testng-container</artifactId>
@@ -90,17 +90,17 @@
 		</dependency>
 
 
-	<!-- <dependency> -->
-	<!-- <groupId>javax.el</groupId> -->
-	<!-- <artifactId>el-api</artifactId> -->
-	<!-- <scope>test</scope> -->
-	<!-- </dependency> -->
-	<!-- <dependency> -->
-	<!-- <groupId>org.glassfish.web</groupId> -->
-	<!-- <artifactId>el-impl</artifactId> -->
-	<!-- <scope>test</scope> -->
-	<!-- </dependency> -->
-		
+		<!-- <dependency> -->
+		<!-- <groupId>javax.el</groupId> -->
+		<!-- <artifactId>el-api</artifactId> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.glassfish.web</groupId> -->
+		<!-- <artifactId>el-impl</artifactId> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>de.odysseus.juel</groupId>
 			<artifactId>juel-api</artifactId>

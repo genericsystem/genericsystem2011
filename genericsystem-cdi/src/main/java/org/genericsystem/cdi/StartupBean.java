@@ -60,6 +60,5 @@ public class StartupBean implements Extension {
 		log.info("-------------------end initialization------------------------");
 		ctx.deactivate();
 		ctx.dissociate(map);
-
 	}
 }

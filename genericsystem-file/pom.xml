@@ -24,14 +24,12 @@
 			<groupId>org.genericsystem</groupId>
 			<artifactId>genericsystem-api</artifactId>
 			<version>1.0-SNAPSHOT</version>
-			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.genericsystem</groupId>
 			<artifactId>genericsystem-impl</artifactId>
 			<version>1.0-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>test</scope>
+<!-- 			<scope>test</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
