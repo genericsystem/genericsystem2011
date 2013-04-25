@@ -1,10 +1,12 @@
 package org.genericsystem.cdi;
 
 import java.io.Serializable;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 
@@ -19,8 +21,9 @@ public class CacheProvider implements Serializable {
 	private transient Cache cache;
 
 	@PostConstruct
-	public void init() {
+	public Cache init() {
 		cache = engine.newCache();
+		return cache;
 	}
 
 	@Produces

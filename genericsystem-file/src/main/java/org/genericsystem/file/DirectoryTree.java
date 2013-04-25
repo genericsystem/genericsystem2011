@@ -1,6 +1,7 @@
 package org.genericsystem.file;
 
 import java.util.Objects;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceClass;
@@ -110,5 +111,13 @@ public class DirectoryTree extends GenericImpl {
 		if (getRootDirectory(cache, name) != null)
 			throw new IllegalStateException("Root directory : " + name + " already exists");
 		return newRoot(cache, name);
+	}
+
+	public byte[] getFileContent(Cache cache, String resource) {
+		String[] files = resource.split("/");
+		Directory directory = getRootDirectory(cache, files[0]);
+		for (int i = 1; i < files.length - 1; i++)
+			directory = directory.getDirectory(cache, files[i]);
+		return directory.getFile(cache, files[files.length - 1]).getContent(cache);
 	}
 }
