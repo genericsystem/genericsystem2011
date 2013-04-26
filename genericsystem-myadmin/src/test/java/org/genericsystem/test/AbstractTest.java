@@ -3,14 +3,8 @@ package org.genericsystem.test;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.enterprise.context.Conversation;
 import javax.inject.Inject;
 
-import org.genericsystem.api.core.Context;
-import org.genericsystem.api.core.Engine;
-import org.genericsystem.impl.core.CacheProvider;
-import org.genericsystem.impl.core.EngineProvider;
-import org.genericsystem.impl.startup.StartupBean;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ArchivePaths;
@@ -27,17 +21,8 @@ public abstract class AbstractTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createTestArchive() {
-		return new Archiver(StartupBean.class, CacheProvider.class, EngineProvider.class).archive();
+		return new Archiver().archive();
 	}
-	
-	@Inject
-	protected Engine engine;
-
-	@Inject
-	protected Context context;
-
-	@Inject
-	Conversation conversation;
 
 	@Inject
 	Expressions expressions;
@@ -86,7 +71,6 @@ public abstract class AbstractTest extends Arquillian {
 			xml += "</alternatives>\n";
 			return xml += "</beans>\n";
 		}
-
 
 		public ByteArrayAsset byteArraySet() {
 			return new ByteArrayAsset(toString().getBytes());
