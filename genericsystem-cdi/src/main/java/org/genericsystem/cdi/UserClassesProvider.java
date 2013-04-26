@@ -6,7 +6,7 @@ import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class UserClasses {
+public class UserClassesProvider {
 
 	private Set<Class<?>> userClasses = new HashSet<>();
 

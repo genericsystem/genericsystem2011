@@ -2,7 +2,6 @@ package org.genericsystem.cdi;
 
 import javax.enterprise.context.Conversation;
 import javax.inject.Inject;
-
 import org.genericsystem.exception.RollbackException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
@@ -20,7 +19,7 @@ public abstract class AbstractTest extends Arquillian {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
-		javaArchive.addClasses(BeanGS.class, CacheProvider.class, EngineProvider.class, UserClasses.class);
+		javaArchive.addClasses(BeanGS.class, CacheProvider.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, MockPersitentDirectoryProvider.class);
 		javaArchive.addPackage(Expressions.class.getPackage());
 		javaArchive.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
 		return javaArchive;

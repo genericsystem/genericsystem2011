@@ -2,12 +2,11 @@ package org.genericsystem.cdi;
 
 import java.io.Serializable;
 import java.util.Arrays;
-
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericSystem;
 import org.slf4j.Logger;
@@ -23,18 +22,29 @@ public class EngineProvider implements Serializable {
 	private transient Engine engine;
 
 	@Inject
-	private UserClasses userClasses;
+	private UserClassesProvider userClassesProvider;
+
+	@Inject
+	PersitentDirectoryProvider persistentDirectoryProvider;
 
 	@PostConstruct
 	public void init() {
-		log.info("############################################## START ENGINE #######################################################################");
-		log.info("with userClasses : " + Arrays.toString(userClasses.getUserClassesArray()));
-		engine = GenericSystem.newInMemoryEngine(userClasses.getUserClassesArray());
-		log.info("#######################################################################################################################################");
+		log.info("$$$$$$$$$$$$$$ START GS ENGINE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+		log.info("$ with directory path : " + persistentDirectoryProvider.getDirectoryPath());
+		log.info("$ with userClasses : " + Arrays.toString(userClassesProvider.getUserClassesArray()));
+		log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+		engine = GenericSystem.newPersistentEngine(persistentDirectoryProvider.getDirectoryPath(), userClassesProvider.getUserClassesArray());
 	}
 
 	@Produces
 	public Engine getEngine() {
 		return engine;
+	}
+
+	@PreDestroy
+	public void destoy() {
+		log.info("$$$$$$$$$$$$$$ STOP GS ENGINE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+		engine.close();
+		engine = null;
 	}
 }
