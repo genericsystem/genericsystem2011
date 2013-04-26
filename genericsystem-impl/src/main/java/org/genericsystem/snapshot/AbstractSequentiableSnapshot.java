@@ -98,12 +98,12 @@ public abstract class AbstractSequentiableSnapshot<T> extends AbstractSnapshot<T
 
 	@Override
 	public boolean addAll(Collection<? extends T> c) {
-		throw new IllegalStateException();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		throw new IllegalStateException();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
