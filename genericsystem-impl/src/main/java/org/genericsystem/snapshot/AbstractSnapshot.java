@@ -137,6 +137,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 					}
 				};
 			}
+
 		};
 	}
 
@@ -149,5 +150,16 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 	public T first() {
 		Iterator<T> it = iterator();
 		return it.hasNext() ? it.next() : null;
+	}
+
+	@Override
+	public Collection<T> toCollection() {
+		return new AbstractSequentiableSnapshot<T>() {
+
+			@Override
+			public Iterator<T> sequentiableIterator() {
+				return iterator();
+			}
+		};
 	}
 }

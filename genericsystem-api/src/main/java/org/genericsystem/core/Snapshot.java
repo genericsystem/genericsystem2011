@@ -118,5 +118,12 @@ public interface Snapshot<T> extends Iterable<T> {
 		T project(E element);
 	}
 
+	/**
+	 * Returns a collection
+	 * 
+	 * @return The collection.
+	 */
+	Collection<T> toCollection();
+
 	void log();
 }
