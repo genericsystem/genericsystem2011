@@ -2,6 +2,7 @@ package org.genericsystem.snapshot;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.iterator.AbstractFilterIterator;
@@ -153,7 +154,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 	}
 
 	@Override
-	public Collection<T> toCollection() {
+	public List<T> toList() {
 		return new AbstractSequentiableSnapshot<T>() {
 
 			@Override

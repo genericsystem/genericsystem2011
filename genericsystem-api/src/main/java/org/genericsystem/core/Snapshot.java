@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * The Snaphot is an aware iterable of the graphe.
@@ -123,7 +124,7 @@ public interface Snapshot<T> extends Iterable<T> {
 	 * 
 	 * @return The collection.
 	 */
-	Collection<T> toCollection();
+	List<T> toList();
 
 	void log();
 }
