@@ -1,5 +1,6 @@
 package org.genericsystem.web.beans;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,22 +17,28 @@ import org.slf4j.LoggerFactory;
 
 @Named
 @RequestScoped
-public class FileSystemBean {
+public class FileSystemBean implements Serializable {
+
+	private static final long serialVersionUID = 5535643610156313741L;
 
 	protected static Logger log = LoggerFactory.getLogger(FileSystemBean.class);
 
 	@Inject
-	private Cache cache;
+	private transient Cache cache;
 
 	/* rich:tree */
-	public synchronized List<Directory> getRootDirectories() {
-		log.info("AAA");
-		FileSystem find = cache.<FileSystem> find(FileSystem.class);
-		log.info("BBB");
-		return find.getRootDirectories(cache).toList();
+	public List<Directory> getRootDirectories() {
+		log.info("getRootDirectories " + cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache));
+		return new AbstractSequentialList<Directory>() {
+			@Override
+			public Iterator<Directory> iterator() {
+				return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).iterator();
+			}
+		};
 	}
 
 	public List<Directory> getDirectories(final Directory directory) {
+		log.info(directory + ".getDirectories(cache) " + directory.getDirectories(cache));
 		return new AbstractSequentialList<Directory>() {
 			@Override
 			public Iterator<Directory> iterator() {

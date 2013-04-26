@@ -9,12 +9,12 @@
 	 <h:form>
         <rich:tree toggleType="ajax" var="item">
             <rich:treeModelRecursiveAdaptor roots="#{fileSystemBean.rootDirectories}" nodes="#{item.directories}">
-<!--                 <rich:treeNode> -->
-<!--                     #{item.shortPath} -->
-<!--                 </rich:treeNode> -->
-<!--                 <rich:treeModelAdaptor nodes="#{item.files}"> -->
-<!--                     <rich:treeNode>#{item}</rich:treeNode> -->
-<!--                 </rich:treeModelAdaptor> -->
+                <rich:treeNode>
+                    #{item.shortPath}
+                </rich:treeNode>
+                <rich:treeModelAdaptor nodes="#{item.files}">
+                    <rich:treeNode>#{item}</rich:treeNode>
+                </rich:treeModelAdaptor>
             </rich:treeModelRecursiveAdaptor>
         </rich:tree>
     </h:form>
