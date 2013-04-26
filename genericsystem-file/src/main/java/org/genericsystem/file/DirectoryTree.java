@@ -27,6 +27,10 @@ import org.slf4j.LoggerFactory;
 public class DirectoryTree extends GenericImpl {
 	protected static Logger log = LoggerFactory.getLogger(DirectoryTree.class);
 
+	private static final String SEPARATOR = "/";
+
+	private static final byte[] EMPTY = "<html/>".getBytes();
+
 	public static class Directory extends GenericImpl {
 		public <T extends File> Snapshot<T> getFiles(Context context) {
 			return getHolders(context, context.<Attribute> find(FileType.class));
@@ -40,6 +44,10 @@ public class DirectoryTree extends GenericImpl {
 			if (getFile(cache, name) != null)
 				throw new IllegalStateException("File : " + name + " already exists");
 			return touchFile(cache, name, content);
+		}
+
+		public <T extends File> T touchFile(Cache cache, String name) {
+			return touchFile(cache, name, EMPTY);
 		}
 
 		public <T extends File> T touchFile(Cache cache, String name, byte[] content) {
@@ -110,16 +118,44 @@ public class DirectoryTree extends GenericImpl {
 		return newRoot(cache, name);
 	}
 
+	public <T extends File> T touchFile(Cache cache, String path) {
+		return touchFile(cache, path, EMPTY);
+	}
+
+	public <T extends File> T touchFile(Cache cache, String path, byte[] content) {
+		if (path.startsWith(SEPARATOR))
+			path = path.substring(1);
+		String[] files = path.split(SEPARATOR);
+		Directory directory = touchRootDirectory(cache, files[0]);
+		if (directory == null)
+			return null;
+		for (int i = 1; i < files.length - 1; i++) {
+			directory = directory.touchDirectory(cache, files[i]);
+			if (directory == null)
+				return null;
+		}
+		return directory.touchFile(cache, files[files.length - 1], content);
+	}
+
 	public byte[] getFileContent(Cache cache, String resource) {
-		log.info("a resource : " + resource);
-		if (resource.startsWith("/"))
+		File file = getFile(cache, resource);
+		if (file == null)
+			return null;
+		return file.getContent(cache);
+	}
+
+	public File getFile(Cache cache, String resource) {
+		if (resource.startsWith(SEPARATOR))
 			resource = resource.substring(1);
-		log.info("b resource : " + resource);
-		String[] files = resource.split("/");
+		String[] files = resource.split(SEPARATOR);
 		Directory directory = getRootDirectory(cache, files[0]);
-		log.info("directory : " + directory);
-		for (int i = 1; i < files.length - 1; i++)
+		if (directory == null)
+			return null;
+		for (int i = 1; i < files.length - 1; i++) {
 			directory = directory.getDirectory(cache, files[i]);
-		return directory.getFile(cache, files[files.length - 1]).getContent(cache);
+			if (directory == null)
+				return null;
+		}
+		return directory.getFile(cache, files[files.length - 1]);
 	}
 }
