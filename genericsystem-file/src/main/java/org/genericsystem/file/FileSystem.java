@@ -109,11 +109,11 @@ public class FileSystem extends GenericImpl {
 	}
 
 	public <T extends Directory> Snapshot<T> getRootDirectories(Context context) {
-		return getInstances(context);
+		return getRoots(context);
 	}
 
 	public <T extends Directory> T getRootDirectory(Context context, final String name) {
-		return getInstanceByValue(context, name);
+		return getRootByValue(context, name);
 	}
 
 	public <T extends Directory> T addRootDirectory(Cache cache, String name) {

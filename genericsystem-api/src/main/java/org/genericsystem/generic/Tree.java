@@ -1,8 +1,9 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
-
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.Context;
+import org.genericsystem.core.Snapshot;
 
 /**
  * A Tree.
@@ -35,4 +36,7 @@ public interface Tree extends Attribute {
 	 */
 	<T extends Node> T newRoot(Cache cache, Serializable value, int dim);
 
+	<T extends Node> Snapshot<T> getRoots(Context context);
+
+	<T extends Node> T getRootByValue(Context context, Serializable value);
 }

@@ -1123,19 +1123,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(context), SystemGeneric.CONCRETE);
+				return instancesIterator(context);
 			}
 		};
 	}
 
+	private <T extends Generic> Iterator<T> instancesIterator(Context context) {
+		return Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(context), SystemGeneric.CONCRETE);
+	}
+
 	@Override
 	public <T extends Generic> T getInstanceByValue(Context context, final Serializable value) {
-		return this.<T> getInstances(context).filter(new Filter<T>() {
-			@Override
-			public boolean isSelected(T element) {
-				return Objects.equals(element.getValue(), value);
-			}
-		}).first();
+		return Statics.unambigousFirst(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(context), value));
 	}
 
 	@Override
@@ -1725,6 +1724,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (i != basePos && components[i].isStructural())
 				return true;
 		return false;
+	}
+
+	@Override
+	public <T extends Node> Snapshot<T> getRoots(final Context context) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return Statics.<T> rootFilter(Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(context), SystemGeneric.CONCRETE));
+			}
+		};
+	}
+
+	@Override
+	public <T extends Node> T getRootByValue(Context context, Serializable value) {
+		return Statics.unambigousFirst(Statics.<T> rootFilter(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(context), value)));
 	}
 
 }
