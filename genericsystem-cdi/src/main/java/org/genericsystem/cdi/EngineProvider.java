@@ -39,8 +39,8 @@ public class EngineProvider implements Serializable {
 		log.info("");
 		log.info("");
 		log.info("-----------------------------------------------------------------------------------------------");
-		log.info("|  directory path : " + persistentDirectoryProvider.getDirectoryPath());
-		log.info("|  userClasses : " + Arrays.toString(userClassesProvider.getUserClassesArray()));
+		log.info("-  directory path : " + persistentDirectoryProvider.getDirectoryPath());
+		log.info("-  userClasses : " + Arrays.toString(userClassesProvider.getUserClassesArray()));
 		log.info("-----------------------------------------------------------------------------------------------");
 		engine = GenericSystem.newPersistentEngine(persistentDirectoryProvider.getDirectoryPath(), userClassesProvider.getUserClassesArray());
 	}
