@@ -21,7 +21,6 @@ import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImp
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.UniqueStructuralValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.EngineConsistencyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.FlushableConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.NotNullConstraintImpl;
@@ -32,6 +31,7 @@ import org.genericsystem.systemproperties.constraints.simple.SingularInstanceCon
 import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UnduplicateBindingConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.UniqueStructuralValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
 
 /**
@@ -76,6 +76,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 		assert components.length == 0;
 	}
 
+	@Override
 	public Factory getFactory() {
 		return factory;
 	}

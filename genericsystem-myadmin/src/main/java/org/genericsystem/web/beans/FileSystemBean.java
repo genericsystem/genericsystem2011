@@ -1,7 +1,6 @@
 package org.genericsystem.web.beans;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.faces.bean.RequestScoped;
@@ -11,7 +10,7 @@ import javax.inject.Named;
 import org.genericsystem.core.Cache;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
-import org.genericsystem.web.util.AbstractSequentialList;
+import org.genericsystem.file.FileSystem.FileType.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,22 +27,22 @@ public class FileSystemBean implements Serializable {
 
 	/* rich:tree */
 	public List<Directory> getRootDirectories() {
-		log.info("getRootDirectories " + cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache));
-		return new AbstractSequentialList<Directory>() {
-			@Override
-			public Iterator<Directory> iterator() {
-				return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).iterator();
-			}
-		};
+		log.info("getRootDirectories " + cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList());
+		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
 	}
 
 	public List<Directory> getDirectories(final Directory directory) {
 		log.info(directory + ".getDirectories(cache) " + directory.getDirectories(cache));
-		return new AbstractSequentialList<Directory>() {
-			@Override
-			public Iterator<Directory> iterator() {
-				return directory.getDirectories(cache).iterator();
-			}
-		};
+		return directory.getDirectories(cache).toList();
+	}
+
+	public List<File> getFiles(final Directory directory) {
+		log.info(directory + ".getFiles(cache) " + directory.getFiles(cache));
+		return directory.getFiles(cache).toList();
+	}
+
+	public String log(String str) {
+		log.info(str);
+		return str;
 	}
 }

@@ -42,7 +42,7 @@ public class GsResolver extends DefaultResourceResolver {
 		String content1 = entete.toString() + "<h:outputText value='coucou Nicolas' />" + basPage.toString();
 		String content2 = entete.toString() + "<h:outputText value='coucou Michaël' />" + basPage.toString();
 
-		directoryTree.touchFile(cache, "/pages/index2.xhtml", content1.getBytes());
+		directoryTree.touchFile(cache, "/pages/test/index2.xhtml", content1.getBytes());
 		directoryTree.touchFile(cache, "/pages/index3.xhtml", content2.getBytes());
 		directoryTree.touchFile(cache, "/pages/index4.xhtml");
 
