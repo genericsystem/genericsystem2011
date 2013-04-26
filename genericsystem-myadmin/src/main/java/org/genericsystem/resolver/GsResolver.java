@@ -15,7 +15,6 @@ import javax.servlet.ServletContext;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.file.FileSystem;
-import org.genericsystem.file.FileSystem.Directory;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
