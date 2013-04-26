@@ -35,6 +35,21 @@
 		<param-value>true</param-value>
 	</context-param>
 
+	<context-param>
+		<param-name>javax.faces.FACELETS_REFRESH_PERIOD</param-name>
+		<param-value>0</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>javax.faces.FACELETS_RESOURCE_RESOLVER</param-name>
+		<param-value>org.genericsystem.resolver.GsResolver</param-value>
+	</context-param>
+
+	<!-- <context-param> -->
+	<!-- <param-name>javax.faces.STATE_SAVING_METHOD</param-name> -->
+	<!-- <param-value>client</param-value> why? -->
+	<!-- </context-param> -->
+
 	<!-- <context-param> -->
 	<!-- <param-name>com.sun.faces.expressionFactory</param-name> -->
 	<!-- <param-value>de.odysseus.el.ExpressionFactoryImpl</param-value> -->
@@ -76,26 +91,23 @@
 		<url-pattern>*.xhtml</url-pattern>
 	</servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>Faces Servlet</servlet-name>
-		<url-pattern>/faces/*</url-pattern>
-	</servlet-mapping>
+	<error-page>
+		<error-code>400</error-code>
+		<location>/pages/error.xhtml</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/pages/error.xhtml</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/pages/error.xhtml</location>
+	</error-page>
 
-	<!-- <context-param> -->
-	<!-- <param-name>javax.faces.STATE_SAVING_METHOD</param-name> -->
-	<!-- <param-value>client</param-value> why? -->
-	<!-- </context-param> -->
-
-	<context-param>
-		<param-name>javax.faces.FACELETS_REFRESH_PERIOD</param-name>
-		<param-value>0</param-value>
-	</context-param>
-
-	<context-param>
-		<param-name>javax.faces.FACELETS_RESOURCE_RESOLVER</param-name>
-		<param-value>org.genericsystem.resolver.GsResolver</param-value>
-	</context-param>
-
+	<!-- <servlet-mapping> -->
+	<!-- <servlet-name>Faces Servlet</servlet-name> -->
+	<!-- <url-pattern>/faces/*</url-pattern> -->
+	<!-- </servlet-mapping> -->
 
 	<!-- <mime-mapping> -->
 	<!-- <extension>ecss</extension> -->
@@ -107,7 +119,7 @@
 	</session-config>
 
 	<welcome-file-list>
-		<welcome-file>faces/pages/index.xhtml</welcome-file>
+		<welcome-file>/pages/index.xhtml</welcome-file>
 	</welcome-file-list>
 
 </web-app>

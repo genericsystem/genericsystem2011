@@ -9,6 +9,8 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
 import javax.enterprise.inject.spi.BeanManager;
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
@@ -28,22 +30,24 @@ public class GsResolver extends DefaultResourceResolver {
 	private BeanManager beanManager = new BeanManagerLocator().getBeanManager();
 
 	public GsResolver() {
-		// BoundSessionContext ctx = Container.instance().deploymentManager().instance().select(BoundSessionContext.class).get();
-		// Map<String, Object> map = new HashMap<>();
-		// ctx.associate(map);
-		// ctx.activate();
-
 		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
 		Cache cache = engine.newCache();
 		FileSystem directoryTree = cache.<FileSystem> find(FileSystem.class);
 
-		Directory directory = directoryTree.touchRootDirectory(cache, "pages");
-		directory.touchFile(cache, "index2.xhtml", "<html><body>coucou Nicolas</body></html>".getBytes());
-		directory.touchFile(cache, "index3.xhtml", "<html><body>coucou Michaël</body></html>".getBytes());
+		StringBuilder entete = new StringBuilder();
+		entete.append("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:h='http://java.sun.com/jsf/html'>");
+		entete.append("<body>");
+		StringBuilder basPage = new StringBuilder();
+		basPage.append("</body>");
+		basPage.append("</html>");
+		String content1 = entete.toString() + "<h:outputText value='coucou Nicolas' />" + basPage.toString();
+		String content2 = entete.toString() + "<h:outputText value='coucou Michaël' />" + basPage.toString();
+
+		directoryTree.touchFile(cache, "/pages/index2.xhtml", content1.getBytes());
+		directoryTree.touchFile(cache, "/pages/index3.xhtml", content2.getBytes());
+		directoryTree.touchFile(cache, "/pages/index4.xhtml");
 
 		cache.flush();
-		// ctx.deactivate();
-		// ctx.dissociate(map);
 	}
 
 	@Override
@@ -75,7 +79,18 @@ public class GsResolver extends DefaultResourceResolver {
 			public synchronized InputStream getInputStream() throws IOException {
 				log.info("getInputStream");
 				Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
-				return new ByteArrayInputStream(cache.<FileSystem> find(FileSystem.class).getFileContent(cache, resource));
+				FileSystem directoryTree = cache.<FileSystem> find(FileSystem.class);
+				byte[] fileContent = directoryTree.getFileContent(cache, resource);
+				if (fileContent == null) {
+					Object ctx = FacesContext.getCurrentInstance().getExternalContext().getContext();
+					if (ctx instanceof ServletContext) {
+						InputStream stream = ((ServletContext) ctx).getResourceAsStream(resource);
+						if (stream != null)
+							return stream;
+					}
+					throw new IllegalStateException("Cannot open resource " + resource);
+				}
+				return new ByteArrayInputStream(fileContent);
 			}
 
 			@Override
