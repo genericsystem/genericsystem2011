@@ -27,6 +27,10 @@ import org.slf4j.LoggerFactory;
 public class FileSystem extends GenericImpl {
 	protected static Logger log = LoggerFactory.getLogger(FileSystem.class);
 
+	private static final String SEPARATOR = "/";
+
+	private static final byte[] EMPTY = "<html/>".getBytes();
+
 	public static class Directory extends GenericImpl {
 		public <T extends File> Snapshot<T> getFiles(Context context) {
 			return getHolders(context, context.<Attribute> find(FileType.class));
@@ -40,6 +44,10 @@ public class FileSystem extends GenericImpl {
 			if (getFile(cache, name) != null)
 				throw new IllegalStateException("File : " + name + " already exists");
 			return touchFile(cache, name, content);
+		}
+
+		public <T extends File> T touchFile(Cache cache, String name) {
+			return touchFile(cache, name, EMPTY);
 		}
 
 		public <T extends File> T touchFile(Cache cache, String name, byte[] content) {
@@ -119,15 +127,35 @@ public class FileSystem extends GenericImpl {
 	}
 
 	public byte[] getFileContent(Cache cache, String resource) {
-		log.info("a resource : " + resource);
-		if (resource.startsWith("/"))
+		if (resource.startsWith(SEPARATOR))
 			resource = resource.substring(1);
-		log.info("b resource : " + resource);
-		String[] files = resource.split("/");
+		String[] files = resource.split(SEPARATOR);
 		Directory directory = getRootDirectory(cache, files[0]);
-		log.info("directory : " + directory);
-		for (int i = 1; i < files.length - 1; i++)
+		if (directory == null)
+			return null;
+		for (int i = 1; i < files.length - 1; i++) {
 			directory = directory.getDirectory(cache, files[i]);
-		return directory.getFile(cache, files[files.length - 1]).getContent(cache);
+			if (directory == null)
+				return null;
+		}
+		File file = directory.getFile(cache, files[files.length - 1]);
+		if (file == null)
+			return null;
+		return file.getContent(cache);
+	}
+
+	public <T extends File> T touchFile(Cache cache, String resource) {
+		return touchFile(cache, resource, EMPTY);
+	}
+
+	public <T extends File> T touchFile(Cache cache, String resource, byte[] content) {
+		if (resource.startsWith(SEPARATOR))
+			resource = resource.substring(1);
+		String[] files = resource.split(SEPARATOR);
+		Directory directory = touchRootDirectory(cache, files[0]);
+		for (int i = 1; i < files.length - 1; i++)
+			directory = directory.touchDirectory(cache, files[i]);
+		return directory.touchFile(cache, files[files.length - 1], content);
+
 	}
 }
