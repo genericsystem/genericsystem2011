@@ -13,7 +13,6 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
 import org.genericsystem.core.Cache;
-import org.genericsystem.core.Engine;
 import org.genericsystem.file.FileSystem;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
@@ -29,24 +28,24 @@ public class GsResolver extends DefaultResourceResolver {
 	private BeanManager beanManager = new BeanManagerLocator().getBeanManager();
 
 	public GsResolver() {
-		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
-		Cache cache = engine.newCache();
-		FileSystem directoryTree = cache.<FileSystem> find(FileSystem.class);
-
-		StringBuilder entete = new StringBuilder();
-		entete.append("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:h='http://java.sun.com/jsf/html'>");
-		entete.append("<body>");
-		StringBuilder basPage = new StringBuilder();
-		basPage.append("</body>");
-		basPage.append("</html>");
-		String content1 = entete.toString() + "<h:outputText value='coucou Nicolas' />" + basPage.toString();
-		String content2 = entete.toString() + "<h:outputText value='coucou Michaël' />" + basPage.toString();
-
-		directoryTree.touchFile(cache, "/pages/index2.xhtml", content1.getBytes());
-		directoryTree.touchFile(cache, "/pages/index3.xhtml", content2.getBytes());
-		directoryTree.touchFile(cache, "/pages/index4.xhtml");
-
-		cache.flush();
+		// Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
+		// Cache cache = engine.newCache();
+		// FileSystem directoryTree = cache.<FileSystem> find(FileSystem.class);
+		//
+		// StringBuilder entete = new StringBuilder();
+		// entete.append("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:h='http://java.sun.com/jsf/html'>");
+		// entete.append("<body>");
+		// StringBuilder basPage = new StringBuilder();
+		// basPage.append("</body>");
+		// basPage.append("</html>");
+		// String content1 = entete.toString() + "<h:outputText value='coucou Nicolas' />" + basPage.toString();
+		// String content2 = entete.toString() + "<h:outputText value='coucou Michaël' />" + basPage.toString();
+		//
+		// directoryTree.touchFile(cache, "/pages/index2.xhtml", content1.getBytes());
+		// directoryTree.touchFile(cache, "/pages/index3.xhtml", content2.getBytes());
+		// directoryTree.touchFile(cache, "/pages/index4.xhtml");
+		//
+		// cache.flush();
 	}
 
 	@Override

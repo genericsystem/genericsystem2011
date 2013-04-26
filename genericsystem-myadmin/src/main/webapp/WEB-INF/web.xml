@@ -99,10 +99,10 @@
 		<error-code>404</error-code>
 		<location>/pages/error.xhtml</location>
 	</error-page>
-	<error-page>
-		<error-code>500</error-code>
-		<location>/pages/error.xhtml</location>
-	</error-page>
+<!-- 	<error-page> -->
+<!-- 		<error-code>500</error-code> -->
+<!-- 		<location>/pages/error.xhtml</location> -->
+<!-- 	</error-page> -->
 
 	<!-- <servlet-mapping> -->
 	<!-- <servlet-name>Faces Servlet</servlet-name> -->
