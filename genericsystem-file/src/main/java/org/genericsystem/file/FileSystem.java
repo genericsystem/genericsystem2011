@@ -65,6 +65,10 @@ public class FileSystem extends GenericImpl {
 		public <T extends Directory> T touchDirectory(Cache cache, String name) {
 			return setHolder(cache, cache.<Attribute> find(FileSystem.class), name);
 		}
+
+		public String getShortPath() {
+			return this.<String> getValue();
+		}
 	}
 
 	@SystemGeneric
@@ -88,6 +92,10 @@ public class FileSystem extends GenericImpl {
 
 			public <T extends Generic> T setContent(Cache cache, byte[] content) {
 				return setValue(cache, cache.<Attribute> find(FileContent.class), content);
+			}
+
+			public String getShortPath() {
+				return this.<String> getValue();
 			}
 		}
 	}
