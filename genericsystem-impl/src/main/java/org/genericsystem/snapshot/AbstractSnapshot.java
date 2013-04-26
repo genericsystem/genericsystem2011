@@ -159,7 +159,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 
 			@Override
 			public Iterator<T> sequentiableIterator() {
-				return iterator();
+				return AbstractSnapshot.this.iterator();
 			}
 		};
 	}
