@@ -7,7 +7,6 @@
 	xmlns:rich="http://richfaces.org/rich">
 
 	<h:form>
-		<h:outputText value="#{fileSystemBean.log('coucou')}" />
 		<rich:tree toggleType="client" var="item" selectionType="ajax">
 			<rich:treeModelRecursiveAdaptor
 				roots="#{fileSystemBean.rootDirectories}"
@@ -15,25 +14,11 @@
 				<rich:treeNode>
                     #{item.shortPath}
                 </rich:treeNode>
-				<rich:treeNode>
-					<h:outputText value="#{fileSystemBean.log('coucou')}" />
-				</rich:treeNode>
 				<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
 					<rich:treeNode>#{item.shortPath}</rich:treeNode>
 				</rich:treeModelAdaptor>
 			</rich:treeModelRecursiveAdaptor>
 		</rich:tree>
-
-		<!--         <rich:tree id="tree" toggleType="client" var="item" -->
-		<!-- 					selectionType="ajax" render="createGenericPopup, instancesPanel" -->
-		<!-- 					selectionChangeListener="#{typesManager.selectionChanged}"> -->
-		<!-- 					<rich:treeModelRecursiveAdaptor roots="#{typesProvider.roots}" -->
-		<!-- 						nodes="#{typesProvider.getTypes(item)}"> -->
-		<!-- 						<rich:treeNode> -->
-		<!-- 							#{item} -->
-		<!-- 						</rich:treeNode> -->
-		<!-- 					</rich:treeModelRecursiveAdaptor> -->
-		<!-- 				</rich:tree> -->
 	</h:form>
 
 </ui:composition>

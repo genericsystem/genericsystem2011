@@ -25,24 +25,16 @@ public class FileSystemBean implements Serializable {
 	@Inject
 	private transient Cache cache;
 
-	/* rich:tree */
 	public List<Directory> getRootDirectories() {
-		log.info("getRootDirectories " + cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList());
 		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
 	}
 
 	public List<Directory> getDirectories(final Directory directory) {
-		log.info(directory + ".getDirectories(cache) " + directory.getDirectories(cache));
 		return directory.getDirectories(cache).toList();
 	}
 
 	public List<File> getFiles(final Directory directory) {
-		log.info(directory + ".getFiles(cache) " + directory.getFiles(cache));
 		return directory.getFiles(cache).toList();
 	}
 
-	public String log(String str) {
-		log.info(str);
-		return str;
-	}
 }
