@@ -5,9 +5,9 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.file.AbstractTest.RollbackCatcher;
-import org.genericsystem.file.DirectoryTree.Directory;
-import org.genericsystem.file.DirectoryTree.FileType;
-import org.genericsystem.file.DirectoryTree.FileType.File;
+import org.genericsystem.file.FileSystem.Directory;
+import org.genericsystem.file.FileSystem.FileType;
+import org.genericsystem.file.FileSystem.FileType.File;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Tree;
@@ -18,15 +18,15 @@ public class FileSystemTest {
 
 	@Test
 	public void testFileSystemAndDirectoryTree() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-		Tree directoryTree = cache.find(DirectoryTree.class);
-		assert cache.isAlive(directoryTree);
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+		Tree fileSystem = cache.find(FileSystem.class);
+		assert cache.isAlive(fileSystem);
 	}
 
 	public void testDirectoryNameNotUniqueInDifferentDirectories() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-		DirectoryTree directoryTree = cache.find(DirectoryTree.class);
-		Directory rootDirectory = directoryTree.addRootDirectory(cache, "rootDirectory");
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+		FileSystem fileSystem = cache.find(FileSystem.class);
+		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
 		Directory directory1 = rootDirectory.addDirectory(cache, "directory1");
 		final Directory directory2 = rootDirectory.addDirectory(cache, "directory2");
 		directory2.addDirectory(cache, "directory1"); // No Exception
@@ -73,9 +73,9 @@ public class FileSystemTest {
 	// }
 
 	public void testFileNameNotUniqueInDifferentDirectories() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-		DirectoryTree directoryTree = cache.find(DirectoryTree.class);
-		Directory rootDirectory = directoryTree.addRootDirectory(cache, "rootDirectory");
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+		FileSystem fileSystem = cache.find(FileSystem.class);
+		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
 		Directory directory1 = rootDirectory.addDirectory(cache, "directory1");
 		Directory directory2 = rootDirectory.addDirectory(cache, "directory2");
 		File file1 = directory1.addFile(cache, "test.hmtl", "<html/>".getBytes());
@@ -84,8 +84,8 @@ public class FileSystemTest {
 	}
 
 	public void testFileNameValueClassViolation() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-		DirectoryTree directoryTree = cache.find(DirectoryTree.class);
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+		FileSystem directoryTree = cache.find(FileSystem.class);
 		final Node rootDirectory = directoryTree.addRootDirectory(cache, "rootDirectory");
 		final Attribute fileSystem = cache.find(FileType.class);
 		new RollbackCatcher() {

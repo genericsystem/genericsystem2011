@@ -12,8 +12,8 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
-import org.genericsystem.file.DirectoryTree;
-import org.genericsystem.file.DirectoryTree.Directory;
+import org.genericsystem.file.FileSystem;
+import org.genericsystem.file.FileSystem.Directory;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class GsResolver extends DefaultResourceResolver {
 
 		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
 		Cache cache = engine.newCache();
-		DirectoryTree directoryTree = cache.<DirectoryTree> find(DirectoryTree.class);
+		FileSystem directoryTree = cache.<FileSystem> find(FileSystem.class);
 
 		Directory directory = directoryTree.touchRootDirectory(cache, "pages");
 		directory.touchFile(cache, "index2.xhtml", "<html><body>coucou Nicolas</body></html>".getBytes());
@@ -75,7 +75,7 @@ public class GsResolver extends DefaultResourceResolver {
 			public synchronized InputStream getInputStream() throws IOException {
 				log.info("getInputStream");
 				Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
-				return new ByteArrayInputStream(cache.<DirectoryTree> find(DirectoryTree.class).getFileContent(cache, resource));
+				return new ByteArrayInputStream(cache.<FileSystem> find(FileSystem.class).getFileContent(cache, resource));
 			}
 
 			@Override

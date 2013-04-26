@@ -11,21 +11,21 @@ import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.file.DirectoryTree.Directory;
-import org.genericsystem.file.DirectoryTree.FileType;
-import org.genericsystem.file.DirectoryTree.FileType.File;
-import org.genericsystem.file.DirectoryTree.FileType.FileContent;
+import org.genericsystem.file.FileSystem.Directory;
+import org.genericsystem.file.FileSystem.FileType;
+import org.genericsystem.file.FileSystem.FileType.File;
+import org.genericsystem.file.FileSystem.FileType.FileContent;
 import org.genericsystem.generic.Attribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SystemGeneric
 @InstanceValueClassConstraint(String.class)
-@Components(DirectoryTree.class)
+@Components(FileSystem.class)
 @Dependencies(FileType.class)
 @InstanceGenericClass(Directory.class)
-public class DirectoryTree extends GenericImpl {
-	protected static Logger log = LoggerFactory.getLogger(DirectoryTree.class);
+public class FileSystem extends GenericImpl {
+	protected static Logger log = LoggerFactory.getLogger(FileSystem.class);
 
 	public static class Directory extends GenericImpl {
 		public <T extends File> Snapshot<T> getFiles(Context context) {
@@ -49,11 +49,11 @@ public class DirectoryTree extends GenericImpl {
 		}
 
 		public <T extends Directory> Snapshot<T> getDirectories(Context context) {
-			return getHolders(context, context.<Attribute> find(DirectoryTree.class));
+			return getHolders(context, context.<Attribute> find(FileSystem.class));
 		}
 
 		public <T extends Directory> T getDirectory(Context context, final String name) {
-			return getHolderByValue(context, context.<Attribute> find(DirectoryTree.class), name);
+			return getHolderByValue(context, context.<Attribute> find(FileSystem.class), name);
 		}
 
 		public <T extends Directory> T addDirectory(Cache cache, String name) {
@@ -63,12 +63,12 @@ public class DirectoryTree extends GenericImpl {
 		}
 
 		public <T extends Directory> T touchDirectory(Cache cache, String name) {
-			return setHolder(cache, cache.<Attribute> find(DirectoryTree.class), name);
+			return setHolder(cache, cache.<Attribute> find(FileSystem.class), name);
 		}
 	}
 
 	@SystemGeneric
-	@Components(DirectoryTree.class)
+	@Components(FileSystem.class)
 	@InstanceValueClassConstraint(String.class)
 	@InstanceGenericClass(File.class)
 	@Dependencies(FileContent.class)
