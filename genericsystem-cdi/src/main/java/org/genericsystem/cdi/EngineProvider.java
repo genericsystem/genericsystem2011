@@ -29,10 +29,19 @@ public class EngineProvider implements Serializable {
 
 	@PostConstruct
 	public void init() {
-		log.info("$$$$$$$$$$$$$$ START GS ENGINE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-		log.info("$ with directory path : " + persistentDirectoryProvider.getDirectoryPath());
-		log.info("$ with userClasses : " + Arrays.toString(userClassesProvider.getUserClassesArray()));
-		log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
+		log.info("");
+		log.info("   _____________   ____________    ________ ");
+		log.info("  |___________ /  / ____/  ___/   /________|");
+		log.info("  |___________/  / /___ \\__  \\   /_________|");
+		log.info("  |__________/  / /_  /___/  /  /__________|");
+		log.info("  |_________/   \\____/______/  /___________|");
+		log.info("");
+		log.info("");
+		log.info("-----------------------------------------------------------------------------------------------");
+		log.info("|  directory path : " + persistentDirectoryProvider.getDirectoryPath());
+		log.info("|  userClasses : " + Arrays.toString(userClassesProvider.getUserClassesArray()));
+		log.info("-----------------------------------------------------------------------------------------------");
 		engine = GenericSystem.newPersistentEngine(persistentDirectoryProvider.getDirectoryPath(), userClassesProvider.getUserClassesArray());
 	}
 
