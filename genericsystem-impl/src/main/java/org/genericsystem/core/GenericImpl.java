@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabledConstraint;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -399,7 +398,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		});
 	}
 
-	private <T extends Holder> Iterator<T> concreteIterator(Context context, Attribute attribute, int basePos, Generic... targets) {
+	public <T extends Holder> Iterator<T> concreteIterator(Context context, Attribute attribute, int basePos, Generic... targets) {
 		return Statics.<T> targetsFilter(GenericImpl.this.<T> concreteIterator(context, attribute, basePos, false), attribute, targets);
 	}
 
@@ -1147,7 +1146,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 		};
 	}
-	
+
 	private <T extends Generic> Iterator<T> allInstancesIterator(Context context) {
 		return Statics.levelFilter(this.<T> allInheritingsAboveIterator(context, getMetaLevel() + 1), getMetaLevel() + 1);
 	}

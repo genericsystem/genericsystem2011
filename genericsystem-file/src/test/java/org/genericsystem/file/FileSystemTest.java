@@ -37,9 +37,11 @@ public class FileSystemTest {
 				directory2.addDirectory(cache, "directory1"); // Exception
 			}
 		}.assertIsCausedBy(IllegalStateException.class);
-		// assert false : fileSystem.getRootDirectories(cache);
+		// assert false : fileSystem.getRootDirectories(cache).toList();
 		directory1.addFile(cache, "fileName", new byte[] { Byte.MAX_VALUE });
 		assert Arrays.equals(directory1.getFile(cache, "fileName").getContent(cache), new byte[] { Byte.MAX_VALUE });
+
+		// assert false : rootDirectory.getDirectories(cache);
 		directory1.getFile(cache, "fileName").remove(cache);
 	}
 
