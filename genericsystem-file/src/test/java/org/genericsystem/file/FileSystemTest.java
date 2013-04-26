@@ -29,7 +29,7 @@ public class FileSystemTest {
 		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
 		Directory directory1 = rootDirectory.addDirectory(cache, "directory1");
 		final Directory directory2 = rootDirectory.addDirectory(cache, "directory2");
-		directory2.addDirectory(cache, "directory1"); // No Exception
+		assert !directory2.addDirectory(cache, "directory1").equals(directory1); // No Exception
 		new RollbackCatcher() {
 
 			@Override
@@ -37,6 +37,7 @@ public class FileSystemTest {
 				directory2.addDirectory(cache, "directory1"); // Exception
 			}
 		}.assertIsCausedBy(IllegalStateException.class);
+		// assert false : fileSystem.getRootDirectories(cache);
 		directory1.addFile(cache, "fileName", new byte[] { Byte.MAX_VALUE });
 		assert Arrays.equals(directory1.getFile(cache, "fileName").getContent(cache), new byte[] { Byte.MAX_VALUE });
 		directory1.getFile(cache, "fileName").remove(cache);
