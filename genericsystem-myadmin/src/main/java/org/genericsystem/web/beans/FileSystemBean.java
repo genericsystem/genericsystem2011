@@ -2,11 +2,8 @@ package org.genericsystem.web.beans;
 
 import java.io.Serializable;
 import java.util.List;
-
-import javax.faces.bean.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
@@ -15,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named
-@RequestScoped
+@javax.enterprise.context.RequestScoped
 public class FileSystemBean implements Serializable {
 
 	private static final long serialVersionUID = 5535643610156313741L;
