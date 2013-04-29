@@ -32,6 +32,7 @@ import java.util.zip.ZipOutputStream;
 public class Archiver {
 
 	// private static final Logger log = LoggerFactory.getLogger(Archiver.class);
+
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 	private Engine engine;
@@ -128,7 +129,7 @@ public class Archiver {
 		out.writeObject(generic.getValue());
 		writeAncestors(generic.getSupers(), out);
 		writeAncestors(generic.getComponents(), out);
-		out.writeObject(generic.getClass());
+		out.writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
 		out.writeBoolean(generic.automatic);
 	}
 
