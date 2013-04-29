@@ -111,10 +111,18 @@
 		<dependency>
 			<groupId>org.jboss.seam.faces</groupId>
 			<artifactId>seam-faces</artifactId>
+			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.ocpsoft</groupId>
+			<artifactId>prettyfaces-jsf2</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.jboss.seam.international</groupId>
 			<artifactId>seam-international</artifactId>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Runtime Dependencies -->
