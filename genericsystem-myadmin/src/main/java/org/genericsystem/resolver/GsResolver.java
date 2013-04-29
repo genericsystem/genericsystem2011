@@ -3,13 +3,11 @@ package org.genericsystem.resolver;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.faces.context.FacesContext;
-import javax.servlet.ServletContext;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.file.FileSystem;
@@ -49,13 +47,28 @@ public class GsResolver extends DefaultResourceResolver {
 	@Override
 	public URL resolveUrl(String resource) {
 		try {
-			return new URL("", "", 0, resource, new GsStreamHandler());
-		} catch (MalformedURLException e) {
-			throw new IllegalStateException();
+			Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
+			log.info("sdsds");
+			FileSystem directoryTree = cache.<FileSystem> find(FileSystem.class);
+			log.info("FIN sdsds");
+			byte[] fileContent = directoryTree.getFileContent(cache, resource);
+			if (fileContent != null)
+				return new URL("", "", 0, resource, new GsStreamHandler(fileContent));
+		} catch (ContextNotActiveException ignore) {
+
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
 		}
+		return super.resolveUrl(resource);
 	}
 
 	public class GsStreamHandler extends URLStreamHandler {
+
+		byte[] fileContent;
+
+		public GsStreamHandler(byte[] fileContent) {
+			this.fileContent = fileContent;
+		}
 
 		@Override
 		protected URLConnection openConnection(URL url) throws IOException {
@@ -64,33 +77,12 @@ public class GsResolver extends DefaultResourceResolver {
 
 		public class GsURLConnection extends URLConnection {
 
-			private String resource;
-
 			public GsURLConnection(String resource) {
 				super(null);
-				this.resource = resource;
 			}
 
 			@Override
 			public synchronized InputStream getInputStream() throws IOException {
-				log.info("getInputStream");
-				Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
-				log.info("sdsds");
-				FileSystem directoryTree = cache.<FileSystem> find(FileSystem.class);
-				log.info("FIN sdsds");
-				byte[] fileContent = directoryTree.getFileContent(cache, resource);
-				if (fileContent == null) {
-					Object ctx = FacesContext.getCurrentInstance().getExternalContext().getContext();
-					if (ctx instanceof ServletContext) {
-						InputStream stream = ((ServletContext) ctx).getResourceAsStream(resource);
-						if (stream != null) {
-							log.info("FIN");
-							return stream;
-						}
-					}
-					throw new IllegalStateException("Cannot open resource " + resource);
-				}
-				log.info("FIN");
 				return new ByteArrayInputStream(fileContent);
 			}
 

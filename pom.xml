@@ -16,7 +16,7 @@
 		<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
 		<maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
 		<cargo-maven2-plugin.version>1.2.1</cargo-maven2-plugin.version>
-		<maven-surefire-plugin.version>2.8</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>2.9</maven-surefire-plugin.version>
 
 		<jsf.version>2.1.19</jsf.version>
 		<jstl.version>1.2</jstl.version>
@@ -25,8 +25,8 @@
 
 		<weld.core.version>1.1.9.Final</weld.core.version>
 
-		<arquillian-testng-container.version>1.0.3.Final</arquillian-testng-container.version>
-
+		<arquillian.version>1.0.3.Final</arquillian.version>
+		
 		<seam.version>3.1.0.Final</seam.version>
 
 		<jboss-ejb3-api.version>3.1.0</jboss-ejb3-api.version>
@@ -84,11 +84,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
-					<!-- groups>Unit, arquillian, Integration</groups-->
 					<reportsDirectory>target/surefire-reports/</reportsDirectory>
 					<argLine>-Xmx512m</argLine>
-					<parallel>methods</parallel>
-					<threadCount>5</threadCount>
 				</configuration>
 			</plugin>
 		</plugins>
