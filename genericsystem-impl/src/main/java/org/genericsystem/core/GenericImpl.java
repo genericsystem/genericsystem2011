@@ -1736,16 +1736,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return false;
 	}
 
+	// TODO KK
 	@Override
 	public <T extends Node> Snapshot<T> getRoots(final Context context) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return Statics.<T> rootFilter(Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(context), SystemGeneric.CONCRETE));
+				return Statics.<T> rootFilter(GenericImpl.this.<T> instancesIterator(context));
 			}
 		};
 	}
 
+	// TODO KK
 	@Override
 	public <T extends Node> T getRootByValue(Context context, Serializable value) {
 		return Statics.unambigousFirst(Statics.<T> rootFilter(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(context), value)));
