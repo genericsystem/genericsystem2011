@@ -84,7 +84,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
-					<groups>Unit, arquillian, Integration</groups>
+					<!-- groups>Unit, arquillian, Integration</groups-->
 					<reportsDirectory>target/surefire-reports/</reportsDirectory>
 					<argLine>-Xmx512m</argLine>
 					<parallel>methods</parallel>
