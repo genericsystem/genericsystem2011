@@ -1,6 +1,5 @@
 package org.genericsystem.file;
 
-import java.util.Iterator;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -17,8 +16,6 @@ import org.genericsystem.file.FileSystem.FileType;
 import org.genericsystem.file.FileSystem.FileType.File;
 import org.genericsystem.file.FileSystem.FileType.FileContent;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.iterator.AbstractFilterIterator;
-import org.genericsystem.snapshot.AbstractSnapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,23 +57,7 @@ public class FileSystem extends GenericImpl {
 		}
 
 		public <T extends Directory> Snapshot<T> getDirectories(final Context context) {
-			final Attribute attribute = context.<Attribute> find(FileSystem.class);
-			return new AbstractSnapshot<T>() {
-
-				@Override
-				public Iterator<T> iterator() {
-					return thisFilter(Directory.this.<T> concreteIterator(context, attribute, getBasePos(attribute)));
-				}
-			};
-		}
-
-		public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
-			return new AbstractFilterIterator<T>(concreteIterator) {
-				@Override
-				public boolean isSelected() {
-					return !Directory.this.equals(next);
-				}
-			};
+			return getChildren(context);
 		}
 
 		public <T extends Directory> T getDirectory(Context context, final String name) {

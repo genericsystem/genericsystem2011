@@ -1394,13 +1394,23 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Node> Snapshot<T> getChildren(Context context) {
-		return this.<T> getHolders(context, this.<Tree> getMeta()).filter(new Filter<T>() {
+	public <T extends Node> Snapshot<T> getChildren(final Context context) {
+		return new AbstractSnapshot<T>() {
 			@Override
-			public boolean isSelected(T node) {
-				return !GenericImpl.this.equals(node);
+			public Iterator<T> iterator() {
+				Tree attribute = getMeta();
+				return thisFilter(GenericImpl.this.<T> concreteIterator(context, attribute, getBasePos(attribute)));
 			}
-		});
+		};
+	}
+
+	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
+		return new AbstractFilterIterator<T>(concreteIterator) {
+			@Override
+			public boolean isSelected() {
+				return !GenericImpl.this.equals(next);
+			}
+		};
 	}
 
 	@Override
