@@ -124,6 +124,11 @@
 			<artifactId>seam-international</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<scope>compile</scope>
+		</dependency>
 
 		<!-- Runtime Dependencies -->
 		<!-- <dependency> -->
