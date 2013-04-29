@@ -18,7 +18,7 @@
 		<cargo-maven2-plugin.version>1.2.1</cargo-maven2-plugin.version>
 		<maven-surefire-plugin.version>2.8</maven-surefire-plugin.version>
 
-		<jsf.version>2.1.16</jsf.version>
+		<jsf.version>2.1.19</jsf.version>
 		<jstl.version>1.2</jstl.version>
 
 		<org.richfaces.bom.version>4.3.1.Final</org.richfaces.bom.version>
@@ -31,7 +31,7 @@
 
 		<jboss-ejb3-api.version>3.1.0</jboss-ejb3-api.version>
 
-		<testng.version>6.5.2</testng.version>
+		<testng.version>6.8.1</testng.version>
 		<slf4j.version>1.6.4</slf4j.version>
 	</properties>
 
@@ -84,9 +84,11 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
+					<groups>Unit, arquillian, Integration</groups>
+					<reportsDirectory>target/surefire-reports/</reportsDirectory>
 					<argLine>-Xmx512m</argLine>
 					<parallel>methods</parallel>
-					<threadCount>1000</threadCount>
+					<threadCount>5</threadCount>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -25,20 +25,19 @@
 			<artifactId>genericsystem-impl</artifactId>
 			<version>1.0-SNAPSHOT</version>
 			<scope>runtime</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+		</dependency> 
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.solder</groupId>
@@ -51,14 +50,18 @@
 		</dependency>
 
 		<dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+         </dependency>
+		<dependency>
 			<groupId>org.jboss.weld</groupId>
 			<artifactId>weld-core</artifactId>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.weld</groupId>
 			<artifactId>weld-api</artifactId>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -90,11 +93,11 @@
 		</dependency>
 
 
-		<!-- <dependency> -->
-		<!-- <groupId>javax.el</groupId> -->
-		<!-- <artifactId>el-api</artifactId> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>el-api</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.glassfish.web</groupId> -->
 		<!-- <artifactId>el-impl</artifactId> -->

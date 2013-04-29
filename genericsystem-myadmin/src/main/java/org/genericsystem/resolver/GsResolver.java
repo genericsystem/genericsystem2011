@@ -7,11 +7,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
-
 import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.file.FileSystem;
@@ -19,7 +17,6 @@ import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.sun.faces.facelets.impl.DefaultResourceResolver;
 
 public class GsResolver extends DefaultResourceResolver {
