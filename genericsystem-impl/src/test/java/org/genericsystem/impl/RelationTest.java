@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -1043,7 +1042,6 @@ public class RelationTest extends AbstractTest {
 
 		assert myBmw.getTargets(cache, carDriver).contains(me);
 		assert myBmw.getTargets(cache, carDriver).contains(ayrton);
-		assert !myBmw.getTargets(cache, sportsCarPilot).contains(ayrton) : myBmw.getTargets(cache, carDriver);
 		assert myBmw.getTargets(cache, carDriver).size() == 2;
 		assert yourAudi.getTargets(cache, carDriver).contains(you);
 		assert yourAudi.getTargets(cache, carDriver).contains(ayrton);
@@ -1085,7 +1083,6 @@ public class RelationTest extends AbstractTest {
 
 		assert myBmw.getTargets(cache, carDriver).contains(me);
 		assert myBmw.getTargets(cache, carDriver).contains(ayrton);
-		assert !myBmw.getTargets(cache, sportsCarPilot).contains(ayrton) : myBmw.getTargets(cache, carDriver);
 		assert myBmw.getTargets(cache, carDriver).size() == 2;
 		assert yourAudi.getTargets(cache, carDriver).contains(you);
 		assert yourAudi.getTargets(cache, carDriver).contains(ayrton);
