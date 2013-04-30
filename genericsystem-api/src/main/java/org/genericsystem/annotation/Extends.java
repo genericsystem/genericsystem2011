@@ -16,9 +16,9 @@ import java.lang.annotation.Target;
 public @interface Extends {
 
 	/**
-	 * Returns the class of the implicit super.
+	 * Returns the class of the mainSuper.
 	 * 
-	 * @return The class of the implicit super.
+	 * @return The class of the mainSuper.
 	 */
 	Class<?> value();
 
