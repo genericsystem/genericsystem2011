@@ -251,11 +251,8 @@ public abstract class AbstractContext implements Context, Serializable {
 		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
 		LinkedHashSet<Class<?>> extendsClasses = new LinkedHashSet<>();
 		if (extendsAnnotation != null) {
-			Class<?>[] others = extendsAnnotation.others();
-			if (others.length == 1 && others[0] == Engine.class)
-				extendsClasses.add(extendsAnnotation.value());
-			else
-				extendsClasses.addAll(Arrays.asList(others));
+			extendsClasses.add(extendsAnnotation.value());
+			extendsClasses.addAll(Arrays.asList(extendsAnnotation.others()));
 			return extendsClasses;
 		}
 		extendsClasses = new LinkedHashSet<>(Arrays.asList(new Class<?>[] {}));
