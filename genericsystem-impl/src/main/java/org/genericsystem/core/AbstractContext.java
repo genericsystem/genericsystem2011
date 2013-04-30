@@ -12,8 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
-import org.genericsystem.annotation.Supers;
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.annotation.value.IntValue;
@@ -221,6 +222,7 @@ public abstract class AbstractContext implements Context, Serializable {
 
 	public abstract boolean isAlive(Generic generic);
 
+	@Override
 	public <T extends Generic> T find(Class<?> clazz) {
 		return this.<EngineImpl> getEngine().find(this, clazz);
 	}
@@ -234,18 +236,11 @@ public abstract class AbstractContext implements Context, Serializable {
 
 	Generic[] findSupers(Class<?> clazz) {
 		int i = 0;
-		Type[] supers = new Type[getSupersClasses(clazz).size()];
-		for (Class<?> superClasse : getSupersClasses(clazz))
+		LinkedHashSet<Class<?>> supersClasses = getSupersClasses(clazz);
+		Type[] supers = new Type[supersClasses.size()];
+		for (Class<?> superClasse : supersClasses)
 			supers[i++] = this.<Type> find(superClasse);
 		return supers;
-	}
-
-	Generic findImplicitSuper(Class<?> clazz) {
-		if (SystemGeneric.STRUCTURAL == clazz.getAnnotation(SystemGeneric.class).value())
-			return getEngine();
-		Generic[] supers = findSupers(clazz);
-		assert supers.length == 1;
-		return supers[0].getImplicit();
 	}
 
 	int findMetaLevel(Class<?> clazz) {
@@ -253,16 +248,36 @@ public abstract class AbstractContext implements Context, Serializable {
 	}
 
 	LinkedHashSet<Class<?>> getSupersClasses(Class<?> clazz) {
-		Supers supersAnnotation = clazz.getAnnotation(Supers.class);
-		LinkedHashSet<Class<?>> superClasses = new LinkedHashSet<>(Arrays.asList(supersAnnotation != null ? supersAnnotation.value() : new Class<?>[] {}));
+		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
+		LinkedHashSet<Class<?>> extendsClasses = new LinkedHashSet<>();
+		if (extendsAnnotation != null) {
+			Class<?>[] others = extendsAnnotation.others();
+			if (others.length == 1 && others[0] == Engine.class)
+				extendsClasses.add(extendsAnnotation.value());
+			else
+				extendsClasses.addAll(Arrays.asList(others));
+			return extendsClasses;
+		}
+		extendsClasses = new LinkedHashSet<>(Arrays.asList(new Class<?>[] {}));
 		Class<?> javaSuperclass = clazz.getSuperclass();
-		if (Object.class.equals(javaSuperclass))
-			return superClasses;
+		if (Object.class.equals(javaSuperclass)) {
+			extendsClasses.add(Engine.class);
+			return extendsClasses;
+		}
 		if (javaSuperclass.getAnnotation(SystemGeneric.class) == null)
-			superClasses.addAll(getSupersClasses(javaSuperclass));
+			extendsClasses.addAll(getSupersClasses(javaSuperclass));
 		else
-			superClasses.add(javaSuperclass);
-		return superClasses;
+			extendsClasses.add(javaSuperclass);
+		return extendsClasses;
+	}
+
+	// TODO KK
+	Generic findImplicitSuper(Class<?> clazz) {
+		if (SystemGeneric.STRUCTURAL == clazz.getAnnotation(SystemGeneric.class).value())
+			return getEngine();
+		Generic[] supers = findSupers(clazz);
+		assert supers.length == 1;
+		return supers[0].getImplicit();
 	}
 
 	Generic[] findComponents(Class<?> clazz) {

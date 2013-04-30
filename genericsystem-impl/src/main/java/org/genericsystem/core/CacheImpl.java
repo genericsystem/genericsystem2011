@@ -378,10 +378,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return orderedGenerics;
 	}
 
-	// TODO refactor => subtype complexe
+	// TODO KK findImplicitSuper
 	<T extends Generic> T bind(Class<?> clazz) {
-		Generic[] supers = findSupers(clazz);
-		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), true), supers, findComponents(clazz), false, clazz);
+		// assert supers[0].getImplicit().equals(findImplicitSuper(clazz)) : "" + supers[0].getImplicit() + " / " + findImplicitSuper(clazz);
+		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), true), findSupers(clazz), findComponents(clazz), false, clazz);
 	}
 
 	<T extends Generic> T bind(Generic implicit, boolean automatic, Generic directSuper, Generic... components) {

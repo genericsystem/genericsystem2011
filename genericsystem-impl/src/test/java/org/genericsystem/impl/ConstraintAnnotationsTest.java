@@ -1,7 +1,7 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.annotation.Components;
-import org.genericsystem.annotation.Supers;
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.NotNullConstraint;
@@ -73,7 +73,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 
 	@SystemGeneric
 	@PropertyConstraint
-	@Supers(value = { GraphicComponent.class }, implicitSuper = GraphicComponent.class)
+	@Extends(value = GraphicComponent.class, others = { GraphicComponent.class })
 	public static class Selectable {
 
 	}

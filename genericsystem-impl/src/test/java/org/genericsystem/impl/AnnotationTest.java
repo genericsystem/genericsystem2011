@@ -1,7 +1,7 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.annotation.Components;
-import org.genericsystem.annotation.Supers;
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
@@ -263,7 +263,7 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Supers(value = { Games.class, Children.class }, implicitSuper = Engine.class)
+	@Extends(value = Engine.class, others = { Games.class, Children.class })
 	public static class ChildrenGames {
 	}
 
@@ -272,8 +272,8 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Supers(value = { Human.class }, implicitSuper = Engine.class)
-	public static class Transformer extends Vehicle {
+	@Extends(value = Engine.class, others = { Human.class, Vehicle.class })
+	public static class Transformer {
 	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
@@ -281,8 +281,8 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Supers(value = { Transformer.class }, implicitSuper = Transformer.class)
-	public static class TransformerChildrenGames extends ChildrenGames {
+	@Extends(value = Transformer.class, others = { Transformer.class, ChildrenGames.class })
+	public static class TransformerChildrenGames {
 	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
@@ -306,7 +306,7 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Supers(value = { GraphicComponent.class }, implicitSuper = GraphicComponent.class)
+	@Extends(value = GraphicComponent.class, others = { GraphicComponent.class })
 	public static class Selectable {
 
 	}
@@ -318,13 +318,13 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Supers(value = { Selectable.class, Window.class }, implicitSuper = Engine.class)
+	@Extends(value = Engine.class, others = { Selectable.class, Window.class })
 	public static class SelectableWindow {
 
 	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	@Supers(value = { SelectableWindow.class }, implicitSuper = SelectableWindow.class)
+	@Extends(value = SelectableWindow.class, others = { SelectableWindow.class })
 	public static class MySelectableWindow {
 
 	}
