@@ -235,6 +235,24 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T setHolder(Cache cache, Holder attribute, Serializable value, Generic... targets);
 
 	/**
+	 * Modify or create a Holder. <br/>
+	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param attribute
+	 *            The Holder.
+	 * @param value
+	 *            The value Link.
+	 * @param basePos
+	 *            The position of this in components
+	 * @param targets
+	 *            The optional targets.
+	 * @return The Link.
+	 */
+	<T extends Link> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets);
+
+	/**
 	 * Returns the targets of the Relation.
 	 * 
 	 * @param context
@@ -535,7 +553,7 @@ public interface Generic extends Comparable<Generic> {
 	 *            The attribute.
 	 * @return The position.
 	 */
-	int getBasePos(Attribute attribute);
+	int getBasePos(Holder attribute);
 
 	/**
 	 * Returns the size of supers.
