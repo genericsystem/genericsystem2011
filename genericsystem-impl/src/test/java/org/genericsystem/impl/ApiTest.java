@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -21,6 +21,49 @@ import org.testng.annotations.Test;
 
 @Test
 public class ApiTest extends AbstractTest {
+
+	public void testUpdate() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		assert ((CacheImpl) cache).update(vehicle, "Vehicle2").getValue().equals("Vehicle2");
+		assert !vehicle.isAlive(cache);
+	}
+
+	public void testUpdateWithSubType() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Type vehicle2 = ((CacheImpl) cache).update(vehicle, "Vehicle2");
+		assert vehicle2.getValue().equals("Vehicle2");
+		assert !vehicle.isAlive(cache);
+		assert !car.isAlive(cache);
+		assert vehicle2.getSubType(cache, "Car").isAlive(cache);
+	}
+
+	public void testUpdateWithSubRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type color = cache.newType("Color");
+		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
+		Relation vehicleColor2 = ((CacheImpl) cache).update(vehicleColor, "VehicleColor2");
+		assert vehicleColor2.getValue().equals("VehicleColor2");
+		assert !vehicleColor.isAlive(cache);
+		assert vehicle.getRelation(cache, "VehicleColor2").isAlive(cache);
+	}
+
+	public void testUpdateWithSubRelation2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Type color = cache.newType("Color");
+		Type matColor = color.newSubType(cache, "MatColor");
+		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
+		car.setRelation(cache, "CarMatColor", matColor);
+		Relation vehicleColor2 = ((CacheImpl) cache).update(vehicleColor, "VehicleColor2");
+		assert vehicleColor2.getValue().equals("VehicleColor2");
+		assert !vehicleColor.isAlive(cache);
+		assert car.getRelation(cache, "CarMatColor").isAlive(cache);
+	}
 
 	public void testRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
@@ -269,12 +312,10 @@ public class ApiTest extends AbstractTest {
 		assert Objects.equals(actual, expected);
 	}
 
-	public void test_get_type_with_null_value() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type expected = cache.newType(null);
-		Type actual = cache.getType(null);
-
-		assert Objects.equals(actual, expected);
+	public void testNewTypeWithNullValue() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type nullType = cache.newType(null);
+		assert nullType.equals(cache.getType(null));
 	}
 
 	public void test_get_type_with_hierarchy() {
@@ -329,13 +370,10 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void test_get_subtype_with_null_value() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type car = cache.newType("Car");
-		// car.enableNotNullConstraint(cache);
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Type car = cache.newType("Car");
 		Type expected = car.newSubType(cache, null);
-		Generic actual = car.getSubType(cache, null);
 
-		assert Objects.equals(actual, expected);
 	}
 
 	// getAllTypes() tests

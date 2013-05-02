@@ -12,7 +12,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -150,7 +149,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
 					for (T inheritingDependency : generic.<T> getInheritings(CacheImpl.this))
-						if (((GenericImpl) inheritingDependency).isPhantom())
+						if (inheritingDependency.getValue() == null)
 							addDependencies(inheritingDependency);
 						else
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
@@ -261,41 +260,43 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	// TODO clean
-	// <T extends Generic> T update(Generic old, Serializable value) {
-	// return reInsert(orderAndRemoveDependencies(old).iterator(), ((GenericImpl) old).getImplicit(), bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel()));
-	// }
-	//
-	// @SuppressWarnings("unchecked")
-	// <T extends Generic> T reInsert(Iterator<Generic> genericsToInsert, Generic oldPrimary, Generic newPrimary) {
-	// Generic updated = replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary);
-	// while (genericsToInsert.hasNext())
-	// replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary);
-	// return (T) updated;
-	// }
-	//
-	// // TODO KK
-	// private Generic replace(Generic genericToReplace, GenericImpl oldImplicit, GenericImpl newImplicit) {
-	// if (((GenericImpl) genericToReplace).isPrimary())
-	// return bindPrimaryByValue(((GenericImpl) genericToReplace).supers[0], genericToReplace.getValue(), genericToReplace.getMetaLevel());
-	//
-	// Generic[] interfaces = ((GenericImpl) genericToReplace).getPrimariesArray();
-	// Generic[] resultInterfaces = new Generic[interfaces.length];
-	// for (int i = 0; i < interfaces.length; i++)
-	// resultInterfaces[i] = ((GenericImpl) interfaces[i]).isPrimary() ? getNewPrimary(interfaces[i], oldImplicit, newImplicit) : replace(interfaces[i], oldImplicit, newImplicit);
-	// Generic[] components = ((GenericImpl) genericToReplace).components;
-	// Generic[] resultComponents = new Generic[components.length];
-	// for (int i = 0; i < components.length; i++)
-	// resultComponents[i] = genericToReplace.equals(components[i]) ? null : ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldImplicit, newImplicit) : replace(components[i], oldImplicit, newImplicit);
-	// return internalBind(genericToReplace.getImplicit().equals(oldImplicit) ? newImplicit : genericToReplace.getImplicit(), resultInterfaces, resultComponents);
-	// }
-	//
-	// private Generic getNewPrimary(Generic oldSubPrimary, Generic oldPrimary, Generic newPrimary) {
-	// if (!(oldSubPrimary.inheritsFrom(oldPrimary)))
-	// return oldSubPrimary;
-	// if (oldSubPrimary.equals(oldPrimary))
-	// return newPrimary;
-	// return bindPrimaryByValue(getNewPrimary(((GenericImpl) oldSubPrimary).supers[0], oldPrimary, newPrimary), oldSubPrimary.getValue(), oldSubPrimary.getMetaLevel());
-	// }
+	public <T extends Generic> T update(Generic old, Serializable value) {
+		return reInsert(orderAndRemoveDependencies(old).iterator(), ((GenericImpl) old).getImplicit(), bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel(), old.isAutomatic()));
+	}
+
+	@SuppressWarnings("unchecked")
+	<T extends Generic> T reInsert(Iterator<Generic> genericsToInsert, Generic oldPrimary, Generic newPrimary) {
+		Generic updated = replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary);
+		while (genericsToInsert.hasNext())
+			replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary);
+		return (T) updated;
+	}
+
+	// TODO KK
+	private Generic replace(Generic genericToReplace, GenericImpl oldImplicit, GenericImpl newImplicit) {
+		if (((GenericImpl) genericToReplace).isPrimary())
+			return bindPrimaryByValue(((GenericImpl) genericToReplace).supers[0], newImplicit.getValue(), genericToReplace.getMetaLevel(), genericToReplace.isAutomatic());
+
+		Generic[] interfaces = ((GenericImpl) genericToReplace).getPrimariesArray();
+		Generic[] resultInterfaces = new Generic[interfaces.length];
+		for (int i = 0; i < interfaces.length; i++)
+			resultInterfaces[i] = ((GenericImpl) interfaces[i]).isPrimary() ? getNewPrimary(interfaces[i], oldImplicit, newImplicit) : replace(interfaces[i], oldImplicit, newImplicit);
+		Generic[] components = ((GenericImpl) genericToReplace).components;
+		Generic[] resultComponents = new Generic[components.length];
+		for (int i = 0; i < components.length; i++)
+			resultComponents[i] = genericToReplace.equals(components[i]) ? null : ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldImplicit, newImplicit) : replace(components[i], oldImplicit, newImplicit);
+
+		Generic implicit = genericToReplace.getImplicit().equals(oldImplicit) ? newImplicit : genericToReplace.getImplicit();
+		return bind(implicit, resultInterfaces, resultComponents, genericToReplace.isAutomatic(), null);
+	}
+
+	private Generic getNewPrimary(Generic oldSubPrimary, Generic oldPrimary, Generic newPrimary) {
+		if (!(oldSubPrimary.inheritsFrom(oldPrimary)))
+			return oldSubPrimary;
+		if (oldSubPrimary.equals(oldPrimary))
+			return newPrimary;
+		return bindPrimaryByValue(getNewPrimary(((GenericImpl) oldSubPrimary).supers[0], oldPrimary, newPrimary), oldSubPrimary.getValue(), oldSubPrimary.getMetaLevel(), oldSubPrimary.isAutomatic());
+	}
 
 	@Override
 	public boolean isScheduledToRemove(Generic generic) {
@@ -353,7 +354,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
-		return bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0), superTypes, components, false, null);
+		T result = bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0), superTypes, components, false, null);
+		assert Objects.equals(value, result.getValue());
+		// if (((GenericImpl) result).isPrimary())
+		// assert Objects.equals(value, result.getSupers().first().getImplicit().getValue()) : result.getSupers();
+		return result;
 	}
 
 	@Override
@@ -424,7 +429,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new AbstractFilterIterator<Generic>(directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
-				return !((GenericImpl) next).isPhantom() && GenericImpl.isSuperOf(interfaces, extendedComponents, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
+				return next.getValue() != null && GenericImpl.isSuperOf(interfaces, extendedComponents, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
 			}
 		};
 	}
