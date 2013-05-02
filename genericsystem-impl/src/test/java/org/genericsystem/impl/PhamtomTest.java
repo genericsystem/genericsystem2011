@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Iterator;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -17,7 +16,7 @@ import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
-public class PhamtomLinkTest extends AbstractTest {
+public class PhamtomTest extends AbstractTest {
 
 	public void testAliveWithStructural() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
@@ -202,14 +201,14 @@ public class PhamtomLinkTest extends AbstractTest {
 
 			@Override
 			public boolean isSelected(Generic element) {
-				return ((GenericImpl) element).isPhantom();
+				return element.getValue() == null;
 			}
 		}).isEmpty();
 		assert vehiclePower.getAllInstances(cache).filter(new Snapshot.Filter<Generic>() {
 
 			@Override
 			public boolean isSelected(Generic element) {
-				return ((GenericImpl) element).isPhantom();
+				return element.getValue() == null;
 			}
 		}).isEmpty();
 	}
@@ -243,10 +242,9 @@ public class PhamtomLinkTest extends AbstractTest {
 		myCar.setValue(cache, vehiclePower, "256");
 
 		assert vehiclePower.getInheritings(cache).filter(new Snapshot.Filter<Generic>() {
-
 			@Override
 			public boolean isSelected(Generic element) {
-				return ((GenericImpl) element).isPhantom();
+				return element.getValue() == null;
 			}
 		}).isEmpty();
 	}

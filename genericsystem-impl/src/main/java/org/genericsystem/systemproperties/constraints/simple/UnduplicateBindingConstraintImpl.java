@@ -3,10 +3,8 @@ package org.genericsystem.systemproperties.constraints.simple;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.AbstractContext;
 import org.genericsystem.core.Context;
@@ -26,7 +24,6 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @SystemGeneric(defaultBehavior = true)
 @Components(Engine.class)
 @SingularConstraint
-@NotNullConstraint
 public class UnduplicateBindingConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = 4244491933647460289L;

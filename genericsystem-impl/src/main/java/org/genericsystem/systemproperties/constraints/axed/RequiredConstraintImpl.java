@@ -2,7 +2,6 @@ package org.genericsystem.systemproperties.constraints.axed;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
@@ -23,7 +22,6 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
-@NotNullConstraint
 public class RequiredConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = 2837810754525623146L;

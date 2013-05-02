@@ -4,7 +4,6 @@ import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
@@ -55,7 +54,6 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@NotNullConstraint
 	public static class GraphicComponent {
 
 	}
@@ -116,38 +114,31 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 	@SystemGeneric
 	// Everyone is unique !
 	@UniqueConstraint
-	public static class Human {
-	}
+	public static class Human {}
 
 	@SystemGeneric
-	public static class Man extends Human {
-	}
+	public static class Man extends Human {}
 
 	@SystemGeneric
 	// There can be only one time...
 	@SingularInstanceConstraint
-	public static class Time {
-	}
+	public static class Time {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class })
 	@SingularConstraint(Statics.TARGET_POSITION)
-	public static class HumanPossessVehicle {
-	}
+	public static class HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Car.class })
-	public static class HumanPossessCar extends HumanPossessVehicle {
-	}
+	public static class HumanPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Man.class, Car.class })
 	@SingularConstraint(Statics.BASE_POSITION)
-	public static class ManPossessCar extends HumanPossessVehicle {
-	}
+	public static class ManPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class, Time.class })
-	public static class HumanPossessVehicleTime {
-	}
+	public static class HumanPossessVehicleTime {}
 }

@@ -2,7 +2,6 @@ package org.genericsystem.systemproperties.constraints.simple;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
@@ -19,7 +18,6 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @SystemGeneric(defaultBehavior = true)
 @Components(Engine.class)
 @SingularConstraint
-@NotNullConstraint
 public class EngineConsistencyConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = 8896806730580779746L;

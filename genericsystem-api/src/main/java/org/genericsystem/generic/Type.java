@@ -1,7 +1,6 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
@@ -270,32 +269,32 @@ public interface Type extends Generic {
 	 */
 	boolean isPropertyConstraintEnabled(Context context);
 
-	/**
-	 * Enable not null constraint.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @return Return this.
-	 */
-	<T extends Type> T enableNotNullConstraint(Cache cache);
-
-	/**
-	 * Disable not null constraint
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @return this
-	 */
-	<T extends Type> T disableNotNullConstraint(Cache cache);
-
-	/**
-	 * Returns true if the not null constraint enabled
-	 * 
-	 * @param context
-	 *            The reference context.
-	 * @return true if the not null constraint enabled
-	 */
-	boolean isNotNullConstraintEnabled(Context context);
+	// /**
+	// * Enable not null constraint.
+	// *
+	// * @param cache
+	// * The reference Cache.
+	// * @return Return this.
+	// */
+	// <T extends Type> T enableNotNullConstraint(Cache cache);
+	//
+	// /**
+	// * Disable not null constraint
+	// *
+	// * @param cache
+	// * The reference Cache.
+	// * @return this
+	// */
+	// <T extends Type> T disableNotNullConstraint(Cache cache);
+	//
+	// /**
+	// * Returns true if the not null constraint enabled
+	// *
+	// * @param context
+	// * The reference context.
+	// * @return true if the not null constraint enabled
+	// */
+	// boolean isNotNullConstraintEnabled(Context context);
 
 	/**
 	 * Enable singular instance constraint.

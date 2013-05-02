@@ -2,8 +2,7 @@ package org.genericsystem.systemproperties.constraints.simple;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InheritanceDisabledConstraint;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
+import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
@@ -21,8 +20,7 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
-@InheritanceDisabledConstraint
-@NotNullConstraint
+@InheritanceDisabled
 public class VirtualConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -5162099352671967024L;

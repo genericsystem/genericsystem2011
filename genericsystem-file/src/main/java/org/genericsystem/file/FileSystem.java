@@ -156,6 +156,5 @@ public class FileSystem extends GenericImpl {
 		for (int i = 1; i < files.length - 1; i++)
 			directory = directory.touchDirectory(cache, files[i]);
 		return directory.touchFile(cache, files[files.length - 1], content);
-
 	}
 }

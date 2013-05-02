@@ -2,10 +2,8 @@ package org.genericsystem.systemproperties.constraints.simple;
 
 import java.util.Iterator;
 import java.util.Objects;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
@@ -27,7 +25,6 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
-@NotNullConstraint
 public class PropertyConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -6429972259714036057L;

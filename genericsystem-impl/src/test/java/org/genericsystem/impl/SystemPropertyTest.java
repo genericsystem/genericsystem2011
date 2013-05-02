@@ -149,8 +149,8 @@ public class SystemPropertyTest extends AbstractTest {
 
 	public void testAskOnHimSelft() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		((GenericImpl) cache.find(CascadeRemoveSystemProperty.class)).isSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class);
-		((GenericImpl) cache.find(ReferentialIntegritySystemProperty.class)).isSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
+		((GenericImpl) cache.find(CascadeRemoveSystemProperty.class)).isBooleanSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class);
+		((GenericImpl) cache.find(ReferentialIntegritySystemProperty.class)).isBooleanSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 	}
 
 	public void cascadeRemoveProperty() {
