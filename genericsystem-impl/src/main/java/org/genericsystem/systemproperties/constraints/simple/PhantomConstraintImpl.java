@@ -44,12 +44,11 @@ public class PhantomConstraintImpl extends Constraint implements BooleanSystemPr
 					Generic component = components[i];
 					Generic subComponent = subComponents[i];
 					if (component != subComponent) {
-						if (!subComponent.getSupers().contains(component))
-							throw new PhantomConstraintViolationException(modified.info());
+						if (!subComponent.inheritsFrom(component))
+							throw new PhantomConstraintViolationException(modified.info() + subComponent.info() + component.info());
 						inheritancesCount++;
 					}
 				}
-				assert false : inheritancesCount;
 				if (inheritancesCount != 1)
 					throw new PhantomConstraintViolationException(modified.info());
 			}

@@ -286,7 +286,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Holder> T setValue(Cache cache, Attribute attribute, Serializable value) {
 		T holder = setHolder(cache, attribute, value);
-		assert value == null ? getValues(cache, attribute).isEmpty() : getValues(cache, attribute).contains(value);
+		assert value == null || getValues(cache, attribute).contains(value) : holder;
 		return holder;
 	}
 
@@ -325,7 +325,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
 		holder.remove(cache);
-		return value != null ? null : this.<T> setHolder(cache, attribute, value, basePos, targets);
+		return value == null ? null : this.<T> setHolder(cache, attribute, value, basePos, targets);
 	}
 
 	public <T extends Link> T getHolderByValue(Context context, Attribute attribute, Serializable value, final Generic... targets) {
@@ -419,11 +419,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Link> T getLink(Context context, Relation relation, Generic... targets) {
 		return Statics.unambigousFirst(this.<T> linksIterator(context, relation, getBasePos(relation), targets));
 	}
-
-	// TODO clean
-	// private static <T extends Generic> T update(Cache cache, Generic old, Serializable value) {
-	// return ((CacheImpl) cache).update(old, value);
-	// }
 
 	public <T extends Generic> Iterator<T> directInheritingsIterator(Context context) {
 		return ((AbstractContext) context).directInheritingsIterator(this);
@@ -598,7 +593,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Generic> Iterator<T> structuralIterator(Context context, Attribute origin, boolean readPhantom) {
 		Iterator<T> iterator = ((GenericImpl) origin).safeIsEnabled(context, getNoInheritanceSystemProperty(context)) ? this.<T> noInheritanceIterator(context, origin, Statics.NO_POSITION, SystemGeneric.STRUCTURAL) : this
 				.<T> inheritanceStructuralIterator(context, origin);
-		return !readPhantom ? Statics.<T> phantomsFilter(iterator) : iterator;
+		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
 	}
 
 	public <T extends Generic> Iterator<T> concreteIterator(Context context, Attribute origin, int basePos, boolean readPhantom) {
@@ -611,7 +606,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			iterator = new ConcateIterator<T>(iterators);
 		} else
 			iterator = noInheritance ? this.<T> noInheritanceIterator(context, origin, basePos, SystemGeneric.CONCRETE) : this.<T> inheritanceConcreteIterator(context, origin, basePos);
-		return !readPhantom ? Statics.<T> phantomsFilter(iterator) : iterator;
+		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
 	}
 
 	private Attribute getNoInheritanceSystemProperty(Context context) {
@@ -622,9 +617,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((AbstractContext) context).<Attribute> find(MultiDirectionalSystemProperty.class);
 	}
 
-	public boolean isPhantom() {
-		return Statics.PHAMTOM.equals(getValue());
-	}
+	// public boolean isPhantom() {
+	// return Statics.PHAMTOM.equals(getValue());
+	// }
 
 	private <T extends Generic> Iterator<T> noInheritanceIterator(Context context, final Generic origin, int pos, final int metaLevel) {
 		return new AbstractFilterIterator<T>(Statics.NO_POSITION == pos ? this.<T> compositesIterator(context) : this.<T> compositesIterator(context, pos)) {
@@ -660,7 +655,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
 						if (selected && ((GenericImpl) next).isPseudoStructural(pos))
 							if (context instanceof CacheImpl)
-								((GenericImpl) next).project((Cache) context, pos, ((CacheImpl) context).findPrimaryByValue(((GenericImpl) next.getImplicit()).supers[0], Statics.PHAMTOM, SystemGeneric.CONCRETE));
+								((GenericImpl) next).project((Cache) context, pos, ((CacheImpl) context).findPrimaryByValue(((GenericImpl) next.getImplicit()).supers[0], null, SystemGeneric.CONCRETE));
 						return selected;
 					}
 				};
@@ -1185,7 +1180,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> T internalCancel(Cache cache, Holder attribute, int basePos) {
-		Generic implicit = attribute.isStructural() ? getEngine().bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.STRUCTURAL, true) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, Statics.PHAMTOM, SystemGeneric.CONCRETE, true);
+		Generic implicit = attribute.isStructural() ? getEngine().bindPrimary(cache, null, SystemGeneric.STRUCTURAL, true) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, null, SystemGeneric.CONCRETE, true);
 		return addLink(cache, implicit, attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
@@ -1200,7 +1195,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
 			Generic[] holderSupers = ((GenericImpl) holder).supers;
-			if (equals(holder.getComponent(basePos)) && ((GenericImpl) holder).isPhantom() && Objects.equals(holderSupers[holderSupers.length - 1].getValue(), attribute.getValue()))
+			if (equals(holder.getComponent(basePos)) && ((GenericImpl) holder).getValue() == null && Objects.equals(holderSupers[holderSupers.length - 1].getValue(), attribute.getValue()))
 				holder.remove(cache);
 		}
 	}
@@ -1295,7 +1290,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					holder.remove(cache);
 					return setBooleanSystemProperty(cache, systemProperty, basePos, defaultBehavior);
 				} else
-					return cancel(cache, holder, basePos);
+					cancel(cache, holder, basePos);
 		}
 		return null;
 	}

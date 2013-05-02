@@ -3,8 +3,8 @@ package org.genericsystem.impl;
 import java.util.Arrays;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.exception.PhantomConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -58,14 +58,14 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert myCar.getLinks(cache, driving).isEmpty();
 	}
 
-	@Test(groups = "subtyping")
+	@Test
 	public void testEnabledConstraintOnASimpleTypeThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		car.newSubType(cache, null);
 	}
 
-	@Test(groups = "subtyping")
+	@Test
 	public void testEnableThenDisableConstraintOnASimpleTypeThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		final Type car = cache.newType("Car");
@@ -76,14 +76,14 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert expected == actual;
 	}
 
-	@Test(groups = "subtyping")
+	@Test
 	public void testEnableSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		car.newSubType(cache, null);
 	}
 
-	@Test(groups = "subtyping")
+	@Test
 	public void testDisabledSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		final Type car = cache.newType("Car");
@@ -92,7 +92,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		Type expected = car.newSubType(cache, null);
 	}
 
-	@Test(groups = "attribute")
+	@Test
 	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateAnAttribute() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
@@ -107,7 +107,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert myBmw.getValues(cache, registration).isEmpty();
 	}
 
-	@Test(groups = "attribute")
+	@Test
 	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
@@ -118,7 +118,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		myBmw.setValue(cache, registration, null);
 	}
 
-	@Test(groups = "attribute")
+	@Test
 	public void testEnableConstraintOnAComplexeHierarchyOfTypes() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
@@ -126,16 +126,17 @@ public class NotNullConstraintTest extends AbstractTest {
 		final Generic myBmw = car.newInstance(cache, "myBmw");
 		Generic myBus = vehicle.newInstance(cache, "myBus");
 
-		Attribute carRegistration = car.setAttribute(cache, "carRegistration");
+		Attribute carRegistration = car.setAttribute(cache, "vehicleRegistration");
 		final Attribute vehicleRegistration = vehicle.setAttribute(cache, "vehicleRegistration");
-		carRegistration.enableNotNullConstraint(cache);
-
-		myBmw.setValue(cache, carRegistration, "AA-BB-CC");
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				myBmw.setValue(cache, vehicleRegistration, null);
-			}
-		}.assertIsCausedBy(PhantomConstraintViolationException.class);
+		carRegistration = ((GenericImpl) carRegistration).<Attribute> reFind(cache);
+		carRegistration.enableSingularConstraint(cache);
+		Holder value = myBmw.setValue(cache, carRegistration, "AA-BB-CC");
+		assert myBmw.getHolders(cache, vehicleRegistration).contains(value);
+		assert myBmw.setValue(cache, vehicleRegistration, null) == null;
+		assert value.isAlive(cache);
+		assert myBmw.getHolders(cache, vehicleRegistration).contains(value);
+		myBmw.setValue(cache, carRegistration, null);
+		assert !value.isAlive(cache);
+		assert myBmw.getHolders(cache, vehicleRegistration).isEmpty();
 	}
 }
