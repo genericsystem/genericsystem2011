@@ -17,7 +17,7 @@ import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
-public class PhamtomLinkTest extends AbstractTest {
+public class PhamtomTest extends AbstractTest {
 
 	public void testAliveWithStructural() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();

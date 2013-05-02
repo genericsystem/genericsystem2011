@@ -28,9 +28,30 @@ public class PhantomConstraintImpl extends Constraint implements BooleanSystemPr
 	// TODO KK
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (!getConstraintValues(context, modified, getClass()).isEmpty())
-			if (modified.isAlive(context) && ((GenericImpl) modified.getImplicit().getSupers().first()).isPhantom())
-				throw new PhantomConstraintViolationException(modified.info());
-	}
+		// if (!getConstraintValues(context, modified, getClass()).isEmpty())
+		Generic[] supers = ((GenericImpl) modified).getSupersArray();
+		if (modified.getValue() == null)
+			if (modified.getComponentsSize() != 0) {
+				if (supers.length != 2)
+					throw new PhantomConstraintViolationException(modified.info());
 
+				Generic[] components = ((GenericImpl) supers[1]).getComponentsArray();
+				Generic[] subComponents = ((GenericImpl) modified).getComponentsArray();
+				assert components.length >= subComponents.length;
+
+				int inheritancesCount = 0;
+				for (int i = 0; i < subComponents.length; i++) {
+					Generic component = components[i];
+					Generic subComponent = subComponents[i];
+					if (component != subComponent) {
+						if (!subComponent.getSupers().contains(component))
+							throw new PhantomConstraintViolationException(modified.info());
+						inheritancesCount++;
+					}
+				}
+				assert false : inheritancesCount;
+				if (inheritancesCount != 1)
+					throw new PhantomConstraintViolationException(modified.info());
+			}
+	}
 }

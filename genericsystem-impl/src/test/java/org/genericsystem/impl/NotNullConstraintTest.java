@@ -1,11 +1,13 @@
 package org.genericsystem.impl;
 
+import java.util.Arrays;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.exception.NotNullConstraintViolationException;
-import org.genericsystem.exception.RollbackException;
+import org.genericsystem.exception.PhantomConstraintViolationException;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -19,14 +21,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		final Attribute registration = car.setAttribute(cache, "Registration");
 		registration.enableNotNullConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myCar.setValue(cache, registration, null);
-			}
-		}.assertIsCausedBy(NotNullConstraintViolationException.class);
+		myCar.setValue(cache, registration, null);
 	}
 
 	public void testPropertySimpleRelationKO() {
@@ -42,80 +37,77 @@ public class NotNullConstraintTest extends AbstractTest {
 		final Generic myHuman = human.newInstance(cache, "myHuman");
 		final Generic myRoad = road.newInstance(cache, "myRoad");
 
+		assert myCar.getLinks(cache, driving).isEmpty();
+		myCar.setLink(cache, driving, null, myHuman, myRoad);
+		assert myCar.getLinks(cache, driving).isEmpty();
+		Link test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
+		Link test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);
+		assert myCar.getLinks(cache, driving).containsAll(Arrays.asList(test, test2));
+		myCar.setLink(cache, driving, null, myHuman, myRoad);// do nothing
+		assert myCar.getLinks(cache, driving).containsAll(Arrays.asList(test, test2));
+		final Cache superCache = cache.newSuperCache();
 		new RollbackCatcher() {
-
 			@Override
 			public void intercept() {
-				myCar.setLink(cache, driving, null, myHuman, myRoad);
+				driving.enableSingularConstraint(superCache);
 			}
-		}.assertIsCausedBy(NotNullConstraintViolationException.class);
+		};
+		test2.remove(cache);
+		driving.enableSingularConstraint(cache);
+		myCar.setLink(cache, driving, null, myHuman, myRoad);// remove test
+		assert myCar.getLinks(cache, driving).isEmpty();
 	}
 
 	@Test(groups = "subtyping")
-	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateASubtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type car = cache.newType("Car");
-		Type expected = car.newSubType(cache, null);
-		Generic actual = car.getSubType(cache, null);
-		assert expected == actual;
-	}
-
-	@Test(groups = "subtyping", expectedExceptions = RollbackException.class)
 	public void testEnabledConstraintOnASimpleTypeThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		car.enableNotNullConstraint(cache);
 		car.newSubType(cache, null);
 	}
 
 	@Test(groups = "subtyping")
 	public void testEnableThenDisableConstraintOnASimpleTypeThenCreateASubtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type car = cache.newType("Car");
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Type car = cache.newType("Car");
 		car.enableNotNullConstraint(cache);
 		car.disableNotNullConstraint(cache);
-
 		Type expected = car.newSubType(cache, null);
 		Generic actual = car.getSubType(cache, null);
 		assert expected == actual;
 	}
 
-	@Test(groups = "subtyping", expectedExceptions = RollbackException.class)
+	@Test(groups = "subtyping")
 	public void testEnableSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-
-		car.enableNotNullConstraint(cache);
-		car.enableNotNullConstraint(cache);
-
 		car.newSubType(cache, null);
 	}
 
 	@Test(groups = "subtyping")
 	public void testDisabledSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type car = cache.newType("Car");
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Type car = cache.newType("Car");
 		car.disableNotNullConstraint(cache);
 		car.disableNotNullConstraint(cache);
-
 		Type expected = car.newSubType(cache, null);
-		Generic actual = car.getSubType(cache, null);
-		assert expected == actual;
 	}
 
 	@Test(groups = "attribute")
 	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateAnAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		Attribute registration = car.setAttribute(cache, "Registration");
-
-		Type myBmw = car.newSubType(cache, "myBmw");
+		final Attribute registration = car.setAttribute(cache, "Registration");
+		Holder myBmwPower = car.setAttribute(cache, 235);
+		final Generic myBmw = car.newInstance(cache, "myBmw");
 		myBmw.setValue(cache, registration, null);
-
-		assert myBmw.getValue(cache, registration) == null;
+		assert myBmw.getHolder(cache, registration) == null;
+		assert myBmw.getValues(cache, registration).isEmpty();
+		myBmw.setValue(cache, registration, null);// No exception
+		assert myBmw.getHolder(cache, registration) == null;
+		assert myBmw.getValues(cache, registration).isEmpty();
 	}
 
-	@Test(groups = "attribute", expectedExceptions = RollbackException.class)
+	@Test(groups = "attribute")
 	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
@@ -128,22 +120,22 @@ public class NotNullConstraintTest extends AbstractTest {
 
 	@Test(groups = "attribute")
 	public void testEnableConstraintOnAComplexeHierarchyOfTypes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
-		Generic myBmw = car.newInstance(cache, "myBmw");
+		final Generic myBmw = car.newInstance(cache, "myBmw");
 		Generic myBus = vehicle.newInstance(cache, "myBus");
 
 		Attribute carRegistration = car.setAttribute(cache, "carRegistration");
-		Attribute vehicleRegistration = vehicle.setAttribute(cache, "vehicleRegistration");
+		final Attribute vehicleRegistration = vehicle.setAttribute(cache, "vehicleRegistration");
 		carRegistration.enableNotNullConstraint(cache);
 
 		myBmw.setValue(cache, carRegistration, "AA-BB-CC");
-		myBmw.setValue(cache, vehicleRegistration, null);
-		myBus.setValue(cache, vehicleRegistration, null);
-
-		assert myBmw.getValue(cache, carRegistration).equals("AA-BB-CC");
-		assert myBmw.getValue(cache, vehicleRegistration) == null;
-		assert myBus.getValue(cache, vehicleRegistration) == null;
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				myBmw.setValue(cache, vehicleRegistration, null);
+			}
+		}.assertIsCausedBy(PhantomConstraintViolationException.class);
 	}
 }

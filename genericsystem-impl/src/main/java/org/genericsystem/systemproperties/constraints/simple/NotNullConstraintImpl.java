@@ -8,8 +8,6 @@ import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.exception.NotNullConstraintViolationException;
-import org.genericsystem.generic.Holder;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.Constraint;
 
@@ -28,9 +26,9 @@ public class NotNullConstraintImpl extends Constraint implements BooleanSystemPr
 	@Override
 	// TODO KK
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (!getConstraintValues(context, modified, getClass()).isEmpty())
-			if (modified.getValue() == null)
-				throw new NotNullConstraintViolationException("Holder should not be null for : " + ((Holder) modified).getMeta());
+		// if (!getConstraintValues(context, modified, getClass()).isEmpty())
+		// if (modified.isType() && modified.getValue() == null)
+		// throw new NotNullConstraintViolationException("Generic value should not be null for : " + modified.info());
 	}
 
 }

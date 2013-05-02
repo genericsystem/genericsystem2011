@@ -142,6 +142,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		assert getMetaLevel() == metaLevel : this + " => getMetaLevel() : " + getMetaLevel() + " / metaLevel : " + metaLevel;
 		if (!isPrimary())
 			assert Objects.equals(directSupers[0].getValue(), value);
+		// zassert /* components.length != 0 || */value != null;
 		return this;
 	}
 
@@ -285,7 +286,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Holder> T setValue(Cache cache, Attribute attribute, Serializable value) {
 		T holder = setHolder(cache, attribute, value);
-		assert getValues(cache, attribute).contains(value) : holder.info();
+		assert value == null ? getValues(cache, attribute).isEmpty() : getValues(cache, attribute).contains(value);
 		return holder;
 	}
 
@@ -315,17 +316,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
-			return addLink(cache, implicit, attribute, basePos, targets);
+			return value == null ? null : this.<T> addLink(cache, implicit, attribute, basePos, targets);
 		if (!this.equals(holder.getComponent(basePos))) {
 			if (!isSuperOf(((GenericImpl) holder).getPrimariesArray(), ((GenericImpl) holder).components, new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 				internalCancel(cache, holder, basePos);
 			return addLink(cache, implicit, attribute, basePos, targets);
 		}
-		if (!((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
-			holder.remove(cache);
-			return setHolder(cache, attribute, value, basePos, targets);
-		}
-		return holder;
+		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+			return holder;
+		holder.remove(cache);
+		return value != null ? null : this.<T> setHolder(cache, attribute, value, basePos, targets);
 	}
 
 	public <T extends Link> T getHolderByValue(Context context, Attribute attribute, Serializable value, final Generic... targets) {
@@ -583,7 +583,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return orderedComponents;
 	}
 
+	// TODO SuperKK
 	private <T extends Link> T addLink(Cache cache, Generic implicit, Generic directSuper, Generic... targets) {
+
 		Generic[] components = Statics.insertFirstIntoArray(this, targets);
 		return ((CacheImpl) cache).bind(implicit, false, directSuper, components);
 	}
@@ -1298,11 +1300,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return null;
 	}
 
-	public boolean isSystemPropertyEnabled(Context context, Class<? extends BooleanSystemProperty> systemPropertyClass) {
-		return isSystemPropertyEnabled(context, systemPropertyClass, Statics.BASE_POSITION);
+	public boolean isBooleanSystemPropertyEnabled(Context context, Class<? extends BooleanSystemProperty> systemPropertyClass) {
+		return isBooleanSystemPropertyEnabled(context, systemPropertyClass, Statics.BASE_POSITION);
 	}
 
-	public boolean isSystemPropertyEnabled(Context context, Class<? extends BooleanSystemProperty> systemPropertyClass, int basePos) {
+	public boolean isBooleanSystemPropertyEnabled(Context context, Class<? extends BooleanSystemProperty> systemPropertyClass, int basePos) {
 		boolean defaultBehavior = systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
 		return getHolderByValue(context, ((AbstractContext) context).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
 	}
@@ -1319,7 +1321,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isMultiDirectional(Context context) {
-		return isSystemPropertyEnabled(context, MultiDirectionalSystemProperty.class);
+		return isBooleanSystemPropertyEnabled(context, MultiDirectionalSystemProperty.class);
 	}
 
 	@Override
@@ -1334,7 +1336,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isCascadeRemove(Context context, int basePos) {
-		return isSystemPropertyEnabled(context, CascadeRemoveSystemProperty.class, basePos);
+		return isBooleanSystemPropertyEnabled(context, CascadeRemoveSystemProperty.class, basePos);
 	}
 
 	@Override
@@ -1349,7 +1351,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isReferentialIntegrity(Context context, int basePos) {
-		return isSystemPropertyEnabled(context, ReferentialIntegritySystemProperty.class, basePos);
+		return isBooleanSystemPropertyEnabled(context, ReferentialIntegritySystemProperty.class, basePos);
 	}
 
 	@Override
@@ -1364,7 +1366,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isSingularConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, SingularConstraintImpl.class);
+		return isBooleanSystemPropertyEnabled(context, SingularConstraintImpl.class);
 	}
 
 	@Override
@@ -1379,7 +1381,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isSingularConstraintEnabled(Context context, int basePos) {
-		return isSystemPropertyEnabled(context, SingularConstraintImpl.class, basePos);
+		return isBooleanSystemPropertyEnabled(context, SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
@@ -1416,7 +1418,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isPropertyConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, PropertyConstraintImpl.class);
+		return isBooleanSystemPropertyEnabled(context, PropertyConstraintImpl.class);
 	}
 
 	@Override
@@ -1431,7 +1433,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class);
+		return isBooleanSystemPropertyEnabled(context, RequiredConstraintImpl.class);
 	}
 
 	@Override
@@ -1446,7 +1448,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isRequiredConstraintEnabled(Context context, int basePos) {
-		return isSystemPropertyEnabled(context, RequiredConstraintImpl.class, basePos);
+		return isBooleanSystemPropertyEnabled(context, RequiredConstraintImpl.class, basePos);
 	}
 
 	@Override
@@ -1461,7 +1463,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isNotNullConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, NotNullConstraintImpl.class);
+		return isBooleanSystemPropertyEnabled(context, NotNullConstraintImpl.class);
 	}
 
 	@Override
@@ -1476,7 +1478,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isUniqueConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, UniqueConstraintImpl.class);
+		return isBooleanSystemPropertyEnabled(context, UniqueConstraintImpl.class);
 	}
 
 	@Override
@@ -1491,7 +1493,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isVirtualConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, VirtualConstraintImpl.class);
+		return isBooleanSystemPropertyEnabled(context, VirtualConstraintImpl.class);
 	}
 
 	// TODO pas comme les autres contraintes
@@ -1519,7 +1521,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isSingularInstanceConstraintEnabled(Context context) {
-		return isSystemPropertyEnabled(context, SingularInstanceConstraintImpl.class);
+		return isBooleanSystemPropertyEnabled(context, SingularInstanceConstraintImpl.class);
 	}
 
 	@Override
@@ -1534,7 +1536,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isInheritanceEnabled(Context context) {
-		return !isSystemPropertyEnabled(context, NoInheritanceSystemProperty.class);
+		return !isBooleanSystemPropertyEnabled(context, NoInheritanceSystemProperty.class);
 	}
 
 	public Generic[] transform(Generic[] components) {

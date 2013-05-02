@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
@@ -269,12 +268,10 @@ public class ApiTest extends AbstractTest {
 		assert Objects.equals(actual, expected);
 	}
 
-	public void test_get_type_with_null_value() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type expected = cache.newType(null);
-		Type actual = cache.getType(null);
-
-		assert Objects.equals(actual, expected);
+	public void testNewTypeWithNullValue() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type nullType = cache.newType(null);
+		assert nullType.equals(cache.getType(null));
 	}
 
 	public void test_get_type_with_hierarchy() {
@@ -329,13 +326,10 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void test_get_subtype_with_null_value() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type car = cache.newType("Car");
-		// car.enableNotNullConstraint(cache);
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Type car = cache.newType("Car");
 		Type expected = car.newSubType(cache, null);
-		Generic actual = car.getSubType(cache, null);
 
-		assert Objects.equals(actual, expected);
 	}
 
 	// getAllTypes() tests
