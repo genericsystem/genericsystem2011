@@ -25,6 +25,18 @@ public interface Type extends Generic {
 	<T extends Attribute> Snapshot<T> getAttributes(Context context);
 
 	/**
+	 * Returns the attributes of Generic.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param attribute
+	 *            The super attribute
+	 * @return The snapshot with all attributes of the Generic.
+	 * @see Snapshot
+	 */
+	<T extends Attribute> Snapshot<T> getAttributes(final Context context, final Attribute attribute);
+
+	/**
 	 * Find an attribute by value.
 	 * 
 	 * @param context
@@ -34,6 +46,20 @@ public interface Type extends Generic {
 	 * @return The attribute or null if not found.
 	 */
 	<T extends Attribute> T getAttribute(Context context, Serializable value);
+
+	/**
+	 * Find an attribute by value.
+	 * 
+	 * @param context
+	 *            The reference context.
+	 * @param attribute
+	 *            The super attribute.
+	 * 
+	 * @param value
+	 *            The attribute value.
+	 * @return The attribute or null if not found.
+	 */
+	<T extends Attribute> T getAttribute(final Context context, Attribute attribute, final Serializable value);
 
 	/**
 	 * Create an attribute for the type.

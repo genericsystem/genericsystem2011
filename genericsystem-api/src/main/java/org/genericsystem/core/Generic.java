@@ -322,7 +322,7 @@ public interface Generic extends Comparable<Generic> {
 	 *            The targets.
 	 * @return The Holder.
 	 */
-	<T extends Holder> T getHolder(Context context, Attribute attribute, int basePos, Generic... targets);
+	<T extends Holder> T getHolder(Context context, Holder attribute, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Holder of value.
@@ -333,7 +333,7 @@ public interface Generic extends Comparable<Generic> {
 	 *            The attribute.
 	 * @return The Holder.
 	 */
-	<T extends Holder> T getHolder(Context context, Attribute attribute, Generic... targets);
+	<T extends Holder> T getHolder(Context context, Holder attribute, Generic... targets);
 
 	/**
 	 * Returns the values.
@@ -347,7 +347,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 * @return The values.
 	 */
-	<T extends Serializable> Snapshot<T> getValues(final Context context, final Attribute attribute);
+	<T extends Serializable> Snapshot<T> getValues(final Context context, final Holder attribute);
 
 	/**
 	 * Returns the value of the attribute.
@@ -356,7 +356,7 @@ public interface Generic extends Comparable<Generic> {
 	 *            The attribute.
 	 * @return The value.
 	 */
-	<S extends Serializable> S getValue(Context context, Attribute attribute);
+	<S extends Serializable> S getValue(Context context, Holder attribute);
 
 	/**
 	 * Modify or create a Holder. <br/>
@@ -370,7 +370,7 @@ public interface Generic extends Comparable<Generic> {
 	 *            The name value.
 	 * @return The value holder.
 	 */
-	<T extends Holder> T setValue(Cache cache, Attribute attribute, Serializable value);
+	<T extends Holder> T setValue(Cache cache, Holder attribute, Serializable value);
 
 	/**
 	 * Returns true if the Generic inherits from the given Generic.

@@ -52,6 +52,17 @@ public interface Node extends Holder {
 	<T extends Node> Snapshot<T> getChildren(Context context);
 
 	/**
+	 * Returns the child of this.
+	 * 
+	 * @param context
+	 *            The reference Context.
+	 * @Param value The value
+	 * @see Snapshot
+	 * @return Return the children.
+	 */
+	<T extends Node> T getChild(Context context, Serializable value);
+
+	/**
 	 * Traverse the Tree.
 	 * 
 	 * @param visitor

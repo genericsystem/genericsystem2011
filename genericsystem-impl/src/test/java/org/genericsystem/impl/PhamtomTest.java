@@ -26,7 +26,7 @@ public class PhamtomTest extends AbstractTest {
 
 		assert car.getAttributes(cache).contains(vehiclePower);
 		car.cancel(cache, vehiclePower);
-		Iterator<Generic> iterator = ((GenericImpl) car).structuralIterator(cache, vehiclePower, true);
+		Iterator<Generic> iterator = ((GenericImpl) car).attributesIterator(cache, vehiclePower, true);
 		Generic phantom = iterator.next();
 		car.restore(cache, vehiclePower);
 		assert !phantom.isAlive(cache);
@@ -104,11 +104,15 @@ public class PhamtomTest extends AbstractTest {
 		assert car.getRelations(cache).size() == 1;
 		assert car.getRelations(cache).contains(vehicleHuman);
 
-		car.cancel(cache, vehicleHuman);
+		// car.cancel(cache, vehicleHuman);
+		((GenericImpl) car).setSubAttribute(cache, vehicleHuman, null, human);
+
 		assert vehicle.getRelations(cache).size() == 1;
 		assert car.getRelations(cache).isEmpty();
 
-		car.restore(cache, vehicleHuman);
+		// car.restore(cache, vehicleHuman);
+		car.getAttribute(cache, vehicleHuman, null).remove(cache);
+
 		assert vehicle.getRelations(cache).size() == 1;
 		assert vehicle.getRelations(cache).contains(vehicleHuman);
 		assert car.getRelations(cache).size() == 1 : car.getRelations(cache);
@@ -254,10 +258,20 @@ public class PhamtomTest extends AbstractTest {
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setProperty(cache, "power");
 		Holder defaultPower = car.setValue(cache, carPower, "233");
-		Generic mycar = car.newInstance(cache, "myCar");
-		assert mycar.getHolder(cache, carPower).equals(defaultPower);
-		mycar.cancel(cache, defaultPower);
-		assert mycar.getHolder(cache, carPower) == null : mycar.getHolder(cache, carPower);
+		Generic myCar = car.newInstance(cache, "myCar");
+		assert myCar.getHolder(cache, carPower).equals(defaultPower);
+
+		// myCar.cancel(cache, defaultPower);
+		Generic cancel = myCar.setValue(cache, carPower, null);
+		assert ((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null) == cancel;
+		assert myCar.getHolder(cache, carPower) == null : myCar.getHolder(cache, carPower);
+
+		// ((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null).remove(cache);
+		Holder newDefaultPower = myCar.setValue(cache, carPower, "233");
+		// assert false : newDefaultPower.info();
+		assert !cancel.isAlive(cache);
+		assert myCar.getValue(cache, carPower).equals("233");
+		assert ((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null) == null;
 	}
 
 	public void cancelDefaultAttributeKo() {

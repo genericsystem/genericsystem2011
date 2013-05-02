@@ -12,7 +12,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
@@ -330,8 +329,8 @@ public class Statics {
 		};
 	}
 
-	public static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Attribute relation, final Generic... targets) {
-		final Map<Generic, Integer> positions = ((GenericImpl) relation).getPositions(targets);
+	public static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, final Generic... targets) {
+		final Map<Generic, Integer> positions = ((GenericImpl) attribute).getPositions(targets);
 		return new AbstractFilterIterator<T>(iterator) {
 			@Override
 			public boolean isSelected() {
@@ -368,10 +367,10 @@ public class Statics {
 			return null;
 		T result = iterator.next();
 		if (iterator.hasNext()) {
-			StringBuilder sb = new StringBuilder(result.toString());
+			String message = "" + result;
 			while (iterator.hasNext())
-				sb.append(" , " + iterator.next());
-			throw new IllegalStateException("Ambigous reponse : " + sb.toString());
+				message += iterator.next();
+			throw new IllegalStateException("Ambigous reponse : " + message);
 		}
 		return result;
 	}

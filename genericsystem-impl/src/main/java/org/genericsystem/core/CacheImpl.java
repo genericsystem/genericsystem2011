@@ -400,14 +400,22 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz) {
-		final Generic[] interfaces = new Primaries(Statics.insertFirstIntoArray(implicit, supers)).toArray();
+		final Primaries primaries = new Primaries(Statics.insertFirstIntoArray(implicit, supers));
+		Generic phantom = findPrimaryByValue(((GenericImpl) ((GenericImpl) implicit).supers[0]), null, implicit.getMetaLevel());
+		if (phantom != null)
+			primaries.add(phantom);
+		Generic[] interfaces = primaries.toArray();
 		Generic[] directSupers = getDirectSupers(interfaces, components);
-		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components)) {
-			if (!implicit.equals(directSupers[0].getImplicit()))
-				throw new IllegalSelectorException();
-			return (T) directSupers[0];
-		}
-
+		if (directSupers.length == 1)
+			if (((GenericImpl) directSupers[0]).equiv(interfaces, components)) {
+				if (implicit.getValue() != null && directSupers[0].getValue() == null) {
+					directSupers[0].remove(this);
+					return bind(implicit, supers, components, automatic, clazz);
+				}
+				if (!implicit.equals(directSupers[0].getImplicit()))
+					throw new IllegalSelectorException();
+				return (T) directSupers[0];
+			}
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(directSuper, interfaces, components);
