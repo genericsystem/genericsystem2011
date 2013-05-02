@@ -19,7 +19,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		final Attribute registration = car.setAttribute(cache, "Registration");
-		registration.enableNotNullConstraint(cache);
+		registration.enableRequiredConstraint(cache);
 		final Generic myCar = car.newInstance(cache, "myCar");
 		myCar.setValue(cache, registration, null);
 	}
@@ -31,7 +31,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		Type human = cache.newType("Human");
 
 		final Relation driving = car.setRelation(cache, "DrivingAlong", human, road);
-		driving.enableNotNullConstraint(cache);
+		driving.enableRequiredConstraint(cache);
 
 		final Generic myCar = car.newInstance(cache, "myCar");
 		final Generic myHuman = human.newInstance(cache, "myHuman");
@@ -69,8 +69,6 @@ public class NotNullConstraintTest extends AbstractTest {
 	public void testEnableThenDisableConstraintOnASimpleTypeThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		final Type car = cache.newType("Car");
-		car.enableNotNullConstraint(cache);
-		car.disableNotNullConstraint(cache);
 		Type expected = car.newSubType(cache, null);
 		Generic actual = car.getSubType(cache, null);
 		assert expected == actual;
@@ -87,8 +85,6 @@ public class NotNullConstraintTest extends AbstractTest {
 	public void testDisabledSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		final Type car = cache.newType("Car");
-		car.disableNotNullConstraint(cache);
-		car.disableNotNullConstraint(cache);
 		Type expected = car.newSubType(cache, null);
 	}
 
@@ -112,8 +108,6 @@ public class NotNullConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Attribute registration = car.setAttribute(cache, "Registration");
-		registration.enableNotNullConstraint(cache);
-
 		Type myBmw = car.newSubType(cache, "myBmw");
 		myBmw.setValue(cache, registration, null);
 	}

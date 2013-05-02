@@ -3,7 +3,6 @@ package org.genericsystem.systemproperties.constraints.simple;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
@@ -22,7 +21,6 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @Components(Engine.class)
 @SingularConstraint
 @Priority(10)
-@NotNullConstraint
 public class SingularInstanceConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -7689576125534105005L;

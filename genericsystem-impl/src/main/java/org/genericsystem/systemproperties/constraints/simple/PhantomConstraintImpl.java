@@ -2,7 +2,6 @@ package org.genericsystem.systemproperties.constraints.simple;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
@@ -20,7 +19,7 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @SystemGeneric(defaultBehavior = true)
 @Components(Engine.class)
 @SingularConstraint
-@NotNullConstraint
+// @NotNullConstraint
 public class PhantomConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -1175582355395269087L;

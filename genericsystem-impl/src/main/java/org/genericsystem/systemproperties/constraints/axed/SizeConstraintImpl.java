@@ -1,11 +1,9 @@
 package org.genericsystem.systemproperties.constraints.axed;
 
 import java.io.Serializable;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.Cache;
@@ -30,7 +28,6 @@ import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl.Si
  */
 @SystemGeneric
 @Components(Engine.class)
-@NotNullConstraint
 @Dependencies(Size.class)
 public class SizeConstraintImpl extends Constraint {
 

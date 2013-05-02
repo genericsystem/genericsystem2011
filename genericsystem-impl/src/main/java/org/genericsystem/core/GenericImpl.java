@@ -10,9 +10,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InheritanceDisabledConstraint;
+import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
@@ -45,7 +44,6 @@ import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImp
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.NotNullConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.SingularInstanceConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueConstraintImpl;
@@ -1088,7 +1086,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	void mountConstraints(Cache cache, Class<?> clazz) {
-		if (clazz.getAnnotation(InheritanceDisabledConstraint.class) != null)
+		if (clazz.getAnnotation(InheritanceDisabled.class) != null)
 			disableInheritance(cache);
 
 		if (clazz.getAnnotation(VirtualConstraint.class) != null)
@@ -1100,9 +1098,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		InstanceValueClassConstraint instanceClass = clazz.getAnnotation(InstanceValueClassConstraint.class);
 		if (instanceClass != null)
 			setConstraintClass(cache, instanceClass.value());
-
-		if (clazz.getAnnotation(NotNullConstraint.class) != null)
-			enableNotNullConstraint(cache);
 
 		if (clazz.getAnnotation(PropertyConstraint.class) != null)
 			enablePropertyConstraint(cache);
@@ -1446,20 +1441,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isBooleanSystemPropertyEnabled(context, RequiredConstraintImpl.class, basePos);
 	}
 
-	@Override
-	public <T extends Type> T enableNotNullConstraint(Cache cache) {
-		return enableSystemProperty(cache, NotNullConstraintImpl.class);
-	}
-
-	@Override
-	public <T extends Type> T disableNotNullConstraint(Cache cache) {
-		return disableSystemProperty(cache, NotNullConstraintImpl.class);
-	}
-
-	@Override
-	public boolean isNotNullConstraintEnabled(Context context) {
-		return isBooleanSystemPropertyEnabled(context, NotNullConstraintImpl.class);
-	}
+	// @Override
+	// public <T extends Type> T enableNotNullConstraint(Cache cache) {
+	// return enableSystemProperty(cache, NotNullConstraintImpl.class);
+	// }
+	//
+	// @Override
+	// public <T extends Type> T disableNotNullConstraint(Cache cache) {
+	// return disableSystemProperty(cache, NotNullConstraintImpl.class);
+	// }
+	//
+	// @Override
+	// public boolean isNotNullConstraintEnabled(Context context) {
+	// return isBooleanSystemPropertyEnabled(context, NotNullConstraintImpl.class);
+	// }
 
 	@Override
 	public <T extends Type> T enableUniqueConstraint(Cache cache) {

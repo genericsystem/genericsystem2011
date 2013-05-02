@@ -3,7 +3,6 @@ package org.genericsystem.systemproperties.constraints.simple;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Context;
@@ -23,7 +22,6 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @Components(Engine.class)
 @SingularConstraint
 @Priority(0)
-@NotNullConstraint
 public class OptimisticLockConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -9140332757904379387L;
