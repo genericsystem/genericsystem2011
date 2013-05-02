@@ -149,7 +149,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
 					for (T inheritingDependency : generic.<T> getInheritings(CacheImpl.this))
-						if (inheritingDependency == null)
+						if (inheritingDependency.getValue() == null)
 							addDependencies(inheritingDependency);
 						else
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
