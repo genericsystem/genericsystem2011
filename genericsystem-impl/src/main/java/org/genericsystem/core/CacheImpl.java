@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -287,7 +288,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			resultComponents[i] = genericToReplace.equals(components[i]) ? null : ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldImplicit, newImplicit) : replace(components[i], oldImplicit, newImplicit);
 
 		Generic implicit = genericToReplace.getImplicit().equals(oldImplicit) ? newImplicit : genericToReplace.getImplicit();
-		return bind(implicit, resultInterfaces, resultComponents, genericToReplace.isAutomatic(), null);
+		return bind(implicit, resultInterfaces, resultComponents, genericToReplace.isAutomatic(), genericToReplace.getClass());
 	}
 
 	private Generic getNewPrimary(Generic oldSubPrimary, Generic oldPrimary, Generic newPrimary) {

@@ -1,7 +1,9 @@
 package org.genericsystem.file;
 
 import java.util.Arrays;
+
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.file.AbstractTest.RollbackCatcher;
@@ -21,6 +23,14 @@ public class FileSystemTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
 		Tree fileSystem = cache.find(FileSystem.class);
 		assert cache.isAlive(fileSystem);
+	}
+
+	public void testUpdate() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+		FileSystem fileSystem = cache.find(FileSystem.class);
+		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
+		assert ((CacheImpl) cache).update(rootDirectory, "rootDirectory2").getValue().equals("rootDirectory2");
+		assert !rootDirectory.isAlive(cache);
 	}
 
 	public void testDirectoryNameNotUniqueInDifferentDirectories() {
