@@ -159,6 +159,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	// }
 	//
 	public <T extends Generic> T reFind(Generic generic) {
+		log.info("refind " + generic);
 		if (generic.isEngine())
 			return getEngine();
 		if (generic.isAlive(this))
@@ -166,18 +167,20 @@ public abstract class AbstractContext implements Context, Serializable {
 		if (((GenericImpl) generic).isPrimary())
 			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue(), generic.getMetaLevel());
 		Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
+		log.info("primariesArray : " + Arrays.toString(primariesArray));
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
-		for (int i = 0; i < primariesArray.length; i++)
-			boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
+		for (int i = 0; i < primariesArray.length; i++) {
+			Generic find = reFind(((GenericImpl) primariesArray[i]));
+			if (find == null)
+				return null;
+			boundPrimaries[i] = find;
+		}
 		Generic[] components = ((GenericImpl) generic).components;
 		Generic[] boundComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++)
 			boundComponents[i] = reFind(((GenericImpl) components[i]));
 
-		T result = fastFind(reFind(generic.getImplicit()), boundPrimaries, boundComponents);
-		if (result != null)
-			return result;
-		throw new IllegalStateException();
+		return fastFind(reFind(generic.getImplicit()), boundPrimaries, boundComponents);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -191,6 +194,7 @@ public abstract class AbstractContext implements Context, Serializable {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFind(Generic implicit, Generic[] supers, Generic[] components) {
+		log.info("supers : " + Arrays.toString(supers));
 		final Generic[] interfaces = new Primaries(supers).toArray();
 		for (Generic generic : components.length == 0 ? implicit.getInheritings(this) : components[0].getComposites(this))
 			if (((GenericImpl) generic).equiv(interfaces, components)) {
