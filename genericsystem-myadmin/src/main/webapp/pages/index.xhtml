@@ -12,8 +12,10 @@
 	xmlns:middleware="http://java.sun.com/jsf/composite/middleware">
 
 	<ui:define name="bodySection">
-		<h:commandButton action="#{cacheBean.discard}" value="#{msg.discard_button}" render="@all"/>
-		<a4j:commandButton action="#{cacheBean.save}" value="#{msg.save_button}"/>
+		<h:commandButton action="#{cacheBean.discard}"
+			value="#{msg.discard_button}" />
+		<h:commandButton action="#{cacheBean.save}" value="#{msg.save_button}" />
+
 		<ui:include src="filesystem.xhtml" />
 	</ui:define>
 

@@ -10,27 +10,44 @@
 	xmlns:rich="http://richfaces.org/rich">
 
 <composite:interface>
-	<composite:attribute name="rendered" type="boolean" required="true" />
-	<composite:attribute name="title" type="String" required="true" />
-	<composite:attribute name="action" method-signature="void action()" />
+	<composite:attribute name="genericType" type="String" required="true" />
+	<composite:attribute name="generic"
+		type="org.genericsystem.core.Generic" required="true" />
 	<composite:attribute name="newInputValue" type="String" required="true" />
+	<composite:attribute name="action" method-signature="void action()"
+		required="true" />
 </composite:interface>
 
 <composite:implementation>
 	<rich:popupPanel id="popupEditFile" domElementAttachment="form"
 		modal="true" resizeable="false" moveable="false" autosized="true">
 		<f:facet name="header">
-			<h:outputText styleClass="uppercase" value="#{cc.attrs.title}" />
+			<h:outputText styleClass="uppercase"
+				value="#{msg.edit} #{msg.of} #{cc.attrs.generic.value}" />
 		</f:facet>
 		<f:facet name="controls">
 			<h:outputLink value="#"
 				onclick="#{rich:component('popupEditFile')}.hide(); return false;">
 					#{msg.close}</h:outputLink>
 		</f:facet>
-		<h:outputText value="#{cc.attrs.title} : " />
-		<h:inputText value="#{cc.attrs.newInputValue}" />
-		<a4j:commandButton execute="popupEditFile" value="#{msg.create}"
-			action="#{cc.attrs.action}" render="tree" />
+		<rich:panel rendered=""
+			title="#{msg.create} #{msg.a} #{msg.sub} #{cc.attrs.genericType}"
+			styleClass="uppercase">
+			<h:outputText
+				value="#{msg.create} #{msg.a} #{msg.sub} #{cc.attrs.genericType} : " />
+			<h:inputText value="#{cc.attrs.newInputValue}" />
+			<a4j:commandButton execute="popupEditFile" value="#{msg.create}"
+				action="#{cc.attrs.action}" render="tree" />
+		</rich:panel>
+
+		<rich:panel title="#{msg.edit} #{msg.the} #{msg.value}"
+			styleClass="uppercase">
+			<h:outputText
+				value="#{msg.edit} #{msg.the} #{msg.value} : " />
+			<h:inputText value="#{cc.attrs.newInputValue}" />
+			<a4j:commandButton execute="popupEditFile" value="#{msg.apply}"
+				action="#{fileSystemBean.modifyValue}" render="tree" />
+		</rich:panel>
 	</rich:popupPanel>
 </composite:implementation>
 

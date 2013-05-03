@@ -10,26 +10,129 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:middleware="http://java.sun.com/jsf/composite/middleware">
 
-	<rich:tree id="tree" toggleType="client" var="item"
-		selectionType="ajax" execute="tree" render="editFile"
-		selectionChangeListener="#{fileSystemBean.changeFile}"
-		onselectionchange="#{rich:component('popupEditFile')}.show()">
-		<rich:treeModelRecursiveAdaptor
-			roots="#{fileSystemBean.rootDirectories}"
-			nodes="#{fileSystemBean.getDirectories(item)}">
-			<rich:treeNode>
+	<rich:panel id="addDirectory"
+		title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
+		styleClass="uppercase">
+		<h:outputText
+			value="#{msg.add} #{msg.a} #{msg.root} #{msg.directory} : " />
+		<h:inputText value="#{fileSystemBean.newRootDirectory}" />
+		<a4j:commandButton value="#{msg.create}"
+			action="#{fileSystemBean.addRootDirectory}"
+			render="tree, addDirectory" />
+	</rich:panel>
+	<a4j:region>
+		<rich:tree id="tree" toggleType="client" var="item"
+			selectionType="ajax" execute="tree" render="editFile"
+			selectionChangeListener="#{fileSystemBean.changeFile}">
+			<rich:treeModelRecursiveAdaptor
+				roots="#{fileSystemBean.rootDirectories}"
+				nodes="#{fileSystemBean.getDirectories(item)}">
+				<rich:treeNode>
                     #{item.shortPath}
                 </rich:treeNode>
-			<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
-				<rich:treeNode>#{item.shortPath}</rich:treeNode>
-			</rich:treeModelAdaptor>
-		</rich:treeModelRecursiveAdaptor>
-	</rich:tree>
+				<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
+					<rich:treeNode>#{item.shortPath}</rich:treeNode>
+				</rich:treeModelAdaptor>
+			</rich:treeModelRecursiveAdaptor>
+		</rich:tree>
+	</a4j:region>
+	<rich:contextMenu target="tree" mode="ajax">
+		<rich:menuItem
+			action="#{popupEditGenericBean.modifyValueWindow('modifyValue')}"
+			oncomplete="#{rich:component('popupEditFile')}.show()" mode="ajax"
+			label="#{msg.edit} #{msg.the} #{msg.value}" />
+		<!-- 				<rich:menuItem rendered="#{fileSystemBean.isDirectory()}" -->
+		<!-- 					label="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}" -->
+		<!-- 					oncomplete="#{rich:component('popupEditFile')}.show()" mode="ajax" /> -->
+
+		<middleware:menu />
+	</rich:contextMenu>
+
 	<h:panelGrid id="editFile">
-		<middleware:composite_linkslist
-			rendered="#{fileSystemBean.renderedEditFile}"
-			title="#{msg.create} #{msg.a} #{msg.file} #{msg.of} #{fileSystemBean.getFileSelected().getValue()}"
-			generic="#{fileSystemBean.fileSelected}"
-			newInputValue="#{fileSystemBean.newFileName}" action="#{fileSystemBean.createFile}" />
+		<!-- 		<middleware:composite_linkslist genericType="#{msg.file}" -->
+		<!-- 			generic="#{fileSystemBean.fileSelected}" -->
+		<!-- 			newInputValue="#{fileSystemBean.newFileName}" -->
+		<!-- 			action="#{fileSystemBean.createFile}" /> -->
+
+		<!-- 		<rich:popupPanel id="popupEditFile" domElementAttachment="form" -->
+		<!-- 			modal="true" resizeable="false" moveable="false" autosized="true"> -->
+		<!-- 			<f:facet name="header"> -->
+		<!-- 				<h:outputText styleClass="uppercase" -->
+		<!-- 					value="#{msg.edit} #{msg.of} #{fileSystemBean.fileSelected.value}" /> -->
+		<!-- 			</f:facet> -->
+		<!-- 			<f:facet name="controls"> -->
+		<!-- 				<h:outputLink value="#" -->
+		<!-- 					onclick="#{rich:component('popupEditFile')}.hide(); return false;"> -->
+		<!-- 					#{msg.close}</h:outputLink> -->
+		<!-- 			</f:facet> -->
+
+		<!-- 			<a4j:commandButton execute="popupEditFile" -->
+		<!-- 				value="#{msg.delete} #{fileSystemBean.fileSelected.value}" -->
+		<!-- 				action="#{fileSystemBean.delete}" render="tree" /> -->
+
+		<!-- 			<rich:panel title="#{msg.edit} #{msg.the} #{msg.value}" -->
+		<!-- 				styleClass="uppercase"> -->
+		<!-- 				<h:outputText value="#{msg.edit} #{msg.the} #{msg.value} : " /> -->
+		<!-- 				<h:inputText value="#{fileSystemBean.newValue}" /> -->
+		<!-- 				<a4j:commandButton execute="popupEditFile" value="#{msg.apply}" -->
+		<!-- 					action="#{fileSystemBean.modifyValue}" render="tree" /> -->
+		<!-- 			</rich:panel> -->
+
+		<!-- 			<rich:panel rendered="#{fileSystemBean.isDirectory()}" -->
+		<!-- 				title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}" -->
+		<!-- 				styleClass="uppercase"> -->
+		<!-- 				<h:outputText -->
+		<!-- 					value="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory} : " /> -->
+		<!-- 				<h:inputText value="#{fileSystemBean.newSubDirectoryName}" /> -->
+		<!-- 				<a4j:commandButton execute="popupEditFile" value="#{msg.create}" -->
+		<!-- 					action="#{fileSystemBean.addSubDirectory}" render="tree" /> -->
+		<!-- 			</rich:panel> -->
+
+		<!-- 			<rich:panel rendered="#{fileSystemBean.isDirectory()}" -->
+		<!-- 				title="#{msg.create} #{msg.a} #{msg.file}" styleClass="uppercase"> -->
+		<!-- 				<h:outputText value="#{msg.create} #{msg.a} #{msg.file} : " /> -->
+		<!-- 				<h:inputText value="#{fileSystemBean.newFileName}" /> -->
+		<!-- 				<a4j:commandButton execute="popupEditFile" value="#{msg.create}" -->
+		<!-- 					action="#{fileSystemBean.addFile}" render="tree" /> -->
+		<!-- 			</rich:panel> -->
+
+		<!-- 			<rich:panel rendered="#{!fileSystemBean.isDirectory()}" -->
+		<!-- 				title="#{msg.edit} #{msg.the} #{msg.content}" styleClass="uppercase"> -->
+		<!-- 				<rich:editor id="editor" toolbar="custom" -->
+		<!-- 					valueChangeListener="#{fileSystemBean.updateContent()}" -->
+		<!-- 					value="#{fileSystemBean.content}" style="margin-bottom: 1em"> -->
+		<!-- 					<f:facet name="config"> -->
+		<!--                     toolbar_custom: -->
+		<!--                         [ -->
+		<!--                             { name: 'document', items : [ 'NewPage','Preview' ] }, -->
+		<!--                             { name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] }, -->
+		<!--                             { name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] }, -->
+		<!--                             { name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak' -->
+		<!--                                      ,'Iframe' ] }, -->
+		<!--                                     '/', -->
+		<!--                             { name: 'styles', items : [ 'Styles','Format' ] }, -->
+		<!--                             { name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] }, -->
+		<!--                             { name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] }, -->
+		<!--                             { name: 'links', items : [ 'Link','Unlink','Anchor' ] }, -->
+		<!--                             { name: 'tools', items : [ 'Maximize','-','About' ] } -->
+		<!--                         ] -->
+		<!--                     </f:facet> -->
+		<!-- 					<a4j:ajax event="change" render="panel" status="panelUpdateStatus" /> -->
+		<!-- 					<a4j:ajax event="dirty" render="panel" status="panelUpdateStatus"> -->
+		<!-- 						<a4j:attachQueue requestDelay="0" /> -->
+		<!-- 					</a4j:ajax> -->
+		<!-- 				</rich:editor> -->
+
+		<!-- 				<rich:panel id="panel"> -->
+		<!-- 					<f:facet name="header"> -->
+		<!--                 	#{msg.output} -->
+		<!-- 		                <a4j:status name="panelUpdateStatus"> -->
+		<!-- 							<f:facet name="start">(#{msg.updating}) </f:facet> -->
+		<!-- 						</a4j:status> -->
+		<!-- 					</f:facet> -->
+		<!-- 					<h:outputText escape="false" value="#{fileSystemBean.content}" /> -->
+		<!-- 				</rich:panel> -->
+		<!-- 			</rich:panel> -->
+		<!-- 		</rich:popupPanel> -->
 	</h:panelGrid>
 </ui:composition>
