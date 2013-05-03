@@ -12,7 +12,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -403,7 +402,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz) {
-		final Primaries primaries = new Primaries(Statics.insertFirstIntoArray(implicit, supers));
+		final Primaries primaries = new Primaries(supers);
+		primaries.add(implicit);
 		Generic phantom = findPrimaryByValue(((GenericImpl) ((GenericImpl) implicit).supers[0]), null, implicit.getMetaLevel());
 		if (phantom != null)
 			primaries.add(phantom);
@@ -413,10 +413,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			if (((GenericImpl) directSupers[0]).equiv(interfaces, components)) {
 				if (implicit.getValue() != null && directSupers[0].getValue() == null) {
 					directSupers[0].remove(this);
-					return bind(implicit, supers, components, automatic, clazz);
+					directSupers[0] = ((GenericImpl) directSupers[0]).supers[1];
 				}
 				if (!implicit.equals(directSupers[0].getImplicit()))
 					throw new IllegalSelectorException();
+
 				return (T) directSupers[0];
 			}
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();

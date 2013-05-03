@@ -98,30 +98,31 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return restore(implicit.getValue(), implicit.getMetaLevel(), null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components, automatic);
 	}
 
-	private void reorderImplicit(Generic implicit, Generic[] directSupers) {
-		int index = 0;
-		for (int i = 0; i < directSupers.length; i++)
-			if (((GenericImpl) directSupers[i]).contains(implicit)) {
-				index = i;
-				break;
-			}
-		if (index != 0) {
-			Generic tmp = directSupers[index];
-			directSupers[index] = directSupers[0];
-			directSupers[0] = tmp;
-		}
+	private void reorderImplicit(Generic implicit, Generic[] supers) {
+		for (int index = 0; index < supers.length; index++)
+			if (implicit.equals(supers[index].getImplicit()))
+				if (index != 0) {
+					switchFirst(index, supers);
+					return;
+				}
 	}
 
-	private boolean contains(Generic search) {
-		if (equals(search))
-			return true;
-		if (isEngine())
-			return false;
-		for (Generic superGeneric : supers)
-			if (((GenericImpl) superGeneric).contains(search))
-				return true;
-		return false;
+	private static void switchFirst(int index, Generic[] supers) {
+		Generic tmp = supers[index];
+		supers[index] = supers[0];
+		supers[0] = tmp;
 	}
+
+	// private boolean contains(Generic search) {
+	// if (equals(search))
+	// return true;
+	// if (isEngine())
+	// return false;
+	// for (Generic superGeneric : supers)
+	// if (((GenericImpl) superGeneric).contains(search))
+	// return true;
+	// return false;
+	// }
 
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components, boolean automatic) {
 		this.value = value;
