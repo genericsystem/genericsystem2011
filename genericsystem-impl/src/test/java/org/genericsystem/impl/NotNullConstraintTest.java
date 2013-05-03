@@ -43,8 +43,10 @@ public class NotNullConstraintTest extends AbstractTest {
 		Link test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
 		Link test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);
 		assert myCar.getLinks(cache, driving).containsAll(Arrays.asList(test, test2));
-		myCar.setLink(cache, driving, null, myHuman, myRoad);// do nothing
-		assert myCar.getLinks(cache, driving).containsAll(Arrays.asList(test, test2));
+		myCar.setLink(cache, driving, null, myHuman, myRoad);
+		assert myCar.getLinks(cache, driving).isEmpty();
+		test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
+		test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);
 		final Cache superCache = cache.newSuperCache();
 		new RollbackCatcher() {
 			@Override
@@ -92,10 +94,10 @@ public class NotNullConstraintTest extends AbstractTest {
 	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateAnAttribute() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		final Attribute registration = car.setAttribute(cache, "Registration");
-		Holder myBmwPower = car.setAttribute(cache, 235);
+		final Attribute registration = car.setProperty(cache, "Registration");
 		final Generic myBmw = car.newInstance(cache, "myBmw");
-		myBmw.setValue(cache, registration, null);
+		Holder holder = car.setValue(cache, registration, 235);
+		myBmw.setValue(cache, holder, null);
 		assert myBmw.getHolder(cache, registration) == null;
 		assert myBmw.getValues(cache, registration).isEmpty();
 		myBmw.setValue(cache, registration, null);// No exception
@@ -126,7 +128,6 @@ public class NotNullConstraintTest extends AbstractTest {
 		carRegistration.enableSingularConstraint(cache);
 		Holder value = myBmw.setValue(cache, carRegistration, "AA-BB-CC");
 		assert myBmw.getHolders(cache, vehicleRegistration).contains(value);
-		assert myBmw.setValue(cache, vehicleRegistration, null) == null;
 		assert value.isAlive(cache);
 		assert myBmw.getHolders(cache, vehicleRegistration).contains(value);
 		myBmw.setValue(cache, carRegistration, null);

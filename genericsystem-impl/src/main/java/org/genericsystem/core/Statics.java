@@ -7,12 +7,10 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
-import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +94,8 @@ public class Statics {
 	}
 
 	public static Generic[] insertIntoArray(Generic generic, Generic[] targets, int basePos) {
+		if (basePos < 0 || basePos > targets.length)
+			throw new IllegalStateException("Unable to find a valid base position");
 		Generic[] result = new Generic[targets.length + 1];
 		System.arraycopy(targets, 0, result, 0, basePos);
 		result[basePos] = generic;
@@ -325,19 +325,6 @@ public class Statics {
 			@Override
 			public boolean isSelected() {
 				return next.isTree();
-			}
-		};
-	}
-
-	public static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, final Generic... targets) {
-		final Map<Generic, Integer> positions = ((GenericImpl) attribute).getPositions(targets);
-		return new AbstractFilterIterator<T>(iterator) {
-			@Override
-			public boolean isSelected() {
-				for (Generic target : targets)
-					if (!target.equals(((Holder) next).getComponent(positions.get(target))))
-						return false;
-				return true;
 			}
 		};
 	}

@@ -153,7 +153,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
-	<T extends Link> T getLink(Context context, Relation relation, int basePos, Generic... targets);
+	<T extends Link> T getLink(Context context, Link relation, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Link of the Relation for the components.
@@ -170,7 +170,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
-	<T extends Link> T getLink(Context context, Relation relation, Generic... targets);
+	<T extends Link> T getLink(Context context, Link relation, Generic... targets);
 
 	/**
 	 * Returns the Links.
@@ -551,9 +551,11 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param attribute
 	 *            The attribute.
+	 * @param targets
+	 *            The tagets.
 	 * @return The position.
 	 */
-	int getBasePos(Holder attribute);
+	int getBasePos(Holder attribute, Generic[] targets);
 
 	/**
 	 * Returns the size of supers.

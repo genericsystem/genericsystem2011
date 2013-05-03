@@ -31,7 +31,7 @@ public class PhantomConstraintImpl extends Constraint implements BooleanSystemPr
 		Generic[] supers = ((GenericImpl) modified).getSupersArray();
 		if (modified.getValue() == null)
 			if (modified.getComponentsSize() != 0) {
-				if (supers.length != 2)
+				if (supers.length != 2 || (modified.isStructural() ? supers[1].isConcrete() : supers[1].isStructural()))
 					throw new PhantomConstraintViolationException(modified.info());
 
 				Generic[] components = ((GenericImpl) supers[1]).getComponentsArray();

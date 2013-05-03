@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
@@ -1361,7 +1360,7 @@ public class RelationTest extends AbstractTest {
 		Relation carColor = car.setRelation(cache, "carColor", color).enableSingularConstraint(cache);
 		Link carRed = car.bind(cache, carColor, red);
 		myBmw.bind(cache, carColor, red);
-		((GenericImpl) myAudi).cancel(cache, carRed);
+		myAudi.setLink(cache, carRed, null, red);
 		myAudi.bind(cache, carColor, blue);
 
 		assert red.getLinks(cache, carColor).size() == 2 : red.getLinks(cache, carColor);

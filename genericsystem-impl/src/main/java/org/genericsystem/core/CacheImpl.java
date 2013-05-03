@@ -405,14 +405,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		final Primaries primaries = new Primaries(supers);
 		primaries.add(implicit);
+		Generic[] interfaces = primaries.toArray();
 		Generic phantomImplicit = findPrimaryByValue(((GenericImpl) ((GenericImpl) implicit).supers[0]), null, implicit.getMetaLevel());
 		if (phantomImplicit != null)
 			primaries.add(phantomImplicit);
-		Generic[] interfaces = primaries.toArray();
-		Generic[] directSupers = getDirectSupers(interfaces, components);
+		Generic[] interfacesWithNull = primaries.toArray();
+		Generic[] directSupers = getDirectSupers(interfacesWithNull, components);
 		if (directSupers.length == 1) {
 			GenericImpl result = (GenericImpl) directSupers[0];
-			if (result.equiv(interfaces, components)) {
+			if (result.equiv(interfacesWithNull, components)) {
 				if (implicit.getValue() != null && result.getValue() == null) {
 					result.remove(this);
 					result = (GenericImpl) ((GenericImpl) directSupers[0]).supers[1];
@@ -422,6 +423,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				return (T) result;
 			}
 		}
+		log.info("ttttttttttttttttttt" + Arrays.toString(directSupers) + implicit);
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(directSuper, interfaces, components);
