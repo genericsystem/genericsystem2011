@@ -712,7 +712,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private boolean findPhantom(Cache cache, Generic phantom, Generic[] components) {
-		return phantom != null && ((CacheImpl) cache).fastFind(phantom, new Generic[] { getImplicit(), phantom }, components) != null;
+		return phantom != null && ((CacheImpl) cache).fastFind(phantom, Statics.insertFirstIntoArray(phantom, supers), components) != null;
 	}
 
 	boolean safeIsEnabled(Context context, Attribute attribute) {

@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -194,14 +193,11 @@ public abstract class AbstractContext implements Context, Serializable {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFind(Generic implicit, Generic[] supers, Generic[] components) {
-		log.info("supers : " + Arrays.toString(supers));
+		assert supers[0].getImplicit().equals(implicit);
 		final Generic[] interfaces = new Primaries(supers).toArray();
 		for (Generic generic : components.length == 0 ? implicit.getInheritings(this) : components[0].getComposites(this))
-			if (((GenericImpl) generic).equiv(interfaces, components)) {
-				// assert generic == find(supers, components);
+			if (((GenericImpl) generic).equiv(interfaces, components))
 				return (T) generic;
-			}
-		// assert find(supers, components) == null;
 		return null;
 	}
 
