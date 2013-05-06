@@ -307,11 +307,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			holder = getHolderByValue(cache, (Attribute) attribute, value, basePos, targets);
 
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
-		if (holder == null) {
-			if (value == null && attribute.isStructural())
-				return null;
-			return this.<T> bind(cache, implicit, attribute, basePos, targets);
-		}
+
+		if (holder == null)
+			return value != null ? this.<T> bind(cache, implicit, attribute, basePos, targets) : null;
 		if (!this.equals(holder.getComponent(basePos))) {
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos)))) {
 				Generic phantomImplicit = ((GenericImpl) attribute).bindPrimary(cache, null, SystemGeneric.CONCRETE, true);
@@ -319,9 +317,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (value == null)
 					return phantom;
 			} else if (value == null) {
-				assert holder.getValue() != null;
 				Generic phantomImplicit = ((GenericImpl) attribute).bindPrimary(cache, null, SystemGeneric.CONCRETE, true);
-				assert !((GenericImpl) holder).getPrimaries().contains(phantomImplicit);
 				return bind(cache, phantomImplicit, holder, basePos, Statics.truncate(basePos, ((GenericImpl) holder).components));
 			}
 			return this.<T> bind(cache, implicit, attribute, basePos, targets);
