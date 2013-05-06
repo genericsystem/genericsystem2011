@@ -78,10 +78,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return components.clone();
 	}
 
-	// public boolean isFlushable(Cache cache) {
-	// return ((CacheImpl) cache).isFlushable(this);
-	// }
-
 	@Override
 	public boolean isAutomatic() {
 		return automatic;
@@ -91,9 +87,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return restore(value, metaLevel, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components, automatic);
 	}
 
-	// TODO clean
 	final GenericImpl initializeComplex(Generic implicit, Generic[] directSupers, Generic[] components, boolean automatic) {
-		assert ((GenericImpl) implicit).isPrimary() : "implicit isn't primary";
+		assert ((GenericImpl) implicit).isPrimary();
 		reorderImplicit(implicit, directSupers);
 		return restore(implicit.getValue(), implicit.getMetaLevel(), null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components, automatic);
 	}
@@ -311,21 +306,29 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (holder == null)
 			return value != null ? this.<T> bind(cache, implicit, attribute, basePos, targets) : null;
 		if (!this.equals(holder.getComponent(basePos))) {
-			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos)))) {
-				Generic phantomImplicit = ((GenericImpl) attribute).bindPrimary(cache, null, SystemGeneric.CONCRETE, true);
-				T phantom = bind(cache, phantomImplicit, holder, basePos, Statics.truncate(basePos, ((GenericImpl) holder).components));
-				if (value == null)
-					return phantom;
-			} else if (value == null) {
-				Generic phantomImplicit = ((GenericImpl) attribute).bindPrimary(cache, null, SystemGeneric.CONCRETE, true);
-				return bind(cache, phantomImplicit, holder, basePos, Statics.truncate(basePos, ((GenericImpl) holder).components));
-			}
+			if (value == null)
+				return internalCancel(cache, holder, basePos);
+			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+				internalCancel(cache, holder, basePos);
 			return this.<T> bind(cache, implicit, attribute, basePos, targets);
 		}
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
 		holder.remove(cache);
 		return this.<T> setHolder(cache, attribute, value, basePos, targets);
+	}
+
+	@Override
+	public void restore(Cache cache, Holder attribute) {
+		restore(cache, attribute, getBasePos(attribute, ((GenericImpl) attribute).components));
+	}
+
+	@Override
+	public void restore(final Cache cache, final Holder attribute, final int basePos) {
+		Holder holder = attribute.isStructural() ? getAttribute(cache, (Attribute) attribute, null, Statics.truncate(basePos, ((GenericImpl) attribute).components)) : getHolderByValue(cache, attribute, null, basePos,
+				Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		if (holder != null)
+			holder.remove(cache);
 	}
 
 	@Override
@@ -398,7 +401,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	// TODO KK
 	public <T extends Generic> Snapshot<T> getTargets(Context context, Relation relation) {
 		return getTargets(context, relation, Statics.TARGET_POSITION);
 	}
@@ -1222,19 +1224,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return bind(cache, implicit, attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
-	@Override
-	public void restore(Cache cache, Holder attribute) {
-		restore(cache, attribute, getBasePos(attribute, ((GenericImpl) attribute).components));
-	}
-
-	@Override
-	public void restore(final Cache cache, final Holder attribute, final int basePos) {
-		Holder holder = attribute.isStructural() ? getAttribute(cache, (Attribute) attribute, null, Statics.truncate(basePos, ((GenericImpl) attribute).components)) : getHolderByValue(cache, attribute, null, basePos,
-				Statics.truncate(basePos, ((GenericImpl) attribute).components));
-		if (holder != null)
-			holder.remove(cache);
-	}
-
 	/*********************************************/
 	/******************* TREE ********************/
 	/*********************************************/
@@ -1244,7 +1233,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return newRoot(cache, value, 1);
 	}
 
-	// TODO KK
 	@Override
 	public <T extends Node> T newRoot(Cache cache, Serializable value, int dim) {
 		return ((CacheImpl) cache).bind(bindPrimary(cache, value, SystemGeneric.CONCRETE, true), false, this, new Generic[dim]);
@@ -1492,21 +1480,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public boolean isRequiredConstraintEnabled(Context context, int basePos) {
 		return isBooleanSystemPropertyEnabled(context, RequiredConstraintImpl.class, basePos);
 	}
-
-	// @Override
-	// public <T extends Type> T enableNotNullConstraint(Cache cache) {
-	// return enableSystemProperty(cache, NotNullConstraintImpl.class);
-	// }
-	//
-	// @Override
-	// public <T extends Type> T disableNotNullConstraint(Cache cache) {
-	// return disableSystemProperty(cache, NotNullConstraintImpl.class);
-	// }
-	//
-	// @Override
-	// public boolean isNotNullConstraintEnabled(Context context) {
-	// return isBooleanSystemPropertyEnabled(context, NotNullConstraintImpl.class);
-	// }
 
 	@Override
 	public <T extends Type> T enableUniqueConstraint(Cache cache) {
