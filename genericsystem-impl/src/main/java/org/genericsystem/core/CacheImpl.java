@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import java.nio.channels.IllegalSelectorException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +11,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -401,28 +401,36 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz) {
+	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz/* , boolean existException */) {
 
 		final Primaries primaries = new Primaries(supers);
 		primaries.add(implicit);
 		Generic[] interfaces = primaries.toArray();
-		Generic phantomImplicit = findPrimaryByValue(((GenericImpl) ((GenericImpl) implicit).supers[0]), null, implicit.getMetaLevel());
-		if (phantomImplicit != null)
-			primaries.add(phantomImplicit);
-		Generic[] interfacesWithNull = primaries.toArray();
-		Generic[] directSupers = getDirectSupers(interfacesWithNull, components);
-		if (directSupers.length == 1) {
-			GenericImpl result = (GenericImpl) directSupers[0];
-			if (result.equiv(interfacesWithNull, components)) {
-				if (implicit.getValue() != null && result.getValue() == null) {
-					result.remove(this);
-					result = (GenericImpl) ((GenericImpl) directSupers[0]).supers[1];
+		if (implicit.getValue() != null) {
+			Generic phantomImplicit = findPrimaryByValue(((GenericImpl) ((GenericImpl) implicit).supers[0]), null, implicit.getMetaLevel());
+			if (phantomImplicit != null) {
+				primaries.add(phantomImplicit);
+				T phantom = fastFindByInterfaces(phantomImplicit, primaries.toArray(), components);
+				if (phantom != null) {
+					phantom.remove(this);
+					return (T) ((GenericImpl) phantom).supers[1];
 				}
-				if (!implicit.equals(result.getImplicit()))
-					throw new IllegalSelectorException();
-				return (T) result;
 			}
 		}
+		T result = fastFindByInterfaces(implicit, interfaces, components);
+		if (result != null) {
+			if (!Objects.equals(result.getValue(), implicit.getValue()))
+				throw new IllegalSelectorException();
+			// if (existsException)
+			// throw new IllegalStateException("Exists exception");
+			return result;
+		}
+		return internalBind(implicit, interfaces, components, automatic, clazz);
+	}
+
+	private <T extends Generic> T internalBind(Generic implicit, Generic[] interfaces, Generic[] components, boolean automatic, Class<?> clazz) {
+		Generic[] directSupers = getDirectSupers(interfaces, components);
+		// assert directSupers.length >= 2;
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(directSuper, interfaces, components);

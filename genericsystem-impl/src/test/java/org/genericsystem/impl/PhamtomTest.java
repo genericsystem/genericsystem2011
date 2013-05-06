@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.Iterator;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -330,12 +331,11 @@ public class PhamtomTest extends AbstractTest {
 		final Generic myCar = car.newInstance(cache, "myCar");
 		assert myCar.getTargets(cache, carColor).contains(red);
 		assert myCar.getTargets(cache, carColor).contains(green);
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				myCar.setValue(cache, carColor, null);
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		try {
+			myCar.setValue(cache, carColor, null);
+		} catch (IllegalStateException e) {
+			// nothing
+		}
 		myCar.clear(cache, carColor, red);
 		assert !myCar.getTargets(cache, carColor).contains(red);
 		assert myCar.getTargets(cache, carColor).contains(green);
@@ -374,7 +374,7 @@ public class PhamtomTest extends AbstractTest {
 		assert myCar.getValue(cache, carPower).equals("233");
 		myCar.setValue(cache, defaultPower, null);
 		assert myCar.getValue(cache, carPower) == null;
-		myCar.getHolder(cache, defaultPower, null).remove(cache);
+		((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null).remove(cache);
 		// myCar.restore(cache, defaultPower);
 		assert myCar.getValue(cache, carPower).equals("233");
 		myCar.restore(cache, defaultPower);
