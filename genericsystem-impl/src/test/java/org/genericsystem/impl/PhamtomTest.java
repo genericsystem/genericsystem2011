@@ -374,7 +374,7 @@ public class PhamtomTest extends AbstractTest {
 		assert myCar.getValue(cache, carPower).equals("233");
 		myCar.setValue(cache, defaultPower, null);
 		assert myCar.getValue(cache, carPower) == null;
-		((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null).remove(cache);
+		// ((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null).remove(cache);
 		myCar.restore(cache, defaultPower);
 		assert myCar.getValue(cache, carPower).equals("233");
 		myCar.restore(cache, defaultPower);

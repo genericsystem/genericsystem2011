@@ -108,10 +108,10 @@ public class NotNullConstraintTest extends AbstractTest {
 	@Test
 	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type car = cache.newType("Car");
-		Attribute registration = car.setAttribute(cache, "Registration");
-		Type myBmw = car.newSubType(cache, "myBmw");
-		myBmw.setValue(cache, registration, null);
+		Type vehicle = cache.newType("Vehicle");
+		Attribute registration = vehicle.setAttribute(cache, "Registration");
+		Type car = vehicle.newSubType(cache, "Car");
+		car.setValue(cache, registration, null);
 	}
 
 	@Test

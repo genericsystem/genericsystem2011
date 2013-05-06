@@ -294,9 +294,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		T holder;
 		if (((Relation) attribute).isSingularConstraintEnabled(cache, basePos))
 			holder = getHolder(cache, (Attribute) attribute, basePos);
-		else if (((Type) attribute).isPropertyConstraintEnabled(cache))
-			holder = getHolder(cache, (Attribute) attribute, basePos, targets);
-		else if (value == null)
+		else if (value == null || ((Type) attribute).isPropertyConstraintEnabled(cache))
 			holder = getHolder(cache, (Attribute) attribute, basePos, targets);
 		else
 			holder = getHolderByValue(cache, (Attribute) attribute, value, basePos, targets);
@@ -307,9 +305,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return value != null ? this.<T> bind(cache, implicit, attribute, basePos, targets) : null;
 		if (!this.equals(holder.getComponent(basePos))) {
 			if (value == null)
-				return internalCancel(cache, holder, basePos);
+				return cancel(cache, holder, basePos);
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
-				internalCancel(cache, holder, basePos);
+				cancel(cache, holder, basePos);
 			return this.<T> bind(cache, implicit, attribute, basePos, targets);
 		}
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
@@ -325,8 +323,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void restore(final Cache cache, final Holder attribute, final int basePos) {
-		Holder holder = attribute.isStructural() ? getAttribute(cache, (Attribute) attribute, null, Statics.truncate(basePos, ((GenericImpl) attribute).components)) : getHolderByValue(cache, attribute, null, basePos,
-				Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		Generic[] components = Statics.truncate(basePos, ((GenericImpl) attribute).components);
+		Holder holder = attribute.isStructural() ? getAttribute(cache, (Attribute) attribute, null, components) : getHolderByValue(cache, attribute, null, basePos, components);
 		if (holder != null)
 			holder.remove(cache);
 	}
@@ -336,10 +334,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Holder holder : getHolders(cache, (Attribute) attribute, targets)) {
 			if (this.equals(holder.getComponent(basePos)))
 				holder.remove(cache);
-			else {
-				Generic phantomImplicit = ((GenericImpl) attribute).bindPrimary(cache, null, SystemGeneric.CONCRETE, true);
-				bind(cache, phantomImplicit, holder, basePos, Statics.truncate(basePos, ((GenericImpl) holder).components));
-			}
+			else
+				cancel(cache, holder, basePos);
 		}
 	}
 
@@ -1198,28 +1194,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, Generic... targets) {
-		if (equals(attribute.getComponent(basePos)))
-			throw new IllegalStateException("Only inherited attributes can be cancelled");
-
-		Iterator<Holder> holders;
-		if (attribute.isStructural()) {
-			holders = GenericImpl.this.<Holder> attributesIterator(cache, (Attribute) attribute, false);
-			while (holders.hasNext()) {
-				Holder holder = holders.next();
-				if (!holder.equals(attribute))
-					throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
-			}
-		}
-		holders = GenericImpl.this.<Holder> holdersIterator(cache, (Attribute) attribute, basePos, false);
-		while (holders.hasNext()) {
-			Holder holder = holders.next();
-			if (!holder.equals(attribute))
-				throw new IllegalStateException("Unable to cancel an attribute with projection : " + holder);
-		}
-		return internalCancel(cache, attribute, basePos);
-	}
-
-	private <T extends Generic> T internalCancel(Cache cache, Holder attribute, int basePos) {
 		Generic implicit = attribute.isStructural() ? getEngine().bindPrimary(cache, null, SystemGeneric.STRUCTURAL, true) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, null, SystemGeneric.CONCRETE, true);
 		return bind(cache, implicit, attribute, basePos, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
