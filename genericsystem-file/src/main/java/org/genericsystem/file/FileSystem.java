@@ -11,6 +11,7 @@ import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
+import org.genericsystem.core.TreeImpl;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType;
 import org.genericsystem.file.FileSystem.FileType.File;
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
 @Components(FileSystem.class)
 @Dependencies(FileType.class)
 @InstanceGenericClass(Directory.class)
-public class FileSystem extends GenericImpl {
+public class FileSystem extends TreeImpl {
 	protected static Logger log = LoggerFactory.getLogger(FileSystem.class);
 
 	private static final String SEPARATOR = "/";

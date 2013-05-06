@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute, Tree, Node {
+public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute, Node {
 
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
 
@@ -613,12 +613,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).bind(bindPrimary(cache, value, getMetaLevel() + 1, false), false, this, false, components);
+		return ((CacheImpl) cache).bind(bindPrimary(cache, value, getMetaLevel() + 1, this.isPrimary() && components.length != 0), false, this, false, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		Generic implicit = getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL, true);
+		Generic implicit = getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL, this.isPrimary() && components.length != 0);
 		return ((CacheImpl) cache).bind(implicit, false, this, false, components);
 	}
 
@@ -1007,7 +1007,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> instancesIterator(Context context) {
+	<T extends Generic> Iterator<T> instancesIterator(Context context) {
 		return Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(context), SystemGeneric.CONCRETE);
 	}
 
@@ -1218,16 +1218,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/*********************************************/
 	/******************* TREE ********************/
 	/*********************************************/
-
-	@Override
-	public <T extends Node> T newRoot(Cache cache, Serializable value) {
-		return newRoot(cache, value, 1);
-	}
-
-	@Override
-	public <T extends Node> T newRoot(Cache cache, Serializable value, int dim) {
-		return ((CacheImpl) cache).bind(bindPrimary(cache, value, SystemGeneric.CONCRETE, true), false, this, false, new Generic[dim]);
-	}
 
 	@Override
 	public <T extends Node> T addNode(Cache cache, Serializable value, Generic... targets) {
@@ -1583,23 +1573,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (i != basePos && components[i].isStructural())
 				return true;
 		return false;
-	}
-
-	// TODO KK
-	@Override
-	public <T extends Node> Snapshot<T> getRoots(final Context context) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return Statics.<T> rootFilter(GenericImpl.this.<T> instancesIterator(context));
-			}
-		};
-	}
-
-	// TODO KK
-	@Override
-	public <T extends Node> T getRootByValue(Context context, Serializable value) {
-		return Statics.unambigousFirst(Statics.<T> rootFilter(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(context), value)));
 	}
 
 	@Override
