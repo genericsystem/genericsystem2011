@@ -43,12 +43,12 @@ public class PhamtomTest extends AbstractTest {
 
 		assert myVehicle.getValue(cache, vehiclePower) == "123";
 		myVehicle.setValue(cache, defaultPower, null);
-		Generic phantom = ((GenericImpl) myVehicle).concreteIterator(cache, vehiclePower, Statics.BASE_POSITION, true).next();
+		Generic phantom = ((GenericImpl) myVehicle).holdersIterator(cache, vehiclePower, Statics.BASE_POSITION, true).next();
 		myVehicle.setValue(cache, defaultPower, "123");
 		assert !phantom.isAlive(cache);
 
 		myVehicle.setValue(cache, defaultPower, null);
-		phantom = ((GenericImpl) myVehicle).concreteIterator(cache, vehiclePower, Statics.BASE_POSITION, true).next();
+		phantom = ((GenericImpl) myVehicle).holdersIterator(cache, vehiclePower, Statics.BASE_POSITION, true).next();
 		myVehicle.setValue(cache, defaultPower, "235");
 		assert phantom.isAlive(cache);
 	}
@@ -375,7 +375,7 @@ public class PhamtomTest extends AbstractTest {
 		myCar.setValue(cache, defaultPower, null);
 		assert myCar.getValue(cache, carPower) == null;
 		((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null).remove(cache);
-		// myCar.restore(cache, defaultPower);
+		myCar.restore(cache, defaultPower);
 		assert myCar.getValue(cache, carPower).equals("233");
 		myCar.restore(cache, defaultPower);
 		assert myCar.getValue(cache, carPower).equals("233");

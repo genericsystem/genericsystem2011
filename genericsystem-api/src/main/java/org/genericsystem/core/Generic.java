@@ -704,7 +704,7 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, Generic... targets);
 
-	void restore(Cache cache, Holder attribute, Generic... targets);
+	void restore(Cache cache, Holder attribute);
 
-	void restore(Cache cache, Holder attribute, int basePos, Generic... targets);
+	void restore(Cache cache, Holder attribute, int basePos);
 }

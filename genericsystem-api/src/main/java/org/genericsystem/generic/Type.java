@@ -42,10 +42,10 @@ public interface Type extends Generic {
 	 * @param context
 	 *            The reference context.
 	 * @param value
-	 *            The attribute value.
+	 *            The attribute value. * @param targets The targets.
 	 * @return The attribute or null if not found.
 	 */
-	<T extends Attribute> T getAttribute(Context context, Serializable value);
+	<T extends Attribute> T getAttribute(Context context, Serializable value, Generic... targets);
 
 	/**
 	 * Find an attribute by value.
@@ -54,12 +54,13 @@ public interface Type extends Generic {
 	 *            The reference context.
 	 * @param attribute
 	 *            The super attribute.
-	 * 
 	 * @param value
 	 *            The attribute value.
+	 * @param targets
+	 *            The targets
 	 * @return The attribute or null if not found.
 	 */
-	<T extends Attribute> T getAttribute(final Context context, Attribute attribute, final Serializable value);
+	<T extends Attribute> T getAttribute(final Context context, Attribute attribute, final Serializable value, Generic... targets);
 
 	/**
 	 * Create an attribute for the type.
