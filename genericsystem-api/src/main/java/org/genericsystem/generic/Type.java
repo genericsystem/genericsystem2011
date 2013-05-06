@@ -63,7 +63,19 @@ public interface Type extends Generic {
 	<T extends Attribute> T getAttribute(final Context context, Attribute attribute, final Serializable value, Generic... targets);
 
 	/**
-	 * Create an attribute for the type.
+	 * Creates an attribute for the type. Throws an exception if already exists.
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param value
+	 *            The attribute value.
+	 * @return Return the attribute.
+	 * @see Attribute
+	 */
+	<T extends Attribute> T addAttribute(Cache cache, Serializable value);
+
+	/**
+	 * Creates an attribute for the type or returns this attribute if already exists.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
@@ -86,7 +98,21 @@ public interface Type extends Generic {
 	<T extends Attribute> T getProperty(Context context, Serializable value);
 
 	/**
-	 * Create a property for the type.
+	 * Creates a property for the type or throws an exception if this property already exists.
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param value
+	 *            the property value
+	 * @param targets
+	 *            The target types.
+	 * @return the attribute
+	 * @see Attribute
+	 */
+	<T extends Attribute> T addProperty(Cache cache, Serializable value, Type... targets);
+
+	/**
+	 * Creates a property for the type or returns this property if already exists.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
@@ -121,7 +147,21 @@ public interface Type extends Generic {
 	<T extends Relation> T getRelation(Context context, Serializable value);
 
 	/**
-	 * Create a relation.
+	 * Creates a relation or returns this relation if this relation already exists.
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param value
+	 *            The relation value.
+	 * @param targets
+	 *            The target types.
+	 * @return Return the relation.
+	 * @see Relation
+	 */
+	<T extends Relation> T addRelation(Cache cache, Serializable value, Type... targets);
+
+	/**
+	 * Creates a relation or returns this relation if this relation already exists.
 	 * 
 	 * @param cache
 	 *            The reference Cache.

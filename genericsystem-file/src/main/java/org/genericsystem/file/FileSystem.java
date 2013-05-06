@@ -40,10 +40,14 @@ public class FileSystem extends GenericImpl {
 			return getHolderByValue(context, context.<Attribute> find(FileType.class), name);
 		}
 
+		public <T extends File> T addFile(Cache cache, String name) {
+			return addFile(cache, name, EMPTY);
+		}
+
 		public <T extends File> T addFile(Cache cache, String name, byte[] content) {
-			if (getFile(cache, name) != null)
-				throw new IllegalStateException("File : " + name + " already exists");
-			return touchFile(cache, name, content);
+			T result = addHolder(cache, cache.<Attribute> find(FileType.class), name);
+			result.setContent(cache, content);
+			return result;
 		}
 
 		public <T extends File> T touchFile(Cache cache, String name) {
@@ -61,17 +65,15 @@ public class FileSystem extends GenericImpl {
 		}
 
 		public <T extends Directory> T getDirectory(Context context, final String name) {
-			return getHolderByValue(context, context.<Attribute> find(FileSystem.class), name);
+			return getChild(context, name);
 		}
 
 		public <T extends Directory> T addDirectory(Cache cache, String name) {
-			if (getDirectory(cache, name) != null)
-				throw new IllegalStateException("Directory : " + name + " already exists");
-			return touchDirectory(cache, name);
+			return addNode(cache, name);
 		}
 
 		public <T extends Directory> T touchDirectory(Cache cache, String name) {
-			return setHolder(cache, cache.<Attribute> find(FileSystem.class), name);
+			return setNode(cache, name);
 		}
 
 		public String getShortPath() {

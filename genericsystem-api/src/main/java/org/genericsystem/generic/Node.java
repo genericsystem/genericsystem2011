@@ -16,7 +16,20 @@ import org.genericsystem.core.Snapshot;
 public interface Node extends Holder {
 
 	/**
-	 * Add a Node if not exists, return existent node otherwise.
+	 * Add a new node or throws an exception if this node already exists
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param value
+	 *            The node name.
+	 * @param targets
+	 *            The targets.
+	 * @return Return the Node.
+	 */
+	<T extends Node> T addNode(Cache cache, Serializable value, Generic... targets);
+
+	/**
+	 * Add a new node or returns this node if already exists.
 	 * 
 	 * @param cache
 	 *            The reference Cache.
