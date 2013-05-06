@@ -552,10 +552,10 @@ public interface Generic extends Comparable<Generic> {
 	 * @param attribute
 	 *            The attribute.
 	 * @param targets
-	 *            The tagets.
+	 *            The targets.
 	 * @return The position.
 	 */
-	int getBasePos(Holder attribute, Generic[] targets);
+	int getBasePos(Holder attribute, Generic... targets);
 
 	/**
 	 * Returns the size of supers.

@@ -191,11 +191,17 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFind(Generic implicit, Generic[] supers, Generic[] components) {
 		assert supers[0].getImplicit().equals(implicit);
-		final Generic[] interfaces = new Primaries(supers).toArray();
-		for (Generic generic : components.length == 0 ? implicit.getInheritings(this) : components[0].getComposites(this))
+		return fastFindByInterfaces(implicit, new Primaries(supers).toArray(), components);
+	}
+
+	<T extends Generic> T fastFindByInterfaces(Generic implicit, Generic[] interfaces, Generic[] components) {
+		if (components.length == 0 && interfaces.length == 1) {
+			assert implicit.equals(interfaces[0]);
+			return (T) implicit;
+		}
+		for (Generic generic : components.length == 0 || components[0] == null ? implicit.getInheritings(this) : components[0].getComposites(this))
 			if (((GenericImpl) generic).equiv(interfaces, components))
 				return (T) generic;
 		return null;

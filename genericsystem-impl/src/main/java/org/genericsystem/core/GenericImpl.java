@@ -113,17 +113,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		supers[0] = tmp;
 	}
 
-	// private boolean contains(Generic search) {
-	// if (equals(search))
-	// return true;
-	// if (isEngine())
-	// return false;
-	// for (Generic superGeneric : supers)
-	// if (((GenericImpl) superGeneric).contains(search))
-	// return true;
-	// return false;
-	// }
-
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components, boolean automatic) {
 		this.value = value;
 		supers = directSupers;
@@ -138,10 +127,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 
 		// TODO KK
-		assert getMetaLevel() == metaLevel : this + " => getMetaLevel() : " + getMetaLevel() + " / metaLevel : " + metaLevel;
+		assert getMetaLevel() == metaLevel : this.info();
 		if (!isPrimary())
 			assert Objects.equals(directSupers[0].getValue(), value);
-		// zassert /* components.length != 0 || */value != null;
+		if (value != null)
+			for (Generic primary : getPrimaries())
+				assert primary.getValue() != null : this.info();
 		return this;
 	}
 
@@ -327,6 +318,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				T phantom = bind(cache, phantomImplicit, holder, basePos, Statics.truncate(basePos, ((GenericImpl) holder).components));
 				if (value == null)
 					return phantom;
+			} else if (value == null) {
+				assert holder.getValue() != null;
+				Generic phantomImplicit = ((GenericImpl) attribute).bindPrimary(cache, null, SystemGeneric.CONCRETE, true);
+				assert !((GenericImpl) holder).getPrimaries().contains(phantomImplicit);
+				return bind(cache, phantomImplicit, holder, basePos, Statics.truncate(basePos, ((GenericImpl) holder).components));
 			}
 			return this.<T> bind(cache, implicit, attribute, basePos, targets);
 		}
@@ -362,7 +358,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public int getBasePos(Holder attribute, Generic[] targets) {
+	public int getBasePos(Holder attribute, Generic... targets) {
 		return ((GenericImpl) attribute).getPositions(Statics.insertFirst(this, targets)).get(0);
 	}
 
