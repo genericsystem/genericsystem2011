@@ -13,7 +13,6 @@ public class EngineConsistencyConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		final Type vehicle = cache.newType("Vehicle");
 		new RollbackCatcher() {
-
 			@Override
 			public void intercept() {
 				vehicle.setAttribute(GenericSystem.newCacheOnANewInMemoryEngine(), "Power");

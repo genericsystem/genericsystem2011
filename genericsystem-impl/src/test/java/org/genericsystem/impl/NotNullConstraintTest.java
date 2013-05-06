@@ -43,7 +43,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		Link test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
 		Link test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);
 		assert myCar.getLinks(cache, driving).containsAll(Arrays.asList(test, test2));
-		myCar.setLink(cache, driving, null, myHuman, myRoad);
+		myCar.clear(cache, driving, myHuman, myRoad);
 		assert myCar.getLinks(cache, driving).isEmpty();
 		test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
 		test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);

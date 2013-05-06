@@ -423,7 +423,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 				return (T) result;
 			}
 		}
-		log.info("ttttttttttttttttttt" + Arrays.toString(directSupers) + implicit);
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(directSuper, interfaces, components);

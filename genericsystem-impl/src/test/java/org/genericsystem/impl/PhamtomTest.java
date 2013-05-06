@@ -40,11 +40,15 @@ public class PhamtomTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 
 		assert myVehicle.getValue(cache, vehiclePower) == "123";
-		myVehicle.cancel(cache, defaultPower);
-		Iterator<Generic> iterator = ((GenericImpl) myVehicle).concreteIterator(cache, vehiclePower, Statics.BASE_POSITION, true);
-		Generic phantom = iterator.next();
-		myVehicle.restore(cache, defaultPower);
+		myVehicle.setValue(cache, defaultPower, null);
+		Generic phantom = ((GenericImpl) myVehicle).concreteIterator(cache, vehiclePower, Statics.BASE_POSITION, true).next();
+		myVehicle.setValue(cache, defaultPower, "123");
 		assert !phantom.isAlive(cache);
+
+		myVehicle.setValue(cache, defaultPower, null);
+		phantom = ((GenericImpl) myVehicle).concreteIterator(cache, vehiclePower, Statics.BASE_POSITION, true).next();
+		myVehicle.setValue(cache, defaultPower, "235");
+		assert phantom.isAlive(cache);
 	}
 
 	public void cancelAttribute() {
@@ -311,20 +315,36 @@ public class PhamtomTest extends AbstractTest {
 
 	public void cancelDefaultRelationKo() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
+
 		final Relation carColor = car.setRelation(cache, "carColor", color);
+
 		Generic red = color.newInstance(cache, "red");
-		car.setLink(cache, carColor, "defaultColor", red);
+		Generic green = color.newInstance(cache, "green");
+
+		car.setLink(cache, carColor, "defaultColor1", red);
+		car.setLink(cache, carColor, "defaultColor2", green);
 		final Generic myCar = car.newInstance(cache, "myCar");
 		assert myCar.getTargets(cache, carColor).contains(red);
+		assert myCar.getTargets(cache, carColor).contains(green);
 		new RollbackCatcher() {
-
 			@Override
 			public void intercept() {
-				myCar.cancel(cache, carColor);
+				myCar.setValue(cache, carColor, null);
 			}
 		}.assertIsCausedBy(IllegalStateException.class);
+		myCar.clear(cache, carColor, red);
+		assert !myCar.getTargets(cache, carColor).contains(red);
+		assert myCar.getTargets(cache, carColor).contains(green);
+		myCar.setLink(cache, carColor, "defaultColor1", red);
+		assert myCar.getTargets(cache, carColor).contains(red);
+		assert myCar.getTargets(cache, carColor).contains(green);
+		myCar.clear(cache, carColor);
+		assert !myCar.getTargets(cache, carColor).contains(red);
+		assert !myCar.getTargets(cache, carColor).contains(green);
+		assert myCar.getTargets(cache, carColor).isEmpty();
 	}
 
 	public void testTwoCancel() {
@@ -346,17 +366,20 @@ public class PhamtomTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setProperty(cache, "power");
+		Generic myCar = car.newInstance(cache, "myCar");
+		assert myCar.setValue(cache, carPower, null) == null; // Do nothing;
+
 		Holder defaultPower = car.setValue(cache, carPower, "233");
-		Generic mycar = car.newInstance(cache, "myCar");
-		assert mycar.getValue(cache, carPower).equals("233");
-		mycar.cancel(cache, defaultPower);
-		assert mycar.getValue(cache, carPower) == null;
-		mycar.restore(cache, defaultPower);
-		assert mycar.getValue(cache, carPower).equals("233");
-		mycar.restore(cache, defaultPower);
-		assert mycar.getValue(cache, carPower).equals("233");
-		mycar.cancel(cache, defaultPower);
-		assert mycar.getValue(cache, carPower) == null;
+		assert myCar.getValue(cache, carPower).equals("233");
+		myCar.setValue(cache, defaultPower, null);
+		assert myCar.getValue(cache, carPower) == null;
+		myCar.getHolder(cache, defaultPower, null).remove(cache);
+		// myCar.restore(cache, defaultPower);
+		assert myCar.getValue(cache, carPower).equals("233");
+		myCar.restore(cache, defaultPower);
+		assert myCar.getValue(cache, carPower).equals("233");
+		myCar.cancel(cache, defaultPower);
+		assert myCar.getValue(cache, carPower) == null;
 	}
 
 	public void testAnyCancelRestore() {

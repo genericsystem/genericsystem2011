@@ -676,11 +676,35 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	String info();
 
-	<T extends Generic> T cancel(Cache cache, Holder attribute);
+	/**
+	 * Clear the holders that inherit from the attribute with exact targets.
+	 * 
+	 * @param cache
+	 *            The cache
+	 * @param attribute
+	 *            the attribute of holders
+	 * @param targets
+	 */
+	void clear(Cache cache, Holder attribute, Generic... targets);
 
-	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos);
+	/**
+	 * Clear the holders that inherit from the attribute with exact targets.
+	 * 
+	 * @param cache
+	 *            The cache
+	 * @param attribute
+	 *            the attribute of holders
+	 * @param basePos
+	 *            the base position
+	 * @param targets
+	 */
+	void clear(Cache cache, Holder attribute, int basePos, Generic... targets);
 
-	void restore(Cache cache, Holder attribute);
+	<T extends Generic> T cancel(Cache cache, Holder attribute, Generic... targets);
 
-	void restore(Cache cache, Holder attribute, int basePos);
+	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, Generic... targets);
+
+	void restore(Cache cache, Holder attribute, Generic... targets);
+
+	void restore(Cache cache, Holder attribute, int basePos, Generic... targets);
 }

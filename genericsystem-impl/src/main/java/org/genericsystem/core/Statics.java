@@ -103,7 +103,7 @@ public class Statics {
 		return result;
 	}
 
-	static Generic[] insertFirstIntoArray(Generic first, Generic... others) {
+	static Generic[] insertFirst(Generic first, Generic... others) {
 		Generic[] result = new Generic[others.length + 1];
 		result[0] = first;
 		System.arraycopy(others, 0, result, 1, others.length);
@@ -357,7 +357,7 @@ public class Statics {
 			String message = "" + result;
 			while (iterator.hasNext())
 				message += iterator.next();
-			throw new IllegalStateException("Ambigous reponse : " + message);
+			throw new IllegalStateException("Ambigous selection : " + message);
 		}
 		return result;
 	}
