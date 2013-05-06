@@ -7,6 +7,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
+import org.genericsystem.exception.PhantomConstraintViolationException;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -95,7 +96,7 @@ public class PhamtomTest extends AbstractTest {
 			public void intercept() {
 				((GenericImpl) car).setSubAttribute(cache, vehiclePower, null);
 			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}.assertIsCausedBy(PhantomConstraintViolationException.class);
 	}
 
 	public void cancelAndRestoreRelation() {
