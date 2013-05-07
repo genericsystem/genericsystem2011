@@ -8,7 +8,7 @@ package org.genericsystem.exception;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class UniqueStructuralValueConstraintViolationException extends RuntimeException {
+public class UniqueStructuralValueConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = 4617646668336129382L;
 

@@ -8,7 +8,7 @@ package org.genericsystem.exception;
  * @author Nicolas Feybesse
  * @author Michaël Ory
  */
-public class UnduplicateBindingConstraintViolationException extends RuntimeException {
+public class UnduplicateBindingConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = 6695533655404884865L;
 
