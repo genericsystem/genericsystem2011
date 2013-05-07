@@ -28,7 +28,7 @@ public class SingularInstanceConstraintImpl extends Constraint implements Boolea
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
-			Type constraintBaseType = (Type) constraintValue.getConstraintType();
+			Type constraintBaseType = (Type) constraintValue.getConstraintBaseType();
 			int instanceNumber = constraintBaseType.getAllInstances(context).size();
 			if (instanceNumber > 1)
 				throw new SingularInstanceConstraintViolationException("Singular instance constraint violation : type " + constraintBaseType + " has " + instanceNumber + " instances.");

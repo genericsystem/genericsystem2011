@@ -1,8 +1,10 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -287,8 +289,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return setHolder(cache, attribute, value, getBasePos(attribute, targets), targets);
 	}
 
-	@Override
-	public <T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets) {
+	private <T extends Holder> T getSelectedHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		T holder;
 		if (((Relation) attribute).isSingularConstraintEnabled(cache, basePos))
 			holder = getHolder(cache, (Attribute) attribute, basePos);
@@ -296,9 +297,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			holder = getHolder(cache, attribute, basePos, targets);
 		else
 			holder = getHolderByValue(cache, attribute, value, basePos, targets);
+		return holder;
+	}
 
+	@Override
+	public <T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets) {
+		T holder = getSelectedHolder(cache, attribute, value, basePos, targets);
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
-
 		if (holder == null)
 			return value != null ? this.<T> bind(cache, implicit, attribute, basePos, true, targets) : null;
 		if (!this.equals(holder.getComponent(basePos))) {
@@ -719,7 +724,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private void project(final Cache cache, final int pos, Generic phantom) {
-		Iterator<Object[]> cartesianIterator = new CartesianIterator(iterables(cache, pos));
+		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(cache, pos));
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = (Generic[]) cartesianIterator.next();
 			if (!findPhantom(cache, phantom, components))
@@ -727,19 +732,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	private Iterable<Generic>[] iterables(final Cache cache, final int pos) {
-		final Iterable<Generic>[] targetProjectionIterable = new Iterable[components.length];
+	private Iterable<Generic>[] projections(final Cache cache, final int pos) {
+		final Iterable<Generic>[] projections = new Iterable[components.length];
 		for (int i = 0; i < components.length; i++) {
 			final int column = i;
-			targetProjectionIterable[i] = new Iterable<Generic>() {
+			projections[i] = new Iterable<Generic>() {
 				@Override
 				public Iterator<Generic> iterator() {
 					return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator(cache) : new SingletonIterator<Generic>(components[column]);
 				}
 			};
 		}
-		return targetProjectionIterable;
-
+		return projections;
 	}
 
 	private boolean findPhantom(Cache cache, Generic phantom, Generic[] components) {
@@ -916,37 +920,102 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void log() {
-		log.debug(info());
+		log.info(info());
+	}
+
+	@Override
+	public void log(Context context) {
+		log.info(info(context));
 	}
 
 	@Override
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
-		s += "toString()     : " + this + "\n";
-		s += "Value          : " + getValue() + "\n";
-		s += "getMeta()      : " + getMeta() + "\n";
-		s += "getInstanciationLevel() : " + getMetaLevel() + "\n";
+		s += "toString    : " + this + "\n";
+		s += "meta        : " + getMeta() + "\n";
+		s += "value       : " + getValue() + "\n";
+		s += "metaLevel   : " + getMetaLevel() + "\n";
+		s += "**********************************************************************\n";
+		s += "design date : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "birth date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "death date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDeathTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "**********************************************************************\n";
 		for (Generic primary : getPrimaries())
-			s += "Primary #" + "       : " + primary + " (" + System.identityHashCode(primary) + ")\n";
+			s += "primary     : " + primary + " (" + System.identityHashCode(primary) + ")\n";
 		for (Generic component : components)
-			s += "Component #" + "    : " + component + " (" + System.identityHashCode(component) + ")\n";
-		for (Generic superGeneric : supers) {
-			s += "Super #" + "        : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
-		}
+			s += "component   : " + component + " (" + System.identityHashCode(component) + ")\n";
+		for (Generic superGeneric : supers)
+			s += "super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
+		s += "**********************************************************************\n";
+		return s;
+	}
+
+	@Override
+	public String info(Context context) {
+		String s = info();
+		for (Attribute attribute : getAttributes(context))
+			if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
+				s += attribute + "\n";
+				for (Holder holder : getHolders(context, attribute))
+					s += "                          ---------->    " + holder + "\n";
+			}
 		s += "**********************************************************************\n";
 		return s;
 	}
 
 	@Override
 	public String toString() {
+		String s = getGenericType();
 		if (isPrimary()) {
 			Serializable value = getValue();
-			return value instanceof Class ? ((Class<?>) value).getSimpleName() : value != null ? value.toString() : "null";
+			return s + "{" + (value instanceof Class ? ((Class<?>) value).getSimpleName() : value) + "}";
 		}
-		return Arrays.toString(getPrimariesArray() /* supers */) + "/" + toString(components);
+		return s + "{" + toString(supers) + "/" + toString(components) + "}";
 	}
 
-	private String toString(Object[] a) {
+	private String getGenericType() {
+		int metaLevel = getMetaLevel();
+		int dim = getComponentsSize();
+		switch (metaLevel) {
+		case SystemGeneric.META:
+			switch (dim) {
+			case Statics.TYPE_SIZE:
+				return "MetaType";
+			case Statics.ATTRIBUTE_SIZE:
+				return "MetaAttribute";
+			case Statics.RELATION_SIZE:
+				return "MetaRelation";
+			default:
+				return "MetaNRelation";
+			}
+		case SystemGeneric.STRUCTURAL:
+			switch (dim) {
+			case Statics.TYPE_SIZE:
+				return "Type";
+			case Statics.ATTRIBUTE_SIZE:
+				return "Attribute";
+			case Statics.RELATION_SIZE:
+				return "Relation";
+			default:
+				return "NRelation";
+			}
+		case SystemGeneric.CONCRETE:
+			switch (dim) {
+			case Statics.TYPE_SIZE:
+				return "Instance";
+			case Statics.ATTRIBUTE_SIZE:
+				return "Holder";
+			case Statics.RELATION_SIZE:
+				return "Link";
+			default:
+				return "NLink";
+			}
+		default:
+			throw new IllegalStateException();
+		}
+	}
+
+	private String toString(Generic[] a) {
 		if (a == null)
 			return "null";
 
@@ -960,7 +1029,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (this.equals(a[i]))
 				b.append("this");
 			else
-				b.append(String.valueOf(a[i]));
+				b.append((a[i].getValue() instanceof Class ? ((Class<?>) a[i].getValue()).getSimpleName() : a[i].getValue()));
 			if (i == iMax)
 				return b.append(']').toString();
 			b.append(", ");
@@ -1207,10 +1276,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return cache.getReferentialIntegrities(this);
 	}
 
-	/*********************************************/
-	/**************** PHANTOM ********************/
-	/*********************************************/
-
 	@Override
 	public <T extends Generic> T cancel(Cache cache, Holder attribute, Generic... targets) {
 		return cancel(cache, attribute, getBasePos(attribute, targets), targets);
@@ -1233,10 +1298,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isTree() {
-		for (int i = 0; i < components.length; i++)
-			if (equals(components[i]))
-				return true;
-		return false;
+		return isStructural() && this.equals(getBaseComponent());
+	}
+
+	@Override
+	public boolean isRoot() {
+		return isConcrete() && this.equals(getBaseComponent());
 	}
 
 	/*********************************************/
@@ -1500,7 +1567,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return !isBooleanSystemPropertyEnabled(context, NoInheritanceSystemProperty.class);
 	}
 
-	public Generic[] transform(Generic[] components) {
+	private Generic[] transform(Generic[] components) {
 		Generic[] result = components.clone();
 		for (int i = 0; i < result.length; i++)
 			if (result[i] == null)
@@ -1514,15 +1581,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Generic> T reBind(Cache cache) {
 		return ((CacheImpl) cache).reBind(this);
-	}
-
-	boolean isPseudoStructural() {
-		if (!isConcrete())
-			return false;
-		for (Generic component : components)
-			if (component.isStructural())
-				return true;
-		return false;
 	}
 
 	boolean isPseudoStructural(int basePos) {

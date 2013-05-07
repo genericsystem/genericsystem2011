@@ -30,6 +30,7 @@ public class FunctionalTest extends AbstractTest {
 		assert carInstancesWithPowerHigherThan90HP.contains(myCar);
 		assert !carInstancesWithPowerHigherThan90HP.contains(yourCar);
 		assert carInstancesWithPowerHigherThan90HP.size() == 1;
+		myCar.log(cache);
 	}
 
 	@Test

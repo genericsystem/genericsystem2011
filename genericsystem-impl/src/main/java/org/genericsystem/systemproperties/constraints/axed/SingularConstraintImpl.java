@@ -38,9 +38,9 @@ public class SingularConstraintImpl extends Constraint implements BooleanSystemP
 			if (value instanceof Integer) {
 				Integer axe = (Integer) value;
 				final Generic component = ((Link) modified).getComponent(axe);
-				Snapshot<Holder> holders = ((GenericImpl) component).getHolders(context, (Relation) constraintValue.getConstraintType(), axe);
+				Snapshot<Holder> holders = ((GenericImpl) component).getHolders(context, (Relation) constraintValue.getConstraintBaseType(), axe);
 				if (holders.size() > 1)
-					throw new SingularConstraintViolationException("Multiple links of type " + constraintValue.getConstraintType() + " on target " + component + " (n° " + axe + ") : " + holders);
+					throw new SingularConstraintViolationException("Multiple links of type " + constraintValue.getConstraintBaseType() + " on target " + component + " (n° " + axe + ") : " + holders);
 			}
 		}
 	}

@@ -11,7 +11,7 @@ import org.genericsystem.exception.ReferentialIntegrityConstraintViolationExcept
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
-@Test(threadPoolSize = 1, invocationCount = 1)
+@Test
 public class ConcurrentTest extends AbstractTest {
 
 	public void testConcurrentWithNoFlush() {

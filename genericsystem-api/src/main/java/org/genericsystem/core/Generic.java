@@ -711,6 +711,13 @@ public interface Generic extends Comparable<Generic> {
 	boolean isTree();
 
 	/**
+	 * Returns true if the Generic is root.
+	 * 
+	 * @return True if the Generic is root.
+	 */
+	boolean isRoot();
+
+	/**
 	 * Returns true if the Generic is removable.
 	 * 
 	 * @param cache
@@ -730,18 +737,34 @@ public interface Generic extends Comparable<Generic> {
 	Snapshot<Generic> getRefenrentialIntegrities(Cache cache);
 
 	/**
-	 * Log with slf4j. The log level is debug.<br/>
-	 * Call the info method.
+	 * Log with slf4j.<br/>
+	 * Call the info() method.
 	 */
 	void log();
 
 	/**
-	 * Build message.<br/>
-	 * Call the toString to Generic. Poster the Holder, the meta, the meta level, the interfaces, the components and the supers.
+	 * Log with slf4j<br/>
+	 * Call the info(context) method.
 	 * 
-	 * @return The message.
+	 * @param context
+	 *            the reference context
+	 */
+	void log(Context context);
+
+	/**
+	 * Returns all available information except linkage information.
+	 * 
+	 * @return all available information except linkage information.
 	 */
 	String info();
+
+	/**
+	 * Returns all available information with linkage information too
+	 * 
+	 * @param context
+	 * @return all available information with linkage information too
+	 */
+	String info(Context context);
 
 	/**
 	 * Clear the holders that inherit from the attribute with exact targets.

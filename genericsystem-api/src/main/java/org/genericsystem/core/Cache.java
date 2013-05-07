@@ -151,5 +151,4 @@ public interface Cache extends Context {
 	 * @return Return a snapshot referential dependencies.
 	 */
 	Snapshot<Generic> getReferentialIntegrities(Generic generic);
-
 }

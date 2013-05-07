@@ -33,7 +33,7 @@ public class PropertyConstraintImpl extends Constraint implements BooleanSystemP
 	@Override
 	public void check(Context context, final Generic modified) throws ConstraintViolationException {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
-			Type constraintBaseType = (Type) constraintValue.getConstraintType();
+			Type constraintBaseType = (Type) constraintValue.getConstraintBaseType();
 			if (modified.isAttribute()) {
 				// TODO KK
 				for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings(context)) {

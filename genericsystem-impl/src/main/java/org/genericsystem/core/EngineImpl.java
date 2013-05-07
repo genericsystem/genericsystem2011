@@ -48,22 +48,12 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	private Archiver archiver;
 
-	// private Map<Generic, Serializable> valuesMap = new HashMap<>();
-
 	public EngineImpl(Config config, Class<?>... userClasses) {
 		factory = config.getFactory();
 		archiver = new Archiver(this, config.getDirectoryPath());
 		systemCache.init(userClasses);
 		archiver.startScheduler();
 	}
-
-	// public Serializable getValue(Generic generic) {
-	// return valuesMap.get(generic);
-	// }
-	//
-	// public void putValue(Generic generic, Serializable value) {
-	// valuesMap.put(generic, value);
-	// }
 
 	void restoreEngine() {
 		restoreEngine(pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE);

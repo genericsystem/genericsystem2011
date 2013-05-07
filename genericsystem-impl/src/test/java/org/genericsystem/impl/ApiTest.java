@@ -143,6 +143,7 @@ public class ApiTest extends AbstractTest {
 		Link myBmwRed = myBmw.bind(cache, carRed, red);
 		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
 		assert red.getLinks(cache, carColor).contains(myBmwRed) : red.getLinks(cache, carColor);
+		red.log(cache);
 	}
 
 	public void ternaryDeductWithTwoInstances() {
