@@ -43,10 +43,10 @@ public class SizeConstraintImpl extends Constraint {
 			if (value instanceof Integer) {
 				Integer axe = (Integer) value;
 				final Generic component = ((Link) modified).getComponent(axe);
-				Snapshot<Holder> holders = ((GenericImpl) component).getHolders(context, (Relation) constraintValue.getConstraintType(), axe);
+				Snapshot<Holder> holders = ((GenericImpl) component).getHolders(context, (Relation) constraintValue.getConstraintBaseType(), axe);
 				Integer size = ((Attribute) modified).getSizeConstraint((Cache) context, axe);
 				if (size != null && holders.size() > size)
-					throw new SizeConstraintViolationException("Multiple links of type " + constraintValue.getConstraintType() + ", and the maximum size is " + size);
+					throw new SizeConstraintViolationException("Multiple links of type " + constraintValue.getConstraintBaseType() + ", and the maximum size is " + size);
 			}
 		}
 	}

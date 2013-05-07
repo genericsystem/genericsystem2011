@@ -26,7 +26,7 @@ public class UniqueConstraintImpl extends Constraint implements BooleanSystemPro
 	@Override
 	public void check(Context context, Generic modified) throws ConstraintViolationException {
 		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
-			Type constraintBaseType = (Type) constraintValue.getConstraintType();
+			Type constraintBaseType = (Type) constraintValue.getConstraintBaseType();
 			for (Generic generic : constraintBaseType.getAllInstances(context))
 				if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
 					throw new UniqueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + constraintBaseType + ".");

@@ -53,29 +53,29 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 		return this.getClass().getName().compareTo(otherConstraint.getClass().getName());
 	}
 
-	public class ConstraintValue {
+	public static class ConstraintValue {
 
 		private Serializable value;
 
-		private Generic constraintType;
+		private Generic constraintBaseType;
 
-		public ConstraintValue(Serializable value, Generic constraintType) {
+		public ConstraintValue(Serializable value, Generic constraintBaseType) {
 			this.value = value;
-			this.constraintType = constraintType;
+			this.constraintBaseType = constraintBaseType;
 		}
 
 		public Serializable getValue() {
 			return value;
 		}
 
-		public Generic getConstraintType() {
-			return constraintType;
+		public Generic getConstraintBaseType() {
+			return constraintBaseType;
 		}
 
 	}
 
 	// TODO it's clean ?
-	protected Snapshot<ConstraintValue> getConstraintValues(final Context context, final Generic modified, final Class<? extends Constraint> clazz) {
+	protected static Snapshot<ConstraintValue> getConstraintValues(final Context context, final Generic modified, final Class<? extends Constraint> clazz) {
 		return new AbstractSnapshot<ConstraintValue>() {
 			@Override
 			public Iterator<ConstraintValue> iterator() {

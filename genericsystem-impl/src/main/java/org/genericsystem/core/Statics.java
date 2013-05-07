@@ -324,7 +324,7 @@ public class Statics {
 
 			@Override
 			public boolean isSelected() {
-				return next.isTree();
+				return next.isRoot();
 			}
 		};
 	}

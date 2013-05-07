@@ -711,6 +711,13 @@ public interface Generic extends Comparable<Generic> {
 	boolean isTree();
 
 	/**
+	 * Returns true if the Generic is root.
+	 * 
+	 * @return True if the Generic is root.
+	 */
+	boolean isRoot();
+
+	/**
 	 * Returns true if the Generic is removable.
 	 * 
 	 * @param cache

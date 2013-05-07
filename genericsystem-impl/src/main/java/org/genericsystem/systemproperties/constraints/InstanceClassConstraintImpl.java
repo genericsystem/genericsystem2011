@@ -32,7 +32,7 @@ public class InstanceClassConstraintImpl extends Constraint {
 				Class<?> clazz = (Class<?>) constraintValue.getValue();
 				if (modified.getValue() != null && !clazz.isAssignableFrom(modified.getValue().getClass()))
 					throw new InstanceClassConstraintViolationException("Wrong value type for generic " + modified + " : should be " + clazz.getSimpleName() + " but is " + modified.getValue().getClass().getSimpleName() + " for type "
-							+ constraintValue.getConstraintType().getValue());
+							+ constraintValue.getConstraintBaseType().getValue());
 			}
 		}
 	}
