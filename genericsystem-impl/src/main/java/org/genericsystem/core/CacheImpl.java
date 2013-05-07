@@ -30,6 +30,7 @@ import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
+import org.genericsystem.tree.TreeImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -287,7 +288,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			resultComponents[i] = genericToReplace.equals(components[i]) ? null : ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldImplicit, newImplicit) : replace(components[i], oldImplicit, newImplicit);
 
 		Generic implicit = genericToReplace.getImplicit().equals(oldImplicit) ? newImplicit : genericToReplace.getImplicit();
-		return bind(implicit, resultInterfaces, resultComponents, genericToReplace.isAutomatic(), genericToReplace.getClass());
+		return bind(implicit, resultInterfaces, resultComponents, genericToReplace.isAutomatic(), genericToReplace.getClass(), true);
 	}
 
 	private Generic getNewPrimary(Generic oldSubPrimary, Generic oldPrimary, Generic newPrimary) {
@@ -354,7 +355,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
-		T result = bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0), superTypes, components, false, null);
+		T result = bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0), superTypes, components, false, null, false);
 		assert Objects.equals(value, result.getValue());
 		// if (((GenericImpl) result).isPrimary())
 		// assert Objects.equals(value, result.getSupers().first().getImplicit().getValue()) : result.getSupers();
@@ -368,7 +369,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, true), Statics.EMPTY_GENERIC_ARRAY, new Generic[dim], false, null).<T> disableInheritance(this);
+		return this.<T> bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, true), Statics.EMPTY_GENERIC_ARRAY, new Generic[dim], false, TreeImpl.class, false).<T> disableInheritance(this);
 	}
 
 	@Override
@@ -386,22 +387,23 @@ public class CacheImpl extends AbstractContext implements Cache {
 	// TODO KK findImplicitSuper
 	<T extends Generic> T bind(Class<?> clazz) {
 		// assert supers[0].getImplicit().equals(findImplicitSuper(clazz)) : "" + supers[0].getImplicit() + " / " + findImplicitSuper(clazz);
-		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), true), findSupers(clazz), findComponents(clazz), false, clazz);
+		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), true), findSupers(clazz), findComponents(clazz), false, clazz, false);
 	}
 
-	<T extends Generic> T bind(Generic implicit, boolean automatic, Generic directSuper, Generic... components) {
+	<T extends Generic> T bind(Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {
 		Class<?> clazz = null;
 		if (implicit.isConcrete()) {
 			components = ((GenericImpl) directSuper).sortAndCheck(components);
-			InstanceGenericClass instanceClass = directSuper.getClass().getAnnotation(InstanceGenericClass.class);
+			Generic meta = directSuper.getMetaLevel() == implicit.getMetaLevel() ? directSuper.getMeta() : directSuper;
+			InstanceGenericClass instanceClass = meta.getClass().getAnnotation(InstanceGenericClass.class);
 			if (instanceClass != null)
 				clazz = instanceClass.value();
 		}
-		return bind(implicit, new Generic[] { directSuper }, components, automatic, clazz);
+		return bind(implicit, new Generic[] { directSuper }, components, automatic, clazz, existsException);
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz/* , boolean existException */) {
+	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz, boolean existsException) {
 
 		final Primaries primaries = new Primaries(supers);
 		primaries.add(implicit);
@@ -421,8 +423,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (result != null) {
 			if (!Objects.equals(result.getValue(), implicit.getValue()))
 				throw new IllegalSelectorException();
-			// if (existsException)
-			// throw new IllegalStateException("Exists exception");
+			if (existsException)
+				throw new IllegalStateException("Exists exception");
 			return result;
 		}
 		return internalBind(implicit, interfaces, components, automatic, clazz);

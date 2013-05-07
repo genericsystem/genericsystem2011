@@ -16,6 +16,8 @@ import org.genericsystem.file.FileSystem.FileType;
 import org.genericsystem.file.FileSystem.FileType.File;
 import org.genericsystem.file.FileSystem.FileType.FileContent;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.tree.NodeImpl;
+import org.genericsystem.tree.TreeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +26,14 @@ import org.slf4j.LoggerFactory;
 @Components(FileSystem.class)
 @Dependencies(FileType.class)
 @InstanceGenericClass(Directory.class)
-public class FileSystem extends GenericImpl {
+public class FileSystem extends TreeImpl {
 	protected static Logger log = LoggerFactory.getLogger(FileSystem.class);
 
 	private static final String SEPARATOR = "/";
 
 	private static final byte[] EMPTY = "<html/>".getBytes();
 
-	public static class Directory extends GenericImpl {
+	public static class Directory extends NodeImpl {
 		public <T extends File> Snapshot<T> getFiles(Context context) {
 			return getHolders(context, context.<Attribute> find(FileType.class));
 		}
@@ -40,10 +42,14 @@ public class FileSystem extends GenericImpl {
 			return getHolderByValue(context, context.<Attribute> find(FileType.class), name);
 		}
 
+		public <T extends File> T addFile(Cache cache, String name) {
+			return addFile(cache, name, EMPTY);
+		}
+
 		public <T extends File> T addFile(Cache cache, String name, byte[] content) {
-			if (getFile(cache, name) != null)
-				throw new IllegalStateException("File : " + name + " already exists");
-			return touchFile(cache, name, content);
+			T result = addHolder(cache, cache.<Attribute> find(FileType.class), name);
+			result.setContent(cache, content);
+			return result;
 		}
 
 		public <T extends File> T touchFile(Cache cache, String name) {
@@ -61,17 +67,15 @@ public class FileSystem extends GenericImpl {
 		}
 
 		public <T extends Directory> T getDirectory(Context context, final String name) {
-			return getHolderByValue(context, context.<Attribute> find(FileSystem.class), name);
+			return getChild(context, name);
 		}
 
 		public <T extends Directory> T addDirectory(Cache cache, String name) {
-			if (getDirectory(cache, name) != null)
-				throw new IllegalStateException("Directory : " + name + " already exists");
-			return touchDirectory(cache, name);
+			return addNode(cache, name);
 		}
 
 		public <T extends Directory> T touchDirectory(Cache cache, String name) {
-			return setHolder(cache, cache.<Attribute> find(FileSystem.class), name);
+			return setNode(cache, name);
 		}
 
 		public String getShortPath() {

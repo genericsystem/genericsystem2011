@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
@@ -122,8 +121,11 @@ public interface Generic extends Comparable<Generic> {
 	 *            The reference Cache.
 	 * @param attribute
 	 *            The attribute.
+	 * @param targets
+	 *            The targets.
+	 * @return A new Generic or the existing Generic.
 	 */
-	void flag(Cache cache, Attribute attribute);
+	<T extends Holder> T flag(Cache cache, Holder attribute, Generic... targets);
 
 	/**
 	 * Bind this with the targets.
@@ -203,7 +205,23 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, Generic... targets);
 
 	/**
-	 * Modify or create a Link. <br/>
+	 * Creates a link or throws an exception if the link if already exists <br/>
+	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param relation
+	 *            The relation.
+	 * @param value
+	 *            The value Link.
+	 * @param targets
+	 *            The optional targets.
+	 * @return The Link.
+	 */
+	<T extends Link> T addLink(Cache cache, Link relation, Serializable value, Generic... targets);
+
+	/**
+	 * Creates a link or returns the link if already exists <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 
 	 * @param cache
@@ -219,7 +237,7 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T setLink(Cache cache, Link relation, Serializable value, Generic... targets);
 
 	/**
-	 * Modify or create a Holder. <br/>
+	 * Creates an holder or throws an exception if this holder already exists. <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 
 	 * @param cache
@@ -230,12 +248,47 @@ public interface Generic extends Comparable<Generic> {
 	 *            The value Link.
 	 * @param targets
 	 *            The optional targets.
-	 * @return The Link.
+	 * @return The Holder.
 	 */
-	<T extends Link> T setHolder(Cache cache, Holder attribute, Serializable value, Generic... targets);
+	<T extends Holder> T addHolder(Cache cache, Holder attribute, Serializable value, Generic... targets);
 
 	/**
-	 * Modify or create a Holder. <br/>
+	 * Creates an holder or throws an exception if this holder already exists. <br/>
+	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param attribute
+	 *            The Holder.
+	 * @param value
+	 *            The value Link.
+	 * @param basePos
+	 *            The base position.
+	 * 
+	 * @param targets
+	 *            The optional targets.
+	 * @return The Holder.
+	 */
+	<T extends Holder> T addHolder(Cache cache, Holder attribute, int basePos, Serializable value, Generic... targets);
+
+	/**
+	 * Creates an holder or returns this holder if already exists. <br/>
+	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param attribute
+	 *            The Holder.
+	 * @param value
+	 *            The value Link.
+	 * @param targets
+	 *            The optional targets.
+	 * @return The Holder.
+	 */
+	<T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, Generic... targets);
+
+	/**
+	 * Creates an holder or returns this holder if already exists. <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 
 	 * @param cache
@@ -248,9 +301,9 @@ public interface Generic extends Comparable<Generic> {
 	 *            The position of this in components
 	 * @param targets
 	 *            The optional targets.
-	 * @return The Link.
+	 * @return The holder.
 	 */
-	<T extends Link> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets);
+	<T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets);
 
 	/**
 	 * Returns the targets of the Relation.
@@ -359,7 +412,21 @@ public interface Generic extends Comparable<Generic> {
 	<S extends Serializable> S getValue(Context context, Holder attribute);
 
 	/**
-	 * Modify or create a Holder. <br/>
+	 * Creates an holder or throws an exception if this holder already exists. <br/>
+	 * If the Singular constraint is enabled on the attribute, then one value will be created.<br/>
+	 * 
+	 * @param cache
+	 *            The reference Cache.
+	 * @param attribute
+	 *            The attribute.
+	 * @param value
+	 *            The name value.
+	 * @return The value holder.
+	 */
+	<T extends Holder> T addValue(Cache cache, Holder attribute, Serializable value);
+
+	/**
+	 * Creates an holder or return this holder if this holder already exists. <br/>
 	 * If the Singular constraint is enabled on the attribute, then one value will be created.<br/>
 	 * 
 	 * @param cache
