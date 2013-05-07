@@ -954,7 +954,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String info(Context context) {
 		String s = info();
 		for (Attribute attribute : getAttributes(context))
-			if (!(attribute.getValue() instanceof Class)) {
+			if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
 				s += attribute + "\n";
 				for (Holder holder : getHolders(context, attribute))
 					s += "                          ---------->    " + holder + "\n";
@@ -968,7 +968,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		String s = getGenericType();
 		if (isPrimary()) {
 			Serializable value = getValue();
-			return s + "{" + (value instanceof Class ? ((Class<?>) value).getSimpleName() : value != null ? value.toString() : "null") + "}";
+			return s + "{" + (value instanceof Class ? ((Class<?>) value).getSimpleName() : value) + "}";
 		}
 		return s + "{" + toString(supers) + "/" + toString(components) + "}";
 	}
@@ -1029,7 +1029,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (this.equals(a[i]))
 				b.append("this");
 			else
-				b.append(String.valueOf(a[i].getValue()));
+				b.append((a[i].getValue() instanceof Class ? ((Class<?>) a[i].getValue()).getSimpleName() : a[i].getValue()));
 			if (i == iMax)
 				return b.append(']').toString();
 			b.append(", ");
