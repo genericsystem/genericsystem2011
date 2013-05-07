@@ -273,7 +273,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return holder;
 	}
 
-	<T extends Generic> T bindPrimary(Cache cache, Serializable value, int metaLevel, boolean automatic) {
+	public <T extends Generic> T bindPrimary(Cache cache, Serializable value, int metaLevel, boolean automatic) {
 		return ((CacheImpl) cache).bindPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel, automatic);
 	}
 
@@ -323,7 +323,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	}
 
-	<T extends Holder> T bind(Cache cache, Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
+	protected <T extends Holder> T bind(Cache cache, Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
 		return ((CacheImpl) cache).bind(implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
 	}
 
@@ -1014,7 +1014,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	<T extends Generic> Iterator<T> instancesIterator(Context context) {
+	protected <T extends Generic> Iterator<T> instancesIterator(Context context) {
 		return Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(context), SystemGeneric.CONCRETE);
 	}
 

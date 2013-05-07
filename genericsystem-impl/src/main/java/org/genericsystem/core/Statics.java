@@ -349,7 +349,7 @@ public class Statics {
 		};
 	}
 
-	static <T> T unambigousFirst(Iterator<T> iterator) {
+	public static <T> T unambigousFirst(Iterator<T> iterator) {
 		if (!iterator.hasNext())
 			return null;
 		T result = iterator.next();

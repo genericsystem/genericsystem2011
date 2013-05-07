@@ -10,14 +10,14 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.NodeImpl;
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.core.TreeImpl;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType;
 import org.genericsystem.file.FileSystem.FileType.File;
 import org.genericsystem.file.FileSystem.FileType.FileContent;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.tree.NodeImpl;
+import org.genericsystem.tree.TreeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

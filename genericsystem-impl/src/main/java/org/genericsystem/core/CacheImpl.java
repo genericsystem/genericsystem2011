@@ -30,6 +30,7 @@ import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
+import org.genericsystem.tree.TreeImpl;
 
 /**
  * @author Nicolas Feybesse

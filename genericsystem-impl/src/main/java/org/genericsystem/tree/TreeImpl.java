@@ -1,8 +1,14 @@
-package org.genericsystem.core;
+package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
 import org.genericsystem.annotation.InstanceGenericClass;
+import org.genericsystem.core.Cache;
+import org.genericsystem.core.Context;
+import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.Snapshot;
+import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.snapshot.AbstractSnapshot;
