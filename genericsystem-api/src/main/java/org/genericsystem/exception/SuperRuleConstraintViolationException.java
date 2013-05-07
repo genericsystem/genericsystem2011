@@ -7,7 +7,7 @@ package org.genericsystem.exception;
  * 
  * @author Nicolas Feybesse
  */
-public class SuperRuleConstraintViolationException extends RuntimeException {
+public class SuperRuleConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = 1838361171620854149L;
 

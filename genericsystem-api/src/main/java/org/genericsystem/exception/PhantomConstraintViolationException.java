@@ -8,7 +8,7 @@ package org.genericsystem.exception;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class PhantomConstraintViolationException extends RuntimeException {
+public class PhantomConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = 3509096441924116316L;
 

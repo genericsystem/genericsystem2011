@@ -8,7 +8,7 @@ package org.genericsystem.exception;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class EngineConsistencyConstraintViolationException extends RuntimeException {
+public class EngineConsistencyConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = 1525561745725526259L;
 
