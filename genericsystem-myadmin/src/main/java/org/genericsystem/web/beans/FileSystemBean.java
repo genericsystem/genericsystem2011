@@ -64,6 +64,7 @@ public class FileSystemBean implements Serializable {
 		Generic currentSelection = (Generic) tree.getRowData();
 		tree.setRowKey(storedKey);
 
+		log.info("changeFile " + currentSelection);
 		setFileSelected(currentSelection);
 		if (!isDirectory()) {
 			byte[] _bytes = ((File) fileSelected).getContent(cache);
@@ -107,7 +108,9 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public boolean isDirectory() {
-		return fileSelected != null && fileSelected instanceof Directory;
+		boolean check = fileSelected != null && fileSelected instanceof Directory;
+		log.info("isDirectory " + fileSelected + " " + check);
+		return check;
 	}
 
 	public void modifyValueWindow() {
