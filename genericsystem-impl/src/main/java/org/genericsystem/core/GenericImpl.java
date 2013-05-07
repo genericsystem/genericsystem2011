@@ -920,52 +920,99 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void log() {
-		log.debug(info());
+		log.info(info());
+	}
+
+	@Override
+	public void log(Context context) {
+		log.info(info(context));
 	}
 
 	@Override
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
-		s += "toString()  : " + this + "\n";
-		s += "value       : " + getValue() + "\n";
+		s += "toString    : " + this + "\n";
 		s += "meta        : " + getMeta() + "\n";
+		s += "value       : " + getValue() + "\n";
 		s += "metaLevel   : " + getMetaLevel() + "\n";
+		s += "**********************************************************************\n";
 		s += "design date : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
 		s += "birth date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
 		s += "death date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDeathTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "**********************************************************************\n";
 		for (Generic primary : getPrimaries())
-			s += "primary #" + "   : " + primary + " (" + System.identityHashCode(primary) + ")\n";
+			s += "primary     : " + primary + " (" + System.identityHashCode(primary) + ")\n";
 		for (Generic component : components)
-			s += "component #" + " : " + component + " (" + System.identityHashCode(component) + ")\n";
+			s += "component   : " + component + " (" + System.identityHashCode(component) + ")\n";
 		for (Generic superGeneric : supers)
-			s += "super #" + "     : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
+			s += "super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
 		s += "**********************************************************************\n";
 		return s;
 	}
 
-	public String linkage(Context context) {
-		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
-		s += "toString()     : " + this + "\n";
-		s += "Value          : " + getValue() + "\n";
-		s += "getMeta()      : " + getMeta() + "\n";
-		s += "getInstanciationLevel() : " + getMetaLevel() + "\n";
-		for (Generic primary : getPrimaries())
-			s += "Primary #" + "   : " + primary + " (" + System.identityHashCode(primary) + ")\n";
-		for (Generic component : components)
-			s += "Component #" + " : " + component + " (" + System.identityHashCode(component) + ")\n";
-		for (Generic superGeneric : supers)
-			s += "Super #" + "     : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
+	@Override
+	public String info(Context context) {
+		String s = info();
+		for (Attribute attribute : getAttributes(context))
+			if (!(attribute.getValue() instanceof Class)) {
+				s += attribute + "\n";
+				for (Holder holder : getHolders(context, attribute))
+					s += "                          ---------->    " + holder + "\n";
+			}
 		s += "**********************************************************************\n";
 		return s;
 	}
 
 	@Override
 	public String toString() {
+		String s = getGenericType();
 		if (isPrimary()) {
 			Serializable value = getValue();
-			return value instanceof Class ? ((Class<?>) value).getSimpleName() : value != null ? value.toString() : "null";
+			return s + "{" + (value instanceof Class ? ((Class<?>) value).getSimpleName() : value != null ? value.toString() : "null") + "}";
 		}
-		return toString(supers) + "/" + toString(components);
+		return s + "{" + toString(supers) + "/" + toString(components) + "}";
+	}
+
+	private String getGenericType() {
+		int metaLevel = getMetaLevel();
+		int dim = getComponentsSize();
+		switch (metaLevel) {
+		case SystemGeneric.META:
+			switch (dim) {
+			case Statics.TYPE_SIZE:
+				return "MetaType";
+			case Statics.ATTRIBUTE_SIZE:
+				return "MetaAttribute";
+			case Statics.RELATION_SIZE:
+				return "MetaRelation";
+			default:
+				return "MetaNRelation";
+			}
+		case SystemGeneric.STRUCTURAL:
+			switch (dim) {
+			case Statics.TYPE_SIZE:
+				return "Type";
+			case Statics.ATTRIBUTE_SIZE:
+				return "Attribute";
+			case Statics.RELATION_SIZE:
+				return "Relation";
+			default:
+				return "NRelation";
+			}
+		case SystemGeneric.CONCRETE:
+			switch (dim) {
+			case Statics.TYPE_SIZE:
+				return "Instance";
+			case Statics.ATTRIBUTE_SIZE:
+				return "Holder";
+			case Statics.RELATION_SIZE:
+				return "Link";
+			default:
+				return "NLink";
+			}
+		default:
+			throw new IllegalStateException();
+		}
 	}
 
 	private String toString(Generic[] a) {

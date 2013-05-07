@@ -33,10 +33,10 @@ public class Statics {
 	public static final int TARGET_POSITION = 1;
 	public static final int SECOND_TARGET_POSITION = 2;
 
-	public static final int TYPE_SIZE = 1;
-	public static final int ATTRIBUTE_SIZE = 2;
-	public static final int RELATION_SIZE = 3;
-	public static final int TERNARY_RELATION_SIZE = 4;
+	public static final int TYPE_SIZE = 0;
+	public static final int ATTRIBUTE_SIZE = 1;
+	public static final int RELATION_SIZE = 2;
+	public static final int TERNARY_RELATION_SIZE = 3;
 
 	public static final int ATTEMPT_SLEEP = 15; // ms
 	public static final int ATTEMPTS = 50;
