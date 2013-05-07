@@ -393,7 +393,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Class<?> clazz = null;
 		if (implicit.isConcrete()) {
 			components = ((GenericImpl) directSuper).sortAndCheck(components);
-			InstanceGenericClass instanceClass = directSuper.getClass().getAnnotation(InstanceGenericClass.class);
+			Generic meta = directSuper.getMetaLevel() == implicit.getMetaLevel() ? directSuper.getMeta() : directSuper;
+			InstanceGenericClass instanceClass = meta.getClass().getAnnotation(InstanceGenericClass.class);
 			if (instanceClass != null)
 				clazz = instanceClass.value();
 		}

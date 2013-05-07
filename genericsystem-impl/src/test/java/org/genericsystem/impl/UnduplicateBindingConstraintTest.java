@@ -72,6 +72,7 @@ public class UnduplicateBindingConstraintTest extends AbstractTest {
 		Generic red = color.newInstance(cache, "red");
 		Relation carColor = car.setRelation(cache, "carColor", color);
 		cache.flush();
+		assert myCar.isAlive(cache);
 		myCar.setLink(cache, carColor, "myCarRed", red);
 		final Cache cache2 = cache.getEngine().newCache();
 		myCar.setLink(cache2, carColor, "myCarRed", red);

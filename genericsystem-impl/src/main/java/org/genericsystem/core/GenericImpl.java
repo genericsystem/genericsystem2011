@@ -23,9 +23,7 @@ import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
-import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
-import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
@@ -56,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute, Node {
+public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute {
 
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
 
@@ -93,7 +91,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return restore(implicit.getValue(), implicit.getMetaLevel(), null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components, automatic);
 	}
 
-	private void reorderImplicit(Generic implicit, Generic[] supers) {
+	private static void reorderImplicit(Generic implicit, Generic[] supers) {
 		for (int index = 0; index < supers.length; index++)
 			if (implicit.equals(supers[index].getImplicit()))
 				if (index != 0) {
@@ -325,7 +323,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	}
 
-	private <T extends Holder> T bind(Cache cache, Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
+	<T extends Holder> T bind(Cache cache, Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
 		return ((CacheImpl) cache).bind(implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
 	}
 
@@ -613,12 +611,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).bind(bindPrimary(cache, value, getMetaLevel() + 1, this.isPrimary() && components.length != 0), false, this, false, components);
+		return ((CacheImpl) cache).bind(bindPrimary(cache, value, getMetaLevel() + 1, !isPrimary()), false, this, false, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		Generic implicit = getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL, this.isPrimary() && components.length != 0);
+		Generic implicit = getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL, !isEngine() || components.length != 0);
 		return ((CacheImpl) cache).bind(implicit, false, this, false, components);
 	}
 
@@ -975,12 +973,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getMeta() {
-		return (T) getInternalMeta(getMetaLevel() == 0 ? 0 : getMetaLevel() - 1);
+		int level = isMeta() ? SystemGeneric.META : getMetaLevel() - 1;
+		GenericImpl generic = this;
+		while (level != generic.getMetaLevel())
+			generic = (GenericImpl) generic.supers[generic.supers.length - 1];
+		return (T) generic;
 	}
 
-	private Generic getInternalMeta(int instanciationLevel) {
-		return getMetaLevel() == instanciationLevel ? this : ((GenericImpl) supers[supers.length - 1]).getInternalMeta(instanciationLevel);
-	}
+	// @Override
+	// public <T extends Generic> T getMeta() {
+	// return (T) getInternalMeta(isMeta() ? SystemGeneric.META : getMetaLevel() - 1);
+	// }
+	//
+	// private Generic getInternalMeta(int instanciationLevel) {
+	// return getMetaLevel() == instanciationLevel ? this : ((GenericImpl) supers[supers.length - 1]).getInternalMeta(instanciationLevel);
+	// }
 
 	@Override
 	public <T extends Generic> T getBaseComponent() {
@@ -1215,49 +1222,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return bind(cache, implicit, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
-	/*********************************************/
-	/******************* TREE ********************/
-	/*********************************************/
-
-	@Override
-	public <T extends Node> T addNode(Cache cache, Serializable value, Generic... targets) {
-		Holder attribute = getMeta();
-		return bind(cache, ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true), attribute, getBasePos(attribute, targets), true, targets);
-	}
-
-	@Override
-	public <T extends Node> T setNode(Cache cache, Serializable value, Generic... targets) {
-		Holder attribute = getMeta();
-		return bind(cache, ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true), attribute, getBasePos(attribute, targets), false, targets);
-	}
-
-	@Override
-	public <T extends Node> T setSubNode(Cache cache, Serializable value, Generic... targets) {
-		Holder implicit = bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
-		return bind(cache, implicit, this, getBasePos(this, targets), false, targets);
-	}
-
-	@Override
-	public <T extends Node> Snapshot<T> getChildren(final Context context) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return childrenIterator(context);
-			}
-		};
-	}
-
-	<T extends Generic> Iterator<T> childrenIterator(Context context) {
-		Tree attribute = getMeta();
-		return thisFilter(GenericImpl.this.<T> holdersIterator(context, attribute, getBasePos(attribute, Statics.EMPTY_GENERIC_ARRAY), false));
-	}
-
-	@Override
-	public <T extends Node> T getChild(Context context, Serializable value) {
-		Tree attribute = getMeta();
-		return Statics.unambigousFirst(Statics.<T> valueFilter(this.<T> thisFilter(GenericImpl.this.<T> holdersIterator(context, attribute, getBasePos(attribute, Statics.EMPTY_GENERIC_ARRAY), value == null)), value));
-	}
-
 	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
 		return new AbstractFilterIterator<T>(concreteIterator) {
 			@Override
@@ -1273,11 +1237,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (equals(components[i]))
 				return true;
 		return false;
-	}
-
-	@Override
-	public void traverse(Visitor visitor) {
-		visitor.traverse(this);
 	}
 
 	/*********************************************/

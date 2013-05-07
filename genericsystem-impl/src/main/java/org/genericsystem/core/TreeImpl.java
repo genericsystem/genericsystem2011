@@ -2,10 +2,12 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Iterator;
+import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.snapshot.AbstractSnapshot;
 
+@InstanceGenericClass(NodeImpl.class)
 public class TreeImpl extends GenericImpl implements Tree {
 
 	@Override
