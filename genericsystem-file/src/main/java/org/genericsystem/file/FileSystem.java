@@ -10,6 +10,7 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.NodeImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.TreeImpl;
 import org.genericsystem.file.FileSystem.Directory;
@@ -32,7 +33,7 @@ public class FileSystem extends TreeImpl {
 
 	private static final byte[] EMPTY = "<html/>".getBytes();
 
-	public static class Directory extends GenericImpl {
+	public static class Directory extends NodeImpl {
 		public <T extends File> Snapshot<T> getFiles(Context context) {
 			return getHolders(context, context.<Attribute> find(FileType.class));
 		}
