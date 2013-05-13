@@ -1,19 +1,45 @@
-.buttonBar{
-	margin-left: 85%; 
-	border: none !important;
-	color: white !important;
-	background-color: white !important;
+body {
+	width: 960px;
+	margin: 0 auto;
+	text-align: left;
+	float: none;
 }
 
-.panel{
-	width: 20%;
-}
-
-.tree{
-	border-top: 1px solid;
-    margin-top: 3px;
+.fullWidth {
+	width: 100%;
 }
 
 .uppercase {
 	text-transform: uppercase;
+}
+
+td {
+	vertical-align: middle;
+}
+
+.middleAlign {
+	vertical-align: middle;
+}
+
+.topAlign {
+	vertical-align: top;
+}
+
+.fullHeight {
+	height: 100%;
+}
+
+.scroll {
+	overflow: auto;
+}
+
+.widthScroll280 {
+	overflow-x: auto;
+	width: 280px;
+}
+
+.bigScroll {
+	max-width: 800px;
+	max-height: 800px;
+	overflow: scroll;
 }

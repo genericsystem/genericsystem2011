@@ -1,22 +1,21 @@
 package org.genericsystem.resolver;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
-
 import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.inject.spi.BeanManager;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.file.FileSystem;
+import org.genericsystem.file.FileSystem.FileType.File;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.sun.faces.facelets.impl.DefaultResourceResolver;
 
 public class GsResolver extends DefaultResourceResolver {
@@ -46,13 +45,58 @@ public class GsResolver extends DefaultResourceResolver {
 		// cache.flush();
 	}
 
+	static byte[] asByteArray(final InputStream in) throws IllegalArgumentException {
+		// Precondition check
+		if (in == null) {
+			throw new IllegalArgumentException("stream must be specified");
+		}
+
+		// Get content as an array of bytes
+		final ByteArrayOutputStream out = new ByteArrayOutputStream(8192);
+		final int len = 4096;
+		final byte[] buffer = new byte[len];
+		int read = 0;
+		try {
+			while (((read = in.read(buffer)) != -1)) {
+				out.write(buffer, 0, read);
+			}
+		} catch (final IOException ioe) {
+			throw new RuntimeException("Error in obtainting bytes from " + in, ioe);
+		} finally {
+			try {
+				in.close();
+			} catch (final IOException ignore) {
+
+			}
+			// We don't need to close the outstream, it's a byte array out
+		}
+
+		// Represent as byte array
+		final byte[] content = out.toByteArray();
+
+		// Return
+		return content;
+	}
+
 	@Override
 	public URL resolveUrl(String resource) {
 		try {
+
 			Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
-			byte[] fileContent = cache.<FileSystem> find(FileSystem.class).getFileContent(cache, resource);
-			if (fileContent != null)
+			FileSystem fileSystem = cache.<FileSystem> find(FileSystem.class);
+			byte[] fileContent = fileSystem.getFileContent(cache, resource);
+			if (fileContent != null) {
+				log.info("GS : Resolved resource : " + resource);
 				return new URL("", "", 0, resource, new GsStreamHandler(fileContent));
+			}
+			URL url = super.resolveUrl(resource);
+			if (url != null) {
+				File file = fileSystem.touchFile(cache, resource, asByteArray(((ByteArrayInputStream) url.getContent())));
+				file.log(cache);
+				log.info("Old resolver : Resolved resource : " + resource);
+				log.info("Content : " + new String(file.getContent(cache)));
+				return new URL("", "", 0, resource, new GsStreamHandler(file.getContent(cache)));
+			}
 		} catch (ContextNotActiveException ignore) {
 
 		} catch (Exception e) {

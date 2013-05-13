@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:middleware="http://java.sun.com/jsf/composite/middleware">
+
+
+	<h:panelGrid columns="2">
+		<a4j:commandLink action="#{cacheBean.save}" render ="directorytree">
+			<h:graphicImage
+				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/data_next.png"
+				title="#{msg.save_button}" />
+		</a4j:commandLink>
+		<a4j:commandLink action="#{cacheBean.discard}" render ="directorytree">
+			<h:graphicImage
+				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/data_previous.png"
+				title="#{msg.discard_button}" />
+		</a4j:commandLink>
+	</h:panelGrid>
+
+</ui:composition>

@@ -1,0 +1,401 @@
+/* Generic System css  
+  --------------------------------------------------------*/
+html,a,body,div,td,dd,dt,dl,li,p,h1,h2,h3,h4,h5,span,form,fieldset {
+	margin: 0;
+	padding: 0;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border-radius: 5px 0 0px 0;
+	-moz-border-radius: 5px 0 0px 0;
+	-webkit-border-radius: 5px 0 0px 0;
+	-khtml-border-radius: 5px 0 0px 0;
+}
+
+textarea {
+    resize: none;
+}
+
+img {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+body {
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+
+form {
+	border: 0px;
+}
+
+table {
+	border: 0px;
+	border-width: 0px;
+	border-spacing: 0px;
+	border-style: none;
+	empty-cells: show;
+	border-collapse: collapse;
+}
+
+input,select,textarea {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+input[type="radio"] {
+	border: none;
+}
+
+input[type="checkbox"] {
+	border: none;
+}
+
+option {
+	max-width: 140px;
+}
+
+input.saveButton {
+	background-image: url(../seam/resource/img/16x16/plain/floppy_disk_blue.png);
+	padding-left: 20px;
+	background-repeat: no-repeat;
+}
+
+input.previousButton {
+	background-image: url(../seam/resource/img/16x16/plain/nav_left_blue.png);
+	padding-left: 20px;
+	background-repeat: no-repeat;
+}
+
+input.nextButton {
+	background-image: url(../seam/resource/img/16x16/plain/nav_right_blue.png);
+	padding-left: 20px;
+	background-repeat: no-repeat;
+}
+
+input.undoButton {
+	background-image: url(../seam/resource/img/16x16/plain/undo.png);
+	padding-left: 20px;
+	background-repeat: no-repeat;
+}
+td {
+	vertical-align: middle;
+}
+
+.middleAlign {
+	vertical-align: middle;
+}
+
+.topAlign {
+	vertical-align: top;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+ul {
+	padding-left: 20px;
+}
+
+ol {
+	padding-left: 20px;
+}
+
+li.info {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(../seam/resource/img/16x16/plain/trafficlight_green.png);
+	background-position: bottom left;
+	font-size: 14px;
+}
+
+li.warn {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(../seam/resource/img/16x16/plain/trafficlight_yellow.png);
+	background-position: bottom left;
+	font-size: 14px;
+}
+
+li.error {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(../seam/resource/img/16x16/plain/trafficlight_red_yellow.png);
+	background-position: bottom left;
+	font-size: 14px;
+}
+
+li.fatal {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(../seam/resource/img/16x16/plain/trafficlight_red.png);
+	background-position: bottom left;
+	font-size: 14px;
+}
+
+.leftAlign {
+	align: left;
+	text-align: left;
+}
+
+.centerAlign {
+	align: center;
+}
+
+.rightAlign {
+	text-align: right;
+}
+
+.mediumColumn {
+	width: 32px;
+}
+
+.smallWidth {
+	width: 24px;
+}
+
+.mediumWidth {
+	width: 48px;
+}
+
+.largeWidth {
+	width: 96px;
+}
+
+.superlargeWidth {
+	width: 200px;
+}
+
+.minMediumWidth {
+	min-width: 300px;
+}
+
+.minWidth {
+	min-width: 50px;
+}
+
+.noWidth {
+	
+}
+
+.noBorderRadius {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	-khtml-border-radius: 0;
+}
+
+.fullWidth {
+	width: 100%;
+}
+
+.noHeight {
+	
+}
+
+.smallHeight {
+	height: 24px;
+}
+
+.mediumHeight {
+	height: 48px;
+}
+
+.largeHeight {
+	height: 96px;
+}
+
+.fullHeight {
+	height: 100%;
+}
+
+.bigScroll {
+	max-height: 300px;
+	overflow: auto;
+}
+
+.biggerScroll {
+	max-height: 650px;
+	max-width: 800px;
+	overflow: auto;
+}
+
+.littleScroll {
+	max-height: 120px;
+	overflow: auto;
+}
+
+.rich-sdt-header-cell {
+	text-align: center;
+}
+
+.veryBigScroll {
+	max-height: 800px;
+	max-width: 800px;
+	overflow: auto;
+}
+
+a.divLink {
+	display: block;
+	width: 100%;
+	height: 100%;
+	text-decoration: none;
+}
+
+a.hover.divLink {
+	display: block;
+	width: 100%;
+	height: 100%;
+	text-decoration: underline;
+}
+
+.formLabel {
+	margin: 2px;
+	float: left;
+	width: 100px;
+	text-align: right;
+}
+
+.rich-filter-input {
+	width: 100%;
+}
+
+.noPadding {
+	padding: 0px;
+}
+
+.noMargin {
+	margin: 0px;
+}
+
+.leftPadding {
+	padding-left: 6px;
+}
+
+.lateralPadding {
+	padding-left: 6px;
+	padding-right: 6px;
+}
+
+.smallLateralPadding {
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+.rightPadding {
+	padding-right: 6px;
+}
+
+.completePadding {
+	padding: 6px;
+}
+
+.smallCompletePadding {
+	padding: 2px;
+}
+
+.noPaddingMargin {
+	vertical-align: top;
+	padding: 0px;
+	margin: 0px;
+}
+
+.block {
+	background-color: white;
+	padding: 0px;
+	margin: 6px;
+}
+
+.bodyClass {
+	margin: 0px;
+	padding: 0px;
+}
+
+.noBorder {
+	border: none;
+}
+
+.topAlign {
+	vertical-align: top;
+}
+
+.bottomAlign {
+	vertical-align: bottom;
+}
+
+.slightlyTransparent {
+	opacity: 0.75;
+	/* For IE 5-7 */
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75);
+	/* For IE 8  Don't miss the added quotes */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
+}
+
+/* Overridden Richfaces Classes */
+.rich-panel-header {
+	border-width: 1px;
+	border-style: solid;
+	border-color: white;
+}
+
+.rich-panel {
+	border-style: none;
+}
+
+.rich-toolbar {
+	border-style: none;
+}
+
+.rich-toolbar-item {
+	margin: 0;
+	padding-left: 6px;
+	padding-right: 6px;
+}
+
+.rich-table {
+	border-style: none;
+}
+
+.rich-table-cell {
+	border-style: none;
+}
+
+.rich-modalpanel {
+	border-style: none;
+}
+
+.rich-mpnl-header {
+	border-width: 1px;
+	border-style: solid;
+	border-color: white;
+}
+
+.rich-mpnl-content {
+	border-style: none;
+}
+
+.rich-mpnl-mask-div-opaque {
+	opacity: 0.8;
+}
