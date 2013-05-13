@@ -12,14 +12,9 @@
 	xmlns:middleware="http://java.sun.com/jsf/composite/middleware">
 
 	<ui:define name="bodySection">
-		<rich:panel styleClass="buttonBar">
-			<h:commandButton action="#{cacheBean.discard}"
-				value="#{msg.discard_button}" />
-			<h:commandButton action="#{cacheBean.save}"
-				value="#{msg.save_button}" />
-		</rich:panel>
-		
-		<ui:include src="filesystem.xhtml" />
+		<h:form>
+			<ui:include src="/pages/filesystem.xhtml" />
+		</h:form>
 	</ui:define>
 
 </ui:composition>

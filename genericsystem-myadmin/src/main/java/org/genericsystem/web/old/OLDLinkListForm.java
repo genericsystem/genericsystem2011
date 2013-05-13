@@ -1,4 +1,4 @@
-package org.genericsystem.web.beans;
+package org.genericsystem.web.old;
 //package org.genericsystem.web.beans;
 //
 //import java.util.HashMap;
