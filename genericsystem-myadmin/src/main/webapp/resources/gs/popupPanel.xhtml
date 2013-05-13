@@ -10,23 +10,23 @@
 	xmlns:rich="http://richfaces.org/rich">
 
 <composite:interface>
-	<composite:attribute name="id" type="String" required="true" />
-	<composite:attribute name="title" type="String" required="true" />
-	<composite:attribute name="input" type="String" required="true" />
+	<composite:attribute name="key" required="true" />
+	<composite:attribute name="title" required="true" />
+	<composite:attribute name="input" required="true" />
 	<composite:attribute name="action" method-signature="void action()"
 		required="true" />
-	<composite:attribute name="render" type="String" required="true" />
+	<composite:attribute name="render" required="true" />
 </composite:interface>
 
 <composite:implementation>
-	<rich:popupPanel id="#{cc.attrs.id}" domElementAttachment="form"
+	<rich:popupPanel id="#{cc.attrs.key}" domElementAttachment="form"
 		modal="true" resizeable="false" moveable="false" autosized="true">
 		<f:facet name="header">
 			<h:outputText styleClass="uppercase" value="#{cc.attrs.title}" />
 		</f:facet>
 		<f:facet name="controls">
 			<h:outputLink value="#"
-				onclick="#{rich:component('#{cc.attrs.id}')}.hide(); return false;">
+				onclick="#{rich:component(cc.attrs.key)}.hide(); return false;">
 				<h:graphicImage
 					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/delete.png"
 					title="#{msg.close}" />
@@ -36,13 +36,9 @@
 		<rich:panel title="#{cc.attrs.title}" styleClass="uppercase">
 			<h:panelGrid columns="2" columnClasses=",fullWidth">
 				<h:inputText value="#{cc.attrs.input}" />
-				<a4j:commandButton action="#{cc.attrs.action}"
-					execute="#{cc.attrs.id}" render="#{cc.attrs.render}"
-					oncomplete="#{rich:component('#{cc.attrs.id}')}.hide(); return false;">
-					<h:graphicImage
-						value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/floppy_disk.png"
-						title="#{msg.apply}" />
-				</a4j:commandButton>
+				<a4j:commandButton action="#{cc.attrs.action}" image="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/floppy_disk.png"
+					execute="#{cc.attrs.key}" render="#{cc.attrs.render}"
+					oncomplete="#{rich:component(cc.attrs.key)}.hide(); return false;"/>
 			</h:panelGrid>
 		</rich:panel>
 	</rich:popupPanel>

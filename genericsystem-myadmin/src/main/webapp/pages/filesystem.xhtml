@@ -17,7 +17,6 @@
 				<h:outputText styleClass="uppercase"
 					value="#{msg.file} #{msg.system} #{msg.manager}" />
 				<ui:include src="/pages/toolbar.xhtml" />
-				<ui:include src="/pages/rootcreation.xhtml" />
 				<ui:include src="/pages/cachemanager.xhtml" />
 			</h:panelGrid>
 		</f:facet>
@@ -29,14 +28,17 @@
 		</h:panelGrid>
 	</rich:panel>
 
-	<gs:popupPanel id="createfile"
+	<gs:popupPanel key="createfile"
 		title="#{msg.create} #{msg.a} #{msg.file}"
 		input="#{fileSystemBean.newFileName}"
 		action="#{fileSystemBean.addFile}" render="directorytree" />
-	<gs:popupPanel id="createsubdirectory"
+	<gs:popupPanel key="createsubdirectory"
 		title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}"
 		input="#{fileSystemBean.newSubDirectoryName}"
 		action="#{fileSystemBean.addSubDirectory}" render="directorytree" />
-
+	<gs:popupPanel key="newrootdirectory"
+		title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
+		input="#{fileSystemBean.newRootDirectory}"
+		action="#{fileSystemBean.addRootDirectory}" render="directorytree" />
 
 </ui:composition>

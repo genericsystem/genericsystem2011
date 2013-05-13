@@ -10,7 +10,7 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<h:panelGrid id="toolbar" columns="7">
+	<h:panelGrid id="toolbar" columns="8">
 		<a4j:status name="panelUpdateStatus">
 			<f:facet name="start">
                         (Updating)
@@ -20,6 +20,7 @@
 			value="#{fileSystemBean.fileShortPath}" />
 		<h:outputText rendered="#{fileSystemBean.directorySelected}"
 			value="#{fileSystemBean.directoryShortPath}" />
+			
 		<a4j:commandLink rendered="#{fileSystemBean.directorySelected}"
 			oncomplete="#{rich:component('createfile')}.show()">
 			<h:graphicImage
@@ -49,6 +50,13 @@
 			<h:graphicImage
 				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/delete.png"
 				title="#{msg.delete}" />
+		</a4j:commandLink>
+
+		<a4j:commandLink
+			oncomplete="#{rich:component('newrootdirectory')}.show()">
+			<h:graphicImage
+				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/add.png"
+				title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
 		</a4j:commandLink>
 	</h:panelGrid>
 </ui:composition>
