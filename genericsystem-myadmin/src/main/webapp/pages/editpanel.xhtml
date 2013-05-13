@@ -10,12 +10,11 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:middleware="http://java.sun.com/jsf/composite/middleware">
 
-	<rich:panel id="edit" styleClass="fullWidth">
-		<h:inputTextarea id="code" name="code" styleClass="fullWidth"
+	<rich:panel id="edit" styleClass="fullWidth fullHeight" >
+		<h:inputTextarea id="code" name="code"
 			value="#{fileSystemBean.content}"
-			rendered="#{fileSystemBean.fileSelected}">
-		</h:inputTextarea>
-
+			rendered="#{fileSystemBean.fileSelected}"/>
+		
 		<script>
 			var editor = CodeMirror.fromTextArea(#{rich:element('code')}, {
 				mode : {
