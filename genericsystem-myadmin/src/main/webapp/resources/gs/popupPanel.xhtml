@@ -15,6 +15,7 @@
 	<composite:attribute name="input" type="String" required="true" />
 	<composite:attribute name="action" method-signature="void action()"
 		required="true" />
+	<composite:attribute name="render" type="String" required="true" />
 </composite:interface>
 
 <composite:implementation>
@@ -26,14 +27,23 @@
 		<f:facet name="controls">
 			<h:outputLink value="#"
 				onclick="#{rich:component('#{cc.attrs.id}')}.hide(); return false;">
-					#{msg.close}</h:outputLink>
+				<h:graphicImage
+					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/delete.png"
+					title="#{msg.close}" />
+			</h:outputLink>
 		</f:facet>
 
 		<rich:panel title="#{cc.attrs.title}" styleClass="uppercase">
-			<h:outputText value="#{cc.attrs.title} : " />
-			<h:inputText value="#{cc.attrs.input}" />
-			<a4j:commandButton execute="#{cc.attrs.id}" value="#{msg.apply}"
-				action="#{cc.attrs.action}" render="tree" />
+			<h:panelGrid columns="2" columnClasses=",fullWidth">
+				<h:inputText value="#{cc.attrs.input}" />
+				<a4j:commandButton action="#{cc.attrs.action}"
+					execute="#{cc.attrs.id}" render="#{cc.attrs.render}"
+					oncomplete="#{rich:component('#{cc.attrs.id}')}.hide(); return false;">
+					<h:graphicImage
+						value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/floppy_disk.png"
+						title="#{msg.apply}" />
+				</a4j:commandButton>
+			</h:panelGrid>
 		</rich:panel>
 	</rich:popupPanel>
 </composite:implementation>
