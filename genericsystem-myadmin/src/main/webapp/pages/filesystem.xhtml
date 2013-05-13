@@ -12,12 +12,11 @@
 
 	<rich:panel styleClass="fullWidth">
 		<f:facet name="header">
-			<h:panelGrid columns="5" styleClass="fullWidth" columnsClasses="fullWidth,,,">
+			<h:panelGrid columns="5" styleClass="fullWidth" columnClasses="fullWidth,,,">
 				<h:outputText styleClass="uppercase"
 					value="#{msg.file} #{msg.system} #{msg.manager}" />
 				<ui:include src="/pages/toolbar.xhtml" />
 				<ui:include src="/pages/rootcreation.xhtml" />
-				<h:panelGroup layout="block" />
 				<ui:include src="/pages/cachemanager.xhtml" />
 			</h:panelGrid>
 		</f:facet>
