@@ -3,11 +3,9 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -40,7 +38,7 @@ public class FileSystemBean implements Serializable {
 
 	private String newValue;
 
-	private String content;
+	// private String content;
 
 	public List<Directory> getRootDirectories() {
 		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
@@ -66,11 +64,6 @@ public class FileSystemBean implements Serializable {
 
 		log.info("changeFile " + currentSelection);
 		setFileSelected(currentSelection);
-		if (!isDirectory()) {
-			byte[] _bytes = ((File) fileSelected).getContent(cache);
-			for (int i = 0; i < _bytes.length; i++)
-				content += (char) _bytes[i];
-		}
 	}
 
 	public void addRootDirectory() {
@@ -88,7 +81,7 @@ public class FileSystemBean implements Serializable {
 
 	public void addFile() {
 		log.info("CREATE " + newFileName + " of " + fileSelected);
-		((Directory) fileSelected).touchFile(cache, newFileName);
+		((Directory) fileSelected).addFile(cache, newFileName);
 		newFileName = "";
 	}
 
@@ -102,13 +95,14 @@ public class FileSystemBean implements Serializable {
 		fileSelected.remove(cache);
 	}
 
-	public void updateContent() {
-		if (fileSelected != null)
-			((File) fileSelected).setContent(cache, content.getBytes());
+	public boolean isDirectorySelected() {
+		boolean check = fileSelected != null && fileSelected instanceof Directory;
+		log.info("isDirectory " + fileSelected + " " + check);
+		return check;
 	}
 
-	public boolean isDirectory() {
-		boolean check = fileSelected != null && fileSelected instanceof Directory;
+	public boolean isFileSelected() {
+		boolean check = fileSelected != null && fileSelected instanceof File;
 		log.info("isDirectory " + fileSelected + " " + check);
 		return check;
 	}
@@ -157,12 +151,23 @@ public class FileSystemBean implements Serializable {
 		this.newValue = newValue;
 	}
 
+	public String getFileShortPath() {
+		return ((File) fileSelected).getShortPath();
+	}
+
+	public String getDirectoryShortPath() {
+		return ((Directory) fileSelected).getShortPath();
+	}
+
 	public String getContent() {
-		return content;
+		if (fileSelected == null)
+			return "";
+		byte[] bytes = ((File) fileSelected).getContent(cache);
+		return new String(bytes != null ? new String(bytes) : "");
 	}
 
 	public void setContent(String content) {
-		this.content = content;
+		((File) fileSelected).setContent(cache, content.getBytes());
 	}
 
 }
