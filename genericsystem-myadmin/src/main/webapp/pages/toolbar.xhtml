@@ -19,7 +19,7 @@
 		<h:outputText rendered="#{fileSystemBean.fileSelected}"
 			value="#{fileSystemBean.fileShortPath}" />
 		<h:outputText rendered="#{fileSystemBean.directorySelected}"
-			alue="#{fileSystemBean.directoryShortPath}" />
+			value="#{fileSystemBean.directoryShortPath}" />
 		<a4j:commandLink rendered="#{fileSystemBean.directorySelected}"
 			oncomplete="#{rich:component('createfile')}.show()">
 			<h:graphicImage
