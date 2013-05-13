@@ -3,9 +3,11 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -37,8 +39,6 @@ public class FileSystemBean implements Serializable {
 	private String newFileName;
 
 	private String newValue;
-
-	// private String content;
 
 	public List<Directory> getRootDirectories() {
 		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
@@ -105,10 +105,6 @@ public class FileSystemBean implements Serializable {
 		boolean check = fileSelected != null && fileSelected instanceof File;
 		log.info("isDirectory " + fileSelected + " " + check);
 		return check;
-	}
-
-	public void modifyValueWindow() {
-
 	}
 
 	public Generic getFileSelected() {

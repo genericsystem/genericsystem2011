@@ -7,8 +7,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+
 import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.inject.spi.BeanManager;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.FileType.File;
@@ -16,6 +18,7 @@ import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.sun.faces.facelets.impl.DefaultResourceResolver;
 
 public class GsResolver extends DefaultResourceResolver {
@@ -84,6 +87,7 @@ public class GsResolver extends DefaultResourceResolver {
 
 			Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
 			FileSystem fileSystem = cache.<FileSystem> find(FileSystem.class);
+			log.info("Resource : " + resource);
 			byte[] fileContent = fileSystem.getFileContent(cache, resource);
 			if (fileContent != null) {
 				log.info("GS : Resolved resource : " + resource);
