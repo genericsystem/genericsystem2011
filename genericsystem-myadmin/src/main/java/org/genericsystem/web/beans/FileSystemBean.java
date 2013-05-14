@@ -67,7 +67,6 @@ public class FileSystemBean implements Serializable {
 
 		log.info("changeFile " + selected);
 		messages.info(new BundleKey("/bundles/messages", "selectionchanged"), selected.getValue());
-
 		setFileSelected(selected);
 	}
 

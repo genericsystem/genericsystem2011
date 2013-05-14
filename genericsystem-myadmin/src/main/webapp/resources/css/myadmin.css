@@ -99,7 +99,7 @@ li.fatal {
 	background-color :white; 
 	min-width: 300px;
 	min-height :51px;
-	max-height: 120px;
+	max-height: 78px;
 	overflow: auto;
 	opacity: 0.75;
 	/* For IE 5-7 */
