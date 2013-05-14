@@ -86,23 +86,8 @@
 
 	<error-page>
 		<exception-type>javax.faces.application.ViewExpiredException</exception-type>
-		<location>/index.xhtml</location>
+		<location>/pages/index.xhtml</location>
 	</error-page>
-
-	<!-- <error-page> -->
-	<!-- <error-code>500</error-code> -->
-	<!-- <location>/pages/error.xhtml</location> -->
-	<!-- </error-page> -->
-
-	<!-- <servlet-mapping> -->
-	<!-- <servlet-name>Faces Servlet</servlet-name> -->
-	<!-- <url-pattern>/faces/*</url-pattern> -->
-	<!-- </servlet-mapping> -->
-
-	<!-- <mime-mapping> -->
-	<!-- <extension>ecss</extension> -->
-	<!-- <mime-type>text/css</mime-type> -->
-	<!-- </mime-mapping> -->
 
 	<session-config>
 		<session-timeout>1</session-timeout>

@@ -97,11 +97,10 @@ li.fatal {
 	margin-right :10px; 
 	margin-top :0px;
 	background-color :white; 
+	min-width: 300px;
 	min-height :51px;
 	max-height: 120px;
 	overflow: auto;
-	
-	min-width: 300px;
 	opacity: 0.75;
 	/* For IE 5-7 */
 	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75);
