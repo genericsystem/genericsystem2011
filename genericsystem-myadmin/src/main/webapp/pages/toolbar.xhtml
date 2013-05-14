@@ -20,7 +20,7 @@
 			value="#{fileSystemBean.fileShortPath}" />
 		<h:outputText rendered="#{fileSystemBean.directorySelected}"
 			value="#{fileSystemBean.directoryShortPath}" />
-			
+
 		<a4j:commandLink rendered="#{fileSystemBean.directorySelected}"
 			oncomplete="#{rich:component('createfile')}.show()">
 			<h:graphicImage
@@ -35,7 +35,7 @@
 				title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}" />
 		</a4j:commandLink>
 
-		<a4j:commandLink execute="edit"
+		<a4j:commandLink id="save" execute="edit"
 			rendered="#{fileSystemBean.fileSelected}" status="panelUpdateStatus"
 			onclick="editor.save();">
 			<h:graphicImage
@@ -59,4 +59,6 @@
 				title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
 		</a4j:commandLink>
 	</h:panelGrid>
+	<rich:hotKey key="ctrl+1" onkeyup="#{rich:element('save')}.click();"/>
+
 </ui:composition>

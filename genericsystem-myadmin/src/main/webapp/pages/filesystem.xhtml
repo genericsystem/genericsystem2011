@@ -10,12 +10,16 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
+	<ui:include src="/pages/head.xhtml" />
 	<rich:panel styleClass="fullWidth">
 		<f:facet name="header">
-			<h:panelGrid columns="5" styleClass="fullWidth"
-				columnClasses="fullWidth,,,">
+			<h:panelGrid columns="6" styleClass="fullWidth"
+				columnClasses=",fullWidth,,,">
 				<h:outputText styleClass="uppercase"
 					value="#{msg.file} #{msg.system} #{msg.manager}" />
+				<a4j:outputPanel ajaxRendered="true" styleClass="scroll">
+					<h:messages />
+				</a4j:outputPanel>
 				<ui:include src="/pages/toolbar.xhtml" />
 				<ui:include src="/pages/cachemanager.xhtml" />
 			</h:panelGrid>
@@ -27,6 +31,7 @@
 			<ui:include src="/pages/editpanel.xhtml" />
 		</h:panelGrid>
 	</rich:panel>
+
 
 	<gs:popupPanel key="createfile"
 		title="#{msg.create} #{msg.a} #{msg.file}"

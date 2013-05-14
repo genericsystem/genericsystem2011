@@ -3,17 +3,17 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType.File;
+import org.jboss.seam.international.status.Messages;
+import org.jboss.seam.international.status.builder.BundleKey;
 import org.richfaces.component.UITree;
 import org.richfaces.event.TreeSelectionChangeEvent;
 import org.slf4j.Logger;
@@ -29,6 +29,9 @@ public class FileSystemBean implements Serializable {
 
 	@Inject
 	private transient Cache cache;
+
+	@Inject
+	private Messages messages;
 
 	private Generic fileSelected;
 
@@ -59,11 +62,13 @@ public class FileSystemBean implements Serializable {
 		UITree tree = (UITree) selectionChangeEvent.getSource();
 		Object storedKey = tree.getRowKey();
 		tree.setRowKey(currentSelectionKey);
-		Generic currentSelection = (Generic) tree.getRowData();
+		Generic selected = (Generic) tree.getRowData();
 		tree.setRowKey(storedKey);
 
-		log.info("changeFile " + currentSelection);
-		setFileSelected(currentSelection);
+		log.info("changeFile " + selected);
+		messages.info(new BundleKey("/bundles/messages", "selectionchanged"), selected.getValue());
+
+		setFileSelected(selected);
 	}
 
 	public void addRootDirectory() {
