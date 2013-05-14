@@ -27,18 +27,17 @@
 		<f:facet name="controls">
 			<h:outputLink value="#"
 				onclick="#{rich:component(cc.attrs.key)}.hide(); return false;">
-				<h:graphicImage
-					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/delete.png"
-					title="#{msg.close}" />
+				<h:graphicImage value="#{infos.delete}" title="#{msg.close}" />
 			</h:outputLink>
 		</f:facet>
 
 		<rich:panel title="#{cc.attrs.title}" styleClass="uppercase">
 			<h:panelGrid columns="2" columnClasses=",fullWidth">
 				<h:inputText value="#{cc.attrs.input}" />
-				<a4j:commandButton action="#{cc.attrs.action}" image="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/floppy_disk.png"
-					execute="#{cc.attrs.key}" render="#{cc.attrs.render}"
-					oncomplete="#{rich:component(cc.attrs.key)}.hide(); return false;"/>
+				<a4j:commandButton action="#{cc.attrs.action}"
+					image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
+					render="#{cc.attrs.render}"
+					oncomplete="#{rich:component(cc.attrs.key)}.hide(); return false;" />
 			</h:panelGrid>
 		</rich:panel>
 	</rich:popupPanel>

@@ -2,7 +2,7 @@ package org.genericsystem.web.beans;
 
 import java.io.Serializable;
 
-import javax.faces.bean.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named
-@RequestScoped
+@SessionScoped
 public class CacheBean implements Serializable {
 
 	private static final long serialVersionUID = 1752488068961882618L;

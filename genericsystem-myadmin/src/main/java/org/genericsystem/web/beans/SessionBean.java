@@ -2,7 +2,7 @@ package org.genericsystem.web.beans;
 
 import java.io.Serializable;
 
-import javax.faces.bean.SessionScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -16,13 +16,8 @@ public class SessionBean implements Serializable {
 	@Inject
 	private ExternalContext externalContext;
 
-	public String invalidate() {
+	public void invalidate() {
 		externalContext.invalidateSession();
-		return refreshJsf();
-	}
-
-	public String refreshJsf() {
-		return "index.xhtml?faces-redirect=true";
 	}
 
 }

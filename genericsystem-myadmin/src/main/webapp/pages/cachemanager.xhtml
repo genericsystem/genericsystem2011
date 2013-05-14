@@ -10,18 +10,12 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-
-	<h:panelGrid columns="2">
-		<a4j:commandLink action="#{cacheBean.save}" render ="directorytree">
-			<h:graphicImage
-				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/data_next.png"
-				title="#{msg.save_button}" />
-		</a4j:commandLink>
-		<a4j:commandLink action="#{cacheBean.discard}" render ="directorytree">
-			<h:graphicImage
-				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/data_previous.png"
-				title="#{msg.discard_button}" />
-		</a4j:commandLink>
-	</h:panelGrid>
+	<a4j:commandLink action="#{cacheBean.save}">
+		<h:graphicImage value="#{infos.data_next}" title="#{msg.save_button}" />
+	</a4j:commandLink>
+	<h:commandLink action="#{cacheBean.discard}">
+		<h:graphicImage value="#{infos.data_previous}"
+			title="#{msg.discard_button}" />
+	</h:commandLink>
 
 </ui:composition>
