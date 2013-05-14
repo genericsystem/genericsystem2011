@@ -20,7 +20,7 @@
 			value="#{fileSystemBean.fileShortPath}" />
 		<h:outputText rendered="#{fileSystemBean.directorySelected}"
 			value="#{fileSystemBean.directoryShortPath}" />
-
+			
 		<a4j:commandLink rendered="#{fileSystemBean.directorySelected}"
 			oncomplete="#{rich:component('createfile')}.show()">
 			<h:graphicImage
@@ -58,7 +58,7 @@
 				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/add.png"
 				title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
 		</a4j:commandLink>
+		
+		<rich:hotKey key="ctrl+1" onkeyup="#{rich:element('save')}.click();"/>
 	</h:panelGrid>
-	<rich:hotKey key="ctrl+1" onkeyup="#{rich:element('save')}.click();"/>
-
 </ui:composition>
