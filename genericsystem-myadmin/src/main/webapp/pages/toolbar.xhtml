@@ -64,7 +64,7 @@
 					title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}" />
 			</a4j:commandLink>
 
-			<a4j:commandLink execute="edit"
+			<a4j:commandLink id="save" execute="edit"
 				rendered="#{fileSystemBean.fileSelected}" status="panelUpdateStatus"
 				onclick="editor.save();">
 				<h:graphicImage
@@ -87,6 +87,7 @@
 					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/add.png"
 					title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
 			</a4j:commandLink>
+			<rich:hotKey key="ctrl+1" onkeyup="#{rich:element('save')}.click();"/>
 		</rich:toolbarGroup>
 	</rich:toolbar>
 </ui:composition>
