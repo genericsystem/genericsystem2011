@@ -3,9 +3,11 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -35,14 +37,6 @@ public class FileSystemBean implements Serializable {
 
 	private Generic fileSelected;
 
-	private String newRootDirectory;
-
-	private String newSubDirectoryName;
-
-	private String newFileName;
-
-	private String newValue;
-
 	public List<Directory> getRootDirectories() {
 		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
 	}
@@ -71,29 +65,25 @@ public class FileSystemBean implements Serializable {
 		setFileSelected(selected);
 	}
 
-	public void addRootDirectory() {
-		log.info("CREATE ROOT DIRECTORY " + newRootDirectory);
+	public void addRootDirectory(String newValue) {
+		log.info("CREATE ROOT DIRECTORY " + newValue);
 		FileSystem directoryTree = cache.<FileSystem> find(FileSystem.class);
-		directoryTree.addRootDirectory(cache, newRootDirectory);
-		newRootDirectory = "";
+		directoryTree.addRootDirectory(cache, newValue);
 	}
 
-	public void addSubDirectory() {
-		log.info("CREATE " + newSubDirectoryName + " of " + fileSelected);
-		((Directory) fileSelected).addDirectory(cache, newSubDirectoryName);
-		newSubDirectoryName = "";
+	public void addSubDirectory(String newValue) {
+		log.info("CREATE " + newValue + " of " + fileSelected);
+		((Directory) fileSelected).addDirectory(cache, newValue);
 	}
 
-	public void addFile() {
-		log.info("CREATE " + newFileName + " of " + fileSelected);
-		((Directory) fileSelected).addFile(cache, newFileName);
-		newFileName = "";
+	public void addFile(String newValue) {
+		log.info("CREATE " + newValue + " of " + fileSelected);
+		((Directory) fileSelected).addFile(cache, newValue);
 	}
 
-	public void modifyValue() {
+	public void modifyValue(String newValue) {
 		log.info("MODIFY VALUE OF " + fileSelected + ", NEW VALUE " + newValue + " " + cache);
 		((CacheImpl) cache).update(fileSelected, newValue);
-		newValue = "";
 	}
 
 	public void delete() {
@@ -118,38 +108,6 @@ public class FileSystemBean implements Serializable {
 
 	public void setFileSelected(Generic fileSelected) {
 		this.fileSelected = fileSelected;
-	}
-
-	public String getNewRootDirectory() {
-		return newRootDirectory;
-	}
-
-	public void setNewRootDirectory(String newRootDirectory) {
-		this.newRootDirectory = newRootDirectory;
-	}
-
-	public String getNewSubDirectoryName() {
-		return newSubDirectoryName;
-	}
-
-	public void setNewSubDirectoryName(String newSubDirectoryName) {
-		this.newSubDirectoryName = newSubDirectoryName;
-	}
-
-	public String getNewFileName() {
-		return newFileName;
-	}
-
-	public void setNewFileName(String newFileName) {
-		this.newFileName = newFileName;
-	}
-
-	public String getNewValue() {
-		return newValue;
-	}
-
-	public void setNewValue(String newValue) {
-		this.newValue = newValue;
 	}
 
 	public String getFileShortPath() {

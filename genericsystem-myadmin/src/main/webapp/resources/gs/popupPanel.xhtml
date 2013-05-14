@@ -12,7 +12,6 @@
 <composite:interface>
 	<composite:attribute name="key" required="true" />
 	<composite:attribute name="title" required="true" />
-	<composite:attribute name="input" required="true" />
 	<composite:attribute name="action" method-signature="void action()"
 		required="true" />
 	<composite:attribute name="render" required="true" />
@@ -33,11 +32,11 @@
 
 		<rich:panel title="#{cc.attrs.title}" styleClass="uppercase">
 			<h:panelGrid columns="2" columnClasses=",fullWidth">
-				<h:inputText value="#{cc.attrs.input}" />
+				<h:inputText id="inputPopupPanel" value="#{popupValue}" />
 				<a4j:commandButton action="#{cc.attrs.action}"
 					image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
 					render="#{cc.attrs.render}"
-					oncomplete="#{rich:component(cc.attrs.key)}.hide(); return false;" />
+					oncomplete="#{rich:component(cc.attrs.key)}.hide(); #{rich:element('inputPopupPanel')}.value=''; return false;" />
 			</h:panelGrid>
 		</rich:panel>
 	</rich:popupPanel>
