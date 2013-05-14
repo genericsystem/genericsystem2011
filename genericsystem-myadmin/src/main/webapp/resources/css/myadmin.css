@@ -92,21 +92,24 @@ li.fatal {
 	font-size: 14px;
 }
 
-.noBorderRadius {
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	-khtml-border-radius: 0;
-}
-
-.minMediumWidth {
-	min-width: 300px;
-}
-
-.littleScroll {
+.messagesBlock {
+	margin-left :6px; 
+	margin-right :10px; 
+	margin-top :0px;
+	background-color :white; 
+	min-height :51px;
 	max-height: 120px;
 	overflow: auto;
+	
+	min-width: 300px;
+	opacity: 0.75;
+	/* For IE 5-7 */
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75);
+	/* For IE 8  Don't miss the added quotes */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";		
 }
+
+
 
 .slightlyTransparent {
 	opacity: 0.75;
