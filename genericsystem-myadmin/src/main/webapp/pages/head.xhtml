@@ -22,10 +22,8 @@
 
 				<h:graphicImage url="#{infos.imgLogo}" style="margin :10px" />
 				
-				<a4j:outputPanel layout="block"
-					ajaxRendered="true"
-					style="margin-left :6px; margin-right :10px; background-color :white; min-height :51px"
-					styleClass="littleScroll noBorderRadius minMediumWidth slightlyTransparent">
+				<a4j:outputPanel layout="block" rendered="#{!empty facesContext.messageList}"
+					ajaxRendered="true"	styleClass="messagesBlock">
 					<h:messages infoStyle="info" warnStyle="warn"
 						errorStyle="error" fatalStyle="fatal" infoClass="info"
 						warnClass="warn" errorClass="error" fatalClass="fatal" />
