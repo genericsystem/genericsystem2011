@@ -6,6 +6,16 @@
 
 	<name>gsmyadmin</name>
 
+	<application>
+		<resource-bundle>
+			<base-name>/bundles/messages</base-name>
+			<var>msg</var>
+		</resource-bundle>
+		<resource-bundle>
+			<base-name>/bundles/infos</base-name>
+			<var>infos</var>
+		</resource-bundle>
+	</application>
 	<converter>
 		<converter-id>genericConverter</converter-id>
 		<converter-class>org.genericsystem.web.beans.converters.GenericConverter</converter-class>

@@ -43,3 +43,75 @@ td {
 	max-height: 800px;
 	overflow: scroll;
 }
+
+li.info {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_green.png);
+	background-position: bottom left;
+	font-size: 14px;
+}
+
+li.warn {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_yellow.png);
+	background-position: bottom left;
+	font-size: 14px;
+}
+
+li.error {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_red_yellow.png);
+	background-position: bottom left;
+	font-size: 14px;
+}
+
+li.fatal {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_red.png);
+	background-position: bottom left;
+	font-size: 14px;
+}
+
+.noBorderRadius {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	-khtml-border-radius: 0;
+}
+
+.minMediumWidth {
+	min-width: 300px;
+}
+
+.littleScroll {
+	max-height: 120px;
+	overflow: auto;
+}
+
+.slightlyTransparent {
+	opacity: 0.75;
+	/* For IE 5-7 */
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75);
+	/* For IE 8  Don't miss the added quotes */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
+}
