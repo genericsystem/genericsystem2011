@@ -10,53 +10,83 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<h:panelGrid id="toolbar" columns="8">
-		<a4j:status name="panelUpdateStatus">
-			<f:facet name="start">
+	<rich:toolbar id="toolbar" itemStyle="padding: 0 4px;"
+		style="background-color: inherit; background-image: inherit; border: medium none;">
+		<rich:toolbarGroup>
+			<a4j:commandLink action="#" render="@all">
+				<h:graphicImage
+					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/refresh.png"
+					title="#{msg.refreshAjax}" />
+			</a4j:commandLink>
+
+			<a4j:commandLink action="#{sessionBean.refreshJsf}">
+				<h:graphicImage
+					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/refresh.png"
+					title="#{msg.refreshJsf}" />
+			</a4j:commandLink>
+
+			<a4j:commandLink action="#{sessionBean.invalidate}"
+				onclick="if (! window.confirm('#{msg.invalidateSessionConfirm}') ) {return false}">
+				<h:graphicImage
+					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/lifebelt.png"
+					title="#{msg.invalidateSession}" />
+			</a4j:commandLink>
+		</rich:toolbarGroup>
+
+		<rich:toolbarGroup itemSeparator="grid">
+			<h:outputText value="" />
+			<h:outputText value="" />
+		</rich:toolbarGroup>
+
+		<rich:toolbarGroup location="right">
+			<a4j:status name="panelUpdateStatus">
+				<f:facet name="start">
                         (Updating)
                     </f:facet>
-		</a4j:status>
-		<h:outputText rendered="#{fileSystemBean.fileSelected}"
-			value="#{fileSystemBean.fileShortPath}" />
-		<h:outputText rendered="#{fileSystemBean.directorySelected}"
-			value="#{fileSystemBean.directoryShortPath}" />
-			
-		<a4j:commandLink rendered="#{fileSystemBean.directorySelected}"
-			oncomplete="#{rich:component('createfile')}.show()">
-			<h:graphicImage
-				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/document_add.png"
-				title="#{msg.create} #{msg.a} #{msg.file}" />
-		</a4j:commandLink>
+			</a4j:status>
 
-		<a4j:commandLink rendered="#{fileSystemBean.directorySelected}"
-			oncomplete="#{rich:component('createsubdirectory')}.show()">
-			<h:graphicImage
-				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/folder_add.png"
-				title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}" />
-		</a4j:commandLink>
+			<h:outputText rendered="#{fileSystemBean.fileSelected}"
+				value="#{fileSystemBean.fileShortPath}" />
+			<h:outputText rendered="#{fileSystemBean.directorySelected}"
+				value="#{fileSystemBean.directoryShortPath}" />
 
-		<a4j:commandLink execute="edit"
-			rendered="#{fileSystemBean.fileSelected}" status="panelUpdateStatus"
-			onclick="editor.save();">
-			<h:graphicImage
-				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/floppy_disk.png"
-				title="#{msg.apply}" />
-		</a4j:commandLink>
+			<a4j:commandLink rendered="#{fileSystemBean.directorySelected}"
+				oncomplete="#{rich:component('createfile')}.show()">
+				<h:graphicImage
+					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/document_add.png"
+					title="#{msg.create} #{msg.a} #{msg.file}" />
+			</a4j:commandLink>
 
-		<a4j:commandLink action="#{fileSystemBean.delete}"
-			rendered="#{fileSystemBean.fileSelected || fileSystemBean.directorySelected}"
-			render="directorytree"
-			onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false}">
-			<h:graphicImage
-				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/delete.png"
-				title="#{msg.delete}" />
-		</a4j:commandLink>
+			<a4j:commandLink rendered="#{fileSystemBean.directorySelected}"
+				oncomplete="#{rich:component('createsubdirectory')}.show()">
+				<h:graphicImage
+					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/folder_add.png"
+					title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}" />
+			</a4j:commandLink>
 
-		<a4j:commandLink
-			oncomplete="#{rich:component('newrootdirectory')}.show()">
-			<h:graphicImage
-				value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/add.png"
-				title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
-		</a4j:commandLink>
-	</h:panelGrid>
+			<a4j:commandLink execute="edit"
+				rendered="#{fileSystemBean.fileSelected}" status="panelUpdateStatus"
+				onclick="editor.save();">
+				<h:graphicImage
+					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/floppy_disk.png"
+					title="#{msg.apply}" />
+			</a4j:commandLink>
+
+			<a4j:commandLink action="#{fileSystemBean.delete}"
+				rendered="#{fileSystemBean.fileSelected || fileSystemBean.directorySelected}"
+				render="directorytree"
+				onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false}">
+				<h:graphicImage
+					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/delete.png"
+					title="#{msg.delete}" />
+			</a4j:commandLink>
+
+			<a4j:commandLink
+				oncomplete="#{rich:component('newrootdirectory')}.show()">
+				<h:graphicImage
+					value="http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/add.png"
+					title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
+			</a4j:commandLink>
+		</rich:toolbarGroup>
+	</rich:toolbar>
 </ui:composition>

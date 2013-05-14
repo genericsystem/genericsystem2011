@@ -12,11 +12,20 @@
 
 	<rich:panel styleClass="fullWidth">
 		<f:facet name="header">
-			<h:panelGrid columns="5" styleClass="fullWidth"
-				columnClasses="fullWidth,,,">
+			<h:panelGrid columns="4" styleClass="fullWidth"
+				columnClasses="fullWidth,,">
 				<h:outputText styleClass="uppercase"
 					value="#{msg.file} #{msg.system} #{msg.manager}" />
 				<ui:include src="/pages/toolbar.xhtml" />
+
+				<rich:toolbar itemStyle="padding: 0 4px;"
+					style="background-color: inherit; background-image: inherit; border: medium none;">
+					<rich:toolbarGroup itemSeparator="grid">
+						<h:outputText value="" />
+						<h:outputText value="" />
+					</rich:toolbarGroup>
+				</rich:toolbar>
+
 				<ui:include src="/pages/cachemanager.xhtml" />
 			</h:panelGrid>
 		</f:facet>
