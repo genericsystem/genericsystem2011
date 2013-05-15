@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.application.ViewExpiredException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.genericsystem.core.Cache;
@@ -13,8 +12,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType.File;
-import org.jboss.seam.international.status.Messages;
-import org.jboss.seam.international.status.builder.BundleKey;
+import org.genericsystem.web.util.GsMessages;
 import org.richfaces.component.UITree;
 import org.richfaces.event.TreeSelectionChangeEvent;
 import org.slf4j.Logger;
@@ -32,7 +30,7 @@ public class FileSystemBean implements Serializable {
 	private transient Cache cache;
 
 	@Inject
-	private Messages messages;
+	private GsMessages messages;
 
 	private Generic fileSelected;
 
@@ -59,7 +57,7 @@ public class FileSystemBean implements Serializable {
 		tree.setRowKey(storedKey);
 
 		log.info("changeFile " + selected);
-		messages.info(new BundleKey("/bundles/messages", "selectionchanged"), selected.getValue());
+		messages.info("selectionchanged", selected.getValue());
 		setFileSelected(selected);
 	}
 
@@ -77,7 +75,6 @@ public class FileSystemBean implements Serializable {
 	public void addFile(String newValue) {
 		log.info("CREATE " + newValue + " of " + fileSelected);
 		((Directory) fileSelected).addFile(cache, newValue);
-		throw new ViewExpiredException();
 	}
 
 	public void modifyValue(String newValue) {

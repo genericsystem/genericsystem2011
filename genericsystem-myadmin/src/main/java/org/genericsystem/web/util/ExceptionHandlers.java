@@ -19,7 +19,7 @@ public class ExceptionHandlers {
 	private ExternalContext context;
 
 	@Inject
-	private RedirectMessages redirectMessage;
+	private GsMessages gsMessages;
 
 	protected static Logger log = LoggerFactory.getLogger(ExceptionHandlers.class);
 
@@ -31,7 +31,7 @@ public class ExceptionHandlers {
 	}
 
 	void handleAll(@Handles CaughtException<Throwable> caught, HttpServletResponse response) {
-		redirectMessage.addErrorMessage("viewExpiredException");
+		gsMessages.redirectError("viewExpiredException");
 		log.error(toString(caught.getException().getStackTrace()));
 		try {
 			if (caught.getException() instanceof ViewExpiredException)

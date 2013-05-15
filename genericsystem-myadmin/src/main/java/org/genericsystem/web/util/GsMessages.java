@@ -18,10 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SessionScoped
-public class RedirectMessages implements Serializable {
+public class GsMessages implements Serializable {
 
 	private static final long serialVersionUID = 7666964394295933934L;
-	private static final Logger log = LoggerFactory.getLogger(RedirectMessages.class);
+	private static final Logger log = LoggerFactory.getLogger(GsMessages.class);
 
 	@Inject
 	FacesContext context;
@@ -32,12 +32,13 @@ public class RedirectMessages implements Serializable {
 	@Inject
 	MessageFactory factory;
 
-	private List<Message> messagesToRedirect = new ArrayList<>();
+	private static final String MESSAGES_BUNDLE_NAME = "/bundles/messages";
 
-	public void addErrorMessage(String key, Object... params) {
-		messagesToRedirect.add(factory.error(new BundleKey("/bundles/messages", key), params).build());
-		log.info("ZZZZZZZZZZZZZZZZZ");
+	private BundleKey getMessagesBundleKey(String key) {
+		return new BundleKey(MESSAGES_BUNDLE_NAME, key);
 	}
+
+	private List<Message> messagesToRedirect = new ArrayList<>();
 
 	public void restoreMessages(@Observes @After PhaseEvent e) {
 		if (PhaseId.RESTORE_VIEW.equals(e.getPhaseId())) {
@@ -45,5 +46,25 @@ public class RedirectMessages implements Serializable {
 				messages.add(message);
 			messagesToRedirect.clear();
 		}
+	}
+
+	public void redirectError(String key, Object... params) {
+		messagesToRedirect.add(factory.error(getMessagesBundleKey(key), params).build());
+	}
+
+	public void info(String key, Object... params) {
+		messages.info(getMessagesBundleKey(key), params);
+	}
+
+	public void warn(String key, Object... params) {
+		messages.warn(getMessagesBundleKey(key), params);
+	}
+
+	public void error(String key, Object... params) {
+		messages.error(getMessagesBundleKey(key), params);
+	}
+
+	public void fatal(String key, Object... params) {
+		messages.fatal(getMessagesBundleKey(key), params);
 	}
 }
