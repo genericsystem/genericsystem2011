@@ -21,6 +21,7 @@
                     </f:facet>
 			</a4j:status>
 
+<!-- 			<rich:inplaceInput defaultLabel="click to enter your name" /> -->
 			<h:outputText rendered="#{fileSystemBean.fileSelected}"
 				value="#{fileSystemBean.fileShortPath}" />
 			<h:outputText rendered="#{fileSystemBean.directorySelected}"
@@ -44,12 +45,11 @@
 				<h:graphicImage value="#{infos.floppy_disk}" title="#{msg.apply}" />
 			</a4j:commandLink>
 
-			<a4j:commandLink action="#{fileSystemBean.delete}"
+			<h:commandLink action="#{fileSystemBean.delete}"
 				rendered="#{fileSystemBean.fileSelected || fileSystemBean.directorySelected}"
-				render="directorytree"
 				onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false}">
 				<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
-			</a4j:commandLink>
+			</h:commandLink>
 
 			<a4j:commandLink
 				oncomplete="#{rich:component('newrootdirectory')}.show()">

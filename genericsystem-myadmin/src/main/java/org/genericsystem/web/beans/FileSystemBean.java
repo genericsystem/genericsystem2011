@@ -79,8 +79,9 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public void delete() {
-		messages.info("delete", fileSelected.getValue());
+		messages.info("deleteFile", fileSelected.getValue());
 		fileSelected.remove(cache);
+		fileSelected = null;
 	}
 
 	public boolean isDirectorySelected() {
