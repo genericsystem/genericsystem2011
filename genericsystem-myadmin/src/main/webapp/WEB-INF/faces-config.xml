@@ -7,6 +7,9 @@
 	<name>gsmyadmin</name>
 
 	<application>
+		<locale-config>
+			<default-locale>en</default-locale>
+		</locale-config>
 		<resource-bundle>
 			<base-name>/bundles/messages</base-name>
 			<var>msg</var>
