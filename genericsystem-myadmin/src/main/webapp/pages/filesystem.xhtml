@@ -37,5 +37,8 @@
 	<gs:popupPanel key="newrootdirectory"
 		title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 		action="#{fileSystemBean.addRootDirectory(popupValue)}" render="directorytree" />
+	<gs:popupPanel key="modifyValue"
+		title="#{msg.update} #{msg.the} #{msg.value}"
+		action="#{fileSystemBean.modifyValue(popupValue)}" render="@all" />
 
 </ui:composition>

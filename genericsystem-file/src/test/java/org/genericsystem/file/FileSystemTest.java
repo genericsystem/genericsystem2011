@@ -12,25 +12,54 @@ import org.genericsystem.file.FileSystem.FileType;
 import org.genericsystem.file.FileSystem.FileType.File;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Node;
-import org.genericsystem.generic.Tree;
 import org.testng.annotations.Test;
 
 @Test
 public class FileSystemTest {
 
-	@Test
-	public void testFileSystemAndDirectoryTree() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
-		Tree fileSystem = cache.find(FileSystem.class);
-		assert cache.isAlive(fileSystem);
-	}
-
-	public void testUpdate() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+	public void testUpdateRootDirectory() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
 		assert ((CacheImpl) cache).update(rootDirectory, "rootDirectory2").getValue().equals("rootDirectory2");
 		assert !rootDirectory.isAlive(cache);
+	}
+
+	public void testUpdateRootDirectoryWithFile() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+		FileSystem fileSystem = cache.find(FileSystem.class);
+		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
+		rootDirectory.addFile(cache, "file");
+		assert ((CacheImpl) cache).update(rootDirectory, "rootDirectory2").getValue().equals("rootDirectory2");
+		assert !rootDirectory.isAlive(cache);
+	}
+
+	public void testUpdateDirectory() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+		FileSystem fileSystem = cache.find(FileSystem.class);
+		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
+		Directory directory = rootDirectory.addDirectory(cache, "directory");
+		assert ((CacheImpl) cache).update(directory, "directory2").getValue().equals("directory2");
+		assert !directory.isAlive(cache);
+	}
+
+	public void testUpdateDirectoryWithFile() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+		FileSystem fileSystem = cache.find(FileSystem.class);
+		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
+		Directory directory = rootDirectory.addDirectory(cache, "directory");
+		directory.addFile(cache, "file");
+		assert ((CacheImpl) cache).update(directory, "directory2").getValue().equals("directory2");
+		assert !directory.isAlive(cache);
+	}
+
+	public void testUpdateFile() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
+		FileSystem fileSystem = cache.find(FileSystem.class);
+		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
+		File file = rootDirectory.addFile(cache, "file");
+		assert ((CacheImpl) cache).update(file, "file2").getValue().equals("file2");
+		assert !file.isAlive(cache);
 	}
 
 	public void testDirectoryNameNotUniqueInDifferentDirectories() {
@@ -54,36 +83,6 @@ public class FileSystemTest {
 		// assert false : rootDirectory.getDirectories(cache);
 		directory1.getFile(cache, "fileName").remove(cache);
 	}
-
-	// public void testDirectoryNameValueClassViolation() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-	// DirectoryTree directoryTree = cache.find(DirectoryTree.class);
-	// assert directoryTree.getConstraintClass(cache) != null;
-	// final Directory rootDirectory = directoryTree.addRootDirectory(cache, "rootDirectory");
-	// new RollbackCatcher() {
-	// @Override
-	// public void intercept() {
-	// rootDirectory.addDirectory(cache, 2L);
-	// }
-	// }.assertIsCausedBy(InstanceClassConstraintViolationException.class);
-	// }
-
-	// //
-	// // // Constraint order problem: NotDuplicated vs Unique
-	// public void testFileNameUniqueInASameDirectory() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(DirectoryTree.class);
-	// Tree directoryTree = cache.find(DirectoryTree.class);
-	// Node rootDirectory = directoryTree.newRoot(cache, "rootDirectory");
-	// final Node directory = rootDirectory.setNode(cache, "directory");
-	// final Attribute fileSystem = cache.find(FileType.class);
-	// directory.setValue(cache, fileSystem, "test.html");
-	// new RollbackCatcher() {
-	// @Override
-	// public void intercept() {
-	// directory.setValue(cache, fileSystem, "test.html");
-	// }
-	// }.assertIsCausedBy(UniqueConstraintViolationException.class);
-	// }
 
 	public void testFileNameNotUniqueInDifferentDirectories() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);

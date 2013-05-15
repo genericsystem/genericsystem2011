@@ -17,6 +17,8 @@ import org.genericsystem.file.FileSystem.FileType.File;
 import org.genericsystem.web.util.GsMessages;
 import org.richfaces.component.UITree;
 import org.richfaces.event.TreeSelectionChangeEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
@@ -73,9 +75,11 @@ public class FileSystemBean implements Serializable {
 		((Directory) fileSelected).addFile(cache, newValue);
 	}
 
+	protected static Logger log = LoggerFactory.getLogger(FileSystemBean.class);
+
 	public void modifyValue(String newValue) {
 		messages.info("modifyValue", newValue, fileSelected.getValue());
-		((CacheImpl) cache).update(fileSelected, newValue);
+		fileSelected = ((CacheImpl) cache).update(fileSelected, newValue);
 	}
 
 	public void delete() {

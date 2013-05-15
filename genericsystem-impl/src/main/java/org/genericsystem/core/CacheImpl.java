@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -267,28 +268,28 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T reInsert(Iterator<Generic> genericsToInsert, Generic oldPrimary, Generic newPrimary) {
-		Generic updated = replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary);
+		Generic updated = replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary, true);
 		while (genericsToInsert.hasNext())
-			replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary);
+			replace(genericsToInsert.next(), (GenericImpl) oldPrimary, (GenericImpl) newPrimary, true);
 		return (T) updated;
 	}
 
 	// TODO KK
-	private Generic replace(Generic genericToReplace, GenericImpl oldImplicit, GenericImpl newImplicit) {
+	private Generic replace(Generic genericToReplace, GenericImpl oldImplicit, GenericImpl newImplicit, boolean existsException) {
 		if (((GenericImpl) genericToReplace).isPrimary())
 			return bindPrimaryByValue(((GenericImpl) genericToReplace).supers[0], newImplicit.getValue(), genericToReplace.getMetaLevel(), genericToReplace.isAutomatic());
 
 		Generic[] interfaces = ((GenericImpl) genericToReplace).getPrimariesArray();
 		Generic[] resultInterfaces = new Generic[interfaces.length];
 		for (int i = 0; i < interfaces.length; i++)
-			resultInterfaces[i] = ((GenericImpl) interfaces[i]).isPrimary() ? getNewPrimary(interfaces[i], oldImplicit, newImplicit) : replace(interfaces[i], oldImplicit, newImplicit);
+			resultInterfaces[i] = ((GenericImpl) interfaces[i]).isPrimary() ? getNewPrimary(interfaces[i], oldImplicit, newImplicit) : replace(interfaces[i], oldImplicit, newImplicit, false);
 		Generic[] components = ((GenericImpl) genericToReplace).components;
 		Generic[] resultComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++)
-			resultComponents[i] = genericToReplace.equals(components[i]) ? null : ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldImplicit, newImplicit) : replace(components[i], oldImplicit, newImplicit);
+			resultComponents[i] = genericToReplace.equals(components[i]) ? null : ((GenericImpl) components[i]).isPrimary() ? getNewPrimary(components[i], oldImplicit, newImplicit) : replace(components[i], oldImplicit, newImplicit, false);
 
 		Generic implicit = genericToReplace.getImplicit().equals(oldImplicit) ? newImplicit : genericToReplace.getImplicit();
-		return bind(implicit, resultInterfaces, resultComponents, genericToReplace.isAutomatic(), genericToReplace.getClass(), true);
+		return bind(implicit, resultInterfaces, resultComponents, genericToReplace.isAutomatic(), genericToReplace.getClass(), existsException);
 	}
 
 	private Generic getNewPrimary(Generic oldSubPrimary, Generic oldPrimary, Generic newPrimary) {
@@ -424,7 +425,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			if (!Objects.equals(result.getValue(), implicit.getValue()))
 				throw new IllegalSelectorException();
 			if (existsException)
-				throw new IllegalStateException("Exists exception");
+				throw new IllegalStateException("Exists exception " + implicit);
 			return result;
 		}
 		return internalBind(implicit, interfaces, components, automatic, clazz);

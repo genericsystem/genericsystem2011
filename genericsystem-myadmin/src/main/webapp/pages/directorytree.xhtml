@@ -19,9 +19,20 @@
 				nodes="#{fileSystemBean.getDirectories(item)}">
 				<rich:treeNode>
                     #{item.shortPath}
-                </rich:treeNode>
+                    <a4j:commandLink
+						oncomplete="#{rich:component('modifyValue')}.show()">
+						<h:graphicImage value="#{infos.edit}"
+							title="#{msg.update} #{msg.the} #{msg.value}" />
+					</a4j:commandLink>
+				</rich:treeNode>
 				<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
-					<rich:treeNode>#{item.shortPath}</rich:treeNode>
+					<rich:treeNode>#{item.shortPath}
+                    <a4j:commandLink
+							oncomplete="#{rich:component('modifyValue')}.show()">
+							<h:graphicImage value="#{infos.edit}"
+								title="#{msg.update} #{msg.the} #{msg.value}" />
+						</a4j:commandLink>
+					</rich:treeNode>
 				</rich:treeModelAdaptor>
 			</rich:treeModelRecursiveAdaptor>
 		</rich:tree>
