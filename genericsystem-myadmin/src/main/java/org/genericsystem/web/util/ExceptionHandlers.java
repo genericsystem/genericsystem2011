@@ -31,13 +31,15 @@ public class ExceptionHandlers {
 	}
 
 	void handleAll(@Handles CaughtException<Throwable> caught, HttpServletResponse response) {
-		gsMessages.redirectError("viewExpiredException");
-		log.error(toString(caught.getException().getStackTrace()));
+		log.error(caught.getException().toString() + "\n" + toString(caught.getException().getStackTrace()));
 		try {
-			if (caught.getException() instanceof ViewExpiredException)
+			if (caught.getException() instanceof ViewExpiredException) {
+				gsMessages.redirectError("viewExpiredException");
 				context.redirect("/gsmyadmin/pages/index.xhtml");
-			else
-				response.sendError(500, "You've been caught by Catch! : " + toString(caught.getException().getStackTrace()));
+			} else {
+				gsMessages.redirectStringError(caught.getException().toString());
+				context.redirect("/gsmyadmin/pages/index.xhtml");
+			}
 		} catch (IOException e) {
 			log.error(toString(e.getStackTrace()));
 		}
