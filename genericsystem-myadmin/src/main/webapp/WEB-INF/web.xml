@@ -45,29 +45,6 @@
 		<param-value>org.genericsystem.resolver.GsResolver</param-value>
 	</context-param>
 
-
-	<!-- <context-param> -->
-	<!-- <param-name>javax.faces.STATE_SAVING_METHOD</param-name> -->
-	<!-- <param-value>client</param-value> why? -->
-	<!-- </context-param> -->
-
-	<!-- context-param> <param-name>com.sun.faces.expressionFactory</param-name> 
-		<param-value>de.odysseus.el.ExpressionFactoryImpl</param-value> <param-value>com.sun.el.ExpressionFactoryImpl</param-value> 
-		</context-param -->
-
-
-	<!-- listener> <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class> 
-		</listener> <listener> <listener-class>org.jboss.solder.resourceLoader.servlet.ResourceListener</listener-class> 
-		</listener -->
-
-	<!-- <listener> -->
-	<!-- <listener-class>org.jboss.seam.faces.beanManager.BeanManagerServletContextListener</listener-class> -->
-	<!-- </listener> -->
-
-	<!-- resource-env-ref> <description>Object factory for the CDI Bean Manager</description> 
-		<resource-env-ref-name>BeanManager</resource-env-ref-name> <resource-env-ref-type>javax.enterprise.inject.spi.BeanManager</resource-env-ref-type> 
-		</resource-env-ref -->
-
 	<servlet>
 		<servlet-name>Faces Servlet</servlet-name>
 		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
@@ -84,13 +61,8 @@
 		<url-pattern>*.xhtml</url-pattern>
 	</servlet-mapping>
 
-	<error-page>
-		<exception-type>javax.faces.application.ViewExpiredException</exception-type>
-		<location>/pages/index.xhtml</location>
-	</error-page>
-
 	<session-config>
-		<session-timeout>1</session-timeout>
+		<session-timeout>30</session-timeout>
 	</session-config>
 
 	<welcome-file-list>
