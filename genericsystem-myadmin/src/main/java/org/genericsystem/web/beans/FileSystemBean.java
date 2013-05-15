@@ -3,9 +3,11 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -15,16 +17,12 @@ import org.genericsystem.file.FileSystem.FileType.File;
 import org.genericsystem.web.util.GsMessages;
 import org.richfaces.component.UITree;
 import org.richfaces.event.TreeSelectionChangeEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
 public class FileSystemBean implements Serializable {
 
 	private static final long serialVersionUID = 5535643610156313741L;
-
-	protected static Logger log = LoggerFactory.getLogger(FileSystemBean.class);
 
 	@Inject
 	private transient Cache cache;
@@ -56,29 +54,27 @@ public class FileSystemBean implements Serializable {
 		Generic selected = (Generic) tree.getRowData();
 		tree.setRowKey(storedKey);
 
-		log.info("changeFile " + selected);
 		messages.info("selectionchanged", selected.getValue());
 		setFileSelected(selected);
 	}
 
 	public void addRootDirectory(String newValue) {
-		log.info("CREATE ROOT DIRECTORY " + newValue);
-		FileSystem directoryTree = cache.<FileSystem> find(FileSystem.class);
-		directoryTree.addRootDirectory(cache, newValue);
+		messages.info("createRootDirectory", newValue);
+		cache.<FileSystem> find(FileSystem.class).addRootDirectory(cache, newValue);
 	}
 
 	public void addSubDirectory(String newValue) {
-		log.info("CREATE " + newValue + " of " + fileSelected);
+		messages.info("createSubDirectory", newValue, fileSelected.getValue());
 		((Directory) fileSelected).addDirectory(cache, newValue);
 	}
 
 	public void addFile(String newValue) {
-		log.info("CREATE " + newValue + " of " + fileSelected);
+		messages.info("createFile", newValue, fileSelected.getValue());
 		((Directory) fileSelected).addFile(cache, newValue);
 	}
 
 	public void modifyValue(String newValue) {
-		log.info("MODIFY VALUE OF " + fileSelected + ", NEW VALUE " + newValue + " " + cache);
+		messages.info("modifyValue", newValue, fileSelected.getValue());
 		((CacheImpl) cache).update(fileSelected, newValue);
 	}
 
@@ -87,15 +83,11 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public boolean isDirectorySelected() {
-		boolean check = fileSelected != null && fileSelected instanceof Directory;
-		// log.info("isDirectory " + fileSelected + " " + check);
-		return check;
+		return fileSelected != null && fileSelected instanceof Directory;
 	}
 
 	public boolean isFileSelected() {
-		boolean check = fileSelected != null && fileSelected instanceof File;
-		// log.info("isDirectory " + fileSelected + " " + check);
-		return check;
+		return fileSelected != null && fileSelected instanceof File;
 	}
 
 	public Generic getFileSelected() {

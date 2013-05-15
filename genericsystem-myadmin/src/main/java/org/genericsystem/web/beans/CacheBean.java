@@ -7,16 +7,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
 public class CacheBean implements Serializable {
 
 	private static final long serialVersionUID = 1752488068961882618L;
-
-	protected static Logger log = LoggerFactory.getLogger(CacheBean.class);
 
 	@Inject
 	private transient Cache cache;
