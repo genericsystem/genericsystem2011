@@ -3,11 +3,10 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.ViewExpiredException;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -78,6 +77,7 @@ public class FileSystemBean implements Serializable {
 	public void addFile(String newValue) {
 		log.info("CREATE " + newValue + " of " + fileSelected);
 		((Directory) fileSelected).addFile(cache, newValue);
+		throw new ViewExpiredException();
 	}
 
 	public void modifyValue(String newValue) {
@@ -91,13 +91,13 @@ public class FileSystemBean implements Serializable {
 
 	public boolean isDirectorySelected() {
 		boolean check = fileSelected != null && fileSelected instanceof Directory;
-		log.info("isDirectory " + fileSelected + " " + check);
+		// log.info("isDirectory " + fileSelected + " " + check);
 		return check;
 	}
 
 	public boolean isFileSelected() {
 		boolean check = fileSelected != null && fileSelected instanceof File;
-		log.info("isDirectory " + fileSelected + " " + check);
+		// log.info("isDirectory " + fileSelected + " " + check);
 		return check;
 	}
 
