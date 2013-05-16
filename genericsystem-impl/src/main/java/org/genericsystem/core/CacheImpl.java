@@ -12,7 +12,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -261,8 +260,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return internalCache;
 	}
 
-	// TODO clean
+	@SuppressWarnings("unchecked")
 	public <T extends Generic> T update(Generic old, Serializable value) {
+		if (Objects.equals(value, old.getValue()))
+			return (T) old;
 		return reInsert(orderAndRemoveDependencies(old).iterator(), ((GenericImpl) old).getImplicit(), bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel(), old.isAutomatic()));
 	}
 

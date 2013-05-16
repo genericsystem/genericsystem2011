@@ -1,9 +1,9 @@
 package org.genericsystem.web.util;
 
-import java.io.IOException;
 import java.util.Objects;
 import javax.faces.application.ViewExpiredException;
 import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import org.jboss.solder.exception.control.CaughtException;
@@ -19,6 +19,9 @@ public class ExceptionHandlers {
 	private ExternalContext context;
 
 	@Inject
+	private FacesContext facesContext;
+
+	@Inject
 	private GsMessages gsMessages;
 
 	protected static Logger log = LoggerFactory.getLogger(ExceptionHandlers.class);
@@ -32,16 +35,10 @@ public class ExceptionHandlers {
 
 	void handleAll(@Handles CaughtException<Throwable> caught, HttpServletResponse response) {
 		log.error(caught.getException().toString() + "\n" + toString(caught.getException().getStackTrace()));
-		try {
-			if (caught.getException() instanceof ViewExpiredException) {
-				gsMessages.redirectError("viewExpiredException");
-				context.redirect("/gsmyadmin/pages/index.xhtml");
-			} else {
-				gsMessages.redirectStringError(caught.getException().toString());
-				context.redirect("/gsmyadmin/pages/index.xhtml");
-			}
-		} catch (IOException e) {
-			log.error(toString(e.getStackTrace()));
-		}
+		if (caught.getException() instanceof ViewExpiredException)
+			gsMessages.redirectError("viewExpiredException");
+		else
+			gsMessages.redirectStringError(caught.getException().getMessage());
+		facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "/gsmyadmin/pages/index.xhtml");
 	}
 }

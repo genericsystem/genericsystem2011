@@ -3,11 +3,10 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.enterprise.context.SessionScoped;
+import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -32,7 +31,7 @@ public class FileSystemBean implements Serializable {
 	@Inject
 	private GsMessages messages;
 
-	private Generic fileSelected;
+	private Generic selectedFile;
 
 	public List<Directory> getRootDirectories() {
 		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
@@ -53,11 +52,9 @@ public class FileSystemBean implements Serializable {
 		UITree tree = (UITree) selectionChangeEvent.getSource();
 		Object storedKey = tree.getRowKey();
 		tree.setRowKey(currentSelectionKey);
-		Generic selected = (Generic) tree.getRowData();
+		selectedFile = (Generic) tree.getRowData();
 		tree.setRowKey(storedKey);
-
-		messages.info("selectionchanged", selected.getValue());
-		setFileSelected(selected);
+		messages.info("selectionchanged", selectedFile.getValue());
 	}
 
 	public void addRootDirectory(String newValue) {
@@ -66,61 +63,55 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public void addSubDirectory(String newValue) {
-		messages.info("createSubDirectory", newValue, fileSelected.getValue());
-		((Directory) fileSelected).addDirectory(cache, newValue);
+		messages.info("createSubDirectory", newValue, selectedFile.getValue());
+		((Directory) selectedFile).addDirectory(cache, newValue);
 	}
 
 	public void addFile(String newValue) {
-		messages.info("createFile", newValue, fileSelected.getValue());
-		((Directory) fileSelected).addFile(cache, newValue);
+		messages.info("createFile", newValue, selectedFile.getValue());
+		((Directory) selectedFile).addFile(cache, newValue);
 	}
 
 	protected static Logger log = LoggerFactory.getLogger(FileSystemBean.class);
 
-	public void modifyValue(String newValue) {
-		messages.info("modifyValue", newValue, fileSelected.getValue());
-		fileSelected = ((CacheImpl) cache).update(fileSelected, newValue);
+	public void updateShortPath(ValueChangeEvent vce) {
+		String shortPath = (String) vce.getNewValue();
+		log.info("updateShortPath : " + shortPath);
+		messages.info("updateShortPath", shortPath, selectedFile.getValue());
+		selectedFile = ((CacheImpl) cache).update(selectedFile, shortPath);
 	}
 
 	public void delete() {
-		messages.info("deleteFile", fileSelected.getValue());
-		fileSelected.remove(cache);
-		fileSelected = null;
+		messages.info("deleteFile", selectedFile.getValue());
+		selectedFile.remove(cache);
+		selectedFile = null;
 	}
 
 	public boolean isDirectorySelected() {
-		return fileSelected != null && fileSelected instanceof Directory;
+		return selectedFile != null && selectedFile instanceof Directory;
 	}
 
 	public boolean isFileSelected() {
-		return fileSelected != null && fileSelected instanceof File;
-	}
-
-	public Generic getFileSelected() {
-		return fileSelected;
-	}
-
-	public void setFileSelected(Generic fileSelected) {
-		this.fileSelected = fileSelected;
+		return selectedFile != null && selectedFile instanceof File;
 	}
 
 	public String getFileShortPath() {
-		return ((File) fileSelected).getShortPath();
+		return ((File) selectedFile).getShortPath();
 	}
 
 	public String getDirectoryShortPath() {
-		return ((Directory) fileSelected).getShortPath();
+		return ((Directory) selectedFile).getShortPath();
 	}
 
 	public String getContent() {
-		if (fileSelected == null)
+		if (selectedFile == null)
 			return "";
-		byte[] bytes = ((File) fileSelected).getContent(cache);
+		byte[] bytes = ((File) selectedFile).getContent(cache);
 		return new String(bytes != null ? new String(bytes) : "");
 	}
 
 	public void setContent(String content) {
-		((File) fileSelected).setContent(cache, content.getBytes());
+		((File) selectedFile).setContent(cache, content.getBytes());
 	}
 
 }
