@@ -5,32 +5,37 @@ body {
 	float: none;
 }
 
+.inplaceInput > span{
+	color : black;
+}
+
 .fullWidth {
 	width: 100%;
-}
-
-.uppercase {
-	text-transform: uppercase;
-}
-
-td {
-	vertical-align: middle;
-}
-
-.middleAlign {
-	vertical-align: middle;
-}
-
-.topAlign {
-	vertical-align: top;
 }
 
 .fullHeight {
 	height: 100%;
 }
 
+.uppercase {
+	text-transform: uppercase;
+}
+
+.topAlign {
+	vertical-align: top;
+}
+
+.middleAlign {
+	vertical-align: middle;
+}
 .scroll {
 	overflow: auto;
+}
+
+.bigScroll {
+	max-width: 800px;
+	max-height: 800px;
+	overflow: scroll;
 }
 
 .widthScroll280 {
@@ -38,10 +43,8 @@ td {
 	width: 280px;
 }
 
-.bigScroll {
-	max-width: 800px;
-	max-height: 800px;
-	overflow: scroll;
+td {
+	vertical-align: middle;
 }
 
 li.info {
@@ -108,8 +111,6 @@ li.fatal {
 	/* For IE 8  Don't miss the added quotes */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";		
 }
-
-
 
 .slightlyTransparent {
 	opacity: 0.75;

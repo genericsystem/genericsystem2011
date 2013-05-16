@@ -3,10 +3,12 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.enterprise.context.SessionScoped;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -47,14 +49,16 @@ public class FileSystemBean implements Serializable {
 
 	public void changeFile(TreeSelectionChangeEvent selectionChangeEvent) {
 		List<Object> selection = new ArrayList<Object>(selectionChangeEvent.getNewSelection());
-		Object currentSelectionKey = selection.get(0);
+		if (!selection.isEmpty()) {
+			Object currentSelectionKey = selection.get(0);
 
-		UITree tree = (UITree) selectionChangeEvent.getSource();
-		Object storedKey = tree.getRowKey();
-		tree.setRowKey(currentSelectionKey);
-		selectedFile = (Generic) tree.getRowData();
-		tree.setRowKey(storedKey);
-		messages.info("selectionchanged", selectedFile.getValue());
+			UITree tree = (UITree) selectionChangeEvent.getSource();
+			Object storedKey = tree.getRowKey();
+			tree.setRowKey(currentSelectionKey);
+			selectedFile = (Generic) tree.getRowData();
+			tree.setRowKey(storedKey);
+			messages.info("selectionchanged", selectedFile.getValue());
+		}
 	}
 
 	public void addRootDirectory(String newValue) {
@@ -79,6 +83,29 @@ public class FileSystemBean implements Serializable {
 		log.info("updateShortPath : " + shortPath);
 		messages.info("updateShortPath", shortPath, selectedFile.getValue());
 		selectedFile = ((CacheImpl) cache).update(selectedFile, shortPath);
+	}
+
+	public Wrapper getWrapper(Generic g) {
+		assert g != null;
+		return new Wrapper(g);
+	}
+
+	public class Wrapper {
+		private Generic generic;
+
+		public Wrapper(Generic g) {
+			this.generic = g;
+		}
+
+		public String getShortPath() {
+			return generic.getValue();
+		}
+
+		public void setShortPath(String newValue) {
+			log.info("updateShortPath : " + newValue + " " + generic);
+			messages.info("updateShortPath", newValue, generic);
+			selectedFile = ((CacheImpl) cache).update(generic, newValue);
+		}
 	}
 
 	public void delete() {
