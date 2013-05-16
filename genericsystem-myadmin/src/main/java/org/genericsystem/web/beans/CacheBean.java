@@ -21,8 +21,9 @@ public class CacheBean implements Serializable {
 		cache.flush();
 	}
 
-	public void discard() {
+	public String discard() {
 		cache.clear();
+		return "/pages/index.xhtml?redirect=true";
 	}
 
 }
