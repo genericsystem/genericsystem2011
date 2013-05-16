@@ -6,9 +6,11 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import org.genericsystem.exception.RollbackException;
 import org.jboss.solder.exception.control.CaughtException;
 import org.jboss.solder.exception.control.Handles;
 import org.jboss.solder.exception.control.HandlesExceptions;
+import org.jboss.solder.exception.control.Precedence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +35,21 @@ public class ExceptionHandlers {
 		return s;
 	}
 
-	void handleAll(@Handles CaughtException<Throwable> caught, HttpServletResponse response) {
+	void handleRollbackException(@Handles CaughtException<RollbackException> caught, HttpServletResponse response) {
 		log.error(caught.getException().toString() + "\n" + toString(caught.getException().getStackTrace()));
-		if (caught.getException() instanceof ViewExpiredException)
-			gsMessages.redirectError("viewExpiredException");
-		else
-			gsMessages.redirectStringError(caught.getException().getMessage());
+		gsMessages.redirectStringError(caught.getException().getMessage());
+		facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "/gsmyadmin/pages/index.xhtml");
+	}
+
+	void handleViewExpiredException(@Handles CaughtException<ViewExpiredException> caught, HttpServletResponse response) {
+		log.error(caught.getException().toString() + "\n" + toString(caught.getException().getStackTrace()));
+		gsMessages.redirectError("viewExpiredException");
+		facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "/gsmyadmin/pages/index.xhtml");
+	}
+
+	void handleRuntimeException(@Handles(precedence = Precedence.LOW) CaughtException<RuntimeException> caught, HttpServletResponse response) {
+		log.error(caught.getException().toString() + "\n" + toString(caught.getException().getStackTrace()));
+		gsMessages.redirectStringError(caught.getException().getMessage());
 		facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "/gsmyadmin/pages/index.xhtml");
 	}
 }

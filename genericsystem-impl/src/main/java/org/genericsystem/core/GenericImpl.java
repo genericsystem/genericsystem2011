@@ -111,10 +111,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	final GenericImpl restore(Serializable value, int metaLevel, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] directSupers, Generic[] components, boolean automatic) {
 		this.value = value;
 		supers = directSupers;
-		this.components = components;
+		this.components = nullToSelfComponent(components);
 		this.automatic = automatic;
 
-		initSelfComponents();
 		lifeManager = new LifeManager(designTs == null ? getEngine().pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
 		for (Generic g1 : directSupers)
 			for (Generic g2 : directSupers)
@@ -142,12 +141,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (effectiveSupersSet.add(effectiveSuper))
 				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
 		return (T) this;
-	}
-
-	private void initSelfComponents() {
-		for (int i = 0; i < components.length; i++)
-			if (components[i] == null)
-				components[i] = this;
 	}
 
 	public LifeManager getLifeManager() {
@@ -638,7 +631,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (int i = 0; i < components.length; i++) {
 			int pos = positions.get(i);
 			if (pos < 0 || pos >= components.length)
-				throw new IllegalStateException("Unable to find a valid positiojn for : " + components[i]);
+				throw new IllegalStateException("Unable to find a valid position for : " + components[i]);
 			orderedComponents[pos] = components[i];
 		}
 		return orderedComponents;
@@ -1272,11 +1265,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public Snapshot<Generic> getRefenrentialIntegrities(Cache cache) {
-		return cache.getReferentialIntegrities(this);
-	}
-
-	@Override
 	public <T extends Generic> T cancel(Cache cache, Holder attribute, Generic... targets) {
 		return cancel(cache, attribute, getBasePos(attribute, targets), targets);
 	}
@@ -1567,7 +1555,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return !isBooleanSystemPropertyEnabled(context, NoInheritanceSystemProperty.class);
 	}
 
-	private Generic[] transform(Generic[] components) {
+	Generic[] nullToSelfComponent(Generic[] components) {
 		Generic[] result = components.clone();
 		for (int i = 0; i < result.length; i++)
 			if (result[i] == null)
@@ -1575,8 +1563,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return result;
 	}
 
+	Generic[] selfToNullComponents() {
+		Generic[] result = components.clone();
+		for (int i = 0; i < result.length; i++)
+			if (equals(result[i]))
+				result[i] = null;
+		return result;
+	}
+
 	boolean equiv(Generic[] interfaces, Generic[] components) {
-		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(transform(components), this.components);
+		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullToSelfComponent(components), this.components);
 	}
 
 	public <T extends Generic> T reBind(Cache cache) {

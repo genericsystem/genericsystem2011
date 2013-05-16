@@ -69,6 +69,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 		return factory;
 	}
 
+	@SuppressWarnings("unchecked")
+	<T extends Generic> T buildComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
+		return (T) ((GenericImpl) getFactory().newGeneric(clazz)).initializeComplex(implicit, supers, components, automatic);
+	}
+
 	@Override
 	public Cache newCache() {
 		return getFactory().newCache(new Transaction(this));

@@ -21,13 +21,12 @@ public class LinkTypeCheckTest extends AbstractTest {
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		road.newInstance(cache, "myRoad");
 
-		new RollbackCatcher() {
+		try {
+			myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, yourDog);
+		} catch (IllegalStateException ignore) {
 
-			@Override
-			public void intercept() {
-				myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, yourDog);
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}
+
 	}
 
 	public void malformedRelationInstanceTooFewTargets() {
@@ -40,13 +39,11 @@ public class LinkTypeCheckTest extends AbstractTest {
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		road.newInstance(cache, "myRoad");
 
-		new RollbackCatcher() {
+		try {
+			myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
+		} catch (IllegalStateException ignore) {
 
-			@Override
-			public void intercept() {
-				myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}
 	}
 
 	public void relationInstanceTooMuchTargets() {
@@ -58,13 +55,13 @@ public class LinkTypeCheckTest extends AbstractTest {
 		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 		final Generic myRoad = road.newInstance(cache, "myRoad");
-		new RollbackCatcher() {
 
-			@Override
-			public void intercept() {
-				myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad, yourDog);
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		try {
+			myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad, yourDog);
+		} catch (IllegalStateException ignore) {
+
+		}
+
 	}
 
 	public void malformedAttributeWrongBase() {
@@ -77,13 +74,11 @@ public class LinkTypeCheckTest extends AbstractTest {
 		final Generic yourDog = dog.newInstance(cache, "yourDog");
 
 		myBMW.setValue(cache, runs, "myBMWRuns");
-		new RollbackCatcher() {
+		try {
+			yourDog.setValue(cache, runs, "myDogRuns");
+		} catch (IllegalStateException ignore) {
 
-			@Override
-			public void intercept() {
-				yourDog.setValue(cache, runs, "myDogRuns");
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}
 	}
 
 	public void test() {

@@ -143,12 +143,4 @@ public interface Cache extends Context {
 	 */
 	boolean isRemovable(Generic generic);
 
-	/**
-	 * Returns the referential integrity for the Generic.
-	 * 
-	 * @param generic
-	 *            The Generic.
-	 * @return Return a snapshot referential dependencies.
-	 */
-	Snapshot<Generic> getReferentialIntegrities(Generic generic);
 }

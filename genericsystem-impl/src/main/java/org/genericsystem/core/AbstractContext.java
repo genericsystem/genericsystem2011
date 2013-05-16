@@ -21,6 +21,7 @@ import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
+import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
@@ -196,6 +197,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		return fastFindByInterfaces(implicit, new Primaries(supers).toArray(), components);
 	}
 
+	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFindByInterfaces(Generic implicit, Generic[] interfaces, Generic[] components) {
 		if (components.length == 0 && interfaces.length == 1) {
 			assert implicit.equals(interfaces[0]);
@@ -221,6 +223,33 @@ public abstract class AbstractContext implements Context, Serializable {
 						addDependencies(inheritingDependency);
 					for (T compositeDependency : g.<T> getComposites(AbstractContext.this))
 						addDependencies(compositeDependency);
+				}
+			}
+		};
+	}
+
+	<T extends Generic> NavigableSet<T> orderRemoves(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
+		return new TreeSet<T>() {
+			private static final long serialVersionUID = -6526972335865898198L;
+			{
+				addDependencies(generic);
+			}
+
+			@SuppressWarnings("unchecked")
+			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
+				if (super.add((T) generic)) {// protect from loop
+					for (T inheritingDependency : generic.<T> getInheritings(AbstractContext.this))
+						if (inheritingDependency.getValue() == null)
+							addDependencies(inheritingDependency);
+						else
+							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
+					for (T compositeDependency : generic.<T> getComposites(AbstractContext.this))
+						if (!generic.equals(compositeDependency)) {
+							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components.length; componentPos++)
+								if (((GenericImpl) compositeDependency).components[componentPos].equals(generic) && compositeDependency.isReferentialIntegrity(AbstractContext.this, componentPos))
+									throw new ReferentialIntegrityConstraintViolationException(compositeDependency + " is Referential Integrity for ancestor " + generic + " by component position : " + componentPos);
+							addDependencies(compositeDependency);
+						}
 				}
 			}
 		};

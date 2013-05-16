@@ -728,15 +728,6 @@ public interface Generic extends Comparable<Generic> {
 	boolean isRemovable(Cache cache);
 
 	/**
-	 * Returns the referential integrity for the Generic.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
-	 * @return Return a snapshot referential dependencies.
-	 */
-	Snapshot<Generic> getRefenrentialIntegrities(Cache cache);
-
-	/**
 	 * Log with slf4j.<br/>
 	 * Call the info() method.
 	 */

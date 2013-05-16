@@ -1,11 +1,11 @@
 package org.genericsystem.file;
 
 import java.util.Arrays;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.InstanceClassConstraintViolationException;
+import org.genericsystem.exception.LackViolationException;
 import org.genericsystem.file.AbstractTest.RollbackCatcher;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType;
@@ -73,9 +73,9 @@ public class FileSystemTest {
 
 			@Override
 			public void intercept() {
-				directory2.addDirectory(cache, "directory1"); // Exception
+				directory2.addDirectory(cache.newSuperCache(), "directory1"); // Exception
 			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}.assertIsCausedBy(LackViolationException.class);
 		// assert false : fileSystem.getRootDirectories(cache).toList();
 		directory1.addFile(cache, "fileName", new byte[] { Byte.MAX_VALUE });
 		assert Arrays.equals(directory1.getFile(cache, "fileName").getContent(cache), new byte[] { Byte.MAX_VALUE });
