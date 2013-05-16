@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
-import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -18,8 +17,6 @@ import org.genericsystem.file.FileSystem.FileType.File;
 import org.genericsystem.web.util.GsMessages;
 import org.richfaces.component.UITree;
 import org.richfaces.event.TreeSelectionChangeEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
@@ -51,7 +48,6 @@ public class FileSystemBean implements Serializable {
 		List<Object> selection = new ArrayList<Object>(selectionChangeEvent.getNewSelection());
 		if (!selection.isEmpty()) {
 			Object currentSelectionKey = selection.get(0);
-
 			UITree tree = (UITree) selectionChangeEvent.getSource();
 			Object storedKey = tree.getRowKey();
 			tree.setRowKey(currentSelectionKey);
@@ -76,25 +72,15 @@ public class FileSystemBean implements Serializable {
 		((Directory) selectedFile).addFile(cache, newValue);
 	}
 
-	protected static Logger log = LoggerFactory.getLogger(FileSystemBean.class);
-
-	public void updateShortPath(ValueChangeEvent vce) {
-		String shortPath = (String) vce.getNewValue();
-		log.info("updateShortPath : " + shortPath);
-		messages.info("updateShortPath", shortPath, selectedFile.getValue());
-		selectedFile = ((CacheImpl) cache).update(selectedFile, shortPath);
-	}
-
-	public Wrapper getWrapper(Generic g) {
-		assert g != null;
-		return new Wrapper(g);
+	public Wrapper getWrapper(Generic generic) {
+		return new Wrapper(generic);
 	}
 
 	public class Wrapper {
 		private Generic generic;
 
-		public Wrapper(Generic g) {
-			this.generic = g;
+		public Wrapper(Generic generic) {
+			this.generic = generic;
 		}
 
 		public String getShortPath() {
@@ -102,9 +88,10 @@ public class FileSystemBean implements Serializable {
 		}
 
 		public void setShortPath(String newValue) {
-			log.info("updateShortPath : " + newValue + " " + generic);
-			messages.info("updateShortPath", newValue, generic);
-			selectedFile = ((CacheImpl) cache).update(generic, newValue);
+			if (!newValue.equals(generic.getValue())) {
+				messages.info("updateShortPath", newValue, generic);
+				selectedFile = ((CacheImpl) cache).update(generic, newValue);
+			}
 		}
 	}
 

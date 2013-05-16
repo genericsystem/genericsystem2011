@@ -81,10 +81,6 @@ public class FileSystem extends TreeImpl {
 		public String getShortPath() {
 			return this.<String> getValue();
 		}
-
-		public void setShortPath(String str) {
-			log.info("=> " + getValue());
-		}
 	}
 
 	@SystemGeneric
@@ -112,10 +108,6 @@ public class FileSystem extends TreeImpl {
 
 			public String getShortPath() {
 				return this.<String> getValue();
-			}
-
-			public void setShortPath(String str) {
-				log.info("=> " + getValue());
 			}
 		}
 	}
