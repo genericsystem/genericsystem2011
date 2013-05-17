@@ -12,15 +12,12 @@
 
 	<rich:panel styleClass="widthScroll280 fullHeight">
 		<f:facet name="header">
-			<h:outputText styleClass="capitalize"
-				value="#{msg.add}" />
-			<h:outputText
-				value=" #{msg.a} #{msg.root} #{msg.directory}" />
-			<a4j:commandLink style="padding-left: 55%;"
-				oncomplete="#{rich:component('newrootdirectory')}.show();">
-				<h:graphicImage value="#{infos.add}"
-					title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
-			</a4j:commandLink>
+			<h:outputText styleClass="capitalize" value="#{msg.add}" />
+			<h:outputText value=" #{msg.a} #{msg.root} #{msg.directory}" />
+			<h:graphicImage value="#{infos.add}"
+				onclick="#{rich:component('newrootdirectory')}.show();"
+					style="cursor:pointer"
+				title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
 		</f:facet>
 		<rich:tree id="directorytree" toggleType="ajax" var="item"
 			status="panelUpdateStatus" selectionType="ajax" render="toolbar,edit"
