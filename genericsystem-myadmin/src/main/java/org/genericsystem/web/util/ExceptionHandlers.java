@@ -1,5 +1,6 @@
 package org.genericsystem.web.util;
 
+import java.io.IOException;
 import java.util.Objects;
 import javax.faces.application.ViewExpiredException;
 import javax.faces.context.FacesContext;
@@ -40,20 +41,35 @@ public class ExceptionHandlers {
 		log.error("\n" + toString(caught.getException()));
 		gsMessages.redirectStringError(caught.getException().toString());
 		caught.handled();
-		facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "HOME");
+		try {
+			facesContext.getExternalContext().redirect("/gsmyadmin/pages/index.xhtml");
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+		// facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "HOME");
 	}
 
 	void handleViewExpiredException(@Handles CaughtException<ViewExpiredException> caught, HttpServletResponse response) {
 		log.error("\n" + toString(caught.getException()));
 		gsMessages.redirectError("viewExpiredException");
 		caught.handled();
-		facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "HOME");
+		try {
+			facesContext.getExternalContext().redirect("/gsmyadmin/pages/index.xhtml");
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+		// facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "HOME");
 	}
 
 	void handleRuntimeException(@Handles CaughtException<RuntimeException> caught, HttpServletResponse response) {
 		log.error("\n" + toString(caught.getException()));
 		gsMessages.redirectStringError(caught.getException().getMessage());
 		caught.handled();
-		facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "HOME");
+		try {
+			facesContext.getExternalContext().redirect("/gsmyadmin/pages/index.xhtml");
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+		// facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "HOME");
 	}
 }

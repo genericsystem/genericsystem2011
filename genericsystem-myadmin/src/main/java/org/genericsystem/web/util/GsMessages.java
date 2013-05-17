@@ -50,6 +50,10 @@ public class GsMessages implements Serializable {
 		messagesToRedirect.add(factory.error(bundleKey(key), params).build());
 	}
 
+	public void redirectInfo(String key, Object... params) {
+		messagesToRedirect.add(factory.info(bundleKey(key), params).build());
+	}
+
 	public void redirectStringError(String message, Object... params) {
 		messagesToRedirect.add(factory.error(message, params).build());
 	}

@@ -1,9 +1,11 @@
 package org.genericsystem.web.beans;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.genericsystem.core.Cache;
@@ -123,9 +125,17 @@ public class FileSystemBean implements Serializable {
 		return new String(bytes != null ? new String(bytes) : "");
 	}
 
+	@Inject
+	private FacesContext facesContext;
+
 	public void setContent(String content) {
 		((File) selectedFile).setContent(cache, content.getBytes());
-		messages.info("setContent", selectedFile.getValue());
+		messages.redirectInfo("setContent", selectedFile.getValue());
+		facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "HOME");
+		try {
+			facesContext.getExternalContext().redirect("/gsmyadmin/pages/index.xhtml");
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
-
 }
