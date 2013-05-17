@@ -12,10 +12,9 @@
 
 	<rich:panel styleClass="widthScroll280 fullHeight">
 		<f:facet name="header">
-			<h:outputText styleClass="capitalize"
-				value="#{msg.add}" />
-			<h:outputText
-				value=" #{msg.a} #{msg.root} #{msg.directory}" />
+			<!-- capitalize prends toutes les premières lettres de chaque el et les transforme en majuscule, pour éviter ceci 2 output -->
+			<h:outputText styleClass="capitalize" value="#{msg.add}" />
+			<h:outputText value=" #{msg.a} #{msg.root} #{msg.directory}" />
 			<a4j:commandLink style="padding-left: 55%;"
 				oncomplete="#{rich:component('newrootdirectory')}.show();">
 				<h:graphicImage value="#{infos.add}"
@@ -34,7 +33,12 @@
 						editEvent="dblclick">
 						<a4j:ajax event="change" render="directorytree,toolbar" />
 					</rich:inplaceInput>
-					<h:commandLink action="#{fileSystemBean.delete}"
+					<a4j:commandLink
+						oncomplete="#{rich:component('createsubdirectory')}.show()">
+						<h:graphicImage value="#{infos.folder_add}"
+							title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}" />
+					</a4j:commandLink>
+					<h:commandLink action="#{fileSystemBean.delete}" immediate="true"
 						onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}">
 						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
 					</h:commandLink>
@@ -46,7 +50,7 @@
 							editEvent="dblclick">
 							<a4j:ajax event="change" render="directorytree,toolbar" />
 						</rich:inplaceInput>
-						<h:commandLink action="#{fileSystemBean.delete}"
+						<h:commandLink action="#{fileSystemBean.delete}" immediate="true"
 							onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}">
 							<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
 						</h:commandLink>
