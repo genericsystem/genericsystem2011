@@ -44,17 +44,17 @@
 				<h:graphicImage value="#{infos.floppy_disk}" title="#{msg.apply}" />
 			</a4j:commandLink>
 
-			<h:commandLink action="#{fileSystemBean.delete}"
-				rendered="#{fileSystemBean.fileSelected || fileSystemBean.directorySelected}"
-				onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}">
-				<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
-			</h:commandLink>
+<!-- 			<h:commandLink action="#{fileSystemBean.delete}" -->
+<!-- 				rendered="#{fileSystemBean.fileSelected || fileSystemBean.directorySelected}" -->
+<!-- 				onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"> -->
+<!-- 				<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" /> -->
+<!-- 			</h:commandLink> -->
 
-			<a4j:commandLink
-				oncomplete="#{rich:component('newrootdirectory')}.show();">
-				<h:graphicImage value="#{infos.add}"
-					title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
-			</a4j:commandLink>
+<!-- 			<a4j:commandLink -->
+<!-- 				oncomplete="#{rich:component('newrootdirectory')}.show();"> -->
+<!-- 				<h:graphicImage value="#{infos.add}" -->
+<!-- 					title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" /> -->
+<!-- 			</a4j:commandLink> -->
 			<rich:hotKey key="ctrl+1" onkeyup="#{rich:element('save')}.click();" />
 		</rich:toolbarGroup>
 
