@@ -100,6 +100,12 @@ public class FileSystemBean implements Serializable {
 		messages.redirectInfo("deleteFile", selectedFile.getValue());
 		selectedFile = null;
 		// return "HOME";
+		// FacesContext context = FacesContext.getCurrentInstance();
+		// String viewId = context.getViewRoot().getViewId();
+		// ViewHandler handler = context.getApplication().getViewHandler();
+		// UIViewRoot root = handler.createView(context, viewId);
+		// root.setViewId(viewId);
+		// context.setViewRoot(root);
 		try {
 			facesContext.getExternalContext().redirect("/gsmyadmin/pages/index.xhtml");
 		} catch (IOException e) {
