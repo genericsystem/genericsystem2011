@@ -3,11 +3,9 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -89,16 +87,17 @@ public class FileSystemBean implements Serializable {
 
 		public void setShortPath(String newValue) {
 			if (!newValue.equals(generic.getValue())) {
-				messages.info("updateShortPath", newValue, generic);
 				selectedFile = ((CacheImpl) cache).update(generic, newValue);
+				messages.info("updateShortPath", newValue, generic.getValue());
 			}
 		}
 	}
 
-	public void delete() {
+	public String delete() {
 		messages.info("deleteFile", selectedFile.getValue());
 		selectedFile.remove(cache);
 		selectedFile = null;
+		return "HOME";
 	}
 
 	public boolean isDirectorySelected() {

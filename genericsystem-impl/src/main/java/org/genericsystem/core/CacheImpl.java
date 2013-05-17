@@ -19,7 +19,7 @@ import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.FunctionalConsistencyViolationException;
-import org.genericsystem.exception.LackViolationException;
+import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Tree;
@@ -363,7 +363,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			if (!Objects.equals(result.getValue(), implicit.getValue()))
 				rollback(new FunctionalConsistencyViolationException(result.info()));
 			if (existsException)
-				rollback(new LackViolationException(result.info()));
+				rollback(new ExistsException(result + " already exists !"));
 			return result;
 		}
 		return internalBind(implicit, interfaces, components, automatic, clazz);
