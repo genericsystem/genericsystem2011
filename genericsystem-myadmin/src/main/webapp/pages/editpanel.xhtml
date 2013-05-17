@@ -29,8 +29,8 @@
 			</script>
 
 			<rich:contextMenu target="editFile" mode="ajax">
-				<rich:menuItem label="#{msg.save_button} #{msg.the} #{msg.file}"
-					onclick="editor.save();" icon="#{infos.floppy_disk}" />
+				<rich:menuItem execute="editFile" label="#{msg.save_button} #{msg.the} #{msg.file}"
+					onclick="editor.save();" icon="#{infos.floppy_disk}" status="panelUpdateStatus" />
 				<rich:menuItem label="#{msg.delete}"
 					action="#{fileSystemBean.delete}" immediate="true"
 					onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
