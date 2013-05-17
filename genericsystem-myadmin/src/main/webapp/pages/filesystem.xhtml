@@ -10,7 +10,7 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<ui:include src="/pages/head.xhtml"/>
+	<ui:include src="/pages/head.xhtml" />
 	<rich:panel styleClass="fullWidth" style="border-width:0;padding:0;">
 		<f:facet name="header">
 			<h:panelGrid columns="2" styleClass="fullWidth"
@@ -20,12 +20,17 @@
 				<ui:include src="/pages/toolbar.xhtml" />
 			</h:panelGrid>
 		</f:facet>
-		<h:panelGrid columns="2" styleClass="fullWidth"
-			rowClasses="fullHeight"
-			columnClasses="topAlign mediumScroll fullHeight,topAlign fullWidth fullHeight">
-			<ui:include src="/pages/directorytree.xhtml" />
-			<ui:include src="/pages/editpanel.xhtml" />
-		</h:panelGrid>
+		<c:catch var="exception">
+			<h:panelGrid columns="2" styleClass="fullWidth"
+				rowClasses="fullHeight"
+				columnClasses="topAlign mediumScroll fullHeight,topAlign fullWidth fullHeight">
+				<ui:include src="/pages/directorytree.xhtml" />
+				<ui:include src="/pages/editpanel.xhtml" />
+			</h:panelGrid>
+		</c:catch>
+		<c:if test="#{exception != null}">
+			<h:outputText value="#{exception}" />
+		</c:if>
 	</rich:panel>
 
 	<gs:popupPanel key="createfile"
@@ -33,12 +38,14 @@
 		action="#{fileSystemBean.addFile(popupValue)}" render="directorytree" />
 	<gs:popupPanel key="createsubdirectory"
 		title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}"
-		action="#{fileSystemBean.addSubDirectory(popupValue)}" render="directorytree" />
+		action="#{fileSystemBean.addSubDirectory(popupValue)}"
+		render="directorytree" />
 	<gs:popupPanel key="newrootdirectory"
 		title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
-		action="#{fileSystemBean.addRootDirectory(popupValue)}" render="directorytree" />
-<!-- 	<gs:popupPanel key="modifyValue" -->
-<!-- 		title="#{msg.update} #{msg.the} #{msg.value}" -->
-<!-- 		action="#{fileSystemBean.modifyValue(popupValue)}" render="@all" /> -->
+		action="#{fileSystemBean.addRootDirectory(popupValue)}"
+		render="directorytree" />
+	<!-- 	<gs:popupPanel key="modifyValue" -->
+	<!-- 		title="#{msg.update} #{msg.the} #{msg.value}" -->
+	<!-- 		action="#{fileSystemBean.modifyValue(popupValue)}" render="@all" /> -->
 
 </ui:composition>

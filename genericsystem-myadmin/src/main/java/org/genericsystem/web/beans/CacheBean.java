@@ -1,11 +1,9 @@
 package org.genericsystem.web.beans;
 
 import java.io.Serializable;
-
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 
 @Named
@@ -23,7 +21,7 @@ public class CacheBean implements Serializable {
 
 	public String discard() {
 		cache.clear();
-		return "/pages/index.xhtml?redirect=true";
+		return "HOME";
 	}
 
 }
