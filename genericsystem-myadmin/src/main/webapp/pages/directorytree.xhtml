@@ -18,7 +18,7 @@
 				roots="#{fileSystemBean.rootDirectories}"
 				nodes="#{fileSystemBean.getDirectories(item)}">
 				<rich:treeNode>
-					<rich:inplaceInput styleClass="inplaceInput"
+					<rich:inplaceInput
 						value="#{fileSystemBean.getWrapper(item).shortPath}"
 						editEvent="dblclick">
 						<a4j:ajax event="change" render="directorytree,toolbar" />
@@ -26,7 +26,7 @@
 				</rich:treeNode>
 				<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
 					<rich:treeNode>
-						<rich:inplaceInput styleClass="inplaceInput"
+						<rich:inplaceInput
 							value="#{fileSystemBean.getWrapper(item).shortPath}"
 							editEvent="dblclick">
 							<a4j:ajax event="change" render="directorytree,toolbar" />
