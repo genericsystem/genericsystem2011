@@ -5,7 +5,8 @@ import org.jboss.seam.faces.view.config.ViewConfig;
 import org.jboss.seam.faces.view.config.ViewPattern;
 
 /**
- * @author <a href="mailto:bleathem@gmail.com">Brian Leathem</a>
+ * @author Nicolas Feybesse
+ * 
  */
 @ViewConfig
 public interface GsViewConfig {

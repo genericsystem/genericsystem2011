@@ -33,11 +33,14 @@
 						editEvent="dblclick">
 						<a4j:ajax event="change" render="directorytree,toolbar" />
 					</rich:inplaceInput>
+<<<<<<< HEAD
 					<a4j:commandLink
 						oncomplete="#{rich:component('createsubdirectory')}.show()">
 						<h:graphicImage value="#{infos.folder_add}"
 							title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}" />
 					</a4j:commandLink>
+=======
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 					<h:commandLink action="#{fileSystemBean.delete}" immediate="true"
 						onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}">
 						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />

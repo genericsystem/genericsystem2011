@@ -56,18 +56,18 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public void addRootDirectory(String newValue) {
-		messages.info("createRootDirectory", newValue);
 		cache.<FileSystem> find(FileSystem.class).addRootDirectory(cache, newValue);
+		messages.info("createRootDirectory", newValue);
 	}
 
 	public void addSubDirectory(String newValue) {
-		messages.info("createSubDirectory", newValue, selectedFile.getValue());
 		((Directory) selectedFile).addDirectory(cache, newValue);
+		messages.info("createSubDirectory", newValue, selectedFile.getValue());
 	}
 
 	public void addFile(String newValue) {
-		messages.info("createFile", newValue, selectedFile.getValue());
 		((Directory) selectedFile).addFile(cache, newValue);
+		messages.info("createFile", newValue, selectedFile.getValue());
 	}
 
 	public Wrapper getWrapper(Generic generic) {
@@ -94,8 +94,8 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public String delete() {
-		messages.info("deleteFile", selectedFile.getValue());
 		selectedFile.remove(cache);
+		messages.info("deleteFile", selectedFile.getValue());
 		selectedFile = null;
 		return "HOME";
 	}
@@ -125,6 +125,7 @@ public class FileSystemBean implements Serializable {
 
 	public void setContent(String content) {
 		((File) selectedFile).setContent(cache, content.getBytes());
+		messages.info("setContent", selectedFile.getValue());
 	}
 
 }

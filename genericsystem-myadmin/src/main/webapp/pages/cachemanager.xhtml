@@ -13,7 +13,7 @@
 	<a4j:commandLink action="#{cacheBean.save}">
 		<h:graphicImage value="#{infos.data_next}" title="#{msg.save_button}" />
 	</a4j:commandLink>
-	<h:commandLink action="#{cacheBean.discard}">
+	<h:commandLink action="#{cacheBean.discard}" immediate="true">
 		<h:graphicImage value="#{infos.data_previous}"
 			title="#{msg.discard_button}" />
 	</h:commandLink>

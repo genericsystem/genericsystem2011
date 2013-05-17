@@ -1,7 +1,6 @@
 package org.genericsystem.web.beans;
 
 import java.io.Serializable;
-
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.inject.Inject;
@@ -16,8 +15,9 @@ public class SessionBean implements Serializable {
 	@Inject
 	private ExternalContext externalContext;
 
-	public void invalidate() {
+	public String invalidate() {
 		externalContext.invalidateSession();
+		return "HOME";
 	}
 
 }
