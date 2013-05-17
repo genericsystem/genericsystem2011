@@ -11,6 +11,17 @@
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
 	<rich:panel styleClass="widthScroll280 fullHeight">
+		<f:facet name="header">
+			<h:outputText styleClass="capitalize"
+				value="#{msg.add}" />
+			<h:outputText
+				value=" #{msg.a} #{msg.root} #{msg.directory}" />
+			<a4j:commandLink style="padding-left: 55%;"
+				oncomplete="#{rich:component('newrootdirectory')}.show();">
+				<h:graphicImage value="#{infos.add}"
+					title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
+			</a4j:commandLink>
+		</f:facet>
 		<rich:tree id="directorytree" toggleType="ajax" var="item"
 			status="panelUpdateStatus" selectionType="ajax" render="toolbar,edit"
 			selectionChangeListener="#{fileSystemBean.changeFile}">
@@ -23,11 +34,10 @@
 						editEvent="dblclick">
 						<a4j:ajax event="change" render="directorytree,toolbar" />
 					</rich:inplaceInput>
-					<!-- <a4j:commandLink
-						oncomplete="#{rich:component('modifyValue')}.show()">
-						<h:graphicImage value="#{infos.edit}"
-							title="#{msg.update} #{msg.the} #{msg.value}" />
-					</a4j:commandLink> -->
+					<h:commandLink action="#{fileSystemBean.delete}"
+						onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}">
+						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
+					</h:commandLink>
 				</rich:treeNode>
 				<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
 					<rich:treeNode>
@@ -36,11 +46,10 @@
 							editEvent="dblclick">
 							<a4j:ajax event="change" render="directorytree,toolbar" />
 						</rich:inplaceInput>
-						<!-- <a4j:commandLink
-							oncomplete="#{rich:component('modifyValue')}.show()">
-							<h:graphicImage value="#{infos.edit}"
-								title="#{msg.update} #{msg.the} #{msg.value}" />
-						</a4j:commandLink> -->
+						<h:commandLink action="#{fileSystemBean.delete}"
+							onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}">
+							<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
+						</h:commandLink>
 					</rich:treeNode>
 				</rich:treeModelAdaptor>
 			</rich:treeModelRecursiveAdaptor>
