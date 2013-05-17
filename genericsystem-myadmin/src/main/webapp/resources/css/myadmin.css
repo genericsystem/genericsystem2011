@@ -5,8 +5,12 @@ body {
 	float: none;
 }
 
-.inplaceInput > span{
-	color : black;
+.inplaceInput {
+	min-width: 50px;
+}
+
+.inplaceInput>span {
+	color: black;
 }
 
 .fullWidth {
@@ -28,6 +32,7 @@ body {
 .middleAlign {
 	vertical-align: middle;
 }
+
 .scroll {
 	overflow: auto;
 }
@@ -55,7 +60,7 @@ li.info {
 	padding-top: 1px;
 	background-image:
 		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_green.png);
-	background-position: bottom left;
+	background-position: top left;
 	font-size: 14px;
 }
 
@@ -67,7 +72,7 @@ li.warn {
 	padding-top: 1px;
 	background-image:
 		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_yellow.png);
-	background-position: bottom left;
+	background-position: top left;
 	font-size: 14px;
 }
 
@@ -79,7 +84,7 @@ li.error {
 	padding-top: 1px;
 	background-image:
 		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_red_yellow.png);
-	background-position: bottom left;
+	background-position: top left;
 	font-size: 14px;
 }
 
@@ -91,25 +96,25 @@ li.fatal {
 	padding-top: 1px;
 	background-image:
 		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_red.png);
-	background-position: bottom left;
+	background-position: top left;
 	font-size: 14px;
 }
 
 .messagesBlock {
-	margin-left :6px; 
-	margin-right :10px; 
-	margin-top :0px;
-	background-color :white; 
+	margin-left: 6px;
+	margin-right: 10px;
+	margin-top: 0px;
+	background-color: white;
 	min-width: 300px;
-	min-height :51px;
+	min-height: 51px;
 	max-height: 79px;
-    max-width: 747px;
+	max-width: 747px;
 	overflow: auto;
 	opacity: 0.75;
 	/* For IE 5-7 */
 	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75);
 	/* For IE 8  Don't miss the added quotes */
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";		
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
 }
 
 .slightlyTransparent {
