@@ -10,31 +10,21 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-<<<<<<< HEAD
-	<rich:panel id="paneldirectorytree" styleClass="widthScroll280 fullHeight">
-<!-- 		<f:facet name="header"> -->
-			<!-- capitalize prends toutes les premières lettres de chaque el et les transforme en majuscule, pour éviter ceci 2 output -->
-<!-- 			<h:outputText styleClass="capitalize" value="#{msg.add}" /> -->
-<!-- 			<h:outputText value=" #{msg.a} #{msg.root} #{msg.directory}" /> -->
-<!-- 			<a4j:commandLink style="padding-left: 55%;" -->
-<!-- 				oncomplete="#{rich:component('newrootdirectory')}.show();"> -->
-<!-- 				<h:graphicImage value="#{infos.add}" -->
-<!-- 					title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" /> -->
-<!-- 			</a4j:commandLink> -->
-<!-- 		</f:facet> -->
-=======
-	<rich:panel styleClass="widthScroll280 fullHeight">
-		<f:facet name="header">
-			<h:outputText styleClass="capitalize" value="#{msg.add}" />
-			<h:outputText value=" #{msg.a} #{msg.root} #{msg.directory}" />
-			<h:graphicImage value="#{infos.add}"
-				onclick="#{rich:component('newrootdirectory')}.show();"
-					style="cursor:pointer"
-				title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" />
-		</f:facet>
->>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
+	<rich:panel id="paneldirectorytree"
+		styleClass="widthScroll280 fullHeight">
+		<!-- 		<f:facet name="header"> -->
+		<!-- capitalize prends toutes les premières lettres de chaque el et les transforme en majuscule, pour éviter ceci 2 output -->
+		<!-- 			<h:outputText styleClass="capitalize" value="#{msg.add}" /> -->
+		<!-- 			<h:outputText value=" #{msg.a} #{msg.root} #{msg.directory}" /> -->
+		<!-- 			<a4j:commandLink style="padding-left: 55%;" -->
+		<!-- 				oncomplete="#{rich:component('newrootdirectory')}.show();"> -->
+		<!-- 				<h:graphicImage value="#{infos.add}" -->
+		<!-- 					title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}" /> -->
+		<!-- 			</a4j:commandLink> -->
+		<!-- 		</f:facet> -->
 		<rich:tree id="directorytree" toggleType="ajax" var="item"
-			status="panelUpdateStatus" selectionType="ajax" render="toolbar,editFile"
+			status="panelUpdateStatus" selectionType="ajax"
+			render="toolbar,editFile"
 			selectionChangeListener="#{fileSystemBean.changeFile}">
 			<rich:treeModelRecursiveAdaptor
 				roots="#{fileSystemBean.rootDirectories}"
