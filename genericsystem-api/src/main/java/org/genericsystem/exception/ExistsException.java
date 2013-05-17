@@ -1,10 +1,10 @@
 package org.genericsystem.exception;
 
-public class LackViolationException extends ConstraintViolationException {
+public class ExistsException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = 3025194866632437953L;
 
-	public LackViolationException(String msg) {
+	public ExistsException(String msg) {
 		super(msg);
 	}
 }
