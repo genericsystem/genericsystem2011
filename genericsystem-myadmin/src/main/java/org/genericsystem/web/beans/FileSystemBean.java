@@ -97,8 +97,14 @@ public class FileSystemBean implements Serializable {
 
 	public String delete() {
 		selectedFile.remove(cache);
-		messages.info("deleteFile", selectedFile.getValue());
+		messages.redirectInfo("deleteFile", selectedFile.getValue());
 		selectedFile = null;
+		// return "HOME";
+		try {
+			facesContext.getExternalContext().redirect("/gsmyadmin/pages/index.xhtml");
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 		return "HOME";
 	}
 
