@@ -29,7 +29,7 @@
 			<rich:treeModelRecursiveAdaptor
 				roots="#{fileSystemBean.rootDirectories}"
 				nodes="#{fileSystemBean.getDirectories(item)}">
-				<rich:treeNode>
+				<rich:treeNode expanded="#{true}">
 					<rich:inplaceInput
 						value="#{fileSystemBean.getWrapper(item).shortPath}"
 						editEvent="dblclick">
