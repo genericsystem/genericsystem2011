@@ -34,7 +34,7 @@
 						editEvent="dblclick">
 						<a4j:ajax event="change" render="directorytree,toolbar" />
 					</rich:inplaceInput>
-					<h:commandLink action="#{fileSystemBean.delete}"
+					<h:commandLink action="#{fileSystemBean.delete}" immediate="true"
 						onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}">
 						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
 					</h:commandLink>
@@ -46,7 +46,7 @@
 							editEvent="dblclick">
 							<a4j:ajax event="change" render="directorytree,toolbar" />
 						</rich:inplaceInput>
-						<h:commandLink action="#{fileSystemBean.delete}"
+						<h:commandLink action="#{fileSystemBean.delete}" immediate="true"
 							onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}">
 							<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
 						</h:commandLink>

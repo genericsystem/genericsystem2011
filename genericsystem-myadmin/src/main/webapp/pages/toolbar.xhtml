@@ -38,7 +38,7 @@
 					title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}" />
 			</a4j:commandLink>
 
-			<a4j:commandLink id="save" execute="edit"
+			<a4j:commandLink id="save" execute="edit" action="HOME"
 				rendered="#{fileSystemBean.fileSelected}" status="panelUpdateStatus"
 				onclick="editor.save();">
 				<h:graphicImage value="#{infos.floppy_disk}" title="#{msg.apply}" />
