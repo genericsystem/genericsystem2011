@@ -37,8 +37,6 @@
 				onclick="editor.save();">
 				<h:graphicImage value="#{infos.floppy_disk}" title="#{msg.apply}" />
 			</a4j:commandLink>
-
-			<rich:hotKey key="ctrl+1" onkeyup="#{rich:element('save')}.click();" />
 		</rich:toolbarGroup>
 
 		<rich:toolbarGroup>
@@ -46,7 +44,7 @@
 				<h:graphicImage value="#{infos.refresh}" title="#{msg.refreshAjax}" />
 			</a4j:commandLink>
 
-			<h:commandLink action="#">
+			<h:commandLink action="HOME">
 				<h:graphicImage value="#{infos.refresh}" title="#{msg.refreshJsf}" />
 			</h:commandLink>
 
