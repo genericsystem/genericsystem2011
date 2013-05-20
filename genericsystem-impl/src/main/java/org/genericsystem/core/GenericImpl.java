@@ -66,9 +66,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	Generic[] components;
 
-	Serializable value;
+	private Serializable value;
 
-	boolean automatic;
+	private boolean automatic;
 
 	public Generic[] getSupersArray() {
 		return supers.clone();

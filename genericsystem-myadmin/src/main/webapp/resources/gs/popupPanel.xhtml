@@ -33,11 +33,14 @@
 		<rich:panel title="#{cc.attrs.title}" styleClass="uppercase">
 			<h:panelGrid columns="2" columnClasses=",fullWidth">
 				<h:inputText id="inputPopupPanel" value="#{popupValue}" />
-				<a4j:commandButton action="#{cc.attrs.action}"
+				<a4j:commandButton id="apply" action="#{cc.attrs.action}"
 					image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
 					render="#{cc.attrs.render}"
 					oncomplete="#{rich:component(cc.attrs.key)}.hide(); #{rich:element('inputPopupPanel')}.value=''; return false;" />
 			</h:panelGrid>
+			<rich:hotKey key="return"
+             handler="#{rich:element('apply')}.click()" 
+             selector="#form"/>
 		</rich:panel>
 	</rich:popupPanel>
 </composite:implementation>
