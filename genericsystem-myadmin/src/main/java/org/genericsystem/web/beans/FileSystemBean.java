@@ -3,9 +3,11 @@ package org.genericsystem.web.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -55,7 +57,7 @@ public class FileSystemBean implements Serializable {
 			tree.setRowKey(currentSelectionKey);
 			selectedFile = (Generic) tree.getRowData();
 			tree.setRowKey(storedKey);
-			messages.info("selectionchanged", selectedFile.getValue());
+			messages.info("selectionchanged", isFileSelected() ? messages.getMessage("file") : messages.getMessage("directory"), selectedFile.getValue());
 		}
 	}
 
@@ -99,8 +101,8 @@ public class FileSystemBean implements Serializable {
 
 	public String delete() {
 		selectedFile.remove(cache);
-		selectedFile = null;
 		redirect.redirectInfo("deleteFile", selectedFile.getValue());
+		selectedFile = null;
 		return "HOME";
 	}
 
