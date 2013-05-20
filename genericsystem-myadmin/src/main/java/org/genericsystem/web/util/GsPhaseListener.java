@@ -12,10 +12,10 @@ public class GsPhaseListener {
 	private static final Logger log = LoggerFactory.getLogger(GsPhaseListener.class);
 
 	public void observeBefore(@Observes @Before PhaseEvent e) {
-		log.info("-----------------------begin :" + e.getPhaseId().toString() + "-----------------------------------------");
+		log.info("=========== begin :" + e.getPhaseId().toString());
 	}
 
 	public void observeAfter(@Observes @After PhaseEvent e) {
-		log.info("-----------------------end   :" + e.getPhaseId().toString() + "------------------------------------------");
+		log.info("===========  end   :" + e.getPhaseId().toString());
 	}
 }
