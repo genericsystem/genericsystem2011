@@ -25,18 +25,6 @@
 				value="#{fileSystemBean.fileShortPath}" />
 			<h:outputText rendered="#{fileSystemBean.directorySelected}"
 				value="#{fileSystemBean.directoryShortPath}" />
-
-			<a4j:commandLink rendered="#{fileSystemBean.directorySelected}"
-				oncomplete="#{rich:component('createfile')}.show()">
-				<h:graphicImage value="#{infos.document_add}"
-					title="#{msg.create} #{msg.a} #{msg.file}" />
-			</a4j:commandLink>
-
-			<a4j:commandLink id="save" execute="editFile" action="HOME"
-				rendered="#{fileSystemBean.fileSelected}" status="panelUpdateStatus"
-				onclick="editor.save();">
-				<h:graphicImage value="#{infos.floppy_disk}" title="#{msg.apply}" />
-			</a4j:commandLink>
 		</rich:toolbarGroup>
 
 		<rich:toolbarGroup>
