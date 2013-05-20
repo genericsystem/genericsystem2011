@@ -3,6 +3,7 @@ package org.genericsystem.web.util;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
@@ -22,6 +23,18 @@ public class GsMessages implements Serializable {
 
 	private static final long serialVersionUID = 7666964394295933934L;
 	protected static Logger log = LoggerFactory.getLogger(GsMessages.class);
+
+	public static String toString(Throwable throwable) {
+		String s = "";
+		while (throwable != null) {
+			s += throwable + "\n";
+			for (Object object : throwable.getStackTrace())
+				s += Objects.toString(object) + "\n";
+			throwable = throwable.getCause();
+			s += "\n";
+		}
+		return s;
+	}
 
 	@Inject
 	FacesContext context;
@@ -47,30 +60,50 @@ public class GsMessages implements Serializable {
 	}
 
 	public void redirectError(String key, Object... params) {
-		messagesToRedirect.add(factory.error(bundleKey(key), params).build());
+		Message message = factory.error(bundleKey(key), params).build();
+		log.error(message.getDetail());
+		messagesToRedirect.add(message);
+	}
+
+	public void redirectWarn(String key, Object... params) {
+		Message message = factory.warn(bundleKey(key), params).build();
+		log.warn(message.getDetail());
+		messagesToRedirect.add(message);
 	}
 
 	public void redirectInfo(String key, Object... params) {
-		messagesToRedirect.add(factory.info(bundleKey(key), params).build());
+		Message message = factory.info(bundleKey(key), params).build();
+		log.info(message.getDetail());
+		messagesToRedirect.add(message);
 	}
 
-	public void redirectStringError(String message, Object... params) {
-		messagesToRedirect.add(factory.error(message, params).build());
+	// public void redirectStringError(String simpleMessage, Object... params) {
+	// Message message = factory.error(simpleMessage, params).build();
+	// log.info(message.getDetail());
+	// messagesToRedirect.add(message);
+	// }
+
+	public void redirectThrowable(Throwable t) {
+		Message message = factory.error(t.toString()).build();
+		log.error("\n" + toString(t));
+		messagesToRedirect.add(message);
 	}
 
 	public void info(String key, Object... params) {
-		messages.info(bundleKey(key), params);
+		Message message = factory.info(bundleKey(key), params).build();
+		log.info(message.getDetail());
+		messagesToRedirect.add(message);
 	}
 
 	public void warn(String key, Object... params) {
-		messages.warn(bundleKey(key), params);
+		Message message = factory.warn(bundleKey(key), params).build();
+		log.warn(message.getDetail());
+		messagesToRedirect.add(message);
 	}
 
 	public void error(String key, Object... params) {
-		messages.error(bundleKey(key), params);
-	}
-
-	public void fatal(String key, Object... params) {
-		messages.fatal(bundleKey(key), params);
+		Message message = factory.error(bundleKey(key), params).build();
+		log.error(message.getDetail());
+		messagesToRedirect.add(message);
 	}
 }
