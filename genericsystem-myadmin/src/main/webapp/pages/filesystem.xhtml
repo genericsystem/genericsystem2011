@@ -27,7 +27,8 @@
 				<ui:include src="/pages/directorytree.xhtml" />
 				<ui:include src="/pages/editpanel.xhtml" />
 			</h:panelGrid>
-			<rich:contextMenu target="paneldirectorytree" mode="ajax">
+			<rich:contextMenu target="paneldirectorytree" mode="ajax"
+				rendered="#{!fileSystemBean.directorySelected and !fileSystemBean.fileSelected}">
 				<rich:menuItem
 					label="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 					oncomplete="#{rich:component('newrootdirectory')}.show()"

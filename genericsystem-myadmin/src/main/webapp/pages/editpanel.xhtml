@@ -10,7 +10,7 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<a4j:outputPanel ajaxRendered="true">
+	<h:panelGroup id="edit" layout="block">
 		<rich:panel id="editFile" styleClass="fullWidth fullHeight"
 			rendered="#{fileSystemBean.fileSelected}">
 			<h:inputTextarea id="code" name="code"
@@ -47,11 +47,14 @@
 					label="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}"
 					oncomplete="#{rich:component('createsubdirectory')}.show()"
 					mode="ajax" icon="#{infos.folder_add}" />
+				<rich:menuItem label="#{msg.create} #{msg.a} #{msg.file}"
+					oncomplete="#{rich:component('createfile')}.show()" mode="ajax"
+					icon="#{infos.document_add}" />
 				<rich:menuItem label="#{msg.delete}"
 					action="#{fileSystemBean.delete}" immediate="true"
 					onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
 					mode="ajax" icon="#{infos.delete}" />
 			</rich:contextMenu>
 		</rich:panel>
-	</a4j:outputPanel>
+	</h:panelGroup>
 </ui:composition>

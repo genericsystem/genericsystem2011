@@ -10,7 +10,8 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:panel id="paneldirectorytree" styleClass="widthScroll280 fullHeight">
+	<rich:panel id="paneldirectorytree"
+		styleClass="widthScroll280 fullHeight">
 		<rich:tree id="directorytree" toggleType="ajax" var="item"
 			status="panelUpdateStatus" selectionType="ajax" render="toolbar,edit"
 			selectionChangeListener="#{fileSystemBean.changeFile}">
