@@ -99,8 +99,8 @@ public class FileSystemBean implements Serializable {
 
 	public String delete() {
 		selectedFile.remove(cache);
-		selectedFile = null;
 		redirect.redirectInfo("deleteFile", selectedFile.getValue());
+		selectedFile = null;
 		return "HOME";
 	}
 
