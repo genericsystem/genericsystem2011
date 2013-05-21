@@ -10,12 +10,10 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:panel id="paneldirectorytree"
-		styleClass="widthScroll280 fullHeight">
-		<gs:fileTree key="directorytree" roots="#{fileSystemBean.rootDirectories}"
-			nodes="#{fileSystemBean.getDirectories(item)}"
-			nodesAdaptor="#{fileSystemBean.getFiles(item)}"
-			inplaceInputValue="#{fileSystemBean.getWrapper(item).shortPath}"
-			renderTree="toolbar,edit" renderAction="directorytree,toolbar" />
+	<rich:panel id="paneltypes" styleClass="widthScroll280 fullHeight">
+		<gs:adminTree key="types" roots="#{typesBean.root}"
+			nodes="#{typesBean.getDirectSubTypes(item)}"
+			inplaceInputValue="#{typesBean.getWrapper(item).value}"
+			renderTree="toolbar,edit" renderAction="types,toolbar" />
 	</rich:panel>
 </ui:composition>

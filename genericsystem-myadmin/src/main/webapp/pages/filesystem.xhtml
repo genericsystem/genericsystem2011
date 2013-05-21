@@ -24,6 +24,12 @@
 			<h:panelGrid columns="2" styleClass="fullWidth"
 				rowClasses="fullHeight"
 				columnClasses="topAlign mediumScroll fullHeight,topAlign fullWidth fullHeight">
+				<ui:include src="/pages/typestree.xhtml" />
+				<ui:include src="/pages/edittypes.xhtml" />
+			</h:panelGrid>
+			<h:panelGrid columns="2" styleClass="fullWidth"
+				rowClasses="fullHeight"
+				columnClasses="topAlign mediumScroll fullHeight,topAlign fullWidth fullHeight">
 				<ui:include src="/pages/directorytree.xhtml" />
 				<ui:include src="/pages/editpanel.xhtml" />
 			</h:panelGrid>
@@ -33,7 +39,6 @@
 					oncomplete="#{rich:component('newrootdirectory')}.show()"
 					mode="ajax" icon="#{infos.add}" />
 			</rich:contextMenu>
-			<!-- <ui:include src="/pages/types.xhtml" /> -->
 		</c:catch>
 		<c:if test="#{exception != null}">
 			<h:outputText value="#{exception}" />

@@ -38,9 +38,6 @@
 					render="#{cc.attrs.render}"
 					oncomplete="#{rich:component(cc.attrs.key)}.hide(); #{rich:element('inputPopupPanel')}.value=''; return false;" />
 			</h:panelGrid>
-			<!-- <rich:hotKey key="return"
-             handler="#{rich:element('commandPopupPanel')}.click()"
-             selector="#form"/> -->
 		</rich:panel>
 	</rich:popupPanel>
 </composite:implementation>

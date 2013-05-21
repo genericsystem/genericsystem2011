@@ -1080,7 +1080,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	protected <T extends Generic> Iterator<T> instancesIterator(Context context) {
-		return Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(context), SystemGeneric.CONCRETE);
+		return Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(context), getMetaLevel() + 1);
 	}
 
 	@Override

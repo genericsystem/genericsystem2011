@@ -1,7 +1,7 @@
-package org.genericsystem.myadmin.beans;
+package org.genericsystem.myadmin.backbeans;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
@@ -13,6 +13,8 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Type;
+import org.genericsystem.myadmin.backbeans.ITreeNode.GenericTreeNode;
+import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
 import org.genericsystem.myadmin.beans.qualifier.TreeSelection;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
@@ -34,27 +36,26 @@ public class TypesBean implements Serializable {
 
 	private Generic selectedType;
 
-	public List<Type> getRoot() {
-		return new ArrayList<Type>() {
-			private static final long serialVersionUID = -6764937845089064529L;
-
-			{
-				add(cache.getEngine());
-			}
-		};
+	public List<GenericTreeNode> getRoot() {
+		return Collections.singletonList(new GenericTreeNode(null, cache.getEngine()));
 	}
 
-	public List<Type> getDirectSubTypes(final Type type) {
-		return type.<Type> getDirectSubTypes(cache).toList();
+	public List<ITreeNode> getDirectSubTypes(final ITreeNode iTreeNode) {
+		return iTreeNode.getChildrens(cache);
 	}
 
 	public List<Generic> getInstances(final Type type) {
 		return type.getInstances(cache).toList();
 	}
 
-	public void changeType(@Observes @TreeSelection Generic generic) {
-		selectedType = generic;
-		messages.info("selectionchanged", messages.getMessage("type"), selectedType.getValue());
+	public void changeType(@Observes @TreeSelection TreeSelectionEvent treeSelectionEvent) {
+		if (treeSelectionEvent.getId().equals("types")) {
+			ITreeNode iTreeNode = (ITreeNode) treeSelectionEvent.getObject();
+			if (iTreeNode instanceof GenericTreeNode) {
+				selectedType = ((GenericTreeNode) iTreeNode).getGeneric();
+				messages.info("selectionchanged", messages.getMessage("type"), selectedType.toString());
+			}
+		}
 	}
 
 	public void newType(String newValue) {
@@ -72,8 +73,8 @@ public class TypesBean implements Serializable {
 		messages.info("createFile", newValue, selectedType.getValue());
 	}
 
-	public Wrapper getWrapper(Generic generic) {
-		return new Wrapper(generic);
+	public Wrapper getWrapper(ITreeNode iTreeNode) {
+		return new Wrapper(iTreeNode);
 	}
 
 	public String delete() {
@@ -93,22 +94,24 @@ public class TypesBean implements Serializable {
 	}
 
 	public class Wrapper {
-		private Generic generic;
+		private ITreeNode iTreeNode;
 
-		public Wrapper(Generic generic) {
-			this.generic = generic;
+		public Wrapper(ITreeNode iTreeNode) {
+			this.iTreeNode = iTreeNode;
 		}
 
 		public String getValue() {
-			return generic.toString();
+			return iTreeNode.getValue();
 		}
 
 		public void setValue(String newValue) {
-			if (!newValue.equals(generic.toString())) {
-				selectedType = ((CacheImpl) cache).update(generic, newValue);
-				messages.info("updateShortPath", newValue, generic.getValue());
+			if (iTreeNode instanceof GenericTreeNode) {
+				Generic generic = ((GenericTreeNode) iTreeNode).getGeneric();
+				if (!newValue.equals(generic.toString())) {
+					selectedType = ((CacheImpl) cache).update(generic, newValue);
+					messages.info("updateShortPath", newValue, generic.getValue());
+				}
 			}
 		}
 	}
-
 }

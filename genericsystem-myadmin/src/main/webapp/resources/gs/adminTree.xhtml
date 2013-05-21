@@ -13,7 +13,6 @@
 	<composite:attribute name="key" required="true" />
 	<composite:attribute name="roots" required="true" />
 	<composite:attribute name="nodes" required="true" />
-	<composite:attribute name="nodesAdaptor" required="true" />
 	<composite:attribute name="inplaceInputValue" required="true" />
 	<composite:attribute name="renderTree" required="true" />
 	<composite:attribute name="renderAction" required="true" />
@@ -28,18 +27,11 @@
 			nodes="#{cc.attrs.nodes}">
 			<rich:treeNode>
 				<rich:inplaceInput value="#{cc.attrs.inplaceInputValue}"
-					editEvent="dblclick">
+					editEvent="dblclick" rendered="#{!item.isReadOnly}">
 					<a4j:ajax event="change" render="#{cc.attrs.renderAction}" />
 				</rich:inplaceInput>
+				<h:outputText value="#{cc.attrs.inplaceInputValue}" rendered="#{item.isReadOnly}"/>
 			</rich:treeNode>
-			<rich:treeModelAdaptor nodes="#{cc.attrs.nodesAdaptor}">
-				<rich:treeNode>
-					<rich:inplaceInput value="#{cc.attrs.inplaceInputValue}"
-						editEvent="dblclick">
-						<a4j:ajax event="change" render="#{cc.attrs.renderAction}" />
-					</rich:inplaceInput>
-				</rich:treeNode>
-			</rich:treeModelAdaptor>
 		</rich:treeModelRecursiveAdaptor>
 	</rich:tree>
 </composite:implementation>

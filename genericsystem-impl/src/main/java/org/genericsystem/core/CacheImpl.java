@@ -10,6 +10,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -18,8 +19,8 @@ import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.ExistsException;
+import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Tree;
@@ -179,7 +180,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private Generic replace(Generic old, Generic newImplicit) {
 		if (((GenericImpl) old).isPrimary())
-			return bindPrimaryByValue(((GenericImpl) old).supers[0], newImplicit.getValue(), old.getMetaLevel(), old.isAutomatic());
+			return newImplicit;
 		return bind(newImplicit, new Primaries(Statics.replace(0, ((GenericImpl) old).supers, newImplicit)).toArray(), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
 	}
 
@@ -411,7 +412,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		private ConnectionMap reBind(NavigableSet<Generic> orderedDependencies) {
 			for (Generic orderedDependency : orderedDependencies)
 				put(orderedDependency,
-						buildAndInsertComplex(orderedDependency.getClass(), orderedDependency.getImplicit(), adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components), orderedDependency.isAutomatic()));
+						buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0], adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components), orderedDependency.isAutomatic()));
 			return this;
 		}
 

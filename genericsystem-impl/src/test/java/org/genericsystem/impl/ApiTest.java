@@ -18,6 +18,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl.Size;
 import org.testng.annotations.Test;
 
 @Test
@@ -28,6 +29,13 @@ public class ApiTest extends AbstractTest {
 	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 	// assert ((CacheImpl) cache).update(cache.getEngine(), "Engine2").getValue().equals("Engine2");
 	// }
+
+	public void testUpdateSize() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Generic size = cache.find(Size.class);
+		size.log();
+		assert ((CacheImpl) cache).update(size.getImplicit(), "Size2").getValue().equals("Size2");
+	}
 
 	public void testUpdate() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
