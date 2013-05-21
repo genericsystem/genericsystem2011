@@ -1,10 +1,10 @@
 package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -14,10 +14,9 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType.File;
+import org.genericsystem.myadmin.beans.qualifier.Tree;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
-import org.richfaces.component.UITree;
-import org.richfaces.event.TreeSelectionChangeEvent;
 
 @Named
 @SessionScoped
@@ -48,17 +47,9 @@ public class FileSystemBean implements Serializable {
 		return directory.getFiles(cache).toList();
 	}
 
-	public void changeFile(TreeSelectionChangeEvent selectionChangeEvent) {
-		List<Object> selection = new ArrayList<Object>(selectionChangeEvent.getNewSelection());
-		if (!selection.isEmpty()) {
-			Object currentSelectionKey = selection.get(0);
-			UITree tree = (UITree) selectionChangeEvent.getSource();
-			Object storedKey = tree.getRowKey();
-			tree.setRowKey(currentSelectionKey);
-			selectedFile = (Generic) tree.getRowData();
-			tree.setRowKey(storedKey);
-			messages.info("selectionchanged", isFileSelected() ? messages.getMessage("file") : messages.getMessage("directory"), selectedFile.getValue());
-		}
+	public void changeFile(@Observes @Tree Generic generic) {
+		selectedFile = generic;
+		messages.info("selectionchanged", isFileSelected() ? messages.getMessage("file") : messages.getMessage("directory"), selectedFile.getValue());
 	}
 
 	public void addRootDirectory(String newValue) {
