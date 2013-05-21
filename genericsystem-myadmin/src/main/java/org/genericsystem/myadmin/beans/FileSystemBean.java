@@ -1,4 +1,4 @@
-package org.genericsystem.web.beans;
+package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType.File;
-import org.genericsystem.web.util.GsMessages;
-import org.genericsystem.web.util.GsRedirect;
+import org.genericsystem.myadmin.util.GsMessages;
+import org.genericsystem.myadmin.util.GsRedirect;
 import org.richfaces.component.UITree;
 import org.richfaces.event.TreeSelectionChangeEvent;
 

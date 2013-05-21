@@ -1,4 +1,4 @@
-package org.genericsystem.web.util;
+package org.genericsystem.myadmin.util;
 
 import org.jboss.seam.faces.rewrite.FacesRedirect;
 import org.jboss.seam.faces.view.config.ViewConfig;

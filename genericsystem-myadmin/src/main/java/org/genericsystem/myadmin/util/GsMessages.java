@@ -1,4 +1,4 @@
-package org.genericsystem.web.util;
+package org.genericsystem.myadmin.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;

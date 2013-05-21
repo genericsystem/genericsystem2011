@@ -1,4 +1,4 @@
-package org.genericsystem.resolver;
+package org.genericsystem.myadmin.resolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
