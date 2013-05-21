@@ -23,10 +23,11 @@ import org.testng.annotations.Test;
 @Test
 public class ApiTest extends AbstractTest {
 
-	public void testUpdateEngine() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		assert ((CacheImpl) cache).update(cache.getEngine(), "Engine2").getValue().equals("Engine2");
-	}
+	// TODO
+	// public void testUpdateEngine() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// assert ((CacheImpl) cache).update(cache.getEngine(), "Engine2").getValue().equals("Engine2");
+	// }
 
 	public void testUpdate() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
