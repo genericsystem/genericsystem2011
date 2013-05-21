@@ -4,13 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
-
 import org.jboss.seam.faces.event.qualifier.Before;
 import org.jboss.seam.faces.event.qualifier.RenderResponse;
 import org.jboss.seam.international.status.Message;
@@ -63,19 +61,19 @@ public class GsMessages implements Serializable {
 
 	public void redirectError(String key, Object... params) {
 		Message message = factory.error(bundleKey(key), params).build();
-		log.error(message.getDetail());
+		log.error(message.getText());
 		messagesToRedirect.add(message);
 	}
 
 	public void redirectWarn(String key, Object... params) {
 		Message message = factory.warn(bundleKey(key), params).build();
-		log.warn(message.getDetail());
+		log.warn(message.getText());
 		messagesToRedirect.add(message);
 	}
 
 	public void redirectInfo(String key, Object... params) {
 		Message message = factory.info(bundleKey(key), params).build();
-		log.info(message.getDetail());
+		log.info(message.getText());
 		messagesToRedirect.add(message);
 	}
 
@@ -97,19 +95,19 @@ public class GsMessages implements Serializable {
 
 	public void info(String key, Object... params) {
 		Message message = factory.info(bundleKey(key), params).build();
-		log.info(message.getDetail());
-		messagesToRedirect.add(message);
+		log.info(message.getText());
+		messages.add(message);
 	}
 
 	public void warn(String key, Object... params) {
 		Message message = factory.warn(bundleKey(key), params).build();
-		log.warn(message.getDetail());
-		messagesToRedirect.add(message);
+		log.warn(message.getText());
+		messages.add(message);
 	}
 
 	public void error(String key, Object... params) {
 		Message message = factory.error(bundleKey(key), params).build();
-		log.error(message.getDetail());
-		messagesToRedirect.add(message);
+		log.error(message.getText());
+		messages.add(message);
 	}
 }

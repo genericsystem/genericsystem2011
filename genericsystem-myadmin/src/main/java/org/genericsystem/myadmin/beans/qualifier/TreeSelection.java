@@ -10,6 +10,6 @@ import javax.inject.Qualifier;
 @Qualifier
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Tree {
+public @interface TreeSelection {
 
 }

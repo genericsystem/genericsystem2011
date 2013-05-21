@@ -13,7 +13,7 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Type;
-import org.genericsystem.myadmin.beans.qualifier.Tree;
+import org.genericsystem.myadmin.beans.qualifier.TreeSelection;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
 
@@ -52,7 +52,7 @@ public class TypesBean implements Serializable {
 		return type.getInstances(cache).toList();
 	}
 
-	public void changeType(@Observes @Tree Generic generic) {
+	public void changeType(@Observes @TreeSelection Generic generic) {
 		selectedType = generic;
 		messages.info("selectionchanged", messages.getMessage("type"), selectedType.getValue());
 	}

@@ -33,7 +33,7 @@
 					oncomplete="#{rich:component('newrootdirectory')}.show()"
 					mode="ajax" icon="#{infos.add}" />
 			</rich:contextMenu>
-			<ui:include src="/pages/types.xhtml" />
+			<!-- <ui:include src="/pages/types.xhtml" /> -->
 		</c:catch>
 		<c:if test="#{exception != null}">
 			<h:outputText value="#{exception}" />
@@ -51,5 +51,7 @@
 		title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 		action="#{fileSystemBean.addRootDirectory(popupValue)}"
 		render="directorytree" />
+
+	<a4j:log />
 
 </ui:composition>

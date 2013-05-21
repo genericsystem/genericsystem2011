@@ -14,7 +14,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType.File;
-import org.genericsystem.myadmin.beans.qualifier.Tree;
+import org.genericsystem.myadmin.beans.qualifier.TreeSelection;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
 
@@ -47,7 +47,7 @@ public class FileSystemBean implements Serializable {
 		return directory.getFiles(cache).toList();
 	}
 
-	public void changeFile(@Observes @Tree Generic generic) {
+	public void changeFile(@Observes @TreeSelection Generic generic) {
 		selectedFile = generic;
 		messages.info("selectionchanged", isFileSelected() ? messages.getMessage("file") : messages.getMessage("directory"), selectedFile.getValue());
 	}
