@@ -1,4 +1,4 @@
-package org.genericsystem.web.beans;
+package org.genericsystem.myadmin.beans;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;

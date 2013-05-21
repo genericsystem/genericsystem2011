@@ -1,4 +1,4 @@
-package org.genericsystem.web.beans.converters;
+package org.genericsystem.myadmin.beans.converters;
 
 import java.io.Serializable;
 import java.util.Map;

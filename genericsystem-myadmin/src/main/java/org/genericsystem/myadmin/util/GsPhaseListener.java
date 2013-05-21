@@ -1,4 +1,4 @@
-package org.genericsystem.web.util;
+package org.genericsystem.myadmin.util;
 
 import javax.enterprise.event.Observes;
 import javax.faces.event.PhaseEvent;

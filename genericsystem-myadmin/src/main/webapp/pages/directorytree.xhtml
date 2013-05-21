@@ -12,29 +12,35 @@
 
 	<rich:panel id="paneldirectorytree"
 		styleClass="widthScroll280 fullHeight">
-		<rich:tree id="directorytree" toggleType="ajax" var="item"
-			status="panelUpdateStatus" selectionType="ajax" render="toolbar,edit"
-			selectionChangeListener="#{fileSystemBean.changeFile}">
-			<rich:treeModelRecursiveAdaptor
-				roots="#{fileSystemBean.rootDirectories}"
-				nodes="#{fileSystemBean.getDirectories(item)}">
-				<rich:treeNode>
-					<rich:inplaceInput
-						value="#{fileSystemBean.getWrapper(item).shortPath}"
-						editEvent="dblclick">
-						<a4j:ajax event="change" render="directorytree,toolbar" />
-					</rich:inplaceInput>
-				</rich:treeNode>
-				<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
-					<rich:treeNode>
-						<rich:inplaceInput
-							value="#{fileSystemBean.getWrapper(item).shortPath}"
-							editEvent="dblclick">
-							<a4j:ajax event="change" render="directorytree,toolbar" />
-						</rich:inplaceInput>
-					</rich:treeNode>
-				</rich:treeModelAdaptor>
-			</rich:treeModelRecursiveAdaptor>
-		</rich:tree>
+		<gs:tree key="directorytree" roots="#{fileSystemBean.rootDirectories}"
+			nodes="#{fileSystemBean.getDirectories(item)}"
+			nodesAdaptor="#{fileSystemBean.getFiles(item)}"
+			inplaceInputValue="#{fileSystemBean.getWrapper(item).shortPath}"
+			renderTree="toolbar,edit" renderAction="directorytree,toolbar" />
+
+		<!-- 		<rich:tree id="directorytree" toggleType="ajax" var="item" -->
+		<!-- 			status="panelUpdateStatus" selectionType="ajax" render="toolbar,edit" -->
+		<!-- 			selectionChangeListener="#{fileSystemBean.changeFile}"> -->
+		<!-- 			<rich:treeModelRecursiveAdaptor -->
+		<!-- 				roots="#{fileSystemBean.rootDirectories}" -->
+		<!-- 				nodes="#{fileSystemBean.getDirectories(item)}"> -->
+		<!-- 				<rich:treeNode> -->
+		<!-- 					<rich:inplaceInput -->
+		<!-- 						value="#{fileSystemBean.getWrapper(item).shortPath}" -->
+		<!-- 						editEvent="dblclick"> -->
+		<!-- 						<a4j:ajax event="change" render="directorytree,toolbar" /> -->
+		<!-- 					</rich:inplaceInput> -->
+		<!-- 				</rich:treeNode> -->
+		<!-- 				<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}"> -->
+		<!-- 					<rich:treeNode> -->
+		<!-- 						<rich:inplaceInput -->
+		<!-- 							value="#{fileSystemBean.getWrapper(item).shortPath}" -->
+		<!-- 							editEvent="dblclick"> -->
+		<!-- 							<a4j:ajax event="change" render="directorytree,toolbar" /> -->
+		<!-- 						</rich:inplaceInput> -->
+		<!-- 					</rich:treeNode> -->
+		<!-- 				</rich:treeModelAdaptor> -->
+		<!-- 			</rich:treeModelRecursiveAdaptor> -->
+		<!-- 		</rich:tree> -->
 	</rich:panel>
 </ui:composition>

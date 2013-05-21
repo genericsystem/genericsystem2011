@@ -1,4 +1,4 @@
-package org.genericsystem.web.util;
+package org.genericsystem.myadmin.util;
 
 import javax.faces.application.ViewExpiredException;
 import javax.faces.context.FacesContext;

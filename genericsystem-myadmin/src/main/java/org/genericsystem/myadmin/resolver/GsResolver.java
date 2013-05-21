@@ -1,4 +1,4 @@
-package org.genericsystem.resolver;
+package org.genericsystem.myadmin.resolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -7,13 +7,16 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+
 import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.inject.spi.BeanManager;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.FileType.File;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
+
 import com.sun.faces.facelets.impl.DefaultResourceResolver;
 
 public class GsResolver extends DefaultResourceResolver {
@@ -36,7 +39,8 @@ public class GsResolver extends DefaultResourceResolver {
 		} finally {
 			try {
 				in.close();
-			} catch (final IOException ignore) {}
+			} catch (final IOException ignore) {
+			}
 		}
 		return out.toByteArray();
 	}
@@ -52,10 +56,10 @@ public class GsResolver extends DefaultResourceResolver {
 			URL url = super.resolveUrl(resource);
 			if (url != null) {
 				File file = fileSystem.touchFile(cache, resource, asByteArray(((ByteArrayInputStream) url.getContent())));
-				// file.log(cache);
 				return new URL("", "", 0, resource, new GsStreamHandler(file.getContent(cache)));
 			}
-		} catch (ContextNotActiveException ignore) {} catch (Exception e) {
+		} catch (ContextNotActiveException ignore) {
+		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 		return super.resolveUrl(resource);
@@ -91,7 +95,8 @@ public class GsResolver extends DefaultResourceResolver {
 			}
 
 			@Override
-			public synchronized void connect() throws IOException {}
+			public synchronized void connect() throws IOException {
+			}
 
 			@Override
 			public long getExpiration() {
