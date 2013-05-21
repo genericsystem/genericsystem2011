@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
@@ -21,6 +22,11 @@ import org.testng.annotations.Test;
 
 @Test
 public class ApiTest extends AbstractTest {
+
+	public void testUpdateEngine() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		assert ((CacheImpl) cache).update(cache.getEngine(), "Engine2").getValue().equals("Engine2");
+	}
 
 	public void testUpdate() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();

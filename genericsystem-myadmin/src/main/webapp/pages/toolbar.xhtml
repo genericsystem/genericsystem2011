@@ -17,8 +17,8 @@
 		<rich:toolbarGroup>
 			<a4j:status name="panelUpdateStatus">
 				<f:facet name="start">
-                        (Updating)
-                    </f:facet>
+					<h:graphicImage value="#{infos.imgProgress}" />
+				</f:facet>
 			</a4j:status>
 
 			<h:outputText rendered="#{fileSystemBean.fileSelected}"

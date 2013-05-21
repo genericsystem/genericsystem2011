@@ -130,7 +130,7 @@ public class Archiver {
 		writeAncestors(generic.getSupers(), out);
 		writeAncestors(generic.getComponents(), out);
 		out.writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
-		out.writeBoolean(generic.automatic);
+		out.writeBoolean(generic.isAutomatic());
 	}
 
 	private static void writeTs(Generic generic, ObjectOutputStream out) throws IOException {
@@ -225,8 +225,7 @@ public class Archiver {
 				Engine engine = loadEngine();
 				for (;;)
 					loadGeneric(engine);
-			} catch (EOFException ignore) {
-			} catch (Exception e) {
+			} catch (EOFException ignore) {} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}

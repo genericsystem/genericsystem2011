@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
+
 import org.jboss.seam.faces.event.qualifier.Before;
 import org.jboss.seam.faces.event.qualifier.RenderResponse;
 import org.jboss.seam.international.status.Message;
@@ -87,6 +89,10 @@ public class GsMessages implements Serializable {
 		Message message = factory.error(t.toString()).build();
 		log.error("\n" + toString(t));
 		messagesToRedirect.add(message);
+	}
+
+	public String getMessage(String key, Object... params) {
+		return factory.info(bundleKey(key), params).build().getText();
 	}
 
 	public void info(String key, Object... params) {
