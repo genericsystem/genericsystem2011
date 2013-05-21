@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -66,9 +67,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	Generic[] components;
 
-	Serializable value;
+	private Serializable value;
 
-	boolean automatic;
+	private boolean automatic;
 
 	public Generic[] getSupersArray() {
 		return supers.clone();
@@ -121,7 +122,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 
 		// TODO KK
-		assert getMetaLevel() == metaLevel : this.info();
+		// assert getMetaLevel() == metaLevel : this.info();
+		if (getMetaLevel() != metaLevel)
+			throw new IllegalStateException("META LEVEL ERROR");
 		if (!isPrimary())
 			assert Objects.equals(directSupers[0].getValue(), value);
 		if (value != null)
