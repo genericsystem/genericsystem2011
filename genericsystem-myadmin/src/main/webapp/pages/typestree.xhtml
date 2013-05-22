@@ -11,9 +11,9 @@
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
 	<rich:panel id="paneltypes" styleClass="widthScroll280 fullHeight">
-		<gs:adminTree key="types" roots="#{typesBean.root}"
+		<gs:adminTree key="typestree" roots="#{typesBean.root}"
 			nodes="#{typesBean.getDirectSubTypes(item)}"
 			inplaceInputValue="#{typesBean.getWrapper(item).value}"
-			renderTree="toolbar,edit" renderAction="types,toolbar" />
+			render="typesmanager"/>
 	</rich:panel>
 </ui:composition>

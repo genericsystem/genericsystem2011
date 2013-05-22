@@ -16,6 +16,6 @@
 			nodes="#{fileSystemBean.getDirectories(item)}"
 			nodesAdaptor="#{fileSystemBean.getFiles(item)}"
 			inplaceInputValue="#{fileSystemBean.getWrapper(item).shortPath}"
-			renderTree="toolbar,edit" renderAction="directorytree,toolbar" />
+			render="filesystemmanager"/>
 	</rich:panel>
 </ui:composition>

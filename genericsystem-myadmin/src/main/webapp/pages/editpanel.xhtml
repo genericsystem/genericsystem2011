@@ -10,8 +10,10 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:panel id="edit" layout="block" styleClass="fullWidth fullHeight" bodyClass="fullHeight">
-		<h:panelGroup layout="block" id="editFile" styleClass="fullWidth fullHeight"
+	<rich:panel id="edit" layout="block" styleClass="fullWidth fullHeight"
+		bodyClass="fullHeight">
+		<h:panelGroup layout="block" id="editFile"
+			styleClass="fullWidth fullHeight"
 			rendered="#{fileSystemBean.fileSelected}">
 			<h:inputTextarea id="code" name="code"
 				value="#{fileSystemBean.content}"
@@ -38,9 +40,10 @@
 					onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
 					mode="ajax" icon="#{infos.delete}" />
 			</rich:contextMenu>
-      </h:panelGroup>
+		</h:panelGroup>
 
-		<h:panelGroup layout="block" id="editDirectory" styleClass="fullWidth fullHeight"
+		<h:panelGroup layout="block" id="editDirectory"
+			styleClass="fullWidth fullHeight"
 			rendered="#{fileSystemBean.directorySelected}">
 			<rich:contextMenu target="editDirectory" mode="ajax">
 				<rich:menuItem
@@ -55,6 +58,6 @@
 					onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
 					mode="ajax" icon="#{infos.delete}" />
 			</rich:contextMenu>
-      </h:panelGroup>
+		</h:panelGroup>
 	</rich:panel>
 </ui:composition>

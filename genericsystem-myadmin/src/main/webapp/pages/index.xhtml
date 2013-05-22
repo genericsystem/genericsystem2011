@@ -12,7 +12,11 @@
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
 	<ui:define name="bodySection">
-		<ui:include src="/pages/filesystem.xhtml" />
+		<ui:include src="/pages/head.xhtml" />
+		<gs:toolbar />
+		<ui:include src="/pages/typesmanager.xhtml" />
+		<ui:include src="/pages/filesystemmanager.xhtml" />
+		<a4j:log />
 	</ui:define>
 
 </ui:composition>

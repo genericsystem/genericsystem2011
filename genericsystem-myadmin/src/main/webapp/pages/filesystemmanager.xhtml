@@ -10,23 +10,17 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<ui:include src="/pages/head.xhtml" />
-	<rich:panel styleClass="fullWidth" style="border-width:0;padding:0;">
+	<rich:panel id="filesystemmanager" styleClass="fullWidth"
+		style="border-width:0;padding:0;">
 		<f:facet name="header">
-			<h:panelGrid columns="2" styleClass="fullWidth"
-				columnClasses="fullWidth,">
-				<h:outputText styleClass="uppercase"
-					value="#{msg.file} #{msg.system} #{msg.manager}" />
-				<ui:include src="/pages/toolbar.xhtml" />
-			</h:panelGrid>
+			<h:outputText styleClass="uppercase"
+				value="#{msg.file} #{msg.system} #{msg.manager}" />
+			<span style="float: right;"> <h:outputText rendered="#{fileSystemBean.fileSelected}"
+					value="#{fileSystemBean.fileShortPath}" /> <h:outputText
+					rendered="#{fileSystemBean.directorySelected}"
+					value="#{fileSystemBean.directoryShortPath}" /></span>
 		</f:facet>
 		<c:catch var="exception">
-			<h:panelGrid columns="2" styleClass="fullWidth"
-				rowClasses="fullHeight"
-				columnClasses="topAlign mediumScroll fullHeight,topAlign fullWidth fullHeight">
-				<ui:include src="/pages/typestree.xhtml" />
-				<ui:include src="/pages/edittypes.xhtml" />
-			</h:panelGrid>
 			<h:panelGrid columns="2" styleClass="fullWidth"
 				rowClasses="fullHeight"
 				columnClasses="topAlign mediumScroll fullHeight,topAlign fullWidth fullHeight">
@@ -56,7 +50,5 @@
 		title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 		action="#{fileSystemBean.addRootDirectory(popupValue)}"
 		render="directorytree" />
-
-	<a4j:log />
 
 </ui:composition>

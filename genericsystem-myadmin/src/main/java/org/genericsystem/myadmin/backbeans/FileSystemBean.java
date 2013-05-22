@@ -57,17 +57,18 @@ public class FileSystemBean implements Serializable {
 
 	public void addRootDirectory(String newValue) {
 		cache.<FileSystem> find(FileSystem.class).addRootDirectory(cache, newValue);
-		messages.info("createRootDirectory", newValue);
+		messages.info("createRoot", messages.getMessage("directory"), newValue);
 	}
 
 	public void addSubDirectory(String newValue) {
 		((Directory) selectedFile).addDirectory(cache, newValue);
-		messages.info("createSubDirectory", newValue, selectedFile.getValue());
+		messages.info("createSub", messages.getMessage("directory"), newValue, selectedFile.getValue());
 	}
 
 	public void addFile(String newValue) {
 		((Directory) selectedFile).addFile(cache, newValue);
 		messages.info("createFile", newValue, selectedFile.getValue());
+		messages.info("createRoot", messages.getMessage("file"), newValue);
 	}
 
 	public Wrapper getWrapper(Generic generic) {
