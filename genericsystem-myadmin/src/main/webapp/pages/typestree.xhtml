@@ -14,6 +14,6 @@
 		<gs:adminTree key="typestree" roots="#{typesBean.root}"
 			nodes="#{typesBean.getDirectSubTypes(item)}"
 			inplaceInputValue="#{typesBean.getWrapper(item).value}"
-			render="typestree" />
+			render="typestree, editTypes" />
 	</rich:panel>
 </ui:composition>

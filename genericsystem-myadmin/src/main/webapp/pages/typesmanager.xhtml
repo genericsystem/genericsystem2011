@@ -28,7 +28,7 @@
 				<ui:include src="/pages/typestree.xhtml" />
 				<ui:include src="/pages/edittypes.xhtml" />
 			</h:panelGrid>
-			<rich:contextMenu target="typestree" mode="ajax">
+			<rich:contextMenu target="paneltypes" mode="ajax">
 				<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
 					oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
 					icon="#{infos.add}" />
