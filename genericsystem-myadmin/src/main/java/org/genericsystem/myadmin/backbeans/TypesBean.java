@@ -12,6 +12,7 @@ import javax.inject.Named;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.backbeans.ITreeNode.GenericTreeNode;
 import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
@@ -98,8 +99,8 @@ public class TypesBean implements Serializable {
 		return selectedType != null && selectedType.getComponentsSize() == 0 && selectedType.isConcrete();
 	}
 
-	public Generic getSelectedType() {
-		return selectedType;
+	public GenericImpl getSelectedType() {
+		return (GenericImpl) selectedType;
 	}
 
 	public void setSelectedType(Generic selectedType) {

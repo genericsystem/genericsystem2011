@@ -15,10 +15,13 @@
 		<f:facet name="header">
 			<h:outputText styleClass="uppercase"
 				value="#{msg.file} #{msg.system} #{msg.manager}" />
-			<span style="float: right;"> <h:outputText rendered="#{fileSystemBean.fileSelected}"
-					value="#{fileSystemBean.fileShortPath}" /> <h:outputText
-					rendered="#{fileSystemBean.directorySelected}"
-					value="#{fileSystemBean.directoryShortPath}" /></span>
+			<span style="float: right;"> <a4j:outputPanel
+					ajaxRendered="true">
+					<h:outputText rendered="#{fileSystemBean.fileSelected}"
+						value="#{fileSystemBean.fileShortPath}" />
+					<h:outputText rendered="#{fileSystemBean.directorySelected}"
+						value="#{fileSystemBean.directoryShortPath}" />
+				</a4j:outputPanel></span>
 		</f:facet>
 		<c:catch var="exception">
 			<h:panelGrid columns="2" styleClass="fullWidth"
@@ -27,7 +30,7 @@
 				<ui:include src="/pages/directorytree.xhtml" />
 				<ui:include src="/pages/editpanel.xhtml" />
 			</h:panelGrid>
-			<rich:contextMenu target="paneldirectorytree" mode="ajax">
+			<rich:contextMenu target="directorytree" mode="ajax">
 				<rich:menuItem
 					label="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 					oncomplete="#{rich:component('newrootdirectory')}.show()"

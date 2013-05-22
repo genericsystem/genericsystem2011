@@ -81,6 +81,11 @@ public class FileSystem extends TreeImpl {
 		public String getShortPath() {
 			return this.<String> getValue();
 		}
+
+		@Override
+		public String getGenericType() {
+			return "Directory";
+		}
 	}
 
 	@SystemGeneric
@@ -108,6 +113,11 @@ public class FileSystem extends TreeImpl {
 
 			public String getShortPath() {
 				return this.<String> getValue();
+			}
+
+			@Override
+			public String getGenericType() {
+				return "File";
 			}
 		}
 	}

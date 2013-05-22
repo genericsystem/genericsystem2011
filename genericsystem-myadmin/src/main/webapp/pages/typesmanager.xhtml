@@ -15,10 +15,11 @@
 		<f:facet name="header">
 			<h:outputText styleClass="uppercase"
 				value="#{msg.type} #{msg.manager}" />
-			<span style="float: right;"> <h:outputText
-					rendered="#{not empty typesBean.selectedType}"
-					value="#{typesBean.selectedType.toString()}" />
-			</span>
+			<span style="float: right;"><a4j:outputPanel
+					ajaxRendered="true">
+					<h:outputText rendered="#{not empty typesBean.selectedType}"
+						value="#{typesBean.selectedType.toStringType()}" />
+				</a4j:outputPanel> </span>
 		</f:facet>
 		<c:catch var="exception">
 			<h:panelGrid columns="2" styleClass="fullWidth"
@@ -27,7 +28,7 @@
 				<ui:include src="/pages/typestree.xhtml" />
 				<ui:include src="/pages/edittypes.xhtml" />
 			</h:panelGrid>
-			<rich:contextMenu target="paneltypes" mode="ajax">
+			<rich:contextMenu target="typestree" mode="ajax">
 				<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
 					oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
 					icon="#{infos.add}" />

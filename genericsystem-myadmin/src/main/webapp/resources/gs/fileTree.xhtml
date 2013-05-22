@@ -19,13 +19,12 @@
 </composite:interface>
 
 <composite:implementation>
-	<rich:tree id="#{cc.attrs.key}" toggleType="ajax" var="item"
+	<rich:tree id="#{cc.attrs.key}" toggleType="client" var="item"
 		status="panelUpdateStatus" selectionType="ajax"
-		render="#{cc.attrs.render}"
 		selectionChangeListener="#{treeBean.change}">
 		<rich:treeModelRecursiveAdaptor roots="#{cc.attrs.roots}"
 			nodes="#{cc.attrs.nodes}">
-			<rich:treeNode>
+			<rich:treeNode expanded="#{true}">
 				<rich:inplaceInput value="#{cc.attrs.inplaceInputValue}"
 					editEvent="dblclick">
 					<a4j:ajax event="change" render="#{cc.attrs.render}" />
