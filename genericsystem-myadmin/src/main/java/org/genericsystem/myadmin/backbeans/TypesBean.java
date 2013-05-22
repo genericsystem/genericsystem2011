@@ -12,6 +12,7 @@ import javax.inject.Named;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.backbeans.ITreeNode.GenericTreeNode;
 import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
@@ -49,7 +50,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public void changeType(@Observes @TreeSelection TreeSelectionEvent treeSelectionEvent) {
-		if (treeSelectionEvent.getId().equals("types")) {
+		if (treeSelectionEvent.getId().equals("typestree")) {
 			ITreeNode iTreeNode = (ITreeNode) treeSelectionEvent.getObject();
 			if (iTreeNode instanceof GenericTreeNode) {
 				selectedType = ((GenericTreeNode) iTreeNode).getGeneric();
@@ -60,17 +61,22 @@ public class TypesBean implements Serializable {
 
 	public void newType(String newValue) {
 		cache.newType(newValue);
-		messages.info("createRootDirectory", newValue);
+		messages.info("createRoot", messages.getMessage("type"), newValue);
 	}
 
 	public void newSubType(String newValue) {
 		((Type) selectedType).newSubType(cache, newValue);
-		messages.info("createSubDirectory", newValue, selectedType.getValue());
+		messages.info("createSub", messages.getMessage("type"), newValue, selectedType.getValue());
+	}
+
+	public void addAttribute(String newValue) {
+		((Type) selectedType).addAttribute(cache, newValue);
+		messages.info("createRoot", messages.getMessage("attribute"), newValue, selectedType.getValue());
 	}
 
 	public void newInstance(String newValue) {
 		((Type) selectedType).newInstance(cache, newValue);
-		messages.info("createFile", newValue, selectedType.getValue());
+		messages.info("createRoot", messages.getMessage("instance"), newValue, selectedType.getValue());
 	}
 
 	public Wrapper getWrapper(ITreeNode iTreeNode) {
@@ -91,6 +97,14 @@ public class TypesBean implements Serializable {
 	public boolean isInstance() {
 		// TODO in core
 		return selectedType != null && selectedType.getComponentsSize() == 0 && selectedType.isConcrete();
+	}
+
+	public GenericImpl getSelectedType() {
+		return (GenericImpl) selectedType;
+	}
+
+	public void setSelectedType(Generic selectedType) {
+		this.selectedType = selectedType;
 	}
 
 	public class Wrapper {

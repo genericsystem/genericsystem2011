@@ -15,28 +15,26 @@
 	<composite:attribute name="nodes" required="true" />
 	<composite:attribute name="nodesAdaptor" />
 	<composite:attribute name="inplaceInputValue" required="true" />
-	<composite:attribute name="renderTree" required="true" />
-	<composite:attribute name="renderAction" required="true" />
+	<composite:attribute name="render" required="true" />
 </composite:interface>
 
 <composite:implementation>
-	<rich:tree id="#{cc.attrs.key}" toggleType="ajax" var="item"
+	<rich:tree id="#{cc.attrs.key}" toggleType="client" var="item"
 		status="panelUpdateStatus" selectionType="ajax"
-		render="#{cc.attrs.renderTree}"
 		selectionChangeListener="#{treeBean.change}">
 		<rich:treeModelRecursiveAdaptor roots="#{cc.attrs.roots}"
 			nodes="#{cc.attrs.nodes}">
-			<rich:treeNode>
+			<rich:treeNode expanded="#{true}">
 				<rich:inplaceInput value="#{cc.attrs.inplaceInputValue}"
 					editEvent="dblclick">
-					<a4j:ajax event="change" render="#{cc.attrs.renderAction}" />
+					<a4j:ajax event="change" render="#{cc.attrs.render}" />
 				</rich:inplaceInput>
 			</rich:treeNode>
 			<rich:treeModelAdaptor nodes="#{cc.attrs.nodesAdaptor}">
 				<rich:treeNode>
 					<rich:inplaceInput value="#{cc.attrs.inplaceInputValue}"
 						editEvent="dblclick">
-						<a4j:ajax event="change" render="#{cc.attrs.renderAction}" />
+						<a4j:ajax event="change" render="#{cc.attrs.render}" />
 					</rich:inplaceInput>
 				</rich:treeNode>
 			</rich:treeModelAdaptor>

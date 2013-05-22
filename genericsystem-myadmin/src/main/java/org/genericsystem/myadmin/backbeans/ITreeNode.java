@@ -43,7 +43,8 @@ public interface ITreeNode {
 
 	public static class GenericTreeNode implements ITreeNode {
 
-		private final List<ITreeNode> childrens = Arrays.<ITreeNode> asList(new AbstractReadOnlyTreeNode[] { new InstancesTreeNode(this), new InheritingsTreeNode(this), new CompositesTreeNode(this) });
+		// private final List<ITreeNode> childrens = Arrays.<ITreeNode> asList(new AbstractReadOnlyTreeNode[] { new InstancesTreeNode(this), new InheritingsTreeNode(this), new CompositesTreeNode(this) });
+		private final List<ITreeNode> childrens = Arrays.<ITreeNode> asList(new AbstractReadOnlyTreeNode[] { new InheritingsTreeNode(this) });
 
 		private AbstractReadOnlyTreeNode parent;
 

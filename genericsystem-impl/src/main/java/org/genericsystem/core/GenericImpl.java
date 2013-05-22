@@ -961,15 +961,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public String toString() {
-		String s = getGenericType();
-		if (isPrimary()) {
-			Serializable value = getValue();
-			return s + "{" + (value instanceof Class ? ((Class<?>) value).getSimpleName() : value) + "}";
-		}
-		return s + "{" + toString(supers) + "/" + toString(components) + "}";
+		Serializable value = getValue();
+		return value instanceof Class ? ((Class<?>) value).getSimpleName() : value.toString();
 	}
 
-	private String getGenericType() {
+	public String toStringType() {
+		return toString() + "(" + getGenericType() + ")";
+	}
+
+	public String getGenericType() {
 		int metaLevel = getMetaLevel();
 		int dim = getComponentsSize();
 		switch (metaLevel) {
@@ -1011,26 +1011,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	private String toString(Generic[] a) {
-		if (a == null)
-			return "null";
-
-		int iMax = a.length - 1;
-		if (iMax == -1)
-			return "[]";
-
-		StringBuilder b = new StringBuilder();
-		b.append('[');
-		for (int i = 0;; i++) {
-			if (this.equals(a[i]))
-				b.append("this");
-			else
-				b.append((a[i].getValue() instanceof Class ? ((Class<?>) a[i].getValue()).getSimpleName() : a[i].getValue()));
-			if (i == iMax)
-				return b.append(']').toString();
-			b.append(", ");
-		}
-	}
+	// TODO clean
+	// private String toString(Generic[] a) {
+	// if (a == null)
+	// return "null";
+	//
+	// int iMax = a.length - 1;
+	// if (iMax == -1)
+	// return "[]";
+	//
+	// StringBuilder b = new StringBuilder();
+	// b.append('[');
+	// for (int i = 0;; i++) {
+	// if (this.equals(a[i]))
+	// b.append("this");
+	// else
+	// b.append((a[i].getValue() instanceof Class ? ((Class<?>) a[i].getValue()).getSimpleName() : a[i].getValue()));
+	// if (i == iMax)
+	// return b.append(']').toString();
+	// b.append(", ");
+	// }
+	// }
 
 	public boolean isPrimary() {
 		return components.length == 0 && supers.length == 1;

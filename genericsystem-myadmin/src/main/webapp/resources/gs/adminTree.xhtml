@@ -14,21 +14,19 @@
 	<composite:attribute name="roots" required="true" />
 	<composite:attribute name="nodes" required="true" />
 	<composite:attribute name="inplaceInputValue" required="true" />
-	<composite:attribute name="renderTree" required="true" />
-	<composite:attribute name="renderAction" required="true" />
+	<composite:attribute name="render" required="true" />
 </composite:interface>
 
 <composite:implementation>
 	<rich:tree id="#{cc.attrs.key}" toggleType="ajax" var="item"
 		status="panelUpdateStatus" selectionType="ajax"
-		render="#{cc.attrs.renderTree}"
 		selectionChangeListener="#{treeBean.change}">
 		<rich:treeModelRecursiveAdaptor roots="#{cc.attrs.roots}"
 			nodes="#{cc.attrs.nodes}">
 			<rich:treeNode>
 				<rich:inplaceInput value="#{cc.attrs.inplaceInputValue}"
 					editEvent="dblclick" rendered="#{!item.isReadOnly}">
-					<a4j:ajax event="change" render="#{cc.attrs.renderAction}" />
+					<a4j:ajax event="change" render="#{cc.attrs.render}" />
 				</rich:inplaceInput>
 				<h:outputText value="#{cc.attrs.inplaceInputValue}" rendered="#{item.isReadOnly}"/>
 			</rich:treeNode>
