@@ -14,9 +14,14 @@
 	<ui:define name="bodySection">
 		<ui:include src="/pages/head.xhtml" />
 		<gs:toolbar />
-		<ui:include src="/pages/typesmanager.xhtml" />
-		<ui:include src="/pages/filesystemmanager.xhtml" />
-		<a4j:log />
+		<c:catch var="exception">
+			<ui:include src="/pages/typesmanager.xhtml" />
+			<ui:include src="/pages/filesystemmanager.xhtml" />
+			<a4j:log />
+		</c:catch>
+		<c:if test="#{exception != null}">
+			<h:outputText value="#{exception}" />
+		</c:if>
 	</ui:define>
 
 </ui:composition>

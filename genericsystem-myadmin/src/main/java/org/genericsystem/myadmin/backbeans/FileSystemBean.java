@@ -110,11 +110,11 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public String getFileShortPath() {
-		return ((File) selectedFile).toStringType();
+		return ((File) selectedFile).toCategoryString();
 	}
 
 	public String getDirectoryShortPath() {
-		return ((Directory) selectedFile).toStringType();
+		return ((Directory) selectedFile).toCategoryString();
 	}
 
 	public String getContent() {

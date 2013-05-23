@@ -21,7 +21,7 @@
 <composite:implementation>
 	<rich:tree id="#{cc.attrs.key}" toggleType="client" var="item"
 		status="panelUpdateStatus" selectionType="ajax"
-		selectionChangeListener="#{treeBean.change}">
+		selectionChangeListener="#{treeBean.change}" render="#{cc.attrs.render}">
 		<rich:treeModelRecursiveAdaptor roots="#{cc.attrs.roots}"
 			nodes="#{cc.attrs.nodes}">
 			<rich:treeNode expanded="#{true}">

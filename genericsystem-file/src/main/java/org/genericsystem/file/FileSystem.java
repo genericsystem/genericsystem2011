@@ -83,7 +83,7 @@ public class FileSystem extends TreeImpl {
 		}
 
 		@Override
-		public String getGenericType() {
+		public String getCategoryString() {
 			return "Directory";
 		}
 	}
@@ -116,7 +116,7 @@ public class FileSystem extends TreeImpl {
 			}
 
 			@Override
-			public String getGenericType() {
+			public String getCategoryString() {
 				return "File";
 			}
 		}

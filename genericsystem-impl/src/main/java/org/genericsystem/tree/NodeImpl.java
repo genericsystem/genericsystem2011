@@ -2,6 +2,7 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
@@ -53,5 +54,10 @@ public class NodeImpl extends GenericImpl implements Node {
 	@Override
 	public <T extends Node> T setSubNode(Cache cache, Serializable value, Generic... targets) {
 		return setHolder(cache, this, value, targets);
+	}
+
+	@Override
+	public String getCategoryString() {
+		return "Node";
 	}
 }
