@@ -10,10 +10,9 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:panel id="paneltypes" styleClass="widthScroll280 fullHeight">
-		<gs:adminTree key="typestree" roots="#{typesBean.root}"
-			nodes="#{typesBean.getDirectSubTypes(item)}"
-			inplaceInputValue="#{typesBean.getWrapper(item).value}"
-			render="typesmanager" />
-	</rich:panel>
+	<gs:adminTree key="typestree" roots="#{typesBean.root}"
+		nodes="#{typesBean.getDirectSubTypes(item)}"
+		inplaceInputValue="#{typesBean.getWrapper(item).value}"
+		render="typesmanager" />
+
 </ui:composition>
