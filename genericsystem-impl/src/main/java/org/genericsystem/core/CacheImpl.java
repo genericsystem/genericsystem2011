@@ -294,6 +294,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
+	// TODO clean
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
 		T result = bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0), superTypes, components, false, null, false);
 		assert Objects.equals(value, result.getValue());
@@ -410,9 +411,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 		private static final long serialVersionUID = 8257917150315417734L;
 
 		private ConnectionMap reBind(NavigableSet<Generic> orderedDependencies) {
-			for (Generic orderedDependency : orderedDependencies)
-				put(orderedDependency,
-						buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0], adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components), orderedDependency.isAutomatic()));
+			for (Generic orderedDependency : orderedDependencies) {
+				Generic generic;
+				if (((GenericImpl) orderedDependency).isPrimary())
+					generic = bindPrimaryByValue(adjust(((GenericImpl) orderedDependency).supers)[0], orderedDependency.getValue(), orderedDependency.getMetaLevel(), orderedDependency.isAutomatic());
+				else
+					generic = buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0], adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components),
+							orderedDependency.isAutomatic());
+				put(orderedDependency, generic);
+			}
 			return this;
 		}
 
@@ -430,7 +437,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Generic[] newComponents = new Generic[oldComponents.length];
 			for (int i = 0; i < newComponents.length; i++) {
 				Generic newComponent = get(oldComponents[i]);
-				assert newComponent == null ? isAlive(oldComponents[i]) : !isAlive(oldComponents[i]);
+				assert newComponent == null ? isAlive(oldComponents[i]) : !isAlive(oldComponents[i]) : newComponent + " / " + oldComponents[i].info();
 				newComponents[i] = newComponent == null ? oldComponents[i] : newComponent;
 				assert isAlive(newComponents[i]);
 			}

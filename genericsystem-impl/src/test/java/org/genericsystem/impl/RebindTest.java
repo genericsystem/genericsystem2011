@@ -79,10 +79,12 @@ public class RebindTest extends AbstractTest {
 	public void rebindTypeNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
+		vehicle.log();
 		Type car = vehicle.newSubType(cache, "Car");
 		Generic mycar = car.newInstance(cache, "mycar");
 		Attribute carPower = car.setAttribute(cache, "power");
 		mycar.setValue(cache, carPower, "123");
+		assert vehicle.isAlive(cache);
 		Generic reboundVehicle = ((GenericImpl) vehicle).reBind(cache);
 		assert !vehicle.isAlive(cache);
 		assert !car.isAlive(cache);
@@ -93,12 +95,13 @@ public class RebindTest extends AbstractTest {
 	public void rebindTypeTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
-		Generic myFourHorsesCar = car.newInstance(cache, "myFourHorsesCar");
+		Generic myCar = car.newInstance(cache, "myCar");
 		Attribute power = car.setAttribute(cache, "Power");
-		power.newInstance(cache, "fourHorses", myFourHorsesCar);
-		Generic yourFourHorsesCar = car.newInstance(cache, "yourFourHorsesCar");
-		yourFourHorsesCar.setValue(cache, power, "tenHorses");
+		Generic myCar123 = power.newInstance(cache, "123", myCar);
+		assert myCar123.inheritsFrom(power);
+		Generic myCar2 = car.newInstance(cache, "myCar2");
+		myCar2.setValue(cache, power, "10");
 		((GenericImpl) car).reBind(cache);
-		assert myFourHorsesCar.getMeta().equals(yourFourHorsesCar.getMeta());
+		assert myCar.getMeta().equals(myCar2.getMeta());
 	}
 }
