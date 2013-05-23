@@ -12,11 +12,19 @@
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
 	<ui:define name="bodySection">
-		<ui:include src="/pages/head.xhtml" />
+		<gs:head />
 		<gs:toolbar />
 		<c:catch var="exception">
-			<ui:include src="/pages/typesmanager.xhtml" />
-			<ui:include src="/pages/filesystemmanager.xhtml" />
+			<gs:panel key="typesmanager"
+				managername="#{msg.type} #{msg.manager}"
+				includetree="/pages/typesmanager/tree.xhtml"
+				includeedit="/pages/typesmanager/edit.xhtml"
+				includemenu="/pages/typesmanager/menu.xhtml" />
+			<gs:panel key="filesystemmanager"
+				managername="#{msg.file} #{msg.system} #{msg.manager}"
+				includetree="/pages/filesystemmanager/tree.xhtml"
+				includeedit="/pages/filesystemmanager/edit.xhtml"
+				includemenu="/pages/filesystemmanager/menu.xhtml" />
 			<a4j:log />
 		</c:catch>
 		<c:if test="#{exception != null}">

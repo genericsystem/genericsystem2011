@@ -10,12 +10,11 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:panel id="paneldirectorytree"
-		styleClass="widthScroll280 fullHeight">
-		<gs:fileTree key="directorytree" roots="#{fileSystemBean.rootDirectories}"
-			nodes="#{fileSystemBean.getDirectories(item)}"
-			nodesAdaptor="#{fileSystemBean.getFiles(item)}"
-			inplaceInputValue="#{fileSystemBean.getWrapper(item).shortPath}"
-			render="filesystemmanager"/>
-	</rich:panel>
+	<gs:fileTree key="directorytree"
+		roots="#{fileSystemBean.rootDirectories}"
+		nodes="#{fileSystemBean.getDirectories(item)}"
+		nodesAdaptor="#{fileSystemBean.getFiles(item)}"
+		inplaceInputValue="#{fileSystemBean.getWrapper(item).shortPath}"
+		render="filesystemmanager" />
+
 </ui:composition>
