@@ -2,6 +2,7 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Context;
@@ -41,5 +42,10 @@ public class TreeImpl extends GenericImpl implements Tree {
 	@Override
 	public <T extends Node> T getRootByValue(Context context, Serializable value) {
 		return Statics.unambigousFirst(Statics.<T> rootFilter(Statics.<T> valueFilter(TreeImpl.this.<T> instancesIterator(context), value)));
+	}
+
+	@Override
+	public String getCategoryString() {
+		return "Tree";
 	}
 }

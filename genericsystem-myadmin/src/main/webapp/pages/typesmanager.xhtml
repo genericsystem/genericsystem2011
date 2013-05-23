@@ -13,30 +13,25 @@
 	<rich:panel id="typesmanager" styleClass="fullWidth"
 		style="border-width:0;padding:0;">
 		<f:facet name="header">
-			<h:outputText styleClass="uppercase"
-				value="#{msg.type} #{msg.manager}" />
-			<span style="float: right;"><a4j:outputPanel
-					ajaxRendered="true">
-					<h:outputText rendered="#{not empty typesBean.selectedType}"
-						value="#{typesBean.selectedType.toStringType()}" />
-				</a4j:outputPanel> </span>
-		</f:facet>
-		<c:catch var="exception">
-			<h:panelGrid columns="2" styleClass="fullWidth"
-				rowClasses="fullHeight"
-				columnClasses="topAlign mediumScroll fullHeight,topAlign fullWidth fullHeight">
-				<ui:include src="/pages/typestree.xhtml" />
-				<ui:include src="/pages/edittypes.xhtml" />
+			<h:panelGrid columns="2" columnClasses="fullWidth,">
+				<h:outputText styleClass="uppercase"
+					value="#{msg.type} #{msg.manager}" />
+				<h:outputText style="white-space: nowrap;"
+					rendered="#{not empty typesBean.selectedType}"
+					value="#{typesBean.selectedType.toCategoryString()}" />
 			</h:panelGrid>
-			<rich:contextMenu target="paneltypes" mode="ajax">
-				<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
-					oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
-					icon="#{infos.add}" />
-			</rich:contextMenu>
-		</c:catch>
-		<c:if test="#{exception != null}">
-			<h:outputText value="#{exception}" />
-		</c:if>
+		</f:facet>
+		<h:panelGrid columns="2" styleClass="fullWidth"
+			rowClasses="fullHeight"
+			columnClasses="topAlign mediumScroll fullHeight,topAlign fullWidth fullHeight">
+			<ui:include src="/pages/typestree.xhtml" />
+			<ui:include src="/pages/edittypes.xhtml" />
+		</h:panelGrid>
+		<rich:contextMenu target="paneltypes" mode="ajax">
+			<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
+				oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
+				icon="#{infos.add}" />
+		</rich:contextMenu>
 	</rich:panel>
 
 	<gs:popupPanel key="newtype" title="#{msg.add} #{msg.a} #{msg.type}"

@@ -20,7 +20,8 @@
 <composite:implementation>
 	<rich:tree id="#{cc.attrs.key}" toggleType="ajax" var="item"
 		status="panelUpdateStatus" selectionType="ajax"
-		selectionChangeListener="#{treeBean.change}">
+		selectionChangeListener="#{treeBean.change}"
+		render="#{cc.attrs.render}">
 		<rich:treeModelRecursiveAdaptor roots="#{cc.attrs.roots}"
 			nodes="#{cc.attrs.nodes}">
 			<rich:treeNode>
@@ -28,7 +29,8 @@
 					editEvent="dblclick" rendered="#{!item.isReadOnly}">
 					<a4j:ajax event="change" render="#{cc.attrs.render}" />
 				</rich:inplaceInput>
-				<h:outputText value="#{cc.attrs.inplaceInputValue}" rendered="#{item.isReadOnly}"/>
+				<h:outputText value="#{cc.attrs.inplaceInputValue}"
+					rendered="#{item.isReadOnly}" />
 			</rich:treeNode>
 		</rich:treeModelRecursiveAdaptor>
 	</rich:tree>

@@ -963,15 +963,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String toString() {
 		Serializable value = getValue();
 		if (null == value)
-			return null;
+			return "";
 		return value instanceof Class ? ((Class<?>) value).getSimpleName() : value.toString();
 	}
 
-	public String toStringType() {
-		return toString() + "(" + getGenericType() + ")";
+	public String toCategoryString() {
+		return "(" + getCategoryString() + ") " + toString();
 	}
 
-	public String getGenericType() {
+	public String getCategoryString() {
 		int metaLevel = getMetaLevel();
 		int dim = getComponentsSize();
 		switch (metaLevel) {
