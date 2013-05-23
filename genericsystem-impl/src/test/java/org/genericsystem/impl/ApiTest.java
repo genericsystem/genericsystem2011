@@ -33,7 +33,6 @@ public class ApiTest extends AbstractTest {
 	public void testUpdateSize() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Generic size = cache.find(Size.class);
-		size.log();
 		assert ((CacheImpl) cache).update(size.getImplicit(), "Size2").getValue().equals("Size2");
 	}
 

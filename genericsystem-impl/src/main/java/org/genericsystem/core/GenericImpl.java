@@ -962,6 +962,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public String toString() {
 		Serializable value = getValue();
+		if (null == value)
+			return null;
 		return value instanceof Class ? ((Class<?>) value).getSimpleName() : value.toString();
 	}
 
