@@ -38,14 +38,14 @@
 	<gs:popupPanel key="createfile"
 		title="#{msg.create} #{msg.a} #{msg.file}"
 		action="#{fileSystemBean.addFile(popupValue)}"
-		render="treefilesystemmanager" />
+		render="directorytree" />
 	<gs:popupPanel key="createsubdirectory"
 		title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}"
 		action="#{fileSystemBean.addSubDirectory(popupValue)}"
-		render="treefilesystemmanager" />
+		render="directorytree" />
 	<gs:popupPanel key="newrootdirectory"
 		title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 		action="#{fileSystemBean.addRootDirectory(popupValue)}"
-		render="treefilesystemmanager" />
+		render="directorytree" />
 
 </ui:composition>
