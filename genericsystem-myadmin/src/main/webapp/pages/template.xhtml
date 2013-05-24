@@ -20,6 +20,40 @@
 		src="#{facesContext.externalContext.requestContextPath}/resources/js/codemirror.js" />
 	<script
 		src="#{facesContext.externalContext.requestContextPath}/resources/js/xml.js" />
+	<script type="text/javascript">
+		var rightClick = false;
+		var posx = 0;
+		var posy = 0;
+		document.oncontextmenu = function() {
+            return false;
+        }
+		function posSouris(e) {
+			if(!e) var e = window.event;
+			if (e.pageX || e.pageY)
+			{
+				posx = e.pageX;
+				posy = e.pageY;
+			}
+			else if (e.clientX || e.clientY)
+			{
+				posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+				posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+			}
+		}
+		var cumulativeOffset = function(element) {
+		    var top = 0, left = 0;
+		    do {
+		        top += element.offsetTop  || 0;
+		        left += element.offsetLeft || 0;
+		        element = element.offsetParent;
+		    } while(element);
+
+		    return {
+		        top: top,
+		        left: left
+		    };
+		};
+	</script>
 </h:head>
 
 <h:body>

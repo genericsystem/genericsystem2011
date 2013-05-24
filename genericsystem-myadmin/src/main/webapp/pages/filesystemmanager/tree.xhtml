@@ -10,11 +10,43 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<gs:fileTree key="directorytree"
-		roots="#{fileSystemBean.rootDirectories}"
-		nodes="#{fileSystemBean.getDirectories(item)}"
-		nodesAdaptor="#{fileSystemBean.getFiles(item)}"
-		inplaceInputValue="#{fileSystemBean.getWrapper(item).shortPath}"
-		render="filesystemmanager" />
+	<script type="text/javascript">
+		function menuFS() {
+			var panelPosX = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().left;
+			var panelPosY = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().top;//cumulativeOffset(#{rich:element('panelfilesystemmanager')}).top; 
+			
+			#{rich:element('menufilesystemmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.left=(posx-panelPosX)+'px';
+			#{rich:element('menufilesystemmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.top=(posy-panelPosY)+'px';
+		}
+	</script>
+
+	<rich:tree id="directorytree" toggleType="client" var="item"
+		status="panelUpdateStatus" selectionType="ajax"
+		oncomplete="#{rich:component('menufilesystemmanager')}.hide();if(rightClick==true){#{rich:component('menufilesystemmanager')}.show();menuFS();}"
+		selectionChangeListener="#{treeBean.change}"
+		render="filesystemmanager">
+		<rich:treeModelRecursiveAdaptor
+			roots="#{fileSystemBean.rootDirectories}"
+			nodes="#{fileSystemBean.getDirectories(item)}">
+			<rich:treeNode expanded="#{true}"
+				onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}">
+				<rich:inplaceInput
+					value="#{fileSystemBean.getWrapper(item).shortPath}"
+					editEvent="dblclick">
+					<a4j:ajax event="change" render="filesystemmanager" />
+				</rich:inplaceInput>
+			</rich:treeNode>
+			<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
+				<rich:treeNode
+					onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}">
+					<rich:inplaceInput
+						value="#{fileSystemBean.getWrapper(item).shortPath}"
+						editEvent="dblclick">
+						<a4j:ajax event="change" render="filesystemmanager" />
+					</rich:inplaceInput>
+				</rich:treeNode>
+			</rich:treeModelAdaptor>
+		</rich:treeModelRecursiveAdaptor>
+	</rich:tree>
 
 </ui:composition>
