@@ -15,19 +15,37 @@
 			label="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 			oncomplete="#{rich:component('newrootdirectory')}.show()" mode="ajax"
 			icon="#{infos.add}" />
+		<rich:menuItem rendered="#{fileSystemBean.directorySelected}"
+			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory} #{msg.for} #{fileSystemBean.getWrapper().shortPath}"
+			oncomplete="#{rich:component('createsubdirectory')}.show()"
+			mode="ajax" icon="#{infos.folder_add}" />
+		<rich:menuItem rendered="#{fileSystemBean.directorySelected}"
+			label="#{msg.create} #{msg.a} #{msg.file} #{msg.for} #{fileSystemBean.getWrapper().shortPath}"
+			oncomplete="#{rich:component('createfile')}.show()" mode="ajax"
+			icon="#{infos.document_add}" />
+		<rich:menuItem rendered="#{fileSystemBean.fileSelected}"
+			label="#{msg.save_button} #{msg.the} #{msg.file} : #{fileSystemBean.getWrapper().shortPath}"
+			onclick="editor.save();" icon="#{infos.floppy_disk}"
+			status="panelUpdateStatus" action="HOME" />
+		<rich:menuItem
+			rendered="#{fileSystemBean.directorySelected || fileSystemBean.fileSelected}"
+			label="#{msg.delete} #{fileSystemBean.getWrapper().shortPath}" action="#{fileSystemBean.delete}"
+			immediate="true"
+			onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
+			mode="ajax" icon="#{infos.delete}" />
 	</rich:contextMenu>
 
 	<gs:popupPanel key="createfile"
 		title="#{msg.create} #{msg.a} #{msg.file}"
 		action="#{fileSystemBean.addFile(popupValue)}"
-		render="treefilesystemmanager" />
+		render="directorytree" />
 	<gs:popupPanel key="createsubdirectory"
 		title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}"
 		action="#{fileSystemBean.addSubDirectory(popupValue)}"
-		render="treefilesystemmanager" />
+		render="directorytree" />
 	<gs:popupPanel key="newrootdirectory"
 		title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 		action="#{fileSystemBean.addRootDirectory(popupValue)}"
-		render="treefilesystemmanager" />
+		render="directorytree" />
 
 </ui:composition>

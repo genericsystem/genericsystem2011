@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -14,6 +15,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType.File;
+import org.genericsystem.myadmin.beans.PanelBean.PanelSelectionEvent;
 import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
 import org.genericsystem.myadmin.beans.qualifier.TreeSelection;
 import org.genericsystem.myadmin.util.GsMessages;
@@ -36,6 +38,9 @@ public class FileSystemBean implements Serializable {
 
 	private Generic selectedFile;
 
+	@Inject
+	private Event<PanelSelectionEvent> selectedChanged;
+
 	public List<Directory> getRootDirectories() {
 		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
 	}
@@ -51,6 +56,7 @@ public class FileSystemBean implements Serializable {
 	public void changeFile(@Observes @TreeSelection TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("directorytree")) {
 			selectedFile = (Generic) treeSelectionEvent.getObject();
+			selectedChanged.fire(new PanelSelectionEvent("filesystemmanager", getShortPath()));
 			messages.info("selectionchanged", isFileSelected() ? messages.getMessage("file") : messages.getMessage("directory"), selectedFile.getValue());
 		}
 	}
@@ -73,6 +79,10 @@ public class FileSystemBean implements Serializable {
 
 	public Wrapper getWrapper(Generic generic) {
 		return new Wrapper(generic);
+	}
+
+	public Wrapper getWrapper() {
+		return new Wrapper(selectedFile);
 	}
 
 	public class Wrapper {
@@ -109,12 +119,15 @@ public class FileSystemBean implements Serializable {
 		return selectedFile != null && selectedFile instanceof File;
 	}
 
-	public String getFileShortPath() {
-		return ((File) selectedFile).toCategoryString();
+	public String getShortPath() {
+		return isFileSelected() ? ((File) selectedFile).toCategoryString() : ((Directory) selectedFile).toCategoryString();
 	}
 
-	public String getDirectoryShortPath() {
-		return ((Directory) selectedFile).toCategoryString();
+	@Override
+	public String toString() {
+		if (null == selectedFile)
+			return "";
+		return selectedFile.toString();
 	}
 
 	public String getContent() {

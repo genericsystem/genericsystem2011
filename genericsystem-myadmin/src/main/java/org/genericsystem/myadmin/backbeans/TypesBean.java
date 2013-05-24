@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -15,6 +16,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.backbeans.ITreeNode.GenericTreeNode;
+import org.genericsystem.myadmin.beans.PanelBean.PanelSelectionEvent;
 import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
 import org.genericsystem.myadmin.beans.qualifier.TreeSelection;
 import org.genericsystem.myadmin.util.GsMessages;
@@ -36,6 +38,8 @@ public class TypesBean implements Serializable {
 	GsRedirect redirect;
 
 	private Generic selectedType;
+	@Inject
+	private Event<PanelSelectionEvent> selectedChanged;
 
 	public List<GenericTreeNode> getRoot() {
 		return Collections.singletonList(new GenericTreeNode(null, cache.getEngine()));
@@ -54,6 +58,7 @@ public class TypesBean implements Serializable {
 			ITreeNode iTreeNode = (ITreeNode) treeSelectionEvent.getObject();
 			if (iTreeNode instanceof GenericTreeNode) {
 				selectedType = ((GenericTreeNode) iTreeNode).getGeneric();
+				selectedChanged.fire(new PanelSelectionEvent("typesmanager", getSelectedType().toCategoryString()));
 				messages.info("selectionchanged", messages.getMessage("type"), selectedType.toString());
 			}
 		}
@@ -105,6 +110,12 @@ public class TypesBean implements Serializable {
 
 	public void setSelectedType(Generic selectedType) {
 		this.selectedType = selectedType;
+	}
+
+	public String getSelectedTypeValue() {
+		if (null == selectedType)
+			return "";
+		return selectedType.toString();
 	}
 
 	public class Wrapper {
