@@ -10,7 +10,7 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:contextMenu target="panelfilesystemmanager" mode="ajax">
+	<rich:contextMenu id="menufilesystemmanager" mode="ajax" attached="false">
 		<rich:menuItem
 			label="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 			oncomplete="#{rich:component('newrootdirectory')}.show()" mode="ajax"
@@ -29,16 +29,15 @@
 			status="panelUpdateStatus" action="HOME" />
 		<rich:menuItem
 			rendered="#{fileSystemBean.directorySelected || fileSystemBean.fileSelected}"
-			label="#{msg.delete} #{fileSystemBean.getWrapper().shortPath}" action="#{fileSystemBean.delete}"
-			immediate="true"
+			label="#{msg.delete} #{fileSystemBean.getWrapper().shortPath}"
+			action="#{fileSystemBean.delete}" immediate="true"
 			onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
 			mode="ajax" icon="#{infos.delete}" />
 	</rich:contextMenu>
 
 	<gs:popupPanel key="createfile"
 		title="#{msg.create} #{msg.a} #{msg.file}"
-		action="#{fileSystemBean.addFile(popupValue)}"
-		render="directorytree" />
+		action="#{fileSystemBean.addFile(popupValue)}" render="directorytree" />
 	<gs:popupPanel key="createsubdirectory"
 		title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}"
 		action="#{fileSystemBean.addSubDirectory(popupValue)}"
