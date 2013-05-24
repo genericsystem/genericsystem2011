@@ -10,8 +10,7 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-
-	<rich:contextMenu target="paneltypesmanager" mode="ajax">
+	<rich:contextMenu id="menutypesmanager" mode="ajax" attached="false">
 		<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
 			oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
 			icon="#{infos.add}" />

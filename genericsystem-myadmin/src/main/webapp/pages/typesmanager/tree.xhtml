@@ -10,9 +10,32 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<gs:adminTree key="typestree" roots="#{typesBean.root}"
-		nodes="#{typesBean.getDirectSubTypes(item)}"
-		inplaceInputValue="#{typesBean.getWrapper(item).value}"
-		render="typesmanager" />
+	<script type="text/javascript">
+		function menuTypes() {
+			var panelPosX = #{rich:element('paneltypesmanager')}.getBoundingClientRect().left;
+			var panelPosY = #{rich:element('paneltypesmanager')}.getBoundingClientRect().top;//cumulativeOffset(#{rich:element('panelfilesystemmanager')}).top; 
+			
+			#{rich:element('menutypesmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.left=(posx-panelPosX)+'px';
+			#{rich:element('menutypesmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.top=(posy-panelPosY)+'px';
+		}
+	</script>
+
+	<rich:tree id="typestree" toggleType="ajax" var="item"
+		status="panelUpdateStatus" selectionType="ajax"
+		oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
+		selectionChangeListener="#{treeBean.change}" render="typesmanager">
+		<rich:treeModelRecursiveAdaptor roots="#{typesBean.root}"
+			nodes="#{typesBean.getDirectSubTypes(item)}">
+			<rich:treeNode
+				onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}">
+				<rich:inplaceInput value="#{typesBean.getWrapper(item).value}"
+					editEvent="dblclick" rendered="#{!item.isReadOnly}">
+					<a4j:ajax event="change" render="typesmanager" />
+				</rich:inplaceInput>
+				<h:outputText value="#{typesBean.getWrapper(item).value}"
+					rendered="#{item.isReadOnly}" />
+			</rich:treeNode>
+		</rich:treeModelRecursiveAdaptor>
+	</rich:tree>
 
 </ui:composition>
