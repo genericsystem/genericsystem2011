@@ -10,11 +10,13 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:panel layout="block" styleClass="fullWidth fullHeight"
-		bodyClass="fullHeight">
+	<rich:panel id="fileseditpanel" layout="block"
+		styleClass="fullWidth fullHeight" bodyClass="fullHeight">
 		<h:inputTextarea id="code" name="code"
 			value="#{fileSystemBean.content}"
-			rendered="#{fileSystemBean.fileSelected}" />
+			rendered="#{fileSystemBean.fileSelected}">
+			<a4j:ajax render="fileseditpanel" execute="code" event="change"/>
+		</h:inputTextarea>
 
 		<script>
 			var editor = CodeMirror.fromTextArea(#{rich:element('code')}, {
@@ -27,9 +29,10 @@
 			});
 			editor.on('blur', function(){
 				editor.save();
-				alert('change');
+				editor.getTextArea().onchange();
+				return false;
 			} );
 			</script>
-		<!-- 	jsf.ajax.request(this, event, {execute: 'name password', render: 'out'}); return false;	 -->
+		<!-- 	jsf.ajax.request(#{rich:element('code')}, 'blur', {execute: 'code', render: 'fileseditpanel'}); return false;-->
 	</rich:panel>
 </ui:composition>

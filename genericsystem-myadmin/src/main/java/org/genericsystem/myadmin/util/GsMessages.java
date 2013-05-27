@@ -9,8 +9,8 @@ import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
-import org.jboss.seam.faces.event.qualifier.Before;
-import org.jboss.seam.faces.event.qualifier.RenderResponse;
+import org.jboss.seam.faces.event.qualifier.After;
+import org.jboss.seam.faces.event.qualifier.RestoreView;
 import org.jboss.seam.international.status.Message;
 import org.jboss.seam.international.status.MessageFactory;
 import org.jboss.seam.international.status.Messages;
@@ -53,9 +53,11 @@ public class GsMessages implements Serializable {
 
 	private List<Message> messagesToRedirect = new ArrayList<>();
 
-	public void restoreMessages(@Observes @RenderResponse @Before PhaseEvent e) {
-		for (Message message : messagesToRedirect)
+	public void restoreMessages(@Observes @RestoreView @After PhaseEvent e) {
+		for (Message message : messagesToRedirect) {
 			messages.add(message);
+			log.info("ZZZZZZZZZZ" + message.getText());
+		}
 		messagesToRedirect.clear();
 	}
 
