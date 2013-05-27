@@ -25,22 +25,22 @@
 		var posx = 0;
 		var posy = 0;
 		document.oncontextmenu = function() {
-            return false;
-        }
+			return false;
+		}
 		function posSouris(e) {
-			if(!e) var e = window.event;
-			if (e.pageX || e.pageY)
-			{
+			if (!e)
+				var e = window.event;
+			if (e.pageX || e.pageY) {
 				posx = e.pageX;
 				posy = e.pageY;
-			}
-			else if (e.clientX || e.clientY)
-			{
-				posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-				posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+			} else if (e.clientX || e.clientY) {
+				posx = e.clientX + document.body.scrollLeft
+						+ document.documentElement.scrollLeft;
+				posy = e.clientY + document.body.scrollTop
+						+ document.documentElement.scrollTop;
 			}
 		}
-		var cumulativeOffset = function(element) {
+		/* var cumulativeOffset = function(element) {
 		    var top = 0, left = 0;
 		    do {
 		        top += element.offsetTop  || 0;
@@ -52,11 +52,12 @@
 		        top: top,
 		        left: left
 		    };
-		};
+		}; */
 	</script>
 </h:head>
 
 <h:body>
+	<a4j:queue requestDelay="500" ignoreDupResponses="true" />
 	<h:form id="form">
 		<ui:insert name="bodySection" />
 	</h:form>

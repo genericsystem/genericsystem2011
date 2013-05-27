@@ -15,7 +15,7 @@
 		<h:inputTextarea id="code" name="code"
 			value="#{fileSystemBean.content}"
 			rendered="#{fileSystemBean.fileSelected}">
-			<a4j:ajax render="fileseditpanel" execute="code" event="change"/>
+			<f:ajax render="fileseditpanel" execute="code" event="change"/>
 		</h:inputTextarea>
 
 		<script>
@@ -27,11 +27,11 @@
 				continuousScanning: 500,
 				lineNumbers : true
 			});
-			editor.on('blur', function(){
+			/* editor.on('blur', function(){
 				editor.save();
 				editor.getTextArea().onchange();
-				return false;
-			} );
+				return true;
+			} ); */
 			</script>
 		<!-- 	jsf.ajax.request(#{rich:element('code')}, 'blur', {execute: 'code', render: 'fileseditpanel'}); return false;-->
 	</rich:panel>
