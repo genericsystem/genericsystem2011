@@ -11,6 +11,25 @@
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
 	<rich:contextMenu id="menutypesmanager" mode="ajax" attached="false">
+		<rich:menuItem label="#{msg.show} #{msg.instance}s"
+			action="#{typesBean.changeTreeType('INSTANCES')}" mode="ajax"
+			render="typestree" />
+		<rich:menuItem label="#{msg.show} #{msg.inheriting}s"
+			action="#{typesBean.changeTreeType('INHERITINGS')}" mode="ajax"
+			render="typestree" />
+		<rich:menuItem label="#{msg.show} #{msg.component}s"
+			action="#{typesBean.changeTreeType('COMPONENTS')}" mode="ajax"
+			render="typestree" />
+		<rich:menuItem label="#{msg.show} #{msg.composite}s"
+			action="#{typesBean.changeTreeType('COMPOSITES')}" mode="ajax"
+			render="typestree" />
+		<rich:menuItem label="#{msg.show} #{msg.attribute}s"
+			action="#{typesBean.changeTreeType('ATTRIBUTES')}" mode="ajax"
+			render="typestree" />
+		<rich:menuItem label="#{msg.show} #{msg.relation}s"
+			action="#{typesBean.changeTreeType('RELATIONS')}" mode="ajax"
+			render="typestree" />
+
 		<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
 			oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
 			icon="#{infos.add}" />
@@ -27,7 +46,8 @@
 			oncomplete="#{rich:component('createinstance')}.show()" mode="ajax"
 			icon="#{infos.folder_add}" />
 		<rich:menuItem rendered="#{not empty typesBean.selectedType}"
-			label="#{msg.delete} #{typesBean.selectedTypeValue}" action="#{typesBean.delete}" immediate="true"
+			label="#{msg.delete} #{typesBean.selectedTypeValue}"
+			action="#{typesBean.delete}" immediate="true"
 			onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
 			mode="ajax" icon="#{infos.delete}" />
 	</rich:contextMenu>

@@ -21,7 +21,7 @@
 	</script>
 
 	<rich:tree id="directorytree" toggleType="client" var="item" execute="code"
-		status="panelUpdateStatus" selectionType="ajax" onbeforeselectionchange="if(typeof editor!='undefined') {editor.save();}return true;"	
+		status="status" selectionType="ajax" onbeforeselectionchange="if(typeof editor!='undefined') {editor.save();}return true;"	
 		oncomplete="#{rich:component('menufilesystemmanager')}.hide();if(rightClick==true){#{rich:component('menufilesystemmanager')}.show();menuFS();}"
 		selectionChangeListener="#{treeBean.change}"
 		render="filesystemmanager">

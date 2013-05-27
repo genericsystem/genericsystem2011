@@ -2,11 +2,13 @@ package org.genericsystem.myadmin.backbeans;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -32,7 +34,7 @@ public class FileSystemBean implements Serializable {
 	private GsMessages messages;
 
 	@Inject
-	GsRedirect redirect;
+	private GsRedirect redirect;
 
 	private Generic selectedFile;
 

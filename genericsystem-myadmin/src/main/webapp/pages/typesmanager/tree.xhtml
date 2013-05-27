@@ -21,13 +21,14 @@
 	</script>
 
 	<rich:tree id="typestree" toggleType="ajax" var="item"
-		status="panelUpdateStatus" selectionType="ajax"
+		status="status" selectionType="ajax"
 		oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
 		selectionChangeListener="#{treeBean.change}" render="typesmanager">
 		<rich:treeModelRecursiveAdaptor roots="#{typesBean.root}"
 			nodes="#{typesBean.getDirectSubTypes(item)}">
 			<rich:treeNode
 				onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}">
+				<h:outputText value="#{typesBean.getTreeType(item).treeType}"/>
 				<rich:inplaceInput value="#{typesBean.getWrapper(item).value}"
 					editEvent="dblclick" rendered="#{!item.isReadOnly}">
 					<a4j:ajax event="change" render="typesmanager" />

@@ -14,7 +14,6 @@ public class PanelBean {
 	private Map<String, String> selectedValueMap = new HashMap<>();
 
 	public String selectedValue(String key) {
-		System.out.println("KEY " + key);
 		String value = selectedValueMap.get(key);
 		if (null == value)
 			return "";
