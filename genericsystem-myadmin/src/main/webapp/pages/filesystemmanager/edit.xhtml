@@ -25,6 +25,11 @@
 				continuousScanning: 500,
 				lineNumbers : true
 			});
+			editor.on('blur', function(){
+				editor.save();
+				alert('change');
+			} );
 			</script>
+		<!-- 	jsf.ajax.request(this, event, {execute: 'name password', render: 'out'}); return false;	 -->
 	</rich:panel>
 </ui:composition>

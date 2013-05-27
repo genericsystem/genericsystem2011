@@ -12,8 +12,8 @@
 
 	<script type="text/javascript">
 		function menuFS() {
-			var panelPosX = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().left;
-			var panelPosY = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().top;//cumulativeOffset(#{rich:element('panelfilesystemmanager')}).top; 
+			var panelPosX = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().left + document.body.scrollLeft +document.documentElement.scrollLeft;
+			var panelPosY = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().top + document.body.scrollTop +document.documentElement.scrollTop; 
 			
 			#{rich:element('menufilesystemmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.left=(posx-panelPosX)+'px';
 			#{rich:element('menufilesystemmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.top=(posy-panelPosY)+'px';
