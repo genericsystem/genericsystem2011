@@ -28,6 +28,7 @@
 				<h:outputText style="white-space: nowrap;"	value="#{panelBean.selectedValue(cc.attrs.key)}" />
 			</h:panelGrid>
 		</f:facet>
+		<ui:include src="#{cc.attrs.includemenu}" />
 		<h:panelGrid columns="2" styleClass="fullWidth"
 			rowClasses="fullHeight"
 			columnClasses="topAlign mediumScroll fullHeight,topAlign fullWidth fullHeight">
@@ -37,7 +38,6 @@
 			</rich:panel>
 			<ui:include src="#{cc.attrs.includeedit}" />
 		</h:panelGrid>
-		<ui:include src="#{cc.attrs.includemenu}" />
 	</rich:panel>
 </composite:implementation>
 
