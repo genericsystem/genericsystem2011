@@ -25,10 +25,9 @@
 		oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
 		selectionChangeListener="#{treeBean.change}" render="typesmanager">
 		<rich:treeModelRecursiveAdaptor roots="#{typesBean.root}"
-			nodes="#{typesBean.getDirectSubTypes(item)}">
-			<rich:treeNode
+			nodes="#{typesBean.getChildrens(item)}">
+			<rich:treeNode iconCollapsed="#{typesBean.getIcon(item)}" iconExpanded="#{typesBean.getIcon(item)}"
 				onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}">
-				<h:outputText value="#{typesBean.getTreeType(item).treeType}"/>
 				<rich:inplaceInput value="#{typesBean.getWrapper(item).value}"
 					editEvent="dblclick" rendered="#{!item.isReadOnly}">
 					<a4j:ajax event="change" render="typesmanager" />

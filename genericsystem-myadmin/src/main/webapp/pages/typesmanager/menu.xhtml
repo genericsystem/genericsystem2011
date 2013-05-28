@@ -33,20 +33,20 @@
 		<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
 			oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
 			icon="#{infos.add}" />
-		<rich:menuItem rendered="#{not empty typesBean.selectedType}"
-			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{typesBean.selectedTypeValue}"
+		<rich:menuItem rendered="#{!typesBean.treeNodeSelected}"
+			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{typesBean.selectedTreeNodeValue}"
 			oncomplete="#{rich:component('createsubtype')}.show()" mode="ajax"
 			icon="#{infos.folder_add}" />
-		<rich:menuItem rendered="#{not empty typesBean.selectedType}"
-			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{typesBean.selectedTypeValue}"
+		<rich:menuItem rendered="#{!typesBean.treeNodeSelected}"
+			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{typesBean.selectedTreeNodeValue}"
 			oncomplete="#{rich:component('createattribute')}.show()" mode="ajax"
 			icon="#{infos.folder_add}" />
-		<rich:menuItem rendered="#{not empty typesBean.selectedType}"
-			label="#{msg.create} #{msg.a} #{msg.instance} #{msg.for} #{typesBean.selectedTypeValue}"
+		<rich:menuItem rendered="#{!typesBean.treeNodeSelected}"
+			label="#{msg.create} #{msg.a} #{msg.instance} #{msg.for} #{typesBean.selectedTreeNodeValue}"
 			oncomplete="#{rich:component('createinstance')}.show()" mode="ajax"
 			icon="#{infos.folder_add}" />
-		<rich:menuItem rendered="#{not empty typesBean.selectedType}"
-			label="#{msg.delete} #{typesBean.selectedTypeValue}"
+		<rich:menuItem rendered="#{!typesBean.treeNodeSelected}"
+			label="#{msg.delete} #{typesBean.selectedTreeNodeValue}"
 			action="#{typesBean.delete}" immediate="true"
 			onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
 			mode="ajax" icon="#{infos.delete}" />

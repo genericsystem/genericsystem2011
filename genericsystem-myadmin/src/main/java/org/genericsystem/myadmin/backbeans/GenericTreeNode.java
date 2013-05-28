@@ -1,12 +1,11 @@
 package org.genericsystem.myadmin.backbeans;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.generic.Type;
 
 public class GenericTreeNode {
@@ -14,84 +13,65 @@ public class GenericTreeNode {
 	// TODO clean
 	// private static Logger log = LoggerFactory.getLogger(GenericTreeNode.class);
 
-	private GenericTreeNode parent;
+	private final GenericTreeNode parent;
 
 	private Generic generic;
 
-	private Map<Generic, TreeType> mapTreeTypes = new HashMap<>();
+	private TreeType treeType;
 
-	public GenericTreeNode(Generic generic) {
-		this.parent = this;
-		this.generic = generic;
-		mapTreeTypes.put(generic, TreeType.INSTANCES);
-	}
+	private List<GenericTreeNode> childrens = new ArrayList<>();
 
-	public GenericTreeNode(GenericTreeNode parent, Generic generic) {
-		this.parent = parent;
-		this.generic = generic;
-		mapTreeTypes.put(generic, TreeType.INSTANCES);
-	}
-
-	public GenericTreeNode getParent() {
-		return parent;
-	}
-
-	public Generic getGeneric() {
-		return generic;
-	}
+	public static final TreeType TreeType_DEFAULT = TreeType.INSTANCES;
 
 	public enum TreeType {
 		INSTANCES, INHERITINGS, COMPONENTS, COMPOSITES, ATTRIBUTES, RELATIONS;
 	}
 
-	public List<GenericTreeNode> getChildrens(Cache cache) {
-		switch (mapTreeTypes.get(generic)) {
-		case INSTANCES: {
-			List<GenericTreeNode> list = new ArrayList<>();
-			for (Generic child : ((Type) generic).getInstances(cache))
-				list.add(newGenericTreeNode(this, generic, child));
-			return list;
-		}
-		case INHERITINGS: {
-			List<GenericTreeNode> list = new ArrayList<>();
-			for (Generic child : generic.getInheritings(cache))
-				list.add(newGenericTreeNode(this, generic, child));
-			return list;
-		}
-		case COMPONENTS: {
-			List<GenericTreeNode> list = new ArrayList<>();
-			for (Generic child : generic.getComponents())
-				list.add(newGenericTreeNode(this, generic, child));
-			return list;
-		}
-		case COMPOSITES: {
-			List<GenericTreeNode> list = new ArrayList<>();
-			for (Generic child : generic.getComposites(cache))
-				list.add(newGenericTreeNode(this, generic, child));
-			return list;
-		}
-		case ATTRIBUTES: {
-			List<GenericTreeNode> list = new ArrayList<>();
-			for (Generic child : ((Type) generic).getAttributes(cache))
-				list.add(newGenericTreeNode(this, generic, child));
-			return list;
-		}
-		case RELATIONS: {
-			List<GenericTreeNode> list = new ArrayList<>();
-			for (Generic child : ((Type) generic).getRelations(cache))
-				list.add(newGenericTreeNode(this, generic, child));
-			return list;
-		}
-		default:
-			break;
+	public GenericTreeNode(GenericTreeNode parent, Generic generic, TreeType treeType) {
+		this.parent = parent;
+		this.generic = generic;
+		this.treeType = treeType;
+	}
+
+	private TreeType getTreeType(Generic generic) {
+		for (GenericTreeNode child : childrens)
+			if (child.getGeneric().equals(generic))
+				return child.getTreeType();
+		return TreeType_DEFAULT;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends Generic> Snapshot<T> getSnapshot(Cache cache) {
+		switch (treeType) {
+		case INSTANCES:
+			return ((Type) generic).getInstances(cache);
+		case INHERITINGS:
+			return generic.getInheritings(cache);
+		case COMPONENTS:
+			return generic.getComponents();
+		case COMPOSITES:
+			return generic.getComposites(cache);
+		case ATTRIBUTES:
+			return (Snapshot<T>) ((Type) generic).getAttributes(cache);
+		case RELATIONS:
+			return (Snapshot<T>) ((Type) generic).getRelations(cache);
 		}
 		throw new IllegalStateException();
 	}
 
-	private GenericTreeNode newGenericTreeNode(GenericTreeNode genericTreeNode, Generic parent, Generic child) {
-		GenericTreeNode treeNode = new GenericTreeNode(this, child);
-		treeNode.setTreeType(child, getTreeType(mapTreeTypes.get(child) != null ? child : parent));
-		return treeNode;
+	private GenericTreeNode getGenericTreeNode(Generic child) {
+		for (GenericTreeNode old : childrens)
+			if (old.getGeneric().equals(child))
+				return old;
+		return new GenericTreeNode(this, child, getTreeType(child));
+	}
+
+	public List<GenericTreeNode> getChildrens(Cache cache) {
+		List<GenericTreeNode> list = new ArrayList<>();
+		for (Generic child : getSnapshot(cache))
+			list.add(getGenericTreeNode(child));
+		childrens = list;
+		return list;
 	}
 
 	public String getValue() {
@@ -102,13 +82,24 @@ public class GenericTreeNode {
 		return generic.isMeta();
 	}
 
-	public TreeType getTreeType(Generic selectedType) {
-		return mapTreeTypes.get(selectedType);
+	public GenericTreeNode getParent() {
+		return parent;
 	}
 
-	public void setTreeType(Generic selectedType, TreeType treeType) {
-		if (null != treeType)
-			mapTreeTypes.put(selectedType, treeType);
+	public Generic getGeneric() {
+		return generic;
+	}
+
+	public void setGeneric(Generic generic) {
+		this.generic = generic;
+	}
+
+	public TreeType getTreeType() {
+		return treeType;
+	}
+
+	public void setTreeType(TreeType treeType) {
+		this.treeType = treeType;
 	}
 
 }

@@ -73,7 +73,6 @@ public class FileSystemBean implements Serializable {
 
 	public void addFile(String newValue) {
 		((Directory) selectedFile).addFile(cache, newValue);
-		messages.info("createFile", newValue, selectedFile.getValue());
 		messages.info("createRoot", messages.getMessage("file"), newValue);
 	}
 

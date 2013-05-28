@@ -22,6 +22,8 @@ import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
 import org.genericsystem.myadmin.beans.qualifier.TreeSelection;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
@@ -30,7 +32,7 @@ public class TypesBean implements Serializable {
 	private static final long serialVersionUID = 8042406937175946234L;
 
 	// TODO clean
-	// private static Logger log = LoggerFactory.getLogger(TypesBean.class);
+	private static Logger log = LoggerFactory.getLogger(TypesBean.class);
 
 	@Inject
 	private transient Cache cache;
@@ -41,62 +43,38 @@ public class TypesBean implements Serializable {
 	@Inject
 	private GsRedirect redirect;
 
-	private Generic selectedType;
-
-	private TreeType selectedTreeType;
+	private GenericTreeNode selectedTreeNode;
 
 	@Inject
 	private Event<PanelSelectionEvent> selectedChanged;
 
-	private List<GenericTreeNode> roots;
+	private GenericTreeNode rootTreeNode;
 
 	@PostConstruct
 	public void init() {
-		roots = Collections.singletonList(new GenericTreeNode(cache.getEngine()));
+		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
 	}
 
 	public List<GenericTreeNode> getRoot() {
-		return roots;
+		return Collections.singletonList(rootTreeNode);
 	}
 
-	public WrapperTreeType getTreeType(GenericTreeNode genericTreeNode) {
-		return new WrapperTreeType(genericTreeNode.getTreeType(genericTreeNode.getGeneric()).name());
-	}
-
-	public class WrapperTreeType {
-
-		public WrapperTreeType(String treeType) {
-			this.treeType = treeType;
-		}
-
-		private String treeType;
-
-		public String getTreeType() {
-			return treeType;
-		}
-
-		public void setTreeType(String treeType) {
-			this.treeType = treeType;
-		}
-	}
-
-	public List<GenericTreeNode> getDirectSubTypes(final GenericTreeNode genericTreeNode) {
-		genericTreeNode.setTreeType(selectedType, selectedTreeType);
+	public List<GenericTreeNode> getChildrens(final GenericTreeNode genericTreeNode) {
 		return genericTreeNode.getChildrens(cache);
 	}
 
 	public void changeType(@Observes @TreeSelection TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			GenericTreeNode genericTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
-			selectedType = genericTreeNode.getGeneric();
-			selectedTreeType = null;
-			selectedChanged.fire(new PanelSelectionEvent("typesmanager", getSelectedType().toCategoryString()));
-			messages.info("selectionchanged", messages.getMessage("type"), selectedType.toString());
+			selectedTreeNode = genericTreeNode;
+			selectedChanged.fire(new PanelSelectionEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
+			messages.info("selectionchanged", messages.getMessage("type"), getSelectedTreeNodeGeneric().toString());
 		}
 	}
 
 	public void changeTreeType(TreeType treeType) {
-		selectedTreeType = treeType;
+		selectedTreeNode.setTreeType(treeType);
+		messages.info("showchanged", treeType);
 	}
 
 	public void newType(String newValue) {
@@ -105,48 +83,39 @@ public class TypesBean implements Serializable {
 	}
 
 	public void newSubType(String newValue) {
-		((Type) selectedType).newSubType(cache, newValue);
-		messages.info("createSub", messages.getMessage("type"), newValue, selectedType.getValue());
+		((Type) getSelectedTreeNodeGeneric()).newSubType(cache, newValue);
+		messages.info("createSub", messages.getMessage("type"), newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public void addAttribute(String newValue) {
-		((Type) selectedType).addAttribute(cache, newValue);
-		messages.info("createRoot", messages.getMessage("attribute"), newValue, selectedType.getValue());
+		((Type) getSelectedTreeNodeGeneric()).addAttribute(cache, newValue);
+		messages.info("createRoot", messages.getMessage("attribute"), newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public void newInstance(String newValue) {
-		((Type) selectedType).newInstance(cache, newValue);
-		messages.info("createRoot", messages.getMessage("instance"), newValue, selectedType.getValue());
+		((Type) getSelectedTreeNodeGeneric()).newInstance(cache, newValue);
+		messages.info("createRoot", messages.getMessage("instance"), newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public String delete() {
-		selectedType.remove(cache);
-		selectedType = null;
-		redirect.redirectInfo("deleteFile", selectedType.getValue());
+		selectedTreeNode.getGeneric().remove(cache);
+		selectedTreeNode = null;
+		redirect.redirectInfo("deleteFile", getSelectedTreeNodeGeneric().getValue());
 		return "HOME";
 	}
 
-	public boolean isType() {
-		return selectedType != null && selectedType.isType();
+	public boolean isTreeNodeSelected() {
+		return selectedTreeNode == null;
 	}
 
-	public boolean isInstance() {
-		// TODO in core
-		return selectedType != null && selectedType.getComponentsSize() == 0 && selectedType.isConcrete();
+	public Generic getSelectedTreeNodeGeneric() {
+		return selectedTreeNode.getGeneric();
 	}
 
-	public GenericImpl getSelectedType() {
-		return (GenericImpl) selectedType;
-	}
-
-	public void setSelectedType(Generic selectedType) {
-		this.selectedType = selectedType;
-	}
-
-	public String getSelectedTypeValue() {
-		if (null == selectedType)
+	public String getSelectedTreeNodeValue() {
+		if (null == selectedTreeNode)
 			return "";
-		return selectedType.toString();
+		return selectedTreeNode.getValue();
 	}
 
 	public Wrapper getWrapper(GenericTreeNode genericTreeNode) {
@@ -167,9 +136,28 @@ public class TypesBean implements Serializable {
 		public void setValue(String newValue) {
 			Generic generic = genericTreeNode.getGeneric();
 			if (!newValue.equals(generic.toString())) {
-				selectedType = ((CacheImpl) cache).update(generic, newValue);
+				genericTreeNode.setGeneric(((CacheImpl) cache).update(generic, newValue));
 				messages.info("updateShortPath", newValue, generic.getValue());
 			}
 		}
+	}
+
+	public String getIcon(GenericTreeNode genericTreeNode) {
+		log.info("genericTreeNode " + genericTreeNode.getGeneric() + " " + genericTreeNode.getTreeType());
+		switch (genericTreeNode.getTreeType()) {
+		case INSTANCES:
+			return messages.getInfos("down_green_arrow");
+		case INHERITINGS:
+			return messages.getInfos("down_right_green_arrow");
+		case COMPONENTS:
+			return messages.getInfos("");
+		case COMPOSITES:
+			return messages.getInfos("right_green_arrow");
+		case ATTRIBUTES:
+			return messages.getInfos("");
+		case RELATIONS:
+			return messages.getInfos("");
+		}
+		return messages.getInfos("down_green_arrow");
 	}
 }
