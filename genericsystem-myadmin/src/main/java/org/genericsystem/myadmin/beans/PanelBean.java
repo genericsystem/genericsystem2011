@@ -2,7 +2,6 @@ package org.genericsystem.myadmin.beans;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Named;
@@ -13,32 +12,30 @@ public class PanelBean {
 
 	private Map<String, String> selectedValueMap = new HashMap<>();
 
-	public String selectedValue(String key) {
+	public String getSelectedValue(String key) {
 		String value = selectedValueMap.get(key);
-		if (null == value)
-			return "";
-		return value;
+		return value == null ? "" : value;
 	}
 
-	public void change(@Observes PanelSelectionEvent panelSelectionEvent) {
-		selectedValueMap.put(panelSelectionEvent.getId(), panelSelectionEvent.getName());
+	public void change(@Observes PanelTitleChangeEvent changeEvent) {
+		selectedValueMap.put(changeEvent.getPanelId(), changeEvent.getTitle());
 	}
 
-	public static class PanelSelectionEvent {
-		private final String id;
-		private final String name;
+	public static class PanelTitleChangeEvent {
+		private final String panelId;
+		private final String title;
 
-		public PanelSelectionEvent(String id, String name) {
-			this.id = id;
-			this.name = name;
+		public PanelTitleChangeEvent(String panelId, String title) {
+			this.panelId = panelId;
+			this.title = title;
 		}
 
-		public String getId() {
-			return id;
+		public String getPanelId() {
+			return panelId;
 		}
 
-		public String getName() {
-			return name;
+		public String getTitle() {
+			return title;
 		}
 
 	}

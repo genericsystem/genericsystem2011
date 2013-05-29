@@ -9,7 +9,6 @@ public class PopupPanelBean {
 
 	private String popupValue;
 
-	@Named
 	public String getPopupValue() {
 		return popupValue;
 	}

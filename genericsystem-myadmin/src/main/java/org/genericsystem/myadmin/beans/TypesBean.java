@@ -1,25 +1,22 @@
-package org.genericsystem.myadmin.backbeans;
+package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Type;
-import org.genericsystem.myadmin.backbeans.GenericTreeNode.TreeType;
-import org.genericsystem.myadmin.beans.PanelBean.PanelSelectionEvent;
+import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
+import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
-import org.genericsystem.myadmin.beans.qualifier.TreeSelection;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
 import org.slf4j.Logger;
@@ -46,7 +43,7 @@ public class TypesBean implements Serializable {
 	private GenericTreeNode selectedTreeNode;
 
 	@Inject
-	private Event<PanelSelectionEvent> selectedChanged;
+	private Event<PanelTitleChangeEvent> selectedChanged;
 
 	private GenericTreeNode rootTreeNode;
 
@@ -63,11 +60,10 @@ public class TypesBean implements Serializable {
 		return genericTreeNode.getChildrens(cache);
 	}
 
-	public void changeType(@Observes @TreeSelection TreeSelectionEvent treeSelectionEvent) {
+	public void changeType(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("typestree")) {
-			GenericTreeNode genericTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
-			selectedTreeNode = genericTreeNode;
-			selectedChanged.fire(new PanelSelectionEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
+			selectedTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
+			selectedChanged.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
 			messages.info("selectionchanged", messages.getMessage("type"), getSelectedTreeNodeGeneric().toString());
 		}
 	}

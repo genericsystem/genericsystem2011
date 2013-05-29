@@ -1,23 +1,21 @@
-package org.genericsystem.myadmin.backbeans;
+package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
 import java.util.List;
-
+import java.util.Objects;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType.File;
-import org.genericsystem.myadmin.beans.PanelBean.PanelSelectionEvent;
+import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
-import org.genericsystem.myadmin.beans.qualifier.TreeSelection;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
 
@@ -39,7 +37,7 @@ public class FileSystemBean implements Serializable {
 	private Generic selectedFile;
 
 	@Inject
-	private Event<PanelSelectionEvent> selectedChanged;
+	private Event<PanelTitleChangeEvent> selectedChanged;
 
 	public List<Directory> getRootDirectories() {
 		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
@@ -53,10 +51,10 @@ public class FileSystemBean implements Serializable {
 		return directory.getFiles(cache).toList();
 	}
 
-	public void changeFile(@Observes @TreeSelection TreeSelectionEvent treeSelectionEvent) {
+	public void changeFile(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("directorytree")) {
 			selectedFile = (Generic) treeSelectionEvent.getObject();
-			selectedChanged.fire(new PanelSelectionEvent("filesystemmanager", getShortPath()));
+			selectedChanged.fire(new PanelTitleChangeEvent("filesystemmanager", getShortPath()));
 			messages.info("selectionchanged", isFileSelected() ? messages.getMessage("file") : messages.getMessage("directory"), selectedFile.getValue());
 		}
 	}
@@ -124,9 +122,7 @@ public class FileSystemBean implements Serializable {
 
 	@Override
 	public String toString() {
-		if (null == selectedFile)
-			return "";
-		return selectedFile.toString();
+		return Objects.toString(selectedFile);
 	}
 
 	public String getContent() {

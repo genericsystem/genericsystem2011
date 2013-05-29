@@ -8,7 +8,6 @@ import javax.enterprise.event.Observes;
 import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.genericsystem.myadmin.beans.qualifier.TreeSelection;
 import org.jboss.seam.faces.event.qualifier.After;
 import org.jboss.seam.faces.event.qualifier.InvokeApplication;
 import org.richfaces.component.UITree;
@@ -19,7 +18,7 @@ import org.richfaces.event.TreeSelectionChangeEvent;
 public class TreeBean {
 
 	@Inject
-	@TreeSelection
+	// @TreeSelection
 	private Event<TreeSelectionEvent> launcher;
 
 	private TreeSelectionEvent event;
