@@ -10,12 +10,12 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:panel id="fileseditpanel" layout="block"
+	<rich:panel id="editfilesystemmanager" layout="block"
 		styleClass="fullWidth fullHeight" bodyClass="fullHeight">
 		<h:inputTextarea id="code" name="code"
 			value="#{fileSystemBean.content}"
 			rendered="#{fileSystemBean.fileSelected}">
-			<f:ajax render="fileseditpanel" execute="code" event="change"/>
+			<f:ajax render="editfilesystemmanager" execute="code" event="change" />
 		</h:inputTextarea>
 
 		<script>
@@ -27,12 +27,6 @@
 				continuousScanning: 500,
 				lineNumbers : true
 			});
-			/* editor.on('blur', function(){
-				editor.save();
-				editor.getTextArea().onchange();
-				return true;
-			} ); */
-			</script>
-		<!-- 	jsf.ajax.request(#{rich:element('code')}, 'blur', {execute: 'code', render: 'fileseditpanel'}); return false;-->
+		</script>
 	</rich:panel>
 </ui:composition>

@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
@@ -92,13 +93,6 @@ public interface Generic extends Comparable<Generic> {
 	 * @return True if the Generic is an Relation.
 	 */
 	boolean isRelation();
-
-	/**
-	 * Returns true if this Generic is a Link.
-	 * 
-	 * @return True if the Generic is a Link.
-	 */
-	boolean isLink();
 
 	/**
 	 * Returns true if this Generic has been automatically created.

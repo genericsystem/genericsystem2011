@@ -24,7 +24,7 @@ public class GenericTreeNode {
 	public static final TreeType TreeType_DEFAULT = TreeType.INSTANCES;
 
 	public enum TreeType {
-		INSTANCES, INHERITINGS, COMPONENTS, COMPOSITES, ATTRIBUTES, RELATIONS;
+		SUPERS, INSTANCES, INHERITINGS, COMPONENTS, COMPOSITES, ATTRIBUTES, RELATIONS, VALUES;
 	}
 
 	public GenericTreeNode(GenericTreeNode parent, Generic generic, TreeType treeType) {
@@ -43,6 +43,8 @@ public class GenericTreeNode {
 	@SuppressWarnings("unchecked")
 	private <T extends Generic> Snapshot<T> getSnapshot(Cache cache) {
 		switch (treeType) {
+		case SUPERS:
+			return generic.getSupers();
 		case INSTANCES:
 			return ((Type) generic).getInstances(cache);
 		case INHERITINGS:
@@ -53,8 +55,10 @@ public class GenericTreeNode {
 			return generic.getComposites(cache);
 		case ATTRIBUTES:
 			return (Snapshot<T>) ((Type) generic).getAttributes(cache);
-		case RELATIONS:
-			return (Snapshot<T>) ((Type) generic).getRelations(cache);
+		case VALUES:
+			return (Snapshot<T>) generic.getHolders(cache, cache.getMetaAttribute());
+		default:
+			break;
 		}
 		throw new IllegalStateException();
 	}

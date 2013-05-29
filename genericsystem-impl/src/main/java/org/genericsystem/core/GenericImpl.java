@@ -235,12 +235,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isRelation() {
-		return isStructural() && components.length > 1;
-	}
-
-	@Override
-	public boolean isLink() {
-		return isConcrete() && components.length > 1;
+		return components.length > 1;
 	}
 
 	@Override
@@ -403,7 +398,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(context, relation, basePos, false, targets)) {
 			@Override
 			public boolean isSelected() {
-				return next.isLink();
+				return next.isConcrete() && next.isRelation();
 			}
 		};
 	}
@@ -690,7 +685,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> inheritanceConcreteIterator(final Context context, final Generic origin, final int pos) {
+	public <T extends Generic> Iterator<T> inheritanceConcreteIterator(final Context context, final Generic origin, final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(context, origin) {
 
 			@Override

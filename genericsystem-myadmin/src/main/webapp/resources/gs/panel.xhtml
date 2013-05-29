@@ -23,7 +23,7 @@
 	<rich:panel id="#{cc.attrs.key}" styleClass="fullWidth"
 		style="border-width:0;padding:0;">
 		<f:facet name="header">
-			<h:panelGrid columns="2" columnClasses="fullWidth,">
+			<h:panelGrid id="paneltitle#{cc.attrs.key}" columns="2" columnClasses="fullWidth,">
 				<h:outputText styleClass="uppercase" value="#{cc.attrs.managername}" />
 				<h:outputText style="white-space: nowrap;"	value="#{panelBean.getSelectedValue(cc.attrs.key)}" />
 			</h:panelGrid>

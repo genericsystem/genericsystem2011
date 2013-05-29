@@ -3,12 +3,14 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -19,8 +21,6 @@ import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
@@ -29,7 +29,7 @@ public class TypesBean implements Serializable {
 	private static final long serialVersionUID = 8042406937175946234L;
 
 	// TODO clean
-	private static Logger log = LoggerFactory.getLogger(TypesBean.class);
+	// private static Logger log = LoggerFactory.getLogger(TypesBean.class);
 
 	@Inject
 	private transient Cache cache;
@@ -138,22 +138,119 @@ public class TypesBean implements Serializable {
 		}
 	}
 
-	public String getIcon(GenericTreeNode genericTreeNode) {
-		log.info("genericTreeNode " + genericTreeNode.getGeneric() + " " + genericTreeNode.getTreeType());
+	public String getExpandedIcon(GenericTreeNode genericTreeNode) {
 		switch (genericTreeNode.getTreeType()) {
+		case SUPERS:
+			return messages.getInfos("up_green_arrow");
 		case INSTANCES:
 			return messages.getInfos("down_green_arrow");
 		case INHERITINGS:
 			return messages.getInfos("down_right_green_arrow");
 		case COMPONENTS:
-			return messages.getInfos("");
+			return messages.getInfos("left_green_arrow");
 		case COMPOSITES:
 			return messages.getInfos("right_green_arrow");
 		case ATTRIBUTES:
-			return messages.getInfos("");
-		case RELATIONS:
-			return messages.getInfos("");
+			return messages.getInfos("up_right_green_arrow");
+		case VALUES:
+			return messages.getInfos("right_green_arrow");
+		default:
+			break;
 		}
-		return messages.getInfos("down_green_arrow");
+		throw new IllegalStateException();
+	}
+
+	public String getCollapsedIcon(GenericTreeNode genericTreeNode) {
+		switch (genericTreeNode.getTreeType()) {
+		case SUPERS:
+			return messages.getInfos("up_red_arrow");
+		case INSTANCES:
+			return messages.getInfos("down_red_arrow");
+		case INHERITINGS:
+			return messages.getInfos("down_right_red_arrow");
+		case COMPONENTS:
+			return messages.getInfos("left_red_arrow");
+		case COMPOSITES:
+			return messages.getInfos("right_red_arrow");
+		case ATTRIBUTES:
+			return messages.getInfos("up_right_red_arrow");
+		case VALUES:
+			return messages.getInfos("right_red_arrow");
+		default:
+			break;
+		}
+		throw new IllegalStateException();
+	}
+
+	public String getIconTitle(GenericTreeNode genericTreeNode) {
+		switch (genericTreeNode.getTreeType()) {
+		case SUPERS:
+			return messages.getMessage("super");
+		case INSTANCES:
+			return messages.getMessage("instance");
+		case INHERITINGS:
+			return messages.getMessage("inheriting");
+		case COMPONENTS:
+			return messages.getMessage("component");
+		case COMPOSITES:
+			return messages.getMessage("composite");
+		case ATTRIBUTES:
+			return messages.getMessage("attribute");
+		case VALUES:
+			return messages.getInfos("value");
+		default:
+			break;
+		}
+		throw new IllegalStateException();
+	}
+
+	public String getTypeIcon(GenericTreeNode genericTreeNode) {
+		Generic generic = genericTreeNode.getGeneric();
+		if (generic.isMeta()) {
+			if (generic.isType())
+				return messages.getInfos("bullet_square_red");
+			if (generic.isReallyAttribute())
+				return messages.getInfos("bullet_triangle_red");
+			if (generic.isRelation())
+				return messages.getInfos("bullet_ball_red");
+		} else if (generic.isStructural()) {
+			if (generic.isType())
+				return messages.getInfos("bullet_square_yellow");
+			if (generic.isReallyAttribute())
+				return messages.getInfos("bullet_triangle_yellow");
+			if (generic.isRelation())
+				return messages.getInfos("bullet_ball_yellow");
+		} else if (generic.isConcrete()) {
+			if (generic.isType())
+				return messages.getInfos("bullet_square_green");
+			if (generic.isReallyAttribute())
+				return messages.getInfos("bullet_triangle_green");
+			if (generic.isRelation())
+				return messages.getInfos("bullet_ball_green");
+		}
+		throw new IllegalStateException();
+	}
+
+	public String getTypeIconTitle(GenericTreeNode genericTreeNode) {
+		Generic generic = genericTreeNode.getGeneric();
+		if (generic.isMeta() && generic.isType())
+			return messages.getMessage("meta") + " " + messages.getMessage("type");
+		else if (generic.isMeta() && generic.isReallyAttribute())
+			return messages.getMessage("meta") + " " + messages.getMessage("attribute");
+		else if (generic.isMeta() && generic.isRelation())
+			return messages.getMessage("meta") + " " + messages.getMessage("relation");
+		else if (generic.isStructural() && generic.isType())
+			return messages.getMessage("type");
+		else if (generic.isStructural() && generic.isReallyAttribute())
+			return messages.getMessage("attribute");
+		else if (generic.isStructural() && generic.isRelation())
+			return messages.getMessage("relation");
+		else if (generic.isConcrete() && generic.isType())
+			return messages.getMessage("instance");
+		else if (generic.isConcrete() && generic.isReallyAttribute())
+			return messages.getMessage("value");
+		else if (generic.isConcrete() && generic.isRelation())
+			return messages.getMessage("link");
+		throw new IllegalStateException();
 	}
 }
