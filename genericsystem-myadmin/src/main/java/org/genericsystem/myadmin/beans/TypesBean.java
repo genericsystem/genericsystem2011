@@ -43,9 +43,11 @@ public class TypesBean implements Serializable {
 	private GenericTreeNode selectedTreeNode;
 
 	@Inject
-	private Event<PanelTitleChangeEvent> selectedChanged;
+	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
 	private GenericTreeNode rootTreeNode;
+
+	private boolean implicitShow;
 
 	@PostConstruct
 	public void init() {
@@ -57,14 +59,14 @@ public class TypesBean implements Serializable {
 	}
 
 	public List<GenericTreeNode> getChildrens(final GenericTreeNode genericTreeNode) {
-		return genericTreeNode.getChildrens(cache);
+		return genericTreeNode.getChildrens(cache, implicitShow);
 	}
 
 	public void changeType(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			selectedTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
-			selectedChanged.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
-			messages.info("selectionchanged", messages.getMessage("type"), getSelectedTreeNodeGeneric().toString());
+			panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
+			messages.info("typeselectionchanged", getSelectedTreeNodeGeneric().toString());
 		}
 	}
 
@@ -75,22 +77,22 @@ public class TypesBean implements Serializable {
 
 	public void newType(String newValue) {
 		cache.newType(newValue);
-		messages.info("createRoot", messages.getMessage("type"), newValue);
+		messages.info("createRootType", newValue);
 	}
 
 	public void newSubType(String newValue) {
 		((Type) getSelectedTreeNodeGeneric()).newSubType(cache, newValue);
-		messages.info("createSub", messages.getMessage("type"), newValue, getSelectedTreeNodeGeneric().getValue());
+		messages.info("createSubType", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public void addAttribute(String newValue) {
 		((Type) getSelectedTreeNodeGeneric()).addAttribute(cache, newValue);
-		messages.info("createRoot", messages.getMessage("attribute"), newValue, getSelectedTreeNodeGeneric().getValue());
+		messages.info("createRootAttribute", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public void newInstance(String newValue) {
 		((Type) getSelectedTreeNodeGeneric()).newInstance(cache, newValue);
-		messages.info("createRoot", messages.getMessage("instance"), newValue, getSelectedTreeNodeGeneric().getValue());
+		messages.info("createRootInstance", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public String delete() {
@@ -112,6 +114,14 @@ public class TypesBean implements Serializable {
 		if (null == selectedTreeNode)
 			return "";
 		return selectedTreeNode.getValue();
+	}
+
+	public boolean isImplicitShow() {
+		return implicitShow;
+	}
+
+	public void setImplicitShow(boolean implicitShow) {
+		this.implicitShow = implicitShow;
 	}
 
 	public Wrapper getWrapper(GenericTreeNode genericTreeNode) {
@@ -255,7 +265,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public String getStyle(GenericTreeNode genericTreeNode) {
-		Generic generic = genericTreeNode.getGeneric();
-		return generic.isAutomatic() && ((GenericImpl) generic).isPrimary() ? "font-style:italic" : "";
+		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) ? "implicit" : "";
 	}
+
 }

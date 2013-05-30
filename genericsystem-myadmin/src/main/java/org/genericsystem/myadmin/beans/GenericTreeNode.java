@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.generic.Type;
 
@@ -21,7 +22,7 @@ public class GenericTreeNode {
 
 	private List<GenericTreeNode> childrens = new ArrayList<>();
 
-	public static final TreeType TreeType_DEFAULT = TreeType.INSTANCES;
+	public static final TreeType TreeType_DEFAULT = TreeType.INHERITINGS;
 
 	public enum TreeType {
 		SUPERS, INSTANCES, INHERITINGS, COMPONENTS, COMPOSITES, ATTRIBUTES, RELATIONS, VALUES;
@@ -70,12 +71,17 @@ public class GenericTreeNode {
 		return new GenericTreeNode(this, child, getTreeType(child));
 	}
 
-	public List<GenericTreeNode> getChildrens(Cache cache) {
+	public List<GenericTreeNode> getChildrens(Cache cache, boolean implicitShow) {
 		List<GenericTreeNode> list = new ArrayList<>();
 		for (Generic child : getSnapshot(cache))
-			list.add(getGenericTreeNode(child));
+			if (implicitShow || !isImplicitAutomatic(child))
+				list.add(getGenericTreeNode(child));
 		childrens = list;
 		return list;
+	}
+
+	public boolean isImplicitAutomatic(Generic generic) {
+		return generic.isAutomatic() && ((GenericImpl) generic).isPrimary();
 	}
 
 	public String getValue() {

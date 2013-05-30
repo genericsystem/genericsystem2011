@@ -5,6 +5,10 @@ body {
 	float: none;
 }
 
+.implicit>span{
+	color: #949595 !important;
+}
+
 .inplaceInput {
 	min-width: 50px;
 }

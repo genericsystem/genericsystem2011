@@ -20,21 +20,39 @@
 		}
 	</script>
 
-	<rich:tree id="typestree" toggleType="ajax" var="item"
-		status="status" selectionType="ajax"
+	<h:outputText value="show implicit" style="font-family: Arial,Verdana,sans-serif;"/>
+	<h:selectBooleanCheckbox value="#{typesBean.implicitShow}"
+		title="show implicit">
+		<a4j:ajax event="change" render="typestree" />
+	</h:selectBooleanCheckbox>
+
+	<rich:tree id="typestree" toggleType="ajax" var="item" status="status"
+		selectionType="ajax"
 		oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
-		selectionChangeListener="#{treeBean.change}" render="menutypesmanager, edittypesmanager, paneltitletypesmanager">
+		selectionChangeListener="#{treeBean.change}"
+		render="menutypesmanager, edittypesmanager, paneltitletypesmanager">
 		<rich:treeModelRecursiveAdaptor roots="#{typesBean.root}"
 			nodes="#{typesBean.getChildrens(item)}">
-			<rich:treeNode iconCollapsed="#{typesBean.getCollapsedIcon(item)}" iconExpanded="#{typesBean.getExpandedIcon(item)}" 
-				onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}" title="#{typesBean.getIconTitle(item)}">
-				<h:graphicImage value="#{typesBean.getTypeIcon(item)}" styleClass="middleAlign" title="#{typesBean.getTypeIconTitle(item)}"/>
-				<rich:inplaceInput value="#{typesBean.getWrapper(item).value}" title="#{typesBean.getTypeIconTitle(item)}"
-					editEvent="dblclick" rendered="#{!item.isReadOnly}" style="#{typesBean.getStyle(item)}">
+			<!-- 			iconCollapsed="#{typesBean.getCollapsedIcon(item)}" -->
+			<!-- 				iconExpanded="#{typesBean.getExpandedIcon(item)}" -->
+			<!-- title="#{typesBean.getIconTitle(item)}" -->
+			<rich:treeNode iconCollapsed="#{typesBean.getTypeIcon(item)}"
+				iconExpanded="#{typesBean.getTypeIcon(item)}"
+				onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}"
+				title="#{typesBean.getTypeIconTitle(item)}">
+				<!-- 				<h:graphicImage value="#{typesBean.getTypeIcon(item)}" -->
+				<!-- 					styleClass="middleAlign" -->
+				<!-- 					title="#{typesBean.getTypeIconTitle(item)}" /> -->
+				<rich:inplaceInput value="#{typesBean.getWrapper(item).value}"
+					title="#{typesBean.getTypeIconTitle(item)}" editEvent="dblclick"
+					rendered="#{!item.isReadOnly}"
+					styleClass="#{typesBean.getStyle(item)}">
 					<a4j:ajax event="change" render="typesmanager" />
 				</rich:inplaceInput>
-				<h:outputText value="#{typesBean.getWrapper(item).value}" title="#{typesBean.getTypeIconTitle(item)}"
-					rendered="#{item.isReadOnly}" />
+				<h:outputText value="#{typesBean.getWrapper(item).value}"
+					title="#{typesBean.getTypeIconTitle(item)}"
+					rendered="#{item.isReadOnly}"
+					styleClass="#{typesBean.getStyle(item)}" />
 			</rich:treeNode>
 		</rich:treeModelRecursiveAdaptor>
 	</rich:tree>

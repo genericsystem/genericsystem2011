@@ -23,7 +23,7 @@ import org.genericsystem.myadmin.util.GsRedirect;
 @SessionScoped
 public class FileSystemBean implements Serializable {
 
-	private static final long serialVersionUID = 5535643610156313741L;
+	private static final long serialVersionUID = -646738653059697257L;
 
 	@Inject
 	private transient Cache cache;
@@ -37,7 +37,7 @@ public class FileSystemBean implements Serializable {
 	private Generic selectedFile;
 
 	@Inject
-	private Event<PanelTitleChangeEvent> selectedChanged;
+	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
 	public List<Directory> getRootDirectories() {
 		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
@@ -54,24 +54,24 @@ public class FileSystemBean implements Serializable {
 	public void changeFile(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("directorytree")) {
 			selectedFile = (Generic) treeSelectionEvent.getObject();
-			selectedChanged.fire(new PanelTitleChangeEvent("filesystemmanager", getShortPath()));
-			messages.info("selectionchanged", isFileSelected() ? messages.getMessage("file") : messages.getMessage("directory"), selectedFile.getValue());
+			panelTitleChangeEvent.fire(new PanelTitleChangeEvent("filesystemmanager", getShortPath()));
+			messages.info(isFileSelected() ? "fileselectionchanged" : "directoryselectionchanged", selectedFile.getValue());
 		}
 	}
 
 	public void addRootDirectory(String newValue) {
 		cache.<FileSystem> find(FileSystem.class).addRootDirectory(cache, newValue);
-		messages.info("createRoot", messages.getMessage("directory"), newValue);
+		messages.info("createRootDirectory", newValue);
 	}
 
 	public void addSubDirectory(String newValue) {
 		((Directory) selectedFile).addDirectory(cache, newValue);
-		messages.info("createSub", messages.getMessage("directory"), newValue, selectedFile.getValue());
+		messages.info("createSubDirectory", newValue, selectedFile.getValue());
 	}
 
 	public void addFile(String newValue) {
 		((Directory) selectedFile).addFile(cache, newValue);
-		messages.info("createRoot", messages.getMessage("file"), newValue);
+		messages.info("createFile", newValue);
 	}
 
 	public Wrapper getWrapper(Generic generic) {
