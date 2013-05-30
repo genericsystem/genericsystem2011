@@ -30,7 +30,7 @@
 				onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}" title="#{typesBean.getIconTitle(item)}">
 				<h:graphicImage value="#{typesBean.getTypeIcon(item)}" styleClass="middleAlign" title="#{typesBean.getTypeIconTitle(item)}"/>
 				<rich:inplaceInput value="#{typesBean.getWrapper(item).value}" title="#{typesBean.getTypeIconTitle(item)}"
-					editEvent="dblclick" rendered="#{!item.isReadOnly}">
+					editEvent="dblclick" rendered="#{!item.isReadOnly}" style="#{typesBean.getStyle(item)}">
 					<a4j:ajax event="change" render="typesmanager" />
 				</rich:inplaceInput>
 				<h:outputText value="#{typesBean.getWrapper(item).value}" title="#{typesBean.getTypeIconTitle(item)}"
