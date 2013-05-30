@@ -3,11 +3,13 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;

@@ -32,7 +32,8 @@
 
 		<rich:panel title="#{cc.attrs.title}" styleClass="uppercase">
 			<h:panelGrid columns="2" columnClasses=",fullWidth">
-				<h:inputText id="inputPopupPanel" value="#{popupValue}"  onkeyup="if (event.keyCode == 13) { #{rich:element('apply')}.click(); return false; }" />
+				<h:inputText id="inputPopupPanel" value="#{popupValue}"
+					onkeyup="if (event.keyCode == 13) { #{rich:element('apply')}.click(); return false; }" />
 				<a4j:commandButton id="apply" action="#{cc.attrs.action}"
 					image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
 					render="#{cc.attrs.render}"
