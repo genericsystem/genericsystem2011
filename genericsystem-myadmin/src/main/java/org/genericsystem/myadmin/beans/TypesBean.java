@@ -253,4 +253,9 @@ public class TypesBean implements Serializable {
 			return messages.getMessage("link");
 		throw new IllegalStateException();
 	}
+
+	public String getStyle(GenericTreeNode genericTreeNode) {
+		Generic generic = genericTreeNode.getGeneric();
+		return generic.isAutomatic() && ((GenericImpl) generic).isPrimary() ? "font-style:italic" : "";
+	}
 }
