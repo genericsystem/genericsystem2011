@@ -64,7 +64,7 @@ public class TypesBean implements Serializable {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			selectedTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
 			selectedChanged.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
-			messages.info("selectionchanged", messages.getMessage("type"), getSelectedTreeNodeGeneric().toString());
+			messages.info("typeselectionchanged", getSelectedTreeNodeGeneric().toString());
 		}
 	}
 
@@ -75,22 +75,22 @@ public class TypesBean implements Serializable {
 
 	public void newType(String newValue) {
 		cache.newType(newValue);
-		messages.info("createRoot", messages.getMessage("type"), newValue);
+		messages.info("createRootType", newValue);
 	}
 
 	public void newSubType(String newValue) {
 		((Type) getSelectedTreeNodeGeneric()).newSubType(cache, newValue);
-		messages.info("createSub", messages.getMessage("type"), newValue, getSelectedTreeNodeGeneric().getValue());
+		messages.info("createSubType", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public void addAttribute(String newValue) {
 		((Type) getSelectedTreeNodeGeneric()).addAttribute(cache, newValue);
-		messages.info("createRoot", messages.getMessage("attribute"), newValue, getSelectedTreeNodeGeneric().getValue());
+		messages.info("createRootAttribute", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public void newInstance(String newValue) {
 		((Type) getSelectedTreeNodeGeneric()).newInstance(cache, newValue);
-		messages.info("createRoot", messages.getMessage("instance"), newValue, getSelectedTreeNodeGeneric().getValue());
+		messages.info("createRootInstance", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public String delete() {
