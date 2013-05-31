@@ -5,7 +5,23 @@ body {
 	float: none;
 }
 
-.implicit>span{
+.implicit {
+	width: 100%;
+	background-image:
+		url('/gsmyadmin/rfRes/gradientA.png.xhtml?v=4.3.2.Final&db=eAFjZJBjZDBiZBBh!H8!IoLx!wQGBgYmACkLBIk_&ln=org.richfaces.images');
+}
+
+.implicit td>span {
+	font-family: Arial, Verdana, sans-serif;
+	vertical-align: middle;
+	color: #FFFFFF;
+}
+
+.implicit td>input {
+	vertical-align: middle;
+}
+
+.implicitColor>span {
 	color: #949595 !important;
 }
 

@@ -11,30 +11,47 @@
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
 	<rich:contextMenu id="menutypesmanager" mode="ajax" attached="false">
-		<rich:menuItem label="#{msg.show} #{msg.super}s"
-			action="#{typesBean.changeTreeType('SUPERS')}" mode="ajax"
-			render="typestree" icon="#{infos.up_green_arrow}" />
-		<rich:menuItem label="#{msg.show} #{msg.instance}s"
-			action="#{typesBean.changeTreeType('INSTANCES')}" mode="ajax"
-			render="typestree" icon="#{infos.down_green_arrow}" />
-		<rich:menuItem label="#{msg.show} #{msg.inheriting}s"
-			action="#{typesBean.changeTreeType('INHERITINGS')}" mode="ajax"
-			render="typestree" icon="#{infos.down_right_green_arrow}" />
-		<rich:menuItem label="#{msg.show} #{msg.component}s"
-			action="#{typesBean.changeTreeType('COMPONENTS')}" mode="ajax"
-			render="typestree" icon="#{infos.left_green_arrow}" />
-		<rich:menuItem label="#{msg.show} #{msg.composite}s"
-			action="#{typesBean.changeTreeType('COMPOSITES')}" mode="ajax"
-			render="typestree" icon="#{infos.right_green_arrow}" />
-		<rich:menuItem label="#{msg.show} #{msg.attribute}s"
-			action="#{typesBean.changeTreeType('ATTRIBUTES')}" mode="ajax"
-			render="typestree" icon="#{infos.up_right_green_arrow}" />
-		<rich:menuItem label="#{msg.show} #{msg.value}s"
-			action="#{typesBean.changeTreeType('VALUES')}" mode="ajax"
-			render="typestree" icon="#{infos.right_green_arrow}" />
-			
+		<rich:menuGroup label="#{msg.show} ...">
+			<rich:menuItem label="#{msg.show} #{msg.super}s"
+				action="#{typesBean.changeTreeType('SUPERS')}" mode="ajax"
+				render="typestree, typestreetitle" icon="#{infos.up_green_arrow}"
+				disabled="#{typesBean.isTreeTypeSelected('SUPERS')}" />
+			<rich:menuItem label="#{msg.show} #{msg.instance}s"
+				action="#{typesBean.changeTreeType('INSTANCES')}" mode="ajax"
+				render="typestree, typestreetitle" icon="#{infos.down_green_arrow}"
+				disabled="#{typesBean.isTreeTypeSelected('INSTANCES')}" />
+			<rich:menuItem label="#{msg.show} #{msg.inheriting}s"
+				action="#{typesBean.changeTreeType('INHERITINGS')}" mode="ajax"
+				render="typestree, typestreetitle"
+				icon="#{infos.down_right_green_arrow}"
+				disabled="#{typesBean.isTreeTypeSelected('INHERITINGS')}" />
+			<rich:menuItem label="#{msg.show} #{msg.component}s"
+				action="#{typesBean.changeTreeType('COMPONENTS')}" mode="ajax"
+				render="typestree, typestreetitle" icon="#{infos.left_green_arrow}"
+				disabled="#{typesBean.isTreeTypeSelected('COMPONENTS')}" />
+			<rich:menuItem label="#{msg.show} #{msg.composite}s"
+				action="#{typesBean.changeTreeType('COMPOSITES')}" mode="ajax"
+				render="typestree, typestreetitle" icon="#{infos.right_green_arrow}"
+				disabled="#{typesBean.isTreeTypeSelected('COMPOSITES')}" />
+			<rich:menuItem label="#{msg.show} #{msg.attribute}s"
+				action="#{typesBean.changeTreeType('ATTRIBUTES')}" mode="ajax"
+				render="typestree, typestreetitle"
+				icon="#{infos.up_right_green_arrow}"
+				disabled="#{typesBean.isTreeTypeSelected('ATTRIBUTES')}" />
+
+			<rich:menuGroup label="#{msg.show} #{msg.value}s ...">
+				<a4j:repeat value="#{repeatBean.items}" var="item">
+					<rich:menuItem label="#{msg.show} #{msg.value}s"
+						action="#{typesBean.changeTreeType('VALUES')}" mode="ajax"
+						render="typestree, typestreetitle"
+						icon="#{infos.right_green_arrow}"
+						disabled="#{typesBean.isTreeTypeSelected('VALUES')}" />
+				</a4j:repeat>
+			</rich:menuGroup>
+		</rich:menuGroup>
+
 		<rich:menuSeparator />
-		
+
 		<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
 			oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
 			icon="#{infos.add}" />

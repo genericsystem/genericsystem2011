@@ -52,6 +52,7 @@ public class TypesBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
+		selectedTreeNode = rootTreeNode;
 	}
 
 	public List<GenericTreeNode> getRoot() {
@@ -111,9 +112,11 @@ public class TypesBean implements Serializable {
 	}
 
 	public String getSelectedTreeNodeValue() {
-		if (null == selectedTreeNode)
-			return "";
 		return selectedTreeNode.getValue();
+	}
+
+	public boolean isTreeTypeSelected(TreeType treeType) {
+		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
 	}
 
 	public boolean isImplicitShow() {
@@ -148,6 +151,10 @@ public class TypesBean implements Serializable {
 		}
 	}
 
+	public String getExpandedIcon() {
+		return getExpandedIcon(selectedTreeNode);
+	}
+
 	public String getExpandedIcon(GenericTreeNode genericTreeNode) {
 		switch (genericTreeNode.getTreeType()) {
 		case SUPERS:
@@ -168,6 +175,10 @@ public class TypesBean implements Serializable {
 			break;
 		}
 		throw new IllegalStateException();
+	}
+
+	public String getCollapsedIcon() {
+		return getCollapsedIcon(selectedTreeNode);
 	}
 
 	public String getCollapsedIcon(GenericTreeNode genericTreeNode) {
@@ -192,6 +203,10 @@ public class TypesBean implements Serializable {
 		throw new IllegalStateException();
 	}
 
+	public String getIconTitle() {
+		return getIconTitle(selectedTreeNode);
+	}
+
 	public String getIconTitle(GenericTreeNode genericTreeNode) {
 		switch (genericTreeNode.getTreeType()) {
 		case SUPERS:
@@ -207,7 +222,7 @@ public class TypesBean implements Serializable {
 		case ATTRIBUTES:
 			return messages.getMessage("attribute");
 		case VALUES:
-			return messages.getInfos("value");
+			return messages.getMessage("value");
 		default:
 			break;
 		}
@@ -265,7 +280,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public String getStyle(GenericTreeNode genericTreeNode) {
-		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) ? "implicit" : "";
+		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) ? "implicitColor" : "";
 	}
 
 }
