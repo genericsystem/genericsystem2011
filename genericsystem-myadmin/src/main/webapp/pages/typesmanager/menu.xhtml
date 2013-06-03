@@ -81,7 +81,7 @@
 		action="#{typesBean.newSubType(popupValue)}" render="typestree" />
 	<gs:popupPanel key="createattribute"
 		title="#{msg.create} #{msg.a} #{msg.attribute}"
-		action="#{typesBean.addAttribute(popupValue)}" render="typestree" />
+		action="#{typesBean.addAttribute(popupValue)}" render="typestree, edittypesmanager" />
 	<gs:popupPanel key="createinstance"
 		title="#{msg.create} #{msg.a} #{msg.instance}"
 		action="#{typesBean.newInstance(popupValue)}" render="typestree" />

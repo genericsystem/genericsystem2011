@@ -37,7 +37,8 @@
 				<a4j:commandButton id="apply" action="#{cc.attrs.action}"
 					image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
 					render="#{cc.attrs.render}"
-					oncomplete="#{rich:component(cc.attrs.key)}.hide(); #{rich:element('inputPopupPanel')}.value=''; return false;" />
+					onbeforedomupdate="#{rich:component(cc.attrs.key)}.hide();"
+					oncomplete="#{rich:element('inputPopupPanel')}.value=''; return false;" />
 			</h:panelGrid>
 		</rich:panel>
 	</rich:popupPanel>

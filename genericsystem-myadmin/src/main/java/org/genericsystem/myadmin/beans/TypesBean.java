@@ -15,6 +15,9 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
@@ -53,6 +56,19 @@ public class TypesBean implements Serializable {
 	public void init() {
 		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
 		selectedTreeNode = rootTreeNode;
+
+		// TEST
+		Type vehicle = cache.newType("Vehicle");
+		Type color = cache.newType("Color");
+		Attribute power = vehicle.addAttribute(cache, "power");
+		Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);
+		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
+		Generic red = color.newInstance(cache, "red");
+		Generic yellow = color.newInstance(cache, "yellow");
+		myVehicle.setValue(cache, power, 123);
+		myVehicle.setValue(cache, power, 136);
+		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
+		myVehicle.bind(cache, vehicleColor, yellow);
 	}
 
 	public List<GenericTreeNode> getRoot() {
@@ -283,4 +299,23 @@ public class TypesBean implements Serializable {
 		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) ? "implicitColor" : "";
 	}
 
+	public List<Attribute> getAttributes() {
+		return ((Type) selectedTreeNode.getGeneric()).getAttributes(cache).toList();
+	}
+
+	public List<Holder> getValues(Attribute attribute) {
+		return ((Type) selectedTreeNode.getGeneric()).getHolders(cache, attribute).toList();
+	}
+
+	public void addValue(Attribute attribute, String newValue) {
+		Generic currentInstance = getSelectedTreeNodeGeneric();
+		currentInstance.setValue(cache, attribute, newValue);
+		messages.info("addValue", newValue, attribute, currentInstance);
+	}
+
+	public void remove(Generic generic) {
+		generic.remove(cache);
+		// TODO add messages
+		// messages.info("addValue", newValue, attribute, currentInstance);
+	}
 }
