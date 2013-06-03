@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -11,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
+import org.generic.map.PropertiesMapProvider;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -26,6 +27,7 @@ import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
+import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
@@ -286,6 +288,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			holder = getHolder(cache, (Attribute) attribute, basePos);
 		else if (value == null || ((Type) attribute).isPropertyConstraintEnabled(cache))
 			holder = getHolder(cache, attribute, basePos, targets);
+		else if (((GenericImpl) attribute).isMapProvider(cache))
+			holder = getHolderByEntryKey(cache, attribute, (AbstractMap.SimpleEntry<Serializable, Serializable>) value, basePos, targets);
 		else
 			holder = getHolderByValue(cache, attribute, value, basePos, targets);
 		return holder;
@@ -351,12 +355,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		clear(cache, attribute, getBasePos(attribute, targets), targets);
 	}
 
-	public <T extends Link> T getHolderByValue(Context context, Holder attribute, Serializable value, final Generic... targets) {
+	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, final Generic... targets) {
 		return getHolderByValue(context, attribute, value, getBasePos(attribute, targets), targets);
 	}
 
-	public <T extends Link> T getHolderByValue(Context context, Holder attribute, Serializable value, int basePos, final Generic... targets) {
+	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, int basePos, final Generic... targets) {
 		return Statics.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(context, attribute, basePos, value == null, targets), value));
+	}
+
+	public <T extends Holder> T getHolderByEntryKey(Context context, Holder attribute, AbstractMap.SimpleEntry<Serializable, Serializable> entry, int basePos, final Generic... targets) {
+		return Statics.unambigousFirst(Statics.entryFilter(this.<T> holdersIterator(context, attribute, basePos, entry == null, targets), entry));
 	}
 
 	@Override
@@ -1285,16 +1293,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	@Override
-	public boolean isTree() {
-		return isStructural() && this.equals(getBaseComponent());
-	}
-
-	@Override
-	public boolean isRoot() {
-		return isConcrete() && this.equals(getBaseComponent());
-	}
-
 	/*********************************************/
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
@@ -1619,4 +1617,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return addHolder(cache, attribute, value);
 	}
 
+	@Override
+	public Map<Serializable, Serializable> getProperties(final Cache cache) {
+		return cache.<PropertiesMapProvider> find(PropertiesMapProvider.class).getMap(cache, this);
+	}
+
+	boolean isMapProvider(Cache cache) {
+		return this instanceof MapProvider;
+	}
+
+	// TODO change with instanceof Tree
+	@Override
+	public boolean isTree() {
+		return isStructural() && this.equals(getBaseComponent());
+	}
+
+	// TODO change with instanceof Node
+	@Override
+	public boolean isRoot() {
+		return isConcrete() && this.equals(getBaseComponent());
+	}
 }

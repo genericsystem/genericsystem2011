@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
@@ -335,6 +336,16 @@ public class Statics {
 			@Override
 			public boolean isSelected() {
 				return Objects.equals(value, next.getValue());
+			}
+		};
+	}
+
+	public static <T extends Generic> Iterator<T> entryFilter(Iterator<T> iterator, final Map.Entry<Serializable, Serializable> entry) {
+		return new AbstractFilterIterator<T>(iterator) {
+
+			@Override
+			public boolean isSelected() {
+				return Objects.equals(entry.getKey(), ((Map.Entry) next.getValue()).getKey());
 			}
 		};
 	}

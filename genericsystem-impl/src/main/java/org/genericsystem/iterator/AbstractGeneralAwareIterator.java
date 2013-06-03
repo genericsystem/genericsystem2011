@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  */
 public abstract class AbstractGeneralAwareIterator<D, T> implements Iterator<T> {
 
-	protected D next;
+	public D next;
 	protected boolean toRead;
 
 	public AbstractGeneralAwareIterator() {
