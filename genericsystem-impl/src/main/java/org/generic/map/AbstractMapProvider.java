@@ -27,7 +27,7 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 			final Generic base = generic;
 
 			@Override
-			public Set<java.util.Map.Entry<Serializable, Serializable>> entrySet() {
+			public Set<Map.Entry<Serializable, Serializable>> entrySet() {
 				return new AbstractSet<Map.Entry<Serializable, Serializable>>() {
 
 					@Override
@@ -44,9 +44,8 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 								Holder holder = next;
 								if (generic.equals(holder.getBaseComponent()))
 									holder.remove(cache);
-								else {
-									cancel(cache, holder);
-								}
+								else
+									cancel(cache, holder, true);
 							}
 
 							@Override

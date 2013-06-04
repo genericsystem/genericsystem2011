@@ -751,37 +751,17 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	String info(Context context);
 
-	/**
-	 * Clear the holders that inherit from the attribute with exact targets.
-	 * 
-	 * @param cache
-	 *            The cache
-	 * @param attribute
-	 *            the attribute of holders
-	 * @param targets
-	 */
-	void clear(Cache cache, Holder attribute, Generic... targets);
+	void clearAll(Cache cache, Holder attribute, boolean concrete, Generic... targets);
 
-	/**
-	 * Clear the holders that inherit from the attribute with exact targets.
-	 * 
-	 * @param cache
-	 *            The cache
-	 * @param attribute
-	 *            the attribute of holders
-	 * @param basePos
-	 *            the base position
-	 * @param targets
-	 */
-	void clear(Cache cache, Holder attribute, int basePos, Generic... targets);
+	void clearAll(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets);
 
-	<T extends Generic> T cancel(Cache cache, Holder attribute, Generic... targets);
+	void cancelAll(Cache cache, Holder attribute, boolean concrete, Generic... targets);
 
-	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, Generic... targets);
+	void cancelAll(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets);
 
-	void restore(Cache cache, Holder attribute);
+	<T extends Generic> T cancel(Cache cache, Holder attribute, boolean concrete, Generic... targets);
 
-	void restore(Cache cache, Holder attribute, int basePos);
+	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets);
 
-	public Map<Serializable, Serializable> getProperties(final Cache cache);
+	Map<Serializable, Serializable> getProperties(final Cache cache);
 }

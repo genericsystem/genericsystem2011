@@ -25,14 +25,14 @@
 
 		<weld.core.version>1.1.12.Final</weld.core.version>
 
-		<arquillian.version>1.0.3.Final</arquillian.version>
+		<arquillian.version>1.0.4.Final</arquillian.version>
 		
 		<seam.version>3.1.0.Final</seam.version>
 
 		<jboss-ejb3-api.version>3.1.0</jboss-ejb3-api.version>
 
 		<testng.version>6.8.1</testng.version>
-		<slf4j.version>1.6.4</slf4j.version>
+		<slf4j.version>1.7.2</slf4j.version>
 	</properties>
 
 	<modules>

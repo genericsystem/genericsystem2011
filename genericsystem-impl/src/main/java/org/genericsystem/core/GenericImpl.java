@@ -303,9 +303,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return value != null ? this.<T> bind(cache, implicit, attribute, basePos, true, targets) : null;
 		if (!this.equals(holder.getComponent(basePos))) {
 			if (value == null)
-				return cancel(cache, holder, basePos);
+				return cancel(cache, holder, basePos, true);
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
-				cancel(cache, holder, basePos);
+				cancel(cache, holder, basePos, true);
 			return this.<T> bind(cache, implicit, attribute, basePos, true, targets);
 		}
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
@@ -327,33 +327,67 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((CacheImpl) cache).bind(implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
 	}
 
-	@Override
-	public void restore(Cache cache, Holder attribute) {
-		restore(cache, attribute, getBasePos(attribute, ((GenericImpl) attribute).components));
+	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
+		return new AbstractFilterIterator<T>(concreteIterator) {
+			@Override
+			public boolean isSelected() {
+				return !GenericImpl.this.equals(next);
+			}
+		};
+	}
+
+	public <T extends Generic> T cancel(Cache cache, Holder attribute, boolean concrete, Generic... targets) {
+		return cancel(cache, attribute, getBasePos(attribute, targets), concrete, targets);
+	}
+
+	public <T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets) {
+		Generic implicit = concrete ? ((GenericImpl) attribute.getMeta()).bindPrimary(cache, null, SystemGeneric.CONCRETE, true) : getEngine().bindPrimary(cache, null, SystemGeneric.STRUCTURAL, true);
+		return bind(cache, implicit, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override
-	public void restore(final Cache cache, final Holder attribute, final int basePos) {
-		Generic[] components = Statics.truncate(basePos, ((GenericImpl) attribute).components);
-		Holder holder = attribute.isStructural() ? getAttribute(cache, (Attribute) attribute, null, components) : getHolderByValue(cache, attribute, null, basePos, components);
-		if (holder != null)
-			holder.remove(cache);
+	public void cancelAll(Cache cache, Holder attribute, boolean concrete, Generic... targets) {
+		// assert (this.isConcrete() || attribute.isConcrete()) == concrete;
+		cancelAll(cache, attribute, getBasePos(attribute, targets), concrete, targets);
 	}
 
 	@Override
-	public void clear(Cache cache, Holder attribute, int basePos, Generic... targets) {
-		for (Holder holder : getHolders(cache, (Attribute) attribute, targets)) {
+	public void cancelAll(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets) {
+		for (Holder holder : concrete ? getHolders(cache, (Attribute) attribute, basePos, targets) : getAttributes(cache, (Attribute) attribute))
 			if (this.equals(holder.getComponent(basePos)))
 				holder.remove(cache);
 			else
-				cancel(cache, holder, basePos);
+				cancel(cache, holder, basePos, concrete);
+	}
+
+	@Override
+	public void clearAll(final Cache cache, final Holder attribute, final int basePos, boolean concrete, final Generic... targets) {
+		Iterator<Holder> holders = concrete ? holdersIterator(cache, attribute, basePos, true, targets) : this.<Holder> attributesIterator(cache, (Attribute) attribute, true);
+		while (holders.hasNext()) {
+			Holder holder = holders.next();
+			if (this.equals(holder.getComponent(basePos)))
+				holder.remove(cache);
 		}
 	}
 
 	@Override
-	public void clear(Cache cache, Holder attribute, Generic... targets) {
-		clear(cache, attribute, getBasePos(attribute, targets), targets);
+	public void clearAll(Cache cache, Holder attribute, boolean concrete, Generic... targets) {
+		// assert (this.isConcrete() || attribute.isConcrete()) == concrete;
+		clearAll(cache, attribute, getBasePos(attribute, targets), concrete, targets);
 	}
+
+	// @Override
+	// public void restore(Cache cache, Holder attribute) {
+	// restore(cache, attribute, getBasePos(attribute, ((GenericImpl) attribute).components));
+	// }
+	//
+	// @Override
+	// public void restore(final Cache cache, final Holder attribute, final int basePos) {
+	// Generic[] components = Statics.truncate(basePos, ((GenericImpl) attribute).components);
+	// Holder holder = attribute.isStructural() ? getAttribute(cache, (Attribute) attribute, null, components) : getHolderByValue(cache, attribute, null, basePos, components);
+	// if (holder != null)
+	// holder.remove(cache);
+	// }
 
 	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, final Generic... targets) {
 		return getHolderByValue(context, attribute, value, getBasePos(attribute, targets), targets);
@@ -1273,26 +1307,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return cache.isRemovable(this);
 	}
 
-	@Override
-	public <T extends Generic> T cancel(Cache cache, Holder attribute, Generic... targets) {
-		return cancel(cache, attribute, getBasePos(attribute, targets), targets);
-	}
-
-	@Override
-	public <T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, Generic... targets) {
-		Generic implicit = attribute.isStructural() ? getEngine().bindPrimary(cache, null, SystemGeneric.STRUCTURAL, true) : ((GenericImpl) attribute.getMeta()).bindPrimary(cache, null, SystemGeneric.CONCRETE, true);
-		return bind(cache, implicit, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
-	}
-
-	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
-		return new AbstractFilterIterator<T>(concreteIterator) {
-			@Override
-			public boolean isSelected() {
-				return !GenericImpl.this.equals(next);
-			}
-		};
-	}
-
 	/*********************************************/
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
@@ -1325,7 +1339,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					holder.remove(cache);
 					return setBooleanSystemProperty(cache, systemProperty, basePos, defaultBehavior);
 				} else
-					cancel(cache, holder, basePos);
+					cancel(cache, holder, basePos, true);
 		}
 		return null;
 	}
