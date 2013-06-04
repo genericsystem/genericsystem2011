@@ -19,34 +19,31 @@
 
 		<rich:dataGrid var="currentAttribute" value="#{typesBean.attributes}"
 			columns="2">
-			<h:dataTable var="currentValue" headerClass="fullWidth,"
+			<rich:dataTable var="currentValue" headerClass="fullWidth,"
 				columnClasses="fullWidth,"
 				value="#{typesBean.getValues(currentAttribute)}">
-				<f:facet name="header">
-					<h:column>
+				<rich:column headerClass="fullWidth">
+					<f:facet name="header">
 						<h:outputText value="#{currentAttribute}" />
-					</h:column>
-					<h:column>
-						<a4j:commandLink style="float:right;"
-							oncomplete="#{rich:component('addValue')}.show()">
+					</f:facet>
+					<h:outputText value="#{currentValue}" styleClass="#{typesBean.getHolderStyle(currentValue)}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<a4j:commandLink oncomplete="#{rich:component('addValue')}.show()">
 							<h:graphicImage value="#{infos.add}"
 								title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentAttribute}" />
 						</a4j:commandLink>
 						<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
 							action="#{typesBean.addValue(currentAttribute,popupValue)}"
 							render="edittypesmanager" />
-					</h:column>
-				</f:facet>
-				<h:column>
-					<h:outputText value="#{currentValue}" />
-				</h:column>
-				<h:column>
-					<a4j:commandLink action="#{typesBean.remove(currentValue)}"
+					</f:facet>
+					<a4j:commandLink action="#{typesBean.removeHolder(currentValue)}"
 						render="edittypesmanager">
 						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
 					</a4j:commandLink>
-				</h:column>
-			</h:dataTable>
+				</rich:column>
+			</rich:dataTable>
 		</rich:dataGrid>
 	</rich:panel>
 
