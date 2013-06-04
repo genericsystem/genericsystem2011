@@ -38,7 +38,7 @@
 					</h:column>
 				</f:facet>
 				<h:column>
-					<h:outputText value="#{currentValue}" />
+					<h:outputText value="#{currentValue}" styleClass="#{typesBean.getHolderStyle(currentValue)}" />
 				</h:column>
 				<h:column>
 					<a4j:commandLink action="#{typesBean.remove(currentValue)}"

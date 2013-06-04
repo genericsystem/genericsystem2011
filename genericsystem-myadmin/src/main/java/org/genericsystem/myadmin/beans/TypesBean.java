@@ -340,6 +340,10 @@ public class TypesBean implements Serializable {
 		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) ? "implicitColor" : "";
 	}
 
+	public String getHolderStyle(Holder holder) {
+		return !holder.getBaseComponent().equals(selectedTreeNode.getGeneric()) ? "implicitColor" : "";
+	}
+
 	public boolean isImplicitShow() {
 		return implicitShow;
 	}

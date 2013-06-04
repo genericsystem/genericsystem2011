@@ -21,6 +21,9 @@ body {
 	vertical-align: middle;
 }
 
+.implicitColor {
+	color: #949595 !important;
+}
 .implicitColor>span {
 	color: #949595 !important;
 }
