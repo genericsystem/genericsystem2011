@@ -41,7 +41,7 @@
 					<h:outputText value="#{currentValue}" styleClass="#{typesBean.getHolderStyle(currentValue)}" />
 				</h:column>
 				<h:column>
-					<a4j:commandLink action="#{typesBean.remove(currentValue)}"
+					<a4j:commandLink action="#{typesBean.removeHolder(currentValue)}"
 						render="edittypesmanager">
 						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
 					</a4j:commandLink>

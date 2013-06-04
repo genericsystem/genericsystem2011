@@ -123,9 +123,14 @@ public class TypesBean implements Serializable {
 		messages.info("addValue", newValue, attribute, currentInstance);
 	}
 
-	public void remove(Generic generic) {
-		generic.remove(cache);
-		messages.info("remove", generic);
+	public void removeHolder(Holder holder) {
+		if (holder.getBaseComponent().equals(selectedTreeNode.getGeneric())) {
+			holder.remove(cache);
+			messages.info("remove", holder);
+		} else {
+			selectedTreeNode.getGeneric().cancel(cache, holder);
+			messages.info("cancel", holder);
+		}
 	}
 
 	public String delete() {
