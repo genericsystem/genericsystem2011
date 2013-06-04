@@ -7,6 +7,7 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 
 public class GenericTreeNode {
@@ -19,6 +20,8 @@ public class GenericTreeNode {
 	private Generic generic;
 
 	private TreeType treeType;
+
+	private Attribute attribute;
 
 	private List<GenericTreeNode> childrens = new ArrayList<>();
 
@@ -41,8 +44,21 @@ public class GenericTreeNode {
 		return TreeType_DEFAULT;
 	}
 
+	public List<GenericTreeNode> getChildrens(Cache cache, boolean implicitShow) {
+		return getChildrens(cache, treeType, implicitShow);
+	}
+
+	public List<GenericTreeNode> getChildrens(Cache cache, TreeType treeType, boolean implicitShow) {
+		List<GenericTreeNode> list = new ArrayList<>();
+		for (Generic child : getSnapshot(cache, treeType))
+			if (implicitShow || !isImplicitAutomatic(child))
+				list.add(getGenericTreeNode(child));
+		childrens = list;
+		return list;
+	}
+
 	@SuppressWarnings("unchecked")
-	private <T extends Generic> Snapshot<T> getSnapshot(Cache cache) {
+	private <T extends Generic> Snapshot<T> getSnapshot(Cache cache, TreeType treeType) {
 		switch (treeType) {
 		case SUPERS:
 			return generic.getSupers();
@@ -57,7 +73,7 @@ public class GenericTreeNode {
 		case ATTRIBUTES:
 			return (Snapshot<T>) ((Type) generic).getAttributes(cache);
 		case VALUES:
-			return (Snapshot<T>) generic.getHolders(cache, cache.getMetaAttribute());
+			return (Snapshot<T>) generic.getHolders(cache, attribute);
 		default:
 			break;
 		}
@@ -69,15 +85,6 @@ public class GenericTreeNode {
 			if (old.getGeneric().equals(child))
 				return old;
 		return new GenericTreeNode(this, child, getTreeType(child));
-	}
-
-	public List<GenericTreeNode> getChildrens(Cache cache, boolean implicitShow) {
-		List<GenericTreeNode> list = new ArrayList<>();
-		for (Generic child : getSnapshot(cache))
-			if (implicitShow || !isImplicitAutomatic(child))
-				list.add(getGenericTreeNode(child));
-		childrens = list;
-		return list;
 	}
 
 	public boolean isImplicitAutomatic(Generic generic) {
@@ -110,6 +117,14 @@ public class GenericTreeNode {
 
 	public void setTreeType(TreeType treeType) {
 		this.treeType = treeType;
+	}
+
+	public Attribute getAttribute() {
+		return attribute;
+	}
+
+	public void setAttribute(Attribute attribute) {
+		this.attribute = attribute;
 	}
 
 }

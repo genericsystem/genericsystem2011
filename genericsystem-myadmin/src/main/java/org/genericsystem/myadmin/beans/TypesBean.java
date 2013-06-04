@@ -5,9 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.el.MethodExpression;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -15,12 +17,17 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
+import org.richfaces.component.UIMenuGroup;
+import org.richfaces.component.UIMenuItem;
 
 @Named
 @SessionScoped
@@ -40,19 +47,36 @@ public class TypesBean implements Serializable {
 	@Inject
 	private GsRedirect redirect;
 
+	private GenericTreeNode rootTreeNode;
+
 	private GenericTreeNode selectedTreeNode;
 
 	@Inject
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
-	private GenericTreeNode rootTreeNode;
-
 	private boolean implicitShow;
+
+	private UIMenuGroup valuesMenuGroup;
 
 	@PostConstruct
 	public void init() {
 		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
 		selectedTreeNode = rootTreeNode;
+		valuesMenuGroup = (UIMenuGroup) FacesContext.getCurrentInstance().getApplication().createComponent(UIMenuGroup.COMPONENT_TYPE);
+		valuesMenuGroup.setLabel("show values...");
+
+		// TODO TEST
+		Type vehicle = cache.newType("Vehicle");
+		Type color = cache.newType("Color");
+		Attribute power = vehicle.addAttribute(cache, "power");
+		Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);
+		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
+		Generic red = color.newInstance(cache, "red");
+		Generic yellow = color.newInstance(cache, "yellow");
+		myVehicle.setValue(cache, power, 123);
+		myVehicle.setValue(cache, power, 136);
+		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
+		myVehicle.bind(cache, vehicleColor, yellow);
 	}
 
 	public List<GenericTreeNode> getRoot() {
@@ -61,19 +85,6 @@ public class TypesBean implements Serializable {
 
 	public List<GenericTreeNode> getChildrens(final GenericTreeNode genericTreeNode) {
 		return genericTreeNode.getChildrens(cache, implicitShow);
-	}
-
-	public void changeType(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
-		if (treeSelectionEvent.getId().equals("typestree")) {
-			selectedTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
-			panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
-			messages.info("typeselectionchanged", getSelectedTreeNodeGeneric().toString());
-		}
-	}
-
-	public void changeTreeType(TreeType treeType) {
-		selectedTreeNode.setTreeType(treeType);
-		messages.info("showchanged", treeType);
 	}
 
 	public void newType(String newValue) {
@@ -95,6 +106,26 @@ public class TypesBean implements Serializable {
 		((Type) getSelectedTreeNodeGeneric()).newInstance(cache, newValue);
 		messages.info("createRootInstance", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
+	
+	public List<Attribute> getAttributes() {
+		return ((Type) selectedTreeNode.getGeneric()).getAttributes(cache).toList();
+	}
+
+	public List<Holder> getValues(Attribute attribute) {
+		return ((Type) selectedTreeNode.getGeneric()).getHolders(cache, attribute).toList();
+	}
+
+	public void addValue(Attribute attribute, String newValue) {
+		Generic currentInstance = getSelectedTreeNodeGeneric();
+		currentInstance.setValue(cache, attribute, newValue);
+		messages.info("addValue", newValue, attribute, currentInstance);
+	}
+
+	public void remove(Generic generic) {
+		generic.remove(cache);
+		// TODO add messages
+		// messages.info("addValue", newValue, attribute, currentInstance);
+	}
 
 	public String delete() {
 		selectedTreeNode.getGeneric().remove(cache);
@@ -103,8 +134,41 @@ public class TypesBean implements Serializable {
 		return "HOME";
 	}
 
-	public boolean isTreeNodeSelected() {
-		return selectedTreeNode == null;
+	public void changeType(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
+		if (treeSelectionEvent.getId().equals("typestree")) {
+			selectedTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
+			panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
+			buildValuesMenuGroup();
+			messages.info("typeselectionchanged", getSelectedTreeNodeGeneric().toString());
+		}
+	}
+
+	private UIMenuGroup buildValuesMenuGroup() {
+		valuesMenuGroup.getChildren().clear();
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		int i = 0;
+		for (GenericTreeNode genericTreeNode : selectedTreeNode.getChildrens(cache, TreeType.ATTRIBUTES, implicitShow)) {
+			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
+			uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
+			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{typesBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
+			uiMenuItem.setActionExpression(methodExpression);
+			uiMenuItem.setRender("typestree, typestreetitle");
+			valuesMenuGroup.getChildren().add(uiMenuItem);
+			i++;
+		}
+		return valuesMenuGroup;
+	}
+
+	public void changeAttributeSelected(int attributeIndex) {
+		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(cache, TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
+		selectedTreeNode.setAttribute(attribute);
+		selectedTreeNode.setTreeType(TreeType.VALUES);
+		messages.info("showvalues", attribute);
+	}
+
+	public void changeTreeType(TreeType treeType) {
+		selectedTreeNode.setTreeType(treeType);
+		messages.info("showchanged", treeType);
 	}
 
 	public Generic getSelectedTreeNodeGeneric() {
@@ -117,14 +181,6 @@ public class TypesBean implements Serializable {
 
 	public boolean isTreeTypeSelected(TreeType treeType) {
 		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
-	}
-
-	public boolean isImplicitShow() {
-		return implicitShow;
-	}
-
-	public void setImplicitShow(boolean implicitShow) {
-		this.implicitShow = implicitShow;
 	}
 
 	public Wrapper getWrapper(GenericTreeNode genericTreeNode) {
@@ -281,6 +337,21 @@ public class TypesBean implements Serializable {
 
 	public String getStyle(GenericTreeNode genericTreeNode) {
 		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) ? "implicitColor" : "";
+	}
+
+	public boolean isImplicitShow() {
+		return implicitShow;
+	}
+
+	public void setImplicitShow(boolean implicitShow) {
+		this.implicitShow = implicitShow;
+	}
+
+	public UIMenuGroup getValuesMenuGroup() {
+		return valuesMenuGroup;
+	}
+
+	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {
 	}
 
 }
