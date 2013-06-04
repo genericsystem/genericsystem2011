@@ -36,6 +36,10 @@ body {
 	color: black;
 }
 
+.bold {
+	font-weight: bold;
+}
+
 .fullWidth {
 	width: 100%;
 }
