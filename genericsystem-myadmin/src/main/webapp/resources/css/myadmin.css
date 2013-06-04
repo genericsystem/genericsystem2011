@@ -45,8 +45,12 @@ body {
 	text-transform: uppercase;
 }
 
-.capitalize {
+.capitalize:first-letter {
 	text-transform: capitalize;
+}
+
+.capitalize {
+    display: inline-block;
 }
 
 .topAlign {
@@ -147,4 +151,9 @@ li.fatal {
 	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75);
 	/* For IE 8  Don't miss the added quotes */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
+}
+
+.align {
+	float:right;
+	vertical-align:middle;
 }

@@ -67,16 +67,18 @@ public class TypesBean implements Serializable {
 
 		// TODO TEST
 		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
 		Type color = cache.newType("Color");
 		Attribute power = vehicle.addAttribute(cache, "power");
 		Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Generic red = color.newInstance(cache, "red");
 		Generic yellow = color.newInstance(cache, "yellow");
-		myVehicle.setValue(cache, power, 123);
+		vehicle.setValue(cache, power, 123);
 		myVehicle.setValue(cache, power, 136);
 		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
-		myVehicle.bind(cache, vehicleColor, yellow);
+		vehicle.bind(cache, vehicleColor, yellow);
+		car.newInstance(cache, "myCar");
 	}
 
 	public List<GenericTreeNode> getRoot() {
@@ -123,8 +125,7 @@ public class TypesBean implements Serializable {
 
 	public void remove(Generic generic) {
 		generic.remove(cache);
-		// TODO add messages
-		// messages.info("addValue", newValue, attribute, currentInstance);
+		messages.info("remove", generic);
 	}
 
 	public String delete() {

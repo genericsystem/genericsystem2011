@@ -20,13 +20,11 @@
 		}
 	</script>
 
-	<h:panelGrid id="typestreetitle" styleClass="implicit">
+	<h:panelGrid id="typestreetitle" styleClass="implicit"
+		columnClasses="align">
 		<h:panelGroup>
-			<h:graphicImage value="#{typesBean.getExpandedIcon()}"
-				styleClass="middleAlign" title="#{typesBean.getIconTitle()}" />
-			<h:outputText value=" #{msg.view} #{typesBean.getIconTitle()}s"
-				styleClass="capitalize" />
-			<h:outputText value=" #{msg.with} #{msg.implicit}" styleClass="capitalize"/>
+			<h:outputText value="#{msg.filter} #{msg.implicit}"
+				styleClass="capitalize"/>
 			<h:selectBooleanCheckbox value="#{typesBean.implicitShow}"
 				title="#{msg.show} #{msg.implicit}">
 				<a4j:ajax event="change" render="typestree" />
