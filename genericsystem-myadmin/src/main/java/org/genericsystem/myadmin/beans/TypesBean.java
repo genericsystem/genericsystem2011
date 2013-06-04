@@ -106,7 +106,7 @@ public class TypesBean implements Serializable {
 		((Type) getSelectedTreeNodeGeneric()).newInstance(cache, newValue);
 		messages.info("createRootInstance", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
-	
+
 	public List<Attribute> getAttributes() {
 		return ((Type) selectedTreeNode.getGeneric()).getAttributes(cache).toList();
 	}

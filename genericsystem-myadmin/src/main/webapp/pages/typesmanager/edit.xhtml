@@ -10,7 +10,40 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:panel id="edittypesmanager" layout="block" styleClass="fullWidth fullHeight"
-		bodyClass="fullHeight">
+	<rich:panel id="edittypesmanager" layout="block"
+		styleClass="fullWidth fullHeight" bodyClass="fullHeight">
+		<f:facet name="header">
+			<h:outputText styleClass="capitalize"
+				value="#{msg.edit} #{typesBean.selectedTreeNodeGeneric}" />
+		</f:facet>
+
+		<rich:dataGrid var="currentAttribute" value="#{typesBean.attributes}"
+			columns="2">
+			<rich:panel>
+				<f:facet name="header">
+					<span style="margin-right: 5px;"> <h:outputText
+							value="#{currentAttribute}" />
+					</span>
+					<a4j:commandLink style="float:right;"
+						oncomplete="#{rich:component('addValue')}.show()">
+						<h:graphicImage value="#{infos.add}"
+							title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentAttribute}" />
+					</a4j:commandLink>
+					<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
+						action="#{typesBean.addValue(currentAttribute,popupValue)}"
+						render="edittypesmanager" />
+				</f:facet>
+				<h:dataTable var="currentValue"
+					value="#{typesBean.getValues(currentAttribute)}">
+					<h:column>
+						<h:outputText value="#{currentValue}" />
+					</h:column>
+					<h:column>
+						<a4j:commandButton value="remove" action="#{typesBean.remove(currentValue)}" render="edittypesmanager"/>
+					</h:column>
+				</h:dataTable>
+			</rich:panel>
+		</rich:dataGrid>
 	</rich:panel>
+
 </ui:composition>
