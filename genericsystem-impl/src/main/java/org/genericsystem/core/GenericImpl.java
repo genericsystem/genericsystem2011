@@ -336,10 +336,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	@Override
 	public <T extends Generic> T cancel(Cache cache, Holder attribute, boolean concrete, Generic... targets) {
 		return cancel(cache, attribute, getBasePos(attribute, targets), concrete, targets);
 	}
 
+	@Override
 	public <T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets) {
 		Generic implicit = concrete ? ((GenericImpl) attribute.getMeta()).bindPrimary(cache, null, SystemGeneric.CONCRETE, true) : getEngine().bindPrimary(cache, null, SystemGeneric.STRUCTURAL, true);
 		return bind(cache, implicit, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
@@ -1000,7 +1002,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String toString() {
 		Serializable value = getValue();
 		if (null == value)
-			return "";
+			return "null" + (supers.length >= 2 ? "[" + supers[1] + "]" : "");
 		return value instanceof Class ? ((Class<?>) value).getSimpleName() : value.toString();
 	}
 
