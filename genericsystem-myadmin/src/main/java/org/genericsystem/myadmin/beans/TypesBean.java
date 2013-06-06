@@ -3,6 +3,7 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.el.MethodExpression;
 import javax.enterprise.context.SessionScoped;
@@ -11,10 +12,12 @@ import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
@@ -68,14 +71,17 @@ public class TypesBean implements Serializable {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type color = cache.newType("Color");
+		Type time = cache.newType("Time");
 		Attribute power = vehicle.addAttribute(cache, "power");
 		Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);
+		Relation vehicleColorTime = vehicle.setRelation(cache, "vehicleColorTime", color, time);
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Generic red = color.newInstance(cache, "red");
 		Generic yellow = color.newInstance(cache, "yellow");
 		vehicle.setValue(cache, power, 123);
 		myVehicle.setValue(cache, power, 136);
 		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
+		myVehicle.bind(cache, vehicleColorTime, red, time.newInstance(cache, "myTime"));
 		vehicle.bind(cache, vehicleColor, yellow);
 		car.newInstance(cache, "myCar");
 	}
@@ -114,6 +120,15 @@ public class TypesBean implements Serializable {
 
 	public List<Holder> getValues(Attribute attribute) {
 		return ((Type) selectedTreeNode.getGeneric()).getHolders(cache, attribute).toList();
+	}
+
+	public List<Generic> getTargets(final Holder holder) {
+		return holder.getComponents().filter(new Filter<Generic>() {
+			@Override
+			public boolean isSelected(Generic element) {
+				return !holder.getBaseComponent().equals(element);
+			}
+		}).toList();
 	}
 
 	public void addValue(Attribute attribute, String newValue) {
@@ -271,7 +286,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_green_arrow");
 		default:
-		break;
+			break;
 		}
 		throw new IllegalStateException();
 	}
@@ -297,7 +312,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_red_arrow");
 		default:
-		break;
+			break;
 		}
 		throw new IllegalStateException();
 	}
@@ -323,7 +338,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getMessage("value");
 		default:
-		break;
+			break;
 		}
 		throw new IllegalStateException();
 	}
@@ -398,6 +413,7 @@ public class TypesBean implements Serializable {
 		return valuesMenuGroup;
 	}
 
-	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {}
+	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {
+	}
 
 }

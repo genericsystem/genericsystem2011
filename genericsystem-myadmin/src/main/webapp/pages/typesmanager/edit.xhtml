@@ -11,7 +11,7 @@
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
 	<rich:panel id="edittypesmanager" layout="block"
-l		styleClass="fullWidth fullHeight" bodyClass="fullHeight"
+		styleClass="fullWidth fullHeight" bodyClass="fullHeight"
 		headerClass="height24">
 		<f:facet name="header">
 			<h:outputText styleClass="capitalize"
@@ -24,15 +24,25 @@ l		styleClass="fullWidth fullHeight" bodyClass="fullHeight"
 		FIN
 
 		<rich:dataGrid var="currentAttribute" value="#{typesBean.attributes}"
-			columns="2">
+			columns="3">
 			<rich:dataTable var="currentValue" headerClass="fullWidth,"
 				columnClasses="fullWidth,"
 				value="#{typesBean.getValues(currentAttribute)}">
 				<f:facet name="header">
+					<h:panelGrid>
+						<h:panelGroup>
+							<h:outputText value="#{currentAttribute}" />
+							<a4j:commandLink
+								oncomplete="#{rich:component('addValue')}.show()">
+								<h:graphicImage value="#{infos.add}"
+									title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentAttribute}" />
+							</a4j:commandLink>
+						</h:panelGroup>
+					</h:panelGrid>
 				</f:facet>
 				<rich:column headerClass="fullWidth">
 					<f:facet name="header">
-						<h:outputText value="#{currentAttribute}" />
+					VALUE
 					</f:facet>
 					<rich:inplaceInput
 						value="#{typesBean.getGenericWrapper(currentValue).value}"
@@ -43,20 +53,26 @@ l		styleClass="fullWidth fullHeight" bodyClass="fullHeight"
 				</rich:column>
 				<rich:column>
 					<f:facet name="header">
-						<a4j:commandLink oncomplete="#{rich:component('addValue')}.show()">
-							<h:graphicImage value="#{infos.add}"
-								title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentAttribute}" />
-						</a4j:commandLink>
-						<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
-							action="#{typesBean.addValue(currentAttribute,popupValue)}"
-							render="edittypesmanager" />
+					TARGET
 					</f:facet>
+					<rich:dataTable var="currentTarget" headerClass="fullWidth,"
+						columnClasses="fullWidth,"
+						value="#{typesBean.getTargets(currentValue)}">
+						<rich:column>#{currentTarget}</rich:column>
+						<rich:column>+</rich:column>
+						<rich:column>X</rich:column>
+					</rich:dataTable>
+				</rich:column>
+				<rich:column>
 					<a4j:commandLink action="#{typesBean.removeHolder(currentValue)}"
 						render="edittypesmanager">
 						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
 					</a4j:commandLink>
 				</rich:column>
 			</rich:dataTable>
+			<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
+				action="#{typesBean.addValue(currentAttribute,popupValue)}"
+				render="edittypesmanager" />
 		</rich:dataGrid>
 	</rich:panel>
 
