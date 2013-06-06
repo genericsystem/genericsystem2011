@@ -3,7 +3,6 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.el.MethodExpression;
 import javax.enterprise.context.SessionScoped;
@@ -12,7 +11,6 @@ import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -128,7 +126,7 @@ public class TypesBean implements Serializable {
 			holder.remove(cache);
 			messages.info("remove", holder);
 		} else {
-			selectedTreeNode.getGeneric().cancel(cache, holder);
+			selectedTreeNode.getGeneric().cancel(cache, holder, true);
 			messages.info("cancel", holder);
 		}
 	}
@@ -213,6 +211,29 @@ public class TypesBean implements Serializable {
 		}
 	}
 
+	public GenericWrapper getGenericWrapper(Generic generic) {
+		return new GenericWrapper(generic);
+	}
+
+	public class GenericWrapper {
+		private Generic wrappedGeneric;
+
+		public GenericWrapper(Generic wrappedGeneric) {
+			this.wrappedGeneric = wrappedGeneric;
+		}
+
+		public String getValue() {
+			return wrappedGeneric.toString();
+		}
+
+		public void setValue(String newValue) {
+			if (!newValue.equals(wrappedGeneric.toString())) {
+				((CacheImpl) cache).update(wrappedGeneric, newValue);
+				messages.info("updateValue", wrappedGeneric, newValue);
+			}
+		}
+	}
+
 	public String getExpandedIcon() {
 		return getExpandedIcon(selectedTreeNode);
 	}
@@ -234,7 +255,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_green_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -260,7 +281,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_red_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -286,7 +307,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getMessage("value");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -361,7 +382,6 @@ public class TypesBean implements Serializable {
 		return valuesMenuGroup;
 	}
 
-	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {
-	}
+	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {}
 
 }
