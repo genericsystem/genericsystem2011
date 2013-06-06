@@ -26,10 +26,11 @@ public class PhamtomTest extends AbstractTest {
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 
 		assert car.getAttributes(cache).contains(vehiclePower);
-		car.cancel(cache, vehiclePower);
+		car.cancelAll(cache, vehiclePower, false);
 		Iterator<Generic> iterator = ((GenericImpl) car).attributesIterator(cache, vehiclePower, true);
 		Generic phantom = iterator.next();
-		car.restore(cache, vehiclePower);
+		// car.restore(cache, vehiclePower);
+		car.clearAll(cache, vehiclePower, false);
 		assert !phantom.isAlive(cache);
 	}
 
@@ -138,19 +139,19 @@ public class PhamtomTest extends AbstractTest {
 		assert car.getRelations(cache).contains(vehicleHuman);
 		assert convertible.getRelations(cache).contains(vehicleHuman);
 
-		car.cancel(cache, vehicleHuman);
+		car.cancelAll(cache, vehicleHuman, false);
 		assert vehicle.getRelations(cache).contains(vehicleHuman);
 		assert car.getRelations(cache).size() == 0;
 		assert !car.getRelations(cache).contains(vehicleHuman);
 		assert convertible.getRelations(cache).size() == 0;
 		assert !convertible.getRelations(cache).contains(vehicleHuman);
 
-		car.restore(cache, vehicleHuman);
+		car.clearAll(cache, vehicleHuman, false);
 		assert vehicle.getRelations(cache).contains(vehicleHuman);
 		assert car.getRelations(cache).contains(vehicleHuman);
 		assert convertible.getRelations(cache).contains(vehicleHuman);
 
-		convertible.cancel(cache, vehicleHuman);
+		convertible.cancelAll(cache, vehicleHuman, false);
 		assert vehicle.getRelations(cache).contains(vehicleHuman);
 		assert car.getRelations(cache).contains(vehicleHuman);
 		assert convertible.getRelations(cache).size() == 0;
@@ -166,13 +167,13 @@ public class PhamtomTest extends AbstractTest {
 		Type breakVehicle = car.newSubType(cache, "BreakVehicle");
 		Type convertible = car.newSubType(cache, "Convertible");
 
-		car.cancel(cache, vehicleColor);
+		car.cancelAll(cache, vehicleColor, false);
 		assert vehicle.getRelations(cache).size() == 1;
 		assert car.getRelations(cache).size() == 0;
 		assert breakVehicle.getRelations(cache).size() == 0;
 		assert convertible.getRelations(cache).size() == 0;
 
-		car.restore(cache, vehicleColor);
+		car.clearAll(cache, vehicleColor, false);
 		assert vehicle.getRelations(cache).size() == 1;
 		assert car.getRelations(cache).get(0).equals(vehicleColor);
 		assert breakVehicle.getRelations(cache).get(0).equals(vehicleColor);
@@ -336,13 +337,13 @@ public class PhamtomTest extends AbstractTest {
 		} catch (IllegalStateException ignore) {
 
 		}
-		myCar.clear(cache, carColor, red);
+		myCar.cancelAll(cache, carColor, true, red);
 		assert !myCar.getTargets(cache, carColor).contains(red);
 		assert myCar.getTargets(cache, carColor).contains(green);
 		myCar.setLink(cache, carColor, "defaultColor1", red);
 		assert myCar.getTargets(cache, carColor).contains(red);
 		assert myCar.getTargets(cache, carColor).contains(green);
-		myCar.clear(cache, carColor);
+		myCar.cancelAll(cache, carColor, true);
 		assert !myCar.getTargets(cache, carColor).contains(red);
 		assert !myCar.getTargets(cache, carColor).contains(green);
 		assert myCar.getTargets(cache, carColor).isEmpty();
@@ -355,11 +356,11 @@ public class PhamtomTest extends AbstractTest {
 		Holder defaultPower = car.setValue(cache, carPower, "233");
 		Generic mycar = car.newInstance(cache, "myCar");
 		assert mycar.getValue(cache, carPower).equals("233");
-		mycar.cancel(cache, defaultPower);
+		mycar.cancelAll(cache, defaultPower, true);
 		assert mycar.getValue(cache, carPower) == null;
-		mycar.cancel(cache, defaultPower);
+		mycar.cancelAll(cache, defaultPower, true);
 		assert mycar.getValue(cache, carPower) == null;
-		mycar.restore(cache, defaultPower);
+		mycar.clearAll(cache, defaultPower, true);
 		assert mycar.getValue(cache, carPower).equals("233");
 	}
 
@@ -375,11 +376,11 @@ public class PhamtomTest extends AbstractTest {
 		myCar.setValue(cache, defaultPower, null);
 		assert myCar.getValue(cache, carPower) == null;
 		// ((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null).remove(cache);
-		myCar.restore(cache, defaultPower);
+		myCar.clearAll(cache, defaultPower, true);
 		assert myCar.getValue(cache, carPower).equals("233");
-		myCar.restore(cache, defaultPower);
+		myCar.clearAll(cache, defaultPower, true);
 		assert myCar.getValue(cache, carPower).equals("233");
-		myCar.cancel(cache, defaultPower);
+		myCar.cancelAll(cache, defaultPower, true);
 		assert myCar.getValue(cache, carPower) == null;
 	}
 
@@ -390,12 +391,12 @@ public class PhamtomTest extends AbstractTest {
 		Holder defaultPower = car.setValue(cache, carPower, "233");
 		Generic mycar = car.newInstance(cache, "myCar");
 		assert mycar.getValue(cache, carPower).equals("233");
-		mycar.cancel(cache, defaultPower);
-		mycar.restore(cache, defaultPower);
-		mycar.restore(cache, defaultPower);
-		mycar.cancel(cache, defaultPower);
-		mycar.cancel(cache, defaultPower);
-		mycar.restore(cache, defaultPower);
+		mycar.cancelAll(cache, defaultPower, true);
+		mycar.clearAll(cache, defaultPower, true);
+		mycar.clearAll(cache, defaultPower, true);
+		mycar.cancelAll(cache, defaultPower, true);
+		mycar.cancelAll(cache, defaultPower, true);
+		mycar.clearAll(cache, defaultPower, true);
 		assert mycar.getValue(cache, carPower).equals("233");
 	}
 
@@ -408,11 +409,11 @@ public class PhamtomTest extends AbstractTest {
 		Link defaultCarColor = car.setLink(cache, carColor, "defaultCarColor", red);
 		Generic myCar = car.newInstance(cache, "myCar");
 		assert myCar.getTargets(cache, carColor).contains(red);
-		myCar.cancel(cache, defaultCarColor);
+		myCar.cancelAll(cache, defaultCarColor, true);
 		assert myCar.getTargets(cache, carColor).isEmpty();
-		myCar.cancel(cache, defaultCarColor);
+		myCar.cancelAll(cache, defaultCarColor, true);
 		assert myCar.getTargets(cache, carColor).isEmpty();
-		myCar.restore(cache, defaultCarColor);
+		myCar.clearAll(cache, defaultCarColor, true);
 		assert myCar.getTargets(cache, carColor).contains(red);
 	}
 
@@ -451,12 +452,12 @@ public class PhamtomTest extends AbstractTest {
 		Link defaultCarColor = car.setLink(cache, carColor, "defaultCarColor", red);
 		Generic myCar = car.newInstance(cache, "myCar");
 		assert myCar.getTargets(cache, carColor).contains(red);
-		myCar.cancel(cache, defaultCarColor);
-		myCar.restore(cache, defaultCarColor);
-		myCar.restore(cache, defaultCarColor);
-		myCar.cancel(cache, defaultCarColor);
-		myCar.cancel(cache, defaultCarColor);
-		myCar.restore(cache, defaultCarColor);
+		myCar.cancelAll(cache, defaultCarColor, true);
+		myCar.clearAll(cache, defaultCarColor, true);
+		myCar.clearAll(cache, defaultCarColor, true);
+		myCar.cancelAll(cache, defaultCarColor, true);
+		myCar.cancelAll(cache, defaultCarColor, true);
+		myCar.clearAll(cache, defaultCarColor, true);
 		assert myCar.getTargets(cache, carColor).contains(red);
 	}
 

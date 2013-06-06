@@ -24,15 +24,13 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 
 		return new AbstractMap<Serializable, Serializable>() {
 
-			final Generic base = generic;
-
 			@Override
-			public Set<java.util.Map.Entry<Serializable, Serializable>> entrySet() {
+			public Set<Map.Entry<Serializable, Serializable>> entrySet() {
 				return new AbstractSet<Map.Entry<Serializable, Serializable>>() {
 
 					@Override
 					public Iterator<Entry<Serializable, Serializable>> iterator() {
-						return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Serializable, Serializable>>(base.getHolders(cache, AbstractMapProvider.this).iterator()) {
+						return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Serializable, Serializable>>(generic.getHolders(cache, AbstractMapProvider.this).iterator()) {
 
 							@Override
 							public boolean isSelected() {
@@ -42,15 +40,17 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 							@Override
 							public void remove() {
 								Holder holder = next;
-								if (generic.equals(holder.getBaseComponent()))
+								if (generic.equals(holder.getBaseComponent())) {
 									holder.remove(cache);
-								else {
-									cancel(cache, holder);
-								}
+									Holder phantom = ((GenericImpl) generic).getHolderByValue(cache, AbstractMapProvider.this, null);
+									if (phantom != null && generic.equals(phantom.getBaseComponent()))
+										phantom.remove(cache);
+								} else
+									cancel(cache, holder, true);
 							}
 
 							@Override
-							protected java.util.Map.Entry<Serializable, Serializable> project() {
+							protected Map.Entry<Serializable, Serializable> project() {
 								return next.getValue();
 							}
 						};
@@ -58,7 +58,7 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 
 					@Override
 					public int size() {
-						return base.getValues(cache, AbstractMapProvider.this).size();
+						return generic.getValues(cache, AbstractMapProvider.this).size();
 					}
 
 				};
@@ -66,7 +66,7 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 
 			@Override
 			public Serializable put(Serializable key, Serializable value) {
-				base.setHolder(cache, AbstractMapProvider.this, new AbstractMap.SimpleEntry<Serializable, Serializable>(key, value));
+				generic.setHolder(cache, AbstractMapProvider.this, new AbstractMap.SimpleEntry<Serializable, Serializable>(key, value));
 				return null;
 			}
 		};
