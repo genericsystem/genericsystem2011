@@ -41,10 +41,11 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 							public void remove() {
 								Holder holder = next;
 								if (generic.equals(holder.getBaseComponent())) {
-									holder.remove(cache);
-									Holder phantom = ((GenericImpl) generic).getHolderByValue(cache, AbstractMapProvider.this, null);
-									if (phantom != null && generic.equals(phantom.getBaseComponent()))
-										phantom.remove(cache);
+									// holder.remove(cache);
+									generic.clearAll(cache, AbstractMapProvider.this, true);
+									// Holder phantom = ((GenericImpl) generic).getHolderByValue(cache, AbstractMapProvider.this, null);
+									// if (phantom != null && generic.equals(phantom.getBaseComponent()))
+									// phantom.remove(cache);
 								} else
 									cancel(cache, holder, true);
 							}
