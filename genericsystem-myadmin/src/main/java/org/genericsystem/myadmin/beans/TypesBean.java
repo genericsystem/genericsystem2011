@@ -3,7 +3,6 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.el.MethodExpression;
 import javax.enterprise.context.SessionScoped;
@@ -12,7 +11,6 @@ import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -28,6 +26,7 @@ import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
 import org.richfaces.component.UIMenuGroup;
 import org.richfaces.component.UIMenuItem;
+import org.richfaces.event.DropEvent;
 
 @Named
 @SessionScoped
@@ -63,7 +62,7 @@ public class TypesBean implements Serializable {
 		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
 		selectedTreeNode = rootTreeNode;
 		valuesMenuGroup = (UIMenuGroup) FacesContext.getCurrentInstance().getApplication().createComponent(UIMenuGroup.COMPONENT_TYPE);
-		valuesMenuGroup.setLabel("show values...");
+		valuesMenuGroup.setLabel("show values ...");
 
 		// TODO TEST
 		Type vehicle = cache.newType("Vehicle");
@@ -128,16 +127,22 @@ public class TypesBean implements Serializable {
 			holder.remove(cache);
 			messages.info("remove", holder);
 		} else {
-			selectedTreeNode.getGeneric().cancel(cache, holder);
+			selectedTreeNode.getGeneric().cancel(cache, holder, true);
 			messages.info("cancel", holder);
 		}
 	}
 
 	public String delete() {
-		selectedTreeNode.getGeneric().remove(cache);
-		selectedTreeNode = null;
-		redirect.redirectInfo("deleteFile", getSelectedTreeNodeGeneric().getValue());
-		return "HOME";
+		Generic generic = getSelectedTreeNodeGeneric();
+		if (isValue(generic)) {
+			selectedTreeNode = selectedTreeNode.getParent();
+			removeHolder((Holder) generic);
+		} else {
+			generic.remove(cache);
+			messages.info("deleteFile", generic.getValue());
+			selectedTreeNode = selectedTreeNode.getParent();
+		}
+		return "";
 	}
 
 	public void changeType(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
@@ -177,6 +182,10 @@ public class TypesBean implements Serializable {
 		messages.info("showchanged", treeType);
 	}
 
+	public void processDrop(DropEvent dropEvent) {
+		System.out.println("getDragValue " + ((GenericTreeNode) dropEvent.getDragValue()).getGeneric());
+	}
+
 	public Generic getSelectedTreeNodeGeneric() {
 		return selectedTreeNode.getGeneric();
 	}
@@ -187,6 +196,11 @@ public class TypesBean implements Serializable {
 
 	public boolean isTreeTypeSelected(TreeType treeType) {
 		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
+	}
+
+	// TODO in GS CORE
+	public boolean isValue(Generic generic) {
+		return generic.isConcrete() && generic.isAttribute();
 	}
 
 	public Wrapper getWrapper(GenericTreeNode genericTreeNode) {
@@ -213,6 +227,29 @@ public class TypesBean implements Serializable {
 		}
 	}
 
+	public GenericWrapper getGenericWrapper(Generic generic) {
+		return new GenericWrapper(generic);
+	}
+
+	public class GenericWrapper {
+		private Generic wrappedGeneric;
+
+		public GenericWrapper(Generic wrappedGeneric) {
+			this.wrappedGeneric = wrappedGeneric;
+		}
+
+		public String getValue() {
+			return wrappedGeneric.toString();
+		}
+
+		public void setValue(String newValue) {
+			if (!newValue.equals(wrappedGeneric.toString())) {
+				((CacheImpl) cache).update(wrappedGeneric, newValue);
+				messages.info("updateValue", wrappedGeneric, newValue);
+			}
+		}
+	}
+
 	public String getExpandedIcon() {
 		return getExpandedIcon(selectedTreeNode);
 	}
@@ -234,7 +271,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_green_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -260,7 +297,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_red_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -286,7 +323,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getMessage("value");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -342,7 +379,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public String getStyle(GenericTreeNode genericTreeNode) {
-		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) ? "implicitColor" : "";
+		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) || (isValue(genericTreeNode.getGeneric()) && !((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(selectedTreeNode.getGeneric())) ? "implicitColor" : "";
 	}
 
 	public String getHolderStyle(Holder holder) {
@@ -361,7 +398,6 @@ public class TypesBean implements Serializable {
 		return valuesMenuGroup;
 	}
 
-	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {
-	}
+	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {}
 
 }

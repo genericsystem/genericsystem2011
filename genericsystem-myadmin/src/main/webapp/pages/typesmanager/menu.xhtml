@@ -38,8 +38,8 @@
 				render="typestree, typestreetitle"
 				icon="#{infos.up_right_green_arrow}"
 				disabled="#{typesBean.isTreeTypeSelected('ATTRIBUTES')}" />
-			<rich:menuGroup binding="#{typesBean.valuesMenuGroup}" />
 		</rich:menuGroup>
+		<rich:menuGroup binding="#{typesBean.valuesMenuGroup}" />
 
 		<rich:menuSeparator />
 
@@ -60,7 +60,7 @@
 			icon="#{infos.folder_add}" />
 		<rich:menuItem
 			label="#{msg.delete} #{typesBean.selectedTreeNodeValue}"
-			action="#{typesBean.delete}" immediate="true"
+			action="#{typesBean.delete}" render="typestree, edittypesmanager"
 			onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
 			mode="ajax" icon="#{infos.delete}" />
 	</rich:contextMenu>
@@ -72,7 +72,8 @@
 		action="#{typesBean.newSubType(popupValue)}" render="typestree" />
 	<gs:popupPanel key="createattribute"
 		title="#{msg.create} #{msg.a} #{msg.attribute}"
-		action="#{typesBean.addAttribute(popupValue)}" render="typestree, edittypesmanager" />
+		action="#{typesBean.addAttribute(popupValue)}"
+		render="typestree, edittypesmanager" />
 	<gs:popupPanel key="createinstance"
 		title="#{msg.create} #{msg.a} #{msg.instance}"
 		action="#{typesBean.newInstance(popupValue)}" render="typestree" />

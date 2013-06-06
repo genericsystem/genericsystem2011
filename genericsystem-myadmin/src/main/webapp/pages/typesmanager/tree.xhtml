@@ -10,57 +10,58 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<script type="text/javascript">
-		function menuTypes() {
-			var panelPosX = #{rich:element('paneltypesmanager')}.getBoundingClientRect().left + document.body.scrollLeft +document.documentElement.scrollLeft;
-			var panelPosY = #{rich:element('paneltypesmanager')}.getBoundingClientRect().top + document.body.scrollTop +document.documentElement.scrollTop; 
-			
-			#{rich:element('menutypesmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.left=(posx-panelPosX)+'px';
-			#{rich:element('menutypesmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.top=(posy-panelPosY)+'px';
-		}
-	</script>
-
-	<h:panelGrid id="typestreetitle" styleClass="implicit"
-		columnClasses="align">
-		<h:panelGroup>
-			<h:outputText value="#{msg.filter} #{msg.implicit}"
-				styleClass="capitalize bold"/>
+	<rich:panel id="paneltypesmanager" layout="block"
+		styleClass="widthScroll280 fullHeight">
+		<f:facet name="header">
+			<h:outputText value="#{msg.show} #{msg.implicit}"
+				styleClass="capitalize bold" />
 			<h:selectBooleanCheckbox value="#{typesBean.implicitShow}"
-				title="#{msg.show} #{msg.implicit}">
+				title="#{msg.show} #{msg.implicit}" style="vertical-align: middle;">
 				<a4j:ajax event="change" render="typestree" />
 			</h:selectBooleanCheckbox>
-		</h:panelGroup>
-	</h:panelGrid>
+		</f:facet>
 
-	<rich:tree id="typestree" toggleType="ajax" var="item" status="status"
-		selectionType="ajax"
-		oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
-		selectionChangeListener="#{treeBean.change}"
-		render="menutypesmanager, edittypesmanager, paneltitletypesmanager">
-		<rich:treeModelRecursiveAdaptor roots="#{typesBean.root}"
-			nodes="#{typesBean.getChildrens(item)}">
-			<!-- 			iconCollapsed="#{typesBean.getCollapsedIcon(item)}" -->
-			<!-- 				iconExpanded="#{typesBean.getExpandedIcon(item)}" -->
-			<!-- title="#{typesBean.getIconTitle(item)}" -->
-			<rich:treeNode iconCollapsed="#{typesBean.getTypeIcon(item)}"
-				iconExpanded="#{typesBean.getTypeIcon(item)}"
-				onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}"
-				title="#{typesBean.getTypeIconTitle(item)}">
-				<!-- 				<h:graphicImage value="#{typesBean.getTypeIcon(item)}" -->
-				<!-- 					styleClass="middleAlign" -->
-				<!-- 					title="#{typesBean.getTypeIconTitle(item)}" /> -->
-				<rich:inplaceInput value="#{typesBean.getWrapper(item).value}"
-					title="#{typesBean.getTypeIconTitle(item)}" editEvent="dblclick"
-					rendered="#{!item.isReadOnly}"
-					styleClass="#{typesBean.getStyle(item)}">
-					<a4j:ajax event="change" render="typesmanager" />
-				</rich:inplaceInput>
-				<h:outputText value="#{typesBean.getWrapper(item).value}"
-					title="#{typesBean.getTypeIconTitle(item)}"
-					rendered="#{item.isReadOnly}"
-					styleClass="#{typesBean.getStyle(item)}" />
-			</rich:treeNode>
-		</rich:treeModelRecursiveAdaptor>
-	</rich:tree>
+		<script type="text/javascript">
+			function menuTypes() {
+				var panelPosX = #{rich:element('paneltypesmanager')}.getBoundingClientRect().left + document.body.scrollLeft +document.documentElement.scrollLeft;
+				var panelPosY = #{rich:element('paneltypesmanager')}.getBoundingClientRect().top + document.body.scrollTop +document.documentElement.scrollTop; 
+			
+				#{rich:element('menutypesmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.left=(posx-panelPosX)+'px';
+				#{rich:element('menutypesmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.top=(posy-panelPosY)+'px';
+			}
+		</script>
+
+		<rich:tree id="typestree" toggleType="ajax" var="item" status="status"
+			selectionType="ajax"
+			oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
+			selectionChangeListener="#{treeBean.change}"
+			render="menutypesmanager, edittypesmanager, paneltitletypesmanager">
+			<rich:treeModelRecursiveAdaptor roots="#{typesBean.root}"
+				nodes="#{typesBean.getChildrens(item)}">
+				<!-- 			iconCollapsed="#{typesBean.getCollapsedIcon(item)}" -->
+				<!-- 				iconExpanded="#{typesBean.getExpandedIcon(item)}" -->
+				<!-- title="#{typesBean.getIconTitle(item)}" -->
+				<rich:treeNode iconCollapsed="#{typesBean.getTypeIcon(item)}"
+					iconExpanded="#{typesBean.getTypeIcon(item)}"
+					onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}"
+					title="#{typesBean.getTypeIconTitle(item)}">
+					<!-- 				<h:graphicImage value="#{typesBean.getTypeIcon(item)}" -->
+					<!-- 					styleClass="middleAlign" -->
+					<!-- 					title="#{typesBean.getTypeIconTitle(item)}" /> -->
+					<rich:dragSource type="std" dragValue="#{item}" />
+					<rich:inplaceInput value="#{typesBean.getWrapper(item).value}"
+						title="#{typesBean.getTypeIconTitle(item)}" editEvent="dblclick"
+						rendered="#{!item.isReadOnly}" activeClass="blackcolor"
+						changedClass="blackcolor" styleClass="#{typesBean.getStyle(item)}">
+						<a4j:ajax event="change" render="typesmanager" />
+					</rich:inplaceInput>
+					<h:outputText value="#{typesBean.getWrapper(item).value}"
+						title="#{typesBean.getTypeIconTitle(item)}"
+						rendered="#{item.isReadOnly}"
+						styleClass="#{typesBean.getStyle(item)}" />
+				</rich:treeNode>
+			</rich:treeModelRecursiveAdaptor>
+		</rich:tree>
+	</rich:panel>
 
 </ui:composition>

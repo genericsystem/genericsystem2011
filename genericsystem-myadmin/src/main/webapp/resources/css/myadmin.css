@@ -11,13 +11,13 @@ body {
 		url('/gsmyadmin/rfRes/gradientA.png.xhtml?v=4.3.2.Final&db=eAFjZJBjZDBiZBBh!H8!IoLx!wQGBgYmACkLBIk_&ln=org.richfaces.images');
 }
 
-.implicit td>span {
+.implicit span {
 	font-family: Arial, Verdana, sans-serif;
 	vertical-align: middle;
 	color: #FFFFFF;
 }
 
-.implicit td>input {
+.implicit input {
 	vertical-align: middle;
 }
 
@@ -163,4 +163,24 @@ li.fatal {
 .align {
 	float:right;
 	vertical-align:middle;
+}
+
+.height24{
+	height: 24px;
+}
+
+.blackcolor{
+	color: #000000;
+	background-color: inherit;
+}
+
+.rf-ii-dflt-lbl{
+	color: #000000 !important;
+} 
+
+.rf-trn-sel{
+	background-color: #EB9A99 !important;
+}
+.rf-trn-sel>span>span{
+	background-color: inherit;
 }

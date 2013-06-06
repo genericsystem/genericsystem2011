@@ -15,8 +15,7 @@
 		<gs:head />
 		<gs:toolbar />
 		<c:catch var="exception">
-			<gs:panel key="typesmanager"
-				managername="#{msg.type} #{msg.manager}"
+			<gs:panel key="typesmanager" managername="#{msg.type} #{msg.manager}"
 				includetree="/pages/typesmanager/tree.xhtml"
 				includeedit="/pages/typesmanager/edit.xhtml"
 				includemenu="/pages/typesmanager/menu.xhtml" />
@@ -25,7 +24,7 @@
 				includetree="/pages/filesystemmanager/tree.xhtml"
 				includeedit="/pages/filesystemmanager/edit.xhtml"
 				includemenu="/pages/filesystemmanager/menu.xhtml" />
-			<a4j:log />
+			<a4j:log level="warn" />
 		</c:catch>
 		<c:if test="#{exception != null}">
 			<h:outputText value="#{exception}" />

@@ -10,34 +10,29 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<script type="text/javascript">
-		function menuFS() {
-			var panelPosX = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().left + document.body.scrollLeft +document.documentElement.scrollLeft;
-			var panelPosY = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().top + document.body.scrollTop +document.documentElement.scrollTop; 
-			
-			#{rich:element('menufilesystemmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.left=(posx-panelPosX)+'px';
-			#{rich:element('menufilesystemmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.top=(posy-panelPosY)+'px';
-		}
-	</script>
+	<rich:panel id="panelfilesystemmanager" layout="block"
+		styleClass="widthScroll280 fullHeight">
 
-	<rich:tree id="directorytree" toggleType="client" var="item" execute="code"
-		status="status" selectionType="ajax" onbeforeselectionchange="if(typeof editor!='undefined') {editor.save();}return true;"	
-		oncomplete="#{rich:component('menufilesystemmanager')}.hide();if(rightClick==true){#{rich:component('menufilesystemmanager')}.show();menuFS();}"
-		selectionChangeListener="#{treeBean.change}"
-		render="menufilesystemmanager, editfilesystemmanager, paneltitlefilesystemmanager">
-		<rich:treeModelRecursiveAdaptor
-			roots="#{fileSystemBean.rootDirectories}"
-			nodes="#{fileSystemBean.getDirectories(item)}">
-			<rich:treeNode expanded="#{true}"
-				onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}">
-				<rich:inplaceInput
-					value="#{fileSystemBean.getWrapper(item).shortPath}"
-					editEvent="dblclick">
-					<a4j:ajax event="change" render="filesystemmanager" />
-				</rich:inplaceInput>
-			</rich:treeNode>
-			<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
-				<rich:treeNode
+		<script type="text/javascript">
+			function menuFS() {
+				var panelPosX = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().left + document.body.scrollLeft +document.documentElement.scrollLeft;
+				var panelPosY = #{rich:element('panelfilesystemmanager')}.getBoundingClientRect().top + document.body.scrollTop +document.documentElement.scrollTop; 
+			
+				#{rich:element('menufilesystemmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.left=(posx-panelPosX)+'px';
+				#{rich:element('menufilesystemmanager')}.getElementsByTagName("div")[0].getElementsByTagName("div")[0].style.top=(posy-panelPosY)+'px';
+			}
+		</script>
+
+		<rich:tree id="directorytree" toggleType="client" var="item"
+			execute="code" status="status" selectionType="ajax"
+			onbeforeselectionchange="if(typeof editor!='undefined') {editor.save();}return true;"
+			oncomplete="#{rich:component('menufilesystemmanager')}.hide();if(rightClick==true){#{rich:component('menufilesystemmanager')}.show();menuFS();}"
+			selectionChangeListener="#{treeBean.change}"
+			render="menufilesystemmanager, editfilesystemmanager, paneltitlefilesystemmanager">
+			<rich:treeModelRecursiveAdaptor
+				roots="#{fileSystemBean.rootDirectories}"
+				nodes="#{fileSystemBean.getDirectories(item)}">
+				<rich:treeNode expanded="#{true}"
 					onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}">
 					<rich:inplaceInput
 						value="#{fileSystemBean.getWrapper(item).shortPath}"
@@ -45,8 +40,18 @@
 						<a4j:ajax event="change" render="filesystemmanager" />
 					</rich:inplaceInput>
 				</rich:treeNode>
-			</rich:treeModelAdaptor>
-		</rich:treeModelRecursiveAdaptor>
-	</rich:tree>
+				<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
+					<rich:treeNode
+						onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}">
+						<rich:inplaceInput
+							value="#{fileSystemBean.getWrapper(item).shortPath}"
+							editEvent="dblclick">
+							<a4j:ajax event="change" render="filesystemmanager" />
+						</rich:inplaceInput>
+					</rich:treeNode>
+				</rich:treeModelAdaptor>
+			</rich:treeModelRecursiveAdaptor>
+		</rich:tree>
+	</rich:panel>
 
 </ui:composition>

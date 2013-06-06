@@ -11,22 +11,35 @@
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
 	<rich:panel id="edittypesmanager" layout="block"
-		styleClass="fullWidth fullHeight" bodyClass="fullHeight">
+l		styleClass="fullWidth fullHeight" bodyClass="fullHeight"
+		headerClass="height24">
 		<f:facet name="header">
-			<h:outputText styleClass="capitalize" style="white-space: nowrap;"
+			<h:outputText styleClass="capitalize"
+				style="white-space: nowrap; padding-top: 5px;"
 				value="#{msg.edit} #{typesBean.selectedTreeNodeGeneric}" />
 		</f:facet>
+		DEB
+			<rich:dropTarget acceptedTypes="std"
+			dropListener="#{typesBean.processDrop}" render="edittypesmanager" />
+		FIN
 
 		<rich:dataGrid var="currentAttribute" value="#{typesBean.attributes}"
 			columns="2">
 			<rich:dataTable var="currentValue" headerClass="fullWidth,"
 				columnClasses="fullWidth,"
 				value="#{typesBean.getValues(currentAttribute)}">
+				<f:facet name="header">
+				</f:facet>
 				<rich:column headerClass="fullWidth">
 					<f:facet name="header">
 						<h:outputText value="#{currentAttribute}" />
 					</f:facet>
-					<h:outputText value="#{currentValue}" styleClass="#{typesBean.getHolderStyle(currentValue)}" />
+					<rich:inplaceInput
+						value="#{typesBean.getGenericWrapper(currentValue).value}"
+						styleClass="#{typesBean.getHolderStyle(currentValue)}"
+						editEvent="dblclick" rendered="true">
+						<a4j:ajax event="change" render="edittypesmanager" />
+					</rich:inplaceInput>
 				</rich:column>
 				<rich:column>
 					<f:facet name="header">
