@@ -39,8 +39,8 @@ public class MapTest extends AbstractTest {
 		assert !(Boolean) map.get("key2");
 		assert (Boolean) map3.get("key2");
 		map3.remove("key2");
-		// map3.put("key2", false);
-		// assert !(Boolean) map.get("key2");
-		// assert !(Boolean) map3.get("key2");
+
+		assert !(Boolean) map.get("key2");
+		assert !(Boolean) map3.get("key2");
 	}
 }
