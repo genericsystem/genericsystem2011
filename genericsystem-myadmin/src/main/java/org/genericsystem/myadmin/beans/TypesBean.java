@@ -1,6 +1,7 @@
 package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,7 +18,6 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
@@ -30,6 +30,8 @@ import org.genericsystem.myadmin.util.GsRedirect;
 import org.richfaces.component.UIMenuGroup;
 import org.richfaces.component.UIMenuItem;
 import org.richfaces.event.DropEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
@@ -38,7 +40,7 @@ public class TypesBean implements Serializable {
 	private static final long serialVersionUID = 8042406937175946234L;
 
 	// TODO clean
-	// private static Logger log = LoggerFactory.getLogger(TypesBean.class);
+	private static Logger log = LoggerFactory.getLogger(TypesBean.class);
 
 	@Inject
 	private transient Cache cache;
@@ -84,6 +86,18 @@ public class TypesBean implements Serializable {
 		myVehicle.bind(cache, vehicleColorTime, red, time.newInstance(cache, "myTime"));
 		vehicle.bind(cache, vehicleColor, yellow);
 		car.newInstance(cache, "myCar");
+
+		Type human = cache.newType("Human");
+		Generic nicolas = human.newInstance(cache, "Nicolas");
+		Generic michael = human.newInstance(cache, "Michael");
+		Relation isTallerOrEqualThan = human.setRelation(cache, "isTallerOrEqualThan", human);
+		nicolas.bind(cache, isTallerOrEqualThan, michael);
+		nicolas.bind(cache, isTallerOrEqualThan, nicolas);
+		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human).enableMultiDirectional(cache); // bug
+		Generic michaelBrother = human.newInstance(cache, "MichaelBrother");
+		michaelBrother.bind(cache, isBrotherOf, michael);
+		Relation isBossOf = human.setRelation(cache, "isBossOf", human);
+		nicolas.bind(cache, isBossOf, michael);
 	}
 
 	public List<GenericTreeNode> getRoot() {
@@ -122,13 +136,69 @@ public class TypesBean implements Serializable {
 		return ((Type) selectedTreeNode.getGeneric()).getHolders(cache, attribute).toList();
 	}
 
-	public List<Generic> getTargets(final Holder holder) {
-		return holder.getComponents().filter(new Filter<Generic>() {
-			@Override
-			public boolean isSelected(Generic element) {
-				return !holder.getBaseComponent().equals(element);
+	public List<Generic> getTargets(Attribute attribute, final Holder holder) {
+		List<Generic> componentsList = new ArrayList<>();
+		Generic[] components = ((GenericImpl) holder).getComponentsArray();
+		int pos = selectedTreeNode.getGeneric().getBasePos(attribute, components);
+		log.info("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		log.info("selectedTreeNode.getGeneric() " + selectedTreeNode.getGeneric());
+		log.info("attribute " + attribute);
+		log.info("holder " + holder);
+		log.info("pos " + pos);
+		for (int i = 0; i < components.length; i++) {
+			log.info("i " + i);
+			log.info("components[i] " + components[i]);
+			if (i != pos) {
+				componentsList.add(components[i]);
+				// componentsList.add(new TargetWrapper(components[i], holder));
 			}
-		}).toList();
+		}
+		log.info("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+		return componentsList;
+
+		// return holder.getComponents().filter(new Filter<Generic>() {
+		// @Override
+		// public boolean isSelected(Generic element) {
+		// return !selectedTreeNode.getGeneric().equals(element);
+		// }
+		// }).project(new Projector<TargetWrapper, Generic>() {
+		//
+		// @Override
+		// public TargetWrapper project(Generic element) {
+		// return new TargetWrapper(element, holder);
+		// }
+		// }).toList();
+	}
+
+	public class TargetWrapper {
+		private Generic generic;
+
+		private Holder holder;
+
+		public TargetWrapper(Generic generic, Holder holder) {
+			this.generic = generic;
+			this.holder = holder;
+		}
+
+		public boolean isBaseComponent() {
+			return holder.getBaseComponent().equals(generic);
+		}
+
+		public Generic getGeneric() {
+			return generic;
+		}
+
+		public void setGeneric(Generic generic) {
+			this.generic = generic;
+		}
+
+		public Holder getHolder() {
+			return holder;
+		}
+
+		public void setHolder(Holder holder) {
+			this.holder = holder;
+		}
 	}
 
 	public void addValue(Attribute attribute, String newValue) {
@@ -399,6 +469,10 @@ public class TypesBean implements Serializable {
 
 	public String getHolderStyle(Holder holder) {
 		return !holder.getBaseComponent().equals(selectedTreeNode.getGeneric()) ? "implicitColor" : "";
+	}
+
+	public String getTargetStyle(Holder holder, Generic generic) {
+		return getHolderStyle(holder).equals("implicitColor") ? "implicitColor" : "";
 	}
 
 	public boolean isImplicitShow() {
