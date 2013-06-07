@@ -23,22 +23,20 @@
 			dropListener="#{typesBean.processDrop}" render="edittypesmanager" />
 		FIN
 
-		<rich:dataGrid var="currentAttribute" value="#{typesBean.attributes}"
-			columns="3">
+		<rich:dataGrid var="currentAttribute" value="#{typesBean.attributes}" styleClass="fullWidth"
+			columns="2">
 			<rich:dataTable var="currentValue" headerClass="fullWidth,"
 				columnClasses="fullWidth,"
 				value="#{typesBean.getValues(currentAttribute)}">
 				<f:facet name="header">
-					<h:panelGrid>
-						<h:panelGroup>
-							<h:outputText value="#{currentAttribute}" />
-							<a4j:commandLink
-								oncomplete="#{rich:component('addValue')}.show()">
-								<h:graphicImage value="#{infos.add}"
-									title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentAttribute}" />
-							</a4j:commandLink>
-						</h:panelGroup>
-					</h:panelGrid>
+					<span style="vertical-align: middle; padding-top: 5px;"> <h:outputText value="#{currentAttribute}" />
+					</span>
+					<span style="float: right;"> <a4j:commandLink
+							oncomplete="#{rich:component('addValue')}.show()">
+							<h:graphicImage value="#{infos.add}"
+								title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentAttribute}" />
+						</a4j:commandLink>
+					</span>
 				</f:facet>
 				<rich:column headerClass="fullWidth">
 					<f:facet name="header">
