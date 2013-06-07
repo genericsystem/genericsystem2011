@@ -90,12 +90,15 @@ public class TypesBean implements Serializable {
 		Type human = cache.newType("Human");
 		Generic nicolas = human.newInstance(cache, "Nicolas");
 		Generic michael = human.newInstance(cache, "Michael");
+		Generic michaelBrother = human.newInstance(cache, "MichaelBrother");
 		Relation isTallerOrEqualThan = human.setRelation(cache, "isTallerOrEqualThan", human);
 		nicolas.bind(cache, isTallerOrEqualThan, michael);
 		nicolas.bind(cache, isTallerOrEqualThan, nicolas);
-		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human).enableMultiDirectional(cache); // bug
-		Generic michaelBrother = human.newInstance(cache, "MichaelBrother");
+		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human);
+		isBrotherOf.enableMultiDirectional(cache); // bug
 		michaelBrother.bind(cache, isBrotherOf, michael);
+		// Generic michaelBrother2 = human.newInstance(cache, "MichaelBrother2");
+		// michaelBrother2.bind(cache, isBrotherOf, michael);
 		Relation isBossOf = human.setRelation(cache, "isBossOf", human);
 		nicolas.bind(cache, isBossOf, michael);
 	}
@@ -140,34 +143,10 @@ public class TypesBean implements Serializable {
 		List<Generic> componentsList = new ArrayList<>();
 		Generic[] components = ((GenericImpl) holder).getComponentsArray();
 		int pos = selectedTreeNode.getGeneric().getBasePos(attribute, components);
-		log.info("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		log.info("selectedTreeNode.getGeneric() " + selectedTreeNode.getGeneric());
-		log.info("attribute " + attribute);
-		log.info("holder " + holder);
-		log.info("pos " + pos);
-		for (int i = 0; i < components.length; i++) {
-			log.info("i " + i);
-			log.info("components[i] " + components[i]);
-			if (i != pos) {
+		for (int i = 0; i < components.length; i++)
+			if (i != pos)
 				componentsList.add(components[i]);
-				// componentsList.add(new TargetWrapper(components[i], holder));
-			}
-		}
-		log.info("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 		return componentsList;
-
-		// return holder.getComponents().filter(new Filter<Generic>() {
-		// @Override
-		// public boolean isSelected(Generic element) {
-		// return !selectedTreeNode.getGeneric().equals(element);
-		// }
-		// }).project(new Projector<TargetWrapper, Generic>() {
-		//
-		// @Override
-		// public TargetWrapper project(Generic element) {
-		// return new TargetWrapper(element, holder);
-		// }
-		// }).toList();
 	}
 
 	public class TargetWrapper {
@@ -467,12 +446,8 @@ public class TypesBean implements Serializable {
 		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) || (isValue(genericTreeNode.getGeneric()) && !((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(selectedTreeNode.getGeneric())) ? "implicitColor" : "";
 	}
 
-	public String getHolderStyle(Holder holder) {
-		return !holder.getBaseComponent().equals(selectedTreeNode.getGeneric()) ? "implicitColor" : "";
-	}
-
-	public String getTargetStyle(Holder holder, Generic generic) {
-		return getHolderStyle(holder).equals("implicitColor") ? "implicitColor" : "";
+	public boolean isBaseComponent(Holder holder) {
+		return holder.getBaseComponent().equals(selectedTreeNode.getGeneric());
 	}
 
 	public boolean isImplicitShow() {
