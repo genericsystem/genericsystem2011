@@ -2,10 +2,9 @@ package org.genericsystem.file;
 
 import java.util.Arrays;
 import org.genericsystem.core.Cache;
-import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.exception.ExistsException;
+import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.file.AbstractTest.RollbackCatcher;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType;
@@ -21,7 +20,7 @@ public class FileSystemTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class);
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
-		assert ((CacheImpl) cache).update(rootDirectory, "rootDirectory2").getValue().equals("rootDirectory2");
+		assert rootDirectory.updateKey(cache, "rootDirectory2").getValue().equals("rootDirectory2");
 		assert !rootDirectory.isAlive(cache);
 	}
 
@@ -30,7 +29,7 @@ public class FileSystemTest {
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
 		rootDirectory.addFile(cache, "file");
-		assert ((CacheImpl) cache).update(rootDirectory, "rootDirectory2").getValue().equals("rootDirectory2");
+		assert rootDirectory.updateKey(cache, "rootDirectory2").getValue().equals("rootDirectory2");
 		assert !rootDirectory.isAlive(cache);
 	}
 
@@ -39,7 +38,7 @@ public class FileSystemTest {
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
 		Directory directory = rootDirectory.addDirectory(cache, "directory");
-		assert ((CacheImpl) cache).update(directory, "directory2").getValue().equals("directory2");
+		assert directory.updateKey(cache, "directory2").getValue().equals("directory2");
 		assert !directory.isAlive(cache);
 	}
 
@@ -49,7 +48,7 @@ public class FileSystemTest {
 		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
 		Directory directory = rootDirectory.addDirectory(cache, "directory");
 		directory.addFile(cache, "file");
-		assert ((CacheImpl) cache).update(directory, "directory2").getValue().equals("directory2");
+		assert directory.updateKey(cache, "directory2").getValue().equals("directory2");
 		assert !directory.isAlive(cache);
 	}
 
@@ -58,7 +57,7 @@ public class FileSystemTest {
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory(cache, "rootDirectory");
 		File file = rootDirectory.addFile(cache, "file");
-		assert ((CacheImpl) cache).update(file, "file2").getValue().equals("file2");
+		assert file.updateKey(cache, "file2").getValue().equals("file2");
 		assert !file.isAlive(cache);
 	}
 
