@@ -10,7 +10,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -140,49 +139,92 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
+	private <T extends Generic> T addComponent(Generic old, Generic component) {
+		return addComponent(old, component, old.getComponentsSize());
+	}
+
+	abstract class Restructurator {
+		@SuppressWarnings("unchecked")
+		<T extends Generic> T rebuildAll(Generic old) {
+			NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old);
+			ConnectionMap map = new ConnectionMap();
+			map.put(old, rebuild());
+			dependencies.remove(old);
+			return (T) map.reBind(dependencies).get(old);
+		}
+
+		abstract Generic rebuild();
+	}
+
+	<T extends Generic> T addComponent(final Generic old, final Generic newComponent, final int pos) {
+		return new Restructurator() {
+			@Override
+			Generic rebuild() {
+				return bind(old.getImplicit(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.isAutomatic(), old.getClass(), true);
+			}
+		}.rebuildAll(old);
+	}
+
+	<T extends Generic> T removeComponent(final Generic old, final int pos) {
+		return new Restructurator() {
+			@Override
+			Generic rebuild() {
+				return bind(old.getImplicit(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), true);
+			}
+		}.rebuildAll(old);
+	}
+
+	<T extends Generic> T addSuper(final Generic old, final Generic newSuper) {
+		return new Restructurator() {
+			@Override
+			Generic rebuild() {
+				return bind(old.getImplicit(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+			}
+		}.rebuildAll(old);
+	}
+
+	<T extends Generic> T removeSuper(final Generic old, final int pos) {
+		if (pos == 0)
+			throw new UnsupportedOperationException();
+		return new Restructurator() {
+			@Override
+			Generic rebuild() {
+				return bind(old.getImplicit(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+			}
+		}.rebuildAll(old);
+	}
+
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T update(Generic old, Serializable value) {
+	<T extends Generic> T updateKey(final Generic old, final Serializable value) {
 		if (Objects.equals(value, old.getValue()))
 			return (T) old;
-		NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old);
-		ConnectionMap map = new ConnectionMap();
-		map.put(old, replace(old, bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel(), old.isAutomatic())));
-		dependencies.remove(old);
-		return (T) map.reBind(dependencies).get(old);
-		// return reInsert(orderAndRemoveDependencies(old), ((GenericImpl) old).getImplicit(), bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel(), old.isAutomatic()));
+		return new Restructurator() {
+			@Override
+			Generic rebuild() {
+				Generic newImplicit = bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel(), old.isAutomatic());
+				if (((GenericImpl) old).isPrimary())
+					return newImplicit;
+				return bind(newImplicit, Statics.replace(0, ((GenericImpl) old).supers, newImplicit), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+			}
+		}.rebuildAll(old);
 	}
 
 	// @SuppressWarnings("unchecked")
-	// <T extends Generic> T reInsert(NavigableSet<Generic> genericsToInsert, Generic oldPrimary, Generic newPrimary) {
-	// Generic result = null;
-	// for (Generic genericToInsert : genericsToInsert) {
-	// Generic updated = replace(genericToInsert, (GenericImpl) oldPrimary, (GenericImpl) newPrimary);
-	// if (result == null)
-	// result = updated;
-	// }
-	// return (T) result;
+	// public <T extends Generic> T update(Generic old, Serializable value) {
+	// if (Objects.equals(value, old.getValue()))
+	// return (T) old;
+	// NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old);
+	// ConnectionMap map = new ConnectionMap();
+	// map.put(old, buildWithNewValue(old, bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel(), old.isAutomatic())));
+	// dependencies.remove(old);
+	// return (T) map.reBind(dependencies).get(old);
 	// }
 
-	// private Generic replace(Generic old, GenericImpl oldImplicit, GenericImpl newImplicit) {
+	// private Generic buildWithNewValue(Generic old, Generic newImplicit) {
 	// if (((GenericImpl) old).isPrimary())
-	// return bindPrimaryByValue(((GenericImpl) old).supers[0], newImplicit.getValue(), old.getMetaLevel(), old.isAutomatic());
-	//
-	// Generic[] interfaces = ((GenericImpl) old).getPrimariesArray();
-	// for (int i = 0; i < interfaces.length; i++)
-	// if (interfaces[i].equals(oldImplicit))
-	// interfaces[i] = newImplicit;
-	//
-	// Generic implicit = old.getImplicit();
-	// if (implicit.equals(oldImplicit))
-	// implicit = newImplicit;
-	// return bind(implicit, interfaces, ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+	// return newImplicit;
+	// return bind(newImplicit, new Primaries(Statics.replace(0, ((GenericImpl) old).supers, newImplicit)).toArray(), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
 	// }
-
-	private Generic replace(Generic old, Generic newImplicit) {
-		if (((GenericImpl) old).isPrimary())
-			return newImplicit;
-		return bind(newImplicit, new Primaries(Statics.replace(0, ((GenericImpl) old).supers, newImplicit)).toArray(), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
-	}
 
 	@Override
 	public void flush() throws RollbackException {

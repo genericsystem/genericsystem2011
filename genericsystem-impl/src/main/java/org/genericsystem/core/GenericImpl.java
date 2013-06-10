@@ -1653,4 +1653,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public boolean isRoot() {
 		return isConcrete() && this.equals(getBaseComponent());
 	}
+
+	public <T extends Generic> T addComponent(Cache cache, int pos, Generic newComponent) {
+		return ((CacheImpl) cache).addComponent(this, newComponent, pos);
+	}
+
+	public <T extends Generic> T removeComponent(Cache cache, int pos, Generic newComponent) {
+		return ((CacheImpl) cache).removeComponent(this, pos);
+	}
+
+	public <T extends Generic> T addSuper(Cache cache, int pos, Generic newSuper) {
+		return ((CacheImpl) cache).addSuper(this, newSuper);
+	}
+
+	public <T extends Generic> T removeSuper(Cache cache, int pos) {
+		return ((CacheImpl) cache).removeSuper(this, pos);
+	}
+
+	public <T extends Generic> T updateKey(Cache cache, Serializable key) {
+		return ((CacheImpl) cache).updateKey(this, key);
+	}
 }

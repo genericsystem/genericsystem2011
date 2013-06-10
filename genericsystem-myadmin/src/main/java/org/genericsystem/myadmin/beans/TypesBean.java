@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.el.MethodExpression;
 import javax.enterprise.context.SessionScoped;
@@ -13,9 +12,7 @@ import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
-import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
@@ -285,7 +282,7 @@ public class TypesBean implements Serializable {
 		public void setValue(String newValue) {
 			Generic generic = genericTreeNode.getGeneric();
 			if (!newValue.equals(generic.toString())) {
-				genericTreeNode.setGeneric(((CacheImpl) cache).update(generic, newValue));
+				genericTreeNode.setGeneric(generic.updateKey(cache, newValue));
 				messages.info("updateShortPath", newValue, generic.getValue());
 			}
 		}
@@ -308,7 +305,7 @@ public class TypesBean implements Serializable {
 
 		public void setValue(String newValue) {
 			if (!newValue.equals(wrappedGeneric.toString())) {
-				((CacheImpl) cache).update(wrappedGeneric, newValue);
+				wrappedGeneric.updateKey(cache, newValue);
 				messages.info("updateValue", wrappedGeneric, newValue);
 			}
 		}
@@ -335,7 +332,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_green_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -361,7 +358,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_red_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -387,7 +384,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getMessage("value");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -462,7 +459,6 @@ public class TypesBean implements Serializable {
 		return valuesMenuGroup;
 	}
 
-	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {
-	}
+	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {}
 
 }
