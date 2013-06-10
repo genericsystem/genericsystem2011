@@ -764,4 +764,14 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets);
 
 	Map<Serializable, Serializable> getProperties(final Cache cache);
+
+	<T extends Generic> T addComponent(Cache cache, int pos, Generic newComponent);
+
+	<T extends Generic> T removeComponent(Cache cache, int pos, Generic newComponent);
+
+	<T extends Generic> T addSuper(Cache cache, int pos, Generic newSuper);
+
+	<T extends Generic> T removeSuper(Cache cache, int pos);
+
+	<T extends Generic> T updateKey(Cache cache, Serializable key);
 }

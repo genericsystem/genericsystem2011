@@ -3,15 +3,12 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
-import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
@@ -97,7 +94,7 @@ public class FileSystemBean implements Serializable {
 
 		public void setShortPath(String newValue) {
 			if (!newValue.equals(generic.getValue())) {
-				selectedFile = ((CacheImpl) cache).update(generic, newValue);
+				selectedFile = generic.updateKey(cache, newValue);
 				messages.info("updateShortPath", newValue, generic.getValue());
 			}
 		}
