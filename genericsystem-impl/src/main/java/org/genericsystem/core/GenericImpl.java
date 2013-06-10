@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.generic.map.PropertiesMapProvider;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
@@ -1289,13 +1290,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 		public int getComponentPos(Generic generic) {
 			int i;
-			for (i = 0; i < getComponentsSize(); i++)
-				if (!forbidden.contains(i) && (generic == null ? GenericImpl.this.equals(getComponent(i)) : generic.inheritsFrom(getComponent(i))))
+			for (i = 0; i < getComponentsSize(); i++) {
+				log.info("generic " + generic + " " + getComponent(i));
+				if (!forbidden.contains(i) && (generic == null ? GenericImpl.this.equals(getComponent(i)) : generic.inheritsFrom(getComponent(i)))) {
+					log.info("++++> " + i);
 					return i;
-			// if (isStructural())
-			// throw new IllegalStateException("Unable to find component position for : " + generic + " in " + GenericImpl.this);
+				}
+			}
 			while (forbidden.contains(i))
 				i++;
+			log.info("===> " + i);
 			return i;
 		}
 	}
