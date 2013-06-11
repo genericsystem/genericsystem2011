@@ -1,11 +1,9 @@
 package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.el.MethodExpression;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
@@ -15,12 +13,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
-import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.Generic.AttributeWrapper;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
@@ -62,43 +59,53 @@ public class TypesBean implements Serializable {
 
 	private UIMenuGroup valuesMenuGroup;
 
-	@PostConstruct
-	public void init() {
-		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
-		selectedTreeNode = rootTreeNode;
-		valuesMenuGroup = (UIMenuGroup) FacesContext.getCurrentInstance().getApplication().createComponent(UIMenuGroup.COMPONENT_TYPE);
-		valuesMenuGroup.setLabel("show values ...");
-
-		// TODO TEST
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type color = cache.newType("Color");
-		Type time = cache.newType("Time");
-		Attribute power = vehicle.addAttribute(cache, "power");
-		Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);
-		Relation vehicleColorTime = vehicle.setRelation(cache, "vehicleColorTime", color, time);
-		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Generic red = color.newInstance(cache, "red");
-		Generic yellow = color.newInstance(cache, "yellow");
-		vehicle.setValue(cache, power, 123);
-		myVehicle.setValue(cache, power, 136);
-		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
-		myVehicle.bind(cache, vehicleColorTime, red, time.newInstance(cache, "myTime"));
-		vehicle.bind(cache, vehicleColor, yellow);
-		car.newInstance(cache, "myCar");
-
-		Type human = cache.newType("Human");
-		Generic nicolas = human.newInstance(cache, "Nicolas");
-		Generic michael = human.newInstance(cache, "Michael");
-		Relation isTallerOrEqualThan = human.setRelation(cache, "isTallerOrEqualThan", human);
-		nicolas.bind(cache, isTallerOrEqualThan, michael);
-		nicolas.bind(cache, isTallerOrEqualThan, nicolas);
-		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human).enableMultiDirectional(cache); // bug
-		Generic michaelBrother = human.newInstance(cache, "MichaelBrother");
-		michaelBrother.bind(cache, isBrotherOf, michael);
-		Relation isBossOf = human.setRelation(cache, "isBossOf", human);
-		nicolas.bind(cache, isBossOf, michael);
+	// TODO remove - only for test
+	public void setSelectedTreeNode(Generic generic) {
+		selectedTreeNode = new GenericTreeNode(null, generic, GenericTreeNode.TreeType_DEFAULT);
 	}
+
+	// TODO uncomment for non test
+	// @PostConstruct
+	// public void init() {
+	// rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
+	// selectedTreeNode = rootTreeNode;
+	// // TODO write better
+	// valuesMenuGroup = (UIMenuGroup) FacesContext.getCurrentInstance().getApplication().createComponent(UIMenuGroup.COMPONENT_TYPE);
+	// valuesMenuGroup.setLabel("show values ...");
+	//
+	// // TODO TEST
+	// Type vehicle = cache.newType("Vehicle");
+	// Type car = vehicle.newSubType(cache, "Car");
+	// Type color = cache.newType("Color");
+	// Type time = cache.newType("Time");
+	// Attribute power = vehicle.setAttribute(cache, "power");
+	// Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);
+	// Relation vehicleColorTime = vehicle.setRelation(cache, "vehicleColorTime", color, time);
+	// Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
+	// Generic red = color.newInstance(cache, "red");
+	// Generic yellow = color.newInstance(cache, "yellow");
+	// vehicle.setValue(cache, power, 123);
+	// myVehicle.setValue(cache, power, 136);
+	// myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
+	// myVehicle.bind(cache, vehicleColorTime, red, time.newInstance(cache, "myTime"));
+	// vehicle.bind(cache, vehicleColor, yellow);
+	// car.newInstance(cache, "myCar");
+	//
+	// Type human = cache.newType("Human");
+	// Generic nicolas = human.newInstance(cache, "Nicolas");
+	// Generic michael = human.newInstance(cache, "Michael");
+	// Generic michaelBrother = human.newInstance(cache, "MichaelBrother");
+	// Relation isTallerOrEqualThan = human.setRelation(cache, "isTallerOrEqualThan", human);
+	// nicolas.bind(cache, isTallerOrEqualThan, michael);
+	// nicolas.bind(cache, isTallerOrEqualThan, nicolas);
+	// Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human);
+	// isBrotherOf.enableMultiDirectional(cache); // bug
+	// michaelBrother.bind(cache, isBrotherOf, michael);
+	// // Generic michaelBrother2 = human.newInstance(cache, "MichaelBrother2");
+	// // michaelBrother2.bind(cache, isBrotherOf, michael);
+	// Relation isBossOf = human.setRelation(cache, "isBossOf", human);
+	// nicolas.bind(cache, isBossOf, michael);
+	// }
 
 	public List<GenericTreeNode> getRoot() {
 		return Collections.singletonList(rootTreeNode);
@@ -128,46 +135,20 @@ public class TypesBean implements Serializable {
 		messages.info("createRootInstance", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
-	public List<Attribute> getAttributes() {
-		return ((Type) selectedTreeNode.getGeneric()).getAttributes(cache).toList();
+	public List<AttributeWrapper> getAttributeWrappers() {
+		return getSelectedTreeNodeGeneric().getAttributeWrappers(cache).toList();
 	}
 
-	public List<Holder> getValues(Attribute attribute) {
-		return ((Type) selectedTreeNode.getGeneric()).getHolders(cache, attribute).toList();
+	public List<Holder> getValues(AttributeWrapper attributeWrapper) {
+		return ((Type) getSelectedTreeNodeGeneric()).getHolders(cache, attributeWrapper.getAttribute(), attributeWrapper.getPosition()).toList();
 	}
 
-	public List<Generic> getTargets(Attribute attribute, final Holder holder) {
-		List<Generic> componentsList = new ArrayList<>();
-		Generic[] components = ((GenericImpl) holder).getComponentsArray();
-		int pos = selectedTreeNode.getGeneric().getBasePos(attribute, components);
-		log.info("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		log.info("selectedTreeNode.getGeneric() " + selectedTreeNode.getGeneric());
-		log.info("attribute " + attribute);
-		log.info("holder " + holder);
-		log.info("pos " + pos);
-		for (int i = 0; i < components.length; i++) {
-			log.info("i " + i);
-			log.info("components[i] " + components[i]);
-			if (i != pos) {
-				componentsList.add(components[i]);
-				// componentsList.add(new TargetWrapper(components[i], holder));
-			}
-		}
-		log.info("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-		return componentsList;
-
-		// return holder.getComponents().filter(new Filter<Generic>() {
-		// @Override
-		// public boolean isSelected(Generic element) {
-		// return !selectedTreeNode.getGeneric().equals(element);
-		// }
-		// }).project(new Projector<TargetWrapper, Generic>() {
-		//
-		// @Override
-		// public TargetWrapper project(Generic element) {
-		// return new TargetWrapper(element, holder);
-		// }
-		// }).toList();
+	public List<Generic> getTargets(int basePos, Holder holder) {
+		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ selectedGeneric " + getSelectedTreeNodeGeneric());
+		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ basePos " + basePos);
+		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ holder " + holder);
+		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ targets " + getSelectedTreeNodeGeneric().getOtherTargets(cache, basePos, holder).toList());
+		return getSelectedTreeNodeGeneric().getOtherTargets(cache, basePos, holder).toList();
 	}
 
 	public class TargetWrapper {
@@ -268,7 +249,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public void processDrop(DropEvent dropEvent) {
-		System.out.println("getDragValue " + ((GenericTreeNode) dropEvent.getDragValue()).getGeneric());
+		log.info("getDragValue " + ((GenericTreeNode) dropEvent.getDragValue()).getGeneric());
 	}
 
 	public Generic getSelectedTreeNodeGeneric() {
@@ -281,6 +262,10 @@ public class TypesBean implements Serializable {
 
 	public boolean isTreeTypeSelected(TreeType treeType) {
 		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
+	}
+
+	public boolean isSingular(Attribute currentAttribute) {
+		return currentAttribute.isSingularConstraintEnabled(cache);
 	}
 
 	// TODO in GS CORE
@@ -306,7 +291,7 @@ public class TypesBean implements Serializable {
 		public void setValue(String newValue) {
 			Generic generic = genericTreeNode.getGeneric();
 			if (!newValue.equals(generic.toString())) {
-				genericTreeNode.setGeneric(((CacheImpl) cache).update(generic, newValue));
+				genericTreeNode.setGeneric(generic.updateKey(cache, newValue));
 				messages.info("updateShortPath", newValue, generic.getValue());
 			}
 		}
@@ -329,7 +314,7 @@ public class TypesBean implements Serializable {
 
 		public void setValue(String newValue) {
 			if (!newValue.equals(wrappedGeneric.toString())) {
-				((CacheImpl) cache).update(wrappedGeneric, newValue);
+				wrappedGeneric.updateKey(cache, newValue);
 				messages.info("updateValue", wrappedGeneric, newValue);
 			}
 		}
@@ -413,6 +398,20 @@ public class TypesBean implements Serializable {
 		throw new IllegalStateException();
 	}
 
+	public String getMenuTypeIcon(String genericType) {
+		switch (genericType) {
+		case "TYPE":
+			return messages.getInfos("bullet_square_yellow");
+		case "ATTRIBUTE":
+			return messages.getInfos("bullet_triangle_yellow");
+		case "INSTANCE":
+			return messages.getInfos("bullet_square_green");
+		default:
+			break;
+		}
+		throw new IllegalStateException();
+	}
+
 	public String getTypeIcon(GenericTreeNode genericTreeNode) {
 		Generic generic = genericTreeNode.getGeneric();
 		if (generic.isMeta()) {
@@ -467,12 +466,8 @@ public class TypesBean implements Serializable {
 		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) || (isValue(genericTreeNode.getGeneric()) && !((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(selectedTreeNode.getGeneric())) ? "implicitColor" : "";
 	}
 
-	public String getHolderStyle(Holder holder) {
-		return !holder.getBaseComponent().equals(selectedTreeNode.getGeneric()) ? "implicitColor" : "";
-	}
-
-	public String getTargetStyle(Holder holder, Generic generic) {
-		return getHolderStyle(holder).equals("implicitColor") ? "implicitColor" : "";
+	public boolean isBaseComponent(Holder holder) {
+		return holder.getBaseComponent().equals(selectedTreeNode.getGeneric());
 	}
 
 	public boolean isImplicitShow() {

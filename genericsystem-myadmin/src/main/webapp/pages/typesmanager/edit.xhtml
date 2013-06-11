@@ -23,50 +23,44 @@
 			dropListener="#{typesBean.processDrop}" render="edittypesmanager" />
 		FIN
 
-		<rich:dataGrid var="currentAttribute" value="#{typesBean.attributes}" styleClass="fullWidth"
-			columns="2">
+
+		<rich:dataGrid var="currentAttributeWrapper" value="#{typesBean.attributeWrappers}"
+			styleClass="fullWidth" columns="2">
 			<rich:dataTable var="currentValue" headerClass="fullWidth,"
-				columnClasses="fullWidth,"
-				value="#{typesBean.getValues(currentAttribute)}">
+				columnClasses=",fullWidth,fullWidth,"
+				value="#{typesBean.getValues(currentAttributeWrapper)}">
 				<f:facet name="header">
-					<span style="vertical-align: middle; padding-top: 5px;"> <h:outputText value="#{currentAttribute}" />
+					<span style="vertical-align: middle; padding-top: 5px;"> <h:outputText
+							value="#{currentAttributeWrapper.attribute}" />
 					</span>
 					<span style="float: right;"> <a4j:commandLink
 							oncomplete="#{rich:component('addValue')}.show()">
 							<h:graphicImage value="#{infos.add}"
-								title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentAttribute}" />
+								title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentAttributeWrapper.attribute}" />
 						</a4j:commandLink>
 					</span>
 				</f:facet>
-				<rich:column headerClass="fullWidth">
-<!-- 					<f:facet name="header"> -->
-<!-- 						<h:outputText class="uppercase" value="#{msg.value}"/> -->
-<!-- 					</f:facet> -->
+				<rich:column>
+					<h:graphicImage value="#{infos.bullet_triangle_grey}"
+						rendered="#{!typesBean.isBaseComponent(currentValue)}" />
+				</rich:column>
+				<rich:column>
 					<rich:inplaceInput
 						value="#{typesBean.getGenericWrapper(currentValue).value}"
-						styleClass="#{typesBean.getHolderStyle(currentValue)}"
 						editEvent="dblclick" rendered="true">
 						<a4j:ajax event="change" render="edittypesmanager" />
 					</rich:inplaceInput>
 				</rich:column>
 				<rich:column>
-<!-- 					<f:facet name="header"> -->
-<!-- 					<h:outputText class="uppercase" value="#{msg.target}s"/> -->
-<!-- 					</f:facet> -->
-					<rich:dataTable var="currentTarget" headerClass="fullWidth,"
-						columnClasses="fullWidth,"
-						value="#{typesBean.getTargets(currentAttribute,currentValue)}">
+					<rich:dataTable var="currentTarget"
+						value="#{typesBean.getTargets(currentAttributeWrapper.position,currentValue)}">
 						<rich:column>
 							<rich:inplaceInput
 								value="#{typesBean.getGenericWrapper(currentTarget).value}"
-								styleClass="#{typesBean.getTargetStyle(currentValue,currentTarget)}"
 								editEvent="dblclick" rendered="true">
 								<a4j:ajax event="change" render="edittypesmanager" />
 							</rich:inplaceInput>
-						</rich:column>rich:column
-						<!-- <rich:column>#{currentTarget}</rich:column> -->
-						<!-- <rich:column 
-						styleClass="#{typesBean.getHolderStyle(currentTarget.getGeneric())}">#{currentTarget.getGeneric()} #{currentTarget.isBaseComponent()}</rich:column> -->
+						</rich:column>
 					</rich:dataTable>
 				</rich:column>
 				<rich:column>
@@ -76,6 +70,14 @@
 					</a4j:commandLink>
 				</rich:column>
 			</rich:dataTable>
+			<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
+				action="#{typesBean.addValue(currentAttributeWrapper.attribute,popupValue)}"
+				render="edittypesmanager" />
+		</rich:dataGrid>
+		
+		<rich:dataGrid var="currentAttribute" value="#{typesBean.attributes}" styleClass="fullWidth"
+			columns="2">
+			<gs:dataTable keyParent="edittypesmanager" var="currentAttribute" link="#{typesBean.getValues(currentAttribute)}"/>
 			<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
 				action="#{typesBean.addValue(currentAttribute,popupValue)}"
 				render="edittypesmanager" />
