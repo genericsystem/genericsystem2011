@@ -31,12 +31,16 @@ import org.genericsystem.generic.Link;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.iterator.AbstractConcateIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
+import org.genericsystem.iterator.AbstractProjectionIterator;
+import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.iterator.ArrayIterator;
 import org.genericsystem.iterator.CartesianIterator;
+import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
@@ -1279,6 +1283,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new Positions(components);
 	}
 
+	public Map<Integer, Integer> getPositions(Snapshot<? extends Generic> components) {
+		return new Positions(components);
+	}
+
 	private class Positions extends LinkedHashMap<Integer, Integer> {
 		private static final long serialVersionUID = 1715235949973772843L;
 		Collection<Integer> forbidden = values();
@@ -1288,18 +1296,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				put(i, getComponentPos(components[i]));
 		}
 
+		private Positions(Snapshot<? extends Generic> components) {
+			int i = 0;
+			for (Generic component : components) {
+				put(i, getComponentPos(component));
+				i++;
+			}
+		}
+
 		public int getComponentPos(Generic generic) {
 			int i;
 			for (i = 0; i < getComponentsSize(); i++) {
-				log.info("generic " + generic + " " + getComponent(i));
+				// log.info("generic " + generic + " " + getComponent(i));
 				if (!forbidden.contains(i) && (generic == null ? GenericImpl.this.equals(getComponent(i)) : generic.inheritsFrom(getComponent(i)))) {
-					log.info("++++> " + i);
+					// log.info("++++> " + i);
 					return i;
 				}
 			}
 			while (forbidden.contains(i))
 				i++;
-			log.info("===> " + i);
+			// log.info("===> " + i);
 			return i;
 		}
 	}
@@ -1658,23 +1674,81 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isConcrete() && this.equals(getBaseComponent());
 	}
 
+	@Override
 	public <T extends Generic> T addComponent(Cache cache, int pos, Generic newComponent) {
 		return ((CacheImpl) cache).addComponent(this, newComponent, pos);
 	}
 
+	@Override
 	public <T extends Generic> T removeComponent(Cache cache, int pos, Generic newComponent) {
 		return ((CacheImpl) cache).removeComponent(this, pos);
 	}
 
+	@Override
 	public <T extends Generic> T addSuper(Cache cache, int pos, Generic newSuper) {
 		return ((CacheImpl) cache).addSuper(this, newSuper);
 	}
 
+	@Override
 	public <T extends Generic> T removeSuper(Cache cache, int pos) {
 		return ((CacheImpl) cache).removeSuper(this, pos);
 	}
 
+	@Override
 	public <T extends Generic> T updateKey(Cache cache, Serializable key) {
 		return ((CacheImpl) cache).updateKey(this, key);
+	}
+
+	@Override
+	public Snapshot<AttributeWrapper> getAttributeWrappers(final Cache cache) {
+		return new AbstractSnapshot<AttributeWrapper>() {
+			@Override
+			public Iterator<AttributeWrapper> iterator() {
+				final Snapshot<Attribute> attributes = ((Type) GenericImpl.this).getAttributes(cache);
+				return new AbstractConcateIterator<Attribute, AttributeWrapper>(attributes.iterator()) {
+					@Override
+					protected Iterator<AttributeWrapper> getIterator(final Attribute attribute) {
+						return new AbstractProjectionIterator<Integer, AttributeWrapper>(positionsIterator(GenericImpl.this, attribute)) {
+							@Override
+							public AttributeWrapper project(Integer pos) {
+								return new AttributeWrapper(attribute, pos);
+							}
+						};
+					}
+				};
+			}
+
+			Iterator<Integer> positionsIterator(final Generic base, final Attribute attribute) {
+				final Generic[] components = ((GenericImpl) attribute).getComponentsArray();
+				return new AbstractFilterIterator<Integer>(new CountIterator(components.length)) {
+					@Override
+					public boolean isSelected() {
+						return base.inheritsFrom(components[next]);
+					}
+				};
+			}
+		};
+	}
+
+	@Override
+	public Snapshot<Generic> getOtherTargets(Cache cache, final int basePos, final Holder holder) {
+		final Generic[] components = ((GenericImpl) holder).getComponentsArray();
+		return new AbstractSnapshot<Generic>() {
+			@Override
+			public Iterator<Generic> iterator() {
+				return new AbstractProjectorAndFilterIterator<Integer, Generic>(new CountIterator(components.length)) {
+
+					@Override
+					public boolean isSelected() {
+						return basePos != next.intValue();
+					}
+
+					@Override
+					protected Generic project() {
+						return components[next];
+					}
+				};
+			}
+		};
 	}
 }

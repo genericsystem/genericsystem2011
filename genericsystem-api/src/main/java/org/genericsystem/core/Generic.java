@@ -2,6 +2,8 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
+
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
@@ -774,4 +776,52 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Generic> T removeSuper(Cache cache, int pos);
 
 	<T extends Generic> T updateKey(Cache cache, Serializable key);
+
+	Snapshot<AttributeWrapper> getAttributeWrappers(Cache cache);
+
+	public static class AttributeWrapper {
+		private Attribute attribute;
+		private int position;
+
+		public AttributeWrapper(Attribute attribute, int position) {
+			this.attribute = attribute;
+			this.position = position;
+		}
+
+		public Attribute getAttribute() {
+			return attribute;
+		}
+
+		public void setAttribute(Attribute attribute) {
+			this.attribute = attribute;
+		}
+
+		public int getPosition() {
+			return position;
+		}
+
+		public void setPosition(int position) {
+			this.position = position;
+		}
+
+		@Override
+		public String toString() {
+			return "AttributeWrapper [attribute=" + attribute + ", position=" + position + "]\n";
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (o == this)
+				return true;
+			if (o == null)
+				return false;
+			if (!(o instanceof AttributeWrapper))
+				return false;
+			AttributeWrapper aw = (AttributeWrapper) o;
+
+			return attribute.equals(aw.attribute) && position == aw.position;
+		}
+	}
+
+	Snapshot<Generic> getOtherTargets(Cache cache, int basePos, Holder holder);
 }

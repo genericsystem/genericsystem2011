@@ -5,8 +5,18 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.genericsystem.cdi.CacheProvider;
+import org.genericsystem.cdi.EngineProvider;
+import org.genericsystem.cdi.PersitentDirectoryProvider;
+import org.genericsystem.cdi.UserClassesProvider;
+import org.genericsystem.myadmin.beans.TypesBean;
+import org.genericsystem.myadmin.util.GsMessages;
+import org.genericsystem.myadmin.util.GsRedirect;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.seam.faces.environment.FacesContextProducer;
+import org.jboss.seam.international.status.MessageFactory;
+import org.jboss.seam.international.status.MessagesImpl;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
@@ -21,7 +31,8 @@ public abstract class AbstractTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createTestArchive() {
-		return new Archiver().archive();
+		return new Archiver(TypesBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class, MessageFactory.class)
+				.archive();
 	}
 
 	@Inject
