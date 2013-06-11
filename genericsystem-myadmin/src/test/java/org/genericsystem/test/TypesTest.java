@@ -1,12 +1,10 @@
 package org.genericsystem.test;
 
 import java.util.List;
-
 import javax.inject.Inject;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Generic.AttributeWrapper;
+import org.genericsystem.core.Structural;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -74,8 +72,8 @@ public class TypesTest extends AbstractTest {
 		michaelBrother.bind(cache, isBrotherOf, michael);
 
 		typesBean.setSelectedTreeNode(michaelBrother);
-		List<AttributeWrapper> attributeWrappers = typesBean.getAttributeWrappers();
-		for (AttributeWrapper currentAttributeWrapper : attributeWrappers) {
+		List<Structural> attributeWrappers = typesBean.getAttributeWrappers();
+		for (Structural currentAttributeWrapper : attributeWrappers) {
 			List<Holder> values = typesBean.getValues(currentAttributeWrapper);
 			for (Holder currentValue : values) {
 				log.info("ZZZZZZZZZZZZZZZZZZZZZZZZZZ attribute " + currentAttributeWrapper.getAttribute());

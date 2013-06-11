@@ -3,7 +3,6 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-
 import javax.el.MethodExpression;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
@@ -11,11 +10,10 @@ import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Generic.AttributeWrapper;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.Structural;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
@@ -135,11 +133,11 @@ public class TypesBean implements Serializable {
 		messages.info("createRootInstance", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
-	public List<AttributeWrapper> getAttributeWrappers() {
-		return getSelectedTreeNodeGeneric().getAttributeWrappers(cache).toList();
+	public List<Structural> getAttributeWrappers() {
+		return getSelectedTreeNodeGeneric().getStructurals(cache).toList();
 	}
 
-	public List<Holder> getValues(AttributeWrapper attributeWrapper) {
+	public List<Holder> getValues(Structural attributeWrapper) {
 		return ((Type) getSelectedTreeNodeGeneric()).getHolders(cache, attributeWrapper.getAttribute(), attributeWrapper.getPosition()).toList();
 	}
 
@@ -148,7 +146,7 @@ public class TypesBean implements Serializable {
 		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ basePos " + basePos);
 		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ holder " + holder);
 		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ targets " + getSelectedTreeNodeGeneric().getOtherTargets(cache, basePos, holder).toList());
-		return getSelectedTreeNodeGeneric().getOtherTargets(cache, basePos, holder).toList();
+		return getSelectedTreeNodeGeneric().getOtherTargets(basePos, holder).toList();
 	}
 
 	public class TargetWrapper {
@@ -337,7 +335,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_green_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -363,7 +361,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_red_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -389,7 +387,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getMessage("value");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -464,7 +462,6 @@ public class TypesBean implements Serializable {
 		return valuesMenuGroup;
 	}
 
-	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {
-	}
+	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {}
 
 }
