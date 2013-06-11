@@ -3,9 +3,7 @@ package org.genericsystem.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.snapshot.AbstractSequentiableSnapshot;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -37,16 +35,16 @@ public class SnapshotTest extends AbstractTest {
 				return new ArrayList<String>().iterator();
 			}
 		};
-		snapshotSequentiable = new AbstractSequentiableSnapshot<String>() {
-			@Override
-			public Iterator<String> sequentiableIterator() {
-				List<String> elements = new ArrayList<>();
-				elements.add("toto");
-				elements.add("tata");
-				elements.add("titi");
-				return elements.iterator();
-			}
-		};
+		// snapshotSequentiable = new AbstractSnapshot<String>() {
+		// @Override
+		// public Iterator<String> sequentiableIterator() {
+		// List<String> elements = new ArrayList<>();
+		// elements.add("toto");
+		// elements.add("tata");
+		// elements.add("titi");
+		// return elements.iterator();
+		// }
+		// };
 	}
 
 	public void testIsEmpty() {
@@ -69,20 +67,20 @@ public class SnapshotTest extends AbstractTest {
 		assert snapshot.get(3) == null;
 	}
 
-	public void testGetSequentiable() {
-		assert snapshotSequentiable.get(0).equals("toto");
-		assert snapshotSequentiable.get(1).equals("tata");
-		assert snapshot.get(3) == null;
-	}
-
-	public void testGetSequentiableWithEqualsIndex() {
-		assert snapshotSequentiable.get(0).equals("toto");
-		assert snapshotSequentiable.get(0).equals("toto");
-	}
-
-	public void testGetSequentiableWithJump() {
-		assert snapshotSequentiable.get(0).equals("toto");
-		assert snapshotSequentiable.get(2).equals("titi");
-	}
+	// public void testGetSequentiable() {
+	// assert snapshotSequentiable.get(0).equals("toto");
+	// assert snapshotSequentiable.get(1).equals("tata");
+	// assert snapshot.get(3) == null;
+	// }
+	//
+	// public void testGetSequentiableWithEqualsIndex() {
+	// assert snapshotSequentiable.get(0).equals("toto");
+	// assert snapshotSequentiable.get(0).equals("toto");
+	// }
+	//
+	// public void testGetSequentiableWithJump() {
+	// assert snapshotSequentiable.get(0).equals("toto");
+	// assert snapshotSequentiable.get(2).equals("titi");
+	// }
 
 }
