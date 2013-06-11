@@ -16,10 +16,6 @@
 				action="#{typesBean.changeTreeType('SUPERS')}" mode="ajax"
 				render="typestree, typestreetitle" icon="#{infos.up_green_arrow}"
 				disabled="#{typesBean.isTreeTypeSelected('SUPERS')}" />
-			<rich:menuItem label="#{msg.show} #{msg.instance}s"
-				action="#{typesBean.changeTreeType('INSTANCES')}" mode="ajax"
-				render="typestree, typestreetitle" icon="#{infos.down_green_arrow}"
-				disabled="#{typesBean.isTreeTypeSelected('INSTANCES')}" />
 			<rich:menuItem label="#{msg.show} #{msg.inheriting}s"
 				action="#{typesBean.changeTreeType('INHERITINGS')}" mode="ajax"
 				render="typestree, typestreetitle"
@@ -45,19 +41,19 @@
 
 		<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
 			oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
-			icon="#{infos.add}" />
+			icon="#{typesBean.getMenuTypeIcon('TYPE')}" />
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{typesBean.selectedTreeNodeValue}"
 			oncomplete="#{rich:component('createsubtype')}.show()" mode="ajax"
-			icon="#{infos.folder_add}" />
+			icon="#{typesBean.getMenuTypeIcon('TYPE')}" />
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{typesBean.selectedTreeNodeValue}"
 			oncomplete="#{rich:component('createattribute')}.show()" mode="ajax"
-			icon="#{infos.folder_add}" />
+			icon="#{typesBean.getMenuTypeIcon('ATTRIBUTE')}" />
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.instance} #{msg.for} #{typesBean.selectedTreeNodeValue}"
 			oncomplete="#{rich:component('createinstance')}.show()" mode="ajax"
-			icon="#{infos.folder_add}" />
+			icon="#{typesBean.getMenuTypeIcon('INSTANCE')}" />
 		<rich:menuItem
 			label="#{msg.delete} #{typesBean.selectedTreeNodeValue}"
 			action="#{typesBean.delete}" render="typestree, edittypesmanager"

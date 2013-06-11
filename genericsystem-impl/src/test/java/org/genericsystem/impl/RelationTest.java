@@ -3,8 +3,10 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
@@ -1291,9 +1293,19 @@ public class RelationTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type human = cache.newType("Human");
 		Relation brother = human.setRelation(cache, "brother", human);
+		brother.enableMultiDirectional(cache);
 		assert human.getRelations(cache).size() == 1;
 		assert human.getRelations(cache).contains(brother);
 		assert human.getRelation(cache, "brother").equals(brother);
+
+		Generic michael = human.newInstance(cache, "michael");
+		Generic quentin = human.newInstance(cache, "quentin");
+		Link holder = michael.bind(cache, brother, quentin);
+
+		Generic[] components = ((GenericImpl) holder).getComponentsArray();
+		assert michael.getBasePos(brother, components) == 0;
+		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		assert quentin.getBasePos(brother, components) == 1 : quentin.getBasePos(brother, components);
 	}
 
 	public void testGetLinkFromTarget() {

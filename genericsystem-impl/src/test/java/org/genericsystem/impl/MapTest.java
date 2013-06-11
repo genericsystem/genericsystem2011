@@ -3,7 +3,9 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -42,5 +44,18 @@ public class MapTest extends AbstractTest {
 
 		assert !(Boolean) map.get("key2");
 		assert !(Boolean) map3.get("key2");
+	}
+
+	public void testPropertyMap2() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		for (Entry<Serializable, Serializable> entry : vehicle.getProperties(cache).entrySet())
+			log.info("KEY " + entry.getKey() + " VALUE " + entry.getValue());
+		for (Entry<Serializable, Serializable> entry : car.getProperties(cache).entrySet())
+			log.info("KEY " + entry.getKey() + " VALUE " + entry.getValue());
+		for (Entry<Serializable, Serializable> entry : myBmw.getProperties(cache).entrySet())
+			log.info("KEY " + entry.getKey() + " VALUE " + entry.getValue());
 	}
 }
