@@ -3,16 +3,15 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.generic.map.PropertiesMapProvider;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
@@ -410,7 +409,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public int getBasePos(Holder attribute, Generic... targets) {
-		return ((GenericImpl) attribute).getPositions(Statics.insertFirst(this, targets)).get(0);
+		Iterator<Integer> iterator = positionsIterator(attribute);
+		return iterator.hasNext() ? iterator.next() : Statics.BASE_POSITION;
 	}
 
 	@Override
@@ -468,7 +468,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	<T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, final Generic... targets) {
-		final Map<Integer, Integer> positions = ((GenericImpl) attribute).getPositions(Statics.insertFirst(this, targets));
+		final List<Integer> positions = ((GenericImpl) attribute).getPositions(Statics.insertFirst(this, targets));
 		return new AbstractFilterIterator<T>(iterator) {
 			@Override
 			public boolean isSelected() {
@@ -673,7 +673,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	Generic[] sortAndCheck(Generic... components) {
 		if (getComponentsSize() != components.length)
 			throw new IllegalStateException("Illegal components size");
-		Map<Integer, Integer> positions = getPositions(components);
+		List<Integer> positions = getPositions(components);
 		Generic[] orderedComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++) {
 			int pos = positions.get(i);
@@ -1279,49 +1279,28 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				enableSingularConstraint(cache, axe);
 	}
 
-	Map<Integer, Integer> getPositions(Generic... components) {
+	List<Integer> getPositions(Generic... components) {
 		return new Positions(components);
 	}
 
-	public Map<Integer, Integer> getPositions(Snapshot<? extends Generic> components) {
-		return new Positions(components);
-	}
-
-	private class Positions extends LinkedHashMap<Integer, Integer> {
+	private class Positions extends ArrayList<Integer> {
 		private static final long serialVersionUID = 1715235949973772843L;
-		Collection<Integer> forbidden = values();
 
 		private Positions(Generic[] components) {
 			for (int i = 0; i < components.length; i++)
-				put(i, getComponentPos(components[i]));
-		}
-
-		private Positions(Snapshot<? extends Generic> components) {
-			int i = 0;
-			for (Generic component : components) {
-				put(i, getComponentPos(component));
-				i++;
-			}
+				add(getComponentPos(components[i]));
 		}
 
 		public int getComponentPos(Generic generic) {
 			int i;
-			for (i = 0; i < getComponentsSize(); i++) {
-				// log.info("generic " + generic + " " + getComponent(i));
-				if (!forbidden.contains(i) && (generic == null ? GenericImpl.this.equals(getComponent(i)) : generic.inheritsFrom(getComponent(i)))) {
-					// log.info("++++> " + i);
+			for (i = 0; i < getComponentsSize(); i++)
+				if (!contains(i) && (generic == null ? GenericImpl.this.equals(getComponent(i)) : generic.inheritsFrom(getComponent(i)))) {
 					return i;
 				}
-			}
-			while (forbidden.contains(i))
+			while (contains(i))
 				i++;
-			// log.info("===> " + i);
 			return i;
 		}
-	}
-
-	public int getFirstComponentPos(Generic component, Generic[] targets) {
-		return getPositions(Statics.insertFirst(component, targets)).get(component);
 	}
 
 	@Override
@@ -1699,31 +1678,43 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((CacheImpl) cache).updateKey(this, key);
 	}
 
-	@Override
-	public Snapshot<AttributeWrapper> getAttributeWrappers(final Cache cache) {
-		return new AbstractSnapshot<AttributeWrapper>() {
+	Snapshot<Integer> getPositions(final Holder attribute) {
+		return new AbstractSnapshot<Integer>() {
 			@Override
-			public Iterator<AttributeWrapper> iterator() {
-				final Snapshot<Attribute> attributes = ((Type) GenericImpl.this).getAttributes(cache);
-				return new AbstractConcateIterator<Attribute, AttributeWrapper>(attributes.iterator()) {
-					@Override
-					protected Iterator<AttributeWrapper> getIterator(final Attribute attribute) {
-						return new AbstractProjectionIterator<Integer, AttributeWrapper>(positionsIterator(GenericImpl.this, attribute)) {
-							@Override
-							public AttributeWrapper project(Integer pos) {
-								return new AttributeWrapper(attribute, pos);
-							}
-						};
-					}
-				};
+			public Iterator<Integer> iterator() {
+				return positionsIterator(attribute);
 			}
+		};
+	}
 
-			Iterator<Integer> positionsIterator(final Generic base, final Attribute attribute) {
-				final Generic[] components = ((GenericImpl) attribute).getComponentsArray();
-				return new AbstractFilterIterator<Integer>(new CountIterator(components.length)) {
+	Iterator<Integer> positionsIterator(final Holder attribute) {
+		final Generic[] components = ((GenericImpl) attribute).getComponentsArray();
+		return new AbstractFilterIterator<Integer>(new CountIterator(components.length)) {
+			@Override
+			public boolean isSelected() {
+				return GenericImpl.this.inheritsFrom(components[next]);
+			}
+		};
+	}
+
+	@Override
+	public Snapshot<Structural> getStructurals(final Cache cache) {
+		return new AbstractSnapshot<Structural>() {
+			@Override
+			public Iterator<Structural> iterator() {
+				return structuralsIterator(cache);
+			}
+		};
+	}
+
+	public Iterator<Structural> structuralsIterator(final Cache cache) {
+		return new AbstractConcateIterator<Attribute, Structural>(GenericImpl.this.getAttributes(cache).iterator()) {
+			@Override
+			protected Iterator<Structural> getIterator(final Attribute attribute) {
+				return new AbstractProjectionIterator<Integer, Structural>(positionsIterator(attribute)) {
 					@Override
-					public boolean isSelected() {
-						return base.inheritsFrom(components[next]);
+					public Structural project(Integer pos) {
+						return new StructuralImpl(attribute, pos);
 					}
 				};
 			}
@@ -1731,23 +1722,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public Snapshot<Generic> getOtherTargets(Cache cache, final int basePos, final Holder holder) {
-		final Generic[] components = ((GenericImpl) holder).getComponentsArray();
+	public Snapshot<Generic> getOtherTargets(final int basePos, final Holder holder) {
 		return new AbstractSnapshot<Generic>() {
 			@Override
 			public Iterator<Generic> iterator() {
-				return new AbstractProjectorAndFilterIterator<Integer, Generic>(new CountIterator(components.length)) {
+				return otherTargetsIterator(basePos, holder);
+			}
+		};
+	}
 
-					@Override
-					public boolean isSelected() {
-						return basePos != next.intValue();
-					}
+	public Iterator<Generic> otherTargetsIterator(final int basePos, final Holder holder) {
+		final Generic[] components = ((GenericImpl) holder).getComponentsArray();
+		return new AbstractProjectorAndFilterIterator<Integer, Generic>(new CountIterator(components.length)) {
 
-					@Override
-					protected Generic project() {
-						return components[next];
-					}
-				};
+			@Override
+			public boolean isSelected() {
+				return basePos != next.intValue();
+			}
+
+			@Override
+			protected Generic project() {
+				return components[next];
 			}
 		};
 	}

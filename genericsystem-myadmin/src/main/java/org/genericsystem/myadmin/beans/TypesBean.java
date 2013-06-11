@@ -406,7 +406,7 @@ public class TypesBean implements Serializable {
 		case "INSTANCE":
 			return messages.getInfos("bullet_square_green");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
