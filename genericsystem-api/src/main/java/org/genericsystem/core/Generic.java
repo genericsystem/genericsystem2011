@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
@@ -762,6 +763,8 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets);
 
 	Map<Serializable, Serializable> getProperties(final Cache cache);
+
+	Snapshot<Entry<Serializable, Serializable>> getPropertiesShot(final Cache cache);
 
 	<T extends Generic> T addComponent(Cache cache, int pos, Generic newComponent);
 

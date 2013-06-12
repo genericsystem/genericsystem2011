@@ -139,10 +139,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	private <T extends Generic> T addComponent(Generic old, Generic component) {
-		return addComponent(old, component, old.getComponentsSize());
-	}
-
 	abstract class Restructurator {
 		@SuppressWarnings("unchecked")
 		<T extends Generic> T rebuildAll(Generic old) {

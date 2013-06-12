@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import org.generic.map.PropertiesMapProvider;
@@ -1611,6 +1612,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public Map<Serializable, Serializable> getProperties(final Cache cache) {
 		return cache.<PropertiesMapProvider> find(PropertiesMapProvider.class).getMap(cache, this);
+	}
+
+	@Override
+	public Snapshot<Entry<Serializable, Serializable>> getPropertiesShot(final Cache cache) {
+		return cache.<PropertiesMapProvider> find(PropertiesMapProvider.class).getEntriesShot(cache, this);
 	}
 
 	boolean isMapProvider(Cache cache) {
