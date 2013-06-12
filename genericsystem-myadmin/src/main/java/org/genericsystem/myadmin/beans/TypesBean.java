@@ -3,14 +3,15 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
+
 import javax.annotation.PostConstruct;
-import javax.el.MethodExpression;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -20,12 +21,11 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
+import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
-import org.richfaces.component.UIMenuGroup;
-import org.richfaces.component.UIMenuItem;
 import org.richfaces.event.DropEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +55,10 @@ public class TypesBean implements Serializable {
 	@Inject
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
-	private boolean implicitShow;
+	@Inject
+	private Event<MenuEvent> menuEvent;
 
-	private UIMenuGroup valuesMenuGroup;
+	private boolean implicitShow;
 
 	// TODO remove - only for test
 	public void setSelectedTreeNode(Generic generic) {
@@ -68,9 +69,6 @@ public class TypesBean implements Serializable {
 	public void init() {
 		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
 		selectedTreeNode = rootTreeNode;
-		// TODO write better
-		valuesMenuGroup = (UIMenuGroup) FacesContext.getCurrentInstance().getApplication().createComponent(UIMenuGroup.COMPONENT_TYPE);
-		valuesMenuGroup.setLabel("show values ...");
 
 		// TODO TEST
 		Type vehicle = cache.newType("Vehicle");
@@ -100,10 +98,10 @@ public class TypesBean implements Serializable {
 		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human);
 		isBrotherOf.enableMultiDirectional(cache); // bug
 		michaelBrother.bind(cache, isBrotherOf, michael);
-		// Generic michaelBrother2 = human.newInstance(cache, "MichaelBrother2");
-		// michaelBrother2.bind(cache, isBrotherOf, michael);
 		Relation isBossOf = human.setRelation(cache, "isBossOf", human);
 		nicolas.bind(cache, isBossOf, michael);
+
+		michael.getProperties(cache).put("KEY TEST", "VALUE TEST");
 	}
 
 	public List<GenericTreeNode> getRoot() {
@@ -127,6 +125,10 @@ public class TypesBean implements Serializable {
 	public void addAttribute(String newValue) {
 		((Type) getSelectedTreeNodeGeneric()).addAttribute(cache, newValue);
 		messages.info("createRootAttribute", newValue, getSelectedTreeNodeGeneric().getValue());
+	}
+
+	public void addProperty(String key, String value) {
+		((Type) getSelectedTreeNodeGeneric()).getProperties(cache).put(key, value);
 	}
 
 	public void newInstance(String newValue) {
@@ -213,26 +215,10 @@ public class TypesBean implements Serializable {
 	public void changeType(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			selectedTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
+			menuEvent.fire(new MenuEvent(cache, selectedTreeNode, implicitShow));
 			panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
-			buildValuesMenuGroup();
 			messages.info("typeselectionchanged", getSelectedTreeNodeGeneric().toString());
 		}
-	}
-
-	private UIMenuGroup buildValuesMenuGroup() {
-		valuesMenuGroup.getChildren().clear();
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-		int i = 0;
-		for (GenericTreeNode genericTreeNode : selectedTreeNode.getChildrens(cache, TreeType.ATTRIBUTES, implicitShow)) {
-			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
-			uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
-			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{typesBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
-			uiMenuItem.setActionExpression(methodExpression);
-			uiMenuItem.setRender("typestree, typestreetitle");
-			valuesMenuGroup.getChildren().add(uiMenuItem);
-			i++;
-		}
-		return valuesMenuGroup;
 	}
 
 	public void changeAttributeSelected(int attributeIndex) {
@@ -249,6 +235,11 @@ public class TypesBean implements Serializable {
 
 	public void processDrop(DropEvent dropEvent) {
 		log.info("getDragValue " + ((GenericTreeNode) dropEvent.getDragValue()).getGeneric());
+	}
+
+	public List<Entry<Serializable, Serializable>> getProperties() {
+		// TODO ADD MESSAGES
+		return getSelectedTreeNodeGeneric().getPropertiesShot(cache).toList();
 	}
 
 	public Generic getSelectedTreeNodeGeneric() {
@@ -340,7 +331,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_green_arrow");
 		default:
-		break;
+			break;
 		}
 		throw new IllegalStateException();
 	}
@@ -366,7 +357,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_red_arrow");
 		default:
-		break;
+			break;
 		}
 		throw new IllegalStateException();
 	}
@@ -392,7 +383,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getMessage("value");
 		default:
-		break;
+			break;
 		}
 		throw new IllegalStateException();
 	}
@@ -406,7 +397,7 @@ public class TypesBean implements Serializable {
 		case "INSTANCE":
 			return messages.getInfos("bullet_square_green");
 		default:
-		break;
+			break;
 		}
 		throw new IllegalStateException();
 	}
@@ -476,11 +467,5 @@ public class TypesBean implements Serializable {
 	public void setImplicitShow(boolean implicitShow) {
 		this.implicitShow = implicitShow;
 	}
-
-	public UIMenuGroup getValuesMenuGroup() {
-		return valuesMenuGroup;
-	}
-
-	public void setValuesMenuGroup(UIMenuGroup valuesMenuGroup) {}
 
 }

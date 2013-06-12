@@ -35,7 +35,8 @@
 				icon="#{infos.up_right_green_arrow}"
 				disabled="#{typesBean.isTreeTypeSelected('ATTRIBUTES')}" />
 		</rich:menuGroup>
-		<rich:menuGroup binding="#{typesBean.valuesMenuGroup}" />
+		<rich:menuGroup label="show values ..."
+			binding="#{menuBean.menuGroup}" />
 
 		<rich:menuSeparator />
 
@@ -49,6 +50,10 @@
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{typesBean.selectedTreeNodeValue}"
 			oncomplete="#{rich:component('createattribute')}.show()" mode="ajax"
+			icon="#{typesBean.getMenuTypeIcon('ATTRIBUTE')}" />
+		<rich:menuItem
+			label="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{typesBean.selectedTreeNodeValue}"
+			oncomplete="#{rich:component('createproperty')}.show()" mode="ajax"
 			icon="#{typesBean.getMenuTypeIcon('ATTRIBUTE')}" />
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.instance} #{msg.for} #{typesBean.selectedTreeNodeValue}"
@@ -70,6 +75,10 @@
 		title="#{msg.create} #{msg.a} #{msg.attribute}"
 		action="#{typesBean.addAttribute(popupValue)}"
 		render="typestree, edittypesmanager" />
+	<gs:popupPanel key="createproperty"
+		title="#{msg.create} #{msg.a} #{msg.property}"
+		action="#{typesBean.addProperty(popupKey, popupValue)}"
+		render="typestree, edittypesmanager" keyInput="true" />
 	<gs:popupPanel key="createinstance"
 		title="#{msg.create} #{msg.a} #{msg.instance}"
 		action="#{typesBean.newInstance(popupValue)}" render="typestree" />

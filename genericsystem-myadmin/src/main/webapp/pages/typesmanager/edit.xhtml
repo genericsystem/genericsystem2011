@@ -23,14 +23,15 @@
 			dropListener="#{typesBean.processDrop}" render="edittypesmanager" />
 		FIN
 
-		<rich:dataGrid var="currentAttributeWrapper" value="#{typesBean.attributeWrappers}"
-			styleClass="fullWidth" columns="2">
+		<rich:dataGrid var="currentAttributeWrapper"
+			value="#{typesBean.attributeWrappers}" styleClass="fullWidth"
+			columns="2">
 			<rich:dataTable var="currentValue" headerClass="fullWidth"
 				columnClasses=",fullWidth,fullWidth," styleClass="fullWidth"
 				value="#{typesBean.getValues(currentAttributeWrapper)}">
 				<f:facet name="header">
 					<span style="vertical-align: middle; padding-top: 5px;"> <h:outputText
-							value="#{currentAttributeWrapper.attribute}" />
+							value="#{currentAttributeWrapper.attribute} (#{currentAttributeWrapper.position})" />
 					</span>
 					<span style="float: right;"> <a4j:commandLink
 							oncomplete="#{rich:component('addValue')}.show()">
@@ -73,14 +74,20 @@
 				action="#{typesBean.addValue(currentAttributeWrapper.attribute,popupValue)}"
 				render="edittypesmanager" />
 		</rich:dataGrid>
-		
-<!-- 		<rich:dataGrid var="currentAttribute" value="#{typesBean.attributes}" styleClass="fullWidth" -->
-<!-- 			columns="2"> -->
-<!-- 			<gs:dataTable keyParent="edittypesmanager" var="currentAttribute" link="#{typesBean.getValues(currentAttribute)}"/> -->
-<!-- 			<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}" -->
-<!-- 				action="#{typesBean.addValue(currentAttribute,popupValue)}" -->
-<!-- 				render="edittypesmanager" /> -->
-<!-- 		</rich:dataGrid> -->
+
+		<rich:dataGrid var="currentEntry" value="#{typesBean.properties}"
+			styleClass="fullWidth" columns="2">
+			<rich:dataTable columnClasses="fullWidth" styleClass="fullWidth"
+				value="#{currentEntry}">
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="#{currentEntry.key}" />
+					</f:facet>
+					<h:outputText value="#{currentEntry.value}" />
+				</rich:column>
+			</rich:dataTable>
+		</rich:dataGrid>
+
 	</rich:panel>
 
 </ui:composition>
