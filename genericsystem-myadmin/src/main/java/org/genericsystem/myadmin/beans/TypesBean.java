@@ -129,6 +129,7 @@ public class TypesBean implements Serializable {
 
 	public void addProperty(String key, String value) {
 		((Type) getSelectedTreeNodeGeneric()).getProperties(cache).put(key, value);
+		messages.info("createRootProperty", key, value);
 	}
 
 	public void newInstance(String newValue) {
@@ -238,8 +239,35 @@ public class TypesBean implements Serializable {
 	}
 
 	public List<Entry<Serializable, Serializable>> getProperties() {
-		// TODO ADD MESSAGES
 		return getSelectedTreeNodeGeneric().getPropertiesShot(cache).toList();
+	}
+
+	public PropertyWrapper getPropertyWrapper(Entry<Serializable, Serializable> entry) {
+		return new PropertyWrapper(entry);
+	}
+
+	public void removeProperty(Entry<Serializable, Serializable> entry) {
+		getSelectedTreeNodeGeneric().getProperties(cache).remove(entry.getKey());
+		messages.info("remove", entry.getValue());
+	}
+
+	public class PropertyWrapper {
+		private Entry<Serializable, Serializable> entry;
+
+		public PropertyWrapper(Entry<Serializable, Serializable> entry) {
+			this.entry = entry;
+		}
+
+		public String getValue() {
+			return (String) entry.getValue();
+		}
+
+		public void setValue(String newValue) {
+			if (!newValue.equals(entry.getValue().toString())) {
+				getSelectedTreeNodeGeneric().getProperties(cache).put(entry.getKey(), newValue);
+				messages.info("updateValue", entry.getValue(), newValue);
+			}
+		}
 	}
 
 	public Generic getSelectedTreeNodeGeneric() {
@@ -254,8 +282,8 @@ public class TypesBean implements Serializable {
 		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
 	}
 
-	public boolean isSingular(Attribute currentAttribute) {
-		return currentAttribute.isSingularConstraintEnabled(cache);
+	public boolean isSingular(Structural structural) {
+		return structural.getAttribute().isSingularConstraintEnabled(cache);
 	}
 
 	// TODO in GS CORE
