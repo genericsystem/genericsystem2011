@@ -2,7 +2,6 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
@@ -18,7 +17,7 @@ public class NodeImpl extends GenericImpl implements Node {
 	@Override
 	public <T extends Node> T getChild(Context context, Serializable value) {
 		Tree attribute = getMeta();
-		return Statics.unambigousFirst(Statics.<T> valueFilter(this.<T> thisFilter(this.<T> holdersIterator(context, attribute, getBasePos(attribute, Statics.EMPTY_GENERIC_ARRAY), value == null)), value));
+		return Statics.unambigousFirst(Statics.<T> valueFilter(this.<T> thisFilter(this.<T> holdersIterator(context, attribute, getBasePos(attribute), value == null)), value));
 	}
 
 	@Override
