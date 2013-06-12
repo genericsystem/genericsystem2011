@@ -1,12 +1,10 @@
 package org.genericsystem.test;
 
 import java.util.List;
-
 import javax.inject.Inject;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Generic.AttributeWrapper;
+import org.genericsystem.core.Structural;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -63,6 +61,22 @@ public class TypesTest extends AbstractTest {
 	// assert targets.size() == 1 : targets.size();
 	// assert targets.contains(michael);
 	// assert !targets.contains(michaelBrother);
+	//
+	// // List<Generic> targets2 = michaelBrother.getOtherTargets(cache, 1, link).toList();
+	// // log.info("" + targets2.size());
+	// // log.info("" + targets2);
+	//
+	// // for (int i = 0; i < 10; i++) {
+	// // List<Generic> targets2 = michaelBrother.getOtherTargets(cache, i, link).toList();
+	// // log.info("" + targets2.size());
+	// // log.info("" + targets2 + "\n");
+	// // }
+	//
+	// List<Generic> targets2 = michael.getOtherTargets(cache, 0, link).toList();
+	// assert targets2.size() == 1 : targets2.size();
+	// log.info("target " + targets2.get(0));
+	// assert targets2.contains(michaelBrother) : targets2.get(0);
+	// assert !targets2.contains(michael);
 	// }
 
 	public void testGUI() {
@@ -72,17 +86,24 @@ public class TypesTest extends AbstractTest {
 		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human);
 		isBrotherOf.enableMultiDirectional(cache);
 		michaelBrother.bind(cache, isBrotherOf, michael);
+		// michaelBrother.setLink(cache, isBrotherOf, "direct", michael);
 
 		typesBean.setSelectedTreeNode(michaelBrother);
-		List<AttributeWrapper> attributeWrappers = typesBean.getAttributeWrappers();
-		for (AttributeWrapper currentAttributeWrapper : attributeWrappers) {
+		List<Structural> attributeWrappers = typesBean.getAttributeWrappers();
+		for (Structural currentAttributeWrapper : attributeWrappers) {
+			log.info("----> attributes");
 			List<Holder> values = typesBean.getValues(currentAttributeWrapper);
 			for (Holder currentValue : values) {
-				log.info("ZZZZZZZZZZZZZZZZZZZZZZZZZZ attribute " + currentAttributeWrapper.getAttribute());
-				log.info("ZZZZZZZZZZZZZZZZZZZZZZZZZZ value " + typesBean.getGenericWrapper(currentValue).getValue());
+				log.info("	----> values");
+				log.info("	attribute " + currentAttributeWrapper.getAttribute());
+				log.info("	value " + typesBean.getGenericWrapper(currentValue).getValue());
+				log.info("	position " + currentAttributeWrapper.getPosition());
 				List<Generic> targets = typesBean.getTargets(currentAttributeWrapper.getPosition(), currentValue);
 				for (Generic currentTarget : targets) {
-					log.info("ZZZZZZZZZZZZZZZZZZZZZZZZZZ target " + typesBean.getGenericWrapper(currentTarget).getValue());
+					if (currentTarget != typesBean.getSelectedTreeNodeGeneric()) {
+						log.info("		----> targets");
+						log.info("		target " + typesBean.getGenericWrapper(currentTarget).getValue());
+					}
 				}
 			}
 		}

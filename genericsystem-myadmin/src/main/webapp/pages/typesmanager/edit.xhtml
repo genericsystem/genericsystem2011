@@ -25,12 +25,12 @@
 
 		<rich:dataGrid var="currentAttributeWrapper" value="#{typesBean.attributeWrappers}"
 			styleClass="fullWidth" columns="2">
-			<rich:dataTable var="currentValue" headerClass="fullWidth,"
-				columnClasses=",fullWidth,fullWidth,"
+			<rich:dataTable var="currentHolder" headerClass="fullWidth,"
+				columnClasses=",fullWidth,fullWidth," styleClass="fullWidth"
 				value="#{typesBean.getValues(currentAttributeWrapper)}">
 				<f:facet name="header">
 					<span style="vertical-align: middle; padding-top: 5px;"> <h:outputText
-							value="#{currentAttributeWrapper.attribute}" />
+							value="#{currentAttributeWrapper.attribute} (#{currentAttributeWrapper.position})" />
 					</span>
 					<span style="float: right;"> <a4j:commandLink
 							oncomplete="#{rich:component('addValue')}.show()">
@@ -41,18 +41,18 @@
 				</f:facet>
 				<rich:column>
 					<h:graphicImage value="#{infos.bullet_triangle_grey}"
-						rendered="#{!typesBean.isBaseComponent(currentValue)}" />
+						rendered="#{!typesBean.isBaseComponent(currentHolder)}" />
 				</rich:column>
 				<rich:column>
 					<rich:inplaceInput
-						value="#{typesBean.getGenericWrapper(currentValue).value}"
+						value="#{typesBean.getGenericWrapper(currentHolder).value}"
 						editEvent="dblclick" rendered="true">
 						<a4j:ajax event="change" render="edittypesmanager" />
 					</rich:inplaceInput>
 				</rich:column>
 				<rich:column>
 					<rich:dataTable var="currentTarget"
-						value="#{typesBean.getTargets(currentAttributeWrapper.position,currentValue)}">
+						value="#{typesBean.getTargets(currentAttributeWrapper.position,currentHolder)}">
 						<rich:column>
 							<rich:inplaceInput
 								value="#{typesBean.getGenericWrapper(currentTarget).value}"
@@ -63,7 +63,7 @@
 					</rich:dataTable>
 				</rich:column>
 				<rich:column>
-					<a4j:commandLink action="#{typesBean.removeHolder(currentValue)}"
+					<a4j:commandLink action="#{typesBean.removeHolder(currentHolder)}"
 						render="edittypesmanager">
 						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
 					</a4j:commandLink>
@@ -73,6 +73,20 @@
 				action="#{typesBean.addValue(currentAttributeWrapper.attribute,popupValue)}"
 				render="edittypesmanager" />
 		</rich:dataGrid>
+
+		<rich:dataGrid var="currentEntry" value="#{typesBean.properties}"
+			styleClass="fullWidth" columns="2">
+			<rich:dataTable columnClasses="fullWidth" styleClass="fullWidth"
+				value="#{currentEntry}">
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="#{currentEntry.key}" />
+					</f:facet>
+					<h:outputText value="#{currentEntry.value}" />
+				</rich:column>
+			</rich:dataTable>
+		</rich:dataGrid>
+
 	</rich:panel>
 
 </ui:composition>
