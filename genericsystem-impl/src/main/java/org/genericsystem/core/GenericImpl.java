@@ -1711,7 +1711,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractConcateIterator<Attribute, Structural>(GenericImpl.this.getAttributes(cache).iterator()) {
 			@Override
 			protected Iterator<Structural> getIterator(final Attribute attribute) {
-				return new AbstractProjectionIterator<Integer, Structural>(positionsIterator(attribute)) {
+				return attribute.isMultiDirectional(cache) ? new SingletonIterator<Structural>(new StructuralImpl(attribute, getBasePos(attribute))) : new AbstractProjectionIterator<Integer, Structural>(positionsIterator(attribute)) {
 					@Override
 					public Structural project(Integer pos) {
 						return new StructuralImpl(attribute, pos);
