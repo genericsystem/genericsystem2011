@@ -485,6 +485,10 @@ public class TypesBean implements Serializable {
 		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) || (isValue(genericTreeNode.getGeneric()) && !((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(selectedTreeNode.getGeneric())) ? "implicitColor" : "";
 	}
 
+	public String getHolderStyle(Holder holder) {
+		return holder.getBaseComponent().equals(getSelectedTreeNodeGeneric()) ? "" : "italic";
+	}
+
 	public boolean isBaseComponent(Holder holder) {
 		return holder.getBaseComponent().equals(selectedTreeNode.getGeneric());
 	}

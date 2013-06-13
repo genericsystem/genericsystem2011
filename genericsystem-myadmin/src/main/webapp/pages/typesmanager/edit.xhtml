@@ -42,13 +42,9 @@
 					</span>
 				</f:facet>
 				<rich:column>
-					<h:graphicImage value="#{infos.bullet_triangle_grey}"
-						rendered="#{!typesBean.isBaseComponent(currentHolder)}" />
-				</rich:column>
-				<rich:column>
 					<rich:inplaceInput
 						value="#{typesBean.getGenericWrapper(currentHolder).value}"
-						editEvent="dblclick" rendered="true">
+						editEvent="dblclick" rendered="true" styleClass="#{typesBean.getHolderStyle(currentHolder)}">
 						<a4j:ajax event="change" render="edittypesmanager" />
 					</rich:inplaceInput>
 				</rich:column>
@@ -58,7 +54,7 @@
 						<rich:column>
 							<rich:inplaceInput
 								value="#{typesBean.getGenericWrapper(currentTarget).value}"
-								editEvent="dblclick" rendered="true">
+								editEvent="dblclick" rendered="true" styleClass="#{typesBean.getHolderStyle(currentHolder)}">
 								<a4j:ajax event="change" render="edittypesmanager" />
 							</rich:inplaceInput>
 						</rich:column>
@@ -67,7 +63,7 @@
 				<rich:column>
 					<a4j:commandLink action="#{typesBean.removeHolder(currentHolder)}"
 						render="edittypesmanager">
-						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
+						<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 					</a4j:commandLink>
 				</rich:column>
 			</rich:dataTable>
@@ -103,7 +99,7 @@
 					</a4j:commandLink>
 				</f:facet>
 				<h:commandLink action="#{typesBean.removeProperty(currentEntry)}">
-					<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
+					<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 				</h:commandLink>
 			</rich:column>
 		</rich:dataTable>
