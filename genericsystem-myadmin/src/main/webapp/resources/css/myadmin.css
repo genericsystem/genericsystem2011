@@ -40,6 +40,10 @@ body {
 	font-weight: bold;
 }
 
+.italic {
+	font-style: italic;
+}
+
 .fullWidth {
 	width: 100%;
 }

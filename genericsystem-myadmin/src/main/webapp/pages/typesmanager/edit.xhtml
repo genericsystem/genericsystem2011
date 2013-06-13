@@ -23,56 +23,52 @@
 			dropListener="#{typesBean.processDrop}" render="edittypesmanager" />
 		FIN
 
-		<rich:dataGrid var="currentAttributeWrapper"
-			value="#{typesBean.attributeWrappers}" styleClass="fullWidth"
+		<rich:dataGrid var="currentStructural"
+			value="#{typesBean.structurals}" styleClass="fullWidth"
 			columns="2">
-			<rich:dataTable var="currentValue" headerClass="fullWidth"
+			<rich:dataTable var="currentHolder" headerClass="fullWidth,"
 				columnClasses=",fullWidth,fullWidth," styleClass="fullWidth"
-				value="#{typesBean.getValues(currentAttributeWrapper)}">
+				value="#{typesBean.getHolders(currentStructural)}">
 				<f:facet name="header">
 					<span style="vertical-align: middle; padding-top: 5px;"> <h:outputText
-							value="#{currentAttributeWrapper.attribute} (#{currentAttributeWrapper.position})" />
+							value="#{currentStructural.attribute} (#{currentStructural.position})" />
 					</span>
 					<span style="float: right;"> <a4j:commandLink
-							rendered="#{typesBean.isSingular(currentAttributeWrapper)}"
+							rendered="#{typesBean.isSingular(currentStructural)}"
 							oncomplete="#{rich:component('addValue')}.show()">
 							<h:graphicImage value="#{infos.add}"
-								title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentAttributeWrapper.attribute}" />
+								title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentStructural.attribute}" />
 						</a4j:commandLink>
 					</span>
 				</f:facet>
 				<rich:column>
-					<h:graphicImage value="#{infos.bullet_triangle_grey}"
-						rendered="#{!typesBean.isBaseComponent(currentValue)}" />
-				</rich:column>
-				<rich:column>
 					<rich:inplaceInput
-						value="#{typesBean.getGenericWrapper(currentValue).value}"
-						editEvent="dblclick" rendered="true">
+						value="#{typesBean.getGenericWrapper(currentHolder).value}"
+						editEvent="dblclick" rendered="true" styleClass="#{typesBean.getHolderStyle(currentHolder)}">
 						<a4j:ajax event="change" render="edittypesmanager" />
 					</rich:inplaceInput>
 				</rich:column>
 				<rich:column>
 					<rich:dataTable var="currentTarget"
-						value="#{typesBean.getTargets(currentAttributeWrapper.position,currentValue)}">
+						value="#{typesBean.getOtherTargets(currentStructural.position,currentHolder)}">
 						<rich:column>
 							<rich:inplaceInput
 								value="#{typesBean.getGenericWrapper(currentTarget).value}"
-								editEvent="dblclick" rendered="true">
+								editEvent="dblclick" rendered="true" styleClass="#{typesBean.getHolderStyle(currentHolder)}">
 								<a4j:ajax event="change" render="edittypesmanager" />
 							</rich:inplaceInput>
 						</rich:column>
 					</rich:dataTable>
 				</rich:column>
 				<rich:column>
-					<a4j:commandLink action="#{typesBean.removeHolder(currentValue)}"
+					<a4j:commandLink action="#{typesBean.removeHolder(currentHolder)}"
 						render="edittypesmanager">
-						<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
+						<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 					</a4j:commandLink>
 				</rich:column>
 			</rich:dataTable>
 			<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
-				action="#{typesBean.addValue(currentAttributeWrapper.attribute,popupValue)}"
+				action="#{typesBean.addValue(currentStructural.attribute,popupValue)}"
 				render="edittypesmanager" />
 		</rich:dataGrid>
 
@@ -103,7 +99,7 @@
 					</a4j:commandLink>
 				</f:facet>
 				<h:commandLink action="#{typesBean.removeProperty(currentEntry)}">
-					<h:graphicImage value="#{infos.delete}" title="#{msg.delete}" />
+					<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 				</h:commandLink>
 			</rich:column>
 		</rich:dataTable>

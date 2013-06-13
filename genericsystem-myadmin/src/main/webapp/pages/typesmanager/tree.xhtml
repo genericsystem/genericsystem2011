@@ -13,10 +13,10 @@
 	<rich:panel id="paneltypesmanager" layout="block"
 		styleClass="widthScroll280 fullHeight">
 		<f:facet name="header">
-			<h:outputText value="#{msg.show} #{msg.implicit}"
+			<h:outputText value="#{msg.show} #{msg.implicits}"
 				styleClass="capitalize bold" />
 			<h:selectBooleanCheckbox value="#{typesBean.implicitShow}"
-				title="#{msg.show} #{msg.implicit}" style="vertical-align: middle;">
+				title="#{msg.show} #{msg.implicits}" style="vertical-align: middle;">
 				<a4j:ajax event="change" render="typestree" />
 			</h:selectBooleanCheckbox>
 		</f:facet>
