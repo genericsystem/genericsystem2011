@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+
 import org.generic.map.PropertiesMapProvider;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
@@ -294,7 +296,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		else if (value == null || ((Type) attribute).isPropertyConstraintEnabled(cache))
 			holder = getHolder(cache, attribute, basePos, targets);
 		else if (((GenericImpl) attribute).isMapProvider(cache))
-			holder = getHolderByEntryKey(cache, attribute, (AbstractMap.SimpleEntry<Serializable, Serializable>) value, basePos, targets);
+			holder = Statics.unambigousFirst(this.<T> holdersByEntryKeyIterator(cache, attribute, (AbstractMap.SimpleEntry<Serializable, Serializable>) value, basePos, false, targets));
 		else
 			holder = getHolderByValue(cache, attribute, value, basePos, targets);
 		return holder;
@@ -354,7 +356,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void cancelAll(Cache cache, Holder attribute, boolean concrete, Generic... targets) {
-		// assert (this.isConcrete() || attribute.isConcrete()) == concrete;
 		cancelAll(cache, attribute, getBasePos(attribute), concrete, targets);
 	}
 
@@ -367,9 +368,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				cancel(cache, holder, basePos, concrete);
 	}
 
-	@Override
-	public void clearAll(final Cache cache, final Holder attribute, final int basePos, boolean concrete, final Generic... targets) {
-		Iterator<Holder> holders = concrete ? holdersIterator(cache, attribute, basePos, true, targets) : this.<Holder> attributesIterator(cache, (Attribute) attribute, true);
+	public void clearAll(Cache cache, Holder attribute, int basePos, Serializable valueFilter, Generic... targets) {
+		Iterator<Holder> holders = valueFilter instanceof Map.Entry ? holdersByEntryKeyIterator(cache, attribute, (SimpleEntry<Serializable, Serializable>) valueFilter, basePos, true, targets) : Statics.valueFilter(
+				holdersIterator(cache, attribute, basePos, true, targets), valueFilter);
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
 			if (this.equals(holder.getComponent(basePos)))
@@ -378,23 +379,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public void clearAll(Cache cache, Holder attribute, boolean concrete, Generic... targets) {
-		// assert (this.isConcrete() || attribute.isConcrete()) == concrete;
-		clearAll(cache, attribute, getBasePos(attribute), concrete, targets);
+	public void clearAll(Cache cache, Holder attribute, int basePos, Generic... targets) {
+		final Iterator<Holder> holders = holdersIterator(cache, attribute, basePos, true, targets);
+		log.info("holders " + new AbstractSnapshot<Holder>() {
+			@Override
+			public Iterator<Holder> iterator() {
+				return holders;
+			}
+		});
+		while (holders.hasNext()) {
+			Holder holder = holders.next();
+			if (this.equals(holder.getComponent(basePos)))
+				holder.remove(cache);
+		}
 	}
 
-	// @Override
-	// public void restore(Cache cache, Holder attribute) {
-	// restore(cache, attribute, getBasePos(attribute, ((GenericImpl) attribute).components));
-	// }
-	//
-	// @Override
-	// public void restore(final Cache cache, final Holder attribute, final int basePos) {
-	// Generic[] components = Statics.truncate(basePos, ((GenericImpl) attribute).components);
-	// Holder holder = attribute.isStructural() ? getAttribute(cache, (Attribute) attribute, null, components) : getHolderByValue(cache, attribute, null, basePos, components);
-	// if (holder != null)
-	// holder.remove(cache);
-	// }
+	@Override
+	public void clearAll(Cache cache, Holder attribute, Generic... targets) {
+		clearAll(cache, attribute, getBasePos(attribute), targets);
+	}
 
 	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, final Generic... targets) {
 		return getHolderByValue(context, attribute, value, getBasePos(attribute), targets);
@@ -404,8 +407,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return Statics.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(context, attribute, basePos, value == null, targets), value));
 	}
 
-	public <T extends Holder> T getHolderByEntryKey(Context context, Holder attribute, AbstractMap.SimpleEntry<Serializable, Serializable> entry, int basePos, final Generic... targets) {
-		return Statics.unambigousFirst(Statics.entryFilter(this.<T> holdersIterator(context, attribute, basePos, entry == null, targets), entry));
+	// TODO readPhantom !?
+	public <T extends Holder> Iterator<T> holdersByEntryKeyIterator(Context context, Holder attribute, AbstractMap.SimpleEntry<Serializable, Serializable> entry, int basePos, boolean readPhantom, final Generic... targets) {
+		return Statics.entryFilter(this.<T> holdersIterator(context, attribute, basePos, readPhantom, targets), entry);
 	}
 
 	@Override

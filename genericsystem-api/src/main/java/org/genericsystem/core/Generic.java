@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
@@ -750,9 +751,9 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	String info(Context context);
 
-	void clearAll(Cache cache, Holder attribute, boolean concrete, Generic... targets);
+	void clearAll(Cache cache, Holder attribute, Generic... targets);
 
-	void clearAll(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets);
+	void clearAll(Cache cache, Holder attribute, int basePos, Generic... targets);
 
 	void cancelAll(Cache cache, Holder attribute, boolean concrete, Generic... targets);
 

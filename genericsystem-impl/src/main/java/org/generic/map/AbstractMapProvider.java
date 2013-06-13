@@ -6,6 +6,7 @@ import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -60,13 +61,9 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 							@Override
 							public void remove() {
 								Holder holder = next;
-								if (generic.equals(holder.getBaseComponent())) {
-									// holder.remove(cache);
-									generic.clearAll(cache, AbstractMapProvider.this, true);
-									// Holder phantom = ((GenericImpl) generic).getHolderByValue(cache, AbstractMapProvider.this, null);
-									// if (phantom != null && generic.equals(phantom.getBaseComponent()))
-									// phantom.remove(cache);
-								} else
+								if (generic.equals(holder.getBaseComponent()))
+									((GenericImpl) generic).clearAll(cache, AbstractMapProvider.this, getBasePos(AbstractMapProvider.this), next.getValue());
+								else
 									cancel(cache, holder, true);
 							}
 

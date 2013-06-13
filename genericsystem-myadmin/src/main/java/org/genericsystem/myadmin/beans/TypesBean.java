@@ -60,11 +60,6 @@ public class TypesBean implements Serializable {
 
 	private boolean implicitShow;
 
-	// TODO remove - only for test
-	public void setSelectedTreeNode(Generic generic) {
-		selectedTreeNode = new GenericTreeNode(null, generic, GenericTreeNode.TreeType_DEFAULT);
-	}
-
 	@PostConstruct
 	public void init() {
 		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
@@ -91,13 +86,13 @@ public class TypesBean implements Serializable {
 		Type human = cache.newType("Human");
 		Generic nicolas = human.newInstance(cache, "Nicolas");
 		Generic michael = human.newInstance(cache, "Michael");
-		Generic michaelBrother = human.newInstance(cache, "MichaelBrother");
+		Generic quentin = human.newInstance(cache, "Quentin");
 		Relation isTallerOrEqualThan = human.setRelation(cache, "isTallerOrEqualThan", human);
 		nicolas.bind(cache, isTallerOrEqualThan, michael);
 		nicolas.bind(cache, isTallerOrEqualThan, nicolas);
 		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human);
-		isBrotherOf.enableMultiDirectional(cache); // bug
-		michaelBrother.bind(cache, isBrotherOf, michael);
+		isBrotherOf.enableMultiDirectional(cache);
+		quentin.bind(cache, isBrotherOf, michael);
 		Relation isBossOf = human.setRelation(cache, "isBossOf", human);
 		nicolas.bind(cache, isBossOf, michael);
 
@@ -137,20 +132,26 @@ public class TypesBean implements Serializable {
 		messages.info("createRootInstance", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
-	public List<Structural> getAttributeWrappers() {
+	public List<Structural> getStructurals() {
 		return getSelectedTreeNodeGeneric().getStructurals(cache).toList();
 	}
 
-	public List<Holder> getValues(Structural attributeWrapper) {
-		return ((Type) getSelectedTreeNodeGeneric()).getHolders(cache, attributeWrapper.getAttribute(), attributeWrapper.getPosition()).toList();
+	public List<Holder> getHolders(Structural structural) {
+		return ((Type) getSelectedTreeNodeGeneric()).getHolders(cache, structural.getAttribute(), structural.getPosition()).toList();
 	}
 
-	public List<Generic> getTargets(int basePos, Holder holder) {
-		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ selectedGeneric " + getSelectedTreeNodeGeneric());
-		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ basePos " + basePos);
-		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ holder " + holder);
-		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ targets " + getSelectedTreeNodeGeneric().getOtherTargets(cache, basePos, holder).toList());
+	public List<Generic> getOtherTargets(int basePos, Holder holder) {
+		if (((Attribute) holder).isMultiDirectional(cache))
+			basePos = getBasePosIfMultiDirectional(basePos, holder);
 		return getSelectedTreeNodeGeneric().getOtherTargets(basePos, holder).toList();
+	}
+
+	public int getBasePosIfMultiDirectional(int originalBasePos, Holder holder) {
+		Generic[] components = ((GenericImpl) holder).getComponentsArray();
+		for (int i = 0; i < components.length; i++)
+			if (components[i].equals(getSelectedTreeNodeGeneric()))
+				return i;
+		throw new IllegalStateException("Unable to find position");
 	}
 
 	public class TargetWrapper {
@@ -248,7 +249,7 @@ public class TypesBean implements Serializable {
 
 	public void removeProperty(Entry<Serializable, Serializable> entry) {
 		getSelectedTreeNodeGeneric().getProperties(cache).remove(entry.getKey());
-		messages.info("remove", entry.getValue());
+		messages.info("remove", entry.getKey());
 	}
 
 	public class PropertyWrapper {
@@ -482,6 +483,10 @@ public class TypesBean implements Serializable {
 
 	public String getStyle(GenericTreeNode genericTreeNode) {
 		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) || (isValue(genericTreeNode.getGeneric()) && !((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(selectedTreeNode.getGeneric())) ? "implicitColor" : "";
+	}
+
+	public String getHolderStyle(Holder holder) {
+		return holder.getBaseComponent().equals(getSelectedTreeNodeGeneric()) ? "" : "italic";
 	}
 
 	public boolean isBaseComponent(Holder holder) {
