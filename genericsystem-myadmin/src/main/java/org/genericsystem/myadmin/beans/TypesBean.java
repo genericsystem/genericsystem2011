@@ -270,6 +270,34 @@ public class TypesBean implements Serializable {
 			}
 		}
 	}
+
+	public PropertyWrapper getPropertyWrapper(Entry<Serializable, Serializable> entry) {
+		return new PropertyWrapper(entry);
+	}
+
+	public void removeProperty(Entry<Serializable, Serializable> entry) {
+		getSelectedTreeNodeGeneric().getProperties(cache).remove(entry.getKey());
+		messages.info("remove", entry.getValue());
+	}
+
+	public class PropertyWrapper {
+		private Entry<Serializable, Serializable> entry;
+
+		public PropertyWrapper(Entry<Serializable, Serializable> entry) {
+			this.entry = entry;
+		}
+
+		public String getValue() {
+			return (String) entry.getValue();
+		}
+
+		public void setValue(String newValue) {
+			if (!newValue.equals(entry.getValue().toString())) {
+				getSelectedTreeNodeGeneric().getProperties(cache).put(entry.getKey(), newValue);
+				messages.info("updateValue", entry.getValue(), newValue);
+			}
+		}
+	}
 	
 	public Generic getSelectedTreeNodeGeneric() {
 		return selectedTreeNode.getGeneric();
