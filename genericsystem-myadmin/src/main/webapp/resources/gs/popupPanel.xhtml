@@ -15,6 +15,7 @@
 	<composite:attribute name="action" method-signature="void action()"
 		required="true" />
 	<composite:attribute name="render" required="true" />
+	<composite:attribute name="keyInput" />
 </composite:interface>
 
 <composite:implementation>
@@ -31,15 +32,18 @@
 		</f:facet>
 
 		<rich:panel title="#{cc.attrs.title}" styleClass="uppercase">
-			<h:panelGrid columns="2" columnClasses=",fullWidth">
-				<h:inputText id="inputPopupPanel" value="#{popupValue}"
-					onkeyup="if (event.keyCode == 13) { #{rich:element('apply')}.click(); return false; }" />
-				<a4j:commandButton id="apply" action="#{cc.attrs.action}"
-					image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
-					render="#{cc.attrs.render}"
-					onbeforedomupdate="#{rich:component(cc.attrs.key)}.hide();"
-					oncomplete="#{rich:element('inputPopupPanel')}.value=''; return false;" />
-			</h:panelGrid>
+			<h:outputText value="#{msg.key} " rendered="#{not empty cc.attrs.keyInput}" />
+			<h:inputText id="inputPopupPanelKey" value="#{popupKey}"
+				rendered="#{not empty cc.attrs.keyInput}" />
+			<h:outputText value=" #{msg.value} "
+				rendered="#{not empty cc.attrs.keyInput}" />
+			<h:inputText id="inputPopupPanel" value="#{popupValue}"
+				onkeyup="if (event.keyCode == 13) { #{rich:element('apply')}.click(); return false; }" />
+			<a4j:commandButton id="apply" action="#{cc.attrs.action}"
+				image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
+				render="#{cc.attrs.render}"
+				onbeforedomupdate="#{rich:component(cc.attrs.key)}.hide();"
+				oncomplete="#{rich:element('inputPopupPanelKey')}.value=''; #{rich:element('inputPopupPanel')}.value=''; return false;" />
 		</rich:panel>
 	</rich:popupPanel>
 </composite:implementation>

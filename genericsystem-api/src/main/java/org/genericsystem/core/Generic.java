@@ -2,8 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
-
-import org.genericsystem.generic.Attribute;
+import java.util.Map.Entry;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
@@ -614,11 +613,9 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param attribute
 	 *            The attribute.
-	 * @param targets
-	 *            The targets.
 	 * @return The position.
 	 */
-	int getBasePos(Holder attribute, Generic... targets);
+	int getBasePos(Holder attribute);
 
 	/**
 	 * Returns the size of supers.
@@ -767,6 +764,8 @@ public interface Generic extends Comparable<Generic> {
 
 	Map<Serializable, Serializable> getProperties(final Cache cache);
 
+	Snapshot<Entry<Serializable, Serializable>> getPropertiesShot(final Cache cache);
+
 	<T extends Generic> T addComponent(Cache cache, int pos, Generic newComponent);
 
 	<T extends Generic> T removeComponent(Cache cache, int pos, Generic newComponent);
@@ -777,51 +776,8 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Generic> T updateKey(Cache cache, Serializable key);
 
-	Snapshot<AttributeWrapper> getAttributeWrappers(Cache cache);
+	Snapshot<Structural> getStructurals(Cache cache);
 
-	public static class AttributeWrapper {
-		private Attribute attribute;
-		private int position;
+	<T extends Generic> Snapshot<T> getOtherTargets(int basePos, Holder holder);
 
-		public AttributeWrapper(Attribute attribute, int position) {
-			this.attribute = attribute;
-			this.position = position;
-		}
-
-		public Attribute getAttribute() {
-			return attribute;
-		}
-
-		public void setAttribute(Attribute attribute) {
-			this.attribute = attribute;
-		}
-
-		public int getPosition() {
-			return position;
-		}
-
-		public void setPosition(int position) {
-			this.position = position;
-		}
-
-		@Override
-		public String toString() {
-			return "AttributeWrapper [attribute=" + attribute + ", position=" + position + "]\n";
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (o == this)
-				return true;
-			if (o == null)
-				return false;
-			if (!(o instanceof AttributeWrapper))
-				return false;
-			AttributeWrapper aw = (AttributeWrapper) o;
-
-			return attribute.equals(aw.attribute) && position == aw.position;
-		}
-	}
-
-	Snapshot<Generic> getOtherTargets(Cache cache, int basePos, Holder holder);
 }

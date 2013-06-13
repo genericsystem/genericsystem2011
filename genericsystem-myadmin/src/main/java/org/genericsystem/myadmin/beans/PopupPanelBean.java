@@ -7,7 +7,19 @@ import javax.inject.Named;
 @RequestScoped
 public class PopupPanelBean {
 
+	@Named
+	private String popupKey;
+
+	@Named
 	private String popupValue;
+
+	public String getPopupKey() {
+		return popupKey;
+	}
+
+	public void setPopupKey(String popupKey) {
+		this.popupKey = popupKey;
+	}
 
 	public String getPopupValue() {
 		return popupValue;

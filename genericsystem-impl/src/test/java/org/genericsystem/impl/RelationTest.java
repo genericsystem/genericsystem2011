@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -1302,10 +1301,13 @@ public class RelationTest extends AbstractTest {
 		Generic quentin = human.newInstance(cache, "quentin");
 		Link holder = michael.bind(cache, brother, quentin);
 
-		Generic[] components = ((GenericImpl) holder).getComponentsArray();
-		assert michael.getBasePos(brother, components) == 0;
-		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		assert quentin.getBasePos(brother, components) == 1 : quentin.getBasePos(brother, components);
+		assert Statics.BASE_POSITION == michael.getBasePos(brother);
+		assert ((GenericImpl) brother).getComponentsPositions(michael, quentin).equals(Arrays.asList(0, 1));
+		Type otherType = cache.newType("OtherType");
+		assert ((GenericImpl) brother).getComponentsPositions(michael, quentin, otherType).equals(Arrays.asList(0, 1, 2));
+		assert ((GenericImpl) brother).getComponentsPositions(otherType, michael, quentin).equals(Arrays.asList(2, 0, 1));
+
+		assert ((GenericImpl) michael).getPositions(brother).toList().equals(Arrays.asList(0, 1));
 	}
 
 	public void testGetLinkFromTarget() {

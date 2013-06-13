@@ -1,5 +1,6 @@
 package org.genericsystem.snapshot;
 
+import java.util.AbstractList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -155,11 +156,16 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 
 	@Override
 	public List<T> toList() {
-		return new AbstractSequentiableSnapshot<T>() {
+		return new AbstractList<T>() {
 
 			@Override
-			public Iterator<T> sequentiableIterator() {
-				return AbstractSnapshot.this.iterator();
+			public T get(int index) {
+				return AbstractSnapshot.this.get(index);
+			}
+
+			@Override
+			public int size() {
+				return AbstractSnapshot.this.size();
 			}
 		};
 	}
