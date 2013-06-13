@@ -32,7 +32,8 @@
 		</f:facet>
 
 		<rich:panel title="#{cc.attrs.title}" styleClass="uppercase">
-			<h:outputText value="#{msg.key} " rendered="#{not empty cc.attrs.keyInput}" />
+			<h:outputText value="#{msg.key} "
+				rendered="#{not empty cc.attrs.keyInput}" />
 			<h:inputText id="inputPopupPanelKey" value="#{popupKey}"
 				rendered="#{not empty cc.attrs.keyInput}" />
 			<h:outputText value=" #{msg.value} "
