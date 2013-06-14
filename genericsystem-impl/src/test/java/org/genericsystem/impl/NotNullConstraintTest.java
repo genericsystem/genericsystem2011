@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -31,11 +32,11 @@ public class NotNullConstraintTest extends AbstractTest {
 		Type car = vehicle.newSubType(cache, "Car");
 		Type sportCar = car.newSubType(cache, "Sportcar");
 		final Attribute vehiclePower = vehicle.setProperty(cache, "Power");
-		Holder vehicleDefaultPower = car.setValue(cache, vehiclePower, 80);
+		car.setValue(cache, vehiclePower, 80);
 		sportCar.setValue(cache, vehiclePower, 250);
 
-		sportCar.clearAll(cache, vehiclePower, true);
-		assert Objects.equals(80, sportCar.getValue(cache, vehiclePower));
+		sportCar.clearAll(cache, vehiclePower);
+		assert Objects.equals(80, sportCar.getValue(cache, vehiclePower)) : sportCar.getHolder(cache, vehiclePower);
 		sportCar.setValue(cache, vehiclePower, 250);
 		sportCar.cancelAll(cache, vehiclePower, true);
 		assert sportCar.getValue(cache, vehiclePower) == null : sportCar.getValue(cache, vehiclePower);
@@ -61,7 +62,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		Link test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
 		Link test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);
 		assert myCar.getLinks(cache, driving).containsAll(Arrays.asList(test, test2));
-		myCar.clearAll(cache, driving, true, myHuman, myRoad);
+		myCar.clearAll(cache, driving, myHuman, myRoad);
 		assert myCar.getLinks(cache, driving).isEmpty();
 		test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
 		test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);

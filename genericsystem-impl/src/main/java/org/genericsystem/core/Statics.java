@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,7 +153,8 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {}
+		private Flag() {
+		}
 
 		@Override
 		public String toString() {
@@ -343,8 +345,11 @@ public class Statics {
 	public static <T extends Generic> Iterator<T> entryFilter(Iterator<T> iterator, final Map.Entry<Serializable, Serializable> entry) {
 		return new AbstractFilterIterator<T>(iterator) {
 
+			@SuppressWarnings("rawtypes")
 			@Override
 			public boolean isSelected() {
+				if (next.getValue() == null && ((GenericImpl) next).supers[1].getValue() instanceof Map.Entry)
+					return ((Map.Entry) ((GenericImpl) next).supers[1].getValue()).getKey().equals(entry.getKey());
 				return Objects.equals(entry.getKey(), ((Map.Entry) next.getValue()).getKey());
 			}
 		};

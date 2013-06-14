@@ -255,7 +255,7 @@ public class TypesBean implements Serializable {
 
 	public void removeProperty(Entry<Serializable, Serializable> entry) {
 		getSelectedTreeNodeGeneric().getProperties(cache).remove(entry.getKey());
-		messages.info("remove", entry.getValue());
+		messages.info("remove", entry.getKey());
 	}
 
 	public class PropertyWrapper {
