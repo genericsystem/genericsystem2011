@@ -133,7 +133,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		// TODO KK
 		// assert getMetaLevel() == metaLevel : this.info();
 		if (getMetaLevel() != metaLevel)
-			throw new IllegalStateException("META LEVEL ERROR");
+			throw new IllegalStateException(value + " : META LEVEL ERROR getMetaLevel() " + getMetaLevel() + " / " + metaLevel);
 		if (!isPrimary())
 			assert Objects.equals(directSupers[0].getValue(), value);
 		if (value != null)
