@@ -118,8 +118,8 @@ public class TypesBean implements Serializable {
 		messages.info("createSubType", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
-	public void addAttribute(String newValue) {
-		((Type) getSelectedTreeNodeGeneric()).addAttribute(cache, newValue);
+	public void setAttribute(String newValue) {
+		((Type) getSelectedTreeNodeGeneric()).setAttribute(cache, newValue);
 		messages.info("createRootAttribute", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
@@ -241,8 +241,12 @@ public class TypesBean implements Serializable {
 	}
 
 	public void processDrop(DropEvent dropEvent) {
-		log.info("getDragValue " + ((GenericTreeNode) dropEvent.getDragValue()).getGeneric());
-		messages.info("dropValue", ((GenericTreeNode) dropEvent.getDragValue()).getGeneric());
+		Object dragValue = dropEvent.getDragValue();
+		Type type = (Type) getSelectedTreeNodeGeneric();
+		Attribute attribute = type.setAttribute(cache, "new_attribute");
+		attribute.setConstraintClass(cache, dragValue.getClass());
+		log.info("getDragValue " + dragValue);
+		messages.info("dropValue", dragValue);
 	}
 
 	public List<Entry<Serializable, Serializable>> getProperties() {

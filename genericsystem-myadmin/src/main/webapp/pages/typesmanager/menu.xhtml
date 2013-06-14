@@ -41,15 +41,15 @@
 		<rich:menuSeparator />
 
 		<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
-			oncomplete="#{rich:component('newtype')}.show()" mode="ajax"
+			action="#{typesBean.newType('new_type')}" render="typestree," mode="ajax"
 			icon="#{typesBean.getMenuTypeIcon('TYPE')}" />
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{typesBean.selectedTreeNodeValue}"
-			oncomplete="#{rich:component('createsubtype')}.show()" mode="ajax"
+			action="#{typesBean.newSubType('new_subType')}" render="typestree" mode="ajax"
 			icon="#{typesBean.getMenuTypeIcon('TYPE')}" />
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{typesBean.selectedTreeNodeValue}"
-			oncomplete="#{rich:component('createattribute')}.show()" mode="ajax"
+			action="#{typesBean.setAttribute('new_attribute')}" render="typestree, edittypesmanager" mode="ajax"
 			icon="#{typesBean.getMenuTypeIcon('ATTRIBUTE')}" />
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{typesBean.selectedTreeNodeValue}"
@@ -57,7 +57,7 @@
 			icon="#{typesBean.getMenuTypeIcon('ATTRIBUTE')}" />
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.instance} #{msg.for} #{typesBean.selectedTreeNodeValue}"
-			oncomplete="#{rich:component('createinstance')}.show()" mode="ajax"
+			action="#{typesBean.newInstance('new_instance')}" render="typestree" mode="ajax"
 			icon="#{typesBean.getMenuTypeIcon('INSTANCE')}" />
 		<rich:menuItem
 			label="#{msg.delete} #{typesBean.selectedTreeNodeValue}"
@@ -66,21 +66,9 @@
 			mode="ajax" icon="#{infos.imgGarb}" />
 	</rich:contextMenu>
 
-	<gs:popupPanel key="newtype" title="#{msg.add} #{msg.a} #{msg.type}"
-		action="#{typesBean.newType(popupValue)}" render="typestree" />
-	<gs:popupPanel key="createsubtype"
-		title="#{msg.create} #{msg.a} #{msg.sub} #{msg.type}"
-		action="#{typesBean.newSubType(popupValue)}" render="typestree" />
-	<gs:popupPanel key="createattribute"
-		title="#{msg.create} #{msg.a} #{msg.attribute}"
-		action="#{typesBean.addAttribute(popupValue)}"
-		render="typestree, edittypesmanager" />
 	<gs:popupPanel key="createproperty"
 		title="#{msg.create} #{msg.a} #{msg.property}"
 		action="#{typesBean.addProperty(popupKey, popupValue)}"
 		render="typestree, edittypesmanager" keyInput="true" />
-	<gs:popupPanel key="createinstance"
-		title="#{msg.create} #{msg.a} #{msg.instance}"
-		action="#{typesBean.newInstance(popupValue)}" render="typestree" />
 
 </ui:composition>

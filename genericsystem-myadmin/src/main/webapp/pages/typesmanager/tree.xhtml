@@ -48,7 +48,6 @@
 					<!-- 				<h:graphicImage value="#{typesBean.getTypeIcon(item)}" -->
 					<!-- 					styleClass="middleAlign" -->
 					<!-- 					title="#{typesBean.getTypeIconTitle(item)}" /> -->
-					<rich:dragSource type="std" dragValue="#{item}" />
 					<rich:inplaceInput value="#{typesBean.getWrapper(item).value}"
 						title="#{typesBean.getTypeIconTitle(item)}" editEvent="dblclick"
 						rendered="#{!item.isReadOnly}" activeClass="blackcolor"
@@ -62,6 +61,37 @@
 				</rich:treeNode>
 			</rich:treeModelRecursiveAdaptor>
 		</rich:tree>
+
+		<rich:panel id="attributestypesmanager" layout="block">
+			<f:facet name="header">
+				<h:outputText value="#{msg.attribute}s"/>
+			</f:facet>
+			
+			<a4j:outputPanel layout="block">
+				<h:outputText value="int" />
+				<rich:dragSource type="std" dragValue="int" />
+			</a4j:outputPanel>
+			<a4j:outputPanel layout="block">
+				<h:outputText value="long" />
+				<rich:dragSource type="std" dragValue="long" />
+			</a4j:outputPanel>
+			<a4j:outputPanel layout="block">
+				<h:outputText value="float" />
+				<rich:dragSource type="std" dragValue="float" />
+			</a4j:outputPanel>
+			<a4j:outputPanel layout="block">
+				<h:outputText value="double" />
+				<rich:dragSource type="std" dragValue="double" />
+			</a4j:outputPanel>
+			<a4j:outputPanel layout="block">
+				<h:outputText value="boolean" />
+				<rich:dragSource type="std" dragValue="boolean" />
+			</a4j:outputPanel>
+			<a4j:outputPanel layout="block">
+				<h:outputText value="string" />
+				<rich:dragSource type="std" dragValue="string" />
+			</a4j:outputPanel>
+		</rich:panel>
 	</rich:panel>
 
 </ui:composition>
