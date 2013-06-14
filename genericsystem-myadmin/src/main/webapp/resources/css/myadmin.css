@@ -21,6 +21,10 @@ body {
 	vertical-align: middle;
 }
 
+.borderNone {
+	border : none !important;
+}
+
 .implicitColor {
 	color: #949595 !important;
 }
@@ -42,6 +46,10 @@ body {
 
 .italic {
 	font-style: italic;
+}
+
+.middleWidth {
+	width: 50%;
 }
 
 .fullWidth {

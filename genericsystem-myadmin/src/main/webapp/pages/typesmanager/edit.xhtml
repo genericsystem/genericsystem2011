@@ -24,10 +24,9 @@
 		FIN
 
 		<rich:dataGrid var="currentStructural"
-			value="#{typesBean.structurals}" styleClass="fullWidth"
-			columns="2">
+			value="#{typesBean.structurals}" styleClass="fullWidth" columns="2">
 			<rich:dataTable var="currentHolder" headerClass="fullWidth,"
-				columnClasses=",fullWidth,fullWidth," styleClass="fullWidth"
+				columnClasses="middleWidth,fullWidth,fullWidth," styleClass="fullWidth"
 				value="#{typesBean.getHolders(currentStructural)}">
 				<f:facet name="header">
 					<span style="vertical-align: middle; padding-top: 5px;"> <h:outputText
@@ -40,23 +39,47 @@
 								title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentStructural.attribute}" />
 						</a4j:commandLink>
 					</span>
+					<span style="vertical-align: middle; padding-top: 5px;">
+						<a4j:commandLink action="#{typesBean.view(currentStructural.attribute)}"
+							render="menutypesmanager, edittypesmanager, paneltitletypesmanager, typestree"
+							style="padding-left : 5%;">
+							<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
+						</a4j:commandLink>
+					</span>
 				</f:facet>
 				<rich:column>
-					<rich:inplaceInput
-						value="#{typesBean.getGenericWrapper(currentHolder).value}"
-						editEvent="dblclick" rendered="true" styleClass="#{typesBean.getHolderStyle(currentHolder)}">
-						<a4j:ajax event="change" render="edittypesmanager" />
-					</rich:inplaceInput>
+					<h:panelGrid styleClass="fullWidth" columnClasses="fullWidth" rowClasses="fullWidth">
+						<h:panelGroup>
+							<rich:inplaceInput
+								value="#{typesBean.getGenericWrapper(currentHolder).value}"
+								editEvent="dblclick" rendered="true"
+								styleClass="#{typesBean.getHolderStyle(currentHolder)}">
+								<a4j:ajax event="change" render="edittypesmanager" />
+							</rich:inplaceInput>
+							<a4j:commandLink action="#{typesBean.view(currentHolder)}"
+								render="menutypesmanager, edittypesmanager, paneltitletypesmanager, typestree"
+								style="padding-left : 5%;">
+								<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
+							</a4j:commandLink>
+						</h:panelGroup>
+					</h:panelGrid>
 				</rich:column>
 				<rich:column>
-					<rich:dataTable var="currentTarget"
+					<rich:dataTable var="currentTarget" styleClass="borderNone" columnClasses="borderNone,borderNone"
 						value="#{typesBean.getOtherTargets(currentStructural.position,currentHolder)}">
 						<rich:column>
 							<rich:inplaceInput
 								value="#{typesBean.getGenericWrapper(currentTarget).value}"
-								editEvent="dblclick" rendered="true" styleClass="#{typesBean.getHolderStyle(currentHolder)}">
+								editEvent="dblclick" rendered="true"
+								styleClass="#{typesBean.getHolderStyle(currentHolder)}">
 								<a4j:ajax event="change" render="edittypesmanager" />
 							</rich:inplaceInput>
+						</rich:column>
+						<rich:column>
+							<a4j:commandLink action="#{typesBean.view(currentTarget)}"
+								render="menutypesmanager, edittypesmanager, paneltitletypesmanager, typestree">
+								<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
+							</a4j:commandLink>
 						</rich:column>
 					</rich:dataTable>
 				</rich:column>

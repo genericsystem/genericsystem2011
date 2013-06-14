@@ -92,7 +92,8 @@ public class TypesBean implements Serializable {
 		nicolas.bind(cache, isTallerOrEqualThan, nicolas);
 		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human);
 		isBrotherOf.enableMultiDirectional(cache);
-		quentin.bind(cache, isBrotherOf, michael);
+		// quentin.bind(cache, isBrotherOf, michael);
+		quentin.setLink(cache, isBrotherOf, "link", michael);
 		Relation isBossOf = human.setRelation(cache, "isBossOf", human);
 		nicolas.bind(cache, isBossOf, michael);
 
@@ -217,10 +218,14 @@ public class TypesBean implements Serializable {
 	public void changeType(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			selectedTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
-			menuEvent.fire(new MenuEvent(cache, selectedTreeNode, implicitShow));
-			panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
+			internalChangeType();
 			messages.info("typeselectionchanged", getSelectedTreeNodeGeneric().toString());
 		}
+	}
+
+	private void internalChangeType() {
+		menuEvent.fire(new MenuEvent(cache, selectedTreeNode, implicitShow));
+		panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
 	}
 
 	public void changeAttributeSelected(int attributeIndex) {
@@ -237,6 +242,7 @@ public class TypesBean implements Serializable {
 
 	public void processDrop(DropEvent dropEvent) {
 		log.info("getDragValue " + ((GenericTreeNode) dropEvent.getDragValue()).getGeneric());
+		messages.info("dropValue", ((GenericTreeNode) dropEvent.getDragValue()).getGeneric());
 	}
 
 	public List<Entry<Serializable, Serializable>> getProperties() {
@@ -269,6 +275,23 @@ public class TypesBean implements Serializable {
 				messages.info("updateValue", entry.getValue(), newValue);
 			}
 		}
+	}
+
+	public void view(Generic generic) {
+		selectedTreeNode = changeView(rootTreeNode, generic);
+		internalChangeType();
+		messages.info("typeselectionchanged", selectedTreeNode.getGeneric());
+	}
+
+	public GenericTreeNode changeView(GenericTreeNode genericTreeNode, Generic generic) {
+		if (genericTreeNode.getGeneric().equals(generic))
+			return genericTreeNode;
+		for (GenericTreeNode tmp : getChildrens(genericTreeNode)) {
+			GenericTreeNode child = changeView(tmp, generic);
+			if (null != child)
+				return child;
+		}
+		return null;
 	}
 
 	public Generic getSelectedTreeNodeGeneric() {
@@ -500,5 +523,4 @@ public class TypesBean implements Serializable {
 	public void setImplicitShow(boolean implicitShow) {
 		this.implicitShow = implicitShow;
 	}
-
 }
