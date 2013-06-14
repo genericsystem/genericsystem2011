@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
-import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -26,6 +25,12 @@ public class AddComponentSuperTest extends AbstractTest {
 		Type vehicleColor = vehicle.addAttribute(cache, "VehicleColor");
 		assert vehicle.getRelation(cache, "VehicleColor") == null;
 		vehicleColor.addComponent(cache, 0, color);
-		assert vehicle.getRelation(cache, "VehicleColor").equals(((CacheImpl) cache).reFind(vehicleColor)) : vehicle.getRelation(cache, "VehicleColor");
+		// vehicleColor.log();
+		assert vehicle.getRelation(cache, "VehicleColor") != null;
+		assert vehicle.getRelation(cache, "VehicleColor").getComponent(0).equals(color);
+		// vehicle.getRelation(cache, "VehicleColor").log();
+		assert vehicle.getRelation(cache, "VehicleColor").inheritsFrom(cache.getMetaRelation());
+		assert vehicleColor.getComponents().contains(vehicle) : vehicleColor.getComponents();
+		// assert vehicleColor.getComponents().contains(color) : vehicleColor.getComponents();
 	}
 }
