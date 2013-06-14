@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -14,8 +15,17 @@ public class AddComponentSuperTest extends AbstractTest {
 		Type power = cache.newType("power");
 		log.info("metaLevel power " + power.getMetaLevel());
 		assert vehicle.getAttribute(cache, "power") == null;
-		power.addComponent(cache, 0, vehicle);
+		vehicle.addComponent(cache, 0, power);
 		assert vehicle.getAttribute(cache, "power").equals(power);
 	}
 
+	public void addRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type color = cache.newType("Color");
+		Type vehicleColor = vehicle.addAttribute(cache, "VehicleColor");
+		assert vehicle.getRelation(cache, "VehicleColor") == null;
+		vehicleColor.addComponent(cache, 0, color);
+		assert vehicle.getRelation(cache, "VehicleColor").equals(((CacheImpl) cache).reFind(vehicleColor)) : vehicle.getRelation(cache, "VehicleColor");
+	}
 }
