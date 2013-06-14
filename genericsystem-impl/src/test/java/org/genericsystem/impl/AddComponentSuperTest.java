@@ -8,17 +8,19 @@ import org.testng.annotations.Test;
 @Test
 public class AddComponentSuperTest extends AbstractTest {
 
-	public void addAttribute() {
+	public void addComponentOnType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type power = cache.newType("power");
 		log.info("metaLevel power " + power.getMetaLevel());
 		assert vehicle.getAttribute(cache, "power") == null;
-		vehicle.addComponent(cache, 0, power);
-		assert vehicle.getAttribute(cache, "power").equals(power);
+		power.addComponent(cache, 0, vehicle).log();
+		assert vehicle.getAttribute(cache, "power") != null;
+		assert vehicle.getAttribute(cache, "power").inheritsFrom(cache.getMetaAttribute());
+		assert vehicle.getAttribute(cache, "power").getBaseComponent().equals(vehicle);
 	}
 
-	public void addRelation() {
+	public void addComponentOnArribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
