@@ -35,7 +35,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		car.setValue(cache, vehiclePower, 80);
 		sportCar.setValue(cache, vehiclePower, 250);
 
-		sportCar.clearAll(cache, vehiclePower);
+		sportCar.clearAllConcrete(cache, vehiclePower);
 		assert Objects.equals(80, sportCar.getValue(cache, vehiclePower)) : sportCar.getHolder(cache, vehiclePower);
 		sportCar.setValue(cache, vehiclePower, 250);
 		sportCar.cancelAll(cache, vehiclePower, true);
@@ -62,7 +62,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		Link test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
 		Link test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);
 		assert myCar.getLinks(cache, driving).containsAll(Arrays.asList(test, test2));
-		myCar.clearAll(cache, driving, myHuman, myRoad);
+		myCar.clearAllConcrete(cache, driving, myHuman, myRoad);
 		assert myCar.getLinks(cache, driving).isEmpty();
 		test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
 		test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);

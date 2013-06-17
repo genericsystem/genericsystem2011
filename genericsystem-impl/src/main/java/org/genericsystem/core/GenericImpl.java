@@ -368,35 +368,34 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				cancel(cache, holder, basePos, concrete);
 	}
 
-	public void clearAll(Cache cache, Holder attribute, int basePos, Serializable valueFilter, Generic... targets) {
-		Iterator<Holder> holders = valueFilter instanceof Map.Entry ? holdersByEntryKeyIterator(cache, attribute, (SimpleEntry<Serializable, Serializable>) valueFilter, basePos, true, targets) : Statics.valueFilter(
-				holdersIterator(cache, attribute, basePos, true, targets), valueFilter);
+	@Override
+	public void clearAllConcrete(Cache cache, Holder attribute, Generic... targets) {
+		clearAllConcrete(cache, attribute, getBasePos(attribute), targets);
+	}
+
+	@Override
+	public void clearAllConcrete(Cache cache, Holder attribute, int basePos, Generic... targets) {
+		internalClearAll(cache, attribute, basePos, true, null, targets);
+	}
+
+	@Override
+	public void clearAllStructural(Cache cache, Holder attribute, Generic... targets) {
+		clearAllStructural(cache, attribute, getBasePos(attribute), targets);
+	}
+
+	@Override
+	public void clearAllStructural(Cache cache, Holder attribute, int basePos, Generic... targets) {
+		internalClearAll(cache, attribute, basePos, false, null, targets);
+	}
+
+	public void internalClearAll(Cache cache, Holder attribute, int basePos, boolean isConcrete, Serializable valueFilter, Generic... targets) {
+		Iterator<Holder> holders = isConcrete ? (valueFilter != null ? holdersByEntryKeyIterator(cache, attribute, (SimpleEntry<Serializable, Serializable>) valueFilter, basePos, true, targets) : holdersIterator(cache, attribute, basePos, true, targets))
+				: this.<Holder> attributesIterator(cache, (Attribute) attribute, true);
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
 			if (this.equals(holder.getComponent(basePos)))
 				holder.remove(cache);
 		}
-	}
-
-	@Override
-	public void clearAll(Cache cache, Holder attribute, int basePos, Generic... targets) {
-		final Iterator<Holder> holders = holdersIterator(cache, attribute, basePos, true, targets);
-		log.info("holders " + new AbstractSnapshot<Holder>() {
-			@Override
-			public Iterator<Holder> iterator() {
-				return holders;
-			}
-		});
-		while (holders.hasNext()) {
-			Holder holder = holders.next();
-			if (this.equals(holder.getComponent(basePos)))
-				holder.remove(cache);
-		}
-	}
-
-	@Override
-	public void clearAll(Cache cache, Holder attribute, Generic... targets) {
-		clearAll(cache, attribute, getBasePos(attribute), targets);
 	}
 
 	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, final Generic... targets) {
