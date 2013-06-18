@@ -28,7 +28,6 @@ import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
-import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractConcateIterator;
@@ -293,8 +292,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			holder = getHolder(cache, (Attribute) attribute, basePos);
 		else if (value == null || ((Type) attribute).isPropertyConstraintEnabled(cache))
 			holder = getHolder(cache, attribute, basePos, targets);
-		else if (((GenericImpl) attribute).isMapProvider(cache))
-			holder = getHolderByValue(cache, attribute, value, basePos, targets);
 		else
 			holder = getHolderByValue(cache, attribute, value, basePos, targets);
 		return holder;
@@ -304,17 +301,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		T holder = getSelectedHolder(cache, attribute, value, basePos, targets);
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
-		if (holder == null)
-			return value != null ? this.<T> bind(cache, implicit, attribute, basePos, true, targets) : null;
+		log.info("this 1 " + this + " " + value + " attribute " + attribute.info());
+		if (holder == null) {
+			if (null != value)
+				return this.<T> bind(cache, implicit, attribute, basePos, true, targets);
+			return null;
+		}
+		log.info("this " + this + " " + holder.getComponent(basePos));
 		if (!this.equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(cache, holder, basePos, true);
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
 				cancel(cache, holder, basePos, true);
+			log.info("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
 			return this.<T> bind(cache, implicit, attribute, basePos, true, targets);
 		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
+			log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBB");
 			return holder;
+		}
 		holder.remove(cache);
 		return this.<T> setHolder(cache, attribute, value, basePos, targets);
 	}
@@ -1612,10 +1617,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public Snapshot<Entry<Serializable, Serializable>> getPropertiesShot(final Cache cache) {
 		return cache.<PropertiesMapProvider> find(PropertiesMapProvider.class).getEntriesShot(cache, this);
-	}
-
-	boolean isMapProvider(Cache cache) {
-		return this instanceof MapProvider;
 	}
 
 	// TODO change with instanceof Tree

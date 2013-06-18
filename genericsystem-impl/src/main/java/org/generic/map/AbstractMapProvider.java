@@ -53,6 +53,8 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 
 					@Override
 					public Iterator<Entry<Serializable, Serializable>> iterator() {
+						for (Holder holder : generic.getHolders(cache, cache.<Attribute> find(PropertiesMapProvider.class)))
+							assert holder.isConcrete() : holder.info();
 						Holder map = generic.getHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class));
 						if (map == null)
 							return Statics.emptyIterator();
@@ -67,12 +69,17 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 
 							@Override
 							public void remove() {
+								assert next.isAlive(cache);
 								Holder map = next.getBaseComponent();
 								if (generic.equals(map.getBaseComponent()))
 									next.remove(cache);
-								else
-									generic.setHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class), PropertiesMapProvider.NAME).setHolder(cache, cache.<Attribute> find(getKeyAttributeClass()), next.getValue())
-											.setHolder(cache, cache.<Attribute> find(getValueAttributeClass()), null);
+								else {
+									map = generic.setHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class), "map");
+									Holder key = ((GenericImpl) map).getHolderByValue(cache, cache.<Attribute> find(getKeyAttributeClass()), next.getValue());
+									if (!((GenericImpl) key.getBaseComponent()).equals(map))
+										key = map.setHolder(cache, cache.<Attribute> find(getKeyAttributeClass()), next.getValue());
+									key.setHolder(cache, cache.<Attribute> find(PropertyValue.class), null).getBaseComponent().log();
+								}
 							}
 
 							@Override
@@ -104,9 +111,21 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 
 			@Override
 			public Serializable put(Serializable key, Serializable value) {
+				assert null != value;
 				Serializable oldValue = get(key);
-				generic.setHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class), PropertiesMapProvider.NAME).setHolder(cache, cache.<Attribute> find(getKeyAttributeClass()), key)
-						.setHolder(cache, cache.<Attribute> find(getValueAttributeClass()), value);
+				// generic.setHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class), PropertiesMapProvider.class).setHolder(cache, cache.<Attribute> find(getKeyAttributeClass()), key)
+				// .setHolder(cache, cache.<Attribute> find(getValueAttributeClass()), value);
+
+				Holder map = generic.setHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class), "map");
+				assert map.getBaseComponent().equals(generic);
+				Holder keyHolder = map.setHolder(cache, cache.<Attribute> find(PropertyKey.class), key);
+				keyHolder.log();
+				assert keyHolder.getBaseComponent().equals(map);
+				log.info("pppppppppppppppp");
+				Holder valueHolder = keyHolder.setHolder(cache, cache.<Attribute> find(PropertyValue.class), value);
+				valueHolder.log();
+				assert valueHolder.getBaseComponent().equals(keyHolder) : valueHolder.info();
+
 				return oldValue;
 			}
 		};

@@ -40,7 +40,6 @@ public class MapTest extends AbstractTest {
 		assert !(Boolean) vehicleMap.get("key2");
 		assert (Boolean) carMap.get("key2");
 		carMap.remove("key2");
-
 		assert !(Boolean) vehicleMap.get("key2");
 		assert !(Boolean) carMap.get("key2");
 	}
@@ -55,6 +54,7 @@ public class MapTest extends AbstractTest {
 		myBmw.getProperties(cache).put("wheel", 4);
 		assert myBmw.getProperties(cache).get("power").equals(123) : myBmw.getProperties(cache);
 		assert myBmw.getProperties(cache).get("wheel").equals(4);
+		log.info("AAAAAAAAAAAAAAAAAAAAAAAA");
 		myBmw.getProperties(cache).remove("power");
 		assert vehicle.getProperties(cache).get("power").equals(123);
 		assert myBmw.getProperties(cache).get("power") == null : myBmw.getProperties(cache).get("power");
@@ -94,8 +94,41 @@ public class MapTest extends AbstractTest {
 		assert car.getProperties(cache).get("power").equals(123);
 		car.getProperties(cache).put("power", 255);
 		assert vehicle.getProperties(cache).get("power").equals(123);
-
 		assert !car.getProperties(cache).get("power").equals(123);
 		assert car.getProperties(cache).get("power").equals(255);
+	}
+
+	public void testRemove() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		vehicle.getProperties(cache).put("power", 123);
+		assert car.getProperties(cache).get("power").equals(123);
+		log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		car.getProperties(cache).remove("power");
+		log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		// car.getProperties(cache).remove("power");
+		// assert car.getProperties(cache).get("power") == null : car.getProperties(cache);
+		car.getProperties(cache).put("power", 123);
+		assert car.getProperties(cache).get("power").equals(123);
+		// vehicle.getProperties(cache).put("power", null);
+		// assert vehicle.getProperties(cache).get("power") == null;
+		// assert car.getProperties(cache).get("power") == null;
+	}
+
+	public void testRemove2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+		vehicle.getProperties(cache).put("power", 123);
+		assert car.getProperties(cache).get("power").equals(123);
+		car.getProperties(cache).remove("power");
+		car.getProperties(cache).remove("power");
+		assert car.getProperties(cache).get("power") == null;
+		car.getProperties(cache).put("power", 124);
+		assert car.getProperties(cache).get("power").equals(124);
+		// vehicle.getProperties(cache).put("power", null);
+		// assert vehicle.getProperties(cache).get("power") == null;
+		// assert car.getProperties(cache).get("power").equals(124);
 	}
 }

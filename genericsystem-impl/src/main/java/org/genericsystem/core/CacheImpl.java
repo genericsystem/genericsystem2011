@@ -10,6 +10,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -387,7 +388,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz, boolean existsException) {
-
 		final Primaries primaries = new Primaries(supers);
 		primaries.add(implicit);
 		Generic[] interfaces = primaries.toArray();
@@ -398,7 +398,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				T phantom = fastFindByInterfaces(phantomImplicit, primaries.toArray(), components);
 				if (phantom != null) {
 					phantom.remove(this);
-					return (T) ((GenericImpl) phantom).supers[1];
+					// return (T) ((GenericImpl) phantom).supers[1];
 				}
 			}
 		}

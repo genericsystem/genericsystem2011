@@ -9,8 +9,6 @@ import org.genericsystem.generic.Attribute;
 @Components(Engine.class)
 public class PropertiesMapProvider extends AbstractMapProvider {
 
-	static final String NAME = "MAP";
-
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends Attribute> Class<T> getKeyAttributeClass() {
