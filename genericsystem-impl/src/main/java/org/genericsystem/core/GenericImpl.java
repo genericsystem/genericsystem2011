@@ -2,8 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.AbstractMap;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -296,7 +294,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		else if (value == null || ((Type) attribute).isPropertyConstraintEnabled(cache))
 			holder = getHolder(cache, attribute, basePos, targets);
 		else if (((GenericImpl) attribute).isMapProvider(cache))
-			holder = Statics.unambigousFirst(this.<T> holdersByEntryKeyIterator(cache, attribute, (AbstractMap.SimpleEntry<Serializable, Serializable>) value, basePos, false, targets));
+			holder = getHolderByValue(cache, attribute, value, basePos, targets);
 		else
 			holder = getHolderByValue(cache, attribute, value, basePos, targets);
 		return holder;
@@ -375,7 +373,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void clearAllConcrete(Cache cache, Holder attribute, int basePos, Generic... targets) {
-		internalClearAll(cache, attribute, basePos, true, null, targets);
+		internalClearAll(cache, attribute, basePos, true, targets);
 	}
 
 	@Override
@@ -385,12 +383,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void clearAllStructural(Cache cache, Holder attribute, int basePos, Generic... targets) {
-		internalClearAll(cache, attribute, basePos, false, null, targets);
+		internalClearAll(cache, attribute, basePos, false, targets);
 	}
 
-	public void internalClearAll(Cache cache, Holder attribute, int basePos, boolean isConcrete, Serializable valueFilter, Generic... targets) {
-		Iterator<Holder> holders = isConcrete ? (valueFilter != null ? holdersByEntryKeyIterator(cache, attribute, (SimpleEntry<Serializable, Serializable>) valueFilter, basePos, true, targets) : holdersIterator(cache, attribute, basePos, true, targets))
-				: this.<Holder> attributesIterator(cache, (Attribute) attribute, true);
+	public void internalClearAll(Cache cache, Holder attribute, int basePos, boolean isConcrete, Generic... targets) {
+		Iterator<Holder> holders = isConcrete ? holdersIterator(cache, attribute, basePos, true, targets) : this.<Holder> attributesIterator(cache, (Attribute) attribute, true);
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
 			if (this.equals(holder.getComponent(basePos)))
@@ -404,11 +401,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, int basePos, final Generic... targets) {
 		return Statics.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(context, attribute, basePos, value == null, targets), value));
-	}
-
-	// TODO readPhantom !?
-	public <T extends Holder> Iterator<T> holdersByEntryKeyIterator(Context context, Holder attribute, AbstractMap.SimpleEntry<Serializable, Serializable> entry, int basePos, boolean readPhantom, final Generic... targets) {
-		return Statics.entryFilter(this.<T> holdersIterator(context, attribute, basePos, readPhantom, targets), entry);
 	}
 
 	@Override
