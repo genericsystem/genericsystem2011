@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -159,7 +160,6 @@ public abstract class AbstractContext implements Context, Serializable {
 	// }
 	//
 	public <T extends Generic> T reFind(Generic generic) {
-		log.info("refind " + generic);
 		if (generic.isEngine())
 			return getEngine();
 		if (generic.isAlive(this))
@@ -167,7 +167,6 @@ public abstract class AbstractContext implements Context, Serializable {
 		if (((GenericImpl) generic).isPrimary())
 			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue(), generic.getMetaLevel());
 		Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
-		log.info("primariesArray : " + Arrays.toString(primariesArray));
 		Generic[] boundPrimaries = new Generic[primariesArray.length];
 		for (int i = 0; i < primariesArray.length; i++) {
 			Generic find = reFind(((GenericImpl) primariesArray[i]));

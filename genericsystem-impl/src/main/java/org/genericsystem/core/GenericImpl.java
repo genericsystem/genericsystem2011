@@ -301,25 +301,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		T holder = getSelectedHolder(cache, attribute, value, basePos, targets);
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
-		log.info("this 1 " + this + " " + value + " attribute " + attribute.info());
-		if (holder == null) {
-			if (null != value)
-				return this.<T> bind(cache, implicit, attribute, basePos, true, targets);
-			return null;
-		}
-		log.info("this " + this + " " + holder.getComponent(basePos));
+		if (holder == null)
+			return null != value ? this.<T> bind(cache, implicit, attribute, basePos, true, targets) : null;
 		if (!this.equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(cache, holder, basePos, true);
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
 				cancel(cache, holder, basePos, true);
-			log.info("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
 			return this.<T> bind(cache, implicit, attribute, basePos, true, targets);
 		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
-			log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
-		}
 		holder.remove(cache);
 		return this.<T> setHolder(cache, attribute, value, basePos, targets);
 	}
@@ -364,11 +356,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void cancelAll(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets) {
-		for (Holder holder : concrete ? getHolders(cache, (Attribute) attribute, basePos, targets) : getAttributes(cache, (Attribute) attribute))
-			if (this.equals(holder.getComponent(basePos)))
+		for (Holder holder : concrete ? getHolders(cache, (Attribute) attribute, basePos, targets) : getAttributes(cache, (Attribute) attribute)) {
+			if (this.equals(holder.getComponent(basePos))) {
 				holder.remove(cache);
-			else
+				cancelAll(cache, attribute, basePos, concrete, targets);
+			} else
 				cancel(cache, holder, basePos, concrete);
+		}
 	}
 
 	@Override
@@ -425,6 +419,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			@Override
 			public Iterator<T> iterator() {
 				return holdersIterator(context, (Attribute) attribute, basePos, false, targets);
+			}
+		};
+	}
+
+	public <T extends Holder> Snapshot<T> getHolders2(final Context context, final Holder attribute, final int basePos, final Generic... targets) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return holdersIterator(context, (Attribute) attribute, basePos, true, targets);
 			}
 		};
 	}

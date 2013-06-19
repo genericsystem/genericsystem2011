@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
@@ -155,7 +156,6 @@ public class ApiTest extends AbstractTest {
 		Link myBmwRed = myBmw.bind(cache, carRed, red);
 		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
 		assert red.getLinks(cache, carColor).contains(myBmwRed) : red.getLinks(cache, carColor);
-		red.log(cache);
 	}
 
 	public void ternaryDeductWithTwoInstances() {

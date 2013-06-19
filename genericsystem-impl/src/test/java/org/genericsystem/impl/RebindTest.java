@@ -79,7 +79,6 @@ public class RebindTest extends AbstractTest {
 	public void rebindTypeNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type vehicle = cache.newType("Vehicle");
-		vehicle.log();
 		Type car = vehicle.newSubType(cache, "Car");
 		Generic mycar = car.newInstance(cache, "mycar");
 		Attribute carPower = car.setAttribute(cache, "power");

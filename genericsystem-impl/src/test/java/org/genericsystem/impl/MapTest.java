@@ -54,7 +54,6 @@ public class MapTest extends AbstractTest {
 		myBmw.getProperties(cache).put("wheel", 4);
 		assert myBmw.getProperties(cache).get("power").equals(123) : myBmw.getProperties(cache);
 		assert myBmw.getProperties(cache).get("wheel").equals(4);
-		log.info("AAAAAAAAAAAAAAAAAAAAAAAA");
 		myBmw.getProperties(cache).remove("power");
 		assert vehicle.getProperties(cache).get("power").equals(123);
 		assert myBmw.getProperties(cache).get("power") == null : myBmw.getProperties(cache).get("power");
@@ -104,11 +103,9 @@ public class MapTest extends AbstractTest {
 		Type car = vehicle.newSubType(cache, "Car");
 		vehicle.getProperties(cache).put("power", 123);
 		assert car.getProperties(cache).get("power").equals(123);
-		log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		car.getProperties(cache).remove("power");
-		log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-		// car.getProperties(cache).remove("power");
-		// assert car.getProperties(cache).get("power") == null : car.getProperties(cache);
+		car.getProperties(cache).remove("power");
+		assert car.getProperties(cache).get("power") == null : car.getProperties(cache);
 		car.getProperties(cache).put("power", 123);
 		assert car.getProperties(cache).get("power").equals(123);
 		// vehicle.getProperties(cache).put("power", null);

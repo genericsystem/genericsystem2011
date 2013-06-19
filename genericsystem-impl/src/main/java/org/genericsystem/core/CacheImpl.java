@@ -386,20 +386,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return bind(implicit, new Generic[] { directSuper }, components, automatic, clazz, existsException);
 	}
 
-	@SuppressWarnings("unchecked")
 	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz, boolean existsException) {
 		final Primaries primaries = new Primaries(supers);
 		primaries.add(implicit);
 		Generic[] interfaces = primaries.toArray();
 		if (implicit.getValue() != null) {
-			Generic phantomImplicit = findPrimaryByValue(((GenericImpl) ((GenericImpl) implicit).supers[0]), null, implicit.getMetaLevel());
+			Generic phantomImplicit = findPrimaryByValue(((GenericImpl) implicit).supers[0], null, implicit.getMetaLevel());
 			if (phantomImplicit != null) {
 				primaries.add(phantomImplicit);
 				T phantom = fastFindByInterfaces(phantomImplicit, primaries.toArray(), components);
-				if (phantom != null) {
+				if (phantom != null)
 					phantom.remove(this);
-					// return (T) ((GenericImpl) phantom).supers[1];
-				}
 			}
 		}
 		T result = fastFindByInterfaces(implicit, interfaces, components);
