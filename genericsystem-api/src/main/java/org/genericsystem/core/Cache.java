@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -28,6 +27,15 @@ public interface Cache extends Context {
 	 */
 	<T extends Type> T newType(Serializable value);
 
+	/**
+	 * Returns the requested type from the context.
+	 * 
+	 * @param value
+	 *            The type name.
+	 * @return The requested type, or null if it does not exist.
+	 */
+	<T extends Type> T getType(Serializable value);
+	
 	/**
 	 * Create a new subtype or get the subtype with this value if it already exists.
 	 * 
@@ -128,12 +136,4 @@ public interface Cache extends Context {
 	 */
 	boolean isRemovable(Generic generic);
 
-	/**
-	 * Returns the requested type from the context.
-	 * 
-	 * @param value
-	 *            The type name.
-	 * @return The requested type, or null if it does not exist.
-	 */
-	<T extends Type> T getType(Serializable value);
 }

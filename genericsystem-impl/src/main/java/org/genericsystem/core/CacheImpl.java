@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
@@ -27,8 +26,6 @@ import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
-import org.genericsystem.iterator.AbstractPreTreeIterator;
-import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 import org.genericsystem.tree.TreeImpl;
@@ -618,21 +615,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	public <T extends Generic> Iterator<T> queryIterator(Context context, final int levelFilter, Generic[] supers, final Generic... components) {
-		final Primaries primaries = new Primaries(supers);
-		final Generic[] interfaces = primaries.toArray();
-		// Generic[] directSupers = getDirectSupers(interfaces, components);
-		// assert directSupers.length >= 2;
-		return new AbstractConcateIterator<Generic, T>(getDirectSupersIterator(interfaces, components)) {
-			@Override
-			protected Iterator<T> getIterator(Generic directSuper) {
-				return new AbstractFilterIterator<T>(CacheImpl.this.<T> concernedDependenciesIterator(directSuper, interfaces, components)) {
-					@Override
-					public boolean isSelected() {
-						return levelFilter == next.getMetaLevel();
-					}
-				};
-			}
-		};
-	}
+	// public <T extends Generic> Iterator<T> queryIterator(Context context, final int levelFilter, Generic[] supers, final Generic... components) {
+	// final Primaries primaries = new Primaries(supers);
+	// final Generic[] interfaces = primaries.toArray();
+	// // Generic[] directSupers = getDirectSupers(interfaces, components);
+	// // assert directSupers.length >= 2;
+	// return new AbstractConcateIterator<Generic, T>(getDirectSupersIterator(interfaces, components)) {
+	// @Override
+	// protected Iterator<T> getIterator(Generic directSuper) {
+	// return new AbstractFilterIterator<T>(CacheImpl.this.<T> concernedDependenciesIterator(directSuper, interfaces, components)) {
+	// @Override
+	// public boolean isSelected() {
+	// return levelFilter == next.getMetaLevel();
+	// }
+	// };
+	// }
+	// };
+	// }
 }
