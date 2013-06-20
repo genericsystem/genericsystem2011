@@ -751,9 +751,13 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	String info(Context context);
 
-	void clearAll(Cache cache, Holder attribute, Generic... targets);
+	void clearAllStructural(Cache cache, Holder attribute, Generic... targets);
 
-	void clearAll(Cache cache, Holder attribute, int basePos, Generic... targets);
+	void clearAllStructural(Cache cache, Holder attribute, int basePos, Generic... targets);
+
+	void clearAllConcrete(Cache cache, Holder attribute, Generic... targets);
+
+	void clearAllConcrete(Cache cache, Holder attribute, int basePos, Generic... targets);
 
 	void cancelAll(Cache cache, Holder attribute, boolean concrete, Generic... targets);
 

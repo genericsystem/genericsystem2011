@@ -20,7 +20,7 @@
 		</f:facet>
 		DEB
 			<rich:dropTarget acceptedTypes="std"
-			dropListener="#{typesBean.processDrop}" render="edittypesmanager" />
+			dropListener="#{typesBean.processDrop}" render="edittypesmanager,typestree" />
 		FIN
 
 		<rich:dataGrid var="currentStructural"
@@ -40,6 +40,7 @@
 							<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
 						</a4j:commandLink>
 						<a4j:commandLink
+							rendered="#{!typesBean.isSingular(currentStructural)}"
 							disabled="#{typesBean.isSingular(currentStructural)}"
 							oncomplete="#{rich:component('addValue')}.show()">
 							<h:graphicImage value="#{infos.add}"

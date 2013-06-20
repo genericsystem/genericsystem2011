@@ -2,8 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.AbstractMap;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -30,7 +28,6 @@ import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
-import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractConcateIterator;
@@ -295,8 +292,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			holder = getHolder(cache, (Attribute) attribute, basePos);
 		else if (value == null || ((Type) attribute).isPropertyConstraintEnabled(cache))
 			holder = getHolder(cache, attribute, basePos, targets);
-		else if (((GenericImpl) attribute).isMapProvider(cache))
-			holder = Statics.unambigousFirst(this.<T> holdersByEntryKeyIterator(cache, attribute, (AbstractMap.SimpleEntry<Serializable, Serializable>) value, basePos, false, targets));
 		else
 			holder = getHolderByValue(cache, attribute, value, basePos, targets);
 		return holder;
@@ -307,7 +302,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		T holder = getSelectedHolder(cache, attribute, value, basePos, targets);
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
-			return value != null ? this.<T> bind(cache, implicit, attribute, basePos, true, targets) : null;
+			return null != value ? this.<T> bind(cache, implicit, attribute, basePos, true, targets) : null;
 		if (!this.equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(cache, holder, basePos, true);
@@ -361,42 +356,42 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void cancelAll(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets) {
-		for (Holder holder : concrete ? getHolders(cache, (Attribute) attribute, basePos, targets) : getAttributes(cache, (Attribute) attribute))
-			if (this.equals(holder.getComponent(basePos)))
+		for (Holder holder : concrete ? getHolders(cache, (Attribute) attribute, basePos, targets) : getAttributes(cache, (Attribute) attribute)) {
+			if (this.equals(holder.getComponent(basePos))) {
 				holder.remove(cache);
-			else
+				cancelAll(cache, attribute, basePos, concrete, targets);
+			} else
 				cancel(cache, holder, basePos, concrete);
+		}
 	}
 
-	public void clearAll(Cache cache, Holder attribute, int basePos, Serializable valueFilter, Generic... targets) {
-		Iterator<Holder> holders = valueFilter instanceof Map.Entry ? holdersByEntryKeyIterator(cache, attribute, (SimpleEntry<Serializable, Serializable>) valueFilter, basePos, true, targets) : Statics.valueFilter(
-				holdersIterator(cache, attribute, basePos, true, targets), valueFilter);
+	@Override
+	public void clearAllConcrete(Cache cache, Holder attribute, Generic... targets) {
+		clearAllConcrete(cache, attribute, getBasePos(attribute), targets);
+	}
+
+	@Override
+	public void clearAllConcrete(Cache cache, Holder attribute, int basePos, Generic... targets) {
+		internalClearAll(cache, attribute, basePos, true, targets);
+	}
+
+	@Override
+	public void clearAllStructural(Cache cache, Holder attribute, Generic... targets) {
+		clearAllStructural(cache, attribute, getBasePos(attribute), targets);
+	}
+
+	@Override
+	public void clearAllStructural(Cache cache, Holder attribute, int basePos, Generic... targets) {
+		internalClearAll(cache, attribute, basePos, false, targets);
+	}
+
+	public void internalClearAll(Cache cache, Holder attribute, int basePos, boolean isConcrete, Generic... targets) {
+		Iterator<Holder> holders = isConcrete ? holdersIterator(cache, attribute, basePos, true, targets) : this.<Holder> attributesIterator(cache, (Attribute) attribute, true);
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
 			if (this.equals(holder.getComponent(basePos)))
 				holder.remove(cache);
 		}
-	}
-
-	@Override
-	public void clearAll(Cache cache, Holder attribute, int basePos, Generic... targets) {
-		final Iterator<Holder> holders = holdersIterator(cache, attribute, basePos, true, targets);
-		log.info("holders " + new AbstractSnapshot<Holder>() {
-			@Override
-			public Iterator<Holder> iterator() {
-				return holders;
-			}
-		});
-		while (holders.hasNext()) {
-			Holder holder = holders.next();
-			if (this.equals(holder.getComponent(basePos)))
-				holder.remove(cache);
-		}
-	}
-
-	@Override
-	public void clearAll(Cache cache, Holder attribute, Generic... targets) {
-		clearAll(cache, attribute, getBasePos(attribute), targets);
 	}
 
 	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, final Generic... targets) {
@@ -405,11 +400,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, int basePos, final Generic... targets) {
 		return Statics.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(context, attribute, basePos, value == null, targets), value));
-	}
-
-	// TODO readPhantom !?
-	public <T extends Holder> Iterator<T> holdersByEntryKeyIterator(Context context, Holder attribute, AbstractMap.SimpleEntry<Serializable, Serializable> entry, int basePos, boolean readPhantom, final Generic... targets) {
-		return Statics.entryFilter(this.<T> holdersIterator(context, attribute, basePos, readPhantom, targets), entry);
 	}
 
 	@Override
@@ -429,6 +419,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			@Override
 			public Iterator<T> iterator() {
 				return holdersIterator(context, (Attribute) attribute, basePos, false, targets);
+			}
+		};
+	}
+
+	public <T extends Holder> Snapshot<T> getHolders2(final Context context, final Holder attribute, final int basePos, final Generic... targets) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return holdersIterator(context, (Attribute) attribute, basePos, true, targets);
 			}
 		};
 	}
@@ -1171,15 +1170,67 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	// @Override
+	// public <T extends Generic> T getSubType(Context context, final Serializable value) {
+	// return Statics.<T> unambigousFirst(new AbstractFilterIterator<T>(this.<T> allSubTypesIteratorWithoutRoot(context)) {
+	//
+	// @Override
+	// public boolean isSelected() {
+	// return Objects.equals(next.getValue(), value);
+	// }
+	// });
+	// }
+
 	@Override
 	public <T extends Generic> T getSubType(Context context, final Serializable value) {
-		return this.<T> getSubTypes(context).filter(new Filter<T>() {
+		final Generic primary = ((AbstractContext) context).findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
+		if (primary == null)
+			return null;
+		log.info("getSubType");
+		this.log();
+		Iterator<T> iterator = Statics.<T> valueFilter(new AbstractFilterIterator<T>((((GenericImpl) primary).<T> directInheritingsIterator(context))) {
+
 			@Override
-			public boolean isSelected(T element) {
-				return Objects.equals(element.getValue(), value);
+			public boolean isSelected() {
+				next.log();
+				return next.inheritsFrom(GenericImpl.this);
+				// return next.inheritsFrom(primary);
 			}
-		}).first();
+		}, value);
+		if (!primary.isAutomatic() && iterator.hasNext())
+			throw new IllegalStateException("Ambigous selection");
+		return Statics.<T> unambigousFirst(iterator);
 	}
+
+	// public <T extends Generic> T getSubType(Context context, Serializable value, Generic[] supers, Generic... components) {
+	// Generic primary = ((CacheImpl) context).findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
+	// if (primary == null)
+	// return null;
+	// return Statics.<T> unambigousFirst(((CacheImpl) context).<T> queryIterator(context, SystemGeneric.STRUCTURAL, Statics.insertFirst(this, Statics.insertFirst(primary, supers)), components));
+	// }
+
+	// public <T extends Generic> Snapshot<T> getSubTypes(final Context context, final Generic[] supers, final Generic... components) {
+	// return new AbstractSnapshot<T>() {
+	//
+	// @Override
+	// public Iterator<T> iterator() {
+	// return ((CacheImpl) context).<T> queryIterator(context, SystemGeneric.STRUCTURAL, supers, components);
+	// }
+	// };
+	// }
+	//
+	// public <T extends Type> Snapshot<T> getSubTypes(final Context context, final Serializable value, final Generic[] supers, final Generic... components) {
+	// return new AbstractSnapshot<T>() {
+	//
+	// @Override
+	// public Iterator<T> iterator() {
+	// Generic primary = ((CacheImpl) context).findPrimaryByValue(getImplicit(), value, SystemGeneric.STRUCTURAL);
+	// if (primary == null)
+	// return Statics.emptyIterator();
+	// return ((CacheImpl) context).<T> queryIterator(context, SystemGeneric.STRUCTURAL, Statics.insertFirst(primary, supers), components);
+	// }
+	// };
+	// }
 
 	@Override
 	public <T extends Generic> Snapshot<T> getDirectSubTypes(final Context context) {
@@ -1621,10 +1672,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public Snapshot<Entry<Serializable, Serializable>> getPropertiesShot(final Cache cache) {
 		return cache.<PropertiesMapProvider> find(PropertiesMapProvider.class).getEntriesShot(cache, this);
-	}
-
-	boolean isMapProvider(Cache cache) {
-		return this instanceof MapProvider;
 	}
 
 	// TODO change with instanceof Tree

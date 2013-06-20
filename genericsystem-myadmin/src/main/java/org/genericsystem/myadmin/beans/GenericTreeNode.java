@@ -88,7 +88,7 @@ public class GenericTreeNode {
 	}
 
 	public boolean isImplicitAutomatic(Generic generic) {
-		return generic.isAutomatic() && ((GenericImpl) generic).isPrimary();
+		return generic.isAutomatic() && ((GenericImpl) generic).getComponentsSize() == 0;
 	}
 
 	public String getValue() {

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
@@ -155,7 +156,6 @@ public class ApiTest extends AbstractTest {
 		Link myBmwRed = myBmw.bind(cache, carRed, red);
 		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
 		assert red.getLinks(cache, carColor).contains(myBmwRed) : red.getLinks(cache, carColor);
-		red.log(cache);
 	}
 
 	public void ternaryDeductWithTwoInstances() {
@@ -295,11 +295,7 @@ public class ApiTest extends AbstractTest {
 
 	public void test_get_non_existing_type() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Type expected = null;
-
-		Type actual = cache.getType("Moto");
-
-		assert Objects.equals(actual, expected);
+		assert cache.getType("Moto") == null;
 	}
 
 	public void test_get_multiple_existing_types() {
@@ -398,7 +394,8 @@ public class ApiTest extends AbstractTest {
 
 		Type superCar = car.newSubType(cache, "SuperCar");
 
-		Snapshot<Type> types = cache.getTypes();
+		Snapshot<Type> types = cache.getEngine().getAllInstances(cache);
+		types.log();
 		assert types.size() >= 4;
 		assert types.containsAll(Arrays.asList(car, bus, moto, superCar));
 	}
