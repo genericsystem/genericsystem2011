@@ -338,7 +338,7 @@ public class TypesBean implements Serializable {
 			Generic generic = genericTreeNode.getGeneric();
 			if (!newValue.equals(generic.toString())) {
 				genericTreeNode.setGeneric(generic.updateKey(cache, newValue));
-				messages.info("updateShortPath", newValue, generic.getValue());
+				messages.info("updateGeneric", newValue, generic.getValue());
 			}
 		}
 	}
