@@ -11,6 +11,8 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.PhantomConstraintViolationException;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.Constraint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
@@ -23,6 +25,8 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 public class PhantomConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -1175582355395269087L;
+
+	protected static Logger log = LoggerFactory.getLogger(PhantomConstraintImpl.class);
 
 	// TODO KK
 	@Override
@@ -48,6 +52,7 @@ public class PhantomConstraintImpl extends Constraint implements BooleanSystemPr
 						inheritancesCount++;
 					}
 				}
+
 				if (inheritancesCount != 1)
 					throw new PhantomConstraintViolationException(modified.info());
 			}
