@@ -22,7 +22,6 @@ import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
 import org.genericsystem.annotation.constraints.UniqueConstraint;
 import org.genericsystem.annotation.constraints.VirtualConstraint;
-import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
@@ -1186,19 +1185,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		final Generic primary = ((AbstractContext) context).findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
 		if (primary == null)
 			return null;
-		log.info("getSubType");
-		this.log();
 		Iterator<T> iterator = Statics.<T> valueFilter(new AbstractFilterIterator<T>((((GenericImpl) primary).<T> directInheritingsIterator(context))) {
 
 			@Override
 			public boolean isSelected() {
-				next.log();
 				return next.inheritsFrom(GenericImpl.this);
-				// return next.inheritsFrom(primary);
 			}
 		}, value);
 		if (!primary.isAutomatic() && iterator.hasNext())
 			throw new IllegalStateException("Ambigous selection");
+		if (!iterator.hasNext() && primary.inheritsFrom(this))
+			return (T) primary;
 		return Statics.<T> unambigousFirst(iterator);
 	}
 
@@ -1258,7 +1255,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> allSubTypesIteratorWithoutRoot(Context context) {
-		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(context), getMetaLevel());
+		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(context), SystemGeneric.STRUCTURAL);// getMetaLevel()); // TODO remove comment
 	}
 
 	public <T extends Generic> Snapshot<T> getAllInheritings(final Context context) {

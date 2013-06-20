@@ -22,13 +22,25 @@ public class GetSubTypeTest extends AbstractTest {
 		assert Objects.equals(car, subType);
 	}
 
+	public void testGetSubTypeSimpleHierarchyTypeKO() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType(cache, "Car");
+
+		assert cache.getEngine().getInstanceByValue(cache, "Car").equals(car.getImplicit());
+		assert cache.getEngine().getInstances(cache).contains(car.getImplicit());
+		assert cache.getEngine().getAllInstances(cache).contains(car.getImplicit()) : cache.getEngine().getAllInstances(cache);
+
+		assert cache.getEngine().getSubType(cache, "Car").equals(car) : cache.getEngine().getSubType(cache, "Car");
+		assert cache.getEngine().getSubTypes(cache).contains(car) : cache.getEngine().getSubTypes(cache);
+	}
+
 	public void testGetSubTypeDoubleHierarchyType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Generic subType = human.getSubType(cache, "Car");
-		assert !Objects.equals(car, subType);
+		vehicle.newSubType(cache, "Car");
+		assert human.getSubType(cache, "Car") == null;
 	}
 
 	public void testGetSubTypeNonExistingType() {
@@ -53,22 +65,17 @@ public class GetSubTypeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute(cache, "Power");
-		Attribute unit = power.setAttribute(cache, "Unit");
-		log.info("test");
-		power.log();
-		unit.log();
-		Generic subAttribute = power.getSubType(cache, "Unit");
-		assert Objects.equals(unit, subAttribute); // KO
+		power.setAttribute(cache, "Unit");
+		assert power.getSubType(cache, "Unit") == null;
 	}
 
 	public void testGetSubTypeDoubleHierarchyAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setAttribute(cache, "power");
-		Attribute carPowerUnit = carPower.setAttribute(cache, "Unit");
+		carPower.setAttribute(cache, "Unit");
 		Attribute wheel = car.setAttribute(cache, "Wheel");
-		Generic subAttribute = wheel.getSubType(cache, "Unit");
-		assert !Objects.equals(carPowerUnit, subAttribute);
+		assert wheel.getSubType(cache, "Unit") == null;
 	}
 
 	// Relation

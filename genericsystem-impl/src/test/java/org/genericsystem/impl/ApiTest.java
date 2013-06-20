@@ -325,6 +325,7 @@ public class ApiTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type nullType = cache.newType(null);
 		assert nullType.equals(cache.getType(null));
+		// nullType.equals(cache.getType(null));
 	}
 
 	public void test_get_type_with_hierarchy() {
