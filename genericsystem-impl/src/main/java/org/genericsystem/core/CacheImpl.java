@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
@@ -27,8 +26,6 @@ import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
-import org.genericsystem.iterator.AbstractPreTreeIterator;
-import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 import org.genericsystem.tree.TreeImpl;
@@ -202,7 +199,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new Restructurator() {
 			@Override
 			Generic rebuild() {
-				Generic newImplicit = bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel(), old.isAutomatic());
+				Generic newImplicit = bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel(), old.getImplicit().isAutomatic());
 				if (((GenericImpl) old).isPrimary())
 					return newImplicit;
 				return bind(newImplicit, Statics.replace(0, ((GenericImpl) old).supers, newImplicit), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
@@ -297,38 +294,19 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<T> newSubType(value);
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T extends Generic> Iterator<T> allInheritingsIterator(final Context context) {
-		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(context.getEngine()) {
-
-			private static final long serialVersionUID = 8161663636838488529L;
-
-			@Override
-			public Iterator<Generic> children(Generic node) {
-				return (((GenericImpl) node).directInheritingsIterator(context));
-			}
-		};
-	}
-
-	@Override
-	public <T extends Type> Snapshot<T> getTypes() {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return CacheImpl.this.<T> allInheritingsIterator(CacheImpl.this);
-			}
-		};
-	}
+	// @Override
+	// public <T extends Type> T getType(final Serializable value) {
+	// return Statics.unambigousFirst(new AbstractFilterIterator<T>(this.<T> directInheritingsIterator(getEngine())) {
+	// @Override
+	// public boolean isSelected() {
+	// return Objects.equals(value, next.getValue());
+	// }
+	// });
+	// }
 
 	@Override
 	public <T extends Type> T getType(final Serializable value) {
-		return this.<T> getTypes().filter(new Filter<T>() {
-			@Override
-			public boolean isSelected(T element) {
-				return Objects.equals(element.getValue(), value);
-			}
-
-		}).first();
+		return getEngine().getSubType(this, value);
 	}
 
 	@Override
@@ -386,20 +364,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return bind(implicit, new Generic[] { directSuper }, components, automatic, clazz, existsException);
 	}
 
-	@SuppressWarnings("unchecked")
 	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> clazz, boolean existsException) {
 		final Primaries primaries = new Primaries(supers);
 		primaries.add(implicit);
 		Generic[] interfaces = primaries.toArray();
 		if (implicit.getValue() != null) {
-			Generic phantomImplicit = findPrimaryByValue(((GenericImpl) ((GenericImpl) implicit).supers[0]), null, implicit.getMetaLevel());
+			Generic phantomImplicit = findPrimaryByValue(((GenericImpl) implicit).supers[0], null, implicit.getMetaLevel());
 			if (phantomImplicit != null) {
 				primaries.add(phantomImplicit);
 				T phantom = fastFindByInterfaces(phantomImplicit, primaries.toArray(), components);
-				if (phantom != null) {
+				if (phantom != null)
 					phantom.remove(this);
-					// return (T) ((GenericImpl) phantom).supers[1];
-				}
 			}
 		}
 		T result = fastFindByInterfaces(implicit, interfaces, components);
@@ -431,11 +406,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return superGeneric;
 	}
 
-	private Iterator<Generic> concernedDependenciesIterator(Generic directSuper, final Generic[] interfaces, final Generic[] extendedComponents) {
-		return new AbstractFilterIterator<Generic>(directInheritingsIterator(directSuper)) {
+	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic directSuper, final Generic[] interfaces, final Generic[] components) {
+		return new AbstractFilterIterator<T>(this.<T> directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
-				return next.getValue() != null && GenericImpl.isSuperOf(interfaces, extendedComponents, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
+				return next.getValue() != null && GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
 			}
 		};
 	}
@@ -640,4 +615,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
+	// public <T extends Generic> Iterator<T> queryIterator(Context context, final int levelFilter, Generic[] supers, final Generic... components) {
+	// final Primaries primaries = new Primaries(supers);
+	// final Generic[] interfaces = primaries.toArray();
+	// // Generic[] directSupers = getDirectSupers(interfaces, components);
+	// // assert directSupers.length >= 2;
+	// return new AbstractConcateIterator<Generic, T>(getDirectSupersIterator(interfaces, components)) {
+	// @Override
+	// protected Iterator<T> getIterator(Generic directSuper) {
+	// return new AbstractFilterIterator<T>(CacheImpl.this.<T> concernedDependenciesIterator(directSuper, interfaces, components)) {
+	// @Override
+	// public boolean isSelected() {
+	// return levelFilter == next.getMetaLevel();
+	// }
+	// };
+	// }
+	// };
+	// }
 }
