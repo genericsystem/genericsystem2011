@@ -6,7 +6,6 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.core.Statics;
 import org.genericsystem.exception.PhantomConstraintViolationException;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
@@ -42,16 +41,19 @@ public class PhamtomTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 
 		assert myVehicle.getValue(cache, vehiclePower) == "123";
-		myVehicle.setValue(cache, defaultPower, null);
-		Generic phantom = ((GenericImpl) myVehicle).holdersIterator(cache, vehiclePower, Statics.BASE_POSITION, true).next();
+		Generic phantom = myVehicle.setValue(cache, defaultPower, null);
 		myVehicle.setValue(cache, defaultPower, "123");
 		assert phantom.getValue() == null;
 		assert !phantom.isAlive(cache);
 
-		myVehicle.setValue(cache, defaultPower, null);
-		phantom = ((GenericImpl) myVehicle).holdersIterator(cache, vehiclePower, Statics.BASE_POSITION, true).next();
-		myVehicle.setValue(cache, defaultPower, "235");
+		phantom = myVehicle.setValue(cache, defaultPower, null);
+		myVehicle.setValue(cache, defaultPower, "555");
 		assert phantom.isAlive(cache);
+
+		vehiclePower.enableSingularConstraint(cache);
+		assert ((Type) defaultPower).isSingularConstraintEnabled(cache);
+		myVehicle.setValue(cache, defaultPower, "235");
+		assert myVehicle.getValue(cache, vehiclePower) == "235";
 	}
 
 	public void cancelAttribute() {
@@ -186,9 +188,9 @@ public class PhamtomTest extends AbstractTest {
 		final Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		final Type color = cache.newType("Color");
-		vehicle.newSubType(cache, "Car");
 
-		vehicle.setRelation(cache, "VehicleHuman", human);
+		Relation r1 = vehicle.setRelation(cache, "VehicleHuman", human);
+		cache.flush();
 		new RollbackCatcher() {
 
 			@Override
@@ -196,6 +198,7 @@ public class PhamtomTest extends AbstractTest {
 				vehicle.setRelation(cache, "VehicleHuman", color);
 			}
 		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
+		assert r1 == cache.getEngine().getSubType(cache, "VehicleHuman") : cache.getEngine().getSubType(cache, "VehicleHuman").info();
 	}
 
 	public void testAttributeWithGetInstances() {
@@ -270,14 +273,11 @@ public class PhamtomTest extends AbstractTest {
 		Generic myCar = car.newInstance(cache, "myCar");
 		assert myCar.getHolder(cache, carPower).equals(defaultPower);
 
-		// myCar.cancel(cache, defaultPower);
 		Generic cancel = myCar.setValue(cache, carPower, null);
 		assert ((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null) == cancel;
 		assert myCar.getHolder(cache, carPower) == null : myCar.getHolder(cache, carPower);
 
-		// ((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null).remove(cache);
-		Holder newDefaultPower = myCar.setValue(cache, carPower, "233");
-		// assert false : newDefaultPower.info();
+		myCar.setValue(cache, carPower, "233");
 		assert !cancel.isAlive(cache);
 		assert myCar.getValue(cache, carPower).equals("233");
 		assert ((GenericImpl) myCar).getHolderByValue(cache, defaultPower, null) == null;
@@ -317,19 +317,16 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void cancelDefaultRelationKo() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		Type car = cache.newType("Car");
+		Generic myCar = car.newInstance(cache, "myCar");
 		Type color = cache.newType("Color");
-
-		final Relation carColor = car.setRelation(cache, "carColor", color);
-
 		Generic red = color.newInstance(cache, "red");
 		Generic green = color.newInstance(cache, "green");
+		Relation carColor = car.setRelation(cache, "carColor", color);
 
-		car.setLink(cache, carColor, "defaultColor1", red);
-		car.setLink(cache, carColor, "defaultColor2", green);
-		final Generic myCar = car.newInstance(cache, "myCar");
+		car.bind(cache, carColor, red);
+		car.bind(cache, carColor, green);
 		assert myCar.getTargets(cache, carColor).contains(red);
 		assert myCar.getTargets(cache, carColor).contains(green);
 
@@ -341,12 +338,12 @@ public class PhamtomTest extends AbstractTest {
 		myCar.cancelAll(cache, carColor, true, red);
 		assert !myCar.getTargets(cache, carColor).contains(red);
 		assert myCar.getTargets(cache, carColor).contains(green);
-		myCar.setLink(cache, carColor, "defaultColor1", red);
+		myCar.bind(cache, carColor, red);
 		assert myCar.getTargets(cache, carColor).contains(red);
 		assert myCar.getTargets(cache, carColor).contains(green);
 		myCar.cancelAll(cache, carColor, true);
-		assert !myCar.getTargets(cache, carColor).contains(red);
 		assert !myCar.getTargets(cache, carColor).contains(green);
+		assert !myCar.getTargets(cache, carColor).contains(red);
 		assert myCar.getTargets(cache, carColor).isEmpty();
 	}
 
@@ -435,12 +432,11 @@ public class PhamtomTest extends AbstractTest {
 		// ((GenericImpl) myCar).getHolderByValue(cache, defaultCarColor, null, red).remove(cache);// restore
 		// assert myCar.getLink(cache, carColor, red).equals(defaultCarColor);
 
-		myCar.setLink(cache, defaultCarColor, null, red).log(); // phantomize
+		myCar.setLink(cache, defaultCarColor, null, red); // phantomize
 		assert myCar.getTargets(cache, carColor).isEmpty();
 
 		Link link = myCar.setLink(cache, carColor, "toto", red);// restore
 		assert myCar.getLink(cache, carColor, red).equals(link);
-		link.log();
 
 	}
 

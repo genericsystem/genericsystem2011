@@ -35,14 +35,7 @@ public interface Cache extends Context {
 	 * @return The requested type, or null if it does not exist.
 	 */
 	<T extends Type> T getType(Serializable value);
-
-	/**
-	 * Returns the requested types from the context.
-	 * 
-	 * @return The requested types.
-	 */
-	<T extends Type> Snapshot<T> getTypes();
-
+	
 	/**
 	 * Create a new subtype or get the subtype with this value if it already exists.
 	 * 

@@ -22,7 +22,6 @@ import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
 import org.genericsystem.annotation.constraints.UniqueConstraint;
 import org.genericsystem.annotation.constraints.VirtualConstraint;
-import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
@@ -301,25 +300,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		T holder = getSelectedHolder(cache, attribute, value, basePos, targets);
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
-		log.info("this 1 " + this + " " + value + " attribute " + attribute.info());
-		if (holder == null) {
-			if (null != value)
-				return this.<T> bind(cache, implicit, attribute, basePos, true, targets);
-			return null;
-		}
-		log.info("this " + this + " " + holder.getComponent(basePos));
+		if (holder == null)
+			return null != value ? this.<T> bind(cache, implicit, attribute, basePos, true, targets) : null;
 		if (!this.equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(cache, holder, basePos, true);
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
 				cancel(cache, holder, basePos, true);
-			log.info("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
 			return this.<T> bind(cache, implicit, attribute, basePos, true, targets);
 		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
-			log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
-		}
 		holder.remove(cache);
 		return this.<T> setHolder(cache, attribute, value, basePos, targets);
 	}
@@ -364,11 +355,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void cancelAll(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets) {
-		for (Holder holder : concrete ? getHolders(cache, (Attribute) attribute, basePos, targets) : getAttributes(cache, (Attribute) attribute))
-			if (this.equals(holder.getComponent(basePos)))
+		for (Holder holder : concrete ? getHolders(cache, (Attribute) attribute, basePos, targets) : getAttributes(cache, (Attribute) attribute)) {
+			if (this.equals(holder.getComponent(basePos))) {
 				holder.remove(cache);
-			else
+				cancelAll(cache, attribute, basePos, concrete, targets);
+			} else
 				cancel(cache, holder, basePos, concrete);
+		}
 	}
 
 	@Override
@@ -425,6 +418,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			@Override
 			public Iterator<T> iterator() {
 				return holdersIterator(context, (Attribute) attribute, basePos, false, targets);
+			}
+		};
+	}
+
+	public <T extends Holder> Snapshot<T> getHolders2(final Context context, final Holder attribute, final int basePos, final Generic... targets) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return holdersIterator(context, (Attribute) attribute, basePos, true, targets);
 			}
 		};
 	}
@@ -1167,15 +1169,65 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	// @Override
+	// public <T extends Generic> T getSubType(Context context, final Serializable value) {
+	// return Statics.<T> unambigousFirst(new AbstractFilterIterator<T>(this.<T> allSubTypesIteratorWithoutRoot(context)) {
+	//
+	// @Override
+	// public boolean isSelected() {
+	// return Objects.equals(next.getValue(), value);
+	// }
+	// });
+	// }
+
 	@Override
 	public <T extends Generic> T getSubType(Context context, final Serializable value) {
-		return this.<T> getSubTypes(context).filter(new Filter<T>() {
+		final Generic primary = ((AbstractContext) context).findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
+		if (primary == null)
+			return null;
+		Iterator<T> iterator = Statics.<T> valueFilter(new AbstractFilterIterator<T>((((GenericImpl) primary).<T> directInheritingsIterator(context))) {
+
 			@Override
-			public boolean isSelected(T element) {
-				return Objects.equals(element.getValue(), value);
+			public boolean isSelected() {
+				return next.inheritsFrom(GenericImpl.this);
 			}
-		}).first();
+		}, value);
+		if (!primary.isAutomatic() && iterator.hasNext())
+			throw new IllegalStateException("Ambigous selection");
+		if (!iterator.hasNext() && primary.inheritsFrom(this))
+			return (T) primary;
+		return Statics.<T> unambigousFirst(iterator);
 	}
+
+	// public <T extends Generic> T getSubType(Context context, Serializable value, Generic[] supers, Generic... components) {
+	// Generic primary = ((CacheImpl) context).findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
+	// if (primary == null)
+	// return null;
+	// return Statics.<T> unambigousFirst(((CacheImpl) context).<T> queryIterator(context, SystemGeneric.STRUCTURAL, Statics.insertFirst(this, Statics.insertFirst(primary, supers)), components));
+	// }
+
+	// public <T extends Generic> Snapshot<T> getSubTypes(final Context context, final Generic[] supers, final Generic... components) {
+	// return new AbstractSnapshot<T>() {
+	//
+	// @Override
+	// public Iterator<T> iterator() {
+	// return ((CacheImpl) context).<T> queryIterator(context, SystemGeneric.STRUCTURAL, supers, components);
+	// }
+	// };
+	// }
+	//
+	// public <T extends Type> Snapshot<T> getSubTypes(final Context context, final Serializable value, final Generic[] supers, final Generic... components) {
+	// return new AbstractSnapshot<T>() {
+	//
+	// @Override
+	// public Iterator<T> iterator() {
+	// Generic primary = ((CacheImpl) context).findPrimaryByValue(getImplicit(), value, SystemGeneric.STRUCTURAL);
+	// if (primary == null)
+	// return Statics.emptyIterator();
+	// return ((CacheImpl) context).<T> queryIterator(context, SystemGeneric.STRUCTURAL, Statics.insertFirst(primary, supers), components);
+	// }
+	// };
+	// }
 
 	@Override
 	public <T extends Generic> Snapshot<T> getDirectSubTypes(final Context context) {
@@ -1203,7 +1255,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> allSubTypesIteratorWithoutRoot(Context context) {
-		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(context), getMetaLevel());
+		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(context), SystemGeneric.STRUCTURAL);// getMetaLevel()); // TODO remove comment
 	}
 
 	public <T extends Generic> Snapshot<T> getAllInheritings(final Context context) {

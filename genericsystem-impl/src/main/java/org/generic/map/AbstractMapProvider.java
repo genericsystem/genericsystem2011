@@ -78,7 +78,7 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 									Holder key = ((GenericImpl) map).getHolderByValue(cache, cache.<Attribute> find(getKeyAttributeClass()), next.getValue());
 									if (!((GenericImpl) key.getBaseComponent()).equals(map))
 										key = map.setHolder(cache, cache.<Attribute> find(getKeyAttributeClass()), next.getValue());
-									key.setHolder(cache, cache.<Attribute> find(PropertyValue.class), null).getBaseComponent().log();
+									key.setHolder(cache, cache.<Attribute> find(PropertyValue.class), null);
 								}
 							}
 
@@ -119,11 +119,8 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 				Holder map = generic.setHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class), "map");
 				assert map.getBaseComponent().equals(generic);
 				Holder keyHolder = map.setHolder(cache, cache.<Attribute> find(PropertyKey.class), key);
-				keyHolder.log();
 				assert keyHolder.getBaseComponent().equals(map);
-				log.info("pppppppppppppppp");
 				Holder valueHolder = keyHolder.setHolder(cache, cache.<Attribute> find(PropertyValue.class), value);
-				valueHolder.log();
 				assert valueHolder.getBaseComponent().equals(keyHolder) : valueHolder.info();
 
 				return oldValue;
