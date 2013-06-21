@@ -18,11 +18,10 @@
 				style="white-space: nowrap; padding-top: 5px;"
 				value="#{msg.edit} #{typesBean.selectedTreeNodeGeneric}" />
 		</f:facet>
-		DEB
-			<rich:dropTarget acceptedTypes="std"
+		
+		<rich:dropTarget acceptedTypes="std"
 			dropListener="#{typesBean.processDrop}" render="edittypesmanager,typestree" />
-		FIN
-
+		
 		<rich:dataGrid var="currentStructural"
 			value="#{typesBean.structurals}" styleClass="fullWidth" columns="2">
 			<rich:dataTable var="currentHolder" headerClass="fullWidth,"
