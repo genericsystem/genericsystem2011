@@ -9,6 +9,25 @@
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
+	<h:outputStylesheet>
+		.rf-ind-drag.default {
+	        background-position: 5px;
+	        background-repeat: no-repeat;
+	        border: 2px solid red;
+	        padding: 5px;
+	        background-color: #EB9A99;
+        }
+        .rf-ind-drag.accept {
+	        background-position: 5px;
+	        background-repeat: no-repeat;
+	        border: 2px solid green;
+        }
+        .rf-ind-drag.reject {
+	        background-position: 5px;
+	        background-repeat: no-repeat;
+	        border: 2px solid red;
+	    }
+	</h:outputStylesheet>
 
 	<rich:panel id="paneltypesmanager" layout="block"
 		styleClass="widthScroll280 fullHeight">
@@ -69,27 +88,45 @@
 			
 			<a4j:outputPanel layout="block">
 				<h:outputText value="int" />
-				<rich:dragSource type="std" dragValue="int" />
+				<rich:dragIndicator id="int" acceptClass="accept" rejectClass="reject" draggingClass="default">
+		        	int
+		    	</rich:dragIndicator>
+				<rich:dragSource type="std" dragValue="int" dragIndicator="int"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="long" />
-				<rich:dragSource type="std" dragValue="long" />
+				<rich:dragIndicator id="long" acceptClass="accept" rejectClass="reject" draggingClass="default">
+			        long
+			    </rich:dragIndicator>
+				<rich:dragSource type="std" dragValue="long" dragIndicator="long"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="float" />
-				<rich:dragSource type="std" dragValue="float" />
+				<rich:dragIndicator id="float" acceptClass="accept" rejectClass="reject" draggingClass="default">
+			        float
+			    </rich:dragIndicator>
+				<rich:dragSource type="std" dragValue="float" dragIndicator="float"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="double" />
-				<rich:dragSource type="std" dragValue="double" />
+				<rich:dragIndicator id="double" acceptClass="accept" rejectClass="reject" draggingClass="default">
+			        double
+			    </rich:dragIndicator>
+				<rich:dragSource type="std" dragValue="double" dragIndicator="double"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="boolean" />
-				<rich:dragSource type="std" dragValue="boolean" />
+				<rich:dragIndicator id="boolean" acceptClass="accept" rejectClass="reject" draggingClass="default">
+			        boolean
+			    </rich:dragIndicator>
+				<rich:dragSource type="std" dragValue="boolean" dragIndicator="boolean"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="string" />
-				<rich:dragSource type="std" dragValue="string" />
+				<rich:dragIndicator id="string" acceptClass="accept" rejectClass="reject" draggingClass="default">
+			        string
+			    </rich:dragIndicator>
+				<rich:dragSource type="std" dragValue="string" dragIndicator="string"/>
 			</a4j:outputPanel>
 		</rich:panel>
 	</rich:panel>

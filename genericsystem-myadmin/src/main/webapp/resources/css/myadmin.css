@@ -22,12 +22,13 @@ body {
 }
 
 .borderNone {
-	border : none !important;
+	border: none !important;
 }
 
 .implicitColor {
 	color: #949595 !important;
 }
+
 .implicitColor>span {
 	color: #949595 !important;
 }
@@ -69,7 +70,7 @@ body {
 }
 
 .capitalize {
-    display: inline-block;
+	display: inline-block;
 }
 
 .topAlign {
@@ -159,7 +160,7 @@ li.fatal {
 	overflow: auto;
 	opacity: 0.75;
 	/* For IE 5-7 */
-	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75);
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75 );
 	/* For IE 8  Don't miss the added quotes */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
 }
@@ -167,32 +168,33 @@ li.fatal {
 .slightlyTransparent {
 	opacity: 0.75;
 	/* For IE 5-7 */
-	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75);
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75 );
 	/* For IE 8  Don't miss the added quotes */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
 }
 
 .align {
-	float:right;
-	vertical-align:middle;
+	float: right;
+	vertical-align: middle;
 }
 
-.height24{
+.height24 {
 	height: 24px;
 }
 
-.blackcolor{
+.blackcolor {
 	color: #000000;
 	background-color: inherit;
 }
 
-.rf-ii-dflt-lbl{
+.rf-ii-dflt-lbl {
 	color: #000000 !important;
-} 
+}
 
-.rf-trn-sel{
+.rf-trn-sel {
 	background-color: #EB9A99 !important;
 }
-.rf-trn-sel>span>span{
+
+.rf-trn-sel>span>span {
 	background-color: inherit;
 }
