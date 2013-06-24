@@ -306,6 +306,10 @@ public class TypesBean implements Serializable {
 		return null;
 	}
 
+	public GenericTreeNode getSelectedTreeNode() {
+		return selectedTreeNode;
+	}
+
 	public Generic getSelectedTreeNodeGeneric() {
 		return selectedTreeNode.getGeneric();
 	}
@@ -347,6 +351,7 @@ public class TypesBean implements Serializable {
 			if (!newValue.equals(generic.toString())) {
 				genericTreeNode.setGeneric(generic.updateKey(cache, newValue));
 				messages.info("updateGeneric", newValue, generic.getValue());
+				panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
 			}
 		}
 	}
