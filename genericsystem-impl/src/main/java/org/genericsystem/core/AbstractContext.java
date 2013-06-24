@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -416,21 +415,6 @@ public abstract class AbstractContext implements Context, Serializable {
 		protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 			removeAll(removes);
 			addAll(adds);
-			try {
-				checkConstraints(adds, removes);
-			} catch (RuntimeException e) {
-				cancelAddAll(adds);
-				cancelRemoveAll(removes);
-				throw e;
-			} catch (ConstraintViolationException e) {
-				cancelAddAll(adds);
-				cancelRemoveAll(removes);
-				throw e;
-			} catch (Exception e) {
-				cancelAddAll(adds);
-				cancelRemoveAll(removes);
-				throw new IllegalStateException(e);
-			}
 		}
 
 		protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
@@ -440,22 +424,22 @@ public abstract class AbstractContext implements Context, Serializable {
 			checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 		}
 
-		private void addAll(Iterable<Generic> generics) {
+		protected void addAll(Iterable<Generic> generics) {
 			for (Generic generic : generics)
 				add((GenericImpl) generic);
 		}
 
-		private void removeAll(Iterable<Generic> generics) {
+		protected void removeAll(Iterable<Generic> generics) {
 			for (Generic generic : generics)
 				remove((GenericImpl) generic);
 		}
 
-		private void cancelAddAll(Iterable<Generic> generics) {
+		protected void cancelAddAll(Iterable<Generic> generics) {
 			for (Generic generic : generics)
 				cancelAdd((GenericImpl) generic);
 		}
 
-		private void cancelRemoveAll(Iterable<Generic> generics) {
+		protected void cancelRemoveAll(Iterable<Generic> generics) {
 			for (Generic generic : generics)
 				cancelRemove((GenericImpl) generic);
 		}
