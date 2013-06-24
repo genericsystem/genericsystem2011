@@ -137,17 +137,17 @@ public class TypesBean implements Serializable {
 	}
 
 	public List<Structural> getStructurals() {
-		return getSelectedTreeNodeGeneric().getStructurals(cache).toList();
+		return getSelectedTreeNodeGeneric().getStructurals(cache);
 	}
 
 	public List<Holder> getHolders(Structural structural) {
-		return ((Type) getSelectedTreeNodeGeneric()).getHolders(cache, structural.getAttribute(), structural.getPosition()).toList();
+		return ((Type) getSelectedTreeNodeGeneric()).getHolders(cache, structural.getAttribute(), structural.getPosition());
 	}
 
 	public List<Generic> getOtherTargets(int basePos, Holder holder) {
 		if (((Attribute) holder).isMultiDirectional(cache))
 			basePos = getBasePosIfMultiDirectional(basePos, holder);
-		return getSelectedTreeNodeGeneric().getOtherTargets(basePos, holder).toList();
+		return getSelectedTreeNodeGeneric().getOtherTargets(basePos, holder);
 	}
 
 	public int getBasePosIfMultiDirectional(int originalBasePos, Holder holder) {
