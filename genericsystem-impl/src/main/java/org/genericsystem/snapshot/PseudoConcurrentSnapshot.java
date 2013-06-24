@@ -15,7 +15,8 @@ public class PseudoConcurrentSnapshot extends AbstractSnapshot<Generic> implemen
 	private Node head = null;
 	private Node tail = null;
 
-	public void add(Generic element) {
+	@Override
+	public boolean add(Generic element) {
 		assert !this.contains(element);
 		assert element != null;
 		Node newNode = new Node(element);
@@ -24,6 +25,7 @@ public class PseudoConcurrentSnapshot extends AbstractSnapshot<Generic> implemen
 		else
 			tail.next = newNode;
 		tail = newNode;
+		return true;
 	}
 
 	public boolean remove(Generic element) {

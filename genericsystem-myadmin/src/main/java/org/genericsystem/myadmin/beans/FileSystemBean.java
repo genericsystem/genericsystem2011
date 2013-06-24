@@ -3,11 +3,13 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
@@ -39,15 +41,15 @@ public class FileSystemBean implements Serializable {
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
 	public List<Directory> getRootDirectories() {
-		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache).toList();
+		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache);
 	}
 
 	public List<Directory> getDirectories(final Directory directory) {
-		return directory.getDirectories(cache).toList();
+		return directory.getDirectories(cache);
 	}
 
 	public List<File> getFiles(final Directory directory) {
-		return directory.getFiles(cache).toList();
+		return directory.getFiles(cache);
 	}
 
 	public void changeFile(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {

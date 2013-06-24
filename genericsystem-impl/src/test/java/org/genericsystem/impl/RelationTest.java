@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -1307,7 +1308,7 @@ public class RelationTest extends AbstractTest {
 		assert ((GenericImpl) brother).getComponentsPositions(michael, quentin, otherType).equals(Arrays.asList(0, 1, 2));
 		assert ((GenericImpl) brother).getComponentsPositions(otherType, michael, quentin).equals(Arrays.asList(2, 0, 1));
 
-		assert ((GenericImpl) michael).getPositions(brother).toList().equals(Arrays.asList(0, 1));
+		assert ((GenericImpl) michael).getPositions(brother).equals(Arrays.asList(0, 1));
 	}
 
 	public void testGetLinkFromTarget() {

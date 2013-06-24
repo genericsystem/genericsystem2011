@@ -15,8 +15,13 @@
 		headerClass="height24">
 		<f:facet name="header">
 			<h:outputText styleClass="capitalize"
-				style="white-space: nowrap; padding-top: 5px;"
-				value="#{msg.edit} #{typesBean.selectedTreeNodeGeneric}" />
+				style="white-space: nowrap; padding-top: 5px; margin-right: 5px;"
+				value="#{msg.edit} " />
+			<rich:inplaceInput 
+				value="#{typesBean.getWrapper(typesBean.selectedTreeNode).value}"
+				editEvent="dblclick" rendered="true">
+				<a4j:ajax event="change" render="typesmanager"/>
+			</rich:inplaceInput>
 		</f:facet>
 		
 		<rich:dropTarget acceptedTypes="std"
@@ -25,7 +30,7 @@
 		<rich:dataGrid var="currentStructural"
 			value="#{typesBean.structurals}" styleClass="fullWidth" columns="2">
 			<rich:dataTable var="currentHolder" headerClass="fullWidth,"
-				columnClasses="middleWidth,fullWidth,fullWidth,"
+				columnClasses="middleWidth,fullWidth,veryLittleWidth,"
 				styleClass="fullWidth"
 				value="#{typesBean.getHolders(currentStructural)}">
 				<f:facet name="header">

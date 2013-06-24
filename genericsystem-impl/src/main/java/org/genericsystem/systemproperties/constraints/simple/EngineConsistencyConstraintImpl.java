@@ -4,7 +4,7 @@ import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Context;
+import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -25,8 +25,8 @@ public class EngineConsistencyConstraintImpl extends Constraint implements Boole
 	private static final long serialVersionUID = 8896806730580779746L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (!modified.getEngine().equals(context.getEngine()))
+	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
+		if (!modified.getEngine().equals(cache.getEngine()))
 			throw new EngineConsistencyConstraintViolationException("The Engine of " + modified + " isn't equals at Engine of the Context");
 	}
 }

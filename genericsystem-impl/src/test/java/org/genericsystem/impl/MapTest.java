@@ -5,10 +5,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.Dependencies;
+import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.annotation.constraints.RequiredConstraint;
+import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
+import org.genericsystem.impl.MapTest.MyMapProvider.MyKey;
+import org.genericsystem.impl.MapTest.MyMapProvider.MyValue;
+import org.genericsystem.map.AbstractMapProvider;
 import org.testng.annotations.Test;
 
 @Test
@@ -58,6 +69,18 @@ public class MapTest extends AbstractTest {
 		assert vehicle.getProperties(cache).get("power").equals(123);
 		assert myBmw.getProperties(cache).get("power") == null : myBmw.getProperties(cache).get("power");
 		assert myBmw.getProperties(cache).get("wheel").equals(4);
+	}
+
+	public void testPropertyInherit2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		car.getProperties(cache).put("power", 123);
+		assert car.getProperties(cache).get("power").equals(123) : car.getProperties(cache);
+		assert myBmw.getProperties(cache).get("power").equals(123) : myBmw.getProperties(cache);
+		myBmw.getProperties(cache).remove("power");
+		assert car.getProperties(cache).get("power").equals(123);
+		assert myBmw.getProperties(cache).get("power") == null : myBmw.getProperties(cache).get("power");
 	}
 
 	public void testSingleMap() {
@@ -127,5 +150,50 @@ public class MapTest extends AbstractTest {
 		// vehicle.getProperties(cache).put("power", null);
 		// assert vehicle.getProperties(cache).get("power") == null;
 		// assert car.getProperties(cache).get("power").equals(124);
+	}
+
+	public void testOtherMap() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(MyMapProvider.class);
+		Type vehicle = cache.newType("Vehicle");
+		vehicle.getMap(cache, MyMapProvider.class).put("power", 123);
+		assert vehicle.getMap(cache, MyMapProvider.class).get("power").equals(123);
+		vehicle.getMap(cache, MyMapProvider.class).remove("power");
+		assert vehicle.getMap(cache, MyMapProvider.class).get("power") == null;
+
+		vehicle.getProperties(cache).put("power", 123);
+		assert vehicle.getProperties(cache).get("power").equals(123);
+		assert vehicle.getMap(cache, MyMapProvider.class).get("power") == null;
+	}
+
+	@SystemGeneric
+	@Components(Engine.class)
+	@Dependencies({ MyKey.class, MyValue.class })
+	public static class MyMapProvider extends AbstractMapProvider {
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public <T extends Attribute> Class<T> getKeyAttributeClass() {
+			return (Class<T>) MyKey.class;
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public <T extends Attribute> Class<T> getValueAttributeClass() {
+			return (Class<T>) MyValue.class;
+		}
+
+		@SystemGeneric
+		@Components(MyMapProvider.class)
+		public static class MyKey extends GenericImpl implements Attribute {
+
+		}
+
+		@SystemGeneric
+		@Components(MyKey.class)
+		@SingularConstraint
+		@RequiredConstraint
+		public static class MyValue extends GenericImpl implements Attribute {
+
+		}
 	}
 }

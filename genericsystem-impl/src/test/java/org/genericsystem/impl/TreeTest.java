@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Random;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -162,7 +163,7 @@ public class TreeTest extends AbstractTest {
 		footer.bind(cache, graphicComponentColor, yellow);
 
 		assert red.equals(body.getLink(cache, graphicComponentColor).getTargetComponent()) : body.getLinks(cache, graphicComponentColor);
-		assert "Red".equals(body.getLinks(cache, graphicComponentColor).first().getTargetComponent().getValue());
+		assert "Red".equals(body.getLinks(cache, graphicComponentColor).get(0).getTargetComponent().getValue());
 		header.bind(cache, graphicComponentColor, blue);
 		cache.flush();
 	}

@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -91,8 +90,8 @@ public class Transaction extends AbstractContext {
 		@Override
 		protected void add(GenericImpl generic) {
 			generic.getLifeManager().beginLife(getTs());
-//			if (Transaction.this.isFlushable(generic))
-				super.add(generic);
+			// if (Transaction.this.isFlushable(generic))
+			super.add(generic);
 		}
 
 		@Override

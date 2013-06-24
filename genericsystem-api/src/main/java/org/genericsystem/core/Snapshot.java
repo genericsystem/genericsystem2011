@@ -1,7 +1,7 @@
 package org.genericsystem.core;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The Snaphot is an aware iterable of the graphe.
@@ -9,64 +9,7 @@ import java.util.List;
  * @author Nicolas Feybesse
  * 
  */
-public interface Snapshot<T> extends Iterable<T> {
-
-	/**
-	 * Returns the size.
-	 * 
-	 * @return The size.
-	 */
-	int size();
-
-	/**
-	 * Returns element of the index.
-	 * 
-	 * @param index
-	 *            The index.
-	 * @return The element.
-	 */
-	T get(int index);
-
-	/**
-	 * Returns the fisrt element or null is empty.
-	 * 
-	 * @return The element.
-	 */
-	T first();
-
-	/**
-	 * Check if the Snapshot is empty.
-	 * 
-	 * @return True if empty.
-	 */
-	boolean isEmpty();
-
-	/**
-	 * Check if the Snapshot contains the object.
-	 * 
-	 * @param object
-	 *            The object.
-	 * @return True if the Snapshot contains the object.
-	 */
-	boolean contains(Object object);
-
-	/**
-	 * Check if the Snapshot contains the objects.
-	 * 
-	 * @param c
-	 *            Objects Collection.
-	 * @return True if the Snapshot contains the objects.
-	 */
-	boolean containsAll(Collection<?> c);
-
-	/**
-	 * Check if the Snapshot contains the objects.
-	 * 
-	 * @param c
-	 *            Objects Snapshot.
-	 * @return True if the Snapshot contains the objects.
-	 */
-	boolean containsAll(Snapshot<?> c);
+public interface Snapshot<T> extends List<T>, Set<T> {
 
 	/**
 	 * Filter the Snapshot.
@@ -118,13 +61,6 @@ public interface Snapshot<T> extends Iterable<T> {
 		 */
 		T project(E element);
 	}
-
-	/**
-	 * Returns a collection
-	 * 
-	 * @return The collection.
-	 */
-	List<T> toList();
 
 	void log();
 }

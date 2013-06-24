@@ -4,14 +4,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.generic.map.PropertiesMapProvider;
-import org.generic.map.PropertyKey;
-import org.generic.map.PropertyValue;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
+import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.MetaAttribute;
 import org.genericsystem.systemproperties.MetaRelation;
@@ -25,7 +23,6 @@ import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.EngineConsistencyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.FlushableConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.OptimisticLockConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PhantomConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
@@ -140,7 +137,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
 					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class,
 					UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
-					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, FlushableConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class, PropertyKey.class, PropertyValue.class);
+					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, /* FlushableConstraintImpl.class, */SizeConstraintImpl.class, PropertiesMapProvider.class);
 
 			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
 			for (Class<?> clazz : classes)

@@ -9,11 +9,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
-import org.generic.map.PropertiesMapProvider;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -27,6 +25,7 @@ import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
+import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractConcateIterator;
@@ -40,6 +39,7 @@ import org.genericsystem.iterator.ArrayIterator;
 import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
+import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
@@ -1662,13 +1662,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public Map<Serializable, Serializable> getProperties(final Cache cache) {
-		return cache.<PropertiesMapProvider> find(PropertiesMapProvider.class).getMap(cache, this);
+	public <T extends MapProvider> Map<Serializable, Serializable> getMap(final Cache cache, Class<T> mapClass) {
+		return cache.<MapProvider> find(mapClass).getMap(cache, this);
 	}
 
 	@Override
-	public Snapshot<Entry<Serializable, Serializable>> getPropertiesShot(final Cache cache) {
-		return cache.<PropertiesMapProvider> find(PropertiesMapProvider.class).getEntriesShot(cache, this);
+	public Map<Serializable, Serializable> getProperties(final Cache cache) {
+		return getMap(cache, PropertiesMapProvider.class);
 	}
 
 	// TODO change with instanceof Tree
