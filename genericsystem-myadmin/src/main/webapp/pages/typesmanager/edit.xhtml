@@ -15,8 +15,13 @@
 		headerClass="height24">
 		<f:facet name="header">
 			<h:outputText styleClass="capitalize"
-				style="white-space: nowrap; padding-top: 5px;"
-				value="#{msg.edit} #{typesBean.selectedTreeNodeGeneric}" />
+				style="white-space: nowrap; padding-top: 5px; margin-right: 5px;"
+				value="#{msg.edit} " />
+			<rich:inplaceInput 
+				value="#{typesBean.getWrapper(typesBean.selectedTreeNode).value}"
+				editEvent="dblclick" rendered="true">
+				<a4j:ajax event="change" render="typesmanager"/>
+			</rich:inplaceInput>
 		</f:facet>
 		
 		<rich:dropTarget acceptedTypes="std"
@@ -30,14 +35,9 @@
 				value="#{typesBean.getHolders(currentStructural)}">
 				<f:facet name="header">
 					<h:panelGrid styleClass="fullWidth" rowClasses="fullWidth"
-						columnClasses="fullWidth,," columns="4">
-						<rich:inplaceInput
-							value="#{typesBean.getGenericWrapper(currentStructural.attribute).value}"
-							editEvent="dblclick" rendered="true">
-							<a4j:ajax event="change" render="edittypesmanager, typestree" />
-						</rich:inplaceInput>
+						columnClasses="fullWidth,," columns="3">
 						<h:outputText
-							value="(#{currentStructural.position})" />
+							value="#{currentStructural.attribute} (#{currentStructural.position})" />
 						<a4j:commandLink
 							action="#{typesBean.view(currentStructural.attribute)}"
 							render="menutypesmanager, edittypesmanager, paneltitletypesmanager, typestree">
