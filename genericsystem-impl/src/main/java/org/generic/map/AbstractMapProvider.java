@@ -56,7 +56,12 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 				};
 			}
 
-			// TODO implements get
+			@Override
+			public Serializable get(Object key) {
+				GenericImpl map = generic.getHolder(cache, AbstractMapProvider.this);
+				Holder keyHolder = map == null ? null : map.getHolderByValue(cache, cache.<Attribute> find(getKeyAttributeClass()), (Serializable) key);
+				return keyHolder == null ? null : keyHolder.getHolder(cache, cache.<Attribute> find(getValueAttributeClass())).getValue();
+			}
 
 			@Override
 			public Serializable put(Serializable key, Serializable value) {
@@ -72,7 +77,8 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 		Holder map = generic.getHolder(cache, this);
 		if (map == null)
 			return Statics.emptyIterator();
-		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Serializable, Serializable>>(map.getHolders(cache, cache.<Attribute> find(getKeyAttributeClass())).iterator()) {
+		Attribute key = cache.<Attribute> find(getKeyAttributeClass());
+		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Serializable, Serializable>>(((GenericImpl) map).<Holder> holdersIterator(cache, key, getBasePos(key), false)) {
 
 			@Override
 			public boolean isSelected() {
