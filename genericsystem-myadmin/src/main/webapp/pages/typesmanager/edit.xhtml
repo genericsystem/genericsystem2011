@@ -25,14 +25,19 @@
 		<rich:dataGrid var="currentStructural"
 			value="#{typesBean.structurals}" styleClass="fullWidth" columns="2">
 			<rich:dataTable var="currentHolder" headerClass="fullWidth,"
-				columnClasses="middleWidth,fullWidth,fullWidth,"
+				columnClasses="middleWidth,fullWidth,veryLittleWidth,"
 				styleClass="fullWidth"
 				value="#{typesBean.getHolders(currentStructural)}">
 				<f:facet name="header">
 					<h:panelGrid styleClass="fullWidth" rowClasses="fullWidth"
-						columnClasses="fullWidth,," columns="3">
+						columnClasses="fullWidth,," columns="4">
+						<rich:inplaceInput
+							value="#{typesBean.getGenericWrapper(currentStructural.attribute).value}"
+							editEvent="dblclick" rendered="true">
+							<a4j:ajax event="change" render="edittypesmanager, typestree" />
+						</rich:inplaceInput>
 						<h:outputText
-							value="#{currentStructural.attribute} (#{currentStructural.position})" />
+							value="(#{currentStructural.position})" />
 						<a4j:commandLink
 							action="#{typesBean.view(currentStructural.attribute)}"
 							render="menutypesmanager, edittypesmanager, paneltitletypesmanager, typestree">
