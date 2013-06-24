@@ -1,4 +1,4 @@
-package org.generic.map;
+package org.genericsystem.map;
 
 import java.io.Serializable;
 import java.util.AbstractMap;
