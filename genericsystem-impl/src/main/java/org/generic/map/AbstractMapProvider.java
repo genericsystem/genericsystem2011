@@ -11,13 +11,11 @@ import java.util.Set;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
-import org.genericsystem.snapshot.AbstractSnapshot;
 
 /**
  * @author Nicolas Feybesse
@@ -26,17 +24,6 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 public abstract class AbstractMapProvider extends GenericImpl implements MapProvider {
 
 	private static final String MAP_VALUE = "map";
-
-	@Override
-	public Snapshot<Map.Entry<Serializable, Serializable>> getEntriesShot(final Cache cache, final Generic generic) {
-		return new AbstractSnapshot<Map.Entry<Serializable, Serializable>>() {
-			@Override
-			public Iterator<Map.Entry<Serializable, Serializable>> iterator() {
-				return entriesIterator(cache, generic);
-			}
-
-		};
-	}
 
 	@Override
 	public Map<Serializable, Serializable> getMap(final Cache cache, final Generic generic) {
