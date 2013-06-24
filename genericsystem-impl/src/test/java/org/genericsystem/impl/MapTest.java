@@ -60,6 +60,18 @@ public class MapTest extends AbstractTest {
 		assert myBmw.getProperties(cache).get("wheel").equals(4);
 	}
 
+	public void testPropertyInherit2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Type car = cache.newType("Car");
+		Generic myBmw = car.newInstance(cache, "myBmw");
+		car.getProperties(cache).put("power", 123);
+		assert car.getProperties(cache).get("power").equals(123) : car.getProperties(cache);
+		assert myBmw.getProperties(cache).get("power").equals(123) : myBmw.getProperties(cache);
+		myBmw.getProperties(cache).remove("power");
+		assert car.getProperties(cache).get("power").equals(123);
+		assert myBmw.getProperties(cache).get("power") == null : myBmw.getProperties(cache).get("power");
+	}
+
 	public void testSingleMap() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
 		final Type vehicle = cache.newType("Vehicle");

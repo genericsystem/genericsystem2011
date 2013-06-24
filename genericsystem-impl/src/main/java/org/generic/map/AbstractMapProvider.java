@@ -25,6 +25,8 @@ import org.genericsystem.snapshot.AbstractSnapshot;
  */
 public abstract class AbstractMapProvider extends GenericImpl implements MapProvider {
 
+	private static final String MAP_VALUE = "map";
+
 	@Override
 	public Snapshot<Map.Entry<Serializable, Serializable>> getEntriesShot(final Cache cache, final Generic generic) {
 		return new AbstractSnapshot<Map.Entry<Serializable, Serializable>>() {
@@ -46,8 +48,6 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 
 					@Override
 					public Iterator<Entry<Serializable, Serializable>> iterator() {
-						for (Holder holder : generic.getHolders(cache, cache.<Attribute> find(PropertiesMapProvider.class)))
-							assert holder.isConcrete() : holder.info();
 						return entriesIterator(cache, generic);
 					}
 
@@ -75,25 +75,21 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 			public Serializable put(Serializable key, Serializable value) {
 				assert null != value;
 				Serializable oldValue = get(key);
-				generic.setHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class), "map").setHolder(cache, cache.<Attribute> find(getKeyAttributeClass()), key).setHolder(cache, cache.<Attribute> find(getValueAttributeClass()), value);
+				generic.setHolder(cache, AbstractMapProvider.this, MAP_VALUE).setHolder(cache, cache.<Attribute> find(getKeyAttributeClass()), key).setHolder(cache, cache.<Attribute> find(getValueAttributeClass()), value);
 				return oldValue;
 			}
 		};
 	}
 
 	private Iterator<Entry<Serializable, Serializable>> entriesIterator(final Cache cache, final Generic generic) {
-		// TODO ???
 		Holder map = generic.getHolder(cache, this);
-		// Holder map = generic.getHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class));
 		if (map == null)
 			return Statics.emptyIterator();
 		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Serializable, Serializable>>(map.getHolders(cache, cache.<Attribute> find(getKeyAttributeClass())).iterator()) {
-			Holder holder;
 
 			@Override
 			public boolean isSelected() {
-				holder = next.getHolder(cache, cache.<Attribute> find(getValueAttributeClass()));
-				return holder != null;
+				return true;
 			}
 
 			@Override
@@ -103,17 +99,15 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 				if (generic.equals(map.getBaseComponent()))
 					next.remove(cache);
 				else {
-					map = generic.setHolder(cache, cache.<Attribute> find(PropertiesMapProvider.class), "map");
-					Holder key = ((GenericImpl) map).getHolderByValue(cache, cache.<Attribute> find(getKeyAttributeClass()), next.getValue());
-					if (!((GenericImpl) key.getBaseComponent()).equals(map))
-						key = map.setHolder(cache, cache.<Attribute> find(getKeyAttributeClass()), next.getValue());
-					key.setHolder(cache, cache.<Attribute> find(PropertyValue.class), null);
+					map = generic.setHolder(cache, AbstractMapProvider.this, MAP_VALUE);
+					if (!((GenericImpl) next.getBaseComponent()).equals(map))
+						map.setHolder(cache, next, null);
 				}
 			}
 
 			@Override
 			protected Map.Entry<Serializable, Serializable> project() {
-				return new AbstractMap.SimpleEntry<Serializable, Serializable>(next.getValue(), holder.getValue());
+				return new AbstractMap.SimpleEntry<Serializable, Serializable>(next.getValue(), next.getHolder(cache, cache.<Attribute> find(getValueAttributeClass())).getValue());
 			}
 		};
 	}
