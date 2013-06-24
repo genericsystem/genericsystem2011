@@ -3,7 +3,7 @@ package org.genericsystem.systemproperties.constraints.simple;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Context;
+import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -24,10 +24,10 @@ public class UniqueConstraintImpl extends Constraint implements BooleanSystemPro
 	private static final long serialVersionUID = -6429972259714036057L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		for (ConstraintValue constraintValue : getConstraintValues(context, modified, getClass())) {
+	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
+		for (ConstraintValue constraintValue : getConstraintValues(cache, modified, getClass())) {
 			Type constraintBaseType = (Type) constraintValue.getConstraintBaseType();
-			for (Generic generic : constraintBaseType.getAllInstances(context))
+			for (Generic generic : constraintBaseType.getAllInstances(cache))
 				if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
 					throw new UniqueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + constraintBaseType + ".");
 		}

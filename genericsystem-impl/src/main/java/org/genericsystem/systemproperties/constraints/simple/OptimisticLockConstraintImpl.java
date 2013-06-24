@@ -4,8 +4,8 @@ import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
+import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
-import org.genericsystem.core.Context;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -27,9 +27,9 @@ public class OptimisticLockConstraintImpl extends Constraint implements BooleanS
 	private static final long serialVersionUID = -9140332757904379387L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (!getConstraintValues(context, modified, getClass()).isEmpty())
-			if (context instanceof CacheImpl && ((CacheImpl) context).isScheduledToRemove(modified) && (!((CacheImpl) context).getSubContext().isAlive(modified) || ((GenericImpl) modified).getLifeManager().willDie()))
+	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
+		if (!getConstraintValues(cache, modified, getClass()).isEmpty())
+			if (cache instanceof CacheImpl && ((CacheImpl) cache).isScheduledToRemove(modified) && (!((CacheImpl) cache).getSubContext().isAlive(modified) || ((GenericImpl) modified).getLifeManager().willDie()))
 				throw new OptimisticLockConstraintViolationException("Generic : " + modified + " has already been removed by another thread");
 	}
 

@@ -4,7 +4,7 @@ import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Context;
+import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -26,9 +26,9 @@ public class VirtualConstraintImpl extends Constraint implements BooleanSystemPr
 	private static final long serialVersionUID = -5162099352671967024L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (!getConstraintValues(context, modified, getClass()).isEmpty())
-			if (((Type) modified.getMeta()).isVirtualConstraintEnabled(context))
+	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
+		if (!getConstraintValues(cache, modified, getClass()).isEmpty())
+			if (((Type) modified.getMeta()).isVirtualConstraintEnabled(cache))
 				throw new VirtualConstraintException(modified.getMeta() + "Problem should not be instanciated");
 	}
 

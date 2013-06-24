@@ -104,7 +104,7 @@ public class FileSystem extends TreeImpl {
 
 		public static class File extends GenericImpl {
 			public byte[] getContent(Context context) {
-				return this.<byte[]> getValues(context, context.<Attribute> find(FileContent.class)).first();
+				return this.<byte[]> getValues(context, context.<Attribute> find(FileContent.class)).get(0);
 			}
 
 			public <T extends Generic> T setContent(Cache cache, byte[] content) {

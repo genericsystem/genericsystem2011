@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -21,11 +23,14 @@ import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
+import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
+import org.genericsystem.systemproperties.constraints.Constraint;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 import org.genericsystem.tree.TreeImpl;
 
@@ -117,6 +122,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return true;
 	}
 
+	// TODO gestion des orphelins automatique
 	void remove(Generic generic) throws RollbackException {
 		try {
 			internalRemove(generic);
@@ -468,6 +474,61 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
+	@SuppressWarnings("unchecked")
+	protected SortedSet<Constraint> getSortedConstraints(CheckingType checkingType, boolean immediatlyCheckable) {
+		SortedSet<Constraint> sortedConstraints = new TreeSet<Constraint>();
+		try {
+			for (Generic constraint : getConstraints()) {
+				Constraint constraintInstance = ((Class<? extends Constraint>) constraint.getValue()).newInstance();
+				if (immediatlyCheckable) {
+					if (constraintInstance.isImmediatelyCheckable() && constraintInstance.isCheckedAt(checkingType))
+						sortedConstraints.add(constraintInstance);
+				} else if (constraintInstance.isCheckedAt(checkingType))
+					sortedConstraints.add(constraintInstance);
+			}
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new IllegalStateException(e);
+		}
+		return sortedConstraints;
+	}
+
+	protected Snapshot<Generic> getConstraints() {
+		return new AbstractSnapshot<Generic>() {
+
+			@Override
+			public Iterator<Generic> iterator() {
+				return new AbstractFilterIterator<Generic>(directInheritingsIterator(getEngine())) {
+					@Override
+					public boolean isSelected() {
+						return next.getValue() instanceof Class && Constraint.class.isAssignableFrom(((Class<?>) next.getValue()));
+					}
+				};
+			}
+		};
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void checkConsistency(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
+		for (Generic constraint : getConstraints()) {
+			Constraint constraintInstance;
+			try {
+				constraintInstance = ((Class<? extends Constraint>) constraint.getValue()).newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new IllegalStateException(e);
+			}
+			if (constraintInstance.isCheckedAt(checkingType) && immediatlyCheckable == constraintInstance.isImmediatelyCheckable())
+				for (Generic generic : generics)
+					if (generic.isInstanceOf(constraint)) {
+						// TODO KK
+						Generic base = ((Holder) generic).getBaseComponent();
+						if (base != null)
+							for (Generic baseInheriting : ((GenericImpl) base).getAllInheritings(CacheImpl.this))
+								constraintInstance.check(CacheImpl.this, baseInheriting);
+
+					}
+		}
+	}
+
 	public class InternalCache extends InternalContext<CacheImpl> {
 
 		private static final long serialVersionUID = 21372907392620336L;
@@ -487,6 +548,19 @@ public class CacheImpl extends AbstractContext implements Cache {
 					};
 				}
 			}, removes);
+		}
+
+		protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
+			checkConsistency(CheckingType.CHECK_ON_ADD_NODE, false, adds);
+			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
+			getInternalContext().checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);
+			getInternalContext().checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
+		}
+
+		protected void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
+			for (Constraint constraint : getSortedConstraints(checkingType, immediatlyCheckable))
+				for (Generic generic : generics)
+					constraint.check(CacheImpl.this, generic);
 		}
 
 		@Override

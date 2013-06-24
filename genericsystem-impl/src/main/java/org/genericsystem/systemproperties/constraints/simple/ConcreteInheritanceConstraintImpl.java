@@ -3,7 +3,7 @@ package org.genericsystem.systemproperties.constraints.simple;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Context;
+import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -24,10 +24,10 @@ public class ConcreteInheritanceConstraintImpl extends Constraint implements Boo
 	private static final long serialVersionUID = -6429972259714036057L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (!getConstraintValues(context, modified, getClass()).isEmpty())
+	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
+		if (!getConstraintValues(cache, modified, getClass()).isEmpty())
 			if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
-				if (((GenericImpl) modified).getSupers().first().isConcrete())
+				if (((GenericImpl) modified).getSupers().get(0).isConcrete())
 					throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());
 	}
 
