@@ -2,7 +2,9 @@ package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
@@ -12,6 +14,7 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.genericsystem.core.AbstractList;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -250,7 +253,12 @@ public class TypesBean implements Serializable {
 	}
 
 	public List<Entry<Serializable, Serializable>> getProperties() {
-		return getSelectedTreeNodeGeneric().getPropertiesShot(cache).toList();
+		return new AbstractList<Map.Entry<Serializable, Serializable>>() {
+			@Override
+			public Iterator<Entry<Serializable, Serializable>> iterator() {
+				return getSelectedTreeNodeGeneric().getProperties(cache).entrySet().iterator();
+			}
+		};
 	}
 
 	public PropertyWrapper getPropertyWrapper(Entry<Serializable, Serializable> entry) {
