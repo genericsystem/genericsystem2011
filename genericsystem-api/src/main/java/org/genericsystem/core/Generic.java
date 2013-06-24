@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
+import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 
 /**
@@ -766,7 +767,9 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets);
 
-	Map<Serializable, Serializable> getProperties(final Cache cache);
+	<T extends MapProvider> Map<Serializable, Serializable> getMap(Cache cache, Class<T> mapClass);
+
+	Map<Serializable, Serializable> getProperties(Cache cache);
 
 	<T extends Generic> T addComponent(Cache cache, int pos, Generic newComponent);
 
