@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -56,6 +55,7 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 				};
 			}
 
+			// TODO : remove cast Serializable in get, containsKey, keySet(), valueSet()...
 			@Override
 			public Serializable get(Object key) {
 				GenericImpl map = generic.getHolder(cache, AbstractMapProvider.this);
