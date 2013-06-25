@@ -11,7 +11,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -342,10 +341,6 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 
-	// public abstract class InternalContext<T extends AbstractContext> implements Serializable {
-
-	// private static final long serialVersionUID = 3961310676895965230L;
-
 	protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 		removeAll(removes);
 		addAll(adds);
@@ -361,16 +356,6 @@ public abstract class AbstractContext implements Context, Serializable {
 			simpleRemove((GenericImpl) generic);
 	}
 
-	protected void cancelAddAll(Iterable<Generic> generics) {
-		for (Generic generic : generics)
-			cancelAdd((GenericImpl) generic);
-	}
-
-	protected void cancelRemoveAll(Iterable<Generic> generics) {
-		for (Generic generic : generics)
-			cancelRemove((GenericImpl) generic);
-	}
-
 	protected void simpleAdd(GenericImpl generic) {
 		plug(generic);
 	}
@@ -378,16 +363,6 @@ public abstract class AbstractContext implements Context, Serializable {
 	protected void simpleRemove(GenericImpl generic) {
 		unplug(generic);
 	}
-
-	protected void cancelAdd(GenericImpl generic) {
-		unplug(generic);
-	}
-
-	protected void cancelRemove(GenericImpl generic) {
-		plug(generic);
-	}
-
-	// }
 
 	public interface TimestampedDependencies {
 

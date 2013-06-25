@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -43,10 +42,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private AbstractContext subContext;
 
-	// private InternalCache internalCache;
-
 	private transient Map<Generic, TimestampedDependencies> compositeDependenciesMap;
-
 	private transient Map<Generic, TimestampedDependencies> inheritingDependenciesMap;
 
 	private Set<Generic> adds;
@@ -59,26 +55,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public void clear() {
-		compositeDependenciesMap = new HashMap<Generic, TimestampedDependencies>();
-		inheritingDependenciesMap = new HashMap<Generic, TimestampedDependencies>();
-		// internalCache = new InternalCache();
-		adds = new LinkedHashSet<Generic>();
-		removes = new LinkedHashSet<Generic>();
+		compositeDependenciesMap = new HashMap<>();
+		inheritingDependenciesMap = new HashMap<>();
+		adds = new LinkedHashSet<>();
+		removes = new LinkedHashSet<>();
 	}
 
 	<T extends Generic> T insert(Generic generic) throws RollbackException {
 		try {
-			return this.<T> internalInsert(generic);
+			addGeneric(generic);
+			return (T) generic;
 		} catch (ConstraintViolationException e) {
 			rollback(e);
 		}
 		throw new IllegalStateException();// Unreachable;
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T extends Generic> T internalInsert(Generic generic) throws ConstraintViolationException {
-		addGeneric(generic);
-		return (T) generic;
 	}
 
 	// TODO implements specializedGeneric !!!
@@ -603,20 +593,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		super.simpleRemove(generic);
 	}
 
-	@Override
-	protected void cancelAdd(GenericImpl generic) {
-		boolean result = adds.remove(generic);
-		assert result == true;
-		super.cancelAdd(generic);
-	}
-
-	@Override
-	protected void cancelRemove(GenericImpl generic) {
-		boolean result = removes.remove(generic);
-		assert result == true;
-		super.cancelRemove(generic);
-	}
-
 	public void addGeneric(Generic generic) throws ConstraintViolationException {
 		simpleAdd((GenericImpl) generic);
 		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
@@ -634,17 +610,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	public void removeOrCancelAdd(Generic generic) throws ConstraintViolationException {
-		if (adds.contains(generic))
-			cancelAdd((GenericImpl) generic);
-		else
+		if (adds.contains(generic)) {
+			adds.remove(generic);
+			unplug((GenericImpl) generic);
+		} else
 			simpleRemove((GenericImpl) generic);
 	}
 
 	public void checkConstraints() throws ConstraintViolationException {
 		checkConstraints(adds, removes);
 	}
-
-	// }
 
 	static class CacheDependencies implements TimestampedDependencies {
 

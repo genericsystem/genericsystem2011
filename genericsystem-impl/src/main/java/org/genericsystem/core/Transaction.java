@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -71,10 +70,6 @@ public class Transaction extends AbstractContext {
 		return false;
 	}
 
-	// public class InternalTransaction extends InternalContext<Transaction> {
-	//
-	// private static final long serialVersionUID = -85246881502473857L;
-
 	@Override
 	protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 		synchronized (getEngine()) {
@@ -95,21 +90,21 @@ public class Transaction extends AbstractContext {
 		super.simpleAdd(generic);
 	}
 
-	@Override
-	protected void cancelAdd(GenericImpl generic) {
-		generic.getLifeManager().cancelBeginLife();
-		super.cancelAdd(generic);
-	}
+	// @Override
+	// protected void cancelAdd(GenericImpl generic) {
+	// generic.getLifeManager().cancelBeginLife();
+	// super.cancelAdd(generic);
+	// }
 
 	@Override
 	protected void simpleRemove(GenericImpl generic) {
 		generic.getLifeManager().kill(getTs());
 	}
 
-	@Override
-	protected void cancelRemove(GenericImpl generic) {
-		generic.getLifeManager().resurect();
-	}
+	// @Override
+	// protected void cancelRemove(GenericImpl generic) {
+	// generic.getLifeManager().resurect();
+	// }
 
 	private void writeLockAllAndCheckMvcc(Set<LifeManager> lockedLifeManagers, Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, OptimisticLockConstraintViolationException {
 		for (Generic generic : removes)
