@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -43,11 +42,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private AbstractContext subContext;
 
-	private InternalCache internalCache;
-
 	private transient Map<Generic, TimestampedDependencies> compositeDependenciesMap;
-
 	private transient Map<Generic, TimestampedDependencies> inheritingDependenciesMap;
+
+	private Set<Generic> adds;
+	private Set<Generic> removes;
 
 	public CacheImpl(Context subContext) {
 		this.subContext = (AbstractContext) subContext;
@@ -56,24 +55,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public void clear() {
-		compositeDependenciesMap = new HashMap<Generic, TimestampedDependencies>();
-		inheritingDependenciesMap = new HashMap<Generic, TimestampedDependencies>();
-		internalCache = new InternalCache();
+		compositeDependenciesMap = new HashMap<>();
+		inheritingDependenciesMap = new HashMap<>();
+		adds = new LinkedHashSet<>();
+		removes = new LinkedHashSet<>();
 	}
 
 	<T extends Generic> T insert(Generic generic) throws RollbackException {
 		try {
-			return this.<T> internalInsert(generic);
+			addGeneric(generic);
+			return (T) generic;
 		} catch (ConstraintViolationException e) {
 			rollback(e);
 		}
 		throw new IllegalStateException();// Unreachable;
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T extends Generic> T internalInsert(Generic generic) throws ConstraintViolationException {
-		getInternalContext().addGeneric(generic);
-		return (T) generic;
 	}
 
 	// TODO implements specializedGeneric !!!
@@ -135,7 +130,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (!isAlive(node))
 			throw new AliveConstraintViolationException(node + " is not alive");
 		for (Generic generic : orderRemoves(node).descendingSet()) {
-			internalCache.removeGeneric(generic);
+			removeGeneric(generic);
 			for (int axe = 0; axe < ((GenericImpl) generic).components.length; axe++)
 				if (((GenericImpl) generic).isCascadeRemove(this, axe))
 					internalRemove(((GenericImpl) generic).components[axe]);
@@ -234,8 +229,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Exception cause = null;
 		for (int attempt = 0; attempt < Statics.ATTEMPTS; attempt++)
 			try {
-				internalCache.checkConstraints();
-				internalCache.flush();
+				checkConstraints();
+				// internalCache.flush();
+
+				getSubContext().apply(new Iterable<Generic>() {
+					@Override
+					public Iterator<Generic> iterator() {
+						return new AbstractFilterIterator<Generic>(adds.iterator()) {
+							@Override
+							public boolean isSelected() {
+								return isFlushable(next);
+							}
+						};
+					}
+				}, removes);
+
 				clear();
 				return;
 			} catch (ConcurrencyControlException e) {
@@ -260,9 +268,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 		throw new RollbackException(e);
 	}
 
+	// @Override
+	// public boolean isAlive(Generic generic) {
+	// return adds.contains(generic) || (!removes.contains(generic) && getSubContext().isAlive(generic));
+	// }
+
 	@Override
 	public boolean isAlive(Generic generic) {
-		return internalCache.isAlive(generic);
+		return adds.contains(generic) || (!removes.contains(generic) && getSubContext().isAlive(generic));
 	}
 
 	@Override
@@ -279,19 +292,27 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return subContext;
 	}
 
-	@Override
-	InternalCache getInternalContext() {
-		return internalCache;
-	}
+	// @Override
+	// InternalCache getInternalContext() {
+	// return internalCache;
+	// }
+
+	// public boolean isScheduledToRemove(Generic generic) {
+	// return removes.contains(generic);
+	// }
+
+	// public boolean isScheduledToAdd(Generic generic) {
+	// return adds.contains(generic);
+	// }
 
 	@Override
 	public boolean isScheduledToRemove(Generic generic) {
-		return getInternalContext().isScheduledToRemove(generic) || subContext.isScheduledToRemove(generic);
+		return removes.contains(generic) || subContext.isScheduledToRemove(generic);
 	}
 
 	@Override
 	public boolean isScheduledToAdd(Generic generic) {
-		return getInternalContext().isScheduledToAdd(generic) || subContext.isScheduledToAdd(generic);
+		return adds.contains(generic) || subContext.isScheduledToAdd(generic);
 	}
 
 	@Override
@@ -529,104 +550,75 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	public class InternalCache extends InternalContext<CacheImpl> {
+	// public class InternalCache extends InternalContext<CacheImpl> {
 
-		private static final long serialVersionUID = 21372907392620336L;
+	// private static final long serialVersionUID = 21372907392620336L;
 
-		private final Set<Generic> adds = new LinkedHashSet<Generic>();
-		private final Set<Generic> removes = new LinkedHashSet<Generic>();
+	// public void flush() throws ConstraintViolationException, ConcurrencyControlException {
+	// getSubContext().getInternalContext().apply(new Iterable<Generic>() {
+	// @Override
+	// public Iterator<Generic> iterator() {
+	// return new AbstractFilterIterator<Generic>(adds.iterator()) {
+	// @Override
+	// public boolean isSelected() {
+	// return isFlushable(next);
+	// }
+	// };
+	// }
+	// }, removes);
+	// }
 
-		public void flush() throws ConstraintViolationException, ConcurrencyControlException {
-			getSubContext().getInternalContext().apply(new Iterable<Generic>() {
-				@Override
-				public Iterator<Generic> iterator() {
-					return new AbstractFilterIterator<Generic>(adds.iterator()) {
-						@Override
-						public boolean isSelected() {
-							return isFlushable(next);
-						}
-					};
-				}
-			}, removes);
-		}
+	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
+		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, false, adds);
+		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
+		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);
+		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
+	}
 
-		protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-			checkConsistency(CheckingType.CHECK_ON_ADD_NODE, false, adds);
-			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
-			getInternalContext().checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);
-			getInternalContext().checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
-		}
+	protected void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
+		for (Constraint constraint : getSortedConstraints(checkingType, immediatlyCheckable))
+			for (Generic generic : generics)
+				constraint.check(CacheImpl.this, generic);
+	}
 
-		protected void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
-			for (Constraint constraint : getSortedConstraints(checkingType, immediatlyCheckable))
-				for (Generic generic : generics)
-					constraint.check(CacheImpl.this, generic);
-		}
+	@Override
+	protected void simpleAdd(GenericImpl generic) {
+		adds.add(generic);
+		super.simpleAdd(generic);
+	}
 
-		@Override
-		protected void add(GenericImpl generic) {
-			adds.add(generic);
-			super.add(generic);
-		}
+	@Override
+	protected void simpleRemove(GenericImpl generic) {
+		removes.add(generic);
+		super.simpleRemove(generic);
+	}
 
-		@Override
-		protected void remove(GenericImpl generic) {
-			removes.add(generic);
-			super.remove(generic);
-		}
+	public void addGeneric(Generic generic) throws ConstraintViolationException {
+		simpleAdd((GenericImpl) generic);
+		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
+		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
+	}
 
-		@Override
-		protected void cancelAdd(GenericImpl generic) {
-			boolean result = adds.remove(generic);
-			assert result == true;
-			super.cancelAdd(generic);
-		}
+	public void removeGeneric(Generic generic) throws ConstraintViolationException {
+		removeOrCancelAdd(generic);
+		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
+		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
+	}
 
-		@Override
-		protected void cancelRemove(GenericImpl generic) {
-			boolean result = removes.remove(generic);
-			assert result == true;
-			super.cancelRemove(generic);
-		}
+	public void removeGenericWithoutCheck(Generic generic) throws ConstraintViolationException {
+		removeOrCancelAdd(generic);
+	}
 
-		public void addGeneric(Generic generic) throws ConstraintViolationException {
-			add((GenericImpl) generic);
-			checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
-			checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
-		}
+	public void removeOrCancelAdd(Generic generic) throws ConstraintViolationException {
+		if (adds.contains(generic)) {
+			adds.remove(generic);
+			unplug((GenericImpl) generic);
+		} else
+			simpleRemove((GenericImpl) generic);
+	}
 
-		public void removeGeneric(Generic generic) throws ConstraintViolationException {
-			removeOrCancelAdd(generic);
-			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
-			checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
-		}
-
-		public void removeGenericWithoutCheck(Generic generic) throws ConstraintViolationException {
-			removeOrCancelAdd(generic);
-		}
-
-		public void removeOrCancelAdd(Generic generic) throws ConstraintViolationException {
-			if (adds.contains(generic))
-				cancelAdd((GenericImpl) generic);
-			else
-				remove((GenericImpl) generic);
-		}
-
-		public boolean isAlive(Generic generic) {
-			return adds.contains(generic) || (!removes.contains(generic) && getSubContext().isAlive(generic));
-		}
-
-		public boolean isScheduledToRemove(Generic generic) {
-			return removes.contains(generic);
-		}
-
-		public boolean isScheduledToAdd(Generic generic) {
-			return adds.contains(generic);
-		}
-
-		public void checkConstraints() throws ConstraintViolationException {
-			checkConstraints(adds, removes);
-		}
+	public void checkConstraints() throws ConstraintViolationException {
+		checkConstraints(adds, removes);
 	}
 
 	static class CacheDependencies implements TimestampedDependencies {
