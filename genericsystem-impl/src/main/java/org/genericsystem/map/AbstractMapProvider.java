@@ -58,6 +58,8 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 			// TODO : remove cast Serializable in get, containsKey, keySet(), valueSet()...
 			@Override
 			public Serializable get(Object key) {
+				if (!(key instanceof Serializable))
+					return null;
 				GenericImpl map = generic.getHolder(cache, AbstractMapProvider.this);
 				Holder keyHolder = map == null ? null : map.getHolderByValue(cache, cache.<Attribute> find(getKeyAttributeClass()), (Serializable) key);
 				return keyHolder == null ? null : keyHolder.getHolder(cache, cache.<Attribute> find(getValueAttributeClass())).getValue();

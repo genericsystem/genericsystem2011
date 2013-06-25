@@ -77,7 +77,7 @@ public abstract class AbstractContext implements Context, Serializable {
 		return (Iterator<T>) getDirectInheritingsDependencies(component).iterator(getTs());
 	}
 
-	abstract InternalContext<? extends AbstractContext> getInternalContext();
+	// abstract InternalContext<? extends AbstractContext> getInternalContext();
 
 	public abstract long getTs();
 
@@ -342,51 +342,52 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 
-	public abstract class InternalContext<T extends AbstractContext> implements Serializable {
+	// public abstract class InternalContext<T extends AbstractContext> implements Serializable {
 
-		private static final long serialVersionUID = 3961310676895965230L;
+	// private static final long serialVersionUID = 3961310676895965230L;
 
-		protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
-			removeAll(removes);
-			addAll(adds);
-		}
-
-		protected void addAll(Iterable<Generic> generics) {
-			for (Generic generic : generics)
-				add((GenericImpl) generic);
-		}
-
-		protected void removeAll(Iterable<Generic> generics) {
-			for (Generic generic : generics)
-				remove((GenericImpl) generic);
-		}
-
-		protected void cancelAddAll(Iterable<Generic> generics) {
-			for (Generic generic : generics)
-				cancelAdd((GenericImpl) generic);
-		}
-
-		protected void cancelRemoveAll(Iterable<Generic> generics) {
-			for (Generic generic : generics)
-				cancelRemove((GenericImpl) generic);
-		}
-
-		protected void add(GenericImpl generic) {
-			plug(generic);
-		}
-
-		protected void remove(GenericImpl generic) {
-			unplug(generic);
-		}
-
-		protected void cancelAdd(GenericImpl generic) {
-			unplug(generic);
-		}
-
-		protected void cancelRemove(GenericImpl generic) {
-			plug(generic);
-		}
+	protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
+		removeAll(removes);
+		addAll(adds);
 	}
+
+	protected void addAll(Iterable<Generic> generics) {
+		for (Generic generic : generics)
+			simpleAdd((GenericImpl) generic);
+	}
+
+	protected void removeAll(Iterable<Generic> generics) {
+		for (Generic generic : generics)
+			simpleRemove((GenericImpl) generic);
+	}
+
+	protected void cancelAddAll(Iterable<Generic> generics) {
+		for (Generic generic : generics)
+			cancelAdd((GenericImpl) generic);
+	}
+
+	protected void cancelRemoveAll(Iterable<Generic> generics) {
+		for (Generic generic : generics)
+			cancelRemove((GenericImpl) generic);
+	}
+
+	protected void simpleAdd(GenericImpl generic) {
+		plug(generic);
+	}
+
+	protected void simpleRemove(GenericImpl generic) {
+		unplug(generic);
+	}
+
+	protected void cancelAdd(GenericImpl generic) {
+		unplug(generic);
+	}
+
+	protected void cancelRemove(GenericImpl generic) {
+		plug(generic);
+	}
+
+	// }
 
 	public interface TimestampedDependencies {
 
