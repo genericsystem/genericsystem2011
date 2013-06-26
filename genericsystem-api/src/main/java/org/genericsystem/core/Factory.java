@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import org.genericsystem.exception.CacheAwareException;
 
 /**
  * Factory.
@@ -37,6 +38,8 @@ public interface Factory extends Serializable {
 	 * @return The new Cache.
 	 */
 	Cache newCache(Context context);
+
+	Cache getCacheLocal();
 
 	/**
 	 * Default Factory.
@@ -100,5 +103,11 @@ public interface Factory extends Serializable {
 				throw new IllegalStateException(e);
 			}
 		}
+
+		@Override
+		public Cache getCacheLocal() {
+			throw new CacheAwareException("Unable to find the current cache. Have you forget to call start(Cache cache) method ?");
+		}
 	}
+
 }
