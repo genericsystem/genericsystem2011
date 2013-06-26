@@ -269,19 +269,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return subContext;
 	}
 
-	// @Override
-	// InternalCache getInternalContext() {
-	// return internalCache;
-	// }
-
-	// public boolean isScheduledToRemove(Generic generic) {
-	// return removes.contains(generic);
-	// }
-
-	// public boolean isScheduledToAdd(Generic generic) {
-	// return adds.contains(generic);
-	// }
-
 	@Override
 	public boolean isScheduledToRemove(Generic generic) {
 		return removes.contains(generic) || subContext.isScheduledToRemove(generic);
@@ -296,16 +283,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public <T extends Type> T newType(Serializable value) {
 		return this.<T> newSubType(value);
 	}
-
-	// @Override
-	// public <T extends Type> T getType(final Serializable value) {
-	// return Statics.unambigousFirst(new AbstractFilterIterator<T>(this.<T> directInheritingsIterator(getEngine())) {
-	// @Override
-	// public boolean isSelected() {
-	// return Objects.equals(value, next.getValue());
-	// }
-	// });
-	// }
 
 	@Override
 	public <T extends Type> T getType(final Serializable value) {
