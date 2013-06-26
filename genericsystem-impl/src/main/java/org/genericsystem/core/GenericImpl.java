@@ -271,8 +271,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return holder;
 	}
 
-	public <T extends Generic> T bindPrimary(Cache cache, Serializable value, int metaLevel, boolean automatic) {
-		return ((CacheImpl) cache).bindPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel, automatic);
+	public <T extends Generic> T bindPrimary(Cache cache, Class<?> specializeGeneric, Serializable value, int metaLevel, boolean automatic) {
+		return ((CacheImpl) cache).bindPrimaryByValue(specializeGeneric, isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel, automatic);
 	}
 
 	@Override
@@ -299,7 +299,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		T holder = getSelectedHolder(cache, attribute, value, basePos, targets);
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
+		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, getClass(), value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
 			return null != value ? this.<T> bind(cache, implicit, attribute, basePos, true, targets) : null;
 		if (!this.equals(holder.getComponent(basePos))) {
@@ -319,7 +319,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Holder> T addHolder(Cache cache, Holder attribute, int basePos, Serializable value, Generic... targets) {
 		if (value == null)
 			return null;
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, value, SystemGeneric.CONCRETE, true);
+		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, getClass(), value, SystemGeneric.CONCRETE, true);
 		return bind(cache, implicit, attribute, basePos, true, targets);
 
 	}
@@ -344,7 +344,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets) {
-		Generic implicit = concrete ? ((GenericImpl) attribute.getMeta()).bindPrimary(cache, null, SystemGeneric.CONCRETE, true) : getEngine().bindPrimary(cache, null, SystemGeneric.STRUCTURAL, true);
+		Generic implicit = concrete ? ((GenericImpl) attribute.getMeta()).bindPrimary(cache, getClass(), null, SystemGeneric.CONCRETE, true) : getEngine().bindPrimary(cache, getClass(), null, SystemGeneric.STRUCTURAL, true);
 		return bind(cache, implicit, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
@@ -640,11 +640,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Relation> T setSubAttribute(Cache cache, Attribute attribute, Serializable value, Type... targets) {
-		return bind(cache, getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), false, targets);
+		return bind(cache, getEngine().bindPrimary(cache, Generic.class, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), false, targets);
 	}
 
 	public <T extends Relation> T addSubAttribute(Cache cache, Attribute attribute, Serializable value, Type... targets) {
-		return bind(cache, getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), true, targets);
+		return bind(cache, getEngine().bindPrimary(cache, Generic.class, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), true, targets);
 	}
 
 	@Override
@@ -659,12 +659,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components) {
-		return ((CacheImpl) cache).bind(bindPrimary(cache, value, getMetaLevel() + 1, !isPrimary()), false, this, false, components);
+		return ((CacheImpl) cache).bind(bindPrimary(cache, getClass(), value, getMetaLevel() + 1, !isPrimary()), false, this, false, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
-		Generic implicit = getEngine().bindPrimary(cache, value, SystemGeneric.STRUCTURAL, !isEngine() || components.length != 0);
+		Generic implicit = getEngine().bindPrimary(cache, Generic.class, value, SystemGeneric.STRUCTURAL, !isEngine() || components.length != 0);
 		return ((CacheImpl) cache).bind(implicit, false, this, false, components);
 	}
 

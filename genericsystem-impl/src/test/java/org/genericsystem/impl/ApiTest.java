@@ -6,9 +6,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
@@ -22,6 +25,30 @@ import org.testng.annotations.Test;
 
 @Test
 public class ApiTest extends AbstractTest {
+
+	@SystemGeneric
+	public static class Vehicle extends GenericImpl {
+
+	}
+
+	@SystemGeneric
+	@Components(Vehicle.class)
+	public static class Power extends GenericImpl {
+
+	}
+
+	public void specializeGeneric() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class);
+		Type vehicle = cache.find(Vehicle.class);
+		assert vehicle instanceof Vehicle;
+	}
+
+	public void specializeAttribute() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Power.class);
+		Attribute power = cache.find(Power.class);
+		assert power instanceof Power;
+		assert power.getImplicit() instanceof Generic;
+	}
 
 	// TODO
 	// public void testUpdateEngine() {
