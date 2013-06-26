@@ -541,13 +541,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	protected void simpleAdd(GenericImpl generic) {
+	void simpleAdd(GenericImpl generic) {
 		adds.add(generic);
 		super.simpleAdd(generic);
 	}
 
 	@Override
-	protected void simpleRemove(GenericImpl generic) {
+	void simpleRemove(GenericImpl generic) {
 		removes.add(generic);
 		super.simpleRemove(generic);
 	}
