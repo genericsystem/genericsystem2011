@@ -38,6 +38,12 @@
 				title="#{msg.show} #{msg.implicits}" style="vertical-align: middle;">
 				<a4j:ajax event="change" render="typestree" />
 			</h:selectBooleanCheckbox>
+			<h:outputText value="#{msg.lockSelection}"
+				styleClass="bold" />
+			<h:selectBooleanCheckbox value="#{treeBean.selectionLocked}"
+				title="#{msg.lockSelection}" style="vertical-align: middle;">
+				<a4j:ajax event="change" render="typestree" />
+			</h:selectBooleanCheckbox>
 		</f:facet>
 
 		<script type="text/javascript">
@@ -67,6 +73,14 @@
 					<!-- 				<h:graphicImage value="#{typesBean.getTypeIcon(item)}" -->
 					<!-- 					styleClass="middleAlign" -->
 					<!-- 					title="#{typesBean.getTypeIconTitle(item)}" /> -->
+<!-- 					<a4j:outputPanel layout="block"> -->
+<!-- 						<h:outputText value="item"/> -->
+						<rich:dragIndicator id="item" acceptClass="accept" rejectClass="reject" draggingClass="default">
+					    	#{item}
+					    </rich:dragIndicator>
+						<rich:dragSource type="std2" dragValue="#{item}"/>
+<!-- 						dragIndicator="item"/> -->
+<!-- 					</a4j:outputPanel> -->
 					<rich:inplaceInput value="#{typesBean.getWrapper(item).value}"
 						title="#{typesBean.getTypeIconTitle(item)}" editEvent="dblclick"
 						rendered="#{!item.isReadOnly}" activeClass="blackcolor"
