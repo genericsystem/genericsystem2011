@@ -16,14 +16,14 @@ public class ValueTest extends AbstractTest {
 	}
 
 	public void testValueOfType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Serializable value = cache.getEngine().newSubType(cache, "Car").getValue();
 		assert value != null;
 		assert value.equals("Car");
 	}
 
 	// public void testValueWithSubAttribute() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
 	// Type car = vehicle.newSubType(cache,"Car");
 	// Attribute vehiclePower = vehicle.addAttribute(cache,"power");

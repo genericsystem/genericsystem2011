@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 public class NotNullConstraintTest extends AbstractTest {
 
 	public void testPropertySimpleAttributeKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Attribute registration = car.setAttribute(cache, "Registration");
 		registration.enableRequiredConstraint(cache);
@@ -27,7 +27,7 @@ public class NotNullConstraintTest extends AbstractTest {
 	}
 
 	public void testPropertySimpleProperty() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type sportCar = car.newSubType(cache, "Sportcar");
@@ -44,7 +44,7 @@ public class NotNullConstraintTest extends AbstractTest {
 	}
 
 	public void testPropertySimpleRelationKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type road = cache.newType("Road");
 		Type human = cache.newType("Human");
@@ -81,14 +81,14 @@ public class NotNullConstraintTest extends AbstractTest {
 
 	@Test
 	public void testEnabledConstraintOnASimpleTypeThenCreateASubtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		car.newSubType(cache, null);
 	}
 
 	@Test
 	public void testEnableThenDisableConstraintOnASimpleTypeThenCreateASubtype() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		Type expected = car.newSubType(cache, null);
 		Generic actual = car.getSubType(cache, null);
@@ -97,21 +97,21 @@ public class NotNullConstraintTest extends AbstractTest {
 
 	@Test
 	public void testEnableSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		car.newSubType(cache, null);
 	}
 
 	@Test
 	public void testDisabledSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		Type expected = car.newSubType(cache, null);
 	}
 
 	@Test
 	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateAnAttribute() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Attribute registration = car.setProperty(cache, "Registration");
 		final Generic myBmw = car.newInstance(cache, "myBmw");
@@ -126,7 +126,7 @@ public class NotNullConstraintTest extends AbstractTest {
 
 	@Test
 	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute registration = vehicle.setAttribute(cache, "Registration");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -135,7 +135,7 @@ public class NotNullConstraintTest extends AbstractTest {
 
 	@Test
 	public void testEnableConstraintOnAComplexeHierarchyOfTypes() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		final Generic myBmw = car.newInstance(cache, "myBmw");

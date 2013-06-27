@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 public class IteratorTest extends AbstractTest {
 	
 	public void testPostTree() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type truck = cache.newType("Truck");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -41,7 +41,7 @@ public class IteratorTest extends AbstractTest {
 	}
 	
 	public void testPreTree() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Snapshot<Generic> snapshot = new AbstractSnapshot<Generic>() {
 			@Override
@@ -59,7 +59,7 @@ public class IteratorTest extends AbstractTest {
 	}
 	
 	public void testPreTreeWithTypeAndSubType() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		car.newSubType(cache, "bmw");
 		car.newSubType(cache, "audi");
@@ -82,7 +82,7 @@ public class IteratorTest extends AbstractTest {
 	}
 	
 	public void testConcreteSnapshot() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type human = cache.newType("Human");
 		Relation humanDriveCar = human.setRelation(cache, "drive", car);

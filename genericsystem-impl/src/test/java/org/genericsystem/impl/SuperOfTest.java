@@ -19,7 +19,7 @@ public class SuperOfTest extends AbstractTest {
 
 	@BeforeMethod
 	public void initMethod() {
-		cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	}
 
 	public void testMultiInheritings() {

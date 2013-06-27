@@ -1,10 +1,12 @@
 package org.genericsystem.cdi;
 
 import java.io.Serializable;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 

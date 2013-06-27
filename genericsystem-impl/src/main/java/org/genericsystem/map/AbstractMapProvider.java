@@ -2,12 +2,10 @@ package org.genericsystem.map;
 
 import java.io.Serializable;
 import java.util.AbstractMap;
-import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -16,6 +14,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
+import org.genericsystem.snapshot.AbstractSnapshot;
 
 /**
  * @author Nicolas Feybesse
@@ -31,33 +30,19 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 
 			@Override
 			public Set<Map.Entry<Serializable, Serializable>> entrySet() {
-				return new AbstractSet<Map.Entry<Serializable, Serializable>>() {
-
+				return new AbstractSnapshot<Entry<Serializable, Serializable>>() {
 					@Override
 					public Iterator<Entry<Serializable, Serializable>> iterator() {
 						return entriesIterator(cache, generic);
 					}
-
-					@Override
-					public boolean isEmpty() {
-						return !iterator().hasNext();
-					}
-
-					@Override
-					public int size() {
-						int i = 0;
-						Iterator<Entry<Serializable, Serializable>> iterator = iterator();
-						while (iterator.hasNext()) {
-							i++;
-							iterator.next();
-						}
-						return i;
-					}
 				};
 			}
 
+			// TODO : remove cast Serializable in get, containsKey, keySet(), valueSet()...
 			@Override
 			public Serializable get(Object key) {
+				if (!(key instanceof Serializable))
+					return null;
 				GenericImpl map = generic.getHolder(cache, AbstractMapProvider.this);
 				Holder keyHolder = map == null ? null : map.getHolderByValue(cache, cache.<Attribute> find(getKeyAttributeClass()), (Serializable) key);
 				return keyHolder == null ? null : keyHolder.getHolder(cache, cache.<Attribute> find(getValueAttributeClass())).getValue();

@@ -23,7 +23,6 @@ import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.EngineConsistencyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.FlushableConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.OptimisticLockConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PhantomConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
@@ -127,6 +126,25 @@ public class EngineImpl extends GenericImpl implements Engine {
 		return SystemGeneric.META;
 	}
 
+	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
+
+	public Cache start(Cache cache) {
+		cacheLocal.set(cache);
+		return cache;
+	}
+
+	public void stop(Cache cache) {
+		assert cacheLocal.get() == cache;
+		cacheLocal.set(null);
+	}
+
+	public Cache getCurrentCache() {
+		Cache currentCache = cacheLocal.get();
+		if (currentCache == null)
+			currentCache = start(factory.getCacheLocal());
+		return currentCache;
+	}
+
 	private class SystemCache extends HashMap<Class<?>, Generic> {
 
 		private static final long serialVersionUID = 1150085123612887245L;
@@ -138,9 +156,10 @@ public class EngineImpl extends GenericImpl implements Engine {
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
 					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class,
 					UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
-					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, FlushableConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class);
+					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, /* FlushableConstraintImpl.class, */SizeConstraintImpl.class, PropertiesMapProvider.class);
 
-			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
+			// TODO clean
+			CacheImpl cache = (CacheImpl) start(newCache());// new CacheImpl(new Transaction(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				if (get(clazz) == null)
 					bind(cache, clazz);
@@ -148,6 +167,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 				if (get(clazz) == null)
 					bind(cache, clazz);
 			cache.flush();
+			stop(cache);
 			startupTime = false;
 			return this;
 		}

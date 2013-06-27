@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 public class UniqueConstraintTest extends AbstractTest {
 
 	public void testPropertySimpleAttributeKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Attribute registration = car.setAttribute(cache, "Registration");
 		registration.enableUniqueConstraint(cache);
@@ -31,7 +31,7 @@ public class UniqueConstraintTest extends AbstractTest {
 	}
 
 	public void testPropertySimpleRelationKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type road = cache.newType("Road");
 		Type human = cache.newType("Human");

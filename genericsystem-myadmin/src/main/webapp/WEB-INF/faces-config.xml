@@ -16,6 +16,7 @@
 			<var>infos</var>
 		</resource-bundle>
 	</application>
+
 	<converter>
 		<converter-id>genericConverter</converter-id>
 		<converter-class>org.genericsystem.myadmin.beans.converters.GenericConverter</converter-class>

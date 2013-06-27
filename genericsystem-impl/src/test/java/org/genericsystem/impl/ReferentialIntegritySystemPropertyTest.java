@@ -17,7 +17,7 @@ import org.testng.annotations.Test;
 public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 
 	public void testAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Attribute metaAttribute = cache.getMetaAttribute();
 		assert !metaAttribute.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 
@@ -27,7 +27,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testAttribute2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Attribute metaAttribute = cache.getEngine().getMetaAttribute();
 		assert !metaAttribute.isReferentialIntegrity(cache, Statics.BASE_POSITION);
 
@@ -63,7 +63,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carOutsideColor = car.setRelation(cache, "outside", color);
@@ -71,7 +71,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testRemoveTypeWithInstance() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		car.newInstance(cache, "myCar");
 		new RollbackCatcher() {
@@ -83,7 +83,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testRemoveTypeWithAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute(cache, "power");
 		car.remove(cache);
@@ -91,7 +91,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testAttributeIsRefenrentialIntegrity() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 
@@ -107,7 +107,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testRemoveTypeWithRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type man = cache.newType("Man");
 		Type car = cache.newType("Car");
 		man.setRelation(cache, "drive", car);
@@ -115,7 +115,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testRemoveTypeWithRelationIntegrity() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type man = cache.newType("Man");
 		Type car = cache.newType("Car");
 		man.setRelation(cache, "drive", car).enableReferentialIntegrity(cache, Statics.BASE_POSITION);
@@ -128,7 +128,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testComportementValueWithType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
 		assert human.isReferentialIntegrity(cache, Statics.BASE_POSITION);
@@ -137,7 +137,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testComportementValueWithSubType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
 		Type man = human.newSubType(cache, "man");
@@ -146,7 +146,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testComportementValueWithAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
 		Attribute weight = human.setAttribute(cache, "weight");
@@ -159,7 +159,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testComportementValueWithAttribute2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
 		Attribute weight = human.setAttribute(cache, "weight");
@@ -173,7 +173,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	}
 
 	public void testComportementValueWithRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		cache.find(ReferentialIntegritySystemProperty.class);
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Human");

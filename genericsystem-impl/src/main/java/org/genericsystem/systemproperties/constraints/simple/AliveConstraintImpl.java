@@ -3,7 +3,7 @@ package org.genericsystem.systemproperties.constraints.simple;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Context;
+import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -24,13 +24,13 @@ public class AliveConstraintImpl extends Constraint implements BooleanSystemProp
 	private static final long serialVersionUID = -6429972259714036057L;
 
 	@Override
-	public void check(Context context, Generic modified) throws ConstraintViolationException {
-		if (!getConstraintValues(context, modified, getClass()).isEmpty()) {
+	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
+		if (!getConstraintValues(cache, modified, getClass()).isEmpty()) {
 			for (Generic generic : ((GenericImpl) modified).getComponents())
-				if (!generic.isAlive(context))
+				if (!generic.isAlive(cache))
 					throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");
 			for (Generic generic : ((GenericImpl) modified).getSupers())
-				if (!generic.isAlive(context))
+				if (!generic.isAlive(cache))
 					throw new AliveConstraintViolationException("Super : " + generic + " of added node " + modified + " should be alive.");
 		}
 	}

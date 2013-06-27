@@ -139,7 +139,7 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	public void testValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(SelectableWindow.class, Size.class, Selected.class, MySelectableWindow.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(SelectableWindow.class, Size.class, Selected.class, MySelectableWindow.class).start();
 		Type selectableWindow = cache.find(SelectableWindow.class);
 		Attribute size = cache.find(Size.class);
 		Attribute selectedSelectable = cache.find(Selected.class);

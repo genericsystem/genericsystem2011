@@ -18,12 +18,12 @@ import org.testng.annotations.Test;
 public class SystemPropertyTest extends AbstractTest {
 
 	public void multiDirectionalIsProperty() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		assert cache.<Type> find(MultiDirectionalSystemProperty.class).isSingularConstraintEnabled(cache);
 	}
 
 	public void relationMultiDirectionalTest() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
 		Relation humanPossessVehicle = human.setRelation(cache, "possess", vehicle);
@@ -35,7 +35,7 @@ public class SystemPropertyTest extends AbstractTest {
 	}
 
 	// public void relationMultiDirectionalTestWithJump() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type human = cache.newType("Human");
 	// Type man = human.newSubType(cache, "Man");
 	// Type vehicle = cache.newType("Vehicle");
@@ -49,7 +49,7 @@ public class SystemPropertyTest extends AbstractTest {
 	// }
 
 	// public void relationMultiDirectionalTestWithJump2() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type human = cache.newType("Human");
 	// Type man = human.newSubType(cache, "Man");
 	// Type vehicle = cache.newType("Vehicle");
@@ -63,7 +63,7 @@ public class SystemPropertyTest extends AbstractTest {
 	// }
 
 	public void cascadeRemoveTest() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
 		Relation humanPossessVehicle = human.setRelation(cache, "possess", vehicle);
@@ -75,7 +75,7 @@ public class SystemPropertyTest extends AbstractTest {
 	}
 
 	// public void cascadeRemoveWithJump() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type human = cache.newType("Human");
 	// Type man = human.newSubType(cache, "Man");
 	// Type vehicle = cache.newType("Vehicle");
@@ -92,7 +92,7 @@ public class SystemPropertyTest extends AbstractTest {
 	// }
 
 	public void test() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Generic multiDirectionalSystemProperty = cache.find(MultiDirectionalSystemProperty.class);
 		assert ((GenericImpl) multiDirectionalSystemProperty.getImplicit()).isPrimary();
 		Type vehicle = cache.newType("Vehicle");
@@ -101,7 +101,7 @@ public class SystemPropertyTest extends AbstractTest {
 	}
 
 	public void isEnabledSystemPropertyTest() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
 		Relation humanOwnVehicle = human.setRelation(cache, "ownership", vehicle);
@@ -121,7 +121,7 @@ public class SystemPropertyTest extends AbstractTest {
 	}
 
 	public void isEnabledSystemPropertyAxedTest() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
 		Relation humanOwnVehicle = human.setRelation(cache, "ownership", vehicle);
@@ -134,7 +134,7 @@ public class SystemPropertyTest extends AbstractTest {
 	}
 
 	public void isEnabledSystemPropertyAxedTest2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
 		Relation humanOwnVehicle = human.setRelation(cache, "ownership", vehicle);
@@ -148,13 +148,13 @@ public class SystemPropertyTest extends AbstractTest {
 	}
 
 	public void testAskOnHimSelft() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		((GenericImpl) cache.find(CascadeRemoveSystemProperty.class)).isBooleanSystemPropertyEnabled(cache, CascadeRemoveSystemProperty.class);
 		((GenericImpl) cache.find(ReferentialIntegritySystemProperty.class)).isBooleanSystemPropertyEnabled(cache, ReferentialIntegritySystemProperty.class);
 	}
 
 	public void cascadeRemoveProperty() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "carColor", color);
@@ -175,7 +175,7 @@ public class SystemPropertyTest extends AbstractTest {
 	}
 
 	public void cascadeRemovePropertyDisabled() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type motor = cache.newType("Motor");
 		Relation powered = car.setRelation(cache, "powered by", motor);

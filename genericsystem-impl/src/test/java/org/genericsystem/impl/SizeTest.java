@@ -15,14 +15,14 @@ import org.testng.annotations.Test;
 public class SizeTest extends AbstractTest {
 
 	public void mountSize() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type sizeConstraint = cache.find(SizeConstraintImpl.class);
 		assert sizeConstraint != null;
 		assert sizeConstraint.getAttribute(cache, SizeConstraintImpl.SIZE) != null : sizeConstraint.info() + " " + sizeConstraint.getAttributes(cache);
 	}
 
 	public void enableSize() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
@@ -32,7 +32,7 @@ public class SizeTest extends AbstractTest {
 	}
 
 	public void enableSizeInTargetPosition() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
@@ -42,7 +42,7 @@ public class SizeTest extends AbstractTest {
 	}
 
 	public void enableSizeTwoAxe() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
@@ -55,7 +55,7 @@ public class SizeTest extends AbstractTest {
 	}
 
 	public void enableComplexSize() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
@@ -68,7 +68,7 @@ public class SizeTest extends AbstractTest {
 	}
 
 	public void checkConstraintWithAttribute() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		final Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		vehiclePower.enableSizeConstraint(cache, Statics.BASE_POSITION, 1);
@@ -84,7 +84,7 @@ public class SizeTest extends AbstractTest {
 	}
 
 	public void checkConstraintWithAttribute2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		final Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		vehiclePower.enableSizeConstraint(cache, Statics.BASE_POSITION, 1);
@@ -100,7 +100,7 @@ public class SizeTest extends AbstractTest {
 	}
 
 	public void checkConstraintWithAttributeWithInherits() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		final Type car = vehicle.newSubType(cache, "Car");
 		final Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -117,7 +117,7 @@ public class SizeTest extends AbstractTest {
 	}
 
 	public void checkConstraintWithAttributeWithInherits2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		final Type car = vehicle.newSubType(cache, "Car");
 		final Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -127,7 +127,7 @@ public class SizeTest extends AbstractTest {
 	}
 
 	public void checkConstraintWithRelation() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		final Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);

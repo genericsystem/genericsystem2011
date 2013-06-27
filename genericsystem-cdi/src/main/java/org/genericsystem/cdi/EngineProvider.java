@@ -2,11 +2,13 @@ package org.genericsystem.cdi;
 
 import java.io.Serializable;
 import java.util.Arrays;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericSystem;
 import org.slf4j.Logger;
@@ -27,8 +29,12 @@ public class EngineProvider implements Serializable {
 	@Inject
 	PersitentDirectoryProvider persistentDirectoryProvider;
 
+	@Inject
+	CdiFactory factory;
+
 	@PostConstruct
 	public void init() {
+		log.info("$$$$$$$$$$$$$$ START GS ENGINE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 
 		String logo = "\n";
 		logo += ("____________________________________________________________________________________________________________\n");
@@ -58,7 +64,7 @@ public class EngineProvider implements Serializable {
 		log.info("-  directory path : " + persistentDirectoryProvider.getDirectoryPath());
 		log.info("-  userClasses : " + Arrays.toString(userClassesProvider.getUserClassesArray()));
 		log.info("-----------------------------------------------------------------------------------------------");
-		engine = GenericSystem.newPersistentEngine(persistentDirectoryProvider.getDirectoryPath(), userClassesProvider.getUserClassesArray());
+		engine = GenericSystem.newPersistentEngine(factory, persistentDirectoryProvider.getDirectoryPath(), userClassesProvider.getUserClassesArray());
 	}
 
 	@Produces
@@ -67,7 +73,7 @@ public class EngineProvider implements Serializable {
 	}
 
 	@PreDestroy
-	public void destoy() {
+	public void destroy() {
 		log.info("$$$$$$$$$$$$$$ STOP GS ENGINE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 		engine.close();
 		engine = null;

@@ -9,12 +9,15 @@ import org.testng.annotations.Test;
 public class CacheTest extends AbstractTest {
 
 	public void testCacheOnCacheWithFlush() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-		Cache cache2 = cache.newSuperCache();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache2 = cache.newSuperCache().start();
 		Type vehicle = cache2.newType("Vehicle");
 		assert cache2.getEngine().getInheritings(cache2).contains(vehicle);
+		cache.start();
 		assert !cache.getEngine().getInheritings(cache).contains(vehicle);
+		cache2.start();
 		cache2.flush();
+		cache.start();
 		assert cache.getEngine().getInheritings(cache).contains(vehicle);
 	}
 

@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 public class AttributeTest extends AbstractTest {
 
 	public void testAncestorAndStructural() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 
@@ -25,7 +25,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testPropertyAncestorAndStructural() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty(cache, "power");
 
@@ -37,7 +37,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testDependency() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 
@@ -49,7 +49,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testPropertyDependency() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty(cache, "power");
 
@@ -61,7 +61,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testIsAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		assert vehiclePower.isAttribute();
@@ -69,7 +69,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testPropertyIsAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty(cache, "power");
 		assert vehiclePower.isAttribute();
@@ -77,13 +77,13 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testDuplicateAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		assert vehicle.setAttribute(cache, "power") == vehicle.setAttribute(cache, "power");
 	}
 
 	public void testGetAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty(cache, "power");
 		assert vehicle.getAttribute(cache, "power").equals(vehiclePower);
@@ -91,7 +91,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testgetAttributes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty(cache, "power");
 		Attribute vehicleWheelsNumber = vehicle.setAttribute(cache, "WheelsNumber");
@@ -101,7 +101,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testGetAttributeWithValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
@@ -116,7 +116,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testPropertyGetAttributeWithValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty(cache, "power");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
@@ -129,7 +129,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testGetAttributeWithInheritance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -138,7 +138,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testGetAttributesWithInheritance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		Attribute vehicleWheelsNumber = vehicle.setAttribute(cache, "WheelsNumber");
@@ -150,7 +150,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testIsAttributeOf() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -167,7 +167,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	// public void testOverrideAttribute() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
 	// Type car = vehicle.newSubType(cache, "Car");
 	// Attribute vehiclePower = vehicle.addAttribute(cache, "power");
@@ -180,7 +180,7 @@ public class AttributeTest extends AbstractTest {
 	// }
 
 	public void testJumpOverrideAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -189,7 +189,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testOverrideValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -221,7 +221,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testOverrideValueWithInstances() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -248,7 +248,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	// public void testOverrideThreeAttribute() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
 	// Type car = vehicle.newSubType(cache, "Car");
 	// Type superCar = car.newSubType(cache, "SuperCar");
@@ -262,7 +262,7 @@ public class AttributeTest extends AbstractTest {
 	// }
 
 	public void testAttributeOnAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -277,7 +277,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testMetaAttributeOnAttributeOnInstance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		Attribute vehiclePowerUnit = vehiclePower.setAttribute(cache, "Unit");
@@ -292,7 +292,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testAttributeOnAttributeWithGetAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		Type car = vehicle.newSubType(cache, "Car");
@@ -314,7 +314,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testSimpleAttributeOnAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 
@@ -333,7 +333,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testDefaultAttributeValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		Holder value = vehicle.setValue(cache, vehiclePower, true);
@@ -343,7 +343,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testDefaultPropertyValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty(cache, "power");
 		assert vehiclePower.equals(vehicle.getProperty(cache, "power")) : vehicle.getAttributes(cache);
@@ -362,7 +362,7 @@ public class AttributeTest extends AbstractTest {
 	}
 
 	public void testDefaultPropertyValueWithInheritance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");

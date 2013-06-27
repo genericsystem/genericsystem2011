@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 public class PropertyConstraintTest extends AbstractTest {
 
 	public void testSingleValueAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
@@ -25,7 +25,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testMultipleValuesAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		final Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
@@ -36,7 +36,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testMultipleValuesAttributeWithoutConstraint() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
@@ -45,7 +45,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testMultipleValuesAttributeWithDisabledConstraint() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		equipment.disablePropertyConstraint(cache);
@@ -55,7 +55,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testBinaryRelationDifferentTarget() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
@@ -68,7 +68,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testBinaryRelationSameTarget() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		final Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
@@ -82,7 +82,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testTernaryRelationDifferentTargets() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Type pilot = cache.newType("Pilot");
@@ -97,7 +97,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testTernaryRelationSameTargets() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Type pilot = cache.newType("Pilot");
@@ -113,7 +113,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testSingleValueAttributeForSubtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute equipment = vehicle.setAttribute(cache, "Equipment");
@@ -123,7 +123,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testMultipleValuesAttributeForSubtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		final Attribute equipment = vehicle.setAttribute(cache, "Equipment");
@@ -136,7 +136,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testMultipleValuesAttributeForSubtypeOtherWay() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = cache.newSubType("Car", vehicle);
 		final Attribute equipment = vehicle.setAttribute(cache, "Equipment");
@@ -149,7 +149,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testSameTarget() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type color = cache.newType("Color");
@@ -164,7 +164,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testBinaryRelationBetweenSubtypeAndSameTarget() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		final Type bike = car.newSubType(cache, "Bike");
@@ -180,7 +180,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testMutlipleInstances() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Generic myVehicle = vehicle.newAnonymousInstance(cache);
 		Generic myVehicle2 = vehicle.newAnonymousInstance(cache);
@@ -188,7 +188,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testMultipleDefaultValuesAttribute1() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		final Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
@@ -201,7 +201,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testMultipleDefaultValuesAttribute2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		final Attribute equipment = vehicle.setAttribute(cache, "Equipment");
 		equipment.enablePropertyConstraint(cache);
@@ -223,7 +223,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testOK() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carOutsideColor = car.setRelation(cache, "outside", color);

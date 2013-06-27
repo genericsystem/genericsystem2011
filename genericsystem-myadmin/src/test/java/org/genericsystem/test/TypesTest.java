@@ -41,11 +41,11 @@ public class TypesTest extends AbstractTest {
 		isBrotherOf.enableMultiDirectional(cache);
 		quentin.bind(cache, isBrotherOf, michael);
 
-		List<Structural> structurals = quentin.getStructurals(cache).toList();
+		List<Structural> structurals = quentin.getStructurals(cache);
 		assert structurals.size() >= 2 : structurals.size();
 		assert structurals.contains(new StructuralImpl(isBrotherOf, 0));
 
-		List<Structural> structurals2 = michael.getStructurals(cache).toList();
+		List<Structural> structurals2 = michael.getStructurals(cache);
 		assert structurals2.size() >= 2 : structurals2.size();
 		assert structurals2.contains(new StructuralImpl(isBrotherOf, 0));
 	}
@@ -58,7 +58,7 @@ public class TypesTest extends AbstractTest {
 		isBrotherOf.enableMultiDirectional(cache);
 		Link link = quentin.bind(cache, isBrotherOf, michael);
 
-		List<Generic> targets = quentin.getOtherTargets(0, link).toList();
+		List<Generic> targets = quentin.getOtherTargets(0, link);
 		assert targets.size() == 1 : targets.size();
 		assert targets.contains(michael);
 		assert !targets.contains(quentin);

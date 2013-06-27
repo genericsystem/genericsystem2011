@@ -19,14 +19,14 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	// Type
 
 	public void testTypeWithSameNameAsTypeOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type car2 = cache.newType("Car");
 		assert Objects.equals(car, car2);
 	}
 
 	public void testAttributeWithSameNameAsTypeKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		cache.newType("Plane");
 
@@ -40,7 +40,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	}
 
 	public void testRelationWithSameNameAsTypeKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		final Type plane = cache.newType("Plane");
 
@@ -56,7 +56,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	// Attribute
 
 	public void testAttributeWithSameNameAsAttributeOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute wheel = car.setAttribute(cache, "Wheels");
 		Attribute wheel2 = car.setAttribute(cache, "Wheels");
@@ -64,7 +64,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	}
 
 	public void testRelationWithSameNameAsAttributeOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type plane = cache.newType("Plane");
 		Attribute wheelAttribute = car.setAttribute(cache, "Wheels");
@@ -75,7 +75,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	// Relation
 
 	public void testRelationWithSameNameAsRelationOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -86,7 +86,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	// 2 types
 
 	public void testTwoTypesWithSameAttributeKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Type plane = cache.newType("Plane");
 		car.setAttribute(cache, "Power");
@@ -100,7 +100,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	}
 
 	public void testTwoTypesWithSameRelationKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Type plane = cache.newType("Plane");
 		final Type color = cache.newType("Color");
@@ -117,7 +117,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	// Instance
 
 	public void testInstanceWithSameNameAsInstanceOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myCar = car.newInstance(cache, "myCar");
 		Generic myCar2 = car.newInstance(cache, "myCar");
@@ -125,7 +125,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	}
 
 	public void testInstanceWithSameNameAsTypeOK() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		Generic myCar = car.newInstance(cache, "Car");
 		assert !Objects.equals(car, myCar);
@@ -134,7 +134,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	// Holder
 
 	public void testHolderWithSameValueAsHolderOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute(cache, "Power");
 		Generic myCar = car.newInstance(cache, "myCar");
@@ -144,7 +144,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	}
 
 	public void testHolderWithSameValueAsTypeNameKO() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute(cache, "Power");
 		Generic myCar = car.newInstance(cache, "myCar");
@@ -155,7 +155,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	// Link
 
 	public void testLinkWithSameNameAsLinkOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -167,7 +167,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	}
 
 	public void testLinkWithSameNameAsAttributeOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Attribute power = car.setAttribute(cache, "Power");

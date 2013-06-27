@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
 public class PhamtomTest extends AbstractTest {
 
 	public void testAliveWithStructural() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -35,7 +35,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testAliveWithConcrete() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		Holder defaultPower = vehicle.setValue(cache, vehiclePower, "123");
@@ -57,7 +57,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void cancelAttribute() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		final Type car = vehicle.newSubType(cache, "Car");
 		final Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -74,7 +74,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void cancelAttributeWithInheritsBase() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -85,7 +85,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void cancelAttributeWithInheritsAttribute() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		final Type car = vehicle.newSubType(cache, "Car");
 		final Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -104,7 +104,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void cancelAndRestoreRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		Relation vehicleHuman = vehicle.setRelation(cache, "VehicleHuman", human);
@@ -131,7 +131,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testPhantomHierarchyRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		Relation vehicleHuman = vehicle.setRelation(cache, "VehicleHuman", human);
@@ -162,7 +162,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testPhantomMultiHierachyRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
@@ -184,7 +184,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testRelationsWithSameName() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		final Type color = cache.newType("Color");
@@ -202,7 +202,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testAttributeWithGetInstances() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute vehiclePower = vehicle.setRelation(cache, "power");
@@ -230,7 +230,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testAttributeWithGetDirectSubTypes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute vehiclePower = vehicle.setRelation(cache, "power");
@@ -246,7 +246,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testAttributeWithGetInheritings() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute vehiclePower = vehicle.setRelation(cache, "power");
@@ -266,7 +266,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void cancelDefaultAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setProperty(cache, "power");
 		Holder defaultPower = car.setValue(cache, carPower, "233");
@@ -284,7 +284,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void cancelDefaultAttributeKo() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Attribute carPower = car.setProperty(cache, "power");
 		car.setValue(cache, carPower, "233");
@@ -295,7 +295,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void cancelDefaultRelation() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		final Relation carColor = car.setRelation(cache, "carColor", color);
@@ -317,7 +317,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void cancelDefaultRelationKo() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myCar = car.newInstance(cache, "myCar");
 		Type color = cache.newType("Color");
@@ -348,7 +348,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testTwoCancel() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setProperty(cache, "power");
 		Holder defaultPower = car.setValue(cache, carPower, "233");
@@ -363,7 +363,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testTwoRestore() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setProperty(cache, "power");
 		Generic myCar = car.newInstance(cache, "myCar");
@@ -383,7 +383,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testAnyCancelRestore() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute carPower = car.setProperty(cache, "power");
 		Holder defaultPower = car.setValue(cache, carPower, "233");
@@ -399,7 +399,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testTwoCancelRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -416,7 +416,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testTwoRestoreRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setProperty(cache, "CarColor", color);
@@ -441,7 +441,7 @@ public class PhamtomTest extends AbstractTest {
 	}
 
 	public void testAnyCancelRestoreRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
