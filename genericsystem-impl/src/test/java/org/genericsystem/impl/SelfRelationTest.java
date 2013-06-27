@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 public class SelfRelationTest extends AbstractTest {
 
 	public void test() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance(cache, "red");
@@ -32,7 +32,7 @@ public class SelfRelationTest extends AbstractTest {
 	}
 
 	public void paternityRelationTest() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Relation paternity = human.setRelation(cache, "paternity", human);
 		Generic theFather = human.newInstance(cache, "theFather");
@@ -46,7 +46,7 @@ public class SelfRelationTest extends AbstractTest {
 	}
 
 	public void fraternityRelationTest() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Relation fraternity = human.setRelation(cache, "brother", human);
 		fraternity.enableMultiDirectional(cache);

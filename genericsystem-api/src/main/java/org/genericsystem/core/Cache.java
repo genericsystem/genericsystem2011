@@ -137,4 +137,6 @@ public interface Cache extends Context {
 	 */
 	boolean isRemovable(Generic generic);
 
+	Cache start();
+
 }

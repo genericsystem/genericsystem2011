@@ -52,25 +52,25 @@ public class ApiTest extends AbstractTest {
 
 	// TODO
 	// public void testUpdateEngine() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// assert ((CacheImpl) cache).update(cache.getEngine(), "Engine2").getValue().equals("Engine2");
 	// }
 
 	public void testUpdateSize() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Generic size = cache.find(Size.class);
 		assert size.getImplicit().updateKey(cache, "Size2").getValue().equals("Size2");
 	}
 
 	public void testUpdate() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		assert vehicle.updateKey(cache, "Vehicle2").getValue().equals("Vehicle2");
 		assert !vehicle.isAlive(cache);
 	}
 
 	public void testUpdateWithSubType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type vehicle2 = vehicle.updateKey(cache, "Vehicle2");
@@ -81,7 +81,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testUpdateWithSubRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
@@ -92,7 +92,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testUpdateWithSubRelation2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type color = cache.newType("Color");
@@ -106,7 +106,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -119,7 +119,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void deduct() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -130,7 +130,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void ternaryDeduct() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Type time = cache.newType("Time");
@@ -145,7 +145,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void deductWithInherits() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type color = cache.newType("Color");
@@ -157,7 +157,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void ternaryDeductWithInherits() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type color = cache.newType("Color");
@@ -172,7 +172,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void deductWithTwoInstances() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -186,7 +186,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void ternaryDeductWithTwoInstances() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Type time = cache.newType("Time");
@@ -203,10 +203,10 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testOrderedGenerics() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle1 = cache.newType("Vehicle1");
 		Engine engine = cache.getEngine();
-		Cache otherCache = engine.newCache();
+		Cache otherCache = engine.newCache().start();
 		Type vehicle2 = otherCache.newType("Vehicle2");
 		Set<Generic> orderedGenerics = new TreeSet<>();
 		orderedGenerics.add(vehicle2);
@@ -217,10 +217,10 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testOrderedGenericsWithCommit() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle1 = cache.newType("Vehicle1");
 		Engine engine = cache.getEngine();
-		Cache otherCache = engine.newCache();
+		Cache otherCache = engine.newCache().start();
 		Type vehicle2 = otherCache.newType("Vehicle2");
 		otherCache.flush();
 		Set<Generic> orderedGenerics = new TreeSet<>();
@@ -232,7 +232,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testCyclicInherits() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type a = cache.newType("A");
 		a.newSubType(cache, "B");
 		final Type b = cache.newType("B");
@@ -246,7 +246,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testGetReferentialAndIsRemovable() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute power = vehicle.setProperty(cache, "Power");
 		power.enableReferentialIntegrity(cache, Statics.BASE_POSITION);
@@ -255,7 +255,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testGetReferentialAndIsRemovable2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type superCar = car.newSubType(cache, "SuperCar");
@@ -270,7 +270,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testGetReferentialAndIsRemovableWithSubTypes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		car.enableReferentialIntegrity(cache, Statics.BASE_POSITION);
@@ -279,7 +279,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testGetReferentialAndIsRemovableWithSubTypes2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type superCar = car.newSubType(cache, "SuperCar");
@@ -290,7 +290,7 @@ public class ApiTest extends AbstractTest {
 
 	@Test(enabled = false)
 	public void test_simple_api() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setProperty(cache, "Power");
 		Type color = cache.newType("Color");
@@ -313,7 +313,7 @@ public class ApiTest extends AbstractTest {
 	// getType() tests
 
 	public void test_get_existing_type() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type expected = cache.newType("Car");
 
 		Type actual = cache.getType("Car");
@@ -321,12 +321,12 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void test_get_non_existing_type() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		assert cache.getType("Moto") == null;
 	}
 
 	public void test_get_multiple_existing_types() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type expectedCar = cache.newType("Car");
 		Type expectedMoto = cache.newType("Moto");
 		Type expectedBus = cache.newType("Bus");
@@ -341,7 +341,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void test_get_null_type() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type expected = null;
 		Type actual = cache.getType(null);
 
@@ -349,14 +349,14 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testNewTypeWithNullValue() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type nullType = cache.newType(null);
 		assert nullType.equals(cache.getType(null));
 		// nullType.equals(cache.getType(null));
 	}
 
 	public void test_get_type_with_hierarchy() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type superCar = car.newSubType(cache, "SuperCar");
 
@@ -366,7 +366,7 @@ public class ApiTest extends AbstractTest {
 	// getSubType() tests
 
 	public void test_get_existing_subtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type expected = car.newSubType(cache, "Audi");
 
@@ -375,7 +375,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void test_get_non_existing_subtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type expected = null;
 
@@ -384,7 +384,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void test_get_multiple_existing_subtypes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type expectedAudi = car.newSubType(cache, "Audi");
 		Type expectedMercedes = car.newSubType(cache, "Mercedes");
@@ -397,7 +397,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void test_get_null_subtype() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 
 		Type expected = null;
@@ -407,7 +407,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void test_get_subtype_with_null_value() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		Type expected = car.newSubType(cache, null);
 
@@ -415,7 +415,7 @@ public class ApiTest extends AbstractTest {
 
 	// getAllTypes() tests
 	public void test_get_all_existing_types() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type bus = cache.newType("Bus");
 		Type moto = cache.newType("Moto");
@@ -431,7 +431,7 @@ public class ApiTest extends AbstractTest {
 	// getInstance tests
 	public void test_get_existing_instances() {
 
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
 		Generic myAudi = car.newInstance(cache, "myAudi");
@@ -446,7 +446,7 @@ public class ApiTest extends AbstractTest {
 
 	public void test_get_non_existing_instances() {
 
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 
 		assert car.getInstanceByValue(cache, "myAudi") == null;
@@ -455,7 +455,7 @@ public class ApiTest extends AbstractTest {
 	// getLink() tests
 	@Test(enabled = false)
 	public void test_dummy() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -478,7 +478,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void test_retrieve_a_father_child_relation_by_the_father() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Homme");
 
 		Relation family = human.setRelation(cache, "family", human);

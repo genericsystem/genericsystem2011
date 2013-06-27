@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 public class MapTest extends AbstractTest {
 
 	public void testPropertyMap() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
@@ -56,7 +56,7 @@ public class MapTest extends AbstractTest {
 	}
 
 	public void testPropertyInherit() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
@@ -72,7 +72,7 @@ public class MapTest extends AbstractTest {
 	}
 
 	public void testPropertyInherit2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
 		car.getProperties(cache).put("power", 123);
@@ -84,7 +84,7 @@ public class MapTest extends AbstractTest {
 	}
 
 	public void testSingleMap() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		vehicle.getProperties(cache).put("power", 123);
 		vehicle.getProperties(cache).put("power", 255);
@@ -95,7 +95,7 @@ public class MapTest extends AbstractTest {
 	}
 
 	public void testOnInstance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myBmw = car.newInstance(cache, "myBmw");
 		myBmw.getProperties(cache).put("power", 123);
@@ -108,7 +108,7 @@ public class MapTest extends AbstractTest {
 	}
 
 	public void testProperty() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		vehicle.getProperties(cache).put("power", 123);
@@ -121,7 +121,7 @@ public class MapTest extends AbstractTest {
 	}
 
 	public void testRemove() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		vehicle.getProperties(cache).put("power", 123);
@@ -137,7 +137,7 @@ public class MapTest extends AbstractTest {
 	}
 
 	public void testRemove2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		vehicle.getProperties(cache).put("power", 123);
@@ -153,7 +153,7 @@ public class MapTest extends AbstractTest {
 	}
 
 	public void testOtherMap() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(MyMapProvider.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(MyMapProvider.class).start();
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.getMap(cache, MyMapProvider.class).put("power", 123);
 		assert vehicle.getMap(cache, MyMapProvider.class).get("power").equals(123);

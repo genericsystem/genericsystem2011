@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
 public class TreeTest extends AbstractTest {
 
 	public void testTree() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.newTree("Tree");
 		final Node root = tree.newRoot(cache, "Root");
 		Node child = root.setNode(cache, "Child");
@@ -64,9 +64,10 @@ public class TreeTest extends AbstractTest {
 			@Override
 			public void intercept() {
 				// mount a cache for try
-				root.remove(cache.newSuperCache());
+				root.remove(cache.newSuperCache().start());
 			}
 		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
+		cache.start();
 		tree.disableReferentialIntegrity(cache, Statics.BASE_POSITION);
 
 		assert !tree.isReferentialIntegrity(cache, Statics.BASE_POSITION);
@@ -79,7 +80,7 @@ public class TreeTest extends AbstractTest {
 	}
 
 	public void testInheritingTree() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.newTree("Tree");
 		final Node root = tree.newRoot(cache, "Root");
 		Node child = root.setSubNode(cache, "Child");
@@ -117,7 +118,7 @@ public class TreeTest extends AbstractTest {
 	}
 
 	public void testGenealogicTree() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree bitree = cache.newTree("Tree", 2);
 		Node grandFather = bitree.newRoot(cache, "grandFather", 2);
 		Node grandMother = bitree.newRoot(cache, "grandMother", 2);
@@ -137,7 +138,7 @@ public class TreeTest extends AbstractTest {
 	}
 
 	public void testAnalogicTree() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Tree graphicComponent = cache.newTree("GraphicComponent");
 		Node webPage = graphicComponent.newRoot(cache, "webPage");
@@ -169,7 +170,7 @@ public class TreeTest extends AbstractTest {
 	}
 
 	public void visitTree() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.newTree("Tree");
 		final Node root = tree.newRoot(cache, "Root");
 
@@ -194,7 +195,7 @@ public class TreeTest extends AbstractTest {
 
 	public void testTree2() {
 		String directoryPath = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
-		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath);
+		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath).start();
 		assert cache.getMetaAttribute().isMeta();
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
@@ -203,13 +204,13 @@ public class TreeTest extends AbstractTest {
 		child.setNode(cache, "Child3");
 		cache.flush();
 		cache.getEngine().close();
-		cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath);
+		cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath).start();
 		assert ((GenericImpl) tree).getDesignTs() == ((GenericImpl) cache.newTree("Tree")).getDesignTs();
 	}
 
 	public void testInheritanceTree2() {
 		String directoryPath = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
-		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath);
+		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath).start();
 		Tree tree = cache.newTree("Tree");
 		Node root = tree.newRoot(cache, "Root");
 		Node child = root.setSubNode(cache, "Child");
@@ -218,7 +219,7 @@ public class TreeTest extends AbstractTest {
 		cache.flush();
 		cache.getEngine().close();
 
-		cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath);
+		cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath).start();
 		assert ((GenericImpl) tree).getDesignTs() == ((GenericImpl) cache.newTree("Tree")).getDesignTs();
 	}
 }

@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
 import org.genericsystem.exception.CacheAwareException;
 
 /**
@@ -63,6 +64,10 @@ public interface Factory extends Serializable {
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
 				throw new IllegalStateException(e);
 			}
+		}
+
+		public DefaultFactory() {
+			this(new Class<?>[0]);
 		}
 
 		@SuppressWarnings("unchecked")

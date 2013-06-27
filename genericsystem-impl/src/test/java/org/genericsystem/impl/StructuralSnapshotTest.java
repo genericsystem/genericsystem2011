@@ -11,14 +11,14 @@ import org.testng.annotations.Test;
 public class StructuralSnapshotTest extends AbstractTest {
 
 	public void testStructuralSnapshotWithAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute power = vehicle.setAttribute(cache, "Power");
 		assert vehicle.getAttributes(cache).contains(power);
 	}
 
 	public void testStructuralSnapshotWithRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		Relation vehicleHuman = vehicle.setRelation(cache, "pilot", human);
@@ -26,7 +26,7 @@ public class StructuralSnapshotTest extends AbstractTest {
 	}
 
 	public void testStructuralSnapshotWithSubType2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Attribute carPower = car.setAttribute(cache, "Power");
@@ -38,7 +38,7 @@ public class StructuralSnapshotTest extends AbstractTest {
 	}
 
 	public void testStructuralSnapshotWithAttributeAndRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
 		Type human = cache.newType("Human");

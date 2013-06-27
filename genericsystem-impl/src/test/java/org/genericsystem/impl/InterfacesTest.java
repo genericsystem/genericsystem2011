@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 public class InterfacesTest extends AbstractTest {
 
 	public void testInterfacesAndReverseInterfaces() {
-		CacheImpl cache = (CacheImpl) GenericSystem.newCacheOnANewInMemoryEngine();
+		CacheImpl cache = (CacheImpl) GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type robot = cache.newType("Robot");
 		Type transformer = cache.newSubType("Transformer", vehicle, robot);
@@ -19,7 +19,7 @@ public class InterfacesTest extends AbstractTest {
 	}
 
 	public void testUnnecessary() {
-		CacheImpl cache = (CacheImpl) GenericSystem.newCacheOnANewInMemoryEngine();
+		CacheImpl cache = (CacheImpl) GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Type electric = cache.newType("Electric");

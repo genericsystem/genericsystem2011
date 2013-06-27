@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 public class AliveConstraintTest extends AbstractTest {
 
 	public void testPropertySimpleRelationKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type human = cache.newType("Human");
 		final Relation humanDriveCar = human.setRelation(cache, "Drive", car);
@@ -30,7 +30,7 @@ public class AliveConstraintTest extends AbstractTest {
 	}
 
 	public void testPropertySimpleRelationOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type human = cache.newType("Human");
 		Relation humanDriveCar = human.setRelation(cache, "Drive", car);

@@ -10,12 +10,12 @@ import org.testng.annotations.Test;
 public class EngineConsistencyConstraintTest extends AbstractTest {
 
 	public void test() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				vehicle.setAttribute(GenericSystem.newCacheOnANewInMemoryEngine(), "Power");
+				vehicle.setAttribute(GenericSystem.newCacheOnANewInMemoryEngine().start(), "Power");
 			}
 		}.assertIsCausedBy(EngineConsistencyConstraintViolationException.class);
 	}

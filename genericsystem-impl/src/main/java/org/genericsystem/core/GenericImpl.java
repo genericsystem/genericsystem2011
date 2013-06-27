@@ -266,6 +266,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Holder> T setValue(Cache cache, Holder attribute, Serializable value) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		T holder = setHolder(cache, attribute, value);
 		assert value == null || getValues(cache, attribute).contains(value) : holder;
 		return holder;
@@ -277,15 +279,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Link> T setLink(Cache cache, Link relation, Serializable value, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		return setHolder(cache, relation, value, targets);
 	}
 
 	@Override
 	public <T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		return setHolder(cache, attribute, value, getBasePos(attribute), targets);
 	}
 
 	private <T extends Holder> T getSelectedHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		T holder;
 		if (((Relation) attribute).isSingularConstraintEnabled(cache, basePos))
 			holder = getHolder(cache, (Attribute) attribute, basePos);
@@ -298,6 +306,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		T holder = getSelectedHolder(cache, attribute, value, basePos, targets);
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, getClass(), value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
@@ -317,6 +327,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Holder> T addHolder(Cache cache, Holder attribute, int basePos, Serializable value, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		if (value == null)
 			return null;
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(cache, getClass(), value, SystemGeneric.CONCRETE, true);
@@ -325,6 +337,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	protected <T extends Holder> T bind(Cache cache, Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
+		// TODO clean
+		Cache currentCache = getEngine().getCurrentCache();
+		assert currentCache == cache : currentCache + " / " + cache;
 		return ((CacheImpl) cache).bind(implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
 	}
 
@@ -339,22 +354,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T cancel(Cache cache, Holder attribute, boolean concrete, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		return cancel(cache, attribute, getBasePos(attribute), concrete, targets);
 	}
 
 	@Override
 	public <T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		Generic implicit = concrete ? ((GenericImpl) attribute.getMeta()).bindPrimary(cache, getClass(), null, SystemGeneric.CONCRETE, true) : getEngine().bindPrimary(cache, getClass(), null, SystemGeneric.STRUCTURAL, true);
 		return bind(cache, implicit, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override
 	public void cancelAll(Cache cache, Holder attribute, boolean concrete, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		cancelAll(cache, attribute, getBasePos(attribute), concrete, targets);
 	}
 
 	@Override
 	public void cancelAll(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		for (Holder holder : concrete ? getHolders(cache, (Attribute) attribute, basePos, targets) : getAttributes(cache, (Attribute) attribute)) {
 			if (this.equals(holder.getComponent(basePos))) {
 				holder.remove(cache);
@@ -366,25 +389,35 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void clearAllConcrete(Cache cache, Holder attribute, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		clearAllConcrete(cache, attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
 	public void clearAllConcrete(Cache cache, Holder attribute, int basePos, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		internalClearAll(cache, attribute, basePos, true, targets);
 	}
 
 	@Override
 	public void clearAllStructural(Cache cache, Holder attribute, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		clearAllStructural(cache, attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
 	public void clearAllStructural(Cache cache, Holder attribute, int basePos, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		internalClearAll(cache, attribute, basePos, false, targets);
 	}
 
 	public void internalClearAll(Cache cache, Holder attribute, int basePos, boolean isConcrete, Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		Iterator<Holder> holders = isConcrete ? holdersIterator(cache, attribute, basePos, true, targets) : this.<Holder> attributesIterator(cache, (Attribute) attribute, true);
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
@@ -394,10 +427,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, final Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == context;
 		return getHolderByValue(context, attribute, value, getBasePos(attribute), targets);
 	}
 
 	public <T extends Holder> T getHolderByValue(Context context, Holder attribute, Serializable value, int basePos, final Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == context;
 		return Statics.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(context, attribute, basePos, value == null, targets), value));
 	}
 
@@ -409,11 +446,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Holder> Snapshot<T> getHolders(final Context context, final Holder attribute, final Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == context;
 		return getHolders(context, attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
 	public <T extends Holder> Snapshot<T> getHolders(final Context context, final Holder attribute, final int basePos, final Generic... targets) {
+		// TODO clean
+		// assert getEngine().getCurrentCache() == context : getEngine().getCurrentCache() + " / " + context;
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
@@ -422,22 +463,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	public <T extends Holder> Snapshot<T> getHolders2(final Context context, final Holder attribute, final int basePos, final Generic... targets) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return holdersIterator(context, (Attribute) attribute, basePos, true, targets);
-			}
-		};
-	}
-
 	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == context;
 		return getLinks(context, relation, getBasePos(relation), targets);
 	}
 
 	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Context context, final Relation relation, final int basePos, final Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == context;
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
@@ -447,6 +483,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Link> Iterator<T> linksIterator(final Context context, final Link relation, final int basePos, final Generic... targets) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == context;
 		return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(context, relation, basePos, false, targets)) {
 			@Override
 			public boolean isSelected() {
@@ -457,6 +495,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> Snapshot<T> getTargets(Context context, Relation relation) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == context;
 		return getTargets(context, relation, Statics.TARGET_POSITION);
 	}
 
@@ -664,6 +704,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T newSubType(Cache cache, Serializable value, Generic... components) {
+		// TODO clean
+		assert getEngine().getCurrentCache() == cache;
 		Generic implicit = getEngine().bindPrimary(cache, Generic.class, value, SystemGeneric.STRUCTURAL, !isEngine() || components.length != 0);
 		return ((CacheImpl) cache).bind(implicit, false, this, false, components);
 	}

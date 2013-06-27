@@ -16,7 +16,7 @@ public class ConcurrentTest extends AbstractTest {
 
 	public void testConcurrentWithNoFlush() {
 		Engine engine = GenericSystem.newInMemoryEngine();
-		Cache cache = engine.newCache();
+		Cache cache = engine.newCache().start();
 		Type car = cache.newType("Car");
 		assert engine.getInheritings(cache.newSuperCache()).contains(car);
 		assert engine.getInheritings(cache).contains(car);
@@ -24,7 +24,7 @@ public class ConcurrentTest extends AbstractTest {
 
 	public void testConcurrentFlush() {
 		Engine engine = GenericSystem.newInMemoryEngine();
-		Cache cache = engine.newCache();
+		Cache cache = engine.newCache().start();
 		Generic car = cache.newType("Car");
 		cache.flush();
 
@@ -37,7 +37,7 @@ public class ConcurrentTest extends AbstractTest {
 
 	public void testRemoveIntegrityConstraintViolation() {
 		Engine engine = GenericSystem.newInMemoryEngine();
-		final Cache cache1 = engine.newCache();
+		final Cache cache1 = engine.newCache().start();
 		final Type car = cache1.newType("Car");
 		Generic bmw = car.newInstance(cache1, "bmw");
 		cache1.flush();
@@ -53,17 +53,23 @@ public class ConcurrentTest extends AbstractTest {
 
 	public void testRemoveFlushConcurrent() {
 		Engine engine = GenericSystem.newInMemoryEngine();
-		final CacheImpl cache1 = (CacheImpl) engine.newCache();
+		final CacheImpl cache1 = (CacheImpl) engine.newCache().start();
 		final Generic car = cache1.newType("Car");
 		cache1.flush();
 		// cache1.deactivate();
 
-		Cache cache2 = engine.newCache();
+		Cache cache2 = engine.newCache().start();
+
+		cache1.start();
 		car.remove(cache1);
+
+		cache2.start();
 		cache2.flush();
 		// cache2.deactivate();
 
 		// cache1.activate();
+
+		cache1.start();
 		cache1.pickNewTs();
 		new RollbackCatcher() {
 			@Override
@@ -76,11 +82,11 @@ public class ConcurrentTest extends AbstractTest {
 
 	public void testRemoveFlushConcurrent2() {
 		Engine engine = GenericSystem.newInMemoryEngine();
-		final Cache cache1 = engine.newCache();
+		final Cache cache1 = engine.newCache().start();
 		final Generic car = cache1.newType("Car");
 		cache1.flush();
 
-		Cache cache2 = engine.newCache();
+		Cache cache2 = engine.newCache().start();
 		car.remove(cache2);
 		cache2.flush();
 
@@ -88,6 +94,7 @@ public class ConcurrentTest extends AbstractTest {
 			@Override
 			public void intercept() {
 				// Type car has already been removed by another thread
+				cache1.start();
 				car.remove(cache1);
 			}
 		}.assertIsCausedBy(OptimisticLockConstraintViolationException.class);
@@ -95,12 +102,12 @@ public class ConcurrentTest extends AbstractTest {
 
 	public void testRemoveFlushConcurrent3() {
 		Engine engine = GenericSystem.newInMemoryEngine();
-		final CacheImpl cache1 = (CacheImpl) engine.newCache();
+		final CacheImpl cache1 = (CacheImpl) engine.newCache().start();
 		final Generic car = cache1.newType("Car");
 		cache1.flush();
 		assert cache1.isAlive(car);
 		// cache1.deactivate();
-		CacheImpl cache2 = (CacheImpl) engine.newCache();
+		CacheImpl cache2 = (CacheImpl) engine.newCache().start();
 		assert cache2.getTs() > cache1.getTs();
 		assert cache2.isAlive(car);
 		car.remove(cache2);
@@ -115,6 +122,7 @@ public class ConcurrentTest extends AbstractTest {
 			@Override
 			public void intercept() {
 				// Type car has already been removed by another thread
+				cache1.start();
 				car.remove(cache1);
 			}
 		}.assertIsCausedBy(OptimisticLockConstraintViolationException.class);
@@ -123,7 +131,7 @@ public class ConcurrentTest extends AbstractTest {
 
 	public void testRemoveConcurrentMVCC() {
 		Engine engine = GenericSystem.newInMemoryEngine();
-		Cache cache1 = engine.newCache();
+		Cache cache1 = engine.newCache().start();
 		Generic car = cache1.newType("Car");
 		cache1.flush();
 		// cache1.deactivate();

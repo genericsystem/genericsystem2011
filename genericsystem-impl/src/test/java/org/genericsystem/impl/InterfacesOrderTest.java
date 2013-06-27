@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 public class InterfacesOrderTest extends AbstractTest {
 
 	public void testOrderInterfaces() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type T1 = cache.newType("T1");
 		Type T2 = cache.newType("T2");
 		Type T3 = cache.newSubType("T3", T1, T2);

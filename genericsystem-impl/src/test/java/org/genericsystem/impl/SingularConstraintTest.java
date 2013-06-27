@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 public class SingularConstraintTest extends AbstractTest {
 
 	public void testSingularConstraint() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Relation metaRelation = cache.getMetaRelation();
 
 		metaRelation.enableSingularConstraint(cache, Statics.BASE_POSITION);
@@ -43,7 +43,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testConstraintCheckOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
 		Attribute vehicleDriver = vehicle.setAttribute(cache, "Driver");
@@ -58,7 +58,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testConstraintCheckKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		final Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
 		final Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
@@ -73,7 +73,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testRelationOK() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog);
@@ -89,7 +89,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testRelationWithTwoSingular() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
 		final Relation humanDriveVehicle = human.setRelation(cache, "Drive", vehicle);
@@ -112,7 +112,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testDoubleRelationSimpleKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog);
@@ -132,7 +132,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testDoubleRelationSimpleOK() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog);
@@ -148,7 +148,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testDoubleRelationOK() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
@@ -166,7 +166,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testDoubleRelationKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
@@ -189,7 +189,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testDoubleRelationKO2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicleType = cache.newType("Vehicle");
 		Type dogType = cache.newType("Dog");
 		Type roadType = cache.newType("Road");
@@ -214,7 +214,7 @@ public class SingularConstraintTest extends AbstractTest {
 	// Rapportés depuis 2010 ----------------------------------------------------------------------
 
 	public void noMoreThanOneAttributePerEntity() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Generic myBmw = car.newInstance(cache, "myBmw");
 		final Attribute registration = car.setAttribute(cache, "registration");
@@ -227,7 +227,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	// public void noMoreThanOneAttributePerEntity2() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type car = cache.newType("Car");
 	// Type frenchCar = car.newSubType(cache, "frenchCar");
 	// Attribute registration = car.addAttribute(cache, "registration");
@@ -244,7 +244,7 @@ public class SingularConstraintTest extends AbstractTest {
 	// }
 
 	public void singularForTargetAxe() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
@@ -265,7 +265,7 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void singularForTargetAxe2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {

@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 public class TypeAndSubTypeTest extends AbstractTest {
 
 	public void testNewSubTypeWithEngine() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newSubType("Car");
 		assert car.isAlive(cache);
 		assert car.isStructural();
@@ -23,7 +23,7 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	}
 
 	public void testExplicitAndStructuralForSubType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicule = cache.newType("Vehicule");
 		Type car = vehicule.newSubType(cache, "Car");
 		assert vehicule.isStructural();
@@ -31,14 +31,14 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	}
 
 	public void testAncestorOfType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		assert car.getSupers().size() == 1;
 		assert car.getSupers().contains(cache.getEngine());
 	}
 
 	public void testAncestorOfSubType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicule = cache.newType("Vehicule");
 		Type car = vehicule.newSubType(cache, "Car");
 		// assert car.getSupers().size() == 1;
@@ -46,14 +46,14 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	}
 
 	public void testDependencyForType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		assert cache.getEngine().getInheritings(cache).contains(car);
 		assert car.getInheritings(cache).isEmpty();
 	}
 
 	public void testDependencyForSubType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicule = cache.newType("Vehicule");
 		Type car = vehicule.newSubType(cache, "Car");
 		assert vehicule.getInheritings(cache).size() == 1;
@@ -61,7 +61,7 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	}
 
 	public void testgetDirectSubTypes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicule = cache.newType("Vehicule");
 		Type car = vehicule.newSubType(cache, "Car");
 		Type audi = car.newSubType(cache, "Audi");
@@ -79,7 +79,7 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetAllSubTypes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicule = cache.newType("Vehicule");
 		Type car = vehicule.newSubType(cache, "Car");
 		Type audi = car.newSubType(cache, "Audi");
@@ -101,7 +101,7 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	}
 
 	public void testgetDirectSubTypesWithImplicit() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicule = cache.newType("Vehicule");
 		Type car = vehicule.newSubType(cache, "Car");
 		Type audi = car.newSubType(cache, "Audi");

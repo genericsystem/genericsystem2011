@@ -73,6 +73,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		throw new IllegalStateException();// Unreachable;
 	}
 
+	@Override
+	public Cache start() {
+		return this.<EngineImpl> getEngine().start(this);
+	}
+
 	<T extends Generic> T bindPrimaryByValue(Class<?> specializeGeneric, Generic primaryAncestor, Serializable value, int metaLevel, boolean automatic) {
 		T implicit = findPrimaryByValue(primaryAncestor, value, metaLevel);
 		return implicit != null ? implicit : this.<T> insert(((GenericImpl) getEngine().getFactory().newGeneric(specializeGeneric)).initializePrimary(value, metaLevel, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY, automatic));
