@@ -341,30 +341,30 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 
-	protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
+	void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 		removeAll(removes);
 		addAll(adds);
 	}
 
-	protected void addAll(Iterable<Generic> generics) {
+	void addAll(Iterable<Generic> generics) {
 		for (Generic generic : generics)
 			simpleAdd((GenericImpl) generic);
 	}
 
-	protected void removeAll(Iterable<Generic> generics) {
+	void removeAll(Iterable<Generic> generics) {
 		for (Generic generic : generics)
 			simpleRemove((GenericImpl) generic);
 	}
 
-	protected void simpleAdd(GenericImpl generic) {
+	void simpleAdd(GenericImpl generic) {
 		plug(generic);
 	}
 
-	protected void simpleRemove(GenericImpl generic) {
+	void simpleRemove(GenericImpl generic) {
 		unplug(generic);
 	}
 
-	public interface TimestampedDependencies {
+	interface TimestampedDependencies {
 
 		void add(Generic generic);
 

@@ -3,7 +3,6 @@ package org.genericsystem.core;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
@@ -124,6 +123,19 @@ public class EngineImpl extends GenericImpl implements Engine {
 	@Override
 	public int getMetaLevel() {
 		return SystemGeneric.META;
+	}
+
+	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
+
+	public void start(Cache cache) {
+		cacheLocal.set(cache);
+	}
+
+	public Cache getCurrentCache() {
+		Cache currentCache = cacheLocal.get();
+		if (currentCache == null)
+			start(factory.getCacheLocal());
+		return currentCache;
 	}
 
 	private class SystemCache extends HashMap<Class<?>, Generic> {

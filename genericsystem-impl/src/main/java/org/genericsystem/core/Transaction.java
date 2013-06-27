@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -86,25 +87,13 @@ public class Transaction extends AbstractContext {
 	@Override
 	protected void simpleAdd(GenericImpl generic) {
 		generic.getLifeManager().beginLife(getTs());
-		// if (Transaction.this.isFlushable(generic))
 		super.simpleAdd(generic);
 	}
-
-	// @Override
-	// protected void cancelAdd(GenericImpl generic) {
-	// generic.getLifeManager().cancelBeginLife();
-	// super.cancelAdd(generic);
-	// }
 
 	@Override
 	protected void simpleRemove(GenericImpl generic) {
 		generic.getLifeManager().kill(getTs());
 	}
-
-	// @Override
-	// protected void cancelRemove(GenericImpl generic) {
-	// generic.getLifeManager().resurect();
-	// }
 
 	private void writeLockAllAndCheckMvcc(Set<LifeManager> lockedLifeManagers, Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, OptimisticLockConstraintViolationException {
 		for (Generic generic : removes)
