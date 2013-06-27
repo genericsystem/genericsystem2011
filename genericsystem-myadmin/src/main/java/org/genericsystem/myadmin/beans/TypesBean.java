@@ -2,19 +2,14 @@ package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.genericsystem.core.AbstractList;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -138,17 +133,17 @@ public class TypesBean implements Serializable {
 	}
 
 	public List<Structural> getStructurals() {
-		return getSelectedTreeNodeGeneric().getStructurals(cache).toList();
+		return getSelectedTreeNodeGeneric().getStructurals(cache);
 	}
 
 	public List<Holder> getHolders(Structural structural) {
-		return ((Type) getSelectedTreeNodeGeneric()).getHolders(cache, structural.getAttribute(), structural.getPosition()).toList();
+		return ((Type) getSelectedTreeNodeGeneric()).getHolders(cache, structural.getAttribute(), structural.getPosition());
 	}
 
 	public List<Generic> getOtherTargets(int basePos, Holder holder) {
 		if (((Attribute) holder).isMultiDirectional(cache))
 			basePos = getBasePosIfMultiDirectional(basePos, holder);
-		return getSelectedTreeNodeGeneric().getOtherTargets(basePos, holder).toList();
+		return getSelectedTreeNodeGeneric().getOtherTargets(basePos, holder);
 	}
 
 	public int getBasePosIfMultiDirectional(int originalBasePos, Holder holder) {
@@ -283,12 +278,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public List<Entry<Serializable, Serializable>> getProperties() {
-		return new AbstractList<Map.Entry<Serializable, Serializable>>() {
-			@Override
-			public Iterator<Entry<Serializable, Serializable>> iterator() {
-				return getSelectedTreeNodeGeneric().getProperties(cache).entrySet().iterator();
-			}
-		};
+		return (List) getSelectedTreeNodeGeneric().getProperties(cache).entrySet();
 	}
 
 	public PropertyWrapper getPropertyWrapper(Entry<Serializable, Serializable> entry) {
@@ -430,7 +420,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_green_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -456,7 +446,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getInfos("right_red_arrow");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -482,7 +472,7 @@ public class TypesBean implements Serializable {
 		case VALUES:
 			return messages.getMessage("value");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
@@ -496,7 +486,7 @@ public class TypesBean implements Serializable {
 		case "INSTANCE":
 			return messages.getInfos("bullet_square_green");
 		default:
-			break;
+		break;
 		}
 		throw new IllegalStateException();
 	}
