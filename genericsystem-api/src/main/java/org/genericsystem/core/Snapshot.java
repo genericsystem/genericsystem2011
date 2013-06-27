@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * The Snaphot is an aware iterable of the graphe.
@@ -8,7 +9,7 @@ import java.util.List;
  * @author Nicolas Feybesse
  * 
  */
-public interface Snapshot<T> extends List<T> {
+public interface Snapshot<T> extends List<T>, Set<T> {
 
 	/**
 	 * Filter the Snapshot.
