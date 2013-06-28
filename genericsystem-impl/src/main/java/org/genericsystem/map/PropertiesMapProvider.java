@@ -11,6 +11,10 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.map.PropertiesMapProvider.PropertyKey;
 import org.genericsystem.map.PropertiesMapProvider.PropertyValue;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ */
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies({ PropertyKey.class, PropertyValue.class })
