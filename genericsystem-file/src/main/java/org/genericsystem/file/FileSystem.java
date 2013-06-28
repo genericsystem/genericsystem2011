@@ -6,8 +6,6 @@ import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
@@ -34,48 +32,48 @@ public class FileSystem extends TreeImpl {
 	private static final byte[] EMPTY = "<html/>".getBytes();
 
 	public static class Directory extends NodeImpl {
-		public <T extends File> Snapshot<T> getFiles(Context context) {
-			return getHolders(context, context.<Attribute> find(FileType.class));
+		public <T extends File> Snapshot<T> getFiles() {
+			return getHolders(getEngine().getCurrentCache().<Attribute> find(FileType.class));
 		}
 
-		public <T extends File> T getFile(Context context, final String name) {
-			return getHolderByValue(context, context.<Attribute> find(FileType.class), name);
+		public <T extends File> T getFile(String name) {
+			return getHolderByValue(getEngine().getCurrentCache().<Attribute> find(FileType.class), name);
 		}
 
-		public <T extends File> T addFile(Cache cache, String name) {
-			return addFile(cache, name, EMPTY);
+		public <T extends File> T addFile(String name) {
+			return addFile(name, EMPTY);
 		}
 
-		public <T extends File> T addFile(Cache cache, String name, byte[] content) {
-			T result = addHolder(cache, cache.<Attribute> find(FileType.class), name);
-			result.setContent(cache, content);
+		public <T extends File> T addFile(String name, byte[] content) {
+			T result = addHolder(getEngine().getCurrentCache().<Attribute> find(FileType.class), name);
+			result.setContent(content);
 			return result;
 		}
 
-		public <T extends File> T touchFile(Cache cache, String name) {
-			return touchFile(cache, name, EMPTY);
+		public <T extends File> T touchFile(String name) {
+			return touchFile(name, EMPTY);
 		}
 
-		public <T extends File> T touchFile(Cache cache, String name, byte[] content) {
-			T result = setHolder(cache, cache.<Attribute> find(FileType.class), name);
-			result.setContent(cache, content);
+		public <T extends File> T touchFile(String name, byte[] content) {
+			T result = setHolder(getEngine().getCurrentCache().<Attribute> find(FileType.class), name);
+			result.setContent(content);
 			return result;
 		}
 
-		public <T extends Directory> Snapshot<T> getDirectories(final Context context) {
-			return getChildren(context);
+		public <T extends Directory> Snapshot<T> getDirectories() {
+			return getChildren();
 		}
 
-		public <T extends Directory> T getDirectory(Context context, final String name) {
-			return getChild(context, name);
+		public <T extends Directory> T getDirectory(String name) {
+			return getChild(name);
 		}
 
-		public <T extends Directory> T addDirectory(Cache cache, String name) {
-			return addNode(cache, name);
+		public <T extends Directory> T addDirectory(String name) {
+			return addNode(name);
 		}
 
-		public <T extends Directory> T touchDirectory(Cache cache, String name) {
-			return setNode(cache, name);
+		public <T extends Directory> T touchDirectory(String name) {
+			return setNode(name);
 		}
 
 		public String getShortPath() {
@@ -103,12 +101,12 @@ public class FileSystem extends TreeImpl {
 		}
 
 		public static class File extends GenericImpl {
-			public byte[] getContent(Context context) {
-				return this.<byte[]> getValues(context, context.<Attribute> find(FileContent.class)).get(0);
+			public byte[] getContent() {
+				return this.<byte[]> getValues(getEngine().getCurrentCache().<Attribute> find(FileContent.class)).get(0);
 			}
 
-			public <T extends Generic> T setContent(Cache cache, byte[] content) {
-				return setValue(cache, cache.<Attribute> find(FileContent.class), content);
+			public <T extends Generic> T setContent(byte[] content) {
+				return setValue(getEngine().getCurrentCache().<Attribute> find(FileContent.class), content);
 			}
 
 			public String getShortPath() {
@@ -122,53 +120,53 @@ public class FileSystem extends TreeImpl {
 		}
 	}
 
-	public <T extends Directory> Snapshot<T> getRootDirectories(Context context) {
-		return getRoots(context);
+	public <T extends Directory> Snapshot<T> getRootDirectories() {
+		return getRoots();
 	}
 
-	public <T extends Directory> T getRootDirectory(Context context, final String name) {
-		return getRootByValue(context, name);
+	public <T extends Directory> T getRootDirectory(String name) {
+		return getRootByValue(name);
 	}
 
-	public <T extends Directory> T addRootDirectory(Cache cache, String name) {
-		if (getRootDirectory(cache, name) != null)
+	public <T extends Directory> T addRootDirectory(String name) {
+		if (getRootDirectory(name) != null)
 			throw new IllegalStateException("Root directory : " + name + " already exists");
-		return touchRootDirectory(cache, name);
+		return touchRootDirectory(name);
 	}
 
-	public <T extends Directory> T touchRootDirectory(Cache cache, String name) {
-		return newRoot(cache, name);
+	public <T extends Directory> T touchRootDirectory(String name) {
+		return newRoot(name);
 	}
 
-	public byte[] getFileContent(Cache cache, String resource) {
+	public byte[] getFileContent(String resource) {
 		if (resource.startsWith(SEPARATOR))
 			resource = resource.substring(1);
 		String[] files = resource.split(SEPARATOR);
-		Directory directory = getRootDirectory(cache, files[0]);
+		Directory directory = getRootDirectory(files[0]);
 		if (directory == null)
 			return null;
 		for (int i = 1; i < files.length - 1; i++) {
-			directory = directory.getDirectory(cache, files[i]);
+			directory = directory.getDirectory(files[i]);
 			if (directory == null)
 				return null;
 		}
-		File file = directory.getFile(cache, files[files.length - 1]);
+		File file = directory.getFile(files[files.length - 1]);
 		if (file == null)
 			return null;
-		return file.getContent(cache);
+		return file.getContent();
 	}
 
-	public <T extends File> T touchFile(Cache cache, String resource) {
-		return touchFile(cache, resource, EMPTY);
+	public <T extends File> T touchFile(String resource) {
+		return touchFile(resource, EMPTY);
 	}
 
-	public <T extends File> T touchFile(Cache cache, String resource, byte[] content) {
+	public <T extends File> T touchFile(String resource, byte[] content) {
 		if (resource.startsWith(SEPARATOR))
 			resource = resource.substring(1);
 		String[] files = resource.split(SEPARATOR);
-		Directory directory = touchRootDirectory(cache, files[0]);
+		Directory directory = touchRootDirectory(files[0]);
 		for (int i = 1; i < files.length - 1; i++)
-			directory = directory.touchDirectory(cache, files[i]);
-		return directory.touchFile(cache, files[files.length - 1], content);
+			directory = directory.touchDirectory(files[i]);
+		return directory.touchFile(files[files.length - 1], content);
 	}
 }

@@ -16,14 +16,14 @@ public class InstanceOfTest extends AbstractTest {
 	// public void testGetMetasAttributes() {
 	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
-	// Type car = vehicle.newSubType(cache, "Car");
-	// Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
-	// Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-	// Generic myCar = car.newInstance(cache, "myCar");
-	// Holder myVehiclePower236 = myVehicle.setValue(cache, vehiclePower, 236);
-	// Attribute carSubPower = car.addSubAttribute(cache, vehiclePower, "subPower");
+	// Type car = vehicle.newSubType( "Car");
+	// Attribute vehiclePower = vehicle.addAttribute( "Power");
+	// Generic myVehicle = vehicle.newInstance( "myVehicle");
+	// Generic myCar = car.newInstance( "myCar");
+	// Holder myVehiclePower236 = myVehicle.setValue( vehiclePower, 236);
+	// Attribute carSubPower = car.addSubAttribute( vehiclePower, "subPower");
 	//
-	// Holder myCarPower235 = myCar.setValue(cache, carSubPower, 235);
+	// Holder myCarPower235 = myCar.setValue( carSubPower, 235);
 	//
 	// assert myVehiclePower236.getMeta().equals(vehiclePower) : myVehiclePower236.getMeta() + "  " + myVehiclePower236.getSupers();
 	// assert myCarPower235.getMeta().equals(carSubPower) : myCarPower235.getMeta();
@@ -37,20 +37,20 @@ public class InstanceOfTest extends AbstractTest {
 	// public void testGetMetasRelations() {
 	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
-	// Type car = vehicle.newSubType(cache, "Car");
+	// Type car = vehicle.newSubType( "Car");
 	// Type human = cache.newType("Human");
-	// Type pilot = human.newSubType(cache, "Pilot");
-	// Relation driving = human.addRelation(cache, "Driving", vehicle);
-	// Relation piloting = pilot.addSubRelation(cache, driving, "Piloting", car);
+	// Type pilot = human.newSubType( "Pilot");
+	// Relation driving = human.addRelation( "Driving", vehicle);
+	// Relation piloting = pilot.addSubRelation( driving, "Piloting", car);
 	//
-	// Generic maurice = human.newInstance(cache, "Maurice");
-	// Generic federer = pilot.newInstance(cache, "Federer");
+	// Generic maurice = human.newInstance( "Maurice");
+	// Generic federer = pilot.newInstance( "Federer");
 	//
-	// Generic titine = vehicle.newInstance(cache, "myTitine");
-	// Generic f1 = car.newInstance(cache, "myF1");
+	// Generic titine = vehicle.newInstance( "myTitine");
+	// Generic f1 = car.newInstance( "myF1");
 	//
-	// Link drives = maurice.setLink(cache, driving, "Maurice_drives_Titine", titine);
-	// Link pilots = federer.setLink(cache, piloting, "Federer_pilots_F1", f1);
+	// Link drives = maurice.setLink( driving, "Maurice_drives_Titine", titine);
+	// Link pilots = federer.setLink( piloting, "Federer_pilots_F1", f1);
 	//
 	// assert drives.getMeta().equals(driving) : drives.getMeta();
 	//
@@ -61,36 +61,36 @@ public class InstanceOfTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type vehicle = cache.newType("Vehicle");
-		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
+		Generic myVehicle = vehicle.newInstance( "myVehicle");
 		assert myVehicle.isInstanceOf(vehicle);
 
-		Type car = vehicle.newSubType(cache, "Car");
-		Generic myCar = car.newInstance(cache, "myCar");
+		Type car = vehicle.newSubType( "Car");
+		Generic myCar = car.newInstance( "myCar");
 		assert myCar.isInstanceOf(car);
 
 		assert myCar.isInstanceOf(vehicle);
 		assert !myVehicle.isInstanceOf(car);
 
-		Attribute vehiclePower = vehicle.setProperty(cache, "Power");
+		Attribute vehiclePower = vehicle.setProperty( "Power");
 
-		Holder v90 = myVehicle.setValue(cache, vehiclePower, 90);
-		Holder v235 = myCar.setValue(cache, vehiclePower, 235);
+		Holder v90 = myVehicle.setValue( vehiclePower, 90);
+		Holder v235 = myCar.setValue( vehiclePower, 235);
 
 		assert v90.isInstanceOf(vehiclePower);
 		assert v235.isInstanceOf(vehiclePower);
 
 		cache.flush();
 
-		assert Objects.equals(myVehicle.getValue(cache, vehiclePower), 90);
-		assert Objects.equals(myCar.getValue(cache, vehiclePower), 235);
+		assert Objects.equals(myVehicle.getValue( vehiclePower), 90);
+		assert Objects.equals(myCar.getValue( vehiclePower), 235);
 
-		assert v90.equals(myVehicle.getHolder(cache, vehiclePower));
-		assert v235.equals(myCar.getHolder(cache, vehiclePower));
+		assert v90.equals(myVehicle.getHolder( vehiclePower));
+		assert v235.equals(myCar.getHolder( vehiclePower));
 
-		v90.remove(cache);
+		v90.remove();
 
-		assert myVehicle.getValue(cache, vehiclePower) == null;
-		assert myVehicle.getHolder(cache, vehiclePower) == null;
+		assert myVehicle.getValue( vehiclePower) == null;
+		assert myVehicle.getHolder( vehiclePower) == null;
 
 		cache.flush();
 	}
@@ -101,10 +101,10 @@ public class InstanceOfTest extends AbstractTest {
 		Type mammal = cache.newType("Mammal");
 
 		Type human = cache.newSubType("Human", animal, mammal);
-		Generic michael = human.newInstance(cache, "Michael");
+		Generic michael = human.newInstance( "Michael");
 
 		Type canid = cache.newSubType("Canid", animal, mammal);
-		Generic milou = canid.newInstance(cache, "Milou");
+		Generic milou = canid.newInstance( "Milou");
 		assert michael.isInstanceOf(human);
 		assert !michael.isInstanceOf(canid);
 		assert michael.isInstanceOf(animal);
@@ -120,7 +120,7 @@ public class InstanceOfTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car1 = cache.newSubType("Car1", vehicle);
-		Type car2 = vehicle.newSubType(cache, "Car2");
+		Type car2 = vehicle.newSubType( "Car2");
 
 		// the first super is implicit => Car1 != Car2
 		assert car1.getSupers().get(1).equals(car2.getSupers().get(1));

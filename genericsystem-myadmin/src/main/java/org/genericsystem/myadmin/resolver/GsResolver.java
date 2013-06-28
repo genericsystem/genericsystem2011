@@ -50,13 +50,13 @@ public class GsResolver extends DefaultResourceResolver {
 		try {
 			Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
 			FileSystem fileSystem = cache.<FileSystem> find(FileSystem.class);
-			byte[] fileContent = fileSystem.getFileContent(cache, resource);
+			byte[] fileContent = fileSystem.getFileContent(resource);
 			if (fileContent != null)
 				return new URL("", "", 0, resource, new GsStreamHandler(fileContent));
 			URL url = super.resolveUrl(resource);
 			if (url != null) {
-				File file = fileSystem.touchFile(cache, resource, asByteArray(((ByteArrayInputStream) url.getContent())));
-				return new URL("", "", 0, resource, new GsStreamHandler(file.getContent(cache)));
+				File file = fileSystem.touchFile(resource, asByteArray(((ByteArrayInputStream) url.getContent())));
+				return new URL("", "", 0, resource, new GsStreamHandler(file.getContent()));
 			}
 		} catch (ContextNotActiveException ignore) {
 		} catch (Exception e) {

@@ -11,11 +11,11 @@ public class AppliWebTest extends AbstractTest {
 	public void testInstanceIsConcreteWithValue() {
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "outsideColor", color);
-		Generic audi = car.newInstance(cache, "audi");
-		Generic red = color.newInstance(cache, "red");
-		audi.setLink(cache, carColor, "audiRed", red);
-		assert audi.getTargets(cache, carColor).contains(red) : audi.getTargets(cache, carColor);
+		Relation carColor = car.setRelation("outsideColor", color);
+		Generic audi = car.newInstance("audi");
+		Generic red = color.newInstance("red");
+		audi.setLink(carColor, "audiRed", red);
+		assert audi.getTargets(carColor).contains(red) : audi.getTargets(carColor);
 	}
 
 }

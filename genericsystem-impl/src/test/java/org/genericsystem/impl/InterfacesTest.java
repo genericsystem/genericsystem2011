@@ -21,7 +21,7 @@ public class InterfacesTest extends AbstractTest {
 	public void testUnnecessary() {
 		CacheImpl cache = (CacheImpl) GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
+		Type car = vehicle.newSubType( "Car");
 		Type electric = cache.newType("Electric");
 		Type carElectric = cache.newSubType("CarElectric", car, vehicle, electric);
 		assert !carElectric.getSupers().contains(vehicle);

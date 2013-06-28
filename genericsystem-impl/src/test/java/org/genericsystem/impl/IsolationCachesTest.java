@@ -28,7 +28,7 @@ public class IsolationCachesTest extends AbstractTest {
 		// After synchronization, Vehicle exists in cache n°2.
 		assert cache2.isAlive(vehicle);
 		// Removes the Vehicle Type in a cache n°2 without synchronization.
-		vehicle.remove(cache2);
+		vehicle.remove();
 		// cache2.deactivate();
 
 		// Creates a cache n°3 for engine.
@@ -56,7 +56,7 @@ public class IsolationCachesTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				vehicle.remove(cache3);
+				vehicle.remove();
 			}
 		}.assertIsCausedBy(OptimisticLockConstraintViolationException.class);
 		cache3.flush();
@@ -135,8 +135,8 @@ public class IsolationCachesTest extends AbstractTest {
 		Cache cache1 = engine.newCache().start();
 		// Adds a Vehicle Type and two instances in the cache n°1 and synchronizes it with engine.
 		Generic vehicle = cache1.newType("Vehicle");
-		vehicle.newInstance(cache1, "Vehicle1");
-		vehicle.newInstance(cache1, "Vehicle2");
+		vehicle.newInstance("Vehicle1");
+		vehicle.newInstance("Vehicle2");
 		cache1.flush();
 		// cache1.deactivate();
 
@@ -144,25 +144,25 @@ public class IsolationCachesTest extends AbstractTest {
 		Cache cache2 = engine.newCache().start();
 		assert (cache2.isAlive(vehicle));
 		// Adds a new instance in the cache n°2 without synchronization.
-		vehicle.newInstance(cache2, "Vehicle3");
+		vehicle.newInstance("Vehicle3");
 		// cache2.deactivate();
 
 		// Creates a cache n°3 for engine.
 		Cache cache3 = engine.newCache().start();
 		// Iterates on the first instance.
-		((Type) vehicle).getAllInstances(cache3).iterator().next();
+		((Type) vehicle).getAllInstances().iterator().next();
 		// cache3.deactivate();
 
 		// cache2.activate();
 
 		cache2.start();
 		cache2.flush();
-		assert (((Type) vehicle).getAllInstances(cache2).size() == 3);
+		assert (((Type) vehicle).getAllInstances().size() == 3);
 		// cache2.deactivate();
 
 		// cache3.activate();
 		assert (cache3.isAlive(vehicle));
-		assert (((Type) vehicle).getAllInstances(cache2).size() == 3);
+		assert (((Type) vehicle).getAllInstances().size() == 3);
 		// cache3.deactivate();
 
 		assert ((CacheImpl) cache2).getTs() < ((CacheImpl) cache3).getTs();
@@ -176,8 +176,8 @@ public class IsolationCachesTest extends AbstractTest {
 		Cache cache1 = engine.newCache().start();
 		// Adds a Vehicle Type and two instances in the cache n°1 and synchronizes it with engine.
 		Generic vehicle = cache1.newType("Vehicle");
-		vehicle.newInstance(cache1, "Vehicle1");
-		vehicle.newInstance(cache1, "Vehicle2");
+		vehicle.newInstance("Vehicle1");
+		vehicle.newInstance("Vehicle2");
 		cache1.flush();
 		// cache1.deactivate();
 
@@ -185,7 +185,7 @@ public class IsolationCachesTest extends AbstractTest {
 		Cache cache2 = engine.newCache().start();
 		assert (cache2.isAlive(vehicle));
 		// Adds a new instance in the cache n°2 without synchronization.
-		vehicle.newInstance(cache2, "Vehicle3");
+		vehicle.newInstance("Vehicle3");
 		// cache2.deactivate();
 
 		// Creates a cache n°3 for engine.
@@ -193,19 +193,19 @@ public class IsolationCachesTest extends AbstractTest {
 		assert (cache3.isAlive(vehicle));
 		// Cache n°3 can read 2 instances.
 		// The size() method iterates on all instances. Equivalent to cache3.isAlive(Vehicle).
-		assert (((Type) vehicle).getAllInstances(cache3).size() == 2);
+		assert (((Type) vehicle).getAllInstances().size() == 2);
 		// cache3.deactivate();
 
 		// cache2.activate();
 
 		cache2.start();
 		cache2.flush();
-		assert (((Type) vehicle).getAllInstances(cache2).size() == 3);
+		assert (((Type) vehicle).getAllInstances().size() == 3);
 		// cache2.deactivate();
 
 		// cache3.activate();
 		// assert (cache3.isAlive(vehicle));
-		assert (((Type) vehicle).getAllInstances(cache2).size() == 3);
+		assert (((Type) vehicle).getAllInstances().size() == 3);
 		// cache3.deactivate();
 
 		assert ((CacheImpl) cache2).getTs() > ((CacheImpl) cache3).getTs();

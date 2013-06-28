@@ -3,7 +3,6 @@ package org.genericsystem.systemproperties.constraints.axed;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -27,20 +26,20 @@ public class RequiredConstraintImpl extends Constraint implements BooleanSystemP
 	private static final long serialVersionUID = 2837810754525623146L;
 
 	@Override
-	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
+	public void check(Generic modified) throws ConstraintViolationException {
 		if (modified.isConcrete()) {
-			if (!modified.isAlive(cache)) {
-				for (ConstraintValue constraintValue : getConstraintValues(cache, modified, RequiredConstraintImpl.class)) {
+			if (!modified.isAlive()) {
+				for (ConstraintValue constraintValue : getConstraintValues(modified, RequiredConstraintImpl.class)) {
 					Integer componentPos = (Integer) constraintValue.getValue();
 					Generic base = ((Attribute) modified).getComponent(componentPos);
-					if (base != null && ((GenericImpl) base).getLinks(cache, modified.<Relation> getMeta(), componentPos).size() < 1)
+					if (base != null && ((GenericImpl) base).getLinks(modified.<Relation> getMeta(), componentPos).size() < 1)
 						throw new RequiredConstraintViolationException(modified.getMeta().getValue() + " is required for " + base.getMeta() + " " + base);
 				}
 			} else
-				for (Attribute requiredAttribute : ((Type) modified).getAttributes(cache)) {
-					for (ConstraintValue constraintValue : getConstraintValues(cache, requiredAttribute, RequiredConstraintImpl.class))
+				for (Attribute requiredAttribute : ((Type) modified).getAttributes()) {
+					for (ConstraintValue constraintValue : getConstraintValues(requiredAttribute, RequiredConstraintImpl.class))
 						// TODO KK getComponent(int pos) <= (Integer) constraintValue.getValue() : autoboxing !!!
-						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent((Integer) constraintValue.getValue())) && modified.getHolders(cache, requiredAttribute).size() < 1)
+						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent((Integer) constraintValue.getValue())) && modified.getHolders(requiredAttribute).size() < 1)
 							throw new RequiredConstraintViolationException(requiredAttribute.getValue() + " is required for new " + modified.getMeta() + " " + modified);
 				}
 		}

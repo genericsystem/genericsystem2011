@@ -4,7 +4,6 @@ import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -26,10 +25,10 @@ public class SingularInstanceConstraintImpl extends Constraint implements Boolea
 	private static final long serialVersionUID = -7689576125534105005L;
 
 	@Override
-	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
-		for (ConstraintValue constraintValue : getConstraintValues(cache, modified, getClass())) {
+	public void check(Generic modified) throws ConstraintViolationException {
+		for (ConstraintValue constraintValue : getConstraintValues(modified, getClass())) {
 			Type constraintBaseType = (Type) constraintValue.getConstraintBaseType();
-			int instanceNumber = constraintBaseType.getAllInstances(cache).size();
+			int instanceNumber = constraintBaseType.getAllInstances().size();
 			if (instanceNumber > 1)
 				throw new SingularInstanceConstraintViolationException("Singular instance constraint violation : type " + constraintBaseType + " has " + instanceNumber + " instances.");
 		}

@@ -24,17 +24,17 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 	public void instanceClass() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Unit.class, Car.class, ElectrikPower.class).start();
 		final Attribute unit = cache.find(Unit.class);
-		assert String.class.equals(unit.getConstraintClass(cache));
+		assert String.class.equals(unit.getConstraintClass());
 		Type car = cache.find(Car.class);
 		Attribute electrikPower = cache.find(ElectrikPower.class);
-		final Generic myBMW = car.newInstance(cache, "myBMW");
+		final Generic myBMW = car.newInstance( "myBMW");
 		assert electrikPower.getBaseComponent() != null : electrikPower.info();
-		final Holder electrikPowerMyBMW = myBMW.setValue(cache, electrikPower, 106);
-		electrikPowerMyBMW.setValue(cache, unit, "Nm");
+		final Holder electrikPowerMyBMW = myBMW.setValue( electrikPower, 106);
+		electrikPowerMyBMW.setValue( unit, "Nm");
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				electrikPowerMyBMW.setValue(cache, unit, 27);
+				electrikPowerMyBMW.setValue( unit, 27);
 			}
 		}.assertIsCausedBy(InstanceClassConstraintViolationException.class);
 	}

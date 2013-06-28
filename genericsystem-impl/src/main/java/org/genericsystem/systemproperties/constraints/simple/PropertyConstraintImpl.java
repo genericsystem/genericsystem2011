@@ -6,7 +6,6 @@ import java.util.Objects;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -32,13 +31,13 @@ public class PropertyConstraintImpl extends Constraint implements BooleanSystemP
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void check(Cache cache, final Generic modified) throws ConstraintViolationException {
-		for (ConstraintValue constraintValue : getConstraintValues(cache, modified, getClass())) {
+	public void check(final Generic modified) throws ConstraintViolationException {
+		for (ConstraintValue constraintValue : getConstraintValues(modified, getClass())) {
 			Type constraintBaseType = (Type) constraintValue.getConstraintBaseType();
 			if (modified.isAttribute()) {
 				// TODO KK
-				for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings(cache)) {
-					Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders(cache, (Attribute) constraintBaseType).iterator()) {
+				for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {
+					Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders((Attribute) constraintBaseType).iterator()) {
 						@Override
 						public boolean isSelected() {
 							for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
@@ -55,7 +54,7 @@ public class PropertyConstraintImpl extends Constraint implements BooleanSystemP
 				}
 				return;
 			}
-			if (new AbstractFilterIterator<Generic>(constraintBaseType.getAllInstances(cache).iterator()) {
+			if (new AbstractFilterIterator<Generic>(constraintBaseType.getAllInstances().iterator()) {
 				@Override
 				public boolean isSelected() {
 					return !next.equals(modified) && Objects.equals(next.getValue(), modified.getValue());

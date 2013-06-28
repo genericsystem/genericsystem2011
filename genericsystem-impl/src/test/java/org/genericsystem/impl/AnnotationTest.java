@@ -28,13 +28,13 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	public void testSubType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Car.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Car.class).start();
 		Type vehicle = cache.find(Vehicle.class);
 		Type car = cache.find(Car.class);
 		assert vehicle.isStructural();
 		assert car.isStructural();
-		assert vehicle.getDirectSubTypes(cache).size() == 1;
-		assert vehicle.getDirectSubTypes(cache).contains(car);
+		assert vehicle.getDirectSubTypes().size() == 1;
+		assert vehicle.getDirectSubTypes().contains(car);
 		assert car.getSupers().size() == 2 : car.getSupers();
 		assert car.getSupers().contains(vehicle);
 		assert car.getSupers().contains(car.getImplicit());
@@ -42,97 +42,97 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	public void testAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Power.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Power.class).start();
 		Type vehicle = cache.find(Vehicle.class);
 		Attribute power = cache.find(Power.class);
 		assert power.isStructural();
-		assert vehicle.getAttributes(cache).contains(power);
+		assert vehicle.getAttributes().contains(power);
 	}
 
 	public void testSubAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Car.class, ElectrikPower.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Car.class, ElectrikPower.class).start();
 		Type car = cache.find(Car.class);
 		Attribute electrikPowerCar = cache.find(ElectrikPower.class);
-		assert car.getAttributes(cache).contains(electrikPowerCar) : car.getAttributes(cache);
+		assert car.getAttributes().contains(electrikPowerCar) : car.getAttributes();
 	}
 
 	public void testAttributeOnAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(ElectrikPower.class, Unit.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(ElectrikPower.class, Unit.class).start();
 		Attribute electrikPowerCar = cache.find(ElectrikPower.class);
 		Attribute unit = cache.find(Unit.class);
 		assert unit.isAttributeOf(electrikPowerCar);
 		assert unit.isAttribute();
 		assert unit.isStructural();
-		assert electrikPowerCar.getAttributes(cache).contains(unit);
+		assert electrikPowerCar.getAttributes().contains(unit);
 	}
 
 	public void testRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, HumanPossessVehicle.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, HumanPossessVehicle.class).start();
 		cache.find(Vehicle.class);
 		Type human = cache.find(Human.class);
 		Relation possess = cache.find(HumanPossessVehicle.class);
-		assert human.getRelations(cache).size() == 1;
-		assert human.getRelations(cache).contains(possess);
+		assert human.getRelations().size() == 1;
+		assert human.getRelations().contains(possess);
 	}
 
 	public void testSubRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Car.class, Human.class, HumanPossessVehicle.class, HumanPossessCar.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Car.class, Human.class, HumanPossessVehicle.class, HumanPossessCar.class).start();
 		cache.find(Car.class);
 		Type human = cache.find(Human.class);
 		Relation possessVehicle = cache.find(HumanPossessVehicle.class);
 		Relation possessCar = cache.find(HumanPossessCar.class);
-		assert human.getRelations(cache).size() == 1 : human.getRelations(cache);
-		assert human.getRelations(cache).contains(possessCar) : human.getRelations(cache);
+		assert human.getRelations().size() == 1 : human.getRelations();
+		assert human.getRelations().contains(possessCar) : human.getRelations();
 		assert possessCar.inheritsFrom(possessVehicle);
 	}
 
 	public void testSubRelationSymetric() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Car.class, Human.class, Man.class, HumanPossessVehicle.class, ManPossessCar.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Car.class, Human.class, Man.class, HumanPossessVehicle.class, ManPossessCar.class).start();
 		cache.find(Car.class);
 		Type human = cache.find(Human.class);
 		Type man = cache.find(Man.class);
 		Relation humanPossessVehicle = cache.find(HumanPossessVehicle.class);
 		Relation manPossessCar = cache.find(ManPossessCar.class);
-		assert human.getRelations(cache).size() == 1;
-		assert human.getRelations(cache).contains(humanPossessVehicle);
-		assert man.getRelations(cache).size() == 1;
-		assert man.getRelations(cache).contains(manPossessCar) : man.getRelations(cache);
+		assert human.getRelations().size() == 1;
+		assert human.getRelations().contains(humanPossessVehicle);
+		assert man.getRelations().size() == 1;
+		assert man.getRelations().contains(manPossessCar) : man.getRelations();
 		assert manPossessCar.inheritsFrom(humanPossessVehicle);
 	}
 
 	public void testRelationTernary() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, Time.class, HumanPossessVehicleTime.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, Time.class, HumanPossessVehicleTime.class).start();
 		cache.find(Vehicle.class);
 		Type human = cache.find(Human.class);
 		cache.find(Time.class);
 		Relation possess = cache.find(HumanPossessVehicleTime.class);
-		assert human.getRelations(cache).size() == 1;
-		assert human.getRelations(cache).contains(possess);
+		assert human.getRelations().size() == 1;
+		assert human.getRelations().contains(possess);
 	}
 
 	public void testgetDirectSubTypesWithDiamondProblem() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(GraphicComponent.class, Window.class, Selectable.class, SelectableWindow.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(GraphicComponent.class, Window.class, Selectable.class, SelectableWindow.class).start();
 		Type graphicComponent = cache.find(GraphicComponent.class);
 		Type window = cache.find(Window.class);
 		Type selectable = cache.find(Selectable.class);
 		Type selectableWindow = cache.find(SelectableWindow.class);
 
-		assert graphicComponent.getDirectSubTypes(cache).size() == 2 : graphicComponent.getDirectSubTypes(cache);
-		assert graphicComponent.getDirectSubTypes(cache).contains(selectable);
-		assert graphicComponent.getDirectSubTypes(cache).contains(window) : graphicComponent.getDirectSubTypes(cache);
+		assert graphicComponent.getDirectSubTypes().size() == 2 : graphicComponent.getDirectSubTypes();
+		assert graphicComponent.getDirectSubTypes().contains(selectable);
+		assert graphicComponent.getDirectSubTypes().contains(window) : graphicComponent.getDirectSubTypes();
 
-		assert graphicComponent.getSubTypes(cache).size() == 3 : graphicComponent.getSubTypes(cache);
-		assert graphicComponent.getSubTypes(cache).contains(selectable);
-		assert graphicComponent.getSubTypes(cache).contains(window);
-		assert graphicComponent.getSubTypes(cache).contains(selectableWindow);
+		assert graphicComponent.getSubTypes().size() == 3 : graphicComponent.getSubTypes();
+		assert graphicComponent.getSubTypes().contains(selectable);
+		assert graphicComponent.getSubTypes().contains(window);
+		assert graphicComponent.getSubTypes().contains(selectableWindow);
 
-		assert window.getDirectSubTypes(cache).size() == 1 : window.getDirectSubTypes(cache);
-		assert window.getDirectSubTypes(cache).contains(selectableWindow) : window.getDirectSubTypes(cache);
+		assert window.getDirectSubTypes().size() == 1 : window.getDirectSubTypes();
+		assert window.getDirectSubTypes().contains(selectableWindow) : window.getDirectSubTypes();
 
-		assert selectable.getDirectSubTypes(cache).size() == 1 : selectable.getDirectSubTypes(cache);
-		assert selectable.getDirectSubTypes(cache).contains(selectableWindow) : selectable.getDirectSubTypes(cache);
+		assert selectable.getDirectSubTypes().size() == 1 : selectable.getDirectSubTypes();
+		assert selectable.getDirectSubTypes().contains(selectableWindow) : selectable.getDirectSubTypes();
 
-		assert selectableWindow.getDirectSubTypes(cache).size() == 0;
+		assert selectableWindow.getDirectSubTypes().size() == 0;
 		assert selectableWindow.inheritsFrom(selectable);
 		assert selectableWindow.inheritsFrom(window);
 		assert selectableWindow.inheritsFrom(graphicComponent);
@@ -147,19 +147,19 @@ public class AnnotationTest extends AbstractTest {
 		assert mySelectableWindow.inheritsFrom(selectableWindow) : mySelectableWindow.info() + selectableWindow.info();
 
 		assert mySelectableWindow.inheritsFrom(cache.find(Selectable.class));
-		Holder vTrue = mySelectableWindow.setValue(cache, selectedSelectable, true);
-		Holder v12 = mySelectableWindow.setValue(cache, size, 12);
+		Holder vTrue = mySelectableWindow.setValue(selectedSelectable, true);
+		Holder v12 = mySelectableWindow.setValue(size, 12);
 
-		assert selectableWindow.getInstances(cache).size() == 1 : selectableWindow.getInstances(cache);
-		assert selectableWindow.getInstances(cache).contains(mySelectableWindow);
-		assert mySelectableWindow.getHolders(cache, size).size() == 1 : mySelectableWindow.getHolders(cache, size);
-		assert mySelectableWindow.getHolders(cache, size).contains(v12);
-		assert mySelectableWindow.getHolders(cache, selectedSelectable).size() == 1;
-		assert mySelectableWindow.getHolders(cache, selectedSelectable).contains(vTrue);
+		assert selectableWindow.getInstances().size() == 1 : selectableWindow.getInstances();
+		assert selectableWindow.getInstances().contains(mySelectableWindow);
+		assert mySelectableWindow.getHolders(size).size() == 1 : mySelectableWindow.getHolders(size);
+		assert mySelectableWindow.getHolders(size).contains(v12);
+		assert mySelectableWindow.getHolders(selectedSelectable).size() == 1;
+		assert mySelectableWindow.getHolders(selectedSelectable).contains(vTrue);
 	}
 
 	public void testMultiInheritanceComplexStructural() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Games.class, Children.class, Vehicle.class, Human.class, ChildrenGames.class, Transformer.class, TransformerChildrenGames.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Games.class, Children.class, Vehicle.class, Human.class, ChildrenGames.class, Transformer.class, TransformerChildrenGames.class).start();
 
 		Type games = cache.find(Games.class);
 		Type children = cache.find(Children.class);
@@ -178,25 +178,25 @@ public class AnnotationTest extends AbstractTest {
 		assert transformerChildrenGames.getSupers().contains(childrenGames) : transformerChildrenGames.info();
 		assert transformerChildrenGames.getSupers().contains(transformer);
 		assert transformerChildrenGames.getSupers().contains(transformerChildrenGames.getImplicit());
-		assert transformerChildrenGames.getInheritings(cache).size() == 0;
-		assert transformerChildrenGames.getComposites(cache).size() == 0;
+		assert transformerChildrenGames.getInheritings().size() == 0;
+		assert transformerChildrenGames.getComposites().size() == 0;
 
 		assert childrenGames.getSupers().contains(games);
 		assert childrenGames.getSupers().contains(children);
 		assert childrenGames.getSupers().contains(childrenGames.getImplicit());
-		assert childrenGames.getInheritings(cache).contains(transformerChildrenGames);
-		assert childrenGames.getComposites(cache).size() == 0;
+		assert childrenGames.getInheritings().contains(transformerChildrenGames);
+		assert childrenGames.getComposites().size() == 0;
 
 		assert transformer.getSupers().contains(vehicle);
 		assert transformer.getSupers().contains(human);
 		assert transformer.getSupers().contains(transformer.getImplicit());
-		assert transformer.getInheritings(cache).contains(transformerChildrenGames);
-		assert transformer.getComposites(cache).size() == 0;
+		assert transformer.getInheritings().contains(transformerChildrenGames);
+		assert transformer.getComposites().size() == 0;
 	}
 
 	public void testMultiInheritanceComplexValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(MyGames.class, MyChildren.class, MyVehicle.class, Myck.class, MyChildrenGames.class, ChildrenGames.class, MyTransformer.class, Transformer.class, TransformerChildrenGames.class,
-				MyTransformerChildrenGames.class);
+				MyTransformerChildrenGames.class).start();
 		Generic myGames = cache.find(MyGames.class);
 		Generic myChildren = cache.find(MyChildren.class);
 		Generic myVehicle = cache.find(MyVehicle.class);
@@ -219,30 +219,30 @@ public class AnnotationTest extends AbstractTest {
 		assert !myTransformerChildrenGames.inheritsFrom(myTransformer);
 		assert myTransformerChildrenGames.getSupers().contains(transformerChildrenGames);
 		assert myTransformerChildrenGames.getSupers().contains(myTransformerChildrenGames.getImplicit());
-		assert myTransformerChildrenGames.getInheritings(cache).size() == 0;
-		assert myTransformerChildrenGames.getComposites(cache).size() == 0;
+		assert myTransformerChildrenGames.getInheritings().size() == 0;
+		assert myTransformerChildrenGames.getComposites().size() == 0;
 
-		assert transformerChildrenGames.getInheritings(cache).contains(myTransformerChildrenGames);
+		assert transformerChildrenGames.getInheritings().contains(myTransformerChildrenGames);
 		assert myTransformerChildrenGames.isInstanceOf(transformerChildrenGames);
 
 		assert !myChildrenGames.inheritsFrom(myGames);
 		assert !myChildrenGames.inheritsFrom(myChildren);
 		assert myChildrenGames.getSupers().contains(childrenGames);
 		assert myChildrenGames.getSupers().contains(myChildrenGames.getImplicit());
-		assert myChildrenGames.getInheritings(cache).size() == 0;
-		assert myChildrenGames.getComposites(cache).size() == 0;
+		assert myChildrenGames.getInheritings().size() == 0;
+		assert myChildrenGames.getComposites().size() == 0;
 
-		assert childrenGames.getInheritings(cache).contains(myChildrenGames);
+		assert childrenGames.getInheritings().contains(myChildrenGames);
 		assert myChildrenGames.isInstanceOf(childrenGames);
 
 		assert !myTransformer.inheritsFrom(myVehicle);
 		assert !myTransformer.inheritsFrom(myck);
 		assert myTransformer.getSupers().contains(transformer);
 		assert myTransformer.getSupers().contains(myTransformer.getImplicit());
-		assert myTransformer.getInheritings(cache).size() == 0;
-		assert myTransformer.getComposites(cache).size() == 0;
+		assert myTransformer.getInheritings().size() == 0;
+		assert myTransformer.getComposites().size() == 0;
 
-		assert transformer.getInheritings(cache).contains(myTransformer);
+		assert transformer.getInheritings().contains(myTransformer);
 		assert myTransformer.isInstanceOf(transformer);
 	}
 

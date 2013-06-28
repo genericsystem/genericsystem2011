@@ -68,37 +68,37 @@ public class TypesBean implements Serializable {
 
 		// TODO TEST
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
+		Type car = vehicle.newSubType("Car");
 		Type color = cache.newType("Color");
 		Type time = cache.newType("Time");
-		Attribute power = vehicle.setAttribute(cache, "power");
-		Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);
-		Relation vehicleColorTime = vehicle.setRelation(cache, "vehicleColorTime", color, time);
-		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Generic red = color.newInstance(cache, "red");
-		Generic yellow = color.newInstance(cache, "yellow");
-		vehicle.setValue(cache, power, 123);
-		myVehicle.setValue(cache, power, 136);
-		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
-		myVehicle.bind(cache, vehicleColorTime, red, time.newInstance(cache, "myTime"));
-		vehicle.bind(cache, vehicleColor, yellow);
-		car.newInstance(cache, "myCar");
+		Attribute power = vehicle.setAttribute("power");
+		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
+		Relation vehicleColorTime = vehicle.setRelation("vehicleColorTime", color, time);
+		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic red = color.newInstance("red");
+		Generic yellow = color.newInstance("yellow");
+		vehicle.setValue(power, 123);
+		myVehicle.setValue(power, 136);
+		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
+		myVehicle.bind(vehicleColorTime, red, time.newInstance("myTime"));
+		vehicle.bind(vehicleColor, yellow);
+		car.newInstance("myCar");
 
 		Type human = cache.newType("Human");
-		Generic nicolas = human.newInstance(cache, "Nicolas");
-		Generic michael = human.newInstance(cache, "Michael");
-		Generic quentin = human.newInstance(cache, "Quentin");
-		Relation isTallerOrEqualThan = human.setRelation(cache, "isTallerOrEqualThan", human);
-		nicolas.bind(cache, isTallerOrEqualThan, michael);
-		nicolas.bind(cache, isTallerOrEqualThan, nicolas);
-		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human);
-		isBrotherOf.enableMultiDirectional(cache);
+		Generic nicolas = human.newInstance("Nicolas");
+		Generic michael = human.newInstance("Michael");
+		Generic quentin = human.newInstance("Quentin");
+		Relation isTallerOrEqualThan = human.setRelation("isTallerOrEqualThan", human);
+		nicolas.bind(isTallerOrEqualThan, michael);
+		nicolas.bind(isTallerOrEqualThan, nicolas);
+		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
+		isBrotherOf.enableMultiDirectional();
 		// quentin.bind(cache, isBrotherOf, michael);
-		quentin.setLink(cache, isBrotherOf, "link", michael);
-		Relation isBossOf = human.setRelation(cache, "isBossOf", human);
-		nicolas.bind(cache, isBossOf, michael);
+		quentin.setLink(isBrotherOf, "link", michael);
+		Relation isBossOf = human.setRelation("isBossOf", human);
+		nicolas.bind(isBossOf, michael);
 
-		michael.getProperties(cache).put("KEY TEST", "VALUE TEST");
+		michael.getProperties().put("KEY TEST", "VALUE TEST");
 	}
 
 	public List<GenericTreeNode> getRoot() {
@@ -106,7 +106,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public List<GenericTreeNode> getChildrens(final GenericTreeNode genericTreeNode) {
-		return genericTreeNode.getChildrens(cache, implicitShow);
+		return genericTreeNode.getChildrens(implicitShow);
 	}
 
 	public void newType(String newValue) {
@@ -115,35 +115,35 @@ public class TypesBean implements Serializable {
 	}
 
 	public void newSubType(String newValue) {
-		((Type) getSelectedTreeNodeGeneric()).newSubType(cache, newValue);
+		((Type) getSelectedTreeNodeGeneric()).newSubType(newValue);
 		messages.info("createSubType", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public void setAttribute(String newValue) {
-		((Type) getSelectedTreeNodeGeneric()).setAttribute(cache, newValue);
+		((Type) getSelectedTreeNodeGeneric()).setAttribute(newValue);
 		messages.info("createRootAttribute", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public void addProperty(String key, String value) {
-		((Type) getSelectedTreeNodeGeneric()).getProperties(cache).put(key, value);
+		((Type) getSelectedTreeNodeGeneric()).getProperties().put(key, value);
 		messages.info("createRootProperty", key, value);
 	}
 
 	public void newInstance(String newValue) {
-		((Type) getSelectedTreeNodeGeneric()).newInstance(cache, newValue);
+		((Type) getSelectedTreeNodeGeneric()).newInstance(newValue);
 		messages.info("createRootInstance", newValue, getSelectedTreeNodeGeneric().getValue());
 	}
 
 	public List<Structural> getStructurals() {
-		return getSelectedTreeNodeGeneric().getStructurals(cache);
+		return getSelectedTreeNodeGeneric().getStructurals();
 	}
 
 	public List<Holder> getHolders(Structural structural) {
-		return ((Type) getSelectedTreeNodeGeneric()).getHolders(cache, structural.getAttribute(), structural.getPosition());
+		return ((Type) getSelectedTreeNodeGeneric()).getHolders(structural.getAttribute(), structural.getPosition());
 	}
 
 	public List<Generic> getOtherTargets(int basePos, Holder holder) {
-		if (((Attribute) holder).isMultiDirectional(cache))
+		if (((Attribute) holder).isMultiDirectional())
 			basePos = getBasePosIfMultiDirectional(basePos, holder);
 		return getSelectedTreeNodeGeneric().getOtherTargets(basePos, holder);
 	}
@@ -189,16 +189,16 @@ public class TypesBean implements Serializable {
 
 	public void addValue(Attribute attribute, String newValue) {
 		Generic currentInstance = getSelectedTreeNodeGeneric();
-		currentInstance.setValue(cache, attribute, newValue);
+		currentInstance.setValue(attribute, newValue);
 		messages.info("addValue", newValue, attribute, currentInstance);
 	}
 
 	public void removeHolder(Holder holder) {
 		if (holder.getBaseComponent().equals(selectedTreeNode.getGeneric())) {
-			holder.remove(cache);
+			holder.remove();
 			messages.info("remove", holder);
 		} else {
-			selectedTreeNode.getGeneric().cancel(cache, holder, true);
+			selectedTreeNode.getGeneric().cancel(holder, true);
 			messages.info("cancel", holder);
 		}
 	}
@@ -209,7 +209,7 @@ public class TypesBean implements Serializable {
 			selectedTreeNode = selectedTreeNode.getParent();
 			removeHolder((Holder) generic);
 		} else {
-			generic.remove(cache);
+			generic.remove();
 			messages.info("deleteFile", generic.getValue());
 			selectedTreeNode = selectedTreeNode.getParent();
 		}
@@ -225,12 +225,12 @@ public class TypesBean implements Serializable {
 	}
 
 	private void internalChangeType() {
-		menuEvent.fire(new MenuEvent(cache, selectedTreeNode, implicitShow));
+		menuEvent.fire(new MenuEvent(selectedTreeNode, implicitShow));
 		panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
 	}
 
 	public void changeAttributeSelected(int attributeIndex) {
-		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(cache, TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
+		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
 		selectedTreeNode.setAttribute(attribute);
 		selectedTreeNode.setTreeType(TreeType.VALUES);
 		messages.info("showvalues", attribute);
@@ -244,20 +244,20 @@ public class TypesBean implements Serializable {
 	public void processDrop(DropEvent dropEvent) {
 		Object dragValue = dropEvent.getDragValue();
 		Type type = (Type) getSelectedTreeNodeGeneric();
-		Attribute attribute = type.setAttribute(cache, "new_attribute");
+		Attribute attribute = type.setAttribute("new_attribute");
 		if (!(dragValue instanceof GenericTreeNode)) {
 			if (dragValue.equals("int"))
-				attribute.setConstraintClass(cache, Integer.class);
+				attribute.setConstraintClass(Integer.class);
 			if (dragValue.equals("long"))
-				attribute.setConstraintClass(cache, Long.class);
+				attribute.setConstraintClass(Long.class);
 			if (dragValue.equals("float"))
-				attribute.setConstraintClass(cache, Float.class);
+				attribute.setConstraintClass(Float.class);
 			if (dragValue.equals("double"))
-				attribute.setConstraintClass(cache, Double.class);
+				attribute.setConstraintClass(Double.class);
 			if (dragValue.equals("boolean"))
-				attribute.setConstraintClass(cache, Boolean.class);
+				attribute.setConstraintClass(Boolean.class);
 			if (dragValue.equals("string"))
-				attribute.setConstraintClass(cache, String.class);
+				attribute.setConstraintClass(String.class);
 		}
 		String msg = dragValue instanceof GenericTreeNode ? "" + ((GenericTreeNode) dragValue).getGeneric() : (String) dragValue;
 		log.info("getDragValue " + msg);
@@ -274,13 +274,13 @@ public class TypesBean implements Serializable {
 		Generic target = ((GenericTreeNode) dragValue).getGeneric();
 		Object dropValue = dropEvent.getDropValue();
 		Attribute attribute = ((Structural) dropValue).getAttribute();
-		attribute = attribute.addComponent(cache, Statics.TARGET_POSITION, target);
+		attribute = attribute.addComponent(Statics.TARGET_POSITION, target);
 		log.info("target for relation " + target);
 		messages.info("targetRelation", target, attribute);
 	}
 
 	public List<Entry<Serializable, Serializable>> getProperties() {
-		return (List) getSelectedTreeNodeGeneric().getProperties(cache).entrySet();
+		return (List) getSelectedTreeNodeGeneric().getProperties().entrySet();
 	}
 
 	public PropertyWrapper getPropertyWrapper(Entry<Serializable, Serializable> entry) {
@@ -288,7 +288,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public void removeProperty(Entry<Serializable, Serializable> entry) {
-		getSelectedTreeNodeGeneric().getProperties(cache).remove(entry.getKey());
+		getSelectedTreeNodeGeneric().getProperties().remove(entry.getKey());
 		messages.info("remove", entry.getKey());
 	}
 
@@ -305,7 +305,7 @@ public class TypesBean implements Serializable {
 
 		public void setValue(String newValue) {
 			if (!newValue.equals(entry.getValue().toString())) {
-				getSelectedTreeNodeGeneric().getProperties(cache).put(entry.getKey(), newValue);
+				getSelectedTreeNodeGeneric().getProperties().put(entry.getKey(), newValue);
 				messages.info("updateValue", entry.getValue(), newValue);
 			}
 		}
@@ -345,7 +345,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public boolean isSingular(Structural structural) {
-		return structural.getAttribute().isSingularConstraintEnabled(cache);
+		return structural.getAttribute().isSingularConstraintEnabled();
 	}
 
 	// TODO in GS CORE
@@ -371,7 +371,7 @@ public class TypesBean implements Serializable {
 		public void setValue(String newValue) {
 			Generic generic = genericTreeNode.getGeneric();
 			if (!newValue.equals(generic.toString())) {
-				genericTreeNode.setGeneric(generic.updateKey(cache, newValue));
+				genericTreeNode.setGeneric(generic.updateKey(newValue));
 				messages.info("updateGeneric", newValue, generic.getValue());
 				panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
 			}
@@ -395,7 +395,7 @@ public class TypesBean implements Serializable {
 
 		public void setValue(String newValue) {
 			if (!newValue.equals(wrappedGeneric.toString())) {
-				wrappedGeneric.updateKey(cache, newValue);
+				wrappedGeneric.updateKey(newValue);
 				messages.info("updateValue", wrappedGeneric, newValue);
 			}
 		}

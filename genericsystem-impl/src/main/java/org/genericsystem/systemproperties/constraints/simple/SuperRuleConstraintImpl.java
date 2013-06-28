@@ -3,7 +3,6 @@ package org.genericsystem.systemproperties.constraints.simple;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -24,7 +23,7 @@ public class SuperRuleConstraintImpl extends Constraint implements BooleanSystem
 	private static final long serialVersionUID = 6874090673594299362L;
 
 	@Override
-	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
+	public void check(Generic modified) throws ConstraintViolationException {
 		// if (!getConstraintValues(context, modified, getClass()).isEmpty())
 		for (Generic directSuper : modified.getSupers())
 			if (!((GenericImpl) directSuper).isSuperOf(modified))

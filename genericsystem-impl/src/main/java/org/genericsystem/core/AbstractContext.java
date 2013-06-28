@@ -11,6 +11,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -91,10 +92,10 @@ public abstract class AbstractContext implements Context, Serializable {
 	public boolean isFlushable(Generic generic) {
 		if (!generic.isAutomatic())
 			return true;
-		for (Generic inheriting : generic.getInheritings(this))
+		for (Generic inheriting : generic.getInheritings())
 			if (isFlushable(inheriting))
 				return true;
-		for (Generic composite : generic.getComposites(this))
+		for (Generic composite : generic.getComposites())
 			if (isFlushable((composite)))
 				return true;
 		return false;
@@ -105,7 +106,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	public abstract boolean isScheduledToRemove(Generic generic);
 
 	Iterator<Generic> getDirectSupersIterator(final Generic[] interfaces, final Generic[] components) {
-		return new AbstractSelectableLeafIterator(this, getEngine()) {
+		return new AbstractSelectableLeafIterator(getEngine()) {
 
 			@Override
 			protected boolean isSelectable() {
@@ -155,7 +156,7 @@ public abstract class AbstractContext implements Context, Serializable {
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isEngine())
 			return getEngine();
-		if (generic.isAlive(this))
+		if (generic.isAlive())
 			return (T) generic;
 		if (((GenericImpl) generic).isPrimary())
 			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue(), generic.getMetaLevel());
@@ -195,7 +196,7 @@ public abstract class AbstractContext implements Context, Serializable {
 			assert implicit.equals(interfaces[0]);
 			return (T) implicit;
 		}
-		for (Generic generic : components.length == 0 || components[0] == null ? implicit.getInheritings(this) : components[0].getComposites(this))
+		for (Generic generic : components.length == 0 || components[0] == null ? implicit.getInheritings() : components[0].getComposites())
 			if (((GenericImpl) generic).equiv(interfaces, components))
 				return (T) generic;
 		return null;
@@ -211,9 +212,9 @@ public abstract class AbstractContext implements Context, Serializable {
 			@SuppressWarnings("unchecked")
 			public void addDependencies(Generic g) {
 				if (super.add((T) g)) {// protect from loop
-					for (T inheritingDependency : g.<T> getInheritings(AbstractContext.this))
+					for (T inheritingDependency : g.<T> getInheritings())
 						addDependencies(inheritingDependency);
-					for (T compositeDependency : g.<T> getComposites(AbstractContext.this))
+					for (T compositeDependency : g.<T> getComposites())
 						addDependencies(compositeDependency);
 				}
 			}
@@ -230,15 +231,15 @@ public abstract class AbstractContext implements Context, Serializable {
 			@SuppressWarnings("unchecked")
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
-					for (T inheritingDependency : generic.<T> getInheritings(AbstractContext.this))
+					for (T inheritingDependency : generic.<T> getInheritings())
 						if (inheritingDependency.getValue() == null)
 							addDependencies(inheritingDependency);
 						else
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
-					for (T compositeDependency : generic.<T> getComposites(AbstractContext.this))
+					for (T compositeDependency : generic.<T> getComposites())
 						if (!generic.equals(compositeDependency)) {
 							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components.length; componentPos++)
-								if (((GenericImpl) compositeDependency).components[componentPos].equals(generic) && compositeDependency.isReferentialIntegrity(AbstractContext.this, componentPos))
+								if (((GenericImpl) compositeDependency).components[componentPos].equals(generic) && compositeDependency.isReferentialIntegrity(componentPos))
 									throw new ReferentialIntegrityConstraintViolationException(compositeDependency + " is Referential Integrity for ancestor " + generic + " by component position : " + componentPos);
 							addDependencies(compositeDependency);
 						}
@@ -251,11 +252,11 @@ public abstract class AbstractContext implements Context, Serializable {
 
 	@Override
 	public <T extends Generic> T find(Class<?> clazz) {
-		return this.<EngineImpl> getEngine().find(this, clazz);
+		return this.<EngineImpl> getEngine().find(clazz);
 	}
 
 	<T extends Generic> T findMeta(Generic[] interfaces, Generic[] components) {
-		for (T composite : getEngine().<T> getComposites(this))
+		for (T composite : getEngine().<T> getComposites())
 			if (composite.isMeta() && Arrays.equals(interfaces, ((GenericImpl) composite).getPrimariesArray()) && Arrays.equals(components, ((GenericImpl) composite).components))
 				return composite;
 		return null;

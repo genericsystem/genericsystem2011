@@ -5,7 +5,6 @@ import java.io.Serializable;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -32,14 +31,14 @@ public class SingularConstraintImpl extends Constraint implements BooleanSystemP
 	// TODO do the same as PropertyConstraint
 
 	@Override
-	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
-		for (ConstraintValue constraintValue : getConstraintValues(cache, modified, getClass())) {
+	public void check(Generic modified) throws ConstraintViolationException {
+		for (ConstraintValue constraintValue : getConstraintValues(modified, getClass())) {
 			// TODO KK because InstanceClassConstraint, see GenericImpl::setConstraintClass
 			Serializable value = constraintValue.getValue();
 			if (value instanceof Integer) {
 				Integer axe = (Integer) value;
 				final Generic component = ((Link) modified).getComponent(axe);
-				Snapshot<Holder> holders = ((GenericImpl) component).getHolders(cache, (Relation) constraintValue.getConstraintBaseType(), axe);
+				Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) constraintValue.getConstraintBaseType(), axe);
 				if (holders.size() > 1)
 					throw new SingularConstraintViolationException("Multiple links of type " + constraintValue.getConstraintBaseType() + " on target " + component + " (n° " + axe + ") : " + holders);
 			}

@@ -5,7 +5,6 @@ import java.util.Iterator;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -28,11 +27,11 @@ public class UniqueStructuralValueConstraintImpl extends Constraint implements B
 	private static final long serialVersionUID = -7212219694902616927L;
 
 	@Override
-	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
+	public void check(Generic modified) throws ConstraintViolationException {
 		if (!modified.isStructural())
 			return;
 		final Generic primary = modified.getImplicit();
-		Iterator<Generic> iterator = Statics.<Generic> valueFilter(new AbstractFilterIterator<Generic>((((GenericImpl) primary).<Generic> directInheritingsIterator(cache))) {
+		Iterator<Generic> iterator = Statics.<Generic> valueFilter(new AbstractFilterIterator<Generic>((((GenericImpl) primary).<Generic> directInheritingsIterator())) {
 			@Override
 			public boolean isSelected() {
 				return next.inheritsFrom(primary);

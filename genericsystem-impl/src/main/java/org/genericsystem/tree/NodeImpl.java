@@ -2,8 +2,7 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Context;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
@@ -15,9 +14,9 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 
 public class NodeImpl extends GenericImpl implements Node {
 	@Override
-	public <T extends Node> T getChild(Context context, Serializable value) {
+	public <T extends Node> T getChild(Serializable value) {
 		Tree attribute = getMeta();
-		return Statics.unambigousFirst(Statics.<T> valueFilter(this.<T> thisFilter(this.<T> holdersIterator(context, attribute, getBasePos(attribute), value == null)), value));
+		return Statics.unambigousFirst(Statics.<T> valueFilter(this.<T> thisFilter(this.<T> holdersIterator(attribute, getBasePos(attribute), value == null)), value));
 	}
 
 	@Override
@@ -26,33 +25,33 @@ public class NodeImpl extends GenericImpl implements Node {
 	}
 
 	@Override
-	public <T extends Node> Snapshot<T> getChildren(final Context context) {
+	public <T extends Node> Snapshot<T> getChildren() {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return childrenIterator(context);
+				return childrenIterator();
 			}
 		};
 	}
 
-	<T extends Generic> Iterator<T> childrenIterator(Context context) {
+	<T extends Generic> Iterator<T> childrenIterator() {
 		Tree attribute = getMeta();
-		return thisFilter(this.<T> holdersIterator(context, attribute, getBasePos(attribute), false));
+		return thisFilter(this.<T> holdersIterator(attribute, getBasePos(attribute), false));
 	}
 
 	@Override
-	public <T extends Node> T addNode(Cache cache, Serializable value, Generic... targets) {
-		return addHolder(cache, this.<Holder> getMeta(), value, targets);
+	public <T extends Node> T addNode(Serializable value, Generic... targets) {
+		return addHolder(this.<Holder> getMeta(), value, targets);
 	}
 
 	@Override
-	public <T extends Node> T setNode(Cache cache, Serializable value, Generic... targets) {
-		return setHolder(cache, this.<Holder> getMeta(), value, targets);
+	public <T extends Node> T setNode(Serializable value, Generic... targets) {
+		return setHolder(this.<Holder> getMeta(), value, targets);
 	}
 
 	@Override
-	public <T extends Node> T setSubNode(Cache cache, Serializable value, Generic... targets) {
-		return setHolder(cache, this, value, targets);
+	public <T extends Node> T setSubNode(Serializable value, Generic... targets) {
+		return setHolder(this, value, targets);
 	}
 
 	@Override

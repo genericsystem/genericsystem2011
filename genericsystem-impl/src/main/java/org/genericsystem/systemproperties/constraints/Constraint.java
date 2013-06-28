@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.core.Cache;
+import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
@@ -30,7 +30,7 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 		CHECK_ON_ADD_NODE, CHECK_ON_REMOVE_NODE
 	}
 
-	public abstract void check(Cache cache, Generic modified) throws ConstraintViolationException;
+	public abstract void check(Generic modified) throws ConstraintViolationException;
 
 	public final int getPriority() {
 		Priority annotation = getClass().getAnnotation(Priority.class);
@@ -75,12 +75,13 @@ public abstract class Constraint implements Comparable<Constraint>, Serializable
 	}
 
 	// TODO it's clean ?
-	protected static Snapshot<ConstraintValue> getConstraintValues(final Cache cache, final Generic modified, final Class<? extends Constraint> clazz) {
+	protected static Snapshot<ConstraintValue> getConstraintValues(final Generic modified, final Class<? extends Constraint> clazz) {
 		return new AbstractSnapshot<ConstraintValue>() {
 			@Override
 			public Iterator<ConstraintValue> iterator() {
 				// TODO base pos KK
-				Iterator<ConstraintValue> iterator = new AbstractProjectionIterator<Holder, ConstraintValue>(((GenericImpl) modified).getHolders(cache, cache.<Attribute> find(clazz), Statics.BASE_POSITION).iterator()) {
+				Iterator<ConstraintValue> iterator = new AbstractProjectionIterator<Holder, ConstraintValue>(((GenericImpl) modified).getHolders(((EngineImpl) modified.getEngine()).getCurrentCache().<Attribute> find(clazz), Statics.BASE_POSITION)
+						.iterator()) {
 					@Override
 					public ConstraintValue project(Holder generic) {
 						return new ConstraintValue(generic.getValue(), generic.getBaseComponent());

@@ -1,8 +1,7 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Context;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 
@@ -17,41 +16,33 @@ public interface Type extends Generic {
 	/**
 	 * Returns the attributes of Generic.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return The snapshot with all attributes of the Generic.
 	 * @see Snapshot
 	 */
-	<T extends Attribute> Snapshot<T> getAttributes(Context context);
+	<T extends Attribute> Snapshot<T> getAttributes();
 
 	/**
 	 * Returns the attributes of Generic.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param attribute
 	 *            The super attribute
 	 * @return The snapshot with all attributes of the Generic.
 	 * @see Snapshot
 	 */
-	<T extends Attribute> Snapshot<T> getAttributes(final Context context, final Attribute attribute);
+	<T extends Attribute> Snapshot<T> getAttributes(Attribute attribute);
 
 	/**
 	 * Find an attribute by value.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param value
 	 *            The attribute value. * @param targets The targets.
 	 * @return The attribute or null if not found.
 	 */
-	<T extends Attribute> T getAttribute(Context context, Serializable value, Generic... targets);
+	<T extends Attribute> T getAttribute(Serializable value, Generic... targets);
 
 	/**
 	 * Find an attribute by value.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param attribute
 	 *            The super attribute.
 	 * @param value
@@ -60,48 +51,40 @@ public interface Type extends Generic {
 	 *            The targets
 	 * @return The attribute or null if not found.
 	 */
-	<T extends Attribute> T getAttribute(final Context context, Attribute attribute, final Serializable value, Generic... targets);
+	<T extends Attribute> T getAttribute(Attribute attribute, Serializable value, Generic... targets);
 
 	/**
 	 * Creates an attribute for the type. Throws an exception if already exists.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param value
 	 *            The attribute value.
 	 * @return Return the attribute.
 	 * @see Attribute
 	 */
-	<T extends Attribute> T addAttribute(Cache cache, Serializable value);
+	<T extends Attribute> T addAttribute(Serializable value);
 
 	/**
 	 * Creates an attribute for the type or returns this attribute if already exists.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param value
 	 *            The attribute value.
 	 * @return Return the attribute.
 	 * @see Attribute
 	 */
-	<T extends Attribute> T setAttribute(Cache cache, Serializable value);
+	<T extends Attribute> T setAttribute(Serializable value);
 
 	/**
 	 * Find the property by value.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param value
 	 *            The property value.
 	 * @return Return the property or null if no property find.
 	 */
-	<T extends Attribute> T getProperty(Context context, Serializable value);
+	<T extends Attribute> T getProperty(Serializable value);
 
 	/**
 	 * Creates a property for the type or throws an exception if this property already exists.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param value
 	 *            the property value
 	 * @param targets
@@ -109,13 +92,11 @@ public interface Type extends Generic {
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T addProperty(Cache cache, Serializable value, Type... targets);
+	<T extends Attribute> T addProperty(Serializable value, Type... targets);
 
 	/**
 	 * Creates a property for the type or returns this property if already exists.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param value
 	 *            the property value
 	 * @param targets
@@ -123,34 +104,28 @@ public interface Type extends Generic {
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T setProperty(Cache cache, Serializable value, Type... targets);
+	<T extends Attribute> T setProperty(Serializable value, Type... targets);
 
 	/**
 	 * Returns the relations of Generic.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return The snapshot with all relations of the Generic.
 	 * @see Snapshot
 	 */
-	<T extends Relation> Snapshot<T> getRelations(Context context);
+	<T extends Relation> Snapshot<T> getRelations();
 
 	/**
 	 * Find the relation by value.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param value
 	 *            The relation value.
 	 * @return Return the relation or null if no relation find.
 	 */
-	<T extends Relation> T getRelation(Context context, Serializable value);
+	<T extends Relation> T getRelation(Serializable value);
 
 	/**
 	 * Creates a relation or returns this relation if this relation already exists.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param value
 	 *            The relation value.
 	 * @param targets
@@ -158,13 +133,11 @@ public interface Type extends Generic {
 	 * @return Return the relation.
 	 * @see Relation
 	 */
-	<T extends Relation> T addRelation(Cache cache, Serializable value, Type... targets);
+	<T extends Relation> T addRelation(Serializable value, Type... targets);
 
 	/**
 	 * Creates a relation or returns this relation if this relation already exists.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param value
 	 *            The relation value.
 	 * @param targets
@@ -172,169 +145,137 @@ public interface Type extends Generic {
 	 * @return Return the relation.
 	 * @see Relation
 	 */
-	<T extends Relation> T setRelation(Cache cache, Serializable value, Type... targets);
+	<T extends Relation> T setRelation(Serializable value, Type... targets);
 
 	/**
 	 * Returns the instances of Generic.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return The snapshot with instances of the Generic.
 	 * @see Snapshot
 	 */
-	<T extends Generic> Snapshot<T> getInstances(Context context);
+	<T extends Generic> Snapshot<T> getInstances();
 
 	/**
 	 * Returns the instance of Generic.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param value
 	 *            The value of the requested instance.
 	 * @return The requested instance if it exists, null otherwise.
 	 */
-	<T extends Generic> T getInstanceByValue(Context context, Serializable value);
+	<T extends Generic> T getInstanceByValue(Serializable value);
 
 	/**
 	 * Returns the instances of Generic and the instances of the childrens.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return The snapshot with all instances of the Generic.
 	 * @see Snapshot
 	 */
-	<T extends Generic> Snapshot<T> getAllInstances(Context context);
+	<T extends Generic> Snapshot<T> getAllInstances();
 
 	/**
 	 * Returns the sub type of Generic.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param value
 	 *            The sub type name.
 	 * @return The sub type, or null if it does not exist.
 	 */
-	<T extends Generic> T getSubType(Context context, Serializable value);
+	<T extends Generic> T getSubType(Serializable value);
 
 	/**
 	 * Returns the direct sub types of Generic.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return The snapshot with the direct sub types of the Generic.
 	 * @see Snapshot
 	 */
-	<T extends Generic> Snapshot<T> getDirectSubTypes(Context context);
+	<T extends Generic> Snapshot<T> getDirectSubTypes();
 
 	/**
 	 * Returns the sub types of Generic and the sub types of the childrens.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return The snapshot with all sub types of the Generic.
 	 * @see Snapshot
 	 */
-	<T extends Generic> Snapshot<T> getSubTypes(Context context);
+	<T extends Generic> Snapshot<T> getSubTypes();
 
 	/**
 	 * Create a subtype.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param value
 	 *            The type value.
 	 * @param components
 	 *            The components.
 	 * @return Return the subtype.
 	 */
-	<T extends Type> T newSubType(Cache cache, Serializable value, Generic... components);
+	<T extends Type> T newSubType(Serializable value, Generic... components);
 
 	/**
 	 * Enable singular constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this.
 	 */
-	<T extends Type> T enableSingularConstraint(Cache cache);
+	<T extends Type> T enableSingularConstraint();
 
 	/**
 	 * Disable singular constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this
 	 */
-	<T extends Type> T disableSingularConstraint(Cache cache);
+	<T extends Type> T disableSingularConstraint();
 
 	/**
 	 * Returns true if the singular constraint enabled
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return true if the singular constraint enabled
 	 */
-	boolean isSingularConstraintEnabled(Context context);
+	boolean isSingularConstraintEnabled();
 
 	/**
 	 * Enable singular constraint for the base position
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param componentPos
 	 *            The component position implicated by the constraint.
 	 * @return this
 	 */
-	<T extends Type> T enableSingularConstraint(Cache cache, int componentPos);
+	<T extends Type> T enableSingularConstraint(int componentPos);
 
 	/**
 	 * Disable singular constraint for the base position.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param componentPos
 	 *            The component position implicated by the constraint.
 	 * @return Return this
 	 */
-	<T extends Type> T disableSingularConstraint(Cache cache, int componentPos);
+	<T extends Type> T disableSingularConstraint(int componentPos);
 
 	/**
 	 * Returns true if the singular constraint enabled for the base position
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param componentPos
 	 *            The component position implicated by the constraint.
 	 * @return true if the singular constraint enabled for the base position
 	 */
-	boolean isSingularConstraintEnabled(Context context, int componentPos);
+	boolean isSingularConstraintEnabled(int componentPos);
 
 	/**
 	 * Enable property constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this
 	 */
-	<T extends Type> T enablePropertyConstraint(Cache cache);
+	<T extends Type> T enablePropertyConstraint();
 
 	/**
 	 * Disable property constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this
 	 */
-	<T extends Type> T disablePropertyConstraint(Cache cache);
+	<T extends Type> T disablePropertyConstraint();
 
 	/**
 	 * Returns true if the property constraint enabled
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return true if the property constraint enabled
 	 */
-	boolean isPropertyConstraintEnabled(Context context);
+	boolean isPropertyConstraintEnabled();
 
 	// /**
 	// * Enable not null constraint.
@@ -366,189 +307,149 @@ public interface Type extends Generic {
 	/**
 	 * Enable singular instance constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this.
 	 */
-	<T extends Type> T enableSingularInstanceConstraint(Cache cache);
+	<T extends Type> T enableSingularInstanceConstraint();
 
 	/**
 	 * Disable singular instance constraint
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return this
 	 */
-	<T extends Type> T disableSingularInstanceConstraint(Cache cache);
+	<T extends Type> T disableSingularInstanceConstraint();
 
 	/**
 	 * Returns true if the singular instance constraint enabled
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return true if the singular instance constraint enabled
 	 */
-	boolean isSingularInstanceConstraintEnabled(Context context);
+	boolean isSingularInstanceConstraintEnabled();
 
 	/**
 	 * Enable required constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this.
 	 */
-	<T extends Type> T enableRequiredConstraint(Cache cache);
+	<T extends Type> T enableRequiredConstraint();
 
 	/**
 	 * Disable required constraint
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return this
 	 */
-	<T extends Type> T disableRequiredConstraint(Cache cache);
+	<T extends Type> T disableRequiredConstraint();
 
 	/**
 	 * Returns true if the required constraint enabled
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return true if the required constraint enabled
 	 */
-	boolean isRequiredConstraintEnabled(Context context);
+	boolean isRequiredConstraintEnabled();
 
 	/**
 	 * Enable required constraint for the base position.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param componentPos
 	 *            The component position implicated by the constraint.
 	 * @return Return this.
 	 */
-	<T extends Type> T enableRequiredConstraint(Cache cache, int componentPos);
+	<T extends Type> T enableRequiredConstraint(int componentPos);
 
 	/**
 	 * Disable required constraint for the base position.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param componentPos
 	 *            The component position implicated by the constraint.
 	 * @return Return this.
 	 */
-	<T extends Type> T disableRequiredConstraint(Cache cache, int componentPos);
+	<T extends Type> T disableRequiredConstraint(int componentPos);
 
 	/**
 	 * Returns true if the required constraint enabled for the base position
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param componentPos
 	 *            The component position implicated by the constraint.
 	 * @return true if the required constraint enabled for the base position
 	 */
-	boolean isRequiredConstraintEnabled(Context context, int componentPos);
+	boolean isRequiredConstraintEnabled(int componentPos);
 
 	/**
 	 * Enable distinct constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this.
 	 */
-	<T extends Type> T enableUniqueConstraint(Cache cache);
+	<T extends Type> T enableUniqueConstraint();
 
 	/**
 	 * Disable distinct constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this.
 	 */
-	<T extends Type> T disableUniqueConstraint(Cache cache);
+	<T extends Type> T disableUniqueConstraint();
 
 	/**
 	 * Returns true if the distinct constraint enabled
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return true if the distinct constraint enabled
 	 */
-	boolean isUniqueConstraintEnabled(Context context);
+	boolean isUniqueConstraintEnabled();
 
 	/**
 	 * Enable virtual constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this.
 	 */
-	<T extends Type> T enableVirtualConstraint(Cache cache);
+	<T extends Type> T enableVirtualConstraint();
 
 	/**
 	 * Disable virtual constraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this.
 	 */
-	<T extends Type> T disableVirtualConstraint(Cache cache);
+	<T extends Type> T disableVirtualConstraint();
 
 	/**
 	 * Returns true if the virtual constraint enabled
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return true if the virtual constraint enabled
 	 */
-	boolean isVirtualConstraintEnabled(Context context);
+	boolean isVirtualConstraintEnabled();
 
 	/**
 	 * Enable inheritance.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this.
 	 */
-	<T extends Type> T enableInheritance(Cache cache);
+	<T extends Type> T enableInheritance();
 
 	/**
 	 * Disable inheritance.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return Return this.
 	 */
-	<T extends Type> T disableInheritance(Cache cache);
+	<T extends Type> T disableInheritance();
 
 	/**
 	 * Returns true if the inheritance enabled
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @return true if the inheritance enabled
 	 */
-	boolean isInheritanceEnabled(Context context);
+	boolean isInheritanceEnabled();
 
 	/**
 	 * Returns the type constraint imposed by the InstanceClassConstraint. By default is Object.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @return The type constraint imposed.
 	 */
-	Class<?> getConstraintClass(Cache cache);
+	Class<?> getConstraintClass();
 
 	/**
 	 * Modify the type constraint imposed by the InstanceClassConstraint.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param constraintClass
 	 *            The type constraint imposed.
 	 * @return Return this.
 	 */
-	<T extends Type> T setConstraintClass(Cache cache, Class<?> constraintClass);
+	<T extends Type> T setConstraintClass(Class<?> constraintClass);
 
 }

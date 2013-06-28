@@ -23,23 +23,23 @@ public class FlushTest {
 		engine.close();
 
 		cache = engine.newCache();
-		assert engine.getInheritings(cache).contains(human);
+		assert engine.getInheritings().contains(human);
 	}
 
 	public void testNoFlush() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
 		Type animal = cache.newType("Animal");
-		Snapshot<Generic> snapshot = animal.getInheritings(cache);
+		Snapshot<Generic> snapshot = animal.getInheritings();
 		assert snapshot.isEmpty();
-		Type human = animal.newSubType(cache, "Human");
+		Type human = animal.newSubType("Human");
 		assert snapshot.size() == 1;
 		assert snapshot.contains(human);
 
 		engine.close();
 
-		cache = engine.newCache();
-		assert engine.getInheritings(cache).filter(new Filter<Generic>() {
+		cache = engine.newCache().start();
+		assert engine.getInheritings().filter(new Filter<Generic>() {
 
 			@Override
 			public boolean isSelected(Generic element) {
@@ -56,8 +56,8 @@ public class FlushTest {
 		Type car = cache.newType("Car");
 		engine.close();
 
-		cache = engine.newCache();
-		Snapshot<Generic> snapshot = engine.getInheritings(cache);
+		cache = engine.newCache().start();
+		Snapshot<Generic> snapshot = engine.getInheritings();
 		assert snapshot.contains(human) : snapshot;
 		assert !snapshot.contains(car) : snapshot;
 	}
@@ -67,7 +67,7 @@ public class FlushTest {
 		Engine engine = cache.getEngine();
 		Type human = cache.newType("Human");
 		cache.flush();
-		Snapshot<Generic> snapshot = engine.getInheritings(cache);
+		Snapshot<Generic> snapshot = engine.getInheritings();
 		assert snapshot.contains(human) : snapshot;
 		// cache.deactivate();
 
@@ -77,7 +77,7 @@ public class FlushTest {
 		engine.close();
 
 		cache = engine.newCache().start();
-		snapshot = engine.getInheritings(cache);
+		snapshot = engine.getInheritings();
 		assert snapshot.containsAll(Arrays.asList(human, car)) : snapshot;
 	}
 
@@ -86,7 +86,7 @@ public class FlushTest {
 		Engine engine = cache.getEngine();
 		Type human = cache.newType("Human");
 		cache.flush();
-		Snapshot<Generic> snapshot = engine.getInheritings(cache);
+		Snapshot<Generic> snapshot = engine.getInheritings();
 		assert snapshot.contains(human) : snapshot;
 
 		cache = engine.newCache().start();
@@ -94,7 +94,7 @@ public class FlushTest {
 		cache.flush();
 
 		cache = engine.newCache();
-		snapshot = engine.getInheritings(cache);
+		snapshot = engine.getInheritings();
 		assert snapshot.containsAll(Arrays.asList(human, car)) : snapshot;
 
 		engine.close();

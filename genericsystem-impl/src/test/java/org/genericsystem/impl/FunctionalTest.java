@@ -16,15 +16,15 @@ public class FunctionalTest extends AbstractTest {
 	public void getCarInstancesWithPowerHigherThan90HP() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		final Attribute carPower = car.setProperty(cache, "Power");
-		Generic myCar = car.newInstance(cache, "myCar");
-		myCar.setValue(cache, carPower, 233);
-		Generic yourCar = car.newInstance(cache, "yourCar");
-		yourCar.setValue(cache, carPower, 89);
-		Snapshot<Generic> carInstancesWithPowerHigherThan90HP = car.getAllInstances(cache).filter(new Filter<Generic>() {
+		final Attribute carPower = car.setProperty( "Power");
+		Generic myCar = car.newInstance( "myCar");
+		myCar.setValue( carPower, 233);
+		Generic yourCar = car.newInstance( "yourCar");
+		yourCar.setValue( carPower, 89);
+		Snapshot<Generic> carInstancesWithPowerHigherThan90HP = car.getAllInstances().filter(new Filter<Generic>() {
 			@Override
 			public boolean isSelected(Generic generic) {
-				return generic.<Integer> getValue(cache, carPower) >= 90;
+				return generic.<Integer> getValue( carPower) >= 90;
 			}
 		});
 		assert carInstancesWithPowerHigherThan90HP.contains(myCar);
@@ -37,14 +37,14 @@ public class FunctionalTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 
-		Snapshot<Generic> snapshot = vehicle.getSubTypes(cache);
+		Snapshot<Generic> snapshot = vehicle.getSubTypes();
 		assert snapshot.isEmpty();
 
-		Type car = vehicle.newSubType(cache, "Car");
+		Type car = vehicle.newSubType( "Car");
 		assert snapshot.size() == 1;
 		assert snapshot.contains(car);
 
-		car.remove(cache);
+		car.remove();
 		assert snapshot.isEmpty();
 		assert !snapshot.contains(car);
 	}

@@ -138,7 +138,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : orderRemoves(node).descendingSet()) {
 			removeGeneric(generic);
 			for (int axe = 0; axe < ((GenericImpl) generic).components.length; axe++)
-				if (((GenericImpl) generic).isCascadeRemove(this, axe))
+				if (((GenericImpl) generic).isCascadeRemove(axe))
 					internalRemove(((GenericImpl) generic).components[axe]);
 		}
 	}
@@ -291,7 +291,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T getType(final Serializable value) {
-		return getEngine().getSubType(this, value);
+		return getEngine().getSubType(value);
 	}
 
 	@Override
@@ -316,7 +316,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(bindPrimaryByValue(TreeImpl.class, getEngine(), value, SystemGeneric.STRUCTURAL, true), Statics.EMPTY_GENERIC_ARRAY, new Generic[dim], false, TreeImpl.class, false).<T> disableInheritance(this);
+		return this.<T> bind(bindPrimaryByValue(TreeImpl.class, getEngine(), value, SystemGeneric.STRUCTURAL, true), Statics.EMPTY_GENERIC_ARRAY, new Generic[dim], false, TreeImpl.class, false).<T> disableInheritance();
 	}
 
 	@Override
@@ -361,7 +361,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				primaries.add(phantomImplicit);
 				T phantom = fastFindByInterfaces(phantomImplicit, primaries.toArray(), components);
 				if (phantom != null)
-					phantom.remove(this);
+					phantom.remove();
 			}
 		}
 		T result = fastFindByInterfaces(implicit, interfaces, components);
@@ -504,8 +504,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 						// TODO KK
 						Generic base = ((Holder) generic).getBaseComponent();
 						if (base != null)
-							for (Generic baseInheriting : ((GenericImpl) base).getAllInheritings(CacheImpl.this))
-								constraintInstance.check(CacheImpl.this, baseInheriting);
+							for (Generic baseInheriting : ((GenericImpl) base).getAllInheritings())
+								constraintInstance.check(baseInheriting);
 
 					}
 		}
@@ -521,7 +521,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Constraint constraint : getSortedConstraints(checkingType, immediatlyCheckable))
 			for (Generic generic : generics)
-				constraint.check(this, generic);
+				constraint.check(generic);
 	}
 
 	@Override

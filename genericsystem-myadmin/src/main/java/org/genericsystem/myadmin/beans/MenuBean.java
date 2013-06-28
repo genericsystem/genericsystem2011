@@ -8,7 +8,6 @@ import javax.enterprise.event.Observes;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 
-import org.genericsystem.core.Cache;
 import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
 import org.richfaces.component.UIMenuGroup;
 import org.richfaces.component.UIMenuItem;
@@ -25,7 +24,7 @@ public class MenuBean implements Serializable {
 		menuGroup.getChildren().clear();
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		int i = 0;
-		for (GenericTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildrens(menuEvent.getCache(), TreeType.ATTRIBUTES, menuEvent.isImplicitShow())) {
+		for (GenericTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildrens(TreeType.ATTRIBUTES, menuEvent.isImplicitShow())) {
 			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
 			uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
 			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{typesBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
@@ -37,18 +36,12 @@ public class MenuBean implements Serializable {
 	}
 
 	public static class MenuEvent {
-		private final Cache cache;
 		private final GenericTreeNode genericTreeNode;
 		private final boolean implicitShow;
 
-		public MenuEvent(Cache cache, GenericTreeNode genericTreeNode, boolean implicitShow) {
-			this.cache = cache;
+		public MenuEvent(GenericTreeNode genericTreeNode, boolean implicitShow) {
 			this.genericTreeNode = genericTreeNode;
 			this.implicitShow = implicitShow;
-		}
-
-		public Cache getCache() {
-			return cache;
 		}
 
 		public GenericTreeNode getGenericTreeNode() {

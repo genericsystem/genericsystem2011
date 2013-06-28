@@ -20,26 +20,26 @@ public class NotNullConstraintTest extends AbstractTest {
 	public void testPropertySimpleAttributeKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		final Attribute registration = car.setAttribute(cache, "Registration");
-		registration.enableRequiredConstraint(cache);
-		final Generic myCar = car.newInstance(cache, "myCar");
-		myCar.setValue(cache, registration, null);
+		final Attribute registration = car.setAttribute("Registration");
+		registration.enableRequiredConstraint();
+		final Generic myCar = car.newInstance("myCar");
+		myCar.setValue(registration, null);
 	}
 
 	public void testPropertySimpleProperty() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type sportCar = car.newSubType(cache, "Sportcar");
-		final Attribute vehiclePower = vehicle.setProperty(cache, "Power");
-		car.setValue(cache, vehiclePower, 80);
-		sportCar.setValue(cache, vehiclePower, 250);
+		Type car = vehicle.newSubType("Car");
+		Type sportCar = car.newSubType("Sportcar");
+		final Attribute vehiclePower = vehicle.setProperty("Power");
+		car.setValue(vehiclePower, 80);
+		sportCar.setValue(vehiclePower, 250);
 
-		sportCar.clearAllConcrete(cache, vehiclePower);
-		assert Objects.equals(80, sportCar.getValue(cache, vehiclePower)) : sportCar.getHolder(cache, vehiclePower);
-		sportCar.setValue(cache, vehiclePower, 250);
-		sportCar.cancelAll(cache, vehiclePower, true);
-		assert sportCar.getValue(cache, vehiclePower) == null : sportCar.getValue(cache, vehiclePower);
+		sportCar.clearAllConcrete(vehiclePower);
+		assert Objects.equals(80, sportCar.getValue(vehiclePower)) : sportCar.getHolder(vehiclePower);
+		sportCar.setValue(vehiclePower, 250);
+		sportCar.cancelAll(vehiclePower, true);
+		assert sportCar.getValue(vehiclePower) == null : sportCar.getValue(vehiclePower);
 
 	}
 
@@ -49,49 +49,49 @@ public class NotNullConstraintTest extends AbstractTest {
 		Type road = cache.newType("Road");
 		Type human = cache.newType("Human");
 
-		final Relation driving = car.setRelation(cache, "DrivingAlong", human, road);
-		driving.enableRequiredConstraint(cache);
+		final Relation driving = car.setRelation("DrivingAlong", human, road);
+		driving.enableRequiredConstraint();
 
-		final Generic myCar = car.newInstance(cache, "myCar");
-		final Generic myHuman = human.newInstance(cache, "myHuman");
-		final Generic myRoad = road.newInstance(cache, "myRoad");
+		final Generic myCar = car.newInstance("myCar");
+		final Generic myHuman = human.newInstance("myHuman");
+		final Generic myRoad = road.newInstance("myRoad");
 
-		assert myCar.getLinks(cache, driving).isEmpty();
-		myCar.setLink(cache, driving, null, myHuman, myRoad);
-		assert myCar.getLinks(cache, driving).isEmpty();
-		Link test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
-		Link test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);
-		assert myCar.getLinks(cache, driving).containsAll(Arrays.asList(test, test2));
-		myCar.clearAllConcrete(cache, driving, myHuman, myRoad);
-		assert myCar.getLinks(cache, driving).isEmpty();
-		test = myCar.setLink(cache, driving, "test", myHuman, myRoad);
-		test2 = myCar.setLink(cache, driving, "test2", myHuman, myRoad);
-		final Cache superCache = cache.newSuperCache();
+		assert myCar.getLinks(driving).isEmpty();
+		myCar.setLink(driving, null, myHuman, myRoad);
+		assert myCar.getLinks(driving).isEmpty();
+		Link test = myCar.setLink(driving, "test", myHuman, myRoad);
+		Link test2 = myCar.setLink(driving, "test2", myHuman, myRoad);
+		assert myCar.getLinks(driving).containsAll(Arrays.asList(test, test2));
+		myCar.clearAllConcrete(driving, myHuman, myRoad);
+		assert myCar.getLinks(driving).isEmpty();
+		test = myCar.setLink(driving, "test", myHuman, myRoad);
+		test2 = myCar.setLink(driving, "test2", myHuman, myRoad);
+		final Cache superCache = cache.newSuperCache().start();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				driving.enableSingularConstraint(superCache);
+				driving.enableSingularConstraint();
 			}
 		};
-		test2.remove(cache);
-		driving.enableSingularConstraint(cache);
-		myCar.setLink(cache, driving, null, myHuman, myRoad);// remove test
-		assert myCar.getLinks(cache, driving).isEmpty();
+		test2.remove();
+		driving.enableSingularConstraint();
+		myCar.setLink(driving, null, myHuman, myRoad);// remove test
+		assert myCar.getLinks(driving).isEmpty();
 	}
 
 	@Test
 	public void testEnabledConstraintOnASimpleTypeThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		car.newSubType(cache, null);
+		car.newSubType(null);
 	}
 
 	@Test
 	public void testEnableThenDisableConstraintOnASimpleTypeThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-		Type expected = car.newSubType(cache, null);
-		Generic actual = car.getSubType(cache, null);
+		Type expected = car.newSubType(null);
+		Generic actual = car.getSubType(null);
 		assert expected == actual;
 	}
 
@@ -99,58 +99,58 @@ public class NotNullConstraintTest extends AbstractTest {
 	public void testEnableSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		car.newSubType(cache, null);
+		car.newSubType(null);
 	}
 
 	@Test
 	public void testDisabledSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-		Type expected = car.newSubType(cache, null);
+		Type expected = car.newSubType(null);
 	}
 
 	@Test
 	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateAnAttribute() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		final Attribute registration = car.setProperty(cache, "Registration");
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		Holder holder = car.setValue(cache, registration, 235);
-		myBmw.setValue(cache, holder, null);
-		assert myBmw.getHolder(cache, registration) == null;
-		assert myBmw.getValues(cache, registration).isEmpty();
-		myBmw.setValue(cache, registration, null);// No exception
-		assert myBmw.getHolder(cache, registration) == null;
-		assert myBmw.getValues(cache, registration).isEmpty();
+		final Attribute registration = car.setProperty("Registration");
+		final Generic myBmw = car.newInstance("myBmw");
+		Holder holder = car.setValue(registration, 235);
+		myBmw.setValue(holder, null);
+		assert myBmw.getHolder(registration) == null;
+		assert myBmw.getValues(registration).isEmpty();
+		myBmw.setValue(registration, null);// No exception
+		assert myBmw.getHolder(registration) == null;
+		assert myBmw.getValues(registration).isEmpty();
 	}
 
 	@Test
 	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute registration = vehicle.setAttribute(cache, "Registration");
-		Type car = vehicle.newSubType(cache, "Car");
-		car.setValue(cache, registration, null);
+		Attribute registration = vehicle.setAttribute("Registration");
+		Type car = vehicle.newSubType("Car");
+		car.setValue(registration, null);
 	}
 
 	@Test
 	public void testEnableConstraintOnAComplexeHierarchyOfTypes() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic myBus = vehicle.newInstance(cache, "myBus");
+		Type car = vehicle.newSubType("Car");
+		final Generic myBmw = car.newInstance("myBmw");
+		Generic myBus = vehicle.newInstance("myBus");
 
-		Attribute carRegistration = car.setAttribute(cache, "vehicleRegistration");
-		final Attribute vehicleRegistration = vehicle.setAttribute(cache, "vehicleRegistration");
-		carRegistration = ((GenericImpl) carRegistration).<Attribute> reFind(cache);
-		carRegistration.enableSingularConstraint(cache);
-		Holder value = myBmw.setValue(cache, carRegistration, "AA-BB-CC");
-		assert myBmw.getHolders(cache, vehicleRegistration).contains(value);
-		assert value.isAlive(cache);
-		assert myBmw.getHolders(cache, vehicleRegistration).contains(value);
-		myBmw.setValue(cache, carRegistration, null);
-		assert !value.isAlive(cache);
-		assert myBmw.getHolders(cache, vehicleRegistration).isEmpty();
+		Attribute carRegistration = car.setAttribute("vehicleRegistration");
+		final Attribute vehicleRegistration = vehicle.setAttribute("vehicleRegistration");
+		carRegistration = ((GenericImpl) carRegistration).<Attribute> reFind();
+		carRegistration.enableSingularConstraint();
+		Holder value = myBmw.setValue(carRegistration, "AA-BB-CC");
+		assert myBmw.getHolders(vehicleRegistration).contains(value);
+		assert value.isAlive();
+		assert myBmw.getHolders(vehicleRegistration).contains(value);
+		myBmw.setValue(carRegistration, null);
+		assert !value.isAlive();
+		assert myBmw.getHolders(vehicleRegistration).isEmpty();
 	}
 }

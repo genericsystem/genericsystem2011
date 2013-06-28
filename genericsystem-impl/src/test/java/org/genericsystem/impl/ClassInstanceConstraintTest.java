@@ -29,32 +29,32 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 	public void simpleAttributeValueOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class).start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myFiat = vehicle.newInstance(cache, "myFiat");
-		Attribute wheelVehcile = vehicle.setAttribute(cache, "wheel");
-		wheelVehcile.setConstraintClass(cache, Wheel.class);
-		assert wheelVehcile.getConstraintClass(cache).equals(Wheel.class) : wheelVehcile.getConstraintClass(cache);
-		myFiat.setValue(cache, wheelVehcile, new Wheel());
+		Generic myFiat = vehicle.newInstance( "myFiat");
+		Attribute wheelVehcile = vehicle.setAttribute( "wheel");
+		wheelVehcile.setConstraintClass( Wheel.class);
+		assert wheelVehcile.getConstraintClass().equals(Wheel.class) : wheelVehcile.getConstraintClass();
+		myFiat.setValue( wheelVehcile, new Wheel());
 	}
 
 	public void simpleAttributeValueKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class).start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute wheelVehcile = vehicle.setAttribute(cache, "wheel");
-		assert wheelVehcile.getConstraintClass(cache).equals(Object.class) : wheelVehcile.getConstraintClass(cache);
+		Attribute wheelVehcile = vehicle.setAttribute( "wheel");
+		assert wheelVehcile.getConstraintClass().equals(Object.class) : wheelVehcile.getConstraintClass();
 	}
 
 	public void simpleAttributeValueKO2() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class).start();
 		Type vehicle = cache.newType("Vehicle");
-		final Generic myFiat = vehicle.newInstance(cache, "myFiat");
-		final Attribute wheelVehcile = vehicle.setAttribute(cache, "wheel");
-		wheelVehcile.setConstraintClass(cache, Wheel.class);
-		assert Wheel.class.equals(wheelVehcile.getConstraintClass(cache));
+		final Generic myFiat = vehicle.newInstance( "myFiat");
+		final Attribute wheelVehcile = vehicle.setAttribute( "wheel");
+		wheelVehcile.setConstraintClass( Wheel.class);
+		assert Wheel.class.equals(wheelVehcile.getConstraintClass());
 
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				myFiat.setValue(cache, wheelVehcile, 23);
+				myFiat.setValue( wheelVehcile, 23);
 			}
 		}.assertIsCausedBy(InstanceClassConstraintViolationException.class);
 	}

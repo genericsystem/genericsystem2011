@@ -32,31 +32,31 @@ public class SuperOfTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type robot = cache.newType("Robot");
 		Type transformer = cache.newSubType("Transformer", vehicle, robot);
-		Attribute power = transformer.setProperty(cache, "Power");
-		Generic myTransformer = transformer.newInstance(cache, "myTransformer");
-		myTransformer.setValue(cache, power, 123);
+		Attribute power = transformer.setProperty( "Power");
+		Generic myTransformer = transformer.newInstance( "myTransformer");
+		myTransformer.setValue( power, 123);
 
 		Type human = cache.newType("Human");
-		Relation humanPilotTransformer = human.setRelation(cache, "pilot", transformer);
-		Generic myck = human.newInstance(cache, "myck");
-		myck.setLink(cache, humanPilotTransformer, "myPilot", myTransformer);
+		Relation humanPilotTransformer = human.setRelation( "pilot", transformer);
+		Generic myck = human.newInstance( "myck");
+		myck.setLink( humanPilotTransformer, "myPilot", myTransformer);
 	}
 
 	@AfterMethod
 	public void compare() {
 		Engine engine = cache.getEngine();
-		for (Generic inheriting : engine.getInheritings(cache))
+		for (Generic inheriting : engine.getInheritings())
 			internalCompare(inheriting, engine);
-		for (Generic composite : engine.getComposites(cache))
+		for (Generic composite : engine.getComposites())
 			internalCompare(composite, engine);
 	}
 
 	private void internalCompare(Generic superGeneric, Generic inheritingGeneric) {
 		assert inheritingGeneric.inheritsFrom(superGeneric) == ((GenericImpl) superGeneric).isSuperOf(inheritingGeneric) : "superGeneric : " + superGeneric + " inheritingGeneric : " + inheritingGeneric + " => "
 				+ inheritingGeneric.inheritsFrom(superGeneric) + " / " + ((GenericImpl) superGeneric).isSuperOf(inheritingGeneric);
-		for (Generic inheriting : inheritingGeneric.getInheritings(cache))
+		for (Generic inheriting : inheritingGeneric.getInheritings())
 			internalCompare(superGeneric, inheriting);
-		for (Generic composite : inheritingGeneric.getComposites(cache))
+		for (Generic composite : inheritingGeneric.getComposites())
 			internalCompare(superGeneric, composite);
 	}
 

@@ -113,34 +113,28 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Mark a instance of the Attribute.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param attribute
 	 *            The attribute.
 	 * @param targets
 	 *            The targets.
 	 * @return A new Generic or the existing Generic.
 	 */
-	<T extends Holder> T flag(Cache cache, Holder attribute, Generic... targets);
+	<T extends Holder> T flag(Holder attribute, Generic... targets);
 
 	/**
 	 * Bind this with the targets.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param relation
 	 *            The Relation.
 	 * @param targets
 	 *            The targets.
 	 * @return A new Generic or the existing Generic.
 	 */
-	<T extends Link> T bind(Cache cache, Link relation, Generic... targets);
+	<T extends Link> T bind(Link relation, Generic... targets);
 
 	/**
 	 * Returns the Link of the Relation for the components and the component position.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param relation
 	 *            The Relation.
 	 * @param basePos
@@ -151,13 +145,11 @@ public interface Generic extends Comparable<Generic> {
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
-	<T extends Link> T getLink(Context context, Link relation, int basePos, Generic... targets);
+	<T extends Link> T getLink(Link relation, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Link of the Relation for the components.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param relation
 	 *            The Relation.
 	 * @param basePos
@@ -168,13 +160,11 @@ public interface Generic extends Comparable<Generic> {
 	 * @throws IllegalStateException
 	 *             Ambigous request for the Relation.
 	 */
-	<T extends Link> T getLink(Context context, Link relation, Generic... targets);
+	<T extends Link> T getLink(Link relation, Generic... targets);
 
 	/**
 	 * Returns the Links.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param relation
 	 *            The Relation.
 	 * @param basePos
@@ -184,13 +174,11 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 * @return The Link.
 	 */
-	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, int basePos, Generic... targets);
+	<T extends Link> Snapshot<T> getLinks(Relation relation, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Link.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param relation
 	 *            The Relation.
 	 * @param targets
@@ -198,14 +186,12 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 * @return The Link.
 	 */
-	<T extends Link> Snapshot<T> getLinks(Context context, Relation relation, Generic... targets);
+	<T extends Link> Snapshot<T> getLinks(Relation relation, Generic... targets);
 
 	/**
 	 * Creates a link or throws an exception if the link if already exists <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param relation
 	 *            The relation.
 	 * @param value
@@ -214,14 +200,12 @@ public interface Generic extends Comparable<Generic> {
 	 *            The optional targets.
 	 * @return The Link.
 	 */
-	<T extends Link> T addLink(Cache cache, Link relation, Serializable value, Generic... targets);
+	<T extends Link> T addLink(Link relation, Serializable value, Generic... targets);
 
 	/**
 	 * Creates a link or returns the link if already exists <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param relation
 	 *            The relation.
 	 * @param value
@@ -230,14 +214,12 @@ public interface Generic extends Comparable<Generic> {
 	 *            The optional targets.
 	 * @return The Link.
 	 */
-	<T extends Link> T setLink(Cache cache, Link relation, Serializable value, Generic... targets);
+	<T extends Link> T setLink(Link relation, Serializable value, Generic... targets);
 
 	/**
 	 * Creates an holder or throws an exception if this holder already exists. <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param attribute
 	 *            The Holder.
 	 * @param value
@@ -246,14 +228,12 @@ public interface Generic extends Comparable<Generic> {
 	 *            The optional targets.
 	 * @return The Holder.
 	 */
-	<T extends Holder> T addHolder(Cache cache, Holder attribute, Serializable value, Generic... targets);
+	<T extends Holder> T addHolder(Holder attribute, Serializable value, Generic... targets);
 
 	/**
 	 * Creates an holder or throws an exception if this holder already exists. <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param attribute
 	 *            The Holder.
 	 * @param value
@@ -265,14 +245,12 @@ public interface Generic extends Comparable<Generic> {
 	 *            The optional targets.
 	 * @return The Holder.
 	 */
-	<T extends Holder> T addHolder(Cache cache, Holder attribute, int basePos, Serializable value, Generic... targets);
+	<T extends Holder> T addHolder(Holder attribute, int basePos, Serializable value, Generic... targets);
 
 	/**
 	 * Creates an holder or returns this holder if already exists. <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param attribute
 	 *            The Holder.
 	 * @param value
@@ -281,14 +259,12 @@ public interface Generic extends Comparable<Generic> {
 	 *            The optional targets.
 	 * @return The Holder.
 	 */
-	<T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, Generic... targets);
+	<T extends Holder> T setHolder(Holder attribute, Serializable value, Generic... targets);
 
 	/**
 	 * Creates an holder or returns this holder if already exists. <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param attribute
 	 *            The Holder.
 	 * @param value
@@ -299,25 +275,21 @@ public interface Generic extends Comparable<Generic> {
 	 *            The optional targets.
 	 * @return The holder.
 	 */
-	<T extends Holder> T setHolder(Cache cache, Holder attribute, Serializable value, int basePos, Generic... targets);
+	<T extends Holder> T setHolder(Holder attribute, Serializable value, int basePos, Generic... targets);
 
 	/**
 	 * Returns the targets of the Relation.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param relation
 	 *            The relation.
 	 * @see Snapshot
 	 * @return The targets.
 	 */
-	<T extends Generic> Snapshot<T> getTargets(Context context, Relation relation);
+	<T extends Generic> Snapshot<T> getTargets(Relation relation);
 
 	/**
 	 * Returns the targets of the Relation.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param relation
 	 *            The relation.
 	 * @param targetPos
@@ -326,13 +298,11 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 * @return The targets.
 	 */
-	<T extends Generic> Snapshot<T> getTargets(Context context, Relation relation, int targetPos);
+	<T extends Generic> Snapshot<T> getTargets(Relation relation, int targetPos);
 
 	/**
 	 * Returns the values holders.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param attribute
 	 *            The attribute.
 	 * @param basePos
@@ -342,13 +312,11 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 * @return The value holders.
 	 */
-	<T extends Holder> Snapshot<T> getHolders(Context context, Holder attribute, int basePos, Generic... targets);
+	<T extends Holder> Snapshot<T> getHolders(Holder attribute, int basePos, Generic... targets);
 
 	/**
 	 * Returns the values holders.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param attribute
 	 *            The attribute.
 	 * @param targets
@@ -356,13 +324,11 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 * @return The value holders.
 	 */
-	<T extends Holder> Snapshot<T> getHolders(Context context, Holder attribute, Generic... targets);
+	<T extends Holder> Snapshot<T> getHolders(Holder attribute, Generic... targets);
 
 	/**
 	 * Returns the Holder of value.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param attribute
 	 *            The attribute.
 	 * @param basePos
@@ -371,32 +337,26 @@ public interface Generic extends Comparable<Generic> {
 	 *            The targets.
 	 * @return The Holder.
 	 */
-	<T extends Holder> T getHolder(Context context, Holder attribute, int basePos, Generic... targets);
+	<T extends Holder> T getHolder(Holder attribute, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Holder of value.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param attribute
 	 *            The attribute.
 	 * @return The Holder.
 	 */
-	<T extends Holder> T getHolder(Context context, Holder attribute, Generic... targets);
+	<T extends Holder> T getHolder(Holder attribute, Generic... targets);
 
 	/**
 	 * Returns the values.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param attribute
 	 *            The attribute.
-	 * @param targets
-	 *            The targets.
 	 * @see Snapshot
 	 * @return The values.
 	 */
-	<T extends Serializable> Snapshot<T> getValues(final Context context, final Holder attribute);
+	<T extends Serializable> Snapshot<T> getValues(Holder attribute);
 
 	/**
 	 * Returns the value of the attribute.
@@ -405,35 +365,31 @@ public interface Generic extends Comparable<Generic> {
 	 *            The attribute.
 	 * @return The value.
 	 */
-	<S extends Serializable> S getValue(Context context, Holder attribute);
+	<S extends Serializable> S getValue(Holder attribute);
 
 	/**
 	 * Creates an holder or throws an exception if this holder already exists. <br/>
 	 * If the Singular constraint is enabled on the attribute, then one value will be created.<br/>
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param attribute
 	 *            The attribute.
 	 * @param value
 	 *            The name value.
 	 * @return The value holder.
 	 */
-	<T extends Holder> T addValue(Cache cache, Holder attribute, Serializable value);
+	<T extends Holder> T addValue(Holder attribute, Serializable value);
 
 	/**
 	 * Creates an holder or return this holder if this holder already exists. <br/>
 	 * If the Singular constraint is enabled on the attribute, then one value will be created.<br/>
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param attribute
 	 *            The attribute.
 	 * @param value
 	 *            The name value.
 	 * @return The value holder.
 	 */
-	<T extends Holder> T setValue(Cache cache, Holder attribute, Serializable value);
+	<T extends Holder> T setValue(Holder attribute, Serializable value);
 
 	/**
 	 * Returns true if the Generic inherits from the given Generic.
@@ -455,20 +411,15 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * Remove the Generic.
-	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 */
-	void remove(Cache cache);
+	void remove();
 
 	/**
 	 * Returns true if the Generic is alive
 	 * 
-	 * @param context
-	 *            The reference Context.
 	 * @return True if the Generic is alive.
 	 */
-	boolean isAlive(Context context);
+	boolean isAlive();
 
 	// TODO
 	// /**
@@ -546,38 +497,32 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Enable referential integrity for component position.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * 
 	 * @param componentPos
 	 *            The component position implicated by the constraint.
 	 * 
 	 * @return This.
 	 */
-	<T extends Generic> T enableReferentialIntegrity(Cache cache, int componentPos);
+	<T extends Generic> T enableReferentialIntegrity(int componentPos);
 
 	/**
 	 * Disable referential integrity for component position.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param componentPos
 	 *            The component position implicated by the constraint.
 	 * 
 	 * @return This.
 	 */
-	<T extends Generic> T disableReferentialIntegrity(Cache cache, int componentPos);
+	<T extends Generic> T disableReferentialIntegrity(int componentPos);
 
 	/**
 	 * Returns true if the referential integrity is enabled for component position.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @param componentPos
 	 *            The component position implicated by the constraint.
 	 * @return True if the referential integrity is enabled.
 	 */
-	boolean isReferentialIntegrity(Context context, int componentPos);
+	boolean isReferentialIntegrity(int componentPos);
 
 	/**
 	 * Returns the implicit.
@@ -628,26 +573,22 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Create a new anonymous instance.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param components
 	 *            The components.
 	 * @return The new Generic.
 	 */
-	<T extends Generic> T newAnonymousInstance(Cache cache, Generic... components);
+	<T extends Generic> T newAnonymousInstance(Generic... components);
 
 	/**
 	 * Create a new instance or get the instance if it already exists.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param value
 	 *            The value.
 	 * @param components
 	 *            The components.
 	 * @return The new Generic.
 	 */
-	<T extends Generic> T newInstance(Cache cache, Serializable value, Generic... components);
+	<T extends Generic> T newInstance(Serializable value, Generic... components);
 
 	/**
 	 * Return the meta.
@@ -659,22 +600,18 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Returns the inheritings Generic.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @see Snapshot
 	 * @return The inheritings Generic.
 	 */
-	<T extends Generic> Snapshot<T> getInheritings(Context context);
+	<T extends Generic> Snapshot<T> getInheritings();
 
 	/**
 	 * Returns the composites Generic.
 	 * 
-	 * @param context
-	 *            The reference context.
 	 * @see Snapshot
 	 * @return The composites Generic.
 	 */
-	<T extends Generic> Snapshot<T> getComposites(Context context);
+	<T extends Generic> Snapshot<T> getComposites();
 
 	/**
 	 * Returns true if the Generic is structural.
@@ -714,12 +651,10 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Returns true if the Generic is removable.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * 
 	 * @return True if the Generic is removable.
 	 */
-	boolean isRemovable(Cache cache);
+	boolean isRemovable();
 
 	/**
 	 * Log with slf4j.<br/>
@@ -728,60 +663,43 @@ public interface Generic extends Comparable<Generic> {
 	void log();
 
 	/**
-	 * Log with slf4j<br/>
-	 * Call the info(context) method.
-	 * 
-	 * @param context
-	 *            the reference context
-	 */
-	void log(Context context);
-
-	/**
 	 * Returns all available information except linkage information.
 	 * 
 	 * @return all available information except linkage information.
 	 */
 	String info();
 
-	/**
-	 * Returns all available information with linkage information too
-	 * 
-	 * @param context
-	 * @return all available information with linkage information too
-	 */
-	String info(Context context);
+	void clearAllStructural(Holder attribute, Generic... targets);
 
-	void clearAllStructural(Cache cache, Holder attribute, Generic... targets);
+	void clearAllStructural(Holder attribute, int basePos, Generic... targets);
 
-	void clearAllStructural(Cache cache, Holder attribute, int basePos, Generic... targets);
+	void clearAllConcrete(Holder attribute, Generic... targets);
 
-	void clearAllConcrete(Cache cache, Holder attribute, Generic... targets);
+	void clearAllConcrete(Holder attribute, int basePos, Generic... targets);
 
-	void clearAllConcrete(Cache cache, Holder attribute, int basePos, Generic... targets);
+	void cancelAll(Holder attribute, boolean concrete, Generic... targets);
 
-	void cancelAll(Cache cache, Holder attribute, boolean concrete, Generic... targets);
+	void cancelAll(Holder attribute, int basePos, boolean concrete, Generic... targets);
 
-	void cancelAll(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets);
+	<T extends Generic> T cancel(Holder attribute, boolean concrete, Generic... targets);
 
-	<T extends Generic> T cancel(Cache cache, Holder attribute, boolean concrete, Generic... targets);
+	<T extends Generic> T cancel(Holder attribute, int basePos, boolean concrete, Generic... targets);
 
-	<T extends Generic> T cancel(Cache cache, Holder attribute, int basePos, boolean concrete, Generic... targets);
+	<T extends MapProvider> Map<Serializable, Serializable> getMap(Class<T> mapClass);
 
-	<T extends MapProvider> Map<Serializable, Serializable> getMap(Cache cache, Class<T> mapClass);
+	Map<Serializable, Serializable> getProperties();
 
-	Map<Serializable, Serializable> getProperties(Cache cache);
+	<T extends Generic> T addComponent(int pos, Generic newComponent);
 
-	<T extends Generic> T addComponent(Cache cache, int pos, Generic newComponent);
+	<T extends Generic> T removeComponent(int pos, Generic newComponent);
 
-	<T extends Generic> T removeComponent(Cache cache, int pos, Generic newComponent);
+	<T extends Generic> T addSuper(int pos, Generic newSuper);
 
-	<T extends Generic> T addSuper(Cache cache, int pos, Generic newSuper);
+	<T extends Generic> T removeSuper(int pos);
 
-	<T extends Generic> T removeSuper(Cache cache, int pos);
+	<T extends Generic> T updateKey(Serializable key);
 
-	<T extends Generic> T updateKey(Cache cache, Serializable key);
-
-	Snapshot<Structural> getStructurals(Cache cache);
+	Snapshot<Structural> getStructurals();
 
 	<T extends Generic> Snapshot<T> getOtherTargets(int basePos, Holder holder);
 

@@ -29,34 +29,34 @@ public class TypesTest extends AbstractTest {
 	//
 	// private void directSubTypes(Cache cache, Type parent) {
 	// log.info("DirectSubTypes " + parent.toString());
-	// for (Type childen : parent.<Type> getDirectSubTypes(cache))
+	// for (Type childen : parent.<Type> getDirectSubTypes())
 	// directSubTypes(cache, childen);
 	// }
 
 	public void testGetAttributes() {
 		Type human = cache.newType("Human");
-		Generic michael = human.newInstance(cache, "Michael");
-		Generic quentin = human.newInstance(cache, "Quentin");
-		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human);
-		isBrotherOf.enableMultiDirectional(cache);
-		quentin.bind(cache, isBrotherOf, michael);
+		Generic michael = human.newInstance("Michael");
+		Generic quentin = human.newInstance("Quentin");
+		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
+		isBrotherOf.enableMultiDirectional();
+		quentin.bind(isBrotherOf, michael);
 
-		List<Structural> structurals = quentin.getStructurals(cache);
+		List<Structural> structurals = quentin.getStructurals();
 		assert structurals.size() >= 2 : structurals.size();
 		assert structurals.contains(new StructuralImpl(isBrotherOf, 0));
 
-		List<Structural> structurals2 = michael.getStructurals(cache);
+		List<Structural> structurals2 = michael.getStructurals();
 		assert structurals2.size() >= 2 : structurals2.size();
 		assert structurals2.contains(new StructuralImpl(isBrotherOf, 0));
 	}
 
 	public void testGetOtherTargets() {
 		Type human = cache.newType("Human");
-		Generic michael = human.newInstance(cache, "Michael");
-		Generic quentin = human.newInstance(cache, "Quentin");
-		Relation isBrotherOf = human.setRelation(cache, "isBrotherOf", human);
-		isBrotherOf.enableMultiDirectional(cache);
-		Link link = quentin.bind(cache, isBrotherOf, michael);
+		Generic michael = human.newInstance("Michael");
+		Generic quentin = human.newInstance("Quentin");
+		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
+		isBrotherOf.enableMultiDirectional();
+		Link link = quentin.bind(isBrotherOf, michael);
 
 		List<Generic> targets = quentin.getOtherTargets(0, link);
 		assert targets.size() == 1 : targets.size();

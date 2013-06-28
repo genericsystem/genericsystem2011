@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.EngineConsistencyConstraintViolationException;
 import org.genericsystem.generic.Type;
@@ -15,9 +16,9 @@ public class EngineConsistencyConstraintTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				vehicle.setAttribute(GenericSystem.newCacheOnANewInMemoryEngine().start(), "Power");
+				((EngineImpl) vehicle.getEngine()).start(GenericSystem.newCacheOnANewInMemoryEngine());
+				vehicle.setAttribute("Power");
 			}
 		}.assertIsCausedBy(EngineConsistencyConstraintViolationException.class);
 	}
-
 }

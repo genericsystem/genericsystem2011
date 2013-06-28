@@ -93,8 +93,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T find(Context context, Class<?> clazz) {
-		return (T) systemCache.get(context, clazz);
+	public <T extends Generic> T find(Class<?> clazz) {
+		return (T) systemCache.get(clazz);
 	}
 
 	@Override
@@ -162,10 +162,10 @@ public class EngineImpl extends GenericImpl implements Engine {
 			CacheImpl cache = (CacheImpl) start(newCache());// new CacheImpl(new Transaction(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				if (get(clazz) == null)
-					bind(cache, clazz);
+					bind(clazz);
 			for (Class<?> clazz : userClasses)
 				if (get(clazz) == null)
-					bind(cache, clazz);
+					bind(clazz);
 			cache.flush();
 			stop(cache);
 			startupTime = false;
@@ -173,18 +173,19 @@ public class EngineImpl extends GenericImpl implements Engine {
 		}
 
 		@SuppressWarnings("unchecked")
-		public <T extends Generic> T get(Context context, Class<?> clazz) {
+		public <T extends Generic> T get(Class<?> clazz) {
 			T systemProperty = (T) super.get(clazz);
 			if (systemProperty != null)
 				return systemProperty;
-			if (startupTime && context instanceof Cache)
-				return bind((CacheImpl) context, clazz);
+			if (startupTime && getCurrentCache() instanceof Cache)
+				return bind(clazz);
 			throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T extends Generic> T bind(CacheImpl cache, Class<?> clazz) {
+		private <T extends Generic> T bind(Class<?> clazz) {
 			T result;
+			CacheImpl cache = (CacheImpl) getCurrentCache();
 			if (Engine.class.equals(clazz))
 				result = (T) EngineImpl.this;
 			if (MetaAttribute.class.equals(clazz)) {
@@ -198,7 +199,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);
-			((GenericImpl) result).mountConstraints(cache, clazz);
+			((GenericImpl) result).mountConstraints(clazz);
 			cache.triggersDependencies(clazz);
 			return result;
 		}

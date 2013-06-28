@@ -59,74 +59,74 @@ public class ApiTest extends AbstractTest {
 	public void testUpdateSize() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Generic size = cache.find(Size.class);
-		assert size.getImplicit().updateKey(cache, "Size2").getValue().equals("Size2");
+		assert size.getImplicit().updateKey( "Size2").getValue().equals("Size2");
 	}
 
 	public void testUpdate() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		assert vehicle.updateKey(cache, "Vehicle2").getValue().equals("Vehicle2");
-		assert !vehicle.isAlive(cache);
+		assert vehicle.updateKey( "Vehicle2").getValue().equals("Vehicle2");
+		assert !vehicle.isAlive();
 	}
 
 	public void testUpdateWithSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type vehicle2 = vehicle.updateKey(cache, "Vehicle2");
+		Type car = vehicle.newSubType( "Car");
+		Type vehicle2 = vehicle.updateKey( "Vehicle2");
 		assert vehicle2.getValue().equals("Vehicle2");
-		assert !vehicle.isAlive(cache);
-		assert !car.isAlive(cache);
-		assert vehicle2.getSubType(cache, "Car").isAlive(cache);
+		assert !vehicle.isAlive();
+		assert !car.isAlive();
+		assert vehicle2.getSubType( "Car").isAlive();
 	}
 
 	public void testUpdateWithSubRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
-		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
-		Relation vehicleColor2 = vehicleColor.updateKey(cache, "VehicleColor2");
+		Relation vehicleColor = vehicle.setRelation( "VehicleColor", color);
+		Relation vehicleColor2 = vehicleColor.updateKey( "VehicleColor2");
 		assert vehicleColor2.getValue().equals("VehicleColor2");
-		assert !vehicleColor.isAlive(cache);
-		assert vehicle.getRelation(cache, "VehicleColor2").isAlive(cache);
+		assert !vehicleColor.isAlive();
+		assert vehicle.getRelation( "VehicleColor2").isAlive();
 	}
 
 	public void testUpdateWithSubRelation2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
+		Type car = vehicle.newSubType( "Car");
 		Type color = cache.newType("Color");
-		Type matColor = color.newSubType(cache, "MatColor");
-		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
-		car.setRelation(cache, "CarMatColor", matColor);
-		Relation vehicleColor2 = vehicleColor.updateKey(cache, "VehicleColor2");
+		Type matColor = color.newSubType( "MatColor");
+		Relation vehicleColor = vehicle.setRelation( "VehicleColor", color);
+		car.setRelation( "CarMatColor", matColor);
+		Relation vehicleColor2 = vehicleColor.updateKey( "VehicleColor2");
 		assert vehicleColor2.getValue().equals("VehicleColor2");
-		assert !vehicleColor.isAlive(cache);
-		assert car.getRelation(cache, "CarMatColor").isAlive(cache);
+		assert !vehicleColor.isAlive();
+		assert car.getRelation( "CarMatColor").isAlive();
 	}
 
 	public void testRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "CarColor", color);
-		Generic myAudi = car.newInstance(cache, "myAudi");
-		Generic red = color.newInstance(cache, "red");
-		Link carRed = car.bind(cache, carColor, red);
-		Link myAudiRed = myAudi.bind(cache, carColor, red);
+		Relation carColor = car.setRelation( "CarColor", color);
+		Generic myAudi = car.newInstance( "myAudi");
+		Generic red = color.newInstance( "red");
+		Link carRed = car.bind( carColor, red);
+		Link myAudiRed = myAudi.bind( carColor, red);
 		assert myAudiRed.inheritsFrom(carRed);
-		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
+		assert !red.getLinks( carColor).contains(carRed) : red.getLinks( carColor);
 	}
 
 	public void deduct() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "CarColor", color);
-		car.newInstance(cache, "myAudi");
-		Generic red = color.newInstance(cache, "red");
-		Link carRed = car.setLink(cache, carColor, "carRed", red);
-		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
+		Relation carColor = car.setRelation( "CarColor", color);
+		car.newInstance( "myAudi");
+		Generic red = color.newInstance( "red");
+		Link carRed = car.setLink( carColor, "carRed", red);
+		assert !red.getLinks( carColor).contains(carRed) : red.getLinks( carColor);
 	}
 
 	public void ternaryDeduct() {
@@ -134,55 +134,55 @@ public class ApiTest extends AbstractTest {
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Type time = cache.newType("Time");
-		Relation carColorTime = car.setRelation(cache, "CarColorTime", color, time);
-		car.newInstance(cache, "myAudi");
-		car.newInstance(cache, "myBmw");
-		Generic red = color.newInstance(cache, "red");
-		time.newInstance(cache, "today");
-		time.newInstance(cache, "tomorrow");
-		Link carRed = car.setLink(cache, carColorTime, "carRed", red, time);
-		assert !red.getLinks(cache, carColorTime).contains(carRed) : red.getLinks(cache, carColorTime);
+		Relation carColorTime = car.setRelation( "CarColorTime", color, time);
+		car.newInstance( "myAudi");
+		car.newInstance( "myBmw");
+		Generic red = color.newInstance( "red");
+		time.newInstance( "today");
+		time.newInstance( "tomorrow");
+		Link carRed = car.setLink( carColorTime, "carRed", red, time);
+		assert !red.getLinks( carColorTime).contains(carRed) : red.getLinks( carColorTime);
 	}
 
 	public void deductWithInherits() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
+		Type car = vehicle.newSubType( "Car");
 		Type color = cache.newType("Color");
-		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color);
-		car.newInstance(cache, "myAudi");
-		Generic red = color.newInstance(cache, "red");
-		Link vehicleRed = vehicle.setLink(cache, vehicleColor, "vehicleRed", red);
-		assert !red.getLinks(cache, vehicleColor).contains(vehicleRed) : red.getLinks(cache, vehicleColor);
+		Relation vehicleColor = vehicle.setRelation( "VehicleColor", color);
+		car.newInstance( "myAudi");
+		Generic red = color.newInstance( "red");
+		Link vehicleRed = vehicle.setLink( vehicleColor, "vehicleRed", red);
+		assert !red.getLinks( vehicleColor).contains(vehicleRed) : red.getLinks( vehicleColor);
 	}
 
 	public void ternaryDeductWithInherits() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
+		Type car = vehicle.newSubType( "Car");
 		Type color = cache.newType("Color");
 		Type time = cache.newType("Time");
-		Relation vehicleColor = vehicle.setRelation(cache, "VehicleColor", color, time);
-		car.newInstance(cache, "myAudi");
-		Generic red = color.newInstance(cache, "red");
-		time.newInstance(cache, "today");
-		time.newInstance(cache, "tomorrow");
-		Link vehicleRed = vehicle.setLink(cache, vehicleColor, "vehicleRed", red, time);
-		assert !red.getLinks(cache, vehicleColor).contains(vehicleRed) : red.getLinks(cache, vehicleColor);
+		Relation vehicleColor = vehicle.setRelation( "VehicleColor", color, time);
+		car.newInstance( "myAudi");
+		Generic red = color.newInstance( "red");
+		time.newInstance( "today");
+		time.newInstance( "tomorrow");
+		Link vehicleRed = vehicle.setLink( vehicleColor, "vehicleRed", red, time);
+		assert !red.getLinks( vehicleColor).contains(vehicleRed) : red.getLinks( vehicleColor);
 	}
 
 	public void deductWithTwoInstances() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "CarColor", color);
-		car.newInstance(cache, "myAudi");
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic red = color.newInstance(cache, "red");
-		Link carRed = car.bind(cache, carColor, red);
-		Link myBmwRed = myBmw.bind(cache, carRed, red);
-		assert !red.getLinks(cache, carColor).contains(carRed) : red.getLinks(cache, carColor);
-		assert red.getLinks(cache, carColor).contains(myBmwRed) : red.getLinks(cache, carColor);
+		Relation carColor = car.setRelation( "CarColor", color);
+		car.newInstance( "myAudi");
+		Generic myBmw = car.newInstance( "myBmw");
+		Generic red = color.newInstance( "red");
+		Link carRed = car.bind( carColor, red);
+		Link myBmwRed = myBmw.bind( carRed, red);
+		assert !red.getLinks( carColor).contains(carRed) : red.getLinks( carColor);
+		assert red.getLinks( carColor).contains(myBmwRed) : red.getLinks( carColor);
 	}
 
 	public void ternaryDeductWithTwoInstances() {
@@ -190,16 +190,16 @@ public class ApiTest extends AbstractTest {
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Type time = cache.newType("Time");
-		Relation carColorTime = car.setRelation(cache, "CarColorTime", color, time);
-		car.newInstance(cache, "myAudi");
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic red = color.newInstance(cache, "red");
-		Generic today = time.newInstance(cache, "today");
-		time.newInstance(cache, "tomorrow");
-		Link carRedTime = car.bind(cache, carColorTime, red, time);
-		Link myBmwRed = myBmw.bind(cache, carRedTime, red, today);
-		assert !red.getLinks(cache, carColorTime).contains(carRedTime);
-		assert red.getLinks(cache, carColorTime).contains(myBmwRed) : red.getLinks(cache, carColorTime);
+		Relation carColorTime = car.setRelation( "CarColorTime", color, time);
+		car.newInstance( "myAudi");
+		Generic myBmw = car.newInstance( "myBmw");
+		Generic red = color.newInstance( "red");
+		Generic today = time.newInstance( "today");
+		time.newInstance( "tomorrow");
+		Link carRedTime = car.bind( carColorTime, red, time);
+		Link myBmwRed = myBmw.bind( carRedTime, red, today);
+		assert !red.getLinks( carColorTime).contains(carRedTime);
+		assert red.getLinks( carColorTime).contains(myBmwRed) : red.getLinks( carColorTime);
 	}
 
 	public void testOrderedGenerics() {
@@ -234,13 +234,13 @@ public class ApiTest extends AbstractTest {
 	public void testCyclicInherits() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type a = cache.newType("A");
-		a.newSubType(cache, "B");
+		a.newSubType( "B");
 		final Type b = cache.newType("B");
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				b.newSubType(cache, "A");
+				b.newSubType( "A");
 			}
 		}.assertIsCausedBy(FunctionalConsistencyViolationException.class);
 	}
@@ -248,66 +248,66 @@ public class ApiTest extends AbstractTest {
 	public void testGetReferentialAndIsRemovable() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute power = vehicle.setProperty(cache, "Power");
-		power.enableReferentialIntegrity(cache, Statics.BASE_POSITION);
-		// assert vehicle.getRefenrentialIntegrities(cache).contains(power) : vehicle.getRefenrentialIntegrities(cache);
-		assert !vehicle.isRemovable(cache);
+		Attribute power = vehicle.setProperty( "Power");
+		power.enableReferentialIntegrity( Statics.BASE_POSITION);
+		// assert vehicle.getRefenrentialIntegrities().contains(power) : vehicle.getRefenrentialIntegrities();
+		assert !vehicle.isRemovable();
 	}
 
 	public void testGetReferentialAndIsRemovable2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type superCar = car.newSubType(cache, "SuperCar");
-		Attribute power = vehicle.setProperty(cache, "Power");
-		power.enableReferentialIntegrity(cache, Statics.BASE_POSITION);
-		// assert vehicle.getRefenrentialIntegrities(cache).contains(power) : vehicle.getRefenrentialIntegrities(cache);
-		// assert car.getRefenrentialIntegrities(cache).contains(superCar) : car.getRefenrentialIntegrities(cache);
-		// assert superCar.getRefenrentialIntegrities(cache).isEmpty();
-		assert !vehicle.isRemovable(cache);
-		assert !car.isRemovable(cache);
-		assert superCar.isRemovable(cache);
+		Type car = vehicle.newSubType( "Car");
+		Type superCar = car.newSubType( "SuperCar");
+		Attribute power = vehicle.setProperty( "Power");
+		power.enableReferentialIntegrity( Statics.BASE_POSITION);
+		// assert vehicle.getRefenrentialIntegrities().contains(power) : vehicle.getRefenrentialIntegrities();
+		// assert car.getRefenrentialIntegrities().contains(superCar) : car.getRefenrentialIntegrities();
+		// assert superCar.getRefenrentialIntegrities().isEmpty();
+		assert !vehicle.isRemovable();
+		assert !car.isRemovable();
+		assert superCar.isRemovable();
 	}
 
 	public void testGetReferentialAndIsRemovableWithSubTypes() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		car.enableReferentialIntegrity(cache, Statics.BASE_POSITION);
-		// assert vehicle.getRefenrentialIntegrities(cache).contains(car) : vehicle.getRefenrentialIntegrities(cache);
-		assert !vehicle.isRemovable(cache);
+		Type car = vehicle.newSubType( "Car");
+		car.enableReferentialIntegrity( Statics.BASE_POSITION);
+		// assert vehicle.getRefenrentialIntegrities().contains(car) : vehicle.getRefenrentialIntegrities();
+		assert !vehicle.isRemovable();
 	}
 
 	public void testGetReferentialAndIsRemovableWithSubTypes2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type superCar = car.newSubType(cache, "SuperCar");
-		superCar.enableReferentialIntegrity(cache, Statics.BASE_POSITION);
-		// assert vehicle.getRefenrentialIntegrities(cache).contains(superCar) : vehicle.getRefenrentialIntegrities(cache);
-		assert !vehicle.isRemovable(cache);
+		Type car = vehicle.newSubType( "Car");
+		Type superCar = car.newSubType( "SuperCar");
+		superCar.enableReferentialIntegrity( Statics.BASE_POSITION);
+		// assert vehicle.getRefenrentialIntegrities().contains(superCar) : vehicle.getRefenrentialIntegrities();
+		assert !vehicle.isRemovable();
 	}
 
 	@Test(enabled = false)
 	public void test_simple_api() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Attribute power = car.setProperty(cache, "Power");
+		Attribute power = car.setProperty( "Power");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Relation carColor = car.setRelation( "CarColor", color);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic red = color.newInstance(cache, "red");
-		myBmw.setValue(cache, power, "123");
-		myBmw.setLink(cache, carColor, "myBmwRed", red);
+		Generic myBmw = car.newInstance( "myBmw");
+		Generic red = color.newInstance( "red");
+		myBmw.setValue( power, "123");
+		myBmw.setLink( carColor, "myBmwRed", red);
 
-		Link carRed = car.setLink(cache, carColor, "CarRed", red);
+		Link carRed = car.setLink( carColor, "CarRed", red);
 
-		Generic myFiat = car.newInstance(cache, "myFiat");
-		assert myFiat.getLink(cache, carColor) != null;
-		assert Objects.equals(myFiat.getLink(cache, carColor), carRed);
-		assert myFiat.getTargets(cache, carColor).contains(red);
-		// assert myFiat.getTargets(cache, carColor).contains(red);
+		Generic myFiat = car.newInstance( "myFiat");
+		assert myFiat.getLink( carColor) != null;
+		assert Objects.equals(myFiat.getLink( carColor), carRed);
+		assert myFiat.getTargets( carColor).contains(red);
+		// assert myFiat.getTargets( carColor).contains(red);
 	}
 
 	// getType() tests
@@ -358,7 +358,7 @@ public class ApiTest extends AbstractTest {
 	public void test_get_type_with_hierarchy() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Type superCar = car.newSubType(cache, "SuperCar");
+		Type superCar = car.newSubType( "SuperCar");
 
 		assert cache.getType("SuperCar") == superCar;
 	}
@@ -368,9 +368,9 @@ public class ApiTest extends AbstractTest {
 	public void test_get_existing_subtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Type expected = car.newSubType(cache, "Audi");
+		Type expected = car.newSubType( "Audi");
 
-		Generic actual = car.getSubType(cache, "Audi");
+		Generic actual = car.getSubType( "Audi");
 		assert Objects.equals(actual, expected);
 	}
 
@@ -379,18 +379,18 @@ public class ApiTest extends AbstractTest {
 		Type car = cache.newType("Car");
 		Type expected = null;
 
-		Generic actual = car.getSubType(cache, "Audi");
+		Generic actual = car.getSubType( "Audi");
 		assert Objects.equals(actual, expected);
 	}
 
 	public void test_get_multiple_existing_subtypes() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Type expectedAudi = car.newSubType(cache, "Audi");
-		Type expectedMercedes = car.newSubType(cache, "Mercedes");
+		Type expectedAudi = car.newSubType( "Audi");
+		Type expectedMercedes = car.newSubType( "Mercedes");
 
-		Generic actualAudi = car.getSubType(cache, "Audi");
-		Generic actualMercedes = car.getSubType(cache, "Mercedes");
+		Generic actualAudi = car.getSubType( "Audi");
+		Generic actualMercedes = car.getSubType( "Mercedes");
 
 		assert Objects.equals(actualAudi, expectedAudi);
 		assert Objects.equals(actualMercedes, expectedMercedes);
@@ -401,7 +401,7 @@ public class ApiTest extends AbstractTest {
 		Type car = cache.newType("Car");
 
 		Type expected = null;
-		Generic actual = car.getSubType(cache, "Audi");
+		Generic actual = car.getSubType( "Audi");
 
 		assert Objects.equals(actual, expected);
 	}
@@ -409,7 +409,7 @@ public class ApiTest extends AbstractTest {
 	public void test_get_subtype_with_null_value() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-		Type expected = car.newSubType(cache, null);
+		Type expected = car.newSubType( null);
 
 	}
 
@@ -420,9 +420,9 @@ public class ApiTest extends AbstractTest {
 		Type bus = cache.newType("Bus");
 		Type moto = cache.newType("Moto");
 
-		Type superCar = car.newSubType(cache, "SuperCar");
+		Type superCar = car.newSubType( "SuperCar");
 
-		Snapshot<Type> types = cache.getEngine().getAllInstances(cache);
+		Snapshot<Type> types = cache.getEngine().getAllInstances();
 		types.log();
 		assert types.size() >= 4;
 		assert types.containsAll(Arrays.asList(car, bus, moto, superCar));
@@ -433,15 +433,15 @@ public class ApiTest extends AbstractTest {
 
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic myAudi = car.newInstance(cache, "myAudi");
-		Generic myMercedes = car.newInstance(cache, "myMercedes");
-		Generic myPeugeot = car.newInstance(cache, "myPeugeot");
+		Generic myBmw = car.newInstance( "myBmw");
+		Generic myAudi = car.newInstance( "myAudi");
+		Generic myMercedes = car.newInstance( "myMercedes");
+		Generic myPeugeot = car.newInstance( "myPeugeot");
 
-		assert car.getInstanceByValue(cache, "myBmw") == myBmw;
-		assert car.getInstanceByValue(cache, "myAudi") == myAudi;
-		assert car.getInstanceByValue(cache, "myMercedes") == myMercedes;
-		assert car.getInstanceByValue(cache, "myPeugeot") == myPeugeot;
+		assert car.getInstanceByValue( "myBmw") == myBmw;
+		assert car.getInstanceByValue( "myAudi") == myAudi;
+		assert car.getInstanceByValue( "myMercedes") == myMercedes;
+		assert car.getInstanceByValue( "myPeugeot") == myPeugeot;
 	}
 
 	public void test_get_non_existing_instances() {
@@ -449,7 +449,7 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 
-		assert car.getInstanceByValue(cache, "myAudi") == null;
+		assert car.getInstanceByValue( "myAudi") == null;
 	}
 
 	// getLink() tests
@@ -458,40 +458,40 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Relation carColor = car.setRelation( "CarColor", color);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic red = color.newInstance(cache, "red");
-		Generic yellow = color.newInstance(cache, "yellow");
+		Generic myBmw = car.newInstance( "myBmw");
+		Generic red = color.newInstance( "red");
+		Generic yellow = color.newInstance( "yellow");
 
-		Link myBmwYellow = myBmw.setLink(cache, carColor, "myBmwYellow", yellow);
-		Link carRed = car.setLink(cache, carColor, "CarRed", red);
+		Link myBmwYellow = myBmw.setLink( carColor, "myBmwYellow", yellow);
+		Link carRed = car.setLink( carColor, "CarRed", red);
 
-		Generic myFiat = car.newInstance(cache, "myFiat");
+		Generic myFiat = car.newInstance( "myFiat");
 
-		assert myBmw.getLink(cache, carColor) != null;
-		assert myBmw.getLinks(cache, carColor).size() == 2;
-		assert myBmw.getLinks(cache, carColor).contains(myBmwYellow);
-		assert myFiat.getLink(cache, carColor) != null;
-		assert Objects.equals(myFiat.getLink(cache, carColor), carRed);
-		assert myFiat.getTargets(cache, carColor).contains(red);
+		assert myBmw.getLink( carColor) != null;
+		assert myBmw.getLinks( carColor).size() == 2;
+		assert myBmw.getLinks( carColor).contains(myBmwYellow);
+		assert myFiat.getLink( carColor) != null;
+		assert Objects.equals(myFiat.getLink( carColor), carRed);
+		assert myFiat.getTargets( carColor).contains(red);
 	}
 
 	public void test_retrieve_a_father_child_relation_by_the_father() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Homme");
 
-		Relation family = human.setRelation(cache, "family", human);
+		Relation family = human.setRelation( "family", human);
 
-		Generic father = human.newInstance(cache, "father");
-		Generic son = human.newInstance(cache, "son");
-		Generic daughter = human.newInstance(cache, "daughter");
+		Generic father = human.newInstance( "father");
+		Generic son = human.newInstance( "son");
+		Generic daughter = human.newInstance( "daughter");
 
-		Link fatherSon = father.setLink(cache, family, "fatherSon", son);
-		Link fatherDaughter = father.setLink(cache, family, "fatherDaughter", daughter);
+		Link fatherSon = father.setLink( family, "fatherSon", son);
+		Link fatherDaughter = father.setLink( family, "fatherDaughter", daughter);
 
-		// assert father.getLink(cache, family, 0) == fatherSon;
-		assert son.getLink(cache, family, 1) == fatherSon;
-		assert daughter.getLink(cache, family, 1) == fatherDaughter;
+		// assert father.getLink( family, 0) == fatherSon;
+		assert son.getLink( family, 1) == fatherSon;
+		assert daughter.getLink( family, 1) == fatherDaughter;
 	}
 }

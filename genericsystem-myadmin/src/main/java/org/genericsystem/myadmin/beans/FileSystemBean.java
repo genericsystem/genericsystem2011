@@ -41,15 +41,15 @@ public class FileSystemBean implements Serializable {
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
 	public List<Directory> getRootDirectories() {
-		return cache.<FileSystem> find(FileSystem.class).getRootDirectories(cache);
+		return cache.<FileSystem> find(FileSystem.class).getRootDirectories();
 	}
 
 	public List<Directory> getDirectories(final Directory directory) {
-		return directory.getDirectories(cache);
+		return directory.getDirectories();
 	}
 
 	public List<File> getFiles(final Directory directory) {
-		return directory.getFiles(cache);
+		return directory.getFiles();
 	}
 
 	public void changeFile(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
@@ -61,17 +61,17 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public void addRootDirectory(String newValue) {
-		cache.<FileSystem> find(FileSystem.class).addRootDirectory(cache, newValue);
+		cache.<FileSystem> find(FileSystem.class).addRootDirectory(newValue);
 		messages.info("createRootDirectory", newValue);
 	}
 
 	public void addSubDirectory(String newValue) {
-		((Directory) selectedFile).addDirectory(cache, newValue);
+		((Directory) selectedFile).addDirectory(newValue);
 		messages.info("createSubDirectory", newValue, selectedFile.getValue());
 	}
 
 	public void addFile(String newValue) {
-		((Directory) selectedFile).addFile(cache, newValue);
+		((Directory) selectedFile).addFile(newValue);
 		messages.info("createFile", newValue);
 	}
 
@@ -96,14 +96,14 @@ public class FileSystemBean implements Serializable {
 
 		public void setShortPath(String newValue) {
 			if (!newValue.equals(generic.getValue())) {
-				selectedFile = generic.updateKey(cache, newValue);
+				selectedFile = generic.updateKey(newValue);
 				messages.info("updateShortPath", newValue, generic.getValue());
 			}
 		}
 	}
 
 	public String delete() {
-		selectedFile.remove(cache);
+		selectedFile.remove();
 		redirect.redirectInfo("deleteFile", selectedFile.getValue());
 		selectedFile = null;
 		return "HOME";
@@ -129,12 +129,12 @@ public class FileSystemBean implements Serializable {
 	public String getContent() {
 		if (selectedFile == null)
 			return "";
-		byte[] bytes = ((File) selectedFile).getContent(cache);
+		byte[] bytes = ((File) selectedFile).getContent();
 		return new String(bytes != null ? new String(bytes) : "");
 	}
 
 	public void setContent(String content) {
-		((File) selectedFile).setContent(cache, content.getBytes());
+		((File) selectedFile).setContent(content.getBytes());
 		messages.info("setContent", selectedFile.getValue());
 	}
 }

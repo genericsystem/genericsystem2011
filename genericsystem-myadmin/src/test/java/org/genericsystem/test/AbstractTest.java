@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.genericsystem.cdi.CacheProvider;
+import org.genericsystem.cdi.CdiFactory;
 import org.genericsystem.cdi.EngineProvider;
 import org.genericsystem.cdi.PersitentDirectoryProvider;
 import org.genericsystem.cdi.UserClassesProvider;
@@ -31,8 +32,8 @@ public abstract class AbstractTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createTestArchive() {
-		return new Archiver(TypesBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class, MessageFactory.class)
-				.archive();
+		return new Archiver(TypesBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class, MessageFactory.class,
+				CdiFactory.class).archive();
 	}
 
 	@Inject

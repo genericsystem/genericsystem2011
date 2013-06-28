@@ -17,10 +17,10 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testInstancesSnapshotOfType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myVehicle1 = vehicle.newInstance(cache, "myVehicle1");
-		Generic myVehicle2 = vehicle.newInstance(cache, "myVehicle2");
-		Generic myVehicle3 = vehicle.newInstance(cache, "myVehicle3");
-		Snapshot<Generic> instances = vehicle.getInstances(cache);
+		Generic myVehicle1 = vehicle.newInstance( "myVehicle1");
+		Generic myVehicle2 = vehicle.newInstance( "myVehicle2");
+		Generic myVehicle3 = vehicle.newInstance( "myVehicle3");
+		Snapshot<Generic> instances = vehicle.getInstances();
 		assert instances.size() == 3;
 		assert instances.contains(myVehicle1);
 		assert instances.contains(myVehicle2);
@@ -31,10 +31,10 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testAllInstancesSnapshotOfType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myVehicle1 = vehicle.newInstance(cache, "myVehicle1");
-		Generic myVehicle2 = vehicle.newInstance(cache, "myVehicle2");
-		Generic myVehicle3 = vehicle.newInstance(cache, "myVehicle3");
-		Snapshot<Generic> snapshot = vehicle.getAllInstances(cache);
+		Generic myVehicle1 = vehicle.newInstance( "myVehicle1");
+		Generic myVehicle2 = vehicle.newInstance( "myVehicle2");
+		Generic myVehicle3 = vehicle.newInstance( "myVehicle3");
+		Snapshot<Generic> snapshot = vehicle.getAllInstances();
 		assert snapshot.size() == 3 : snapshot;
 		assert snapshot.contains(myVehicle1);
 		assert snapshot.contains(myVehicle2);
@@ -44,12 +44,12 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testInstancesSnapshotOfTypeWithSubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		car.newInstance(cache, "myCar1");
-		Generic myVehicle1 = vehicle.newInstance(cache, "myVehicle1");
-		Generic myVehicle2 = vehicle.newInstance(cache, "myVehicle2");
-		Generic myVehicle3 = vehicle.newInstance(cache, "myVehicle3");
-		Snapshot<Generic> snapshot = vehicle.getInstances(cache);
+		Type car = vehicle.newSubType( "Car");
+		car.newInstance( "myCar1");
+		Generic myVehicle1 = vehicle.newInstance( "myVehicle1");
+		Generic myVehicle2 = vehicle.newInstance( "myVehicle2");
+		Generic myVehicle3 = vehicle.newInstance( "myVehicle3");
+		Snapshot<Generic> snapshot = vehicle.getInstances();
 		assert snapshot.size() == 3 : snapshot;
 		assert snapshot.contains(myVehicle1);
 		assert snapshot.contains(myVehicle2);
@@ -59,18 +59,18 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testAllInstancesSnapshotOfTypeWithSubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Generic myCar1 = car.newInstance(cache, "myCar1");
-		Generic myVehicle1 = vehicle.newInstance(cache, "myVehicle1");
-		Generic myVehicle2 = vehicle.newInstance(cache, "myVehicle2");
-		Generic myVehicle3 = vehicle.newInstance(cache, "myVehicle3");
-		Snapshot<Generic> snapshot = vehicle.getAllInstances(cache);
+		Type car = vehicle.newSubType( "Car");
+		Generic myCar1 = car.newInstance( "myCar1");
+		Generic myVehicle1 = vehicle.newInstance( "myVehicle1");
+		Generic myVehicle2 = vehicle.newInstance( "myVehicle2");
+		Generic myVehicle3 = vehicle.newInstance( "myVehicle3");
+		Snapshot<Generic> snapshot = vehicle.getAllInstances();
 		assert snapshot.size() == 4 : snapshot;
 		assert snapshot.contains(myVehicle1);
 		assert snapshot.contains(myVehicle2);
 		assert snapshot.contains(myVehicle3);
 		assert snapshot.contains(myCar1);
-		snapshot = car.getAllInstances(cache);
+		snapshot = car.getAllInstances();
 		assert snapshot.size() == 1 : snapshot;
 		assert snapshot.contains(myCar1);
 	}
@@ -78,23 +78,23 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testInstancesSnapshotOfAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute vehiclePower = vehicle.setAttribute(cache, "vehiclePower");
-		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Holder valueOfAttribute = myVehicle.setValue(cache, vehiclePower, "233 HP");
-		Snapshot<Generic> snapshot = vehiclePower.getInstances(cache);
+		Attribute vehiclePower = vehicle.setAttribute( "vehiclePower");
+		Generic myVehicle = vehicle.newInstance( "myVehicle");
+		Holder valueOfAttribute = myVehicle.setValue( vehiclePower, "233 HP");
+		Snapshot<Generic> snapshot = vehiclePower.getInstances();
 		assert snapshot.size() == 1 : valueOfAttribute.info();
 		assert snapshot.contains(valueOfAttribute);
-		valueOfAttribute.remove(cache);
+		valueOfAttribute.remove();
 		assert snapshot.size() == 0;
 	}
 
 	public void testAllInstancesSnapshotOfAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
-		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Holder valueOfAttribute = myVehicle.setValue(cache, vehiclePower, "123");
-		Snapshot<Generic> snapshot = vehiclePower.getAllInstances(cache);
+		Attribute vehiclePower = vehicle.setAttribute( "power");
+		Generic myVehicle = vehicle.newInstance( "myVehicle");
+		Holder valueOfAttribute = myVehicle.setValue( vehiclePower, "123");
+		Snapshot<Generic> snapshot = vehiclePower.getAllInstances();
 		assert snapshot.size() == 1 : snapshot;
 		assert snapshot.contains(valueOfAttribute);
 	}
@@ -103,12 +103,12 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation relation = color.setRelation(cache, "relation", car);
-		Generic bmw = car.newInstance(cache, "bmw");
-		Generic red = color.newInstance(cache, "red");
-		Link link2 = red.setLink(cache, relation, "link2", bmw);
-		assert relation.getInstances(cache).size() == 1 : relation.getInstances(cache);
-		assert relation.getInstances(cache).contains(link2);
+		Relation relation = color.setRelation( "relation", car);
+		Generic bmw = car.newInstance( "bmw");
+		Generic red = color.newInstance( "red");
+		Link link2 = red.setLink( relation, "link2", bmw);
+		assert relation.getInstances().size() == 1 : relation.getInstances();
+		assert relation.getInstances().contains(link2);
 	}
 
 	public void testInstancesSnapshotOfRelationTernary() {
@@ -116,32 +116,32 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		Type time = cache.newType("Time");
-		Relation drive = human.setRelation(cache, "drive", vehicle, time);
-		Generic myck = human.newInstance(cache, "myck");
-		Generic myBmw = vehicle.newInstance(cache, "myBmw");
-		Generic myTime = time.newInstance(cache, "myTime");
-		Link link = myck.setLink(cache, drive, "theDrive", myBmw, myTime);
-		assert drive.getInstances(cache).size() == 1 : drive.getInstances(cache);
-		assert drive.getInstances(cache).contains(link);
+		Relation drive = human.setRelation( "drive", vehicle, time);
+		Generic myck = human.newInstance( "myck");
+		Generic myBmw = vehicle.newInstance( "myBmw");
+		Generic myTime = time.newInstance( "myTime");
+		Link link = myck.setLink( drive, "theDrive", myBmw, myTime);
+		assert drive.getInstances().size() == 1 : drive.getInstances();
+		assert drive.getInstances().contains(link);
 	}
 
 	public void testAllInstancesSnapshotOfRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation driver = human.setRelation(cache, "drive", vehicle);
-		Generic myBmw = vehicle.newInstance(cache, "myBmw");
-		Generic myck = human.newInstance(cache, "myck");
-		Link link = myck.setLink(cache, driver, "theDrive", myBmw);
-		assert driver.getAllInstances(cache).size() == 1 : driver.getAllInstances(cache);
-		assert driver.getAllInstances(cache).contains(link);
+		Relation driver = human.setRelation( "drive", vehicle);
+		Generic myBmw = vehicle.newInstance( "myBmw");
+		Generic myck = human.newInstance( "myck");
+		Link link = myck.setLink( driver, "theDrive", myBmw);
+		assert driver.getAllInstances().size() == 1 : driver.getAllInstances();
+		assert driver.getAllInstances().contains(link);
 	}
 
 	public void testOneSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes(cache);
+		Type car = vehicle.newSubType( "Car");
+		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes();
 		assert snapshot.size() == 1;
 		assert snapshot.contains(car);
 	}
@@ -149,10 +149,10 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testManySubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		car.newSubType(cache, "ElectricCar");
-		Type truck = vehicle.newSubType(cache, "Truck");
-		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes(cache);
+		Type car = vehicle.newSubType( "Car");
+		car.newSubType( "ElectricCar");
+		Type truck = vehicle.newSubType( "Truck");
+		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes();
 		assert snapshot.size() == 2;
 		assert snapshot.contains(car) : snapshot;
 		assert snapshot.contains(truck);
@@ -161,10 +161,10 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testManyAllSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type electricCar = car.newSubType(cache, "ElectricCar");
-		Type truck = vehicle.newSubType(cache, "Truck");
-		Snapshot<Generic> snapshot = vehicle.getSubTypes(cache);
+		Type car = vehicle.newSubType( "Car");
+		Type electricCar = car.newSubType( "ElectricCar");
+		Type truck = vehicle.newSubType( "Truck");
+		Snapshot<Generic> snapshot = vehicle.getSubTypes();
 		assert snapshot.size() == 3 : snapshot;
 		assert snapshot.contains(car);
 		assert snapshot.contains(electricCar);
@@ -174,11 +174,11 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testSubTypeWithInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		vehicle.newInstance(cache, "myVehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		car.newInstance(cache, "myCar");
-		Type truck = vehicle.newSubType(cache, "Truck");
-		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes(cache);
+		vehicle.newInstance( "myVehicle");
+		Type car = vehicle.newSubType( "Car");
+		car.newInstance( "myCar");
+		Type truck = vehicle.newSubType( "Truck");
+		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes();
 		assert snapshot.size() == 2 : snapshot;
 		assert snapshot.contains(car);
 		assert snapshot.contains(truck);
@@ -187,12 +187,12 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testAllSubTypeWithInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		vehicle.newInstance(cache, "myVehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type electricCar = car.newSubType(cache, "ElectricCar");
-		car.newInstance(cache, "myCar");
-		Type truck = vehicle.newSubType(cache, "Truck");
-		Snapshot<Generic> snapshot = vehicle.getSubTypes(cache);
+		vehicle.newInstance( "myVehicle");
+		Type car = vehicle.newSubType( "Car");
+		Type electricCar = car.newSubType( "ElectricCar");
+		car.newInstance( "myCar");
+		Type truck = vehicle.newSubType( "Truck");
+		Snapshot<Generic> snapshot = vehicle.getSubTypes();
 		assert snapshot.size() == 3 : snapshot;
 		assert snapshot.contains(car) : snapshot;
 		assert snapshot.contains(electricCar);
@@ -202,11 +202,11 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testSubTypeWithAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		vehicle.setAttribute(cache, "power");
-		Type car = vehicle.newSubType(cache, "Car");
-		car.newInstance(cache, "myCar");
-		Type truck = vehicle.newSubType(cache, "Truck");
-		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes(cache);
+		vehicle.setAttribute( "power");
+		Type car = vehicle.newSubType( "Car");
+		car.newInstance( "myCar");
+		Type truck = vehicle.newSubType( "Truck");
+		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes();
 		assert snapshot.size() == 2 : snapshot;
 		assert snapshot.contains(car);
 		assert snapshot.contains(truck);
@@ -215,13 +215,13 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 	public void testAllSubTypeWithAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		vehicle.setAttribute(cache, "power");
-		Type car = vehicle.newSubType(cache, "Car");
-		Type electricCar = car.newSubType(cache, "ElectricCar");
-		car.setAttribute(cache, "numberWheel");
-		car.newInstance(cache, "myCar");
-		Type truck = vehicle.newSubType(cache, "Truck");
-		Snapshot<Generic> snapshot = vehicle.getSubTypes(cache);
+		vehicle.setAttribute( "power");
+		Type car = vehicle.newSubType( "Car");
+		Type electricCar = car.newSubType( "ElectricCar");
+		car.setAttribute( "numberWheel");
+		car.newInstance( "myCar");
+		Type truck = vehicle.newSubType( "Truck");
+		Snapshot<Generic> snapshot = vehicle.getSubTypes();
 		assert snapshot.size() == 3 : snapshot;
 		assert snapshot.contains(car);
 		assert snapshot.contains(electricCar);
@@ -232,11 +232,11 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		human.setRelation(cache, "drive", vehicle);
-		Type car = vehicle.newSubType(cache, "Car");
-		car.newInstance(cache, "myCar");
-		Type truck = vehicle.newSubType(cache, "Truck");
-		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes(cache);
+		human.setRelation( "drive", vehicle);
+		Type car = vehicle.newSubType( "Car");
+		car.newInstance( "myCar");
+		Type truck = vehicle.newSubType( "Truck");
+		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes();
 		assert snapshot.size() == 2 : snapshot;
 		assert snapshot.contains(car);
 		assert snapshot.contains(truck);
@@ -246,12 +246,12 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		human.setRelation(cache, "drive", vehicle);
-		Type car = vehicle.newSubType(cache, "Car");
-		Type electricCar = car.newSubType(cache, "ElectricCar");
-		car.newInstance(cache, "myCar");
-		Type truck = vehicle.newSubType(cache, "Truck");
-		Snapshot<Generic> snapshot = vehicle.getSubTypes(cache);
+		human.setRelation( "drive", vehicle);
+		Type car = vehicle.newSubType( "Car");
+		Type electricCar = car.newSubType( "ElectricCar");
+		car.newInstance( "myCar");
+		Type truck = vehicle.newSubType( "Truck");
+		Snapshot<Generic> snapshot = vehicle.getSubTypes();
 
 		assert snapshot.size() == 3 : snapshot;
 		assert snapshot.contains(car);

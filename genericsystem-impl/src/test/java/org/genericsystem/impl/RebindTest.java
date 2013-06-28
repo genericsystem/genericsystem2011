@@ -17,90 +17,90 @@ public class RebindTest extends AbstractTest {
 	public void simpleTestRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Attribute carPower = car.setAttribute(cache, "Power");
-		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
-		assert !carPower.isAlive(cache);
-		assert ((GenericImpl) carPower).reFind(cache).inheritsFrom(vehiclePower);
+		Type car = vehicle.newSubType( "Car");
+		Attribute carPower = car.setAttribute( "Power");
+		Attribute vehiclePower = vehicle.setAttribute( "Power");
+		assert !carPower.isAlive();
+		assert ((GenericImpl) carPower).reFind().inheritsFrom(vehiclePower);
 
 	}
 
 	public void testRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Attribute carPower = car.setAttribute(cache, "Power");
-		Attribute carPowerUnit = carPower.setAttribute(cache, "Unit");
-		Generic myCar = car.newInstance(cache, "Audi");
-		Holder vPower = myCar.setValue(cache, carPower, "200");
-		Holder vUnit = vPower.setValue(cache, carPowerUnit, "HorsePower");
-		assert vPower.getHolders(cache, carPowerUnit).contains(vUnit);
-		assert myCar.getHolders(cache, carPower).contains(vPower);
-		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
+		Type car = vehicle.newSubType( "Car");
+		Attribute carPower = car.setAttribute( "Power");
+		Attribute carPowerUnit = carPower.setAttribute( "Unit");
+		Generic myCar = car.newInstance( "Audi");
+		Holder vPower = myCar.setValue( carPower, "200");
+		Holder vUnit = vPower.setValue( carPowerUnit, "HorsePower");
+		assert vPower.getHolders( carPowerUnit).contains(vUnit);
+		assert myCar.getHolders( carPower).contains(vPower);
+		Attribute vehiclePower = vehicle.setAttribute( "Power");
 		assert ((CacheImpl) cache).reFind(carPower).inheritsFrom(vehiclePower);
 	}
 
 	public void testRelationRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type metal = cache.newType("metal");
-		Type preciousMetal = metal.newSubType(cache, "preciousMetal");
-		Generic zink = metal.newInstance(cache, "zink");
-		Generic iron = preciousMetal.newInstance(cache, "iron");
+		Type preciousMetal = metal.newSubType( "preciousMetal");
+		Generic zink = metal.newInstance( "zink");
+		Generic iron = preciousMetal.newInstance( "iron");
 		Type color = cache.newType("color");
-		Type primeColor = color.newSubType(cache, "primeColor");
-		Generic gray = color.newInstance(cache, "gray");
-		Generic yellow = primeColor.newInstance(cache, "yellow");
-		Relation preciousMetalPrimeColor = preciousMetal.setRelation(cache, "metalColor", primeColor);
-		iron.bind(cache, preciousMetalPrimeColor, yellow);
-		iron.setLink(cache, preciousMetalPrimeColor, "almost", yellow);
+		Type primeColor = color.newSubType( "primeColor");
+		Generic gray = color.newInstance( "gray");
+		Generic yellow = primeColor.newInstance( "yellow");
+		Relation preciousMetalPrimeColor = preciousMetal.setRelation( "metalColor", primeColor);
+		iron.bind( preciousMetalPrimeColor, yellow);
+		iron.setLink( preciousMetalPrimeColor, "almost", yellow);
 		assert zink.inheritsFrom(metal);
-		Relation metalColor = metal.setRelation(cache, "metalColor", color);
-		zink.bind(cache, metalColor, gray);
-		assert metalColor.isAlive(cache);
+		Relation metalColor = metal.setRelation( "metalColor", color);
+		zink.bind( metalColor, gray);
+		assert metalColor.isAlive();
 	}
 
 	public void rebindAttributeNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type color = cache.newType("color");
-		Type primeColor = color.newSubType(cache, "primeColor");
+		Type primeColor = color.newSubType( "primeColor");
 
-		Generic red = primeColor.newInstance(cache, "red");
-		Attribute lightness = primeColor.setAttribute(cache, "lightness");
-		Holder lightnessValue = red.setValue(cache, lightness, "40");
-		Generic reboundLightness = ((GenericImpl) lightness).reBind(cache);
-		assert !lightness.isAlive(cache);
-		assert !lightnessValue.isAlive(cache);
+		Generic red = primeColor.newInstance( "red");
+		Attribute lightness = primeColor.setAttribute( "lightness");
+		Holder lightnessValue = red.setValue( lightness, "40");
+		Generic reboundLightness = ((GenericImpl) lightness).reBind();
+		assert !lightness.isAlive();
+		assert !lightnessValue.isAlive();
 		assert null != ((CacheImpl) cache).reFind(lightness);
-		assert reboundLightness.isAlive(cache);
-		assert primeColor.isAlive(cache);
+		assert reboundLightness.isAlive();
+		assert primeColor.isAlive();
 
 	}
 
 	public void rebindTypeNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Generic mycar = car.newInstance(cache, "mycar");
-		Attribute carPower = car.setAttribute(cache, "power");
-		mycar.setValue(cache, carPower, "123");
-		assert vehicle.isAlive(cache);
-		Generic reboundVehicle = ((GenericImpl) vehicle).reBind(cache);
-		assert !vehicle.isAlive(cache);
-		assert !car.isAlive(cache);
+		Type car = vehicle.newSubType( "Car");
+		Generic mycar = car.newInstance( "mycar");
+		Attribute carPower = car.setAttribute( "power");
+		mycar.setValue( carPower, "123");
+		assert vehicle.isAlive();
+		Generic reboundVehicle = ((GenericImpl) vehicle).reBind();
+		assert !vehicle.isAlive();
+		assert !car.isAlive();
 		assert null != ((CacheImpl) cache).reFind(vehicle);
-		assert reboundVehicle.isAlive(cache);
+		assert reboundVehicle.isAlive();
 	}
 
 	public void rebindTypeTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myCar = car.newInstance(cache, "myCar");
-		Attribute power = car.setAttribute(cache, "Power");
-		Generic myCar123 = power.newInstance(cache, "123", myCar);
+		Generic myCar = car.newInstance( "myCar");
+		Attribute power = car.setAttribute( "Power");
+		Generic myCar123 = power.newInstance( "123", myCar);
 		assert myCar123.inheritsFrom(power);
-		Generic myCar2 = car.newInstance(cache, "myCar2");
-		myCar2.setValue(cache, power, "10");
-		((GenericImpl) car).reBind(cache);
+		Generic myCar2 = car.newInstance( "myCar2");
+		myCar2.setValue( power, "10");
+		((GenericImpl) car).reBind();
 		assert myCar.getMeta().equals(myCar2.getMeta());
 	}
 }

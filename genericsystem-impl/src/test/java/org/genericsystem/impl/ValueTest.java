@@ -17,7 +17,7 @@ public class ValueTest extends AbstractTest {
 
 	public void testValueOfType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Serializable value = cache.getEngine().newSubType(cache, "Car").getValue();
+		Serializable value = cache.getEngine().newSubType( "Car").getValue();
 		assert value != null;
 		assert value.equals("Car");
 	}
@@ -25,14 +25,14 @@ public class ValueTest extends AbstractTest {
 	// public void testValueWithSubAttribute() {
 	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
-	// Type car = vehicle.newSubType(cache,"Car");
-	// Attribute vehiclePower = vehicle.addAttribute(cache,"power");
-	// Attribute carUltraPower = car.addSubAttribute(cache,vehiclePower, "ultraPower");
-	// vehicle.setValue(cache,vehiclePower, 0);
-	// Generic myCar = car.newInstance(cache,"myCar");
-	// Holder value = myCar.setValue(cache,carUltraPower, 123);
-	// assert myCar.getValueHolders(cache,carUltraPower).contains(value);
-	// assert myCar.getValueHolders(cache,vehiclePower).contains(value);
+	// Type car = vehicle.newSubType("Car");
+	// Attribute vehiclePower = vehicle.addAttribute("power");
+	// Attribute carUltraPower = car.addSubAttribute(vehiclePower, "ultraPower");
+	// vehicle.setValue(vehiclePower, 0);
+	// Generic myCar = car.newInstance("myCar");
+	// Holder value = myCar.setValue(carUltraPower, 123);
+	// assert myCar.getValueHolders(carUltraPower).contains(value);
+	// assert myCar.getValueHolders(vehiclePower).contains(value);
 	// }
 
 }

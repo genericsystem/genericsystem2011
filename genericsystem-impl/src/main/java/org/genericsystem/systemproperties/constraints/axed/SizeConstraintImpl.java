@@ -7,7 +7,6 @@ import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
-import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -36,15 +35,15 @@ public class SizeConstraintImpl extends Constraint {
 	public static final String SIZE = "Size";
 
 	@Override
-	public void check(Cache cache, Generic modified) throws ConstraintViolationException {
-		for (ConstraintValue constraintValue : getConstraintValues(cache, modified, getClass())) {
+	public void check(Generic modified) throws ConstraintViolationException {
+		for (ConstraintValue constraintValue : getConstraintValues(modified, getClass())) {
 			// TODO KK because InstanceClassConstraint, see GenericImpl::setConstraintClass
 			Serializable value = constraintValue.getValue();
 			if (value instanceof Integer) {
 				Integer axe = (Integer) value;
 				final Generic component = ((Link) modified).getComponent(axe);
-				Snapshot<Holder> holders = ((GenericImpl) component).getHolders(cache, (Relation) constraintValue.getConstraintBaseType(), axe);
-				Integer size = ((Attribute) modified).getSizeConstraint(cache, axe);
+				Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) constraintValue.getConstraintBaseType(), axe);
+				Integer size = ((Attribute) modified).getSizeConstraint(axe);
 				if (size != null && holders.size() > size)
 					throw new SizeConstraintViolationException("Multiple links of type " + constraintValue.getConstraintBaseType() + ", and the maximum size is " + size);
 			}

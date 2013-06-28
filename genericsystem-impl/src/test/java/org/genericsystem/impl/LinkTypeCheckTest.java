@@ -16,13 +16,13 @@ public class LinkTypeCheckTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
-		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
-		final Generic yourDog = dog.newInstance(cache, "yourDog");
-		road.newInstance(cache, "myRoad");
+		final Relation runsOver = vehicle.setRelation( "RunsOver", dog, road);
+		final Generic myBMW = vehicle.newInstance( "myBMW");
+		final Generic yourDog = dog.newInstance( "yourDog");
+		road.newInstance( "myRoad");
 
 		try {
-			myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, yourDog);
+			myBMW.setLink( runsOver, "myBMWRunsOverYourDog", yourDog, yourDog);
 		} catch (IllegalStateException ignore) {
 
 		}
@@ -34,13 +34,13 @@ public class LinkTypeCheckTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
-		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
-		final Generic yourDog = dog.newInstance(cache, "yourDog");
-		road.newInstance(cache, "myRoad");
+		final Relation runsOver = vehicle.setRelation( "RunsOver", dog, road);
+		final Generic myBMW = vehicle.newInstance( "myBMW");
+		final Generic yourDog = dog.newInstance( "yourDog");
+		road.newInstance( "myRoad");
 
 		try {
-			myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
+			myBMW.setLink( runsOver, "myBMWRunsOverYourDog", yourDog);
 		} catch (IllegalStateException ignore) {
 
 		}
@@ -51,13 +51,13 @@ public class LinkTypeCheckTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
-		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
-		final Generic yourDog = dog.newInstance(cache, "yourDog");
-		final Generic myRoad = road.newInstance(cache, "myRoad");
+		final Relation runsOver = vehicle.setRelation( "RunsOver", dog, road);
+		final Generic myBMW = vehicle.newInstance( "myBMW");
+		final Generic yourDog = dog.newInstance( "yourDog");
+		final Generic myRoad = road.newInstance( "myRoad");
 
 		try {
-			myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad, yourDog);
+			myBMW.setLink( runsOver, "myBMWRunsOverYourDog", yourDog, myRoad, yourDog);
 		} catch (IllegalStateException ignore) {
 
 		}
@@ -68,14 +68,14 @@ public class LinkTypeCheckTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
-		final Attribute runs = vehicle.setAttribute(cache, "Runs");
-		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
+		final Attribute runs = vehicle.setAttribute( "Runs");
+		final Generic myBMW = vehicle.newInstance( "myBMW");
 		assert myBMW.inheritsFrom(runs.getBaseComponent());
-		final Generic yourDog = dog.newInstance(cache, "yourDog");
+		final Generic yourDog = dog.newInstance( "yourDog");
 
-		myBMW.setValue(cache, runs, "myBMWRuns");
+		myBMW.setValue( runs, "myBMWRuns");
 		try {
-			yourDog.setValue(cache, runs, "myDogRuns");
+			yourDog.setValue( runs, "myDogRuns");
 		} catch (IllegalStateException ignore) {
 
 		}
@@ -85,11 +85,11 @@ public class LinkTypeCheckTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
-		Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);
-		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Generic red = color.newInstance(cache, "red");
-		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
-		assert myVehicle.getLink(cache, vehicleColor, cache.newType("Date")) == null;
-		assert myVehicle.getLinks(cache, vehicleColor, cache.newType("Date")).size() == 0;
+		Relation vehicleColor = vehicle.setRelation( "vehicleColor", color);
+		Generic myVehicle = vehicle.newInstance( "myVehicle");
+		Generic red = color.newInstance( "red");
+		myVehicle.setLink( vehicleColor, "myVehicleRed", red);
+		assert myVehicle.getLink( vehicleColor, cache.newType("Date")) == null;
+		assert myVehicle.getLinks( vehicleColor, cache.newType("Date")).size() == 0;
 	}
 }

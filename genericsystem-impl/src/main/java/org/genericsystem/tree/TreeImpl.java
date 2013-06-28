@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 import org.genericsystem.annotation.InstanceGenericClass;
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
@@ -18,30 +16,30 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 public class TreeImpl extends GenericImpl implements Tree {
 
 	@Override
-	public <T extends Node> T newRoot(Cache cache, Serializable value) {
-		return newRoot(cache, value, 1);
+	public <T extends Node> T newRoot(Serializable value) {
+		return newRoot(value, 1);
 	}
 
 	@Override
-	public <T extends Node> T newRoot(Cache cache, Serializable value, int dim) {
-		return newInstance(cache, value, new Generic[dim]);
+	public <T extends Node> T newRoot(Serializable value, int dim) {
+		return newInstance(value, new Generic[dim]);
 	}
 
 	// TODO KK
 	@Override
-	public <T extends Node> Snapshot<T> getRoots(final Context context) {
+	public <T extends Node> Snapshot<T> getRoots() {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return Statics.<T> rootFilter(TreeImpl.this.<T> instancesIterator(context));
+				return Statics.<T> rootFilter(TreeImpl.this.<T> instancesIterator());
 			}
 		};
 	}
 
 	// TODO KK
 	@Override
-	public <T extends Node> T getRootByValue(Context context, Serializable value) {
-		return Statics.unambigousFirst(Statics.<T> rootFilter(Statics.<T> valueFilter(TreeImpl.this.<T> instancesIterator(context), value)));
+	public <T extends Node> T getRootByValue(Serializable value) {
+		return Statics.unambigousFirst(Statics.<T> rootFilter(Statics.<T> valueFilter(TreeImpl.this.<T> instancesIterator(), value)));
 	}
 
 	@Override
