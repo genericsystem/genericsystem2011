@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.Iterator;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -43,7 +44,6 @@ public class PhamtomTest extends AbstractTest {
 		assert myVehicle.getValue(cache, vehiclePower) == "123";
 		Generic phantom = myVehicle.setValue(cache, defaultPower, null);
 		myVehicle.setValue(cache, defaultPower, "123");
-		assert phantom.getValue() == null;
 		assert !phantom.isAlive(cache);
 
 		phantom = myVehicle.setValue(cache, defaultPower, null);
