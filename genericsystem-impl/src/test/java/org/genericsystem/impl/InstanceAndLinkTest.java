@@ -14,14 +14,14 @@ import org.testng.annotations.Test;
 public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testInstanceIsConcrete() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic audi = car.newInstance(cache, "audi");
 		assert audi.isConcrete();
 	}
 
 	public void testCountAncestor() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic audi = car.newInstance(cache, "audi");
 		Snapshot<Generic> snapshot = audi.getSupers();
@@ -30,7 +30,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testInstanceIsConcreteWithValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "outsideColor", color);
@@ -41,7 +41,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testCountAncestorLink() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "outsideColor", color);
@@ -52,7 +52,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testTargetsAncestor() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Type human = cache.newType("Human");
@@ -63,7 +63,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testTargetsAncestorWithMultipleTarget() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Generic myVehicle1 = vehicle.newInstance(cache, "myVehicle1");
 		Generic myVehicle2 = vehicle.newInstance(cache, "myVehicle2");
@@ -79,7 +79,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testUnidirectionalRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Type human = cache.newType("Human");
@@ -93,7 +93,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testBidirectionalRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Type human = cache.newType("Human");
@@ -114,7 +114,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testRelationToHimself() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Generic myck = human.newInstance(cache, "myck");
 		Generic quentin = human.newInstance(cache, "quentin");
@@ -128,7 +128,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testRelationToHimselfUnidirectional() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Generic myck = human.newInstance(cache, "myck");
 		Generic quentin = human.newInstance(cache, "quentin");
@@ -140,7 +140,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testNewInstanceBinaryRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myBMW = car.newInstance(cache, "myBMW");
 		Type pilot = cache.newType("Pilot");
@@ -153,7 +153,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 	}
 
 	public void testNewInstanceTernaryRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myBMW = car.newInstance(cache, "myBMW");
 		Type color = cache.newType("Color");

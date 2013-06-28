@@ -23,7 +23,7 @@ public class PersistenceTest {
 	private Cache initWorkingSpace() {
 		String path = directoryPath + new Random().nextInt();
 		cleanDirectory(path);
-		return GenericSystem.newCacheOnANewPersistentEngine(path);
+		return GenericSystem.newCacheOnANewPersistentEngine(path).start();
 	}
 
 	private void closingWorkingSpace(Cache cache) {

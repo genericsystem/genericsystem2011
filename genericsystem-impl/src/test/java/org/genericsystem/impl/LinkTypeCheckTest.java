@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 public class LinkTypeCheckTest extends AbstractTest {
 
 	public void malformedRelationInstanceWrongTargetType() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
@@ -30,7 +30,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 	}
 
 	public void malformedRelationInstanceTooFewTargets() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
@@ -47,7 +47,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 	}
 
 	public void relationInstanceTooMuchTargets() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
@@ -65,7 +65,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 	}
 
 	public void malformedAttributeWrongBase() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		final Attribute runs = vehicle.setAttribute(cache, "Runs");
@@ -82,7 +82,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 	}
 
 	public void test() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);

@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 public class InstanceOfTest extends AbstractTest {
 
 	// public void testGetMetasAttributes() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
 	// Type car = vehicle.newSubType(cache, "Car");
 	// Attribute vehiclePower = vehicle.addAttribute(cache, "Power");
@@ -35,7 +35,7 @@ public class InstanceOfTest extends AbstractTest {
 	// }
 
 	// public void testGetMetasRelations() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
 	// Type car = vehicle.newSubType(cache, "Car");
 	// Type human = cache.newType("Human");
@@ -58,7 +58,7 @@ public class InstanceOfTest extends AbstractTest {
 	// }
 
 	public void testInstanceOf() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type vehicle = cache.newType("Vehicle");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
@@ -96,7 +96,7 @@ public class InstanceOfTest extends AbstractTest {
 	}
 
 	public void testMutipleInstanceOf() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type animal = cache.newType("Animal");
 		Type mammal = cache.newType("Mammal");
 
@@ -117,7 +117,7 @@ public class InstanceOfTest extends AbstractTest {
 	}
 
 	public void testNewSubTypeWithJustOneSuper() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car1 = cache.newSubType("Car1", vehicle);
 		Type car2 = vehicle.newSubType(cache, "Car2");
@@ -127,7 +127,7 @@ public class InstanceOfTest extends AbstractTest {
 	}
 
 	public void testNewSubTypeWithoutSuper() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car1 = cache.newSubType("Car1");
 		assert car1.getSupers().get(0).equals(cache.getEngine());
 	}

@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 public class RemoveTest extends AbstractTest {
 
 	public void testRemoveType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.remove(cache);
 		assert !vehicle.isAlive(cache);
@@ -24,7 +24,7 @@ public class RemoveTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 				Type vehicle = cache.newType("Vehicle");
 				vehicle.newSubType(cache, "Car");
 				vehicle.remove(cache);
@@ -33,7 +33,7 @@ public class RemoveTest extends AbstractTest {
 	}
 
 	public void testRemoveAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute power = vehicle.setAttribute(cache, "power");
 		power.remove(cache);
@@ -43,7 +43,7 @@ public class RemoveTest extends AbstractTest {
 	}
 
 	// public void testRemoveAttributeWithSubAttribute() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
 	// final Attribute vehiclePower = vehicle.addAttribute(cache,"power");
 	// Type car = vehicle.newSubType(cache,"Car");
@@ -61,7 +61,7 @@ public class RemoveTest extends AbstractTest {
 	// }
 
 	public void testRemoveProperty() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
 		Attribute height = window.setProperty(cache, "Height");
 		Generic myWindow = window.newInstance(cache, "MyWindow");
@@ -74,7 +74,7 @@ public class RemoveTest extends AbstractTest {
 	}
 
 	// public void testRemoveRelationWithSubRelation() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type human = cache.newType("Human");
 	// Type man = human.newSubType(cache,"Man");
 	// Type vehicle = cache.newType("Vehicle");
@@ -97,7 +97,7 @@ public class RemoveTest extends AbstractTest {
 	// }
 
 	public void testRemoveInstance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
 		Generic myWindow = window.newInstance(cache, "myWindow");
 		myWindow.remove(cache);
@@ -107,7 +107,7 @@ public class RemoveTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 				Type window = cache.newType("Window");
 				window.newInstance(cache, "myWindow");
 				window.remove(cache);

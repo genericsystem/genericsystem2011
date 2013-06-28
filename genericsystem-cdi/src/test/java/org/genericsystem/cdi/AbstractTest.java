@@ -1,8 +1,8 @@
 package org.genericsystem.cdi;
 
-import javax.enterprise.context.Conversation;
 import javax.inject.Inject;
 
+import org.genericsystem.core.Cache;
 import org.genericsystem.exception.RollbackException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
@@ -20,17 +20,14 @@ public abstract class AbstractTest extends Arquillian {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
-		javaArchive.addClasses(CacheProvider.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class);
+		javaArchive.addClasses(CacheProvider.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, CdiFactory.class);
 		javaArchive.addPackage(Expressions.class.getPackage());
 		javaArchive.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
 		return javaArchive;
 	}
 
 	@Inject
-	Conversation conversation;
-
-	@Inject
-	Expressions expressions;
+	Cache cache;
 
 	public abstract static class RollbackCatcher {
 		public void assertIsCausedBy(Class<? extends Throwable> clazz) {

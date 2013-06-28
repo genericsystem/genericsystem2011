@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
@@ -127,14 +128,20 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
 
-	public void start(Cache cache) {
+	public Cache start(Cache cache) {
 		cacheLocal.set(cache);
+		return cache;
+	}
+
+	public void stop(Cache cache) {
+		assert cacheLocal.get() == cache;
+		cacheLocal.set(null);
 	}
 
 	public Cache getCurrentCache() {
 		Cache currentCache = cacheLocal.get();
 		if (currentCache == null)
-			start(factory.getCacheLocal());
+			currentCache = start(factory.getCacheLocal());
 		return currentCache;
 	}
 
@@ -151,7 +158,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 					UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
 					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, /* FlushableConstraintImpl.class, */SizeConstraintImpl.class, PropertiesMapProvider.class);
 
-			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
+			// TODO clean
+			CacheImpl cache = (CacheImpl) start(newCache());// new CacheImpl(new Transaction(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				if (get(clazz) == null)
 					bind(cache, clazz);
@@ -159,6 +167,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 				if (get(clazz) == null)
 					bind(cache, clazz);
 			cache.flush();
+			stop(cache);
 			startupTime = false;
 			return this;
 		}

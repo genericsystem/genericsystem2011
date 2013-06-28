@@ -17,7 +17,7 @@ public class GetSubTypeTest extends AbstractTest {
 	// Type
 
 	public void testGetSubTypeSimpleHierarchyType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 		Generic subType = vehicle.getSubType(cache, "Car");
@@ -25,7 +25,7 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeSimpleHierarchyTypeKO() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "Car");
 
@@ -38,7 +38,7 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeDoubleHierarchyType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.newSubType(cache, "Car");
@@ -46,13 +46,13 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeNonExistingType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		assert vehicle.getSubType(cache, "Alien") == null;
 	}
 
 	public void testGetSubTypeDiamondInheritingType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type plane = cache.newType("Plane");
 		Type car = cache.newType("Car");
 		cache.newSubType("FlyingCar", car, plane);
@@ -64,7 +64,7 @@ public class GetSubTypeTest extends AbstractTest {
 	// Attribute
 
 	public void testGetSubTypeSimpleHierarchyAttributeOfAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute(cache, "Power");
 		power.setAttribute(cache, "Unit");
@@ -72,7 +72,7 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeSimpleHierarchyAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute(cache, "Power");
 		Attribute specializedPower = ((GenericImpl) car).setSubAttribute(cache, power, "SpecializedPower");
@@ -81,7 +81,7 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeDoubleHierarchyAttributeOfAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute(cache, "Power");
 		power.setAttribute(cache, "Unit");
@@ -90,7 +90,7 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeDoubleHierarchyAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute(cache, "Power");
 		((GenericImpl) car).setSubAttribute(cache, power, "SpecializedPower");
@@ -100,14 +100,14 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeNonExistingAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.setAttribute(cache, "Power");
 		assert vehicle.getSubType(cache, "Alien") == null;
 	}
 
 	public void testGetSubTypeDiamondInheritingAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute(cache, "Power");
 		Attribute wheels = car.setAttribute(cache, "Wheels");
@@ -120,7 +120,7 @@ public class GetSubTypeTest extends AbstractTest {
 	// Relation
 
 	public void testGetSubTypeSimpleHierarchyRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -132,7 +132,7 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeDoubleHierarchyRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -146,7 +146,7 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeNonExistingRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		car.setRelation(cache, "CarColor", color);
@@ -154,7 +154,7 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeDiamondInheritingRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);

@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 public class AddComponentSuperTest extends AbstractTest {
 
 	public void addComponentOnType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type power = cache.newType("power");
 		assert vehicle.getAttribute(cache, "power") == null;
@@ -21,7 +21,7 @@ public class AddComponentSuperTest extends AbstractTest {
 	}
 
 	public void addComponentOnArribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Type vehicleColor = vehicle.addAttribute(cache, "VehicleColor");
@@ -36,7 +36,7 @@ public class AddComponentSuperTest extends AbstractTest {
 	}
 
 	public void removeComponentOnType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute power = vehicle.addAttribute(cache, "power");
 		power.removeComponent(cache, 0, vehicle);
@@ -44,7 +44,7 @@ public class AddComponentSuperTest extends AbstractTest {
 	}
 
 	public void addAndRemoveComponentOnType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type power = cache.newType("power");
 		assert vehicle.getAttribute(cache, "power") == null;
@@ -57,7 +57,7 @@ public class AddComponentSuperTest extends AbstractTest {
 	}
 
 	public void addAndRemoveComponentOnArribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Type vehicleColor = vehicle.addAttribute(cache, "VehicleColor");

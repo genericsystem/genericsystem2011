@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 public class MultipleInheritanceTest extends AbstractTest {
 
 	public void testInheritsFrom() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
@@ -26,7 +26,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testgetDirectSubTypes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
 		Type selectable = cache.newType("Selectable");
 		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
@@ -40,7 +40,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testgetDirectSubTypesWithDiamondProblem() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
@@ -61,7 +61,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testGetAllSubTypes() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
 		Type selectable = cache.newType("Selectable");
 		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
@@ -85,7 +85,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testGetAllSubTypesWithDiamond() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
@@ -107,7 +107,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testgetDirectSubTypesWithDiamond() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
@@ -138,7 +138,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testgetDirectSubTypesWithImplicit() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
 		Type selectable = cache.newType("Selectable");
 		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
@@ -148,7 +148,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testgetDirectSubTypesWithImplicitWithDiamond() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
@@ -174,7 +174,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
@@ -190,7 +190,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
@@ -211,7 +211,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testBaseComponent() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
@@ -221,7 +221,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 	}
 
 	public void testTargetComponent() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");

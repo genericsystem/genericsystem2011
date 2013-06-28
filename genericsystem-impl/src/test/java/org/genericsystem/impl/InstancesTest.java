@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 public class InstancesTest extends AbstractTest {
 
 	public void testTypeInstances() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type newType = cache.newType("newType");
 		Generic aNewType = newType.newInstance(cache, "aNewType");
 		assert newType.getInstances(cache).size() == 1;
@@ -20,7 +20,7 @@ public class InstancesTest extends AbstractTest {
 	}
 
 	public void testSubTypeInstances() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type newType = cache.newType("newType");
 		Type newSubType = newType.newSubType(cache, "newSubType");
 		Generic aNewType = newType.newInstance(cache, "aNewType");
@@ -32,7 +32,7 @@ public class InstancesTest extends AbstractTest {
 	}
 
 	public void testAttributeInstances() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type newType = cache.newType("newType");
 		Attribute newAttribute = cache.getEngine().setAttribute(cache, "newAttribute");
 		Generic aNewType1 = newType.newInstance(cache, "aNewType1");

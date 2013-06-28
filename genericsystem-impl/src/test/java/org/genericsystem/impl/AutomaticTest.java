@@ -8,7 +8,6 @@ import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics;
-import org.genericsystem.core.Transaction;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -23,7 +22,7 @@ import org.testng.annotations.Test;
 public class AutomaticTest extends AbstractTest {
 
 	public void test() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		assert !((GenericImpl) cache.getEngine()).isAutomatic();
 		assert ((CacheImpl) cache).isFlushable(cache.getEngine());
 		assert !((GenericImpl) cache.getEngine().getMetaAttribute()).isAutomatic();
@@ -37,7 +36,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void testAttribut() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 
@@ -50,7 +49,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void testRemoveAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
 		Generic power = vehiclePower.getImplicit();
@@ -69,7 +68,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void testSubType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType(cache, "car");
 
@@ -82,7 +81,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void testMutipleInheritance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType(cache, "Window");
 		Type selectable = graphicComponent.newSubType(cache, "Selectable");
@@ -105,7 +104,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void testAttributWithValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
 		Attribute vehiclePower = vehicle.setAttribute(cache, "power");
@@ -121,7 +120,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void testRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -131,7 +130,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void testRelationWithLink() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myCar = car.newInstance(cache, "myCar");
 		Type color = cache.newType("Color");
@@ -144,7 +143,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void testRelationWithDefaultLink() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		car.newInstance(cache, "myCar");
 		Type color = cache.newType("Color");
@@ -157,7 +156,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void testTree() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.newTree("tree");
 		Node root = tree.newRoot(cache, "root");
 		Node children = root.setNode(cache, "children");
@@ -170,7 +169,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void deduct() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
@@ -185,7 +184,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void ternaryDeduct() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Type time = cache.newType("Time");
@@ -224,7 +223,7 @@ public class AutomaticTest extends AbstractTest {
 	}
 
 	public void ternaryFlush() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Type time = cache.newType("Time");
@@ -242,19 +241,19 @@ public class AutomaticTest extends AbstractTest {
 
 		cache.flush();
 
-		assert red.getLinks(new Transaction(cache.getEngine()), carColorTime).filter(new Filter<Link>() {
-			@Override
-			public boolean isSelected(Link element) {
-				return ((GenericImpl) element).isAutomatic();
-			}
-		}).isEmpty();
-		assert red.getTargets(cache.getEngine().newCache(), carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(new Transaction(cache.getEngine()), carColorTime, Statics.BASE_POSITION);
-		assert myAudi.getTargets(cache, carColorTime).contains(red);
+		// assert red.getLinks(cache.getEngine().newCache().start(), carColorTime).filter(new Filter<Link>() {
+		// @Override
+		// public boolean isSelected(Link element) {
+		// return ((GenericImpl) element).isAutomatic();
+		// }
+		// }).isEmpty();
+		assert red.getTargets(cache.getEngine().newCache().start(), carColorTime, Statics.BASE_POSITION).contains(myAudi);
+		assert myAudi.getTargets(cache.start(), carColorTime).contains(red);
 		assert red.getTargets(cache, carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(cache, carColorTime, Statics.BASE_POSITION);
 	}
 
 	public void test2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation(cache, "CarColor", color);
