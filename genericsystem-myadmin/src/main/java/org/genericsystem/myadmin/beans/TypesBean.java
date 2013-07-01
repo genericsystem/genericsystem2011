@@ -15,7 +15,6 @@ import javax.inject.Named;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.Statics;
 import org.genericsystem.core.Structural;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -93,7 +92,7 @@ public class TypesBean implements Serializable {
 		nicolas.bind(isTallerOrEqualThan, nicolas);
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
 		isBrotherOf.enableMultiDirectional();
-		// quentin.bind(cache, isBrotherOf, michael);
+		// quentin.bind(isBrotherOf, michael);
 		quentin.setLink(isBrotherOf, "link", michael);
 		Relation isBossOf = human.setRelation("isBossOf", human);
 		nicolas.bind(isBossOf, michael);
@@ -188,6 +187,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public void addValue(Attribute attribute, String newValue) {
+		log.info("attribute " + attribute + " newValue " + newValue);
 		Generic currentInstance = getSelectedTreeNodeGeneric();
 		currentInstance.setValue(attribute, newValue);
 		messages.info("addValue", newValue, attribute, currentInstance);
@@ -201,6 +201,11 @@ public class TypesBean implements Serializable {
 			selectedTreeNode.getGeneric().cancel(holder, true);
 			messages.info("cancel", holder);
 		}
+	}
+
+	public void removeAttribute(Attribute attribute) {
+		attribute.remove();
+		messages.info("remove", attribute);
 	}
 
 	public String delete() {
@@ -245,38 +250,51 @@ public class TypesBean implements Serializable {
 		Object dragValue = dropEvent.getDragValue();
 		Type type = (Type) getSelectedTreeNodeGeneric();
 		Attribute attribute = type.setAttribute("new_attribute");
-		if (!(dragValue instanceof GenericTreeNode)) {
-			if (dragValue.equals("int"))
-				attribute.setConstraintClass(Integer.class);
-			if (dragValue.equals("long"))
-				attribute.setConstraintClass(Long.class);
-			if (dragValue.equals("float"))
-				attribute.setConstraintClass(Float.class);
-			if (dragValue.equals("double"))
-				attribute.setConstraintClass(Double.class);
-			if (dragValue.equals("boolean"))
-				attribute.setConstraintClass(Boolean.class);
-			if (dragValue.equals("string"))
-				attribute.setConstraintClass(String.class);
-		}
-		String msg = dragValue instanceof GenericTreeNode ? "" + ((GenericTreeNode) dragValue).getGeneric() : (String) dragValue;
+		// if (!(dragValue instanceof GenericTreeNode)) {
+		if (dragValue.equals("int"))
+			attribute.setConstraintClass(Integer.class);
+		if (dragValue.equals("long"))
+			attribute.setConstraintClass(Long.class);
+		if (dragValue.equals("float"))
+			attribute.setConstraintClass(Float.class);
+		if (dragValue.equals("double"))
+			attribute.setConstraintClass(Double.class);
+		if (dragValue.equals("boolean"))
+			attribute.setConstraintClass(Boolean.class);
+		if (dragValue.equals("string"))
+			attribute.setConstraintClass(String.class);
+		// }
+		String msg = /* dragValue instanceof GenericTreeNode ? "" + ((GenericTreeNode) dragValue).getGeneric() : */(String) dragValue;
 		log.info("getDragValue " + msg);
 		messages.info("dropValue", msg);
 	}
 
 	public void processDrop2(DropEvent dropEvent) {
 		Object dragValue = dropEvent.getDragValue();
-		if (!(dragValue instanceof GenericTreeNode)) {
-			log.info("Targets for relation cannot be simple type");
-			return;
-		}
+		// if (!(dragValue instanceof GenericTreeNode)) {
+		// log.info("Targets for relation cannot be simple type");
+		// return;
+		// }
 
 		Generic target = ((GenericTreeNode) dragValue).getGeneric();
-		Object dropValue = dropEvent.getDropValue();
-		Attribute attribute = ((Structural) dropValue).getAttribute();
-		attribute = attribute.addComponent(Statics.TARGET_POSITION, target);
-		log.info("target for relation " + target);
-		messages.info("targetRelation", target, attribute);
+		if (target.isStructural()) {
+			Object dropValue = dropEvent.getDropValue();
+			Attribute attribute = ((Structural) dropValue).getAttribute();
+			attribute = attribute.addComponent(attribute.getComponentsSize(), target);
+			log.info("target for relation " + target);
+			messages.info("targetRelation", target, attribute);
+		} else if (target.isConcrete()) {
+			Object dropValue = dropEvent.getDropValue();
+			Attribute attribute = ((Structural) dropValue).getAttribute();
+			if (attribute.getClass() == Relation.class) {
+				Generic base = getSelectedTreeNodeGeneric();
+				base.bind((Relation) attribute, target);
+				log.info("target for link " + target);
+				messages.info("targetLink", target, attribute);
+			} else {
+				messages.info("errorTargetLink");
+			}
+		}
 	}
 
 	public List<Entry<Serializable, Serializable>> getProperties() {
@@ -340,19 +358,6 @@ public class TypesBean implements Serializable {
 		return selectedTreeNode.getValue();
 	}
 
-	public boolean isTreeTypeSelected(TreeType treeType) {
-		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
-	}
-
-	public boolean isSingular(Structural structural) {
-		return structural.getAttribute().isSingularConstraintEnabled();
-	}
-
-	// TODO in GS CORE
-	public boolean isValue(Generic generic) {
-		return generic.isConcrete() && generic.isAttribute();
-	}
-
 	public Wrapper getWrapper(GenericTreeNode genericTreeNode) {
 		return new Wrapper(genericTreeNode);
 	}
@@ -399,6 +404,33 @@ public class TypesBean implements Serializable {
 				messages.info("updateValue", wrappedGeneric, newValue);
 			}
 		}
+	}
+
+	public boolean isImplicitShow() {
+		return implicitShow;
+	}
+
+	public void setImplicitShow(boolean implicitShow) {
+		this.implicitShow = implicitShow;
+	}
+
+	public boolean hasValues(Attribute attribute) {
+		return !getSelectedTreeNodeGeneric().getValues(attribute).isEmpty();
+	}
+
+	// ********************************************** DISPLAY *****************************************************************************
+
+	public boolean isTreeTypeSelected(TreeType treeType) {
+		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
+	}
+
+	public boolean isSingular(Structural structural) {
+		return structural.getAttribute().isSingularConstraintEnabled();
+	}
+
+	// TODO in GS CORE
+	public boolean isValue(Generic generic) {
+		return generic.isConcrete() && generic.isAttribute();
 	}
 
 	public String getExpandedIcon() {
@@ -555,11 +587,7 @@ public class TypesBean implements Serializable {
 		return holder.getBaseComponent().equals(selectedTreeNode.getGeneric());
 	}
 
-	public boolean isImplicitShow() {
-		return implicitShow;
-	}
-
-	public void setImplicitShow(boolean implicitShow) {
-		this.implicitShow = implicitShow;
+	public boolean display() {
+		return getSelectedTreeNodeGeneric().isMeta() || getSelectedTreeNodeGeneric().isStructural();
 	}
 }

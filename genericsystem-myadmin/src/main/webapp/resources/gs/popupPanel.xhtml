@@ -46,9 +46,9 @@
 					<a4j:commandButton id="apply" action="#{cc.attrs.action}"
 						image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
 						render="#{cc.attrs.render}"
+						style="vertical-align: middle;"
 						onbeforedomupdate="#{rich:component(cc.attrs.key)}.hide();"
-						oncomplete="#{rich:element('inputPopupPanelKey')}.value=''; #{rich:element('inputPopupPanel')}.value=''; return false;"
-						style="vertical-align: middle;" />
+						oncomplete="#{rich:element('inputPopupPanelKey')}.value=''; #{rich:element('inputPopupPanel')}.value=''; return false;"/>
 				</h:panelGroup>
 			</h:panelGrid>
 		</rich:panel>
