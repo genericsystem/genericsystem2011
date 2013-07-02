@@ -63,8 +63,7 @@ public class AutomaticTest extends AbstractTest {
 
 		vehiclePower.remove();
 
-		assert ((GenericImpl) power).isAutomatic();
-		assert !((CacheImpl) cache).isFlushable(power);
+		assert !power.isAlive();
 	}
 
 	public void testSubType() {
@@ -254,13 +253,30 @@ public class AutomaticTest extends AbstractTest {
 		assert red.getTargets(carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(carColorTime, Statics.BASE_POSITION);
 	}
 
-	public void test2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation("CarColor", color);
-		Generic myAudi = car.newInstance("myAudi");
-		Generic red = color.newInstance("red");
-		carColor.enableRequiredConstraint();
+	public void rebuild() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Attribute carPower = car.addAttribute("power");
+		Attribute vehiclePower = vehicle.setAttribute("power");
+		assert !carPower.isAlive();
+		assert carPower.getImplicit().isAlive();
+		assert carPower.getImplicit() == vehiclePower.getImplicit();
 	}
+
+	public void rebind() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Attribute carPower = car.addAttribute("power");
+		Attribute carPowerUnit = carPower.addAttribute("unit");
+		Attribute vehiclePower = vehicle.setAttribute("power");
+		assert !carPower.isAlive();
+		assert carPower.getImplicit().isAlive();
+		assert !carPowerUnit.isAlive();
+		assert carPowerUnit.getImplicit().isAlive();
+		assert carPower.getImplicit() == vehiclePower.getImplicit();
+		((GenericImpl) carPowerUnit).reBind().remove();
+	}
+
 }

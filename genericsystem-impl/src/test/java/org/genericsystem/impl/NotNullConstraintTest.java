@@ -135,14 +135,14 @@ public class NotNullConstraintTest extends AbstractTest {
 
 	@Test
 	public void testEnableConstraintOnAComplexeHierarchyOfTypes() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
-		final Generic myBmw = car.newInstance("myBmw");
-		Generic myBus = vehicle.newInstance("myBus");
+		Generic myBmw = car.newInstance("myBmw");
+		vehicle.newInstance("myBus");
 
 		Attribute carRegistration = car.setAttribute("vehicleRegistration");
-		final Attribute vehicleRegistration = vehicle.setAttribute("vehicleRegistration");
+		Attribute vehicleRegistration = vehicle.setAttribute("vehicleRegistration");
 		carRegistration = ((GenericImpl) carRegistration).<Attribute> reFind();
 		carRegistration.enableSingularConstraint();
 		Holder value = myBmw.setValue(carRegistration, "AA-BB-CC");

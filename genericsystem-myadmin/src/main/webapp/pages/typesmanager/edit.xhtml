@@ -31,8 +31,10 @@
 			<c:forEach var="currentStructural" items="#{typesBean.structurals}">
 				<h:panelGroup>
 					<a4j:outputPanel>
-						<rich:dropTarget acceptedTypes="std2" dropValue="#{currentStructural}"
-							dropListener="#{typesBean.processDrop2}" render="edittypesmanager,typestree" />
+						<rich:dropTarget acceptedTypes="std2"
+							dropValue="#{currentStructural}"
+							dropListener="#{typesBean.processDrop2}"
+							render="edittypesmanager,typestree" />
 						<rich:dataTable var="currentHolder" headerClass="fullWidth,"
 							columnClasses="middleWidth,fullWidth,veryLittleWidth,"
 							styleClass="fullWidth"
@@ -106,11 +108,11 @@
 							</rich:column>
 						</rich:dataTable>
 					</a4j:outputPanel>
-					<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
-						action="#{typesBean.addValue(currentStructural.attribute,popupValue)}"
-						render="edittypesmanager" />
 				</h:panelGroup>
 			</c:forEach>
+			<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
+				action="#{typesBean.addValue(currentStructural.attribute,popupValue)}"
+				render="edittypesmanager" />
 		</h:panelGrid>
 
 		<rich:dataTable styleClass="fullWidth" var="currentEntry"

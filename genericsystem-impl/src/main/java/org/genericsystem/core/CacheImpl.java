@@ -123,13 +123,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return true;
 	}
 
-	// TODO gestion des orphelins automatique
-	void remove(Generic generic) throws RollbackException {
+	void removeWithAutomatics(Generic generic) throws RollbackException {
+		remove(generic);
+		Generic automatic = findAutomaticAlone(generic);
+		if (null != automatic)
+			remove(automatic);
+	}
+
+	private void remove(Generic generic) throws RollbackException {
 		try {
 			internalRemove(generic);
 		} catch (ConstraintViolationException e) {
 			rollback(e);
 		}
+	}
+
+	private Generic findAutomaticAlone(Generic generic) {
+		Generic automaticCandidate = generic.getImplicit();
+		if (automaticCandidate.isAlive() && automaticCandidate.isAutomatic() && automaticCandidate.getInheritings().isEmpty() && automaticCandidate.getComposites().isEmpty())
+			return automaticCandidate;
+		return null;
 	}
 
 	private void internalRemove(Generic node) throws ConstraintViolationException {
@@ -377,7 +390,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private <T extends Generic> T internalBind(Generic implicit, Generic[] interfaces, Generic[] components, boolean automatic, Class<?> clazz) {
 		Generic[] directSupers = getDirectSupers(interfaces, components);
-		// assert directSupers.length >= 2;
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(directSuper, interfaces, components);
@@ -387,9 +399,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : orderedDependencies.descendingSet())
 			remove(generic);
 
+		ConnectionMap connectionMap = new ConnectionMap();
+		if (!implicit.isAlive()) {
+			Generic newImplicit = bindPrimaryByValue(implicit.getClass(), ((GenericImpl) implicit).supers[0], implicit.getValue(), implicit.getMetaLevel(), implicit.isAutomatic());
+			connectionMap.put(implicit, newImplicit);
+			implicit = newImplicit;
+			directSupers = connectionMap.adjust(directSupers);
+		}
+
 		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric(clazz)).initializeComplex(implicit, directSupers, components, automatic);
 		T superGeneric = this.<T> insert(newGeneric);
-		new ConnectionMap().reBuild(orderedDependencies);
+		connectionMap.reBuild(orderedDependencies);
 		return superGeneric;
 	}
 
@@ -403,8 +423,29 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T reBind(final Generic generic) {
+	public <T extends Generic> T reBuild(Generic generic) {
+		if (!generic.isAlive())
+			throw new UnsupportedOperationException(generic.info());
+		// TODO kk method name
 		return (T) new ConnectionMap().reBind(orderAndRemoveDependencies(generic)).get(generic);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Generic> T reBind(Generic generic) {
+		if (generic.isAlive())
+			return (T) generic;
+		else {
+			if (((GenericImpl) generic).supers.length == 1)
+				return bindPrimaryByValue(generic.getClass(), ((GenericImpl) generic).supers[0], generic.getValue(), generic.getMetaLevel(), generic.isAutomatic());
+			return bind(reBind(generic.getImplicit()), reBind(((GenericImpl) generic).supers), reBind(((GenericImpl) generic).components), generic.isAutomatic(), generic.getClass(), false);
+		}
+	}
+
+	private Generic[] reBind(Generic[] generics) {
+		Generic[] reBind = new Generic[generics.length];
+		for (int i = 0; i < generics.length; i++)
+			reBind[i] = reBind(generics[i]);
+		return reBind;
 	}
 
 	private <T extends Generic> T buildAndInsertComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
@@ -414,14 +455,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private class ConnectionMap extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 8257917150315417734L;
 
-		private ConnectionMap reBind(NavigableSet<Generic> orderedDependencies) {
+		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
 			for (Generic orderedDependency : orderedDependencies) {
 				Generic generic;
 				if (((GenericImpl) orderedDependency).isPrimary())
 					generic = bindPrimaryByValue(orderedDependency.getClass(), adjust(((GenericImpl) orderedDependency).supers)[0], orderedDependency.getValue(), orderedDependency.getMetaLevel(), orderedDependency.isAutomatic());
-				else
+				else {
 					generic = buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0], adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components),
 							orderedDependency.isAutomatic());
+				}
 				put(orderedDependency, generic);
 			}
 			return this;

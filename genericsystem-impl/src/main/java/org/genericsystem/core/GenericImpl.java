@@ -27,6 +27,7 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
+import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractConcateIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
@@ -126,10 +127,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 
-		// TODO KK
-		// assert getMetaLevel() == metaLevel : this.info();
 		if (getMetaLevel() != metaLevel)
-			throw new IllegalStateException(value + " : META LEVEL ERROR getMetaLevel() " + getMetaLevel() + " / " + metaLevel);
+			throw new IllegalStateException(info() + " : META LEVEL ERROR getMetaLevel() " + getMetaLevel() + " / metaLevel " + metaLevel);
 		if (!isPrimary())
 			assert Objects.equals(directSupers[0].getValue(), value);
 		if (value != null)
@@ -181,12 +180,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public boolean isInstanceOf(Generic generic) {
 		return getMetaLevel() - generic.getMetaLevel() == 1 ? this.inheritsFrom(generic) : false;
 	}
-
-	// TODO clean
-	// @Override
-	// public int getMetaLevel() {
-	// return metaLevel;
-	// }
 
 	@Override
 	public int getMetaLevel() {
@@ -245,7 +238,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <S extends Serializable> S getValue() {
-		return (S) value;// (S) getEngine().getValue(this);
+		return (S) value;
 	}
 
 	@Override
@@ -884,7 +877,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void remove() {
-		((CacheImpl) getEngine().getCurrentCache()).remove(this);
+		((CacheImpl) getEngine().getCurrentCache()).removeWithAutomatics(this);
 	}
 
 	@Override
@@ -1046,28 +1039,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	// TODO clean
-	// private String toString(Generic[] a) {
-	// if (a == null)
-	// return "null";
-	//
-	// int iMax = a.length - 1;
-	// if (iMax == -1)
-	// return "[]";
-	//
-	// StringBuilder b = new StringBuilder();
-	// b.append('[');
-	// for (int i = 0;; i++) {
-	// if (this.equals(a[i]))
-	// b.append("this");
-	// else
-	// b.append((a[i].getValue() instanceof Class ? ((Class<?>) a[i].getValue()).getSimpleName() : a[i].getValue()));
-	// if (i == iMax)
-	// return b.append(']').toString();
-	// b.append(", ");
-	// }
-	// }
-
 	public boolean isPrimary() {
 		return components.length == 0 && supers.length == 1;
 	}
@@ -1080,15 +1051,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			generic = (GenericImpl) generic.supers[generic.supers.length - 1];
 		return (T) generic;
 	}
-
-	// @Override
-	// public <T extends Generic> T getMeta() {
-	// return (T) getInternalMeta(isMeta() ? SystemGeneric.META : getMetaLevel() - 1);
-	// }
-	//
-	// private Generic getInternalMeta(int instanciationLevel) {
-	// return getMetaLevel() == instanciationLevel ? this : ((GenericImpl) supers[supers.length - 1]).getInternalMeta(instanciationLevel);
-	// }
 
 	@Override
 	public <T extends Generic> T getBaseComponent() {
@@ -1155,17 +1117,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	// @Override
-	// public <T extends Generic> T getSubType(Context context, final Serializable value) {
-	// return Statics.<T> unambigousFirst(new AbstractFilterIterator<T>(this.<T> allSubTypesIteratorWithoutRoot(context)) {
-	//
-	// @Override
-	// public boolean isSelected() {
-	// return Objects.equals(next.getValue(), value);
-	// }
-	// });
-	// }
-
 	@Override
 	public <T extends Generic> T getSubType(final Serializable value) {
 		final Generic primary = ((AbstractContext) getEngine().getCurrentCache()).findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
@@ -1184,36 +1135,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return (T) primary;
 		return Statics.<T> unambigousFirst(iterator);
 	}
-
-	// public <T extends Generic> T getSubType(Context context, Serializable value, Generic[] supers, Generic... components) {
-	// Generic primary = ((CacheImpl) context).findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
-	// if (primary == null)
-	// return null;
-	// return Statics.<T> unambigousFirst(((CacheImpl) context).<T> queryIterator(context, SystemGeneric.STRUCTURAL, Statics.insertFirst(this, Statics.insertFirst(primary, supers)), components));
-	// }
-
-	// public <T extends Generic> Snapshot<T> getSubTypes(final Context context, final Generic[] supers, final Generic... components) {
-	// return new AbstractSnapshot<T>() {
-	//
-	// @Override
-	// public Iterator<T> iterator() {
-	// return ((CacheImpl) context).<T> queryIterator(context, SystemGeneric.STRUCTURAL, supers, components);
-	// }
-	// };
-	// }
-	//
-	// public <T extends Type> Snapshot<T> getSubTypes(final Context context, final Serializable value, final Generic[] supers, final Generic... components) {
-	// return new AbstractSnapshot<T>() {
-	//
-	// @Override
-	// public Iterator<T> iterator() {
-	// Generic primary = ((CacheImpl) context).findPrimaryByValue(getImplicit(), value, SystemGeneric.STRUCTURAL);
-	// if (primary == null)
-	// return Statics.emptyIterator();
-	// return ((CacheImpl) context).<T> queryIterator(context, SystemGeneric.STRUCTURAL, Statics.insertFirst(primary, supers), components);
-	// }
-	// };
-	// }
 
 	@Override
 	public <T extends Generic> Snapshot<T> getDirectSubTypes() {
@@ -1241,7 +1162,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> allSubTypesIteratorWithoutRoot() {
-		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), SystemGeneric.STRUCTURAL);// getMetaLevel()); // TODO remove comment
+		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), SystemGeneric.STRUCTURAL);
 	}
 
 	public <T extends Generic> Snapshot<T> getAllInheritings() {
@@ -1604,6 +1525,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullToSelfComponent(components), this.components);
 	}
 
+	public <T extends Generic> T reBuild() {
+		return ((CacheImpl) getEngine().getCurrentCache()).reBuild(this);
+	}
+
 	public <T extends Generic> T reBind() {
 		return ((CacheImpl) getEngine().getCurrentCache()).reBind(this);
 	}
@@ -1657,16 +1582,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getMap(PropertiesMapProvider.class);
 	}
 
-	// TODO change with instanceof Tree
 	@Override
 	public boolean isTree() {
-		return isStructural() && this.equals(getBaseComponent());
+		return this instanceof Tree;
 	}
 
-	// TODO change with instanceof Node
 	@Override
 	public boolean isRoot() {
-		return isConcrete() && this.equals(getBaseComponent());
+		return isTree() && equals(getBaseComponent());
 	}
 
 	@Override
