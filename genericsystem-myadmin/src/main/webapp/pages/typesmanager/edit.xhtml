@@ -18,7 +18,7 @@
 				style="white-space: nowrap; padding-top: 5px; margin-right: 5px;"
 				value="#{msg.edit} " />
 			<rich:inplaceInput
-				value="#{typesBean.getWrapper(typesBean.selectedTreeNode).value}"
+				value="#{genericTreeBean.getGenericTreeNodeWrapper(genericTreeBean.selectedTreeNode).value}"
 				editEvent="dblclick" rendered="true">
 				<a4j:ajax event="change" render="typesmanager" />
 			</rich:inplaceInput>
@@ -44,7 +44,7 @@
 										<h:outputText
 											value="#{currentStructural.attribute} (#{currentStructural.position})" />
 										<a4j:commandLink
-											action="#{typesBean.view(currentStructural.attribute)}"
+											action="#{genericTreeBean.view(currentStructural.attribute)}"
 											render="menutypesmanager, edittypesmanager, paneltitletypesmanager, typestree">
 											<h:graphicImage value="#{infos.imgNavigate}"
 												title="#{msg.view}" />
@@ -75,7 +75,7 @@
 											styleClass="#{typesBean.getHolderStyle(currentHolder)}">
 											<a4j:ajax event="change" render="edittypesmanager" />
 										</rich:inplaceInput>
-										<a4j:commandLink action="#{typesBean.view(currentHolder)}"
+										<a4j:commandLink action="#{genericTreeBean.view(currentHolder)}"
 											render="menutypesmanager, edittypesmanager, paneltitletypesmanager, typestree"
 											style="padding-left : 5%;">
 											<h:graphicImage value="#{infos.imgNavigate}"
@@ -97,7 +97,7 @@
 										</rich:inplaceInput>
 									</rich:column>
 									<rich:column>
-										<a4j:commandLink action="#{typesBean.view(currentTarget)}"
+										<a4j:commandLink action="#{genericTreeBean.view(currentTarget)}"
 											render="menutypesmanager, edittypesmanager, paneltitletypesmanager, typestree">
 											<h:graphicImage value="#{infos.imgNavigate}"
 												title="#{msg.view}" />
@@ -144,7 +144,7 @@
 					<a4j:commandLink
 						oncomplete="#{rich:component('createproperty')}.show()">
 						<h:graphicImage value="#{infos.add}"
-							title="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{typesBean.selectedTreeNodeValue}" />
+							title="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}" />
 					</a4j:commandLink>
 				</f:facet>
 				<h:commandLink action="#{typesBean.removeProperty(currentEntry)}">

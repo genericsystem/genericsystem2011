@@ -13,27 +13,27 @@
 	<rich:contextMenu id="menutypesmanager" mode="ajax" attached="false">
 		<rich:menuGroup label="#{msg.show} ...">
 			<rich:menuItem label="#{msg.show} #{msg.super}s"
-				action="#{typesBean.changeTreeType('SUPERS')}" mode="ajax"
+				action="#{genericTreeBean.changeTreeType('SUPERS')}" mode="ajax"
 				render="typestree, typestreetitle" icon="#{infos.up_green_arrow}"
-				disabled="#{typesBean.isTreeTypeSelected('SUPERS')}" />
+				disabled="#{genericTreeBean.isTreeTypeSelected('SUPERS')}" />
 			<rich:menuItem label="#{msg.show} #{msg.inheriting}s"
-				action="#{typesBean.changeTreeType('INHERITINGS')}" mode="ajax"
+				action="#{genericTreeBean.changeTreeType('INHERITINGS')}" mode="ajax"
 				render="typestree, typestreetitle"
 				icon="#{infos.down_right_green_arrow}"
-				disabled="#{typesBean.isTreeTypeSelected('INHERITINGS')}" />
+				disabled="#{genericTreeBean.isTreeTypeSelected('INHERITINGS')}" />
 			<rich:menuItem label="#{msg.show} #{msg.component}s"
-				action="#{typesBean.changeTreeType('COMPONENTS')}" mode="ajax"
+				action="#{genericTreeBean.changeTreeType('COMPONENTS')}" mode="ajax"
 				render="typestree, typestreetitle" icon="#{infos.left_green_arrow}"
-				disabled="#{typesBean.isTreeTypeSelected('COMPONENTS')}" />
+				disabled="#{genericTreeBean.isTreeTypeSelected('COMPONENTS')}" />
 			<rich:menuItem label="#{msg.show} #{msg.composite}s"
-				action="#{typesBean.changeTreeType('COMPOSITES')}" mode="ajax"
+				action="#{genericTreeBean.changeTreeType('COMPOSITES')}" mode="ajax"
 				render="typestree, typestreetitle" icon="#{infos.right_green_arrow}"
-				disabled="#{typesBean.isTreeTypeSelected('COMPOSITES')}" />
+				disabled="#{genericTreeBean.isTreeTypeSelected('COMPOSITES')}" />
 			<rich:menuItem label="#{msg.show} #{msg.attribute}s"
-				action="#{typesBean.changeTreeType('ATTRIBUTES')}" mode="ajax"
+				action="#{genericTreeBean.changeTreeType('ATTRIBUTES')}" mode="ajax"
 				render="typestree, typestreetitle"
 				icon="#{infos.up_right_green_arrow}"
-				disabled="#{typesBean.isTreeTypeSelected('ATTRIBUTES')}" />
+				disabled="#{genericTreeBean.isTreeTypeSelected('ATTRIBUTES')}" />
 		</rich:menuGroup>
 		<rich:menuGroup label="show values ..."
 			binding="#{menuBean.menuGroup}" />
@@ -42,30 +42,30 @@
 
 		<rich:menuItem label="#{msg.add} #{msg.a} #{msg.type}"
 			action="#{typesBean.newType('new_type')}" render="typestree," mode="ajax"
-			icon="#{typesBean.getMenuTypeIcon('TYPE')}"
-			disabled="#{!typesBean.display()}" />
+			icon="#{menuBean.getMenuTypeIcon('TYPE')}"
+			disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{typesBean.selectedTreeNodeValue}"
+			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
 			action="#{typesBean.newSubType('new_subType')}" render="typestree" mode="ajax"
-			icon="#{typesBean.getMenuTypeIcon('TYPE')}"
-			disabled="#{!typesBean.display()}" />
+			icon="#{menuBean.getMenuTypeIcon('TYPE')}"
+			disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{typesBean.selectedTreeNodeValue}"
+			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
 			action="#{typesBean.setAttribute('new_attribute')}" render="typestree, edittypesmanager" mode="ajax"
-			icon="#{typesBean.getMenuTypeIcon('ATTRIBUTE')}" 
-			disabled="#{!typesBean.display()}" />
+			icon="#{menuBean.getMenuTypeIcon('ATTRIBUTE')}" 
+			disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{typesBean.selectedTreeNodeValue}"
+			label="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
 			oncomplete="#{rich:component('createproperty')}.show()" mode="ajax"
-			icon="#{typesBean.getMenuTypeIcon('ATTRIBUTE')}"
-			disabled="#{!typesBean.display()}" />
+			icon="#{menuBean.getMenuTypeIcon('ATTRIBUTE')}"
+			disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.create} #{msg.a} #{msg.instance} #{msg.for} #{typesBean.selectedTreeNodeValue}"
+			label="#{msg.create} #{msg.a} #{msg.instance} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
 			action="#{typesBean.newInstance('new_instance')}" render="typestree" mode="ajax"
-			icon="#{typesBean.getMenuTypeIcon('INSTANCE')}"
-			disabled="#{!typesBean.display()}" />
+			icon="#{menuBean.getMenuTypeIcon('INSTANCE')}"
+			disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.delete} #{typesBean.selectedTreeNodeValue}"
+			label="#{msg.delete} #{genericTreeBean.selectedTreeNodeValue}"
 			action="#{typesBean.delete}" render="typestree, edittypesmanager"
 			onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
 			mode="ajax" icon="#{infos.imgGarb}" />
