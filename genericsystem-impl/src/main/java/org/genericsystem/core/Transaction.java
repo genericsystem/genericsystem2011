@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -18,8 +17,6 @@ public class Transaction extends AbstractContext {
 	private transient long ts;
 
 	private transient final Engine engine;
-
-	// private final InternalTransaction internalTransaction = new InternalTransaction();
 
 	public Transaction(Engine engine) {
 		this(engine.pickNewTs(), engine);
@@ -50,11 +47,6 @@ public class Transaction extends AbstractContext {
 	TimestampedDependencies getCompositeDependencies(Generic component) {
 		return ((GenericImpl) component).getLifeManager().engineComposites;
 	}
-
-	// @Override
-	// InternalTransaction getInternalContext() {
-	// return internalTransaction;
-	// }
 
 	@Override
 	public boolean isAlive(Generic generic) {
@@ -95,6 +87,7 @@ public class Transaction extends AbstractContext {
 		generic.getLifeManager().kill(getTs());
 	}
 
+	// TODO static class extends HashSet...
 	private void writeLockAllAndCheckMvcc(Set<LifeManager> lockedLifeManagers, Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, OptimisticLockConstraintViolationException {
 		for (Generic generic : removes)
 			writeLockAndCheckMvcc(lockedLifeManagers, ((GenericImpl) generic).getLifeManager());
@@ -119,6 +112,4 @@ public class Transaction extends AbstractContext {
 		for (LifeManager lifeManager : lockedLifeManagers)
 			lifeManager.writeUnlock();
 	}
-	// }
-
 }
