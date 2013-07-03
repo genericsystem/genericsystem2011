@@ -773,7 +773,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private boolean findPhantom(Generic phantom, Generic[] components) {
-		return phantom != null && ((CacheImpl) getEngine().getCurrentCache()).fastFind(phantom, Statics.insertFirst(phantom, supers), components) != null;
+		return phantom != null && ((CacheImpl) getEngine().getCurrentCache()).fastFindByInterfaces(phantom, new Primaries(Statics.insertFirst(phantom, supers)).toArray(), components) != null;
 	}
 
 	boolean safeIsEnabled(Attribute attribute) {
@@ -1525,10 +1525,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullToSelfComponent(components), this.components);
 	}
 
-	public <T extends Generic> T reBuild() {
-		return ((CacheImpl) getEngine().getCurrentCache()).reBuild(this);
-	}
-
 	public <T extends Generic> T reBind() {
 		return ((CacheImpl) getEngine().getCurrentCache()).reBind(this);
 	}
@@ -1685,22 +1681,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public Snapshot<Generic> getOtherTargets(final int basePos, final Holder holder) {
+	public Snapshot<Generic> getOtherTargets(final Holder holder) {
 		return new AbstractSnapshot<Generic>() {
 			@Override
 			public Iterator<Generic> iterator() {
-				return otherTargetsIterator(basePos, holder);
+				return otherTargetsIterator(holder);
 			}
 		};
 	}
 
-	public Iterator<Generic> otherTargetsIterator(final int basePos, final Holder holder) {
-		final Generic[] components = ((GenericImpl) holder).getComponentsArray();
+	public Iterator<Generic> otherTargetsIterator(final Holder holder) {
+		final Generic[] components = ((GenericImpl) holder).components;
 		return new AbstractProjectorAndFilterIterator<Integer, Generic>(new CountIterator(components.length)) {
 
 			@Override
 			public boolean isSelected() {
-				return basePos != next.intValue();
+				return !GenericImpl.this.equals(components[next.intValue()]);
 			}
 
 			@Override
