@@ -773,7 +773,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private boolean findPhantom(Generic phantom, Generic[] components) {
-		return phantom != null && ((CacheImpl) getEngine().getCurrentCache()).fastFind(phantom, Statics.insertFirst(phantom, supers), components) != null;
+		return phantom != null && ((CacheImpl) getEngine().getCurrentCache()).fastFindByInterfaces(phantom, new Primaries(Statics.insertFirst(phantom, supers)).toArray(), components) != null;
 	}
 
 	boolean safeIsEnabled(Attribute attribute) {
@@ -1523,10 +1523,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	boolean equiv(Generic[] interfaces, Generic[] components) {
 		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullToSelfComponent(components), this.components);
-	}
-
-	public <T extends Generic> T reBuild() {
-		return ((CacheImpl) getEngine().getCurrentCache()).reBuild(this);
 	}
 
 	public <T extends Generic> T reBind() {

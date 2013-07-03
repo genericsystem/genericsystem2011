@@ -76,7 +76,7 @@ public class RebindTest extends AbstractTest {
 		Generic red = primeColor.newInstance("red");
 		Attribute lightness = primeColor.setAttribute("lightness");
 		Holder lightnessValue = red.setValue(lightness, "40");
-		Generic reboundLightness = ((GenericImpl) lightness).reBuild();
+		Generic reboundLightness = ((GenericImpl) lightness).reBind();
 		assert !lightness.isAlive();
 		assert !lightnessValue.isAlive();
 		assert null != ((CacheImpl) cache).reFind(lightness);
@@ -93,7 +93,7 @@ public class RebindTest extends AbstractTest {
 		Attribute carPower = car.setAttribute("power");
 		mycar.setValue(carPower, "123");
 		assert vehicle.isAlive();
-		Generic reboundVehicle = ((GenericImpl) vehicle).reBuild();
+		Generic reboundVehicle = ((GenericImpl) vehicle).reBind();
 		assert !vehicle.isAlive();
 		assert !car.isAlive();
 		assert null != ((CacheImpl) cache).reFind(vehicle);
@@ -109,7 +109,7 @@ public class RebindTest extends AbstractTest {
 		assert myCar123.inheritsFrom(power);
 		Generic myCar2 = car.newInstance("myCar2");
 		myCar2.setValue(power, "10");
-		((GenericImpl) car).reBuild();
+		((GenericImpl) car).reBind();
 		assert myCar.getMeta().equals(myCar2.getMeta());
 	}
 
