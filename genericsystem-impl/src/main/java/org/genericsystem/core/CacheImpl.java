@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -317,12 +318,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	// TODO clean
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
 		T result = bind(bindPrimaryByValue(Generic.class, getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0), superTypes, components, false, null, false);
 		assert Objects.equals(value, result.getValue());
-		// if (((GenericImpl) result).isPrimary())
-		// assert Objects.equals(value, result.getSupers().first().getImplicit().getValue()) : result.getSupers();
 		return result;
 	}
 

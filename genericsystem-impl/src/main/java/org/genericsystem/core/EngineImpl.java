@@ -158,10 +158,9 @@ public class EngineImpl extends GenericImpl implements Engine {
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
 					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class,
 					UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
-					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, /* FlushableConstraintImpl.class, */SizeConstraintImpl.class, PropertiesMapProvider.class, AloneAutomaticsConstraintImpl.class);
+					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class, AloneAutomaticsConstraintImpl.class);
 
-			// TODO clean
-			CacheImpl cache = (CacheImpl) start(newCache());// new CacheImpl(new Transaction(EngineImpl.this));
+			CacheImpl cache = (CacheImpl) start(newCache());
 			for (Class<?> clazz : classes)
 				if (get(clazz) == null)
 					bind(clazz);

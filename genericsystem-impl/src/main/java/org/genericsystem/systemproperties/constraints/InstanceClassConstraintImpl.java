@@ -19,8 +19,6 @@ import org.genericsystem.generic.Attribute;
 @Components(Engine.class)
 @SingularConstraint
 public class InstanceClassConstraintImpl extends Constraint {
-	// TODO
-	// implements NoBooleanSystemProperty {
 
 	private static final long serialVersionUID = -6429972259714036057L;
 
