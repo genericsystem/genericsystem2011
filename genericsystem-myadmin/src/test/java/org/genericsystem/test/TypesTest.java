@@ -58,7 +58,7 @@ public class TypesTest extends AbstractTest {
 		isBrotherOf.enableMultiDirectional();
 		Link link = quentin.bind(isBrotherOf, michael);
 
-		List<Generic> targets = quentin.getOtherTargets(0, link);
+		List<Generic> targets = quentin.getOtherTargets(link);
 		assert targets.size() == 1 : targets.size();
 		assert targets.contains(michael);
 		assert !targets.contains(quentin);

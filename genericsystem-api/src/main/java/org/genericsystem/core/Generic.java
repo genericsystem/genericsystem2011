@@ -628,6 +628,6 @@ public interface Generic extends Comparable<Generic> {
 
 	Snapshot<Structural> getStructurals();
 
-	<T extends Generic> Snapshot<T> getOtherTargets(int basePos, Holder holder);
+	<T extends Generic> Snapshot<T> getOtherTargets(Holder holder);
 
 }

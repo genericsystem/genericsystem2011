@@ -87,7 +87,7 @@
 							<rich:column>
 								<rich:dataTable var="currentTarget" styleClass="borderNone"
 									columnClasses="borderNone,borderNone"
-									value="#{typesBean.getOtherTargets(currentStructural.position,currentHolder)}">
+									value="#{typesBean.getOtherTargets(currentHolder)}">
 									<rich:column>
 										<rich:inplaceInput
 											value="#{typesBean.getGenericWrapper(currentTarget).value}"

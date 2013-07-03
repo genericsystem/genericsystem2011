@@ -1674,22 +1674,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public Snapshot<Generic> getOtherTargets(final int basePos, final Holder holder) {
+	public Snapshot<Generic> getOtherTargets(final Holder holder) {
 		return new AbstractSnapshot<Generic>() {
 			@Override
 			public Iterator<Generic> iterator() {
-				return otherTargetsIterator(basePos, holder);
+				return otherTargetsIterator(holder);
 			}
 		};
 	}
 
-	public Iterator<Generic> otherTargetsIterator(final int basePos, final Holder holder) {
-		final Generic[] components = ((GenericImpl) holder).getComponentsArray();
+	public Iterator<Generic> otherTargetsIterator(final Holder holder) {
+		final Generic[] components = ((GenericImpl) holder).components;
 		return new AbstractProjectorAndFilterIterator<Integer, Generic>(new CountIterator(components.length)) {
 
 			@Override
 			public boolean isSelected() {
-				return basePos != next.intValue();
+				return !GenericImpl.this.equals(components[next.intValue()]);
 			}
 
 			@Override
