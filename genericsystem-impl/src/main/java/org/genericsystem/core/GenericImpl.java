@@ -968,22 +968,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic superGeneric : supers)
 			s += "super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
 		s += "**********************************************************************\n";
+		for (Attribute attribute : getAttributes())
+			if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
+				s += "attribute : " + attribute + "\n";
+				for (Holder holder : getHolders(attribute))
+					s += "                          ----------> holder : " + holder + "\n";
+			}
+		s += "**********************************************************************\n";
 		return s;
 	}
-
-	// TODO
-	// @Override
-	// public String info(Context context) {
-	// String s = info();
-	// for (Attribute attribute : getAttributes(context))
-	// if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
-	// s += attribute + "\n";
-	// for (Holder holder : getHolders(context, attribute))
-	// s += "                          ---------->    " + holder + "\n";
-	// }
-	// s += "**********************************************************************\n";
-	// return s;
-	// }
 
 	@Override
 	public String toString() {
