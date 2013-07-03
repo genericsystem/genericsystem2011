@@ -78,8 +78,6 @@ public abstract class AbstractContext implements Serializable {
 		return (Iterator<T>) getDirectInheritingsDependencies(component).iterator(getTs());
 	}
 
-	// abstract InternalContext<? extends AbstractContext> getInternalContext();
-
 	public abstract long getTs();
 
 	public <T extends Attribute> T getMetaAttribute() {
