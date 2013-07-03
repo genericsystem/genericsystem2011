@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
@@ -138,11 +139,12 @@ public class EngineImpl extends GenericImpl implements Engine {
 		cacheLocal.set(null);
 	}
 
-	public Cache getCurrentCache() {
+	@Override
+	public CacheImpl getCurrentCache() {
 		Cache currentCache = cacheLocal.get();
 		if (currentCache == null)
 			currentCache = start(factory.getCacheLocal());
-		return currentCache;
+		return (CacheImpl) currentCache;
 	}
 
 	private class SystemCache extends HashMap<Class<?>, Generic> {
@@ -156,10 +158,9 @@ public class EngineImpl extends GenericImpl implements Engine {
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
 					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class,
 					UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
-					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, /* FlushableConstraintImpl.class, */SizeConstraintImpl.class, PropertiesMapProvider.class, AloneAutomaticsConstraintImpl.class);
+					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class, AloneAutomaticsConstraintImpl.class);
 
-			// TODO clean
-			CacheImpl cache = (CacheImpl) start(newCache());// new CacheImpl(new Transaction(EngineImpl.this));
+			CacheImpl cache = (CacheImpl) start(newCache());
 			for (Class<?> clazz : classes)
 				if (get(clazz) == null)
 					bind(clazz);
@@ -185,7 +186,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 		@SuppressWarnings("unchecked")
 		private <T extends Generic> T bind(Class<?> clazz) {
 			T result;
-			CacheImpl cache = (CacheImpl) getCurrentCache();
+			CacheImpl cache = getCurrentCache();
 			if (Engine.class.equals(clazz))
 				result = (T) EngineImpl.this;
 			if (MetaAttribute.class.equals(clazz)) {
