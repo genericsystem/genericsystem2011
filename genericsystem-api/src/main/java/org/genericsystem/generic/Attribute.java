@@ -63,12 +63,4 @@ public interface Attribute extends Holder, Type {
 	 */
 	Integer getSizeConstraint(int basePos);
 
-	// TODO clean
-	// /**
-	// * Do all necessary inductions on this attribute.
-	// *
-	// * @param cache
-	// * The reference Cache.
-	// */
-	// void deduct(Cache cache);
 }
