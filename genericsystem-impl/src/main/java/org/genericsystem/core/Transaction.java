@@ -1,7 +1,7 @@
 package org.genericsystem.core;
 
 import java.util.HashSet;
-import java.util.Set;
+
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -66,12 +66,12 @@ public class Transaction extends AbstractContext {
 	@Override
 	protected void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 		synchronized (getEngine()) {
-			Set<LifeManager> lockedLifeManagers = new HashSet<LifeManager>();
+			LockedLifeManager lockedLifeManager = new LockedLifeManager();
 			try {
-				writeLockAllAndCheckMvcc(lockedLifeManagers, adds, removes);
+				lockedLifeManager.writeLockAllAndCheckMvcc(adds, removes);
 				super.apply(adds, removes);
 			} finally {
-				writeUnlockAll(lockedLifeManagers);
+				lockedLifeManager.writeUnlockAll();
 			}
 		}
 	}
@@ -87,29 +87,33 @@ public class Transaction extends AbstractContext {
 		generic.getLifeManager().kill(getTs());
 	}
 
-	// TODO static class extends HashSet...
-	private void writeLockAllAndCheckMvcc(Set<LifeManager> lockedLifeManagers, Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, OptimisticLockConstraintViolationException {
-		for (Generic generic : removes)
-			writeLockAndCheckMvcc(lockedLifeManagers, ((GenericImpl) generic).getLifeManager());
-		for (Generic generic : adds) {
-			for (Generic effectiveSuper : ((GenericImpl) generic).supers)
-				writeLockAndCheckMvcc(lockedLifeManagers, ((GenericImpl) effectiveSuper).getLifeManager());
-			for (Generic component : ((GenericImpl) generic).components)
-				writeLockAndCheckMvcc(lockedLifeManagers, ((GenericImpl) component).getLifeManager());
-			writeLockAndCheckMvcc(lockedLifeManagers, ((GenericImpl) generic).getLifeManager());
-		}
-	}
+	private class LockedLifeManager extends HashSet<LifeManager> {
 
-	private void writeLockAndCheckMvcc(Set<LifeManager> lockedLifeManagers, LifeManager manager) throws ConcurrencyControlException, OptimisticLockConstraintViolationException {
-		if (!lockedLifeManagers.contains(manager)) {
-			manager.writeLock();
-			lockedLifeManagers.add(manager);
-			manager.checkMvcc(getTs());
-		}
-	}
+		private static final long serialVersionUID = -8771313495837238881L;
 
-	private void writeUnlockAll(Set<LifeManager> lockedLifeManagers) {
-		for (LifeManager lifeManager : lockedLifeManagers)
-			lifeManager.writeUnlock();
+		private void writeLockAllAndCheckMvcc(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, OptimisticLockConstraintViolationException {
+			for (Generic generic : removes)
+				writeLockAndCheckMvcc(((GenericImpl) generic).getLifeManager());
+			for (Generic generic : adds) {
+				for (Generic effectiveSuper : ((GenericImpl) generic).supers)
+					writeLockAndCheckMvcc(((GenericImpl) effectiveSuper).getLifeManager());
+				for (Generic component : ((GenericImpl) generic).components)
+					writeLockAndCheckMvcc(((GenericImpl) component).getLifeManager());
+				writeLockAndCheckMvcc(((GenericImpl) generic).getLifeManager());
+			}
+		}
+
+		private void writeLockAndCheckMvcc(LifeManager manager) throws ConcurrencyControlException, OptimisticLockConstraintViolationException {
+			if (!contains(manager)) {
+				manager.writeLock();
+				add(manager);
+				manager.checkMvcc(getTs());
+			}
+		}
+
+		private void writeUnlockAll() {
+			for (LifeManager lifeManager : this)
+				lifeManager.writeUnlock();
+		}
 	}
 }

@@ -78,7 +78,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	@Override
 	public Cache newCache() {
-		return getFactory().newCache(new Transaction(this));
+		return getFactory().newCache(this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -139,11 +139,12 @@ public class EngineImpl extends GenericImpl implements Engine {
 		cacheLocal.set(null);
 	}
 
-	public Cache getCurrentCache() {
+	@Override
+	public CacheImpl getCurrentCache() {
 		Cache currentCache = cacheLocal.get();
 		if (currentCache == null)
 			currentCache = start(factory.getCacheLocal());
-		return currentCache;
+		return (CacheImpl) currentCache;
 	}
 
 	private class SystemCache extends HashMap<Class<?>, Generic> {
@@ -186,7 +187,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 		@SuppressWarnings("unchecked")
 		private <T extends Generic> T bind(Class<?> clazz) {
 			T result;
-			CacheImpl cache = (CacheImpl) getCurrentCache();
+			CacheImpl cache = getCurrentCache();
 			if (Engine.class.equals(clazz))
 				result = (T) EngineImpl.this;
 			if (MetaAttribute.class.equals(clazz)) {

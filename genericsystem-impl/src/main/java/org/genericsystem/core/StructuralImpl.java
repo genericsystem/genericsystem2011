@@ -46,5 +46,4 @@ public class StructuralImpl implements Structural {
 	public int hashCode() {
 		return attribute.hashCode();
 	}
-
 }

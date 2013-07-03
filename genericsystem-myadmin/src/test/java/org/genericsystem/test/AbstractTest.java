@@ -10,6 +10,7 @@ import org.genericsystem.cdi.CdiFactory;
 import org.genericsystem.cdi.EngineProvider;
 import org.genericsystem.cdi.PersitentDirectoryProvider;
 import org.genericsystem.cdi.UserClassesProvider;
+import org.genericsystem.myadmin.beans.GenericTreeBean;
 import org.genericsystem.myadmin.beans.TypesBean;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
@@ -33,7 +34,7 @@ public abstract class AbstractTest extends Arquillian {
 	@Deployment
 	public static JavaArchive createTestArchive() {
 		return new Archiver(TypesBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class, MessageFactory.class,
-				CdiFactory.class).archive();
+				CdiFactory.class, GenericTreeBean.class).archive();
 	}
 
 	@Inject

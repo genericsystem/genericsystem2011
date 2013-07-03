@@ -11,7 +11,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -33,11 +32,13 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * 
  */
-public abstract class AbstractContext implements Context, Serializable {
+public abstract class AbstractContext implements Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractContext.class);
 
 	private static final long serialVersionUID = -6036571074310729022L;
+
+	abstract <T extends Engine> T getEngine();
 
 	<T extends GenericImpl> T plug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
@@ -126,54 +127,23 @@ public abstract class AbstractContext implements Context, Serializable {
 		final Iterator<Generic> iterator = getDirectSupersIterator(interfaces, components);
 		while (iterator.hasNext())
 			list.add(iterator.next());
-		// Generic[] result = list.toArray(new Generic[list.size()]);
-		// assert Arrays.equals(new Primaries(result).toArray(), interfaces) :
-		// new Primaries(result) + " <---> " + Arrays.toString(interfaces);
 		return list.toArray(new Generic[list.size()]);
 	}
 
 	@SuppressWarnings("unchecked")
-	// TODO KK
-	// public <T extends Generic> T reFind(Generic generic) {
-	// if (generic.isAlive(this))
-	// return (T) generic;
-	// if (((GenericImpl) generic).isPrimary())
-	// return findPrimaryByValue(((GenericImpl) generic).supers[0], generic.getValue(), generic.getMetaLevel());
-	// Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
-	// Generic[] boundPrimaries = new Generic[primariesArray.length];
-	// for (int i = 0; i < primariesArray.length; i++)
-	// boundPrimaries[i] = reFind(((GenericImpl) primariesArray[i]));
-	// Generic[] extendedComponents = ((GenericImpl) generic).components;
-	// Generic[] extendedBoundComponents = new Generic[((GenericImpl) generic).components.length];
-	// for (int i = 0; i < extendedComponents.length; i++)
-	// extendedBoundComponents[i] = generic.equals(extendedComponents[i]) ? null : reFind(extendedComponents[i]);
-	// Generic[] directSupers = getDirectSupers(boundPrimaries, extendedBoundComponents);
-	// if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(boundPrimaries, extendedBoundComponents))
-	// return (T) directSupers[0];
-	// return null;
-	// }
-	//
 	public <T extends Generic> T reFind(Generic generic) {
-		if (generic.isEngine())
-			return getEngine();
-		if (generic.isAlive())
+		if (generic.isEngine() || generic.isAlive())
 			return (T) generic;
 		if (((GenericImpl) generic).isPrimary())
 			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue(), generic.getMetaLevel());
-		Generic[] primariesArray = ((GenericImpl) generic).getPrimariesArray();
-		Generic[] boundPrimaries = new Generic[primariesArray.length];
-		for (int i = 0; i < primariesArray.length; i++) {
-			Generic find = reFind(((GenericImpl) primariesArray[i]));
-			if (find == null)
-				return null;
-			boundPrimaries[i] = find;
-		}
-		Generic[] components = ((GenericImpl) generic).components;
-		Generic[] boundComponents = new Generic[components.length];
-		for (int i = 0; i < components.length; i++)
-			boundComponents[i] = reFind(((GenericImpl) components[i]));
+		return fastFindByInterfaces(reFind(generic.getImplicit()), new Primaries(reFind(((GenericImpl) generic).getPrimariesArray())).toArray(), reFind(((GenericImpl) generic).components));
+	}
 
-		return fastFind(reFind(generic.getImplicit()), boundPrimaries, boundComponents);
+	private Generic[] reFind(Generic[] generics) {
+		Generic[] reBind = new Generic[generics.length];
+		for (int i = 0; i < generics.length; i++)
+			reBind[i] = reFind(generics[i]);
+		return reBind;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -185,10 +155,10 @@ public abstract class AbstractContext implements Context, Serializable {
 		return null;
 	}
 
-	<T extends Generic> T fastFind(Generic implicit, Generic[] supers, Generic[] components) {
-		assert supers[0].getImplicit().equals(implicit);
-		return fastFindByInterfaces(implicit, new Primaries(supers).toArray(), components);
-	}
+	// <T extends Generic> T fastFind(Generic implicit, Generic[] supers, Generic[] components) {
+	// assert supers[0].getImplicit().equals(implicit);
+	// return fastFindByInterfaces(implicit, new Primaries(supers).toArray(), components);
+	// }
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFindByInterfaces(Generic implicit, Generic[] interfaces, Generic[] components) {
@@ -250,7 +220,6 @@ public abstract class AbstractContext implements Context, Serializable {
 
 	public abstract boolean isAlive(Generic generic);
 
-	@Override
 	public <T extends Generic> T find(Class<?> clazz) {
 		return this.<EngineImpl> getEngine().find(clazz);
 	}

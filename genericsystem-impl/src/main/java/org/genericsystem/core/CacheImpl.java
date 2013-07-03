@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -49,8 +48,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private Set<Generic> adds;
 	private Set<Generic> removes;
 
-	public CacheImpl(Context subContext) {
-		this.subContext = (AbstractContext) subContext;
+	public CacheImpl(Cache cache) {
+		this.subContext = (CacheImpl) cache;
+		clear();
+	}
+
+	public CacheImpl(Engine engine) {
+		this.subContext = new Transaction(engine);
 		clear();
 	}
 
@@ -423,28 +427,23 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T reBuild(Generic generic) {
-		if (!generic.isAlive())
-			throw new UnsupportedOperationException(generic.info());
-		// TODO kk method name
-		return (T) new ConnectionMap().reBind(orderAndRemoveDependencies(generic)).get(generic);
+	public <T extends Generic> T reBind(Generic generic) {
+		return (T) (generic.isAlive() ? new ConnectionMap().reBind(orderAndRemoveDependencies(generic)).get(generic) : internalReBind(generic));
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T reBind(Generic generic) {
-		if (generic.isAlive())
+	public <T extends Generic> T internalReBind(Generic generic) {
+		if (generic.isEngine() || generic.isAlive())
 			return (T) generic;
-		else {
-			if (((GenericImpl) generic).supers.length == 1)
-				return bindPrimaryByValue(generic.getClass(), ((GenericImpl) generic).supers[0], generic.getValue(), generic.getMetaLevel(), generic.isAutomatic());
-			return bind(reBind(generic.getImplicit()), reBind(((GenericImpl) generic).supers), reBind(((GenericImpl) generic).components), generic.isAutomatic(), generic.getClass(), false);
-		}
+		if (((GenericImpl) generic).isPrimary())
+			return bindPrimaryByValue(generic.getClass(), ((GenericImpl) generic).supers[0], generic.getValue(), generic.getMetaLevel(), generic.isAutomatic());
+		return bind(internalReBind(generic.getImplicit()), reBind(((GenericImpl) generic).supers), reBind(((GenericImpl) generic).components), generic.isAutomatic(), generic.getClass(), false);
 	}
 
 	private Generic[] reBind(Generic[] generics) {
 		Generic[] reBind = new Generic[generics.length];
 		for (int i = 0; i < generics.length; i++)
-			reBind[i] = reBind(generics[i]);
+			reBind[i] = internalReBind(generics[i]);
 		return reBind;
 	}
 

@@ -11,7 +11,6 @@ import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Structural;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -112,19 +111,8 @@ public class TypesBean implements Serializable {
 		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structural.getAttribute(), structural.getPosition());
 	}
 
-	// TODO see to integrate getBasePosIfMultiDirectional in core
-	public List<Generic> getOtherTargets(int basePos, Holder holder) {
-		if (((Attribute) holder).isMultiDirectional())
-			basePos = getBasePosIfMultiDirectional(basePos, holder);
-		return genericTreeBean.getSelectedTreeNodeGeneric().getOtherTargets(basePos, holder);
-	}
-
-	private int getBasePosIfMultiDirectional(int originalBasePos, Holder holder) {
-		Generic[] components = ((GenericImpl) holder).getComponentsArray();
-		for (int i = 0; i < components.length; i++)
-			if (components[i].equals(genericTreeBean.getSelectedTreeNodeGeneric()))
-				return i;
-		throw new IllegalStateException("Unable to find position");
+	public List<Generic> getOtherTargets(Holder holder) {
+		return genericTreeBean.getSelectedTreeNodeGeneric().getOtherTargets(holder);
 	}
 
 	public void addValue(Attribute attribute, String newValue) {

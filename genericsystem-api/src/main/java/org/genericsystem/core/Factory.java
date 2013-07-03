@@ -3,7 +3,6 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import org.genericsystem.exception.CacheAwareException;
 
 /**
@@ -34,11 +33,20 @@ public interface Factory extends Serializable {
 	/**
 	 * Create a new Cache.
 	 * 
-	 * @param context
-	 *            The sub context.
+	 * @param cache
+	 *            The sub cache.
 	 * @return The new Cache.
 	 */
-	Cache newCache(Context context);
+	Cache newCache(Cache subCache);
+
+	/**
+	 * Create a new Cache.
+	 * 
+	 * @param engine
+	 *            The engine on which a cache is mount.
+	 * @return The new Cache.
+	 */
+	Cache newCache(Engine engine);
 
 	Cache getCacheLocal();
 
@@ -53,14 +61,16 @@ public interface Factory extends Serializable {
 
 		private Class<Generic> genericClass;
 		private Constructor<Engine> engineConstructor;
-		private Constructor<Cache> cacheConstructor;
+		private Constructor<Cache> cacheConstructorOnCache;
+		private Constructor<Cache> cacheConstructorOnEngine;
 
 		@SuppressWarnings({ "static-access", "unchecked" })
 		public DefaultFactory(Class<?>... classes) {
 			try {
 				engineConstructor = this.<Engine> getImplementation((Class<Engine>) Class.forName("org.genericsystem.core.EngineImpl"), classes).getConstructor(Config.class, Class[].class);
 				genericClass = this.<Generic> getImplementation((Class<Generic>) Class.forName("org.genericsystem.core.GenericImpl"), classes);
-				cacheConstructor = this.<Cache> getImplementation((Class<Cache>) Class.forName("org.genericsystem.core.CacheImpl"), classes).getConstructor(Context.class);
+				cacheConstructorOnCache = this.<Cache> getImplementation((Class<Cache>) Class.forName("org.genericsystem.core.CacheImpl"), classes).getConstructor(Cache.class);
+				cacheConstructorOnEngine = this.<Cache> getImplementation((Class<Cache>) Class.forName("org.genericsystem.core.CacheImpl"), classes).getConstructor(Engine.class);
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
 				throw new IllegalStateException(e);
 			}
@@ -101,9 +111,18 @@ public interface Factory extends Serializable {
 		}
 
 		@Override
-		public Cache newCache(Context context) {
+		public Cache newCache(Cache cache) {
 			try {
-				return cacheConstructor.newInstance(context);
+				return cacheConstructorOnCache.newInstance(cache);
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
+		@Override
+		public Cache newCache(Engine engine) {
+			try {
+				return cacheConstructorOnEngine.newInstance(engine);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new IllegalStateException(e);
 			}

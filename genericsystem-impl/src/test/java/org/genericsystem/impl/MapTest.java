@@ -28,8 +28,8 @@ public class MapTest extends AbstractTest {
 	public void testPropertyMap() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType( "Car");
-		Generic myBmw = car.newInstance( "myBmw");
+		Type car = vehicle.newSubType("Car");
+		Generic myBmw = car.newInstance("myBmw");
 		Map<Serializable, Serializable> vehicleMap = vehicle.getProperties();
 		Map<Serializable, Serializable> map2 = new HashMap<>();
 		Map<Serializable, Serializable> carMap = car.getProperties();
@@ -58,8 +58,8 @@ public class MapTest extends AbstractTest {
 	public void testPropertyInherit() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType( "Car");
-		Generic myBmw = car.newInstance( "myBmw");
+		Type car = vehicle.newSubType("Car");
+		Generic myBmw = car.newInstance("myBmw");
 		vehicle.getProperties().put("power", 123);
 		assert vehicle.getProperties().get("power").equals(123) : vehicle.getProperties();
 		myBmw.getProperties().put("wheel", 4);
@@ -74,7 +74,7 @@ public class MapTest extends AbstractTest {
 	public void testPropertyInherit2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myBmw = car.newInstance( "myBmw");
+		Generic myBmw = car.newInstance("myBmw");
 		car.getProperties().put("power", 123);
 		assert car.getProperties().get("power").equals(123) : car.getProperties();
 		assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
@@ -97,7 +97,7 @@ public class MapTest extends AbstractTest {
 	public void testOnInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myBmw = car.newInstance( "myBmw");
+		Generic myBmw = car.newInstance("myBmw");
 		myBmw.getProperties().put("power", 123);
 		assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
 		myBmw.getProperties().put("wheel", 4);
@@ -110,7 +110,7 @@ public class MapTest extends AbstractTest {
 	public void testProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType( "Car");
+		Type car = vehicle.newSubType("Car");
 		vehicle.getProperties().put("power", 123);
 		vehicle.getProperties().put("whell", 4);
 		assert car.getProperties().get("power").equals(123);
@@ -123,7 +123,7 @@ public class MapTest extends AbstractTest {
 	public void testRemove() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType( "Car");
+		Type car = vehicle.newSubType("Car");
 		vehicle.getProperties().put("power", 123);
 		assert car.getProperties().get("power").equals(123);
 		car.getProperties().remove("power");
@@ -139,7 +139,7 @@ public class MapTest extends AbstractTest {
 	public void testRemove2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType( "Car");
+		Type car = vehicle.newSubType("Car");
 		vehicle.getProperties().put("power", 123);
 		assert car.getProperties().get("power").equals(123);
 		car.getProperties().remove("power");
@@ -155,14 +155,14 @@ public class MapTest extends AbstractTest {
 	public void testOtherMap() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(MyMapProvider.class).start();
 		Type vehicle = cache.newType("Vehicle");
-		vehicle.getMap( MyMapProvider.class).put("power", 123);
-		assert vehicle.getMap( MyMapProvider.class).get("power").equals(123);
-		vehicle.getMap( MyMapProvider.class).remove("power");
-		assert vehicle.getMap( MyMapProvider.class).get("power") == null;
+		vehicle.getMap(MyMapProvider.class).put("power", 123);
+		assert vehicle.getMap(MyMapProvider.class).get("power").equals(123);
+		vehicle.getMap(MyMapProvider.class).remove("power");
+		assert vehicle.getMap(MyMapProvider.class).get("power") == null;
 
 		vehicle.getProperties().put("power", 123);
 		assert vehicle.getProperties().get("power").equals(123);
-		assert vehicle.getMap( MyMapProvider.class).get("power") == null;
+		assert vehicle.getMap(MyMapProvider.class).get("power") == null;
 	}
 
 	@SystemGeneric

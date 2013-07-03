@@ -265,7 +265,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> T bindPrimary(Class<?> specializeGeneric, Serializable value, int metaLevel, boolean automatic) {
-		return ((CacheImpl) getEngine().getCurrentCache()).bindPrimaryByValue(specializeGeneric, isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel, automatic);
+		return getCurrentCache().bindPrimaryByValue(specializeGeneric, isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel, automatic);
 	}
 
 	@Override
@@ -318,7 +318,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	protected <T extends Holder> T bind(Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
-		return ((CacheImpl) getEngine().getCurrentCache()).bind(implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
+		return getCurrentCache().bind(implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
@@ -492,7 +492,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Iterator<T> directInheritingsIterator() {
-		return ((AbstractContext) getEngine().getCurrentCache()).directInheritingsIterator(this);
+		return getCurrentCache().directInheritingsIterator(this);
 	}
 
 	@Override
@@ -506,7 +506,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Iterator<T> compositesIterator() {
-		return ((AbstractContext) getEngine().getCurrentCache()).compositesIterator(this);
+		return getCurrentCache().compositesIterator(this);
 	}
 
 	public <T extends Generic> Iterator<T> compositesIterator(final int pos) {
@@ -529,7 +529,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Iterator<T> attributesIterator(boolean readPhantoms) {
-		return this.<T> attributesIterator(((AbstractContext) getEngine().getCurrentCache()).getMetaAttribute(), readPhantoms);
+		return this.<T> attributesIterator(getCurrentCache().getMetaAttribute(), readPhantoms);
 	}
 
 	@Override
@@ -554,7 +554,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Attribute> T getAttribute(final Serializable value, Generic... targets) {
-		return getAttribute(((AbstractContext) getEngine().getCurrentCache()).getMetaAttribute(), value, targets);
+		return getAttribute(getCurrentCache().getMetaAttribute(), value, targets);
 	}
 
 	@Override
@@ -588,7 +588,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> T reFind() {
-		return ((CacheImpl) getEngine().getCurrentCache()).reFind(this);
+		return getCurrentCache().reFind(this);
 	}
 
 	@Override
@@ -643,13 +643,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Serializable value, Generic... components) {
-		return ((CacheImpl) getEngine().getCurrentCache()).bind(bindPrimary(getClass(), value, getMetaLevel() + 1, !isPrimary()), false, this, false, components);
+		return getCurrentCache().bind(bindPrimary(getClass(), value, getMetaLevel() + 1, !isPrimary()), false, this, false, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
 		Generic implicit = getEngine().bindPrimary(Generic.class, value, SystemGeneric.STRUCTURAL, !isEngine() || components.length != 0);
-		return ((CacheImpl) getEngine().getCurrentCache()).bind(implicit, false, this, false, components);
+		return getCurrentCache().bind(implicit, false, this, false, components);
 	}
 
 	@Override
@@ -690,11 +690,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private Attribute getNoInheritanceSystemProperty() {
-		return ((AbstractContext) getEngine().getCurrentCache()).<Attribute> find(NoInheritanceSystemProperty.class);
+		return getCurrentCache().<Attribute> find(NoInheritanceSystemProperty.class);
 	}
 
 	private Attribute getMultiDirectionalSystemProperty() {
-		return ((AbstractContext) getEngine().getCurrentCache()).<Attribute> find(MultiDirectionalSystemProperty.class);
+		return getCurrentCache().<Attribute> find(MultiDirectionalSystemProperty.class);
 	}
 
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final Generic origin, int pos, final int metaLevel) {
@@ -730,8 +730,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					public boolean isSelected() {
 						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
 						if (selected && ((GenericImpl) next).isPseudoStructural(pos))
-							if (getEngine().getCurrentCache() instanceof CacheImpl)
-								((GenericImpl) next).project(pos, ((CacheImpl) getEngine().getCurrentCache()).findPrimaryByValue(((GenericImpl) next.getImplicit()).supers[0], null, SystemGeneric.CONCRETE));
+							if (getCurrentCache() instanceof CacheImpl)
+								((GenericImpl) next).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) next.getImplicit()).supers[0], null, SystemGeneric.CONCRETE));
 						return selected;
 					}
 				};
@@ -754,7 +754,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = (Generic[]) cartesianIterator.next();
 			if (!findPhantom(phantom, components))
-				((CacheImpl) getEngine().getCurrentCache()).bind(getImplicit(), true, this, false, components);
+				getCurrentCache().bind(getImplicit(), true, this, false, components);
 		}
 	}
 
@@ -877,12 +877,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void remove() {
-		((CacheImpl) getEngine().getCurrentCache()).removeWithAutomatics(this);
+		getCurrentCache().removeWithAutomatics(this);
 	}
 
 	@Override
 	public boolean isAlive() {
-		return ((AbstractContext) getEngine().getCurrentCache()).isAlive(this);
+		return getCurrentCache().isAlive(this);
 	}
 
 	public boolean isAlive(long ts) {
@@ -1119,7 +1119,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getSubType(final Serializable value) {
-		final Generic primary = ((AbstractContext) getEngine().getCurrentCache()).findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
+		final Generic primary = getCurrentCache().findPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL);
 		if (primary == null)
 			return null;
 		Iterator<T> iterator = Statics.<T> valueFilter(new AbstractFilterIterator<T>((((GenericImpl) primary).<T> directInheritingsIterator())) {
@@ -1241,7 +1241,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isRemovable() {
-		return getEngine().getCurrentCache().isRemovable(this);
+		return getCurrentCache().isRemovable(this);
 	}
 
 	/*********************************************/
@@ -1257,12 +1257,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> T enableSystemProperty(Class<?> systemPropertyClass, int basePos) {
-		setBooleanSystemProperty(getEngine().getCurrentCache().<Attribute> find(systemPropertyClass), basePos, !systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
+		setBooleanSystemProperty(getCurrentCache().<Attribute> find(systemPropertyClass), basePos, !systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
 		return (T) this;
 	}
 
 	public <T extends Generic> T disableSystemProperty(Class<?> systemPropertyClass, int basePos) {
-		setBooleanSystemProperty(getEngine().getCurrentCache().<Attribute> find(systemPropertyClass), basePos, systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
+		setBooleanSystemProperty(getCurrentCache().<Attribute> find(systemPropertyClass), basePos, systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior());
 		return (T) this;
 	}
 
@@ -1287,7 +1287,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public boolean isBooleanSystemPropertyEnabled(Class<? extends BooleanSystemProperty> systemPropertyClass, int basePos) {
 		boolean defaultBehavior = systemPropertyClass.getAnnotation(SystemGeneric.class).defaultBehavior();
-		return getHolderByValue(((AbstractContext) getEngine().getCurrentCache()).<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
+		return getHolderByValue(getCurrentCache().<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
 	}
 
 	@Override
@@ -1367,7 +1367,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T enableSizeConstraint(final int basePos, Integer size) {
-		Attribute sizeConstraint = getEngine().getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
+		Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
 		T holder = setBooleanSystemProperty(sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
 		holder.setHolder(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE), size);
 		return (T) this;
@@ -1380,7 +1380,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public Integer getSizeConstraint(final int basePos) {
-		Attribute sizeConstraint = getEngine().getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
+		Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
 		Link valuedHolder = getHolderByValue(sizeConstraint, basePos);
 		if (valuedHolder == null)
 			return null;
@@ -1465,14 +1465,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	// TODO pas comme les autres contraintes
 	@Override
 	public Class<?> getConstraintClass() {
-		Holder holder = getHolder(getEngine().getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class));
+		Holder holder = getHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class));
 		return (Class<?>) (holder == null ? Object.class : holder.getValue());
 	}
 
 	// TODO pas comme les autres contraintes
 	@Override
 	public <T extends Type> T setConstraintClass(Class<?> constraintClass) {
-		return setHolder(getEngine().getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class), constraintClass);
+		return setHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class), constraintClass);
 	}
 
 	@Override
@@ -1526,7 +1526,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> T reBind() {
-		return ((CacheImpl) getEngine().getCurrentCache()).reBind(this);
+		return getCurrentCache().reBind(this);
 	}
 
 	boolean isPseudoStructural(int basePos) {
@@ -1570,7 +1570,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends MapProvider> Map<Serializable, Serializable> getMap(Class<T> mapClass) {
-		return getEngine().getCurrentCache().<MapProvider> find(mapClass).getMap(this);
+		return getCurrentCache().<MapProvider> find(mapClass).getMap(this);
 	}
 
 	@Override
@@ -1590,27 +1590,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T addComponent(int pos, Generic newComponent) {
-		return ((CacheImpl) getEngine().getCurrentCache()).addComponent(this, newComponent, pos);
+		return getCurrentCache().addComponent(this, newComponent, pos);
 	}
 
 	@Override
 	public <T extends Generic> T removeComponent(int pos, Generic newComponent) {
-		return ((CacheImpl) getEngine().getCurrentCache()).removeComponent(this, pos);
+		return getCurrentCache().removeComponent(this, pos);
 	}
 
 	@Override
 	public <T extends Generic> T addSuper(int pos, Generic newSuper) {
-		return ((CacheImpl) getEngine().getCurrentCache()).addSuper(this, newSuper);
+		return getCurrentCache().addSuper(this, newSuper);
 	}
 
 	@Override
 	public <T extends Generic> T removeSuper(int pos) {
-		return ((CacheImpl) getEngine().getCurrentCache()).removeSuper(this, pos);
+		return getCurrentCache().removeSuper(this, pos);
 	}
 
 	@Override
 	public <T extends Generic> T updateKey(Serializable key) {
-		return ((CacheImpl) getEngine().getCurrentCache()).updateKey(this, key);
+		return getCurrentCache().updateKey(this, key);
 	}
 
 	public List<Integer> getComponentsPositions(Generic... components) {
@@ -1704,5 +1704,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return components[next];
 			}
 		};
+	}
+
+	public CacheImpl getCurrentCache() {
+		return getEngine().getCurrentCache();
 	}
 }
