@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -49,8 +48,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private Set<Generic> adds;
 	private Set<Generic> removes;
 
-	public CacheImpl(Context subContext) {
-		this.subContext = (AbstractContext) subContext;
+	public CacheImpl(Cache cache) {
+		this.subContext = (CacheImpl) cache;
+		clear();
+	}
+
+	public CacheImpl(Engine engine) {
+		this.subContext = new Transaction(engine);
 		clear();
 	}
 

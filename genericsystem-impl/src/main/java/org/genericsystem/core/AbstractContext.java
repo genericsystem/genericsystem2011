@@ -11,7 +11,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -33,11 +32,13 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * 
  */
-public abstract class AbstractContext implements Context, Serializable {
+public abstract class AbstractContext implements Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractContext.class);
 
 	private static final long serialVersionUID = -6036571074310729022L;
+
+	abstract <T extends Engine> T getEngine();
 
 	<T extends GenericImpl> T plug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
@@ -219,7 +220,6 @@ public abstract class AbstractContext implements Context, Serializable {
 
 	public abstract boolean isAlive(Generic generic);
 
-	@Override
 	public <T extends Generic> T find(Class<?> clazz) {
 		return this.<EngineImpl> getEngine().find(clazz);
 	}
