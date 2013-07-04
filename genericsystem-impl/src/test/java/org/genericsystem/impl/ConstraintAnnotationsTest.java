@@ -1,20 +1,18 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.annotation.Components;
-import org.genericsystem.annotation.Supers;
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InstanceClassConstraint;
-import org.genericsystem.annotation.constraints.NotNullConstraint;
+import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
 import org.genericsystem.annotation.constraints.UniqueConstraint;
-import org.genericsystem.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.ClassInstanceConstraintViolationException;
+import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
@@ -24,21 +22,21 @@ import org.testng.annotations.Test;
 public class ConstraintAnnotationsTest extends AbstractTest {
 
 	public void instanceClass() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Unit.class, Car.class, ElectrikPower.class);
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Unit.class, Car.class, ElectrikPower.class).start();
 		final Attribute unit = cache.find(Unit.class);
+		assert String.class.equals(unit.getConstraintClass());
 		Type car = cache.find(Car.class);
 		Attribute electrikPower = cache.find(ElectrikPower.class);
-		final Generic myBMW = car.newInstance(cache, "myBMW");
+		final Generic myBMW = car.newInstance( "myBMW");
 		assert electrikPower.getBaseComponent() != null : electrikPower.info();
-		final Holder electrikPowerMyBMW = myBMW.setValue(cache, electrikPower, 106);
-		electrikPowerMyBMW.setValue(cache, unit, "Nm");
-		assert unit.isSystemPropertyEnabled(cache, InstanceClassConstraintImpl.class);
+		final Holder electrikPowerMyBMW = myBMW.setValue( electrikPower, 106);
+		electrikPowerMyBMW.setValue( unit, "Nm");
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				electrikPowerMyBMW.setValue(cache, unit, 27);
+				electrikPowerMyBMW.setValue( unit, 27);
 			}
-		}.assertIsCausedBy(ClassInstanceConstraintViolationException.class);
+		}.assertIsCausedBy(InstanceClassConstraintViolationException.class);
 	}
 
 	@SystemGeneric
@@ -56,7 +54,6 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@NotNullConstraint
 	public static class GraphicComponent {
 
 	}
@@ -74,7 +71,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 
 	@SystemGeneric
 	@PropertyConstraint
-	@Supers(value = { GraphicComponent.class }, implicitSuper = GraphicComponent.class)
+	@Extends(value = GraphicComponent.class, others = { GraphicComponent.class })
 	public static class Selectable {
 
 	}
@@ -109,7 +106,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 
 	@SystemGeneric
 	@Components(ElectrikPower.class)
-	@InstanceClassConstraint(String.class)
+	@InstanceValueClassConstraint(String.class)
 	public static class Unit {
 
 	}

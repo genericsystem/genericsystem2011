@@ -6,6 +6,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ * @param <T>
+ */
 public abstract class AbstractPostTreeIterator<T> extends AbstractAwareIterator<T> {
 
 	protected Deque<T> stack = new ArrayDeque<>();

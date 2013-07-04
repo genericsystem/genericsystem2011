@@ -6,7 +6,6 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
@@ -17,33 +16,18 @@ public class CacheProvider implements Serializable {
 	private static final long serialVersionUID = 5201003234496546928L;
 
 	@Inject
-	@Memory
-	private transient Engine engineMemory;
+	private transient Engine engine;
 
-	@Inject
-	@Persistent
-	private transient Engine enginePersistent;
-
-	private transient Cache cacheMemory;
-
-	private transient Cache cachePersistent;
+	private transient Cache cache;
 
 	@PostConstruct
-	// TODO KK => 2 cache for 1 session ???
 	public void init() {
-		cacheMemory = engineMemory.newCache();
-		cachePersistent = enginePersistent.newCache();
+		cache = engine.newCache();
 	}
 
 	@Produces
-	@Named("getCacheWithMemoryEngine")
-	public Cache getCacheWithMemoryEngine() {
-		return cacheMemory;
+	public Cache getCache() {
+		return cache;
 	}
 
-	@Produces
-	@Named("getCacheWithPersistentEngine")
-	public Cache getCacheWithPersistentEngine() {
-		return cachePersistent;
-	}
 }

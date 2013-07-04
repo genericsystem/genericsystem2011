@@ -9,14 +9,14 @@ import org.genericsystem.core.Generic;
  * @author Michael Ory
  */
 public interface Holder extends Generic {
-	
+
 	/**
 	 * Returns the base component.
 	 * 
 	 * @return Return the base component.
 	 */
 	<T extends Generic> T getBaseComponent();
-	
+
 	/**
 	 * Returns the component for the position.
 	 * 
@@ -25,5 +25,5 @@ public interface Holder extends Generic {
 	 * @return Return the component if it exist else null.
 	 */
 	<T extends Generic> T getComponent(int basePos);
-	
+
 }

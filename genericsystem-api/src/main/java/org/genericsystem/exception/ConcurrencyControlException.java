@@ -5,7 +5,7 @@ package org.genericsystem.exception;
  * 
  * @author Nicolas Feybesse
  */
-public class ConcurrencyControlException extends Exception {
+public class ConcurrencyControlException extends ConstraintViolationException {
 
 	public ConcurrencyControlException(String string) {
 		super(string);

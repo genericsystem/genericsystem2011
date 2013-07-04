@@ -14,18 +14,18 @@ import org.testng.annotations.Test;
 public class CompareToTest extends AbstractTest {
 
 	public void testCompareTo() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic audi = car.newInstance(cache,"audi");
+		Generic audi = car.newInstance("audi");
 		assert car.compareTo(audi) < 0;
 		assert audi.compareTo(car) > 0;
 		assert car.compareTo(car) == 0;
 	}
 
 	public void testSort() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic audi = car.newInstance(cache,"audi");
+		Generic audi = car.newInstance("audi");
 		List<Generic> l = new ArrayList<>();
 		l.add(audi);
 		l.add(car);

@@ -3,6 +3,11 @@ package org.genericsystem.iterator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ * @param <T>
+ */
 public class ArrayIterator<T> implements Iterator<T> {
 
 	private final T[] array;

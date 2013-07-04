@@ -11,40 +11,40 @@ import org.testng.annotations.Test;
 public class StructuralSnapshotTest extends AbstractTest {
 
 	public void testStructuralSnapshotWithAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute power = vehicle.setAttribute(cache, "Power");
-		assert vehicle.getAttributes(cache).contains(power);
+		Attribute power = vehicle.setAttribute( "Power");
+		assert vehicle.getAttributes().contains(power);
 	}
 
 	public void testStructuralSnapshotWithRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation vehicleHuman = vehicle.setRelation(cache, "pilot", human);
-		assert vehicle.getAttributes(cache).contains(vehicleHuman);
+		Relation vehicleHuman = vehicle.setRelation( "pilot", human);
+		assert vehicle.getAttributes().contains(vehicleHuman);
 	}
 
 	public void testStructuralSnapshotWithSubType2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
-		Attribute carPower = car.setAttribute(cache, "Power");
+		Type car = vehicle.newSubType( "Car");
+		Attribute carPower = car.setAttribute( "Power");
 		Type human = cache.newType("Human");
-		human.newSubType(cache, "Pilot");
-		Relation vehicleHuman = vehicle.setRelation(cache, "Drive", human);
-		assert car.getAttributes(cache).contains(vehicleHuman);
-		assert car.getAttributes(cache).contains(carPower);
+		human.newSubType( "Pilot");
+		Relation vehicleHuman = vehicle.setRelation( "Drive", human);
+		assert car.getAttributes().contains(vehicleHuman);
+		assert car.getAttributes().contains(carPower);
 	}
 
 	public void testStructuralSnapshotWithAttributeAndRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute vehiclePower = vehicle.setAttribute(cache, "Power");
+		Attribute vehiclePower = vehicle.setAttribute( "Power");
 		Type human = cache.newType("Human");
-		Relation vehicleHuman = vehicle.setRelation(cache, "pilot", human);
-		assert vehicle.getAttributes(cache).contains(vehicleHuman);
-		assert vehicle.getAttributes(cache).contains(vehiclePower);
+		Relation vehicleHuman = vehicle.setRelation( "pilot", human);
+		assert vehicle.getAttributes().contains(vehicleHuman);
+		assert vehicle.getAttributes().contains(vehiclePower);
 	}
 
 }

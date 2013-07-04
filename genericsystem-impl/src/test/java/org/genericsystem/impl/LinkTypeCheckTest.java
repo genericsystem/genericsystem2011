@@ -12,89 +12,84 @@ import org.testng.annotations.Test;
 public class LinkTypeCheckTest extends AbstractTest {
 
 	public void malformedRelationInstanceWrongTargetType() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
-		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
-		final Generic yourDog = dog.newInstance(cache, "yourDog");
-		road.newInstance(cache, "myRoad");
+		final Relation runsOver = vehicle.setRelation( "RunsOver", dog, road);
+		final Generic myBMW = vehicle.newInstance( "myBMW");
+		final Generic yourDog = dog.newInstance( "yourDog");
+		road.newInstance( "myRoad");
 
-		new RollbackCatcher() {
+		try {
+			myBMW.setLink( runsOver, "myBMWRunsOverYourDog", yourDog, yourDog);
+		} catch (IllegalStateException ignore) {
 
-			@Override
-			public void intercept() {
-				myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, yourDog);
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}
+
 	}
 
 	public void malformedRelationInstanceTooFewTargets() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
-		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
-		final Generic yourDog = dog.newInstance(cache, "yourDog");
-		road.newInstance(cache, "myRoad");
+		final Relation runsOver = vehicle.setRelation( "RunsOver", dog, road);
+		final Generic myBMW = vehicle.newInstance( "myBMW");
+		final Generic yourDog = dog.newInstance( "yourDog");
+		road.newInstance( "myRoad");
 
-		new RollbackCatcher() {
+		try {
+			myBMW.setLink( runsOver, "myBMWRunsOverYourDog", yourDog);
+		} catch (IllegalStateException ignore) {
 
-			@Override
-			public void intercept() {
-				myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog);
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}
 	}
 
 	public void relationInstanceTooMuchTargets() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
 		Type road = cache.newType("Road");
-		final Relation runsOver = vehicle.setRelation(cache, "RunsOver", dog, road);
-		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
-		final Generic yourDog = dog.newInstance(cache, "yourDog");
-		final Generic myRoad = road.newInstance(cache, "myRoad");
-		new RollbackCatcher() {
+		final Relation runsOver = vehicle.setRelation( "RunsOver", dog, road);
+		final Generic myBMW = vehicle.newInstance( "myBMW");
+		final Generic yourDog = dog.newInstance( "yourDog");
+		final Generic myRoad = road.newInstance( "myRoad");
 
-			@Override
-			public void intercept() {
-				myBMW.setLink(cache, runsOver, "myBMWRunsOverYourDog", yourDog, myRoad, yourDog);
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		try {
+			myBMW.setLink( runsOver, "myBMWRunsOverYourDog", yourDog, myRoad, yourDog);
+		} catch (IllegalStateException ignore) {
+
+		}
+
 	}
 
 	public void malformedAttributeWrongBase() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type dog = cache.newType("Dog");
-		final Attribute runs = vehicle.setAttribute(cache, "Runs");
-		final Generic myBMW = vehicle.newInstance(cache, "myBMW");
+		final Attribute runs = vehicle.setAttribute( "Runs");
+		final Generic myBMW = vehicle.newInstance( "myBMW");
 		assert myBMW.inheritsFrom(runs.getBaseComponent());
-		final Generic yourDog = dog.newInstance(cache, "yourDog");
+		final Generic yourDog = dog.newInstance( "yourDog");
 
-		myBMW.setValue(cache, runs, "myBMWRuns");
-		new RollbackCatcher() {
+		myBMW.setValue( runs, "myBMWRuns");
+		try {
+			yourDog.setValue( runs, "myDogRuns");
+		} catch (IllegalStateException ignore) {
 
-			@Override
-			public void intercept() {
-				yourDog.setValue(cache, runs, "myDogRuns").log();
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}
 	}
 
 	public void test() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
-		Relation vehicleColor = vehicle.setRelation(cache, "vehicleColor", color);
-		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Generic red = color.newInstance(cache, "red");
-		myVehicle.setLink(cache, vehicleColor, "myVehicleRed", red);
-		assert myVehicle.getLink(cache, vehicleColor, cache.newType("Date")) == null;
-		assert myVehicle.getLinks(cache, vehicleColor, cache.newType("Date")).size() == 0;
+		Relation vehicleColor = vehicle.setRelation( "vehicleColor", color);
+		Generic myVehicle = vehicle.newInstance( "myVehicle");
+		Generic red = color.newInstance( "red");
+		myVehicle.setLink( vehicleColor, "myVehicleRed", red);
+		assert myVehicle.getLink( vehicleColor, cache.newType("Date")) == null;
+		assert myVehicle.getLinks( vehicleColor, cache.newType("Date")).size() == 0;
 	}
 }

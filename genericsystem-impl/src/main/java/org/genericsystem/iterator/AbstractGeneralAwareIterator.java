@@ -3,9 +3,15 @@ package org.genericsystem.iterator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ * @param <D>
+ * @param <T>
+ */
 public abstract class AbstractGeneralAwareIterator<D, T> implements Iterator<T> {
 
-	protected D next;
+	public D next;
 	protected boolean toRead;
 
 	public AbstractGeneralAwareIterator() {

@@ -12,9 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
-import org.genericsystem.core.Generic;
-import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Holder;
+
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +35,10 @@ public class Statics {
 	public static final int TARGET_POSITION = 1;
 	public static final int SECOND_TARGET_POSITION = 2;
 
-	public static final int TYPE_SIZE = 1;
-	public static final int ATTRIBUTE_SIZE = 2;
-	public static final int RELATION_SIZE = 3;
-	public static final int TERNARY_RELATION_SIZE = 4;
+	public static final int TYPE_SIZE = 0;
+	public static final int ATTRIBUTE_SIZE = 1;
+	public static final int RELATION_SIZE = 2;
+	public static final int TERNARY_RELATION_SIZE = 3;
 
 	public static final int ATTEMPT_SLEEP = 15; // ms
 	public static final int ATTEMPTS = 50;
@@ -57,21 +55,21 @@ public class Statics {
 	public static final long SESSION_TIMEOUT = 1000L;
 	public static final long ARCHIVER_COEFF = 5L;
 
-	public static final Serializable PHAMTOM = new Phantom();
+	// public static final Serializable PHAMTOM = new Phantom();
 
-	private static class Phantom implements Serializable {
-		private static final long serialVersionUID = -5467290057275284040L;
-
-		@Override
-		public boolean equals(Object obj) {
-			return obj instanceof Phantom;
-		}
-
-		@Override
-		public int hashCode() {
-			return 0;
-		}
-	}
+	// private static class Phantom implements Serializable {
+	// private static final long serialVersionUID = -5467290057275284040L;
+	//
+	// @Override
+	// public boolean equals(Object obj) {
+	// return obj instanceof Phantom;
+	// }
+	//
+	// @Override
+	// public int hashCode() {
+	// return 0;
+	// }
+	// }
 
 	@SuppressWarnings("rawtypes")
 	private static final Iterator EMPTY_ITERATOR = new Iterator<Object>() {
@@ -98,6 +96,8 @@ public class Statics {
 	}
 
 	public static Generic[] insertIntoArray(Generic generic, Generic[] targets, int basePos) {
+		if (basePos < 0 || basePos > targets.length)
+			throw new IllegalStateException("Unable to find a valid base position");
 		Generic[] result = new Generic[targets.length + 1];
 		System.arraycopy(targets, 0, result, 0, basePos);
 		result[basePos] = generic;
@@ -105,7 +105,7 @@ public class Statics {
 		return result;
 	}
 
-	static Generic[] insertFirstIntoArray(Generic first, Generic... others) {
+	static Generic[] insertFirst(Generic first, Generic... others) {
 		Generic[] result = new Generic[others.length + 1];
 		result[0] = first;
 		System.arraycopy(others, 0, result, 1, others.length);
@@ -153,7 +153,8 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {}
+		private Flag() {
+		}
 
 		@Override
 		public String toString() {
@@ -321,15 +322,12 @@ public class Statics {
 		};
 	}
 
-	public static <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Attribute relation, final Generic... targets) {
-		final Map<Generic, Integer> positions = ((GenericImpl) relation).getPositions(targets);
+	public static <T extends Generic> Iterator<T> rootFilter(Iterator<T> iterator) {
 		return new AbstractFilterIterator<T>(iterator) {
+
 			@Override
 			public boolean isSelected() {
-				for (Generic target : targets)
-					if (!target.equals(((Holder) next).getComponent(positions.get(target))))
-						return false;
-				return true;
+				return next.isRoot();
 			}
 		};
 	}
@@ -344,23 +342,39 @@ public class Statics {
 		};
 	}
 
-	public static <T extends Generic> Iterator<T> phantomsFilter(Iterator<T> iterator) {
+	public static <T extends Generic> Iterator<T> entryFilter(Iterator<T> iterator, final Map.Entry<Serializable, Serializable> entry) {
 		return new AbstractFilterIterator<T>(iterator) {
 
+			@SuppressWarnings("rawtypes")
 			@Override
 			public boolean isSelected() {
-				return !((GenericImpl) next).isPhantom();
+				if (next.getValue() == null && ((GenericImpl) next).supers[1].getValue() instanceof Map.Entry)
+					return ((Map.Entry) ((GenericImpl) next).supers[1].getValue()).getKey().equals(entry.getKey());
+				return Objects.equals(entry.getKey(), ((Map.Entry) next.getValue()).getKey());
 			}
 		};
 	}
 
-	static <T> T unambigousFirst(Iterator<T> iterator) {
+	public static <T extends Generic> Iterator<T> nullFilter(Iterator<T> iterator) {
+		return new AbstractFilterIterator<T>(iterator) {
+
+			@Override
+			public boolean isSelected() {
+				return next.getValue() != null;
+			}
+		};
+	}
+
+	public static <T> T unambigousFirst(Iterator<T> iterator) {
 		if (!iterator.hasNext())
 			return null;
 		T result = iterator.next();
-		if (iterator.hasNext())
-			throw new IllegalStateException("Ambigous reponse : " + result);
+		if (iterator.hasNext()) {
+			String message = "" + result;
+			while (iterator.hasNext())
+				message += iterator.next();
+			throw new IllegalStateException("Ambigous selection : " + message);
+		}
 		return result;
 	}
-
 }

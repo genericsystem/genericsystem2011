@@ -8,7 +8,7 @@ package org.genericsystem.exception;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class ConcreteInheritanceConstraintViolationException extends AbstractConstraintViolationException {
+public class ConcreteInheritanceConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = 8217219756975555723L;
 

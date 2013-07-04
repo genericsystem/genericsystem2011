@@ -5,13 +5,21 @@ import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 
 /**
- * Instance of class Engine represents a unit of persistence, but also the root
- * of internal graph attached to it.
+ * Instance of class Engine represents a unit of persistence, but also the root of internal graph attached to it.
  * 
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
 public interface Engine extends Type {
+
+	/**
+	 * Returns the Factory.
+	 * 
+	 * @see Factory
+	 * 
+	 * @return The Factory.
+	 */
+	Factory getFactory();
 
 	/**
 	 * Close engine and do a last snapshot if persistent.

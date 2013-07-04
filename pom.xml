@@ -16,23 +16,23 @@
 		<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
 		<maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
 		<cargo-maven2-plugin.version>1.2.1</cargo-maven2-plugin.version>
-		<maven-surefire-plugin.version>2.8</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>2.9</maven-surefire-plugin.version>
 
-		<jsf.version>2.1.10</jsf.version>
+		<jsf.version>2.1.19</jsf.version>
 		<jstl.version>1.2</jstl.version>
 
-		<org.richfaces.bom.version>4.2.2.Final</org.richfaces.bom.version>
+		<org.richfaces.bom.version>4.3.2.Final</org.richfaces.bom.version>
 
-		<weld.core.version>1.1.9.Final</weld.core.version>
+		<weld.core.version>1.1.12.Final</weld.core.version>
 
-		<arquillian-testng-container.version>1.0.3.Final</arquillian-testng-container.version>
-
+		<arquillian.version>1.0.4.Final</arquillian.version>
+		
 		<seam.version>3.1.0.Final</seam.version>
 
 		<jboss-ejb3-api.version>3.1.0</jboss-ejb3-api.version>
 
-		<testng.version>6.5.2</testng.version>
-		<slf4j.version>1.6.4</slf4j.version>
+		<testng.version>6.8.1</testng.version>
+		<slf4j.version>1.7.2</slf4j.version>
 	</properties>
 
 	<modules>
@@ -84,9 +84,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
+					<reportsDirectory>target/surefire-reports/</reportsDirectory>
 					<argLine>-Xmx512m</argLine>
-					<parallel>methods</parallel>
-					<threadCount>1000</threadCount>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -180,14 +179,6 @@
 		</repository>
 
 	</repositories>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.easytesting</groupId>
-			<artifactId>fest-assert</artifactId>
-			<version>1.4</version>
-		</dependency>
-	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>

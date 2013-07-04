@@ -2,6 +2,12 @@ package org.genericsystem.iterator;
 
 import java.util.Iterator;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ * @param <T>
+ * @param <U>
+ */
 public abstract class AbstractProjectionIterator<T, U> implements Iterator<U> {
 
 	private Iterator<T> iterator;

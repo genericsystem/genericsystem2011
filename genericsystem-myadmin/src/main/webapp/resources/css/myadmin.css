@@ -1,52 +1,204 @@
-.richMessages {
+body {
+	width: 960px;
+	margin: 0 auto;
+	text-align: left;
+	float: none;
+}
+
+.implicit {
+	width: 100%;
+	background-image:
+		url('/gsmyadmin/rfRes/gradientA.png.xhtml?v=4.3.2.Final&db=eAFjZJBjZDBiZBBh!H8!IoLx!wQGBgYmACkLBIk_&ln=org.richfaces.images');
+}
+
+.implicit span {
+	font-family: Arial, Verdana, sans-serif;
+	vertical-align: middle;
+	color: #FFFFFF;
+}
+
+.implicit input {
+	vertical-align: middle;
+}
+
+.borderNone {
+	border: none !important;
+}
+
+.implicitColor {
+	color: #949595 !important;
+}
+
+.implicitColor>span {
+	color: #949595 !important;
+}
+
+.inplaceInput {
+	min-width: 50px;
+}
+
+.inplaceInput>span {
 	color: black;
-	font-size: large;
+}
+
+.bold {
 	font-weight: bold;
-	text-align: center;
+}
+
+.italic {
+	font-style: italic;
+}
+
+.veryLittleWidth {
+	width: 10%;
+}
+
+.middleWidth {
+	width: 50%;
+}
+
+.fullWidth {
+	width: 100%;
+}
+
+.fullHeight {
+	height: 100%;
 }
 
 .uppercase {
 	text-transform: uppercase;
 }
 
-.capitalize {
+.capitalize:first-letter {
 	text-transform: capitalize;
 }
 
-.header {
-	background-image: url(/gsmyadmin/resources/images/panorama.jpg);
-	height: 126px;
-	width: 100%;
+.capitalize {
+	display: inline-block;
 }
 
-.headerToolbar {
-	border: none !important;
-	height: 30px;
-	margin: 0 0 0 0;
-}
-
-.headerTitle {
-	font-size: 25px;
-}
-
-.body {
-	width: 100%;
-}
-
-.leftColumn {
+.topAlign {
 	vertical-align: top;
-	width: 20%;
 }
 
-.rightColumn {
-	vertical-align: top;
-	width: 80%;
+.middleAlign {
+	vertical-align: middle;
 }
 
-.instancesPanel {
-	margin-top: 10px;
+.scroll {
+	overflow: auto;
 }
 
-.createInstancePanel {
-	padding-top: 10px;
+.bigScroll {
+	max-width: 800px;
+	max-height: 800px;
+	overflow: scroll;
+}
+
+.widthScroll280 {
+	overflow-x: auto;
+	width: 280px;
+}
+
+td {
+	vertical-align: middle;
+}
+
+li.info {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_green.png);
+	background-position: top left;
+	font-size: 14px;
+}
+
+li.warn {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_yellow.png);
+	background-position: top left;
+	font-size: 14px;
+}
+
+li.error {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_red_yellow.png);
+	background-position: top left;
+	font-size: 14px;
+}
+
+li.fatal {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding-top: 1px;
+	background-image:
+		url(http://www.genericsystem.com/genericsystem.com/seam/resource/img/16x16/plain/trafficlight_red.png);
+	background-position: top left;
+	font-size: 14px;
+}
+
+.messagesBlock {
+	margin-left: 6px;
+	margin-right: 10px;
+	margin-top: 0px;
+	background-color: white;
+	min-width: 300px;
+	min-height: 51px;
+	max-height: 79px;
+	max-width: 747px;
+	overflow: auto;
+	opacity: 0.75;
+	/* For IE 5-7 */
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75 );
+	/* For IE 8  Don't miss the added quotes */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
+}
+
+.slightlyTransparent {
+	opacity: 0.75;
+	/* For IE 5-7 */
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75 );
+	/* For IE 8  Don't miss the added quotes */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
+}
+
+.align {
+	float: right;
+	vertical-align: middle;
+}
+
+.height24 {
+	height: 24px;
+}
+
+.blackcolor {
+	color: #000000;
+	background-color: inherit;
+}
+
+.rf-ii-dflt-lbl {
+	color: #000000 !important;
+}
+
+.rf-trn-sel {
+	background-color: #EB9A99 !important;
+}
+
+.rf-trn-sel>span>span {
+	background-color: inherit;
 }

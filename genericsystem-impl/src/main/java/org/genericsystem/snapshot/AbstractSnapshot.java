@@ -1,6 +1,6 @@
 package org.genericsystem.snapshot;
 
-import java.util.Collection;
+import java.util.AbstractList;
 import java.util.Iterator;
 
 import org.genericsystem.core.Snapshot;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * 
  */
-public abstract class AbstractSnapshot<T> implements Snapshot<T> {
+public abstract class AbstractSnapshot<T> extends AbstractList<T> implements Snapshot<T> {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractSnapshot.class);
 
@@ -49,70 +49,6 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 	}
 
 	@Override
-	public boolean contains(Object object) {
-		Iterator<T> iterator = iterator();
-		while (iterator.hasNext())
-			if (object.equals(iterator.next()))
-				return true;
-		return false;
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> c) {
-		for (Object e : c)
-			if (!contains(e))
-				return false;
-		return true;
-	}
-
-	@Override
-	public boolean containsAll(Snapshot<?> c) {
-		for (Object e : c)
-			if (!contains(e)) {
-				log.info(this + " / " + e);
-				return false;
-			}
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		Iterator<T> it = iterator();
-		if (!it.hasNext())
-			return "[]";
-
-		StringBuilder sb = new StringBuilder();
-		sb.append('[');
-		for (;;) {
-			T e = it.next();
-			sb.append(e == this ? "(this Collection)" : e);
-			if (!it.hasNext())
-				return sb.append(']').toString();
-			sb.append(',').append(' ');
-		}
-	}
-
-	@Override
-	public int hashCode() {
-		int hashCode = 1;
-		for (T t : this)
-			hashCode = 31 * hashCode + (t == null ? 0 : t.hashCode());
-		return hashCode;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Snapshot))
-			return false;
-		Iterator<T> it = ((Snapshot<T>) obj).iterator();
-		for (T t : this)
-			if (!it.hasNext() || !it.next().equals(t))
-				return false;
-		return !it.hasNext();
-	}
-
-	@Override
 	public Snapshot<T> filter(final Filter<T> filter) {
 		return new AbstractSnapshot<T>() {
 			@Override
@@ -139,6 +75,7 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 					}
 				};
 			}
+
 		};
 	}
 
@@ -147,9 +84,4 @@ public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 		log.info(toString());
 	}
 
-	@Override
-	public T first() {
-		Iterator<T> it = iterator();
-		return it.hasNext() ? it.next() : null;
-	}
 }

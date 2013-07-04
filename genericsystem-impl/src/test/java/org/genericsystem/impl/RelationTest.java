@@ -3,13 +3,14 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.core.Statics;
 import org.genericsystem.core.Snapshot.Filter;
+import org.genericsystem.core.Statics;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
@@ -22,138 +23,137 @@ import org.testng.annotations.Test;
 public class RelationTest extends AbstractTest {
 
 	public void test() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic myBmw = car.newInstance("myBmw");
 		Type color = cache.newType("Color");
-		Generic red = color.newInstance(cache, "red");
-		Generic yellow = color.newInstance(cache, "yellow");
-		Relation carColor = car.setRelation(cache, "carColor", color);
-		Link carRed = car.bind(cache, carColor, red);
+		Generic red = color.newInstance("red");
+		Generic yellow = color.newInstance("yellow");
+		Relation carColor = car.setRelation("carColor", color);
+		Link carRed = car.bind(carColor, red);
 		assert carRed.inheritsFrom(carColor);
-		Link myBmwYellow = myBmw.bind(cache, carColor, yellow);
+		Link myBmwYellow = myBmw.bind(carColor, yellow);
 		assert !myBmwYellow.inheritsFrom(carRed);
-		assert myBmw.getLinks(cache, carColor).size() == 2;
-		assert myBmw.getLinks(cache, carColor).contains(myBmwYellow);
-		assert myBmw.getLinks(cache, carColor).contains(carRed);
+		assert myBmw.getLinks(carColor).size() == 2;
+		assert myBmw.getLinks(carColor).contains(myBmwYellow);
+		assert myBmw.getLinks(carColor).contains(carRed);
 	}
 
 	public void test2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic myBmw = car.newInstance("myBmw");
 		Type color = cache.newType("Color");
-		Generic red = color.newInstance(cache, "red");
-		Generic yellow = color.newInstance(cache, "yellow");
-		Relation carColor = car.setRelation(cache, "carColor", color);
-		carColor.enableSingularConstraint(cache);
-		Link carRed = car.bind(cache, carColor, red);
-		assert carRed.inheritsFrom(carColor);
-		Link myBmwYellow = myBmw.bind(cache, carColor, yellow);
-		assert !myBmwYellow.inheritsFrom(carRed);
-		assert myBmw.getLinks(cache, carColor).size() == 1;
-		assert myBmw.getLinks(cache, carColor).contains(myBmwYellow);
-		assert !myBmw.getLinks(cache, carColor).contains(carRed);
+		Generic red = color.newInstance("red");
+		Generic yellow = color.newInstance("yellow");
+		Relation carColor = car.setRelation("carColor", color);
+		carColor.enableSingularConstraint();
+
+		car.setLink(carColor, "defaultColor", red);
+		myBmw.setLink(carColor, "myBmwYellow", yellow);
 	}
 
 	public void testToOneOverride() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "driver", color);
-		carColor.enableSingularConstraint(cache);
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic myAudi = car.newInstance(cache, "myAudi");
-		Generic red = color.newInstance(cache, "red");
-		Generic blue = color.newInstance(cache, "blue");
-		Link carRed = car.bind(cache, carColor, red);
-		((GenericImpl) carRed).deduct(cache);
-		assert myBmw.getTargets(cache, carColor).contains(red) : myBmw.getTargets(cache, carColor);
-		assert myAudi.getTargets(cache, carColor).contains(red);
-		myBmw.bind(cache, carColor, blue);
-		assert car.getLinks(cache, carColor).size() == 1;
-		assert car.getLinks(cache, carColor).first().getTargetComponent().equals(red);
+		final Relation carColor = car.setRelation("driver", color);
+		carColor.enableSingularConstraint();
+		final Generic myBmw = car.newInstance("myBmw");
+		car.newInstance("myAudi");
+		Generic red = color.newInstance("red");
+		final Generic blue = color.newInstance("blue");
+		car.bind(carColor, red);
+		assert myBmw.getTargets(carColor).contains(red) : myBmw.getTargets(carColor);
 
-		assert myBmw.getLinks(cache, carColor).size() == 1;
-		assert myBmw.getLinks(cache, carColor).first().getTargetComponent().equals(blue);
-		assert blue.getLinks(cache, carColor).size() == 1;
-		assert myBmw.equals(blue.getLinks(cache, carColor).first().getBaseComponent());
-		assert red.getLinks(cache, carColor).size() == 1 : red.getLinks(cache, carColor);
-		assert myAudi.equals(red.getLinks(cache, carColor).first().getBaseComponent()) : red.getLinks(cache, carColor);
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				myBmw.bind(carColor, blue);
+			}
+		};
 	}
 
 	public void testReverseTernaryAccess() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
-		Type passenger = cache.newType("Passenger");
+		final Type passenger = cache.newType("Passenger");
 		Type time = cache.newType("time");
 
-		final Relation carPassengerTime = car.setRelation(cache, "CarPassengerTime", passenger, time);
-		carPassengerTime.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carPassengerTime.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		final Relation carPassengerTime = car.setRelation("CarPassengerTime", passenger, time);
+		carPassengerTime.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carPassengerTime.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		final Generic michael = passenger.newInstance(cache, "michael");
-		passenger.newInstance(cache, "nicolas");
-		Generic today = time.newInstance(cache, "today");
-		Generic yesterday = time.newInstance(cache, "yesterday");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
+		final Generic myBmw = car.newInstance("myBmw");
+		final Generic michael = passenger.newInstance("michael");
+		passenger.newInstance("nicolas");
+		Generic today = time.newInstance("today");
+		final Generic yesterday = time.newInstance("yesterday");
+		Generic yourAudi = car.newInstance("yourAudi");
 
-		michael.bind(cache, carPassengerTime, myBmw, today);
-		assert michael.getLinks(cache, carPassengerTime).size() == 1;
-		michael.bind(cache, carPassengerTime, yourAudi, today);
-		assert michael.getLinks(cache, carPassengerTime).size() == 1;
+		michael.bind(carPassengerTime, myBmw, today);
 
-		yesterday.bind(cache, carPassengerTime, myBmw, passenger);
-		assert yesterday.getLinks(cache, carPassengerTime).size() == 1;
+		assert michael.getLinks(carPassengerTime).size() == 1;
+		michael.bind(carPassengerTime, yourAudi, today);
+		assert michael.getLinks(carPassengerTime).size() == 1;
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				yesterday.bind(carPassengerTime, myBmw, passenger);
+				assert yesterday.getLinks(carPassengerTime).size() == 1;
+
+			}
+		}.assertIsCausedBy(SingularConstraintViolationException.class);
 
 	}
 
 	public void testSimple() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type person = cache.newType("Person");
-		Relation carDriver = car.setRelation(cache, "driver", person);
-		carDriver.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = person.newInstance(cache, "me");
-		Generic you = person.newInstance(cache, "you");
-		myBmw.bind(cache, carDriver, me);
-		myBmw.bind(cache, carDriver, you);
-		assert myBmw.getLinks(cache, carDriver).size() == 2 : myBmw.getLinks(cache, carDriver);
+		Relation carDriver = car.setRelation("driver", person);
+		carDriver.enableSingularConstraint(Statics.TARGET_POSITION);
+		Generic myBmw = car.newInstance("myBmw");
+		Generic me = person.newInstance("me");
+		Generic you = person.newInstance("you");
+		myBmw.bind(carDriver, me);
+		myBmw.bind(carDriver, you);
+		assert myBmw.getLinks(carDriver).size() == 2 : myBmw.getLinks(carDriver);
 	}
 
 	public void testSimpleReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type person = cache.newType("Person");
-		Relation carDriver = car.setRelation(cache, "driver", person);
-		carDriver.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = person.newInstance(cache, "me");
-		me.bind(cache, carDriver, myBmw);
-		assert me.getLinks(cache, carDriver).size() == 1;
+		Relation carDriver = car.setRelation("driver", person);
+		carDriver.enableSingularConstraint(Statics.TARGET_POSITION);
+		Generic myBmw = car.newInstance("myBmw");
+		Generic me = person.newInstance("me");
+		me.bind(carDriver, myBmw);
+		assert me.getLinks(carDriver).size() == 1;
 	}
 
 	public void testSimpleTernary() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type person = cache.newType("Person");
 		Type time = cache.newType("Time");
-		Relation carDriverTime = car.setRelation(cache, "driver", person, time);
-		carDriverTime.enableSingularConstraint(cache, Statics.TARGET_POSITION);
+		Relation carDriverTime = car.setRelation("driver", person, time);
+		carDriverTime.enableSingularConstraint(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = person.newInstance(cache, "me");
-		Generic you = person.newInstance(cache, "you");
-		Generic myTime = time.newInstance(cache, "myTime");
-		Generic yourTime = time.newInstance(cache, "yourTime");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic me = person.newInstance("me");
+		Generic you = person.newInstance("you");
+		Generic myTime = time.newInstance("myTime");
+		Generic yourTime = time.newInstance("yourTime");
 
-		myBmw.bind(cache, carDriverTime, me, myTime);
-		myBmw.bind(cache, carDriverTime, you, yourTime);
+		myBmw.bind(carDriverTime, me, myTime);
+		myBmw.bind(carDriverTime, you, yourTime);
 
-		assert myBmw.getLinks(cache, carDriverTime).size() == 2 : myBmw.getLinks(cache, carDriverTime);
+		assert myBmw.getLinks(carDriverTime).size() == 2 : myBmw.getLinks(carDriverTime);
 		assert carDriverTime.getComponents().get(Statics.BASE_POSITION).equals(car);
 		assert carDriverTime.getComponents().get(Statics.TARGET_POSITION).equals(person);
 		assert carDriverTime.getComponents().get(Statics.SECOND_TARGET_POSITION).equals(time);
@@ -162,371 +162,371 @@ public class RelationTest extends AbstractTest {
 	}
 
 	public void testOneToManyManyToManyImpl() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type passenger = cache.newType("Passenger");
-		final Relation carPassenger = car.setRelation(cache, "CarPassenger", passenger);
-		carPassenger.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carPassenger.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		final Relation carPassenger = car.setRelation("CarPassenger", passenger);
+		carPassenger.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carPassenger.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		final Generic michael = passenger.newInstance(cache, "michael");
-		Generic nicolas = passenger.newInstance(cache, "nicolas");
+		final Generic myBmw = car.newInstance("myBmw");
+		final Generic michael = passenger.newInstance("michael");
+		Generic nicolas = passenger.newInstance("nicolas");
 
-		myBmw.setLink(cache, carPassenger, "30%", michael);
-		myBmw.setLink(cache, carPassenger, "40%", nicolas);
+		myBmw.setLink(carPassenger, "30%", michael);
+		myBmw.setLink(carPassenger, "40%", nicolas);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				myBmw.setLink(cache, carPassenger, "60%", michael);
+				myBmw.setLink(carPassenger, "60%", michael);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
 
 	public void testOneToManyManyToManyImplReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 
 		Type passenger = cache.newType("Passenger");
 
-		final Relation carPassenger = car.setRelation(cache, "CarPassenger", passenger);
-		carPassenger.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carPassenger.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		final Relation carPassenger = car.setRelation("CarPassenger", passenger);
+		carPassenger.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carPassenger.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
+		final Generic myBmw = car.newInstance("myBmw");
 
-		final Generic michael = passenger.newInstance(cache, "michael");
-		Generic nicolas = passenger.newInstance(cache, "nicolas");
+		final Generic michael = passenger.newInstance("michael");
+		Generic nicolas = passenger.newInstance("nicolas");
 
-		Link link30 = michael.setLink(cache, carPassenger, "30%", myBmw);
-		Link link40 = nicolas.setLink(cache, carPassenger, "40%", myBmw);
-		assert link30.isAlive(cache);
-		michael.setLink(cache, carPassenger, "60%", myBmw);
-		assert !link30.isAlive(cache);
-		assert link40.isAlive(cache);
+		Link link30 = michael.setLink(carPassenger, "30%", myBmw);
+		Link link40 = nicolas.setLink(carPassenger, "40%", myBmw);
+		assert link30.isAlive();
+		michael.setLink(carPassenger, "60%", myBmw);
+		assert !link30.isAlive();
+		assert link40.isAlive();
 	}
 
 	public void testOneToManyManyToManyImplTernary() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type passenger = cache.newType("Passenger");
 		Type time = cache.newType("time");
 
-		final Relation carPassengerTime = car.setRelation(cache, "CarPassenger", passenger, time);
-		carPassengerTime.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carPassengerTime.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		final Relation carPassengerTime = car.setRelation("CarPassenger", passenger, time);
+		carPassengerTime.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carPassengerTime.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		final Generic yourAudi = car.newInstance(cache, "yourAudi");
-		final Generic michael = passenger.newInstance(cache, "michael");
-		final Generic today = time.newInstance(cache, "today");
-		Generic nicolas = passenger.newInstance(cache, "nicolas");
+		final Generic myBmw = car.newInstance("myBmw");
+		final Generic yourAudi = car.newInstance("yourAudi");
+		final Generic michael = passenger.newInstance("michael");
+		final Generic today = time.newInstance("today");
+		Generic nicolas = passenger.newInstance("nicolas");
 
-		myBmw.setLink(cache, carPassengerTime, "30%", michael, today);
-		myBmw.setLink(cache, carPassengerTime, "40%", nicolas, today);
+		myBmw.setLink(carPassengerTime, "30%", michael, today);
+		myBmw.setLink(carPassengerTime, "40%", nicolas, today);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				yourAudi.setLink(cache, carPassengerTime, "60%", michael, today);
+				yourAudi.setLink(carPassengerTime, "60%", michael, today);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
 
 	public void testToOne() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 
 		Type owner = cache.newType("Owner");
 
-		Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic yourAudi = car.newInstance("yourAudi");
 
-		Generic sven = owner.newInstance(cache, "sven");
+		Generic sven = owner.newInstance("sven");
 
-		myBmw.bind(cache, carOwner, sven);
-		yourAudi.bind(cache, carOwner, sven);
+		myBmw.bind(carOwner, sven);
+		yourAudi.bind(carOwner, sven);
 
-		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, carOwner);
-		assert yourAudi.getLinks(cache, carOwner).size() == 1 : yourAudi.getLinks(cache, carOwner);
+		assert myBmw.getLinks(carOwner).size() == 1 : myBmw.getLinks(carOwner);
+		assert yourAudi.getLinks(carOwner).size() == 1 : yourAudi.getLinks(carOwner);
 	}
 
 	public void testToOneReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
-		Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
-		Generic sven = owner.newInstance(cache, "sven");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic yourAudi = car.newInstance("yourAudi");
+		Generic sven = owner.newInstance("sven");
 
-		sven.bind(cache, carOwner, myBmw);
-		sven.bind(cache, carOwner, yourAudi);
+		sven.bind(carOwner, myBmw);
+		sven.bind(carOwner, yourAudi);
 
-		assert sven.getLinks(cache, carOwner).size() == 2 : sven.getLinks(cache, carOwner);
+		assert sven.getLinks(carOwner).size() == 2 : sven.getLinks(carOwner);
 	}
 
 	public void testToOneTernary() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
 		Type time = cache.newType("Time");
 
-		final Relation carOwnerTime = car.setRelation(cache, "CarOwnerTime", owner, time);
-		carOwnerTime.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwnerTime.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		final Relation carOwnerTime = car.setRelation("CarOwnerTime", owner, time);
+		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwnerTime.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic nicolas = owner.newInstance(cache, "nicolas");
-		final Generic michael = owner.newInstance(cache, "michael");
-		Generic today = time.newInstance(cache, "today");
-		final Generic yesterday = time.newInstance(cache, "yesterday");
+		final Generic myBmw = car.newInstance("myBmw");
+		Generic nicolas = owner.newInstance("nicolas");
+		final Generic michael = owner.newInstance("michael");
+		Generic today = time.newInstance("today");
+		final Generic yesterday = time.newInstance("yesterday");
 
-		Link myBmwNicolasToday = myBmw.bind(cache, carOwnerTime, nicolas, today);
-		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, carOwnerTime);
-		Link myBmwMichaelYesterday = myBmw.bind(cache, carOwnerTime, michael, yesterday);
+		Link myBmwNicolasToday = myBmw.bind(carOwnerTime, nicolas, today);
+		assert myBmw.getLinks(carOwnerTime).size() == 1 : myBmw.getLinks(carOwnerTime);
+		Link myBmwMichaelYesterday = myBmw.bind(carOwnerTime, michael, yesterday);
 
-		assert myBmw.getLinks(cache, carOwnerTime).contains(myBmwMichaelYesterday);
-		assert !myBmw.getLinks(cache, carOwnerTime).contains(myBmwNicolasToday);
+		assert myBmw.getLinks(carOwnerTime).contains(myBmwMichaelYesterday);
+		assert !myBmw.getLinks(carOwnerTime).contains(myBmwNicolasToday);
 	}
 
 	public void testToOneInheritance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 
 		Type owner = cache.newType("Owner");
 
-		Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic myBmw = car.newInstance("myBmw");
 
-		Generic me = owner.newInstance(cache, "me");
-		Generic you = owner.newInstance(cache, "you");
+		Generic me = owner.newInstance("me");
+		Generic you = owner.newInstance("you");
 
-		Link carMe = car.setLink(cache, carOwner, "defaultOwner", me);
-		assert myBmw.getLink(cache, carOwner).getBaseComponent().equals(car);
+		Link carMe = car.setLink(carOwner, "defaultOwner", me);
+		assert myBmw.getLink(carOwner).getBaseComponent().equals(car);
 
-		Link carYou = myBmw.bind(cache, carOwner, you);
+		Link carYou = myBmw.bind(carOwner, you);
 
-		assert myBmw.getLink(cache, carOwner).equals(carYou) : myBmw.getLinks(cache, carOwner);
-		assert !myBmw.getLinks(cache, carOwner).contains(carMe) : myBmw.getLinks(cache, carOwner);
+		assert myBmw.getLink(carOwner).equals(carYou) : myBmw.getLinks(carOwner);
+		assert !myBmw.getLinks(carOwner).contains(carMe) : myBmw.getLinks(carOwner);
 	}
 
 	public void testToOneInheritanceReverse() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
 
-		final Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		final Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = owner.newInstance(cache, "me");
-		final Generic you = owner.newInstance(cache, "you");
+		final Generic myBmw = car.newInstance("myBmw");
+		Generic me = owner.newInstance("me");
+		final Generic you = owner.newInstance("you");
 
-		me.setLink(cache, carOwner, "defaultOwner", car);
-		assert myBmw.getLink(cache, carOwner).getBaseComponent().equals(car);
+		me.setLink(carOwner, "defaultOwner", car);
+		assert myBmw.getLink(carOwner).getBaseComponent().equals(car);
 
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				you.bind(cache, carOwner, myBmw);
+				you.bind(carOwner, myBmw);
 			}
 
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
 
 	public void testToOneInheritanceTernary() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
 		Type time = cache.newType("Time");
 
-		Relation carOwnerTime = car.setRelation(cache, "CarOwnerTime", owner, time);
-		carOwnerTime.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwnerTime.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		Relation carOwnerTime = car.setRelation("CarOwnerTime", owner, time);
+		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwnerTime.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = owner.newInstance(cache, "me");
-		Generic you = owner.newInstance(cache, "you");
-		Generic today = time.newInstance(cache, "today");
-		Generic yesterday = time.newInstance(cache, "yesterday");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic me = owner.newInstance("me");
+		Generic you = owner.newInstance("you");
+		Generic today = time.newInstance("today");
+		Generic yesterday = time.newInstance("yesterday");
 
-		Link carMeToday = car.setLink(cache, carOwnerTime, "defaultOwner", me, today);
-		assert myBmw.getLink(cache, carOwnerTime).getBaseComponent().equals(car);
+		Link carMeToday = car.setLink(carOwnerTime, "defaultOwner", me, today);
+		assert myBmw.getLink(carOwnerTime).getBaseComponent().equals(car);
 
-		Link carYouYesterday = myBmw.bind(cache, carOwnerTime, you, yesterday);
+		Link carYouYesterday = myBmw.bind(carOwnerTime, you, yesterday);
 
-		assert myBmw.getLink(cache, carOwnerTime).equals(carYouYesterday) : myBmw.getLinks(cache, carOwnerTime);
-		assert !myBmw.getLinks(cache, carOwnerTime).contains(carMeToday) : myBmw.getLinks(cache, carOwnerTime);
+		assert myBmw.getLink(carOwnerTime).equals(carYouYesterday) : myBmw.getLinks(carOwnerTime);
+		assert !myBmw.getLinks(carOwnerTime).contains(carMeToday) : myBmw.getLinks(carOwnerTime);
 	}
 
 	public void testToOneNewTarget() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
-		Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = owner.newInstance(cache, "me");
-		Generic you = owner.newInstance(cache, "you");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic me = owner.newInstance("me");
+		Generic you = owner.newInstance("you");
 
-		Link myBmwMe = myBmw.bind(cache, carOwner, me);
-		assert myBmw.getLinks(cache, carOwner).contains(myBmwMe);
-		Link myBmwYou = myBmw.bind(cache, carOwner, you);
-		assert !myBmw.getLinks(cache, carOwner).contains(myBmwMe);
-		assert myBmw.getLinks(cache, carOwner).contains(myBmwYou);
-		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, carOwner);
+		Link myBmwMe = myBmw.bind(carOwner, me);
+		assert myBmw.getLinks(carOwner).contains(myBmwMe);
+		Link myBmwYou = myBmw.bind(carOwner, you);
+		assert !myBmw.getLinks(carOwner).contains(myBmwMe);
+		assert myBmw.getLinks(carOwner).contains(myBmwYou);
+		assert myBmw.getLinks(carOwner).size() == 1 : myBmw.getLinks(carOwner);
 	}
 
 	public void testToOneNewTargetReverse() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
-		final Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
+		final Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = owner.newInstance(cache, "me");
-		final Generic you = owner.newInstance(cache, "you");
+		final Generic myBmw = car.newInstance("myBmw");
+		Generic me = owner.newInstance("me");
+		final Generic you = owner.newInstance("you");
 
-		Link myBmwMe = me.bind(cache, carOwner, myBmw);
-		assert me.getLinks(cache, carOwner).contains(myBmwMe);
+		Link myBmwMe = me.bind(carOwner, myBmw);
+		assert me.getLinks(carOwner).contains(myBmwMe);
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				you.bind(cache, carOwner, myBmw);
+				you.bind(carOwner, myBmw);
 			}
 
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
 
 	public void testToOneNewTargetTernary() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
 		Type time = cache.newType("Time");
-		Relation carOwnerTime = car.setRelation(cache, "CarOwner", owner, time);
-		carOwnerTime.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwnerTime.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		Relation carOwnerTime = car.setRelation("CarOwner", owner, time);
+		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwnerTime.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = owner.newInstance(cache, "me");
-		Generic you = owner.newInstance(cache, "you");
-		Generic today = time.newInstance(cache, "today");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic me = owner.newInstance("me");
+		Generic you = owner.newInstance("you");
+		Generic today = time.newInstance("today");
 
-		Link myBmwMeToday = myBmw.bind(cache, carOwnerTime, me, today);
-		assert myBmw.getLinks(cache, carOwnerTime).contains(myBmwMeToday);
-		Link myBmwYou = myBmw.bind(cache, carOwnerTime, you, today);
-		assert !myBmw.getLinks(cache, carOwnerTime).contains(myBmwMeToday);
-		assert myBmw.getLinks(cache, carOwnerTime).contains(myBmwYou);
-		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, carOwnerTime);
+		Link myBmwMeToday = myBmw.bind(carOwnerTime, me, today);
+		assert myBmw.getLinks(carOwnerTime).contains(myBmwMeToday);
+		Link myBmwYou = myBmw.bind(carOwnerTime, you, today);
+		assert !myBmw.getLinks(carOwnerTime).contains(myBmwMeToday);
+		assert myBmw.getLinks(carOwnerTime).contains(myBmwYou);
+		assert myBmw.getLinks(carOwnerTime).size() == 1 : myBmw.getLinks(carOwnerTime);
 	}
 
 	public void testToOneSameValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
-		Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = owner.newInstance(cache, "me");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic me = owner.newInstance("me");
 
-		Link myBmwMe1 = myBmw.setLink(cache, carOwner, "value1", me);
-		Link myBmwMe2 = myBmw.setLink(cache, carOwner, "value1", me);
+		Link myBmwMe1 = myBmw.setLink(carOwner, "value1", me);
+		Link myBmwMe2 = myBmw.setLink(carOwner, "value1", me);
 		assert myBmwMe1 == myBmwMe2;
 
-		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, carOwner);
+		assert myBmw.getLinks(carOwner).size() == 1 : myBmw.getLinks(carOwner);
 	}
 
 	public void testToOneSameValueReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
-		Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = owner.newInstance(cache, "me");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic me = owner.newInstance("me");
 
-		Link myBmwMe1 = me.setLink(cache, carOwner, "value1", myBmw);
-		Link myBmwMe2 = me.setLink(cache, carOwner, "value1", myBmw);
+		Link myBmwMe1 = me.setLink(carOwner, "value1", myBmw);
+		Link myBmwMe2 = me.setLink(carOwner, "value1", myBmw);
 		assert myBmwMe1 == myBmwMe2;
 
-		assert me.getLinks(cache, carOwner).size() == 1 : me.getLinks(cache, carOwner);
+		assert me.getLinks(carOwner).size() == 1 : me.getLinks(carOwner);
 	}
 
 	public void testToOneSameValueTernary() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
 		Type time = cache.newType("Time");
 
-		final Relation carOwnerTime = car.setRelation(cache, "CarOwnerTime", owner, time);
-		carOwnerTime.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwnerTime.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		final Relation carOwnerTime = car.setRelation("CarOwnerTime", owner, time);
+		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwnerTime.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		final Generic me = owner.newInstance(cache, "me");
-		Generic today = time.newInstance(cache, "today");
-		time.newInstance(cache, "yesterday");
+		final Generic myBmw = car.newInstance("myBmw");
+		final Generic me = owner.newInstance("me");
+		Generic today = time.newInstance("today");
+		time.newInstance("yesterday");
 
-		Link myBmwMe1 = myBmw.setLink(cache, carOwnerTime, "value1", me, today);
-		Link myBmwMe2 = myBmw.setLink(cache, carOwnerTime, "value1", me, today);
+		Link myBmwMe1 = myBmw.setLink(carOwnerTime, "value1", me, today);
+		Link myBmwMe2 = myBmw.setLink(carOwnerTime, "value1", me, today);
 		assert myBmwMe1 == myBmwMe2;
-		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, carOwnerTime);
+		assert myBmw.getLinks(carOwnerTime).size() == 1 : myBmw.getLinks(carOwnerTime);
 
-		myBmw.setLink(cache, carOwnerTime, "value2", me, today);
-		assert myBmw.getLinks(cache, carOwnerTime).size() == 1 : myBmw.getLinks(cache, carOwnerTime);
+		myBmw.setLink(carOwnerTime, "value2", me, today);
+		assert myBmw.getLinks(carOwnerTime).size() == 1 : myBmw.getLinks(carOwnerTime);
 	}
 
 	public void testToOneDifferentValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
-		Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic me = owner.newInstance(cache, "me");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic me = owner.newInstance("me");
 
-		Link myBmwMe1 = myBmw.setLink(cache, carOwner, "value1", me);
-		Link myBmwMe2 = myBmw.setLink(cache, carOwner, "value2", me);
+		Link myBmwMe1 = myBmw.setLink(carOwner, "value1", me);
+		Link myBmwMe2 = myBmw.setLink(carOwner, "value2", me);
 		assert myBmwMe1 != myBmwMe2;
 
-		assert myBmw.getLinks(cache, carOwner).size() == 1 : myBmw.getLinks(cache, carOwner);
-		assert equals((Snapshot) myBmw.getLinks(cache, carOwner), "value1") == null;
-		assert equals((Snapshot) myBmw.getLinks(cache, carOwner), "value2") != null;
+		assert myBmw.getLinks(carOwner).size() == 1 : myBmw.getLinks(carOwner);
+		assert equals((Snapshot) myBmw.getLinks(carOwner), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carOwner), "value2") != null;
 
 	}
 
@@ -541,601 +541,594 @@ public class RelationTest extends AbstractTest {
 	}
 
 	public void testToOneDifferentValueReverse() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type owner = cache.newType("Owner");
-		final Relation carOwner = car.setRelation(cache, "CarOwner", owner);
-		carOwner.enableSingularConstraint(cache, Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(cache, Statics.BASE_POSITION);
+		final Relation carOwner = car.setRelation("CarOwner", owner);
+		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		final Generic me = owner.newInstance(cache, "me");
-		me.setLink(cache, carOwner, "value1", myBmw);
+		final Generic myBmw = car.newInstance("myBmw");
+		final Generic me = owner.newInstance("me");
+		me.setLink(carOwner, "value1", myBmw);
 
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				me.setLink(cache.newSuperCache(), carOwner, "value2", myBmw);
+				cache.newSuperCache().start();
+				me.setLink(carOwner, "value2", myBmw);
 			}
 
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 
-		assert me.getLinks(cache, carOwner).size() == 1 : me.getLinks(cache, carOwner);
-		assert equals((Snapshot) myBmw.getLinks(cache, carOwner), "value1") != null;
-		assert equals((Snapshot) myBmw.getLinks(cache, carOwner), "value2") == null;
+		cache.start();
+		assert me.getLinks(carOwner).size() == 1 : me.getLinks(carOwner);
+		assert equals((Snapshot) myBmw.getLinks(carOwner), "value1") != null;
+		assert equals((Snapshot) myBmw.getLinks(carOwner), "value2") == null;
 		cache.flush();
 	}
 
 	public void testOneToMany() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type tyre = cache.newType("Tyre");
-		Relation carTyres = car.setRelation(cache, "CarTyres", tyre);
+		Relation carTyres = car.setRelation("CarTyres", tyre);
 
-		carTyres.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carTyres.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic frontLeft = tyre.newInstance(cache, "frontLeft");
-		Generic frontRight = tyre.newInstance(cache, "frontRight");
-		Generic rearLeft = tyre.newInstance(cache, "rearLeft");
-		Generic rearRight = tyre.newInstance(cache, "rearRight");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic frontLeft = tyre.newInstance("frontLeft");
+		Generic frontRight = tyre.newInstance("frontRight");
+		Generic rearLeft = tyre.newInstance("rearLeft");
+		Generic rearRight = tyre.newInstance("rearRight");
 
-		myBmw.bind(cache, carTyres, frontLeft);
-		myBmw.bind(cache, carTyres, frontRight);
-		myBmw.bind(cache, carTyres, rearLeft);
-		myBmw.bind(cache, carTyres, rearRight);
+		myBmw.bind(carTyres, frontLeft);
+		myBmw.bind(carTyres, frontRight);
+		myBmw.bind(carTyres, rearLeft);
+		myBmw.bind(carTyres, rearRight);
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
+		assert myBmw.getLinks(carTyres).size() == 4 : myBmw.getLinks(carTyres);
 	}
 
 	public void testOneToManyReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type tyre = cache.newType("Tyre");
-		Relation carTyres = car.setRelation(cache, "CarTyres", tyre);
+		Relation carTyres = car.setRelation("CarTyres", tyre);
 
-		carTyres.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carTyres.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic frontLeft = tyre.newInstance(cache, "frontLeft");
-		Generic frontRight = tyre.newInstance(cache, "frontRight");
-		Generic rearLeft = tyre.newInstance(cache, "rearLeft");
-		Generic rearRight = tyre.newInstance(cache, "rearRight");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic frontLeft = tyre.newInstance("frontLeft");
+		Generic frontRight = tyre.newInstance("frontRight");
+		Generic rearLeft = tyre.newInstance("rearLeft");
+		Generic rearRight = tyre.newInstance("rearRight");
 
-		frontLeft.bind(cache, carTyres, myBmw);
-		frontRight.bind(cache, carTyres, myBmw);
-		rearLeft.bind(cache, carTyres, myBmw);
-		rearRight.bind(cache, carTyres, myBmw);
+		frontLeft.bind(carTyres, myBmw);
+		frontRight.bind(carTyres, myBmw);
+		rearLeft.bind(carTyres, myBmw);
+		rearRight.bind(carTyres, myBmw);
 
-		assert frontLeft.getLinks(cache, carTyres).size() == 1 : frontLeft.getLinks(cache, carTyres);
-		assert frontRight.getLinks(cache, carTyres).size() == 1 : frontLeft.getLinks(cache, carTyres);
-		assert rearLeft.getLinks(cache, carTyres).size() == 1 : frontLeft.getLinks(cache, carTyres);
-		assert rearRight.getLinks(cache, carTyres).size() == 1 : frontLeft.getLinks(cache, carTyres);
+		assert frontLeft.getLinks(carTyres).size() == 1 : frontLeft.getLinks(carTyres);
+		assert frontRight.getLinks(carTyres).size() == 1 : frontLeft.getLinks(carTyres);
+		assert rearLeft.getLinks(carTyres).size() == 1 : frontLeft.getLinks(carTyres);
+		assert rearRight.getLinks(carTyres).size() == 1 : frontLeft.getLinks(carTyres);
 	}
 
 	public void testOneToManyInheritance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type tyre = cache.newType("Tyre");
-		Relation carTyres = car.setRelation(cache, "CarTyres", tyre);
+		Relation carTyres = car.setRelation("CarTyres", tyre);
 
-		carTyres.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carTyres.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic frontLeft = tyre.newInstance(cache, "frontLeft");
-		Generic frontRight = tyre.newInstance(cache, "frontRight");
-		Generic rearLeft = tyre.newInstance(cache, "rearLeft");
-		Generic rearRight = tyre.newInstance(cache, "rearRight");
-		Generic center = tyre.newInstance(cache, "center");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic frontLeft = tyre.newInstance("frontLeft");
+		Generic frontRight = tyre.newInstance("frontRight");
+		Generic rearLeft = tyre.newInstance("rearLeft");
+		Generic rearRight = tyre.newInstance("rearRight");
+		Generic center = tyre.newInstance("center");
 
-		car.setLink(cache, carTyres, "defaultTyre", center);
-		assert myBmw.getLink(cache, carTyres).getBaseComponent().equals(car);
+		car.setLink(carTyres, "defaultTyre", center);
+		assert myBmw.getLink(carTyres).getBaseComponent().equals(myBmw);
 
-		myBmw.bind(cache, carTyres, frontLeft);
-		myBmw.bind(cache, carTyres, frontRight);
-		myBmw.bind(cache, carTyres, rearLeft);
-		myBmw.bind(cache, carTyres, rearRight);
+		myBmw.bind(carTyres, frontLeft);
+		myBmw.bind(carTyres, frontRight);
+		myBmw.bind(carTyres, rearLeft);
+		myBmw.bind(carTyres, rearRight);
 
-		assert myBmw.getLinks(cache, carTyres).size() == 5 : myBmw.getLinks(cache, carTyres);
+		assert myBmw.getLinks(carTyres).size() == 5 : myBmw.getLinks(carTyres);
 	}
 
 	public void testSingularTargetDefaultColor() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		final Generic myAudi = car.newInstance(cache, "myAudi");
-		final Generic red = color.newInstance(cache, "red");
+		car.newInstance("myBmw");
+		car.newInstance("myAudi");
+		final Generic red = color.newInstance("red");
 
-		final Relation carColor = car.setRelation(cache, "CarColor", color);
-		carColor.enableSingularConstraint(cache, Statics.TARGET_POSITION);
+		final Relation carColor = car.setRelation("CarColor", color);
+		carColor.enableSingularConstraint(Statics.TARGET_POSITION);
 
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				Generic carRed = car.bind(cache, carColor, red);
-				((GenericImpl) carRed).deduct(cache);
-				// assert red.getLinks(cache, carColor, Statics.TARGET_POSITION).size() == 2 : red.getLinks(cache, carColor, Statics.TARGET_POSITION);
-				// assert red.getTargets(cache, carColor, Statics.BASE_POSITION).contains(myBmw);
-				// assert red.getTargets(cache, carColor, Statics.BASE_POSITION).contains(myAudi);
+				car.bind(carColor, red);
+				assert red.getLinks(carColor).size() == 2 : red.getLinks(carColor);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
 
 	public void testOneToManyInheritanceReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type person = cache.newType("person");
-		Relation carPerson = car.setRelation(cache, "CarPersons", person);
+		Relation carPerson = car.setRelation("CarPersons", person);
 
-		carPerson.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carPerson.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		carPerson.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carPerson.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
+		Generic myBmw = car.newInstance("myBmw");
 
-		// Generic michael = person.newInstance(cache, "michael");
-		// Generic nicolas = person.newInstance(cache, "nicolas");
-		// Generic sven = person.newInstance(cache, "sven");
-		// Generic sofiane = person.newInstance(cache, "sofiane");
-		Generic pierre = person.newInstance(cache, "pierre");
+		// Generic michael = person.newInstance( "michael");
+		// Generic nicolas = person.newInstance( "nicolas");
+		// Generic sven = person.newInstance( "sven");
+		// Generic sofiane = person.newInstance( "sofiane");
+		Generic pierre = person.newInstance("pierre");
 
-		Link carPierre = pierre.setLink(cache, carPerson, "defaultPerson", car);
-		Generic myAudi = car.newInstance(cache, "myAudi");
-		log.info("" + pierre.getLinks(cache, carPerson));
+		Link carPierre = pierre.setLink(carPerson, "defaultPerson", car);
+		Generic myAudi = car.newInstance("myAudi");
 		// should throw a singular constraint exception
 
-		// assert myBmw.getLink(cache, carPerson).getBaseComponent().equals(car);
-		// assert false : "" + michael.getLinks(cache, carPerson, Statics.TARGET_POSITION);
-		// Link myBmwMichael = michael.bind(cache, carPerson, myBmw);
-		// assert false : carPerson.getAllInstances(cache);
-		// Link myBmwNicolas = nicolas.bind(cache, carPerson, myBmw);
-		// Link myBmwSven = sven.bind(cache, carPerson, myBmw);
-		// Link myBmwSofiane = sofiane.bind(cache, carPerson, myBmw);
+		// assert myBmw.getLink( carPerson).getBaseComponent().equals(car);
+		// assert false : "" + michael.getLinks( carPerson, Statics.TARGET_POSITION);
+		// Link myBmwMichael = michael.bind( carPerson, myBmw);
+		// assert false : carPerson.getAllInstances();
+		// Link myBmwNicolas = nicolas.bind( carPerson, myBmw);
+		// Link myBmwSven = sven.bind( carPerson, myBmw);
+		// Link myBmwSofiane = sofiane.bind( carPerson, myBmw);
 		//
-		// assert michael.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : michael.getLinks(cache, carPerson, Statics.TARGET_POSITION);
-		// assert nicolas.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : nicolas.getLinks(cache, carPerson, Statics.TARGET_POSITION);
-		// assert sven.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : sven.getLinks(cache, carPerson, Statics.TARGET_POSITION);
-		// assert sofiane.getLinks(cache, carPerson, Statics.TARGET_POSITION).size() == 1 : sofiane.getLinks(cache, carPerson, Statics.TARGET_POSITION);
+		// assert michael.getLinks( carPerson, Statics.TARGET_POSITION).size() == 1 : michael.getLinks( carPerson, Statics.TARGET_POSITION);
+		// assert nicolas.getLinks( carPerson, Statics.TARGET_POSITION).size() == 1 : nicolas.getLinks( carPerson, Statics.TARGET_POSITION);
+		// assert sven.getLinks( carPerson, Statics.TARGET_POSITION).size() == 1 : sven.getLinks( carPerson, Statics.TARGET_POSITION);
+		// assert sofiane.getLinks( carPerson, Statics.TARGET_POSITION).size() == 1 : sofiane.getLinks( carPerson, Statics.TARGET_POSITION);
 		//
-		// assert myBmw.getLinks(cache, carPerson).contains(carPierre) : myBmw.getLinks(cache, carPerson);
-		// assert myBmw.getLinks(cache, carPerson).contains(myBmwMichael) : myBmw.getLinks(cache, carPerson);
-		// assert myBmw.getLinks(cache, carPerson).contains(myBmwNicolas) : myBmw.getLinks(cache, carPerson);
-		// assert myBmw.getLinks(cache, carPerson).contains(myBmwSven) : myBmw.getLinks(cache, carPerson);
-		// assert myBmw.getLinks(cache, carPerson).contains(myBmwSofiane) : myBmw.getLinks(cache, carPerson);
+		// assert myBmw.getLinks( carPerson).contains(carPierre) : myBmw.getLinks( carPerson);
+		// assert myBmw.getLinks( carPerson).contains(myBmwMichael) : myBmw.getLinks( carPerson);
+		// assert myBmw.getLinks( carPerson).contains(myBmwNicolas) : myBmw.getLinks( carPerson);
+		// assert myBmw.getLinks( carPerson).contains(myBmwSven) : myBmw.getLinks( carPerson);
+		// assert myBmw.getLinks( carPerson).contains(myBmwSofiane) : myBmw.getLinks( carPerson);
 	}
 
 	public void testOneToManyInheritanceReverse2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type person = cache.newType("person");
-		Relation carPerson = car.setRelation(cache, "CarPersons", person);
+		Relation carPerson = car.setRelation("CarPersons", person);
 
-		carPerson.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carPerson.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		carPerson.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carPerson.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic michael = person.newInstance(cache, "michael");
-		Generic nicolas = person.newInstance(cache, "nicolas");
-		Generic sven = person.newInstance(cache, "sven");
-		Generic sofiane = person.newInstance(cache, "sofiane");
-		Generic pierre = person.newInstance(cache, "pierre");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic michael = person.newInstance("michael");
+		Generic nicolas = person.newInstance("nicolas");
+		Generic sven = person.newInstance("sven");
+		Generic sofiane = person.newInstance("sofiane");
+		Generic pierre = person.newInstance("pierre");
 
-		Link carPierre = pierre.setLink(cache, carPerson, "defaultPerson", car);
-		assert myBmw.getLink(cache, carPerson).getBaseComponent().equals(car);
+		Link carPierre = pierre.setLink(carPerson, "defaultPerson", car);
+		assert myBmw.getLink(carPerson).getBaseComponent().equals(myBmw);
 
-		Link myBmwMichael = michael.bind(cache, carPerson, myBmw);
-		Link myBmwNicolas = nicolas.bind(cache, carPerson, myBmw);
-		Link myBmwSven = sven.bind(cache, carPerson, myBmw);
-		Link myBmwSofiane = sofiane.bind(cache, carPerson, myBmw);
+		Link myBmwMichael = michael.bind(carPerson, myBmw);
+		Link myBmwNicolas = nicolas.bind(carPerson, myBmw);
+		Link myBmwSven = sven.bind(carPerson, myBmw);
+		Link myBmwSofiane = sofiane.bind(carPerson, myBmw);
 
-		assert michael.getLinks(cache, carPerson).size() == 1 : michael.getLinks(cache, carPerson);
-		assert nicolas.getLinks(cache, carPerson).size() == 1 : nicolas.getLinks(cache, carPerson);
-		assert sven.getLinks(cache, carPerson).size() == 1 : sven.getLinks(cache, carPerson);
-		assert sofiane.getLinks(cache, carPerson).size() == 1 : sofiane.getLinks(cache, carPerson);
+		assert michael.getLinks(carPerson).size() == 1 : michael.getLinks(carPerson);
+		assert nicolas.getLinks(carPerson).size() == 1 : nicolas.getLinks(carPerson);
+		assert sven.getLinks(carPerson).size() == 1 : sven.getLinks(carPerson);
+		assert sofiane.getLinks(carPerson).size() == 1 : sofiane.getLinks(carPerson);
 
-		assert myBmw.getLinks(cache, carPerson).contains(carPierre) : myBmw.getLinks(cache, carPerson);
-		assert myBmw.getLinks(cache, carPerson).contains(myBmwMichael) : myBmw.getLinks(cache, carPerson);
-		assert myBmw.getLinks(cache, carPerson).contains(myBmwNicolas) : myBmw.getLinks(cache, carPerson);
-		assert myBmw.getLinks(cache, carPerson).contains(myBmwSven) : myBmw.getLinks(cache, carPerson);
-		assert myBmw.getLinks(cache, carPerson).contains(myBmwSofiane) : myBmw.getLinks(cache, carPerson);
+		assert !myBmw.getLinks(carPerson).contains(carPierre) : myBmw.getLinks(carPerson);
+		assert myBmw.getLinks(carPerson).contains(myBmwMichael) : myBmw.getLinks(carPerson);
+		assert myBmw.getLinks(carPerson).contains(myBmwNicolas) : myBmw.getLinks(carPerson);
+		assert myBmw.getLinks(carPerson).contains(myBmwSven) : myBmw.getLinks(carPerson);
+		assert myBmw.getLinks(carPerson).contains(myBmwSofiane) : myBmw.getLinks(carPerson);
 	}
 
 	public void testOneToManyDifferentValue() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type tyre = cache.newType("Tyre");
-		final Relation carTyres = car.setRelation(cache, "CarTyres", tyre);
+		final Relation carTyres = car.setRelation("CarTyres", tyre);
 
-		carTyres.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carTyres.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
-		carTyres.enablePropertyConstraint(cache);
-		assert carTyres.isPropertyConstraintEnabled(cache);
+		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		carTyres.enablePropertyConstraint();
+		assert carTyres.isPropertyConstraintEnabled();
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic frontLeft = tyre.newInstance(cache, "frontLeft");
-		Generic frontRight = tyre.newInstance(cache, "frontRight");
-		Generic rearLeft = tyre.newInstance(cache, "rearLeft");
-		final Generic rearRight = tyre.newInstance(cache, "rearRight");
+		final Generic myBmw = car.newInstance("myBmw");
+		Generic frontLeft = tyre.newInstance("frontLeft");
+		Generic frontRight = tyre.newInstance("frontRight");
+		Generic rearLeft = tyre.newInstance("rearLeft");
+		final Generic rearRight = tyre.newInstance("rearRight");
 
-		myBmw.bind(cache, carTyres, frontLeft);
-		myBmw.bind(cache, carTyres, frontRight);
-		myBmw.bind(cache, carTyres, rearLeft);
+		myBmw.bind(carTyres, frontLeft);
+		myBmw.bind(carTyres, frontRight);
+		myBmw.bind(carTyres, rearLeft);
 
-		Link myBmwRearRight1 = myBmw.setLink(cache, carTyres, "value1", rearRight);
-		Link myBmwRearRight2 = myBmw.setLink(cache, carTyres, "value2", rearRight);
+		Link myBmwRearRight1 = myBmw.setLink(carTyres, "value1", rearRight);
+		Link myBmwRearRight2 = myBmw.setLink(carTyres, "value2", rearRight);
 
-		assert !myBmwRearRight1.isAlive(cache);
-		assert myBmwRearRight2.isAlive(cache);
+		assert !myBmwRearRight1.isAlive();
+		assert myBmwRearRight2.isAlive();
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
-		assert equals((Snapshot) myBmw.getLinks(cache, carTyres), "value1") == null;
-		assert equals((Snapshot) myBmw.getLinks(cache, carTyres), "value2") != null;
+		assert myBmw.getLinks(carTyres).size() == 4 : myBmw.getLinks(carTyres);
+		assert equals((Snapshot) myBmw.getLinks(carTyres), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carTyres), "value2") != null;
 
-		carTyres.disablePropertyConstraint(cache);
+		carTyres.disablePropertyConstraint();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				myBmw.setLink(cache, carTyres, "value3", rearRight);
+				myBmw.setLink(carTyres, "value3", rearRight);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
 
 	public void testOneToManyDifferentValueReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type tyre = cache.newType("Tyre");
-		final Relation carTyres = car.setRelation(cache, "CarTyres", tyre);
+		final Relation carTyres = car.setRelation("CarTyres", tyre);
 
-		carTyres.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carTyres.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
-		carTyres.enablePropertyConstraint(cache);
-		assert carTyres.isPropertyConstraintEnabled(cache);
+		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		carTyres.enablePropertyConstraint();
+		assert carTyres.isPropertyConstraintEnabled();
 
-		final Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic frontLeft = tyre.newInstance(cache, "frontLeft");
-		Generic frontRight = tyre.newInstance(cache, "frontRight");
-		Generic rearLeft = tyre.newInstance(cache, "rearLeft");
-		final Generic rearRight = tyre.newInstance(cache, "rearRight");
+		final Generic myBmw = car.newInstance("myBmw");
+		Generic frontLeft = tyre.newInstance("frontLeft");
+		Generic frontRight = tyre.newInstance("frontRight");
+		Generic rearLeft = tyre.newInstance("rearLeft");
+		final Generic rearRight = tyre.newInstance("rearRight");
 
-		frontLeft.bind(cache, carTyres, myBmw);
-		frontRight.bind(cache, carTyres, myBmw);
-		rearLeft.bind(cache, carTyres, myBmw);
+		frontLeft.bind(carTyres, myBmw);
+		frontRight.bind(carTyres, myBmw);
+		rearLeft.bind(carTyres, myBmw);
 
-		final Link myBmwRearRight1 = rearRight.setLink(cache, carTyres, "value1", myBmw);
-		final Link myBmwRearRight2 = rearRight.setLink(cache, carTyres, "value2", myBmw);
+		final Link myBmwRearRight1 = rearRight.setLink(carTyres, "value1", myBmw);
+		final Link myBmwRearRight2 = rearRight.setLink(carTyres, "value2", myBmw);
 
-		assert !myBmwRearRight1.isAlive(cache);
-		assert myBmwRearRight2.isAlive(cache);
+		assert !myBmwRearRight1.isAlive();
+		assert myBmwRearRight2.isAlive();
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
-		assert equals((Snapshot) myBmw.getLinks(cache, carTyres), "value1") == null;
-		assert equals((Snapshot) myBmw.getLinks(cache, carTyres), "value2") != null;
+		assert myBmw.getLinks(carTyres).size() == 4 : myBmw.getLinks(carTyres);
+		assert equals((Snapshot) myBmw.getLinks(carTyres), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carTyres), "value2") != null;
 
-		carTyres.disablePropertyConstraint(cache);
+		carTyres.disablePropertyConstraint();
 
-		rearRight.setLink(cache, carTyres, "value3", myBmw);
-		assert !myBmwRearRight1.isAlive(cache);
-		assert !myBmwRearRight2.isAlive(cache);
+		rearRight.setLink(carTyres, "value3", myBmw);
+		assert !myBmwRearRight1.isAlive();
+		assert !myBmwRearRight2.isAlive();
 	}
 
 	public void testOneToManySameValue() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type tyre = cache.newType("Tyre");
-		Relation carTyres = car.setRelation(cache, "CarTyres", tyre);
+		Relation carTyres = car.setRelation("CarTyres", tyre);
 
-		carTyres.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carTyres.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic frontLeft = tyre.newInstance(cache, "frontLeft");
-		Generic frontRight = tyre.newInstance(cache, "frontRight");
-		Generic rearLeft = tyre.newInstance(cache, "rearLeft");
-		Generic rearRight = tyre.newInstance(cache, "rearRight");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic frontLeft = tyre.newInstance("frontLeft");
+		Generic frontRight = tyre.newInstance("frontRight");
+		Generic rearLeft = tyre.newInstance("rearLeft");
+		Generic rearRight = tyre.newInstance("rearRight");
 
-		myBmw.bind(cache, carTyres, frontLeft);
-		myBmw.bind(cache, carTyres, frontRight);
-		myBmw.bind(cache, carTyres, rearLeft);
-		Link myBmwRearRight1 = myBmw.setLink(cache, carTyres, "value1", rearRight);
-		assert myBmw.getLinks(cache, carTyres).contains(myBmwRearRight1);
-		Link myBmwRearRight2 = myBmw.setLink(cache, carTyres, "value1", rearRight);
+		myBmw.bind(carTyres, frontLeft);
+		myBmw.bind(carTyres, frontRight);
+		myBmw.bind(carTyres, rearLeft);
+		Link myBmwRearRight1 = myBmw.setLink(carTyres, "value1", rearRight);
+		assert myBmw.getLinks(carTyres).contains(myBmwRearRight1);
+		Link myBmwRearRight2 = myBmw.setLink(carTyres, "value1", rearRight);
 		assert myBmwRearRight1 == myBmwRearRight2;
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
-		assert myBmw.getLinks(cache, carTyres).contains(myBmwRearRight1);
+		assert myBmw.getLinks(carTyres).size() == 4 : myBmw.getLinks(carTyres);
+		assert myBmw.getLinks(carTyres).contains(myBmwRearRight1);
 	}
 
 	public void testOneToManySameValueReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type tyre = cache.newType("Tyre");
-		Relation carTyres = car.setRelation(cache, "CarTyres", tyre);
+		Relation carTyres = car.setRelation("CarTyres", tyre);
 
-		carTyres.enableSingularConstraint(cache, Statics.TARGET_POSITION);
-		assert carTyres.isSingularConstraintEnabled(cache, Statics.TARGET_POSITION);
+		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic frontLeft = tyre.newInstance(cache, "frontLeft");
-		Generic frontRight = tyre.newInstance(cache, "frontRight");
-		Generic rearLeft = tyre.newInstance(cache, "rearLeft");
-		Generic rearRight = tyre.newInstance(cache, "rearRight");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic frontLeft = tyre.newInstance("frontLeft");
+		Generic frontRight = tyre.newInstance("frontRight");
+		Generic rearLeft = tyre.newInstance("rearLeft");
+		Generic rearRight = tyre.newInstance("rearRight");
 
-		frontLeft.bind(cache, carTyres, myBmw);
-		frontRight.bind(cache, carTyres, myBmw);
-		rearLeft.bind(cache, carTyres, myBmw);
-		Link myBmwRearRight1 = rearRight.setLink(cache, carTyres, "value1", myBmw);
-		assert myBmw.getLinks(cache, carTyres).contains(myBmwRearRight1);
-		log.info("zzzzzzzzzzzzzzzzzzzzzzzzz");
-		Link myBmwRearRight2 = rearRight.setLink(cache, carTyres, "value1", myBmw);
+		frontLeft.bind(carTyres, myBmw);
+		frontRight.bind(carTyres, myBmw);
+		rearLeft.bind(carTyres, myBmw);
+		Link myBmwRearRight1 = rearRight.setLink(carTyres, "value1", myBmw);
+		assert myBmw.getLinks(carTyres).contains(myBmwRearRight1);
+		Link myBmwRearRight2 = rearRight.setLink(carTyres, "value1", myBmw);
 		assert myBmwRearRight1 == myBmwRearRight2;
 
-		assert myBmw.getLinks(cache, carTyres).size() == 4 : myBmw.getLinks(cache, carTyres);
-		assert myBmw.getLinks(cache, carTyres).contains(myBmwRearRight1);
+		assert myBmw.getLinks(carTyres).size() == 4 : myBmw.getLinks(carTyres);
+		assert myBmw.getLinks(carTyres).contains(myBmwRearRight1);
 	}
 
 	public void testManyToMany() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Relation carColor = car.setRelation("CarColor", color);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
-		Generic red = color.newInstance(cache, "red");
-		Generic blue = color.newInstance(cache, "blue");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic yourAudi = car.newInstance("yourAudi");
+		Generic red = color.newInstance("red");
+		Generic blue = color.newInstance("blue");
 
-		myBmw.bind(cache, carColor, red);
-		myBmw.bind(cache, carColor, blue);
-		yourAudi.bind(cache, carColor, blue);
-		yourAudi.bind(cache, carColor, red);
+		myBmw.bind(carColor, red);
+		myBmw.bind(carColor, blue);
+		yourAudi.bind(carColor, blue);
+		yourAudi.bind(carColor, red);
 
-		assert myBmw.getLinks(cache, carColor).size() == 2 : myBmw.getLinks(cache, carColor);
-		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, carColor);
+		assert myBmw.getLinks(carColor).size() == 2 : myBmw.getLinks(carColor);
+		assert yourAudi.getLinks(carColor).size() == 2 : yourAudi.getLinks(carColor);
 	}
 
 	public void testManyToManyReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Relation carColor = car.setRelation("CarColor", color);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
-		Generic red = color.newInstance(cache, "red");
-		Generic blue = color.newInstance(cache, "blue");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic yourAudi = car.newInstance("yourAudi");
+		Generic red = color.newInstance("red");
+		Generic blue = color.newInstance("blue");
 
-		red.bind(cache, carColor, myBmw);
-		blue.bind(cache, carColor, myBmw);
-		blue.bind(cache, carColor, yourAudi);
-		red.bind(cache, carColor, yourAudi);
+		red.bind(carColor, myBmw);
+		blue.bind(carColor, myBmw);
+		blue.bind(carColor, yourAudi);
+		red.bind(carColor, yourAudi);
 
-		assert red.getLinks(cache, carColor).size() == 2 : red.getLinks(cache, carColor);
-		assert blue.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, carColor);
+		assert red.getLinks(carColor).size() == 2 : red.getLinks(carColor);
+		assert blue.getLinks(carColor).size() == 2 : yourAudi.getLinks(carColor);
 	}
 
 	public void testManyToManyInheritance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
+		Generic yourAudi = car.newInstance("yourAudi");
 
 		Type color = cache.newType("Color");
-		Generic red = color.newInstance(cache, "red");
+		Generic red = color.newInstance("red");
 
-		Relation carColor = car.setRelation(cache, "CarColor", color);
-		Link carRed = car.setLink(cache, carColor, "defaultColor", red);
-		assert yourAudi.getLink(cache, carColor).getBaseComponent().equals(car);
+		Relation carColor = car.setRelation("CarColor", color);
+		Link carRed = car.setLink(carColor, "defaultColor", red);
+		assert yourAudi.getLink(carColor).getBaseComponent().equals(car);
 
-		Link yourAudiRed = yourAudi.bind(cache, carColor, red);
+		Link yourAudiRed = yourAudi.bind(carColor, red);
 
-		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, carColor);
-		assert yourAudi.getLinks(cache, carColor).contains(carRed);
-		assert yourAudi.getLinks(cache, carColor).contains(yourAudiRed);
+		assert yourAudi.getLinks(carColor).size() == 2 : yourAudi.getLinks(carColor);
+		assert yourAudi.getLinks(carColor).contains(carRed);
+		assert yourAudi.getLinks(carColor).contains(yourAudiRed);
 	}
 
 	public void testManyToManyInheritanceReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
+		Generic yourAudi = car.newInstance("yourAudi");
 		Type color = cache.newType("Color");
-		Generic red = color.newInstance(cache, "red");
+		Generic red = color.newInstance("red");
 
-		Relation carColor = car.setRelation(cache, "CarColor", color);
-		Link carRed = red.setLink(cache, carColor, "defaultColor", car);
-		log.info("" + red.getLink(cache, carColor) + " " + carColor.getAllInstances(cache));
-		assert red.getLink(cache, carColor).getBaseComponent().equals(car);
+		Relation carColor = car.setRelation("CarColor", color);
+		red.setLink(carColor, "defaultColor", car);
+		assert red.getLink(carColor).getBaseComponent().equals(yourAudi);
 
-		Link yourAudiRed = red.bind(cache, carColor, yourAudi);
+		Link yourAudiRed = red.bind(carColor, yourAudi);
 
-		assert yourAudi.getLinks(cache, carColor).size() == 2;
-		assert yourAudi.getLinks(cache, carColor).contains(carRed);
-		assert yourAudi.getLinks(cache, carColor).contains(yourAudiRed);
+		assert yourAudi.getLinks(carColor).size() == 2;
+		assert yourAudi.getLinks(carColor).contains(yourAudiRed);
 	}
 
 	public void testManyToManyPropertyConstraint() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Relation carColor = car.setRelation("CarColor", color);
 
-		carColor.enablePropertyConstraint(cache);
+		carColor.enablePropertyConstraint();
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
-		Generic red = color.newInstance(cache, "red");
-		Generic blue = color.newInstance(cache, "blue");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic yourAudi = car.newInstance("yourAudi");
+		Generic red = color.newInstance("red");
+		Generic blue = color.newInstance("blue");
 
-		myBmw.setLink(cache, carColor, "value1", red);
-		Link bmwRed2 = myBmw.setLink(cache, carColor, "value2", red);
+		myBmw.setLink(carColor, "value1", red);
+		Link bmwRed2 = myBmw.setLink(carColor, "value2", red);
 
-		yourAudi.bind(cache, carColor, blue);
-		yourAudi.bind(cache, carColor, red);
+		yourAudi.bind(carColor, blue);
+		yourAudi.bind(carColor, red);
 
-		assert myBmw.getLinks(cache, carColor).size() == 1 : myBmw.getLinks(cache, carColor);
-		assert equals((Snapshot) myBmw.getLinks(cache, carColor), "value1") == null;
-		assert equals((Snapshot) myBmw.getLinks(cache, carColor), "value2") == bmwRed2;
-		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, carColor);
+		assert myBmw.getLinks(carColor).size() == 1 : myBmw.getLinks(carColor);
+		assert equals((Snapshot) myBmw.getLinks(carColor), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carColor), "value2") == bmwRed2;
+		assert yourAudi.getLinks(carColor).size() == 2 : yourAudi.getLinks(carColor);
 	}
 
 	public void testManyToManyPropertyConstraintReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation(cache, "CarColor", color);
+		Relation carColor = car.setRelation("CarColor", color);
 
-		carColor.enablePropertyConstraint(cache);
+		carColor.enablePropertyConstraint();
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
-		Generic red = color.newInstance(cache, "red");
-		Generic blue = color.newInstance(cache, "blue");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic yourAudi = car.newInstance("yourAudi");
+		Generic red = color.newInstance("red");
+		Generic blue = color.newInstance("blue");
 
-		red.setLink(cache, carColor, "value1", myBmw);
-		Link bmwRed2 = red.setLink(cache, carColor, "value2", myBmw);
+		red.setLink(carColor, "value1", myBmw);
+		Link bmwRed2 = red.setLink(carColor, "value2", myBmw);
 
-		blue.bind(cache, carColor, yourAudi);
-		red.bind(cache, carColor, yourAudi);
+		blue.bind(carColor, yourAudi);
+		red.bind(carColor, yourAudi);
 
-		assert myBmw.getLinks(cache, carColor).size() == 1 : myBmw.getLinks(cache, carColor);
-		assert equals((Snapshot) myBmw.getLinks(cache, carColor), "value1") == null;
-		assert equals((Snapshot) myBmw.getLinks(cache, carColor), "value2") == bmwRed2;
-		assert yourAudi.getLinks(cache, carColor).size() == 2 : yourAudi.getLinks(cache, carColor);
+		assert myBmw.getLinks(carColor).size() == 1 : myBmw.getLinks(carColor);
+		assert equals((Snapshot) myBmw.getLinks(carColor), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carColor), "value2") == bmwRed2;
+		assert yourAudi.getLinks(carColor).size() == 2 : yourAudi.getLinks(carColor);
 
-		assert equals((Snapshot) red.getLinks(cache, carColor), "value2") == bmwRed2;
-		assert blue.getLinks(cache, carColor).size() == 1 : blue.getLinks(cache, carColor);
+		assert equals((Snapshot) red.getLinks(carColor), "value2") == bmwRed2;
+		assert blue.getLinks(carColor).size() == 1 : blue.getLinks(carColor);
 	}
 
 	public void testSimpleRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
-		Type sportsCar = car.newSubType(cache, "SportsCar");
+		Type sportsCar = car.newSubType("SportsCar");
 		Type person = cache.newType("Person");
-		Type pilot = person.newSubType(cache, "Pilot");
-		Relation carDriver = car.setRelation(cache, "driver", person);
-		Relation sportsCarPilot = sportsCar.setRelation(cache, "driver", pilot);
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
-		Generic ourFerrari = sportsCar.newInstance(cache, "ourFerrari");
+		Type pilot = person.newSubType("Pilot");
+		Relation carDriver = car.setRelation("driver", person);
+		Relation sportsCarPilot = sportsCar.setRelation("driver", pilot);
+		Generic myBmw = car.newInstance("myBmw");
+		Generic yourAudi = car.newInstance("yourAudi");
+		Generic ourFerrari = sportsCar.newInstance("ourFerrari");
 
-		Generic me = person.newInstance(cache, "me");
-		Generic you = person.newInstance(cache, "you");
-		Generic ayrton = pilot.newInstance(cache, "Ayrton");
+		Generic me = person.newInstance("me");
+		Generic you = person.newInstance("you");
+		Generic ayrton = pilot.newInstance("Ayrton");
 
-		myBmw.bind(cache, carDriver, me);
-		myBmw.bind(cache, carDriver, ayrton);
+		myBmw.bind(carDriver, me);
+		myBmw.bind(carDriver, ayrton);
 
-		yourAudi.bind(cache, carDriver, you);
-		yourAudi.bind(cache, carDriver, ayrton);
-		ourFerrari.bind(cache, carDriver, me);
-		ourFerrari.bind(cache, carDriver, you);
-		ourFerrari.bind(cache, sportsCarPilot, ayrton);
+		yourAudi.bind(carDriver, you);
+		yourAudi.bind(carDriver, ayrton);
+		ourFerrari.bind(carDriver, me);
+		ourFerrari.bind(carDriver, you);
+		ourFerrari.bind(sportsCarPilot, ayrton);
 
-		assert myBmw.getTargets(cache, carDriver).contains(me);
-		assert myBmw.getTargets(cache, carDriver).contains(ayrton);
-		assert !myBmw.getTargets(cache, sportsCarPilot).contains(ayrton) : myBmw.getTargets(cache, carDriver);
-		assert myBmw.getTargets(cache, carDriver).size() == 2;
-		assert yourAudi.getTargets(cache, carDriver).contains(you);
-		assert yourAudi.getTargets(cache, carDriver).contains(ayrton);
-		assert yourAudi.getTargets(cache, carDriver).size() == 2;
-		assert ourFerrari.getTargets(cache, carDriver).contains(me);
-		assert ourFerrari.getTargets(cache, carDriver).contains(you);
-		assert ourFerrari.getTargets(cache, carDriver).contains(ayrton);
+		assert myBmw.getTargets(carDriver).contains(me);
+		assert myBmw.getTargets(carDriver).contains(ayrton);
+		assert myBmw.getTargets(carDriver).size() == 2;
+		assert yourAudi.getTargets(carDriver).contains(you);
+		assert yourAudi.getTargets(carDriver).contains(ayrton);
+		assert yourAudi.getTargets(carDriver).size() == 2;
+		assert ourFerrari.getTargets(carDriver).contains(me);
+		assert ourFerrari.getTargets(carDriver).contains(you);
+		assert ourFerrari.getTargets(carDriver).contains(ayrton);
 
 	}
 
 	public void testSimpleRelationReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
-		Type sportsCar = car.newSubType(cache, "SportsCar");
+		Type sportsCar = car.newSubType("SportsCar");
 
 		Type person = cache.newType("Person");
-		Type pilot = person.newSubType(cache, "Pilot");
+		Type pilot = person.newSubType("Pilot");
 
-		Relation carDriver = car.setRelation(cache, "driver", person);
-		Relation sportsCarPilot = sportsCar.setRelation(cache, "driver", pilot);
+		Relation carDriver = car.setRelation("driver", person);
+		Relation sportsCarPilot = sportsCar.setRelation("driver", pilot);
 
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic yourAudi = car.newInstance(cache, "yourAudi");
-		Generic ourFerrari = sportsCar.newInstance(cache, "ourFerrari");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic yourAudi = car.newInstance("yourAudi");
+		Generic ourFerrari = sportsCar.newInstance("ourFerrari");
 
-		Generic me = person.newInstance(cache, "me");
-		Generic you = person.newInstance(cache, "you");
-		Generic ayrton = pilot.newInstance(cache, "Ayrton");
+		Generic me = person.newInstance("me");
+		Generic you = person.newInstance("you");
+		Generic ayrton = pilot.newInstance("Ayrton");
 
-		me.bind(cache, carDriver, myBmw);
-		ayrton.bind(cache, carDriver, myBmw);
+		me.bind(carDriver, myBmw);
+		ayrton.bind(carDriver, myBmw);
 
-		you.bind(cache, carDriver, yourAudi);
-		ayrton.bind(cache, carDriver, yourAudi);
-		me.bind(cache, carDriver, ourFerrari);
-		you.bind(cache, carDriver, ourFerrari);
-		ayrton.bind(cache, sportsCarPilot, ourFerrari);
+		you.bind(carDriver, yourAudi);
+		ayrton.bind(carDriver, yourAudi);
+		me.bind(carDriver, ourFerrari);
+		you.bind(carDriver, ourFerrari);
+		ayrton.bind(sportsCarPilot, ourFerrari);
 
-		assert myBmw.getTargets(cache, carDriver).contains(me);
-		assert myBmw.getTargets(cache, carDriver).contains(ayrton);
-		assert !myBmw.getTargets(cache, sportsCarPilot).contains(ayrton) : myBmw.getTargets(cache, carDriver);
-		assert myBmw.getTargets(cache, carDriver).size() == 2;
-		assert yourAudi.getTargets(cache, carDriver).contains(you);
-		assert yourAudi.getTargets(cache, carDriver).contains(ayrton);
-		assert yourAudi.getTargets(cache, carDriver).size() == 2;
-		assert ourFerrari.getTargets(cache, carDriver).contains(me);
-		assert ourFerrari.getTargets(cache, carDriver).contains(you);
-		assert ourFerrari.getTargets(cache, carDriver).contains(ayrton);
+		assert myBmw.getTargets(carDriver).contains(me);
+		assert myBmw.getTargets(carDriver).contains(ayrton);
+		assert myBmw.getTargets(carDriver).size() == 2;
+		assert yourAudi.getTargets(carDriver).contains(you);
+		assert yourAudi.getTargets(carDriver).contains(ayrton);
+		assert yourAudi.getTargets(carDriver).size() == 2;
+		assert ourFerrari.getTargets(carDriver).contains(me);
+		assert ourFerrari.getTargets(carDriver).contains(you);
+		assert ourFerrari.getTargets(carDriver).contains(ayrton);
 
-		assert me.getTargets(cache, carDriver, Statics.BASE_POSITION).contains(myBmw);
-		assert ayrton.getTargets(cache, carDriver, Statics.BASE_POSITION).contains(myBmw);
-		assert !ayrton.getTargets(cache, sportsCarPilot, Statics.BASE_POSITION).contains(myBmw) : ayrton.getTargets(cache, carDriver);
-		assert me.getTargets(cache, carDriver, Statics.BASE_POSITION).size() == 2;
-		assert you.getTargets(cache, carDriver, Statics.BASE_POSITION).contains(yourAudi);
-		assert ayrton.getTargets(cache, carDriver, Statics.BASE_POSITION).contains(yourAudi);
-		assert you.getTargets(cache, carDriver, Statics.BASE_POSITION).size() == 2;
-		assert me.getTargets(cache, carDriver, Statics.BASE_POSITION).contains(ourFerrari);
-		assert you.getTargets(cache, carDriver, Statics.BASE_POSITION).contains(ourFerrari);
-		assert ayrton.getTargets(cache, carDriver, Statics.BASE_POSITION).contains(ourFerrari);
+		assert me.getTargets(carDriver, Statics.BASE_POSITION).contains(myBmw);
+		assert ayrton.getTargets(carDriver, Statics.BASE_POSITION).contains(myBmw);
+		assert !ayrton.getTargets(sportsCarPilot, Statics.BASE_POSITION).contains(myBmw) : ayrton.getTargets(carDriver);
+		assert me.getTargets(carDriver, Statics.BASE_POSITION).size() == 2;
+		assert you.getTargets(carDriver, Statics.BASE_POSITION).contains(yourAudi);
+		assert ayrton.getTargets(carDriver, Statics.BASE_POSITION).contains(yourAudi);
+		assert you.getTargets(carDriver, Statics.BASE_POSITION).size() == 2;
+		assert me.getTargets(carDriver, Statics.BASE_POSITION).contains(ourFerrari);
+		assert you.getTargets(carDriver, Statics.BASE_POSITION).contains(ourFerrari);
+		assert ayrton.getTargets(carDriver, Statics.BASE_POSITION).contains(ourFerrari);
 
 	}
 
 	public void testCountAncestor() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation relation = vehicle.setRelation(cache, "pilot", human);
+		Relation relation = vehicle.setRelation("pilot", human);
 		assert relation.getComponents().size() == 2 : relation.getComponents().size();
 	}
 
 	public void testDependency() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation relationPilot = vehicle.setRelation(cache, "pilot", human);
+		Relation relationPilot = vehicle.setRelation("pilot", human);
 		Type pilot = relationPilot.getImplicit();
-		assert cache.getEngine().getInheritings(cache).containsAll(Arrays.asList(vehicle, human, pilot));
+		assert cache.getEngine().getInheritings().containsAll(Arrays.asList(vehicle, human, pilot));
 	}
 
 	public void testIsRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation relation = vehicle.setRelation(cache, "pilot", human);
+		Relation relation = vehicle.setRelation("pilot", human);
 		assert !relation.inheritsFrom(vehicle);
 		assert !relation.inheritsFrom(human);
 		assert relation.inheritsFrom(relation.getImplicit());
@@ -1143,11 +1136,11 @@ public class RelationTest extends AbstractTest {
 	}
 
 	public void testIsTernaryRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type level = cache.newType("Level");
 		Type human = cache.newType("Human");
-		Relation humanGames = human.setRelation(cache, "Games", car, level);
+		Relation humanGames = human.setRelation("Games", car, level);
 		assert humanGames.isAttributeOf(human);
 		assert humanGames.inheritsFrom(humanGames.getImplicit());
 		assert !humanGames.inheritsFrom(human);
@@ -1156,264 +1149,272 @@ public class RelationTest extends AbstractTest {
 	}
 
 	public void testOnegetRelationsSnapshot() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type human = cache.newType("Human");
-		Relation carHuman = car.setRelation(cache, "pilot", human);
-		assert car.getRelations(cache).size() == 1 : car.getRelations(cache);
-		assert car.getRelations(cache).contains(carHuman) : car.getRelations(cache);
+		Relation carHuman = car.setRelation("pilot", human);
+		assert car.getRelations().size() == 1 : car.getRelations();
+		assert car.getRelations().contains(carHuman) : car.getRelations();
 	}
 
 	public void testTwogetRelationsSnapshot() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type human = cache.newType("Human");
-		Relation pilot = car.setRelation(cache, "pilot", human);
-		Relation passenger = car.setRelation(cache, "passenger", human);
-		assert car.getRelations(cache).size() == 2 : car.getRelations(cache);
-		assert car.getRelations(cache).contains(pilot) : car.getRelations(cache);
-		assert car.getRelations(cache).contains(passenger) : car.getRelations(cache);
+		Relation pilot = car.setRelation("pilot", human);
+		Relation passenger = car.setRelation("passenger", human);
+		assert car.getRelations().size() == 2 : car.getRelations();
+		assert car.getRelations().contains(pilot) : car.getRelations();
+		assert car.getRelations().contains(passenger) : car.getRelations();
 	}
 
 	public void testSuperOnegetRelationsSnapshot() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
+		Type car = vehicle.newSubType("Car");
 		Type human = cache.newType("Human");
-		Relation vehicleHuman = vehicle.setRelation(cache, "pilot", human);
-		assert car.getRelations(cache).size() == 1 : car.getRelations(cache);
-		assert car.getRelations(cache).contains(vehicleHuman) : car.getRelations(cache);
+		Relation vehicleHuman = vehicle.setRelation("pilot", human);
+		assert car.getRelations().size() == 1 : car.getRelations();
+		assert car.getRelations().contains(vehicleHuman) : car.getRelations();
 	}
 
 	public void testSuperTwogetRelationsSnapshot() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType(cache, "Car");
+		Type car = vehicle.newSubType("Car");
 		Type human = cache.newType("Human");
-		Relation pilot = vehicle.setRelation(cache, "pilot", human);
-		Relation passenger = vehicle.setRelation(cache, "passenger", human);
-		assert car.getRelations(cache).size() == 2 : car.getRelations(cache);
-		assert car.getRelations(cache).contains(pilot) : car.getRelations(cache);
-		assert car.getRelations(cache).contains(passenger) : car.getRelations(cache);
+		Relation pilot = vehicle.setRelation("pilot", human);
+		Relation passenger = vehicle.setRelation("passenger", human);
+		assert car.getRelations().size() == 2 : car.getRelations();
+		assert car.getRelations().contains(pilot) : car.getRelations();
+		assert car.getRelations().contains(passenger) : car.getRelations();
 	}
 
 	public void testDuplicateRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation humanPilotVehicle = vehicle.setRelation(cache, "pilot", human);
-		Relation humanPilotVehicle2 = vehicle.setRelation(cache, "pilot", human);
-		assert vehicle.getAttributes(cache).contains(humanPilotVehicle);
+		Relation humanPilotVehicle = vehicle.setRelation("pilot", human);
+		Relation humanPilotVehicle2 = vehicle.setRelation("pilot", human);
+		assert vehicle.getAttributes().contains(humanPilotVehicle);
 		assert humanPilotVehicle == humanPilotVehicle2;
 	}
 
 	public void testGetRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation humanPilotVehicle = human.setRelation(cache, "pilot", vehicle);
-		Relation getRelation = human.getRelation(cache, "pilot");
+		Relation humanPilotVehicle = human.setRelation("pilot", vehicle);
+		Relation getRelation = human.getRelation("pilot");
 		assert getRelation != null;
 		assert getRelation.equals(humanPilotVehicle);
-		assert human.getRelation(cache, "passenger") == null;
+		assert human.getRelation("passenger") == null;
 	}
 
 	public void testGetRelationWithTargets() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type bike = cache.newType("Bike");
 		Type human = cache.newType("Human");
-		Relation humanPilot = human.setRelation(cache, "pilot", vehicle, bike);
-		Relation getRelation = human.getRelation(cache, "pilot");
-		assert human.getAttribute(cache, "pilot") != null;
+		Relation humanPilot = human.setRelation("pilot", vehicle, bike);
+		Relation getRelation = human.getRelation("pilot");
+		assert human.getAttribute("pilot") != null;
 		assert getRelation != null;
 		assert getRelation.equals(humanPilot);
-		assert human.getRelation(cache, "passenger") == null;
+		assert human.getRelation("passenger") == null;
 	}
 
 	// public void testSubRelation() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
-	// Type car = vehicle.newSubType(cache, "Car");
+	// Type car = vehicle.newSubType( "Car");
 	// Type human = cache.newType("Human");
-	// Relation possessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
-	// Relation possessCar = human.addSubRelation(cache, possessVehicle, "HumanPossessCar", car);
-	// assert human.getRelations(cache).size() == 1;
-	// assert human.getRelations(cache).contains(possessCar);
+	// Relation possessVehicle = human.addRelation( "HumanPossessVehicle", vehicle);
+	// Relation possessCar = human.addSubRelation( possessVehicle, "HumanPossessCar", car);
+	// assert human.getRelations().size() == 1;
+	// assert human.getRelations().contains(possessCar);
 	// assert possessCar.inheritsFrom(possessVehicle);
 	// }
 
 	// public void testSubRelationSymetric() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicle = cache.newType("Vehicle");
-	// Type car = vehicle.newSubType(cache, "Car");
+	// Type car = vehicle.newSubType( "Car");
 	// Type human = cache.newType("Human");
-	// Type man = human.newSubType(cache, "Man");
-	// Relation humanPossessVehicle = human.addRelation(cache, "HumanPossessVehicle", vehicle);
-	// Relation manPossessCar = man.addSubRelation(cache, humanPossessVehicle, "ManPossessCar", car);
-	// assert human.getRelations(cache).size() == 1;
-	// assert human.getRelations(cache).contains(humanPossessVehicle);
-	// assert man.getRelations(cache).size() == 1;
-	// assert man.getRelations(cache).contains(manPossessCar);
+	// Type man = human.newSubType( "Man");
+	// Relation humanPossessVehicle = human.addRelation( "HumanPossessVehicle", vehicle);
+	// Relation manPossessCar = man.addSubRelation( humanPossessVehicle, "ManPossessCar", car);
+	// assert human.getRelations().size() == 1;
+	// assert human.getRelations().contains(humanPossessVehicle);
+	// assert man.getRelations().size() == 1;
+	// assert man.getRelations().contains(manPossessCar);
 	// assert manPossessCar.inheritsFrom(humanPossessVehicle);
 	// }
 
 	public void testTargetsAncestor() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation possessVehicle = human.setRelation(cache, "HumanPossessVehicle", vehicle);
+		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 		assert possessVehicle.getTargetComponent().equals(vehicle);
 	}
 
 	public void testTargetsAncestorWithMultipleTarget() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation possessVehicle = human.setRelation(cache, "HumanPossessVehicle", vehicle, human);
+		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle, human);
 		assert possessVehicle.getTargetComponent().equals(vehicle);
 		assert possessVehicle.getComponent(Statics.SECOND_TARGET_POSITION).equals(human);
 	}
 
 	public void testUnidirectionalRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation possessVehicle = human.setRelation(cache, "HumanPossessVehicle", vehicle);
-		assert human.getRelations(cache).size() == 1;
-		assert human.getRelations(cache).contains(possessVehicle);
-		assert human.getRelation(cache, "HumanPossessVehicle").equals(possessVehicle);
-		assert vehicle.getRelation(cache, "HumanPossessVehicle").equals(possessVehicle);
+		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
+		assert human.getRelations().size() == 1;
+		assert human.getRelations().contains(possessVehicle);
+		assert human.getRelation("HumanPossessVehicle").equals(possessVehicle);
+		assert vehicle.getRelation("HumanPossessVehicle").equals(possessVehicle);
 	}
 
 	public void testBidirectionalRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation possessVehicle = human.setRelation(cache, "HumanPossessVehicle", vehicle);
+		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 
-		Snapshot<Relation> vehicleRelations = vehicle.getRelations(cache);
-		possessVehicle.enableMultiDirectional(cache);
-		assert human.getRelations(cache).contains(possessVehicle);
+		Snapshot<Relation> vehicleRelations = vehicle.getRelations();
+		possessVehicle.enableMultiDirectional();
+		assert human.getRelations().contains(possessVehicle);
 		assert vehicleRelations.contains(possessVehicle) : vehicleRelations + " " + possessVehicle;
 	}
 
 	public void testRelationToHimself() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
-		Relation brother = human.setRelation(cache, "brother", human);
-		assert human.getRelations(cache).size() == 1;
-		assert human.getRelations(cache).contains(brother);
-		assert human.getRelation(cache, "brother").equals(brother);
+		Relation brother = human.setRelation("brother", human);
+		brother.enableMultiDirectional();
+		assert human.getRelations().size() == 1;
+		assert human.getRelations().contains(brother);
+		assert human.getRelation("brother").equals(brother);
+
+		Generic michael = human.newInstance("michael");
+		Generic quentin = human.newInstance("quentin");
+		Link holder = michael.bind(brother, quentin);
+
+		assert Statics.BASE_POSITION == michael.getBasePos(brother);
+		assert ((GenericImpl) brother).getComponentsPositions(michael, quentin).equals(Arrays.asList(0, 1));
+		Type otherType = cache.newType("OtherType");
+		assert ((GenericImpl) brother).getComponentsPositions(michael, quentin, otherType).equals(Arrays.asList(0, 1, 2));
+		assert ((GenericImpl) brother).getComponentsPositions(otherType, michael, quentin).equals(Arrays.asList(2, 0, 1));
+
+		assert ((GenericImpl) michael).getPositions(brother).equals(Arrays.asList(0, 1));
 	}
 
 	public void testGetLinkFromTarget() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		Relation possessVehicle = human.setRelation(cache, "HumanPossessVehicle", vehicle);
-		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Generic myHuman = human.newInstance(cache, "myHuman");
-		Link possession = myHuman.setLink(cache, possessVehicle, "possession", myVehicle);
+		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
+		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myHuman = human.newInstance("myHuman");
+		Link possession = myHuman.setLink(possessVehicle, "possession", myVehicle);
 		assert possessVehicle.getTargetComponent().equals(vehicle);
 
-		assert myVehicle.getLinks(cache, possessVehicle).size() == 1;
-		assert myHuman.getLinks(cache, possessVehicle).size() == 1;
-		assert myVehicle.getLinks(cache, possessVehicle).contains(possession);
-		assert myHuman.getLinks(cache, possessVehicle).contains(possession);
+		assert myVehicle.getLinks(possessVehicle).size() == 1;
+		assert myHuman.getLinks(possessVehicle).size() == 1;
+		assert myVehicle.getLinks(possessVehicle).contains(possession);
+		assert myHuman.getLinks(possessVehicle).contains(possession);
 	}
 
 	public void testGetLinkFromTarget2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		Type road = cache.newType("Road");
-		Relation drivesOn = human.setRelation(cache, "DrivingOn", vehicle, road);
-		Generic myVehicle = vehicle.newInstance(cache, "myVehicle");
-		Generic myHuman = human.newInstance(cache, "myHuman");
-		Generic myRoad = road.newInstance(cache, "myRoad");
-		Link driving = myHuman.setLink(cache, drivesOn, "myDrivingOn", myVehicle, myRoad);
+		Relation drivesOn = human.setRelation("DrivingOn", vehicle, road);
+		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myHuman = human.newInstance("myHuman");
+		Generic myRoad = road.newInstance("myRoad");
+		Link driving = myHuman.setLink(drivesOn, "myDrivingOn", myVehicle, myRoad);
 		assert drivesOn.getTargetComponent().equals(vehicle);
 
-		assert myRoad.getLinks(cache, drivesOn).size() == 1;
-		assert myVehicle.getLinks(cache, drivesOn).size() == 1;
-		assert myHuman.getLinks(cache, drivesOn).size() == 1;
-		assert myRoad.getLinks(cache, drivesOn).contains(driving);
-		assert myVehicle.getLinks(cache, drivesOn).contains(driving);
-		assert myHuman.getLinks(cache, drivesOn).contains(driving);
+		assert myRoad.getLinks(drivesOn).size() == 1;
+		assert myVehicle.getLinks(drivesOn).size() == 1;
+		assert myHuman.getLinks(drivesOn).size() == 1;
+		assert myRoad.getLinks(drivesOn).contains(driving);
+		assert myVehicle.getLinks(drivesOn).contains(driving);
+		assert myHuman.getLinks(drivesOn).contains(driving);
 	}
 
 	public void testDefaultReverseLinks2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic myAudi = car.newInstance(cache, "myAudi");
-		Generic myMercedes = car.newInstance(cache, "myMercedes");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic myAudi = car.newInstance("myAudi");
+		Generic myMercedes = car.newInstance("myMercedes");
 		Type color = cache.newType("Color");
-		Generic red = color.newInstance(cache, "red");
+		Generic red = color.newInstance("red");
 
-		Relation carColor = car.setRelation(cache, "carColor", color);
-		Link carRed = car.bind(cache, carColor, red);
+		Relation carColor = car.setRelation("carColor", color);
+		car.bind(carColor, red);
 
-		((Attribute) carRed).deduct(cache);
-
-		assert red.getLinks(cache, carColor).size() == 3 : red.getLinks(cache, carColor);
-		assert red.getTargets(cache, carColor, Statics.BASE_POSITION).containsAll(Arrays.asList(new Generic[] { myBmw, myAudi, myMercedes }));
+		assert red.getLinks(carColor).size() == 3 : red.getLinks(carColor);
+		assert red.getTargets(carColor, Statics.BASE_POSITION).containsAll(Arrays.asList(new Generic[] { myBmw, myAudi, myMercedes }));
 	}
 
 	public void testDefaultReverseLinks() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myBmw = car.newInstance(cache, "myBmw");
-		Generic myAudi = car.newInstance(cache, "myAudi");
-		Generic myMercedes = car.newInstance(cache, "myMercedes");
+		Generic myBmw = car.newInstance("myBmw");
+		Generic myAudi = car.newInstance("myAudi");
+		Generic myMercedes = car.newInstance("myMercedes");
 		Type color = cache.newType("Color");
-		Generic red = color.newInstance(cache, "red");
-		Generic blue = color.newInstance(cache, "blue");
-		Relation carColor = car.setRelation(cache, "carColor", color).enableSingularConstraint(cache);
-		Link carRed = car.bind(cache, carColor, red);
-		myBmw.bind(cache, carColor, red);
-		((GenericImpl) myAudi).cancel(cache, carRed);
-		myAudi.bind(cache, carColor, blue);
+		Generic red = color.newInstance("red");
+		Generic blue = color.newInstance("blue");
+		Relation carColor = car.setRelation("carColor", color).enableSingularConstraint();
+		Link carRed = car.bind(carColor, red);
+		myBmw.bind(carColor, red);
+		myAudi.setLink(carRed, null, red);
+		myAudi.bind(carColor, blue);
 
-		((Attribute) carRed).deduct(cache);
-		assert red.getLinks(cache, carColor).size() == 2 : red.getLinks(cache, carColor);
-		assert red.getTargets(cache, carColor, Statics.BASE_POSITION).containsAll(Arrays.asList(new Generic[] { myMercedes, myBmw }));
+		assert red.getLinks(carColor).size() == 2 : red.getLinks(carColor);
+		assert red.getTargets(carColor, Statics.BASE_POSITION).containsAll(Arrays.asList(new Generic[] { myMercedes, myBmw }));
 	}
 
 	public void testDiamantKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type person = cache.newType("Person");
-		final Attribute age = person.setProperty(cache, "Age");
-		person.setValue(cache, age, "25");
+		final Attribute age = person.setProperty("Age");
+		person.setValue(age, "25");
 
-		final Type student = person.newSubType(cache, "Student");
-		student.setValue(cache, age, "30");
+		final Type student = person.newSubType("Student");
+		student.setValue(age, "30");
 
-		final Type teacher = person.newSubType(cache, "Teacher");
-		teacher.setValue(cache, age, "20");
+		final Type teacher = person.newSubType("Teacher");
+		teacher.setValue(age, "20");
 
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				cache.newSubType("doctoral", student, teacher).getValue(cache, age);
-			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		try {
+			cache.newSubType("doctoral", student, teacher).getValue(age);
+		} catch (IllegalStateException ignore) {
 
+		}
 	}
 
 	public void testDiamantOK() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type person = cache.newType("Person");
-		Attribute age = person.setProperty(cache, "Age");
-		person.setValue(cache, age, "25");
+		Attribute age = person.setProperty("Age");
+		person.setValue(age, "25");
 
-		Type student = person.newSubType(cache, "Student");
-		student.setValue(cache, age, "30");
+		Type student = person.newSubType("Student");
+		student.setValue(age, "30");
 
-		Type teacher = person.newSubType(cache, "Teacher");
+		Type teacher = person.newSubType("Teacher");
 
-		assert "30" == cache.newSubType("doctoral", student, teacher).getValue(cache, age);
+		assert "30" == cache.newSubType("doctoral", student, teacher).getValue(age);
 	}
 
 }

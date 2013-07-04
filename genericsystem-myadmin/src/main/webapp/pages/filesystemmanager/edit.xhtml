@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:gs="http://java.sun.com/jsf/composite/gs">
+
+	<rich:panel id="editfilesystemmanager" layout="block"
+		styleClass="fullWidth fullHeight" bodyClass="fullHeight">
+		<h:inputTextarea id="code" name="code"
+			value="#{fileSystemBean.content}"
+			rendered="#{fileSystemBean.fileSelected}">
+			<f:ajax render="editfilesystemmanager" execute="code" event="change" />
+		</h:inputTextarea>
+
+		<script>
+			var editor = CodeMirror.fromTextArea(#{rich:element('code')}, {
+				mode : {
+					name : "xml",
+					alignCDATA : true
+				},
+				continuousScanning: 500,
+				lineNumbers : true
+			});
+		</script>
+	</rich:panel>
+
+</ui:composition>

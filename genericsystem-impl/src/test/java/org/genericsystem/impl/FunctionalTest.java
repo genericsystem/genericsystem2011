@@ -11,45 +11,41 @@ import org.testng.annotations.Test;
 
 @Test
 public class FunctionalTest extends AbstractTest {
-	
+
 	@Test
 	public void getCarInstancesWithPowerHigherThan90HP() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		final Attribute carPower = car.setProperty(cache, "Power");
-		Generic myCar = car.newInstance(cache, "myCar");
-		myCar.setValue(cache, carPower, 233);
-		Generic yourCar = car.newInstance(cache, "yourCar");
-		yourCar.setValue(cache, carPower, 89);
-		Snapshot<Generic> carInstancesWithPowerHigherThan90HP = car.getAllInstances(cache).filter(new Filter<Generic>() {
+		final Attribute carPower = car.setProperty( "Power");
+		Generic myCar = car.newInstance( "myCar");
+		myCar.setValue( carPower, 233);
+		Generic yourCar = car.newInstance( "yourCar");
+		yourCar.setValue( carPower, 89);
+		Snapshot<Generic> carInstancesWithPowerHigherThan90HP = car.getAllInstances().filter(new Filter<Generic>() {
 			@Override
 			public boolean isSelected(Generic generic) {
-				return generic.<Integer> getValue(cache, carPower) >= 90;
+				return generic.<Integer> getValue( carPower) >= 90;
 			}
 		});
 		assert carInstancesWithPowerHigherThan90HP.contains(myCar);
 		assert !carInstancesWithPowerHigherThan90HP.contains(yourCar);
 		assert carInstancesWithPowerHigherThan90HP.size() == 1;
-		carInstancesWithPowerHigherThan90HP.log();
 	}
-	
+
 	@Test
 	public void testSnaphotIsAware() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		
-		Snapshot<Generic> snapshot = vehicle.getAllSubTypes(cache);
+
+		Snapshot<Generic> snapshot = vehicle.getSubTypes();
+		assert snapshot.isEmpty();
+
+		Type car = vehicle.newSubType( "Car");
 		assert snapshot.size() == 1;
-		assert snapshot.contains(vehicle);
-		
-		Type car = vehicle.newSubType(cache, "Car");
-		assert snapshot.size() == 2;
-		assert snapshot.contains(vehicle);
 		assert snapshot.contains(car);
-		
-		car.remove(cache);
-		assert snapshot.size() == 1;
-		assert snapshot.contains(vehicle);
+
+		car.remove();
+		assert snapshot.isEmpty();
 		assert !snapshot.contains(car);
 	}
 }

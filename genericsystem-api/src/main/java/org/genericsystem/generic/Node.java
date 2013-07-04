@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Context;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 
@@ -17,40 +15,54 @@ import org.genericsystem.core.Snapshot;
 public interface Node extends Holder {
 
 	/**
-	 * Add a Node.
+	 * Add a new node or throws an exception if this node already exists
 	 * 
-	 * @param cache
-	 *            The reference Cache.
 	 * @param value
 	 *            The node name.
 	 * @param targets
 	 *            The targets.
 	 * @return Return the Node.
 	 */
-	<T extends Node> T addNode(Cache cache, Serializable value, Generic... targets);
+	<T extends Node> T addNode(Serializable value, Generic... targets);
 
 	/**
-	 * Add a Node that inherits of this.
+	 * Add a new node or returns this node if already exists.
 	 * 
-	 * @param cache
-	 *            The reference Cache.
+	 * @param value
+	 *            The node name.
+	 * @param targets
+	 *            The targets.
+	 * @return Return the Node.
+	 */
+	<T extends Node> T setNode(Serializable value, Generic... targets);
+
+	/**
+	 * Add an inheriting subNode if not exists, return existent inheriting subNode otherwise.
+	 * 
 	 * @param value
 	 *            The node name.
 	 * @param targets
 	 *            The targets.
 	 * @return Return the subNode.
 	 */
-	<T extends Node> T addSubNode(Cache cache, Serializable value, Generic... targets);
+	<T extends Node> T setSubNode(Serializable value, Generic... targets);
 
 	/**
 	 * Returns the children of this.
 	 * 
-	 * @param context
-	 *            The reference Context.
 	 * @see Snapshot
 	 * @return Return the children.
 	 */
-	<T extends Node> Snapshot<T> getChildren(Context context);
+	<T extends Node> Snapshot<T> getChildren();
+
+	/**
+	 * Returns the child of this.
+	 * 
+	 * @Param value The value
+	 * @see Snapshot
+	 * @return Return the children.
+	 */
+	<T extends Node> T getChild(Serializable value);
 
 	/**
 	 * Traverse the Tree.
@@ -62,18 +74,12 @@ public interface Node extends Holder {
 
 	public abstract static class Visitor {
 
-		protected final Context context;
-
-		public Visitor(Context context) {
-			this.context = context;
-		}
-
 		protected Set<Node> alreadyVisited = new HashSet<>();
 
 		public void traverse(Node node) {
 			if (alreadyVisited.add(node)) {
 				before(node);
-				for (Node child : node.getChildren(context))
+				for (Node child : node.getChildren())
 					traverse(child);
 				after(node);
 			}

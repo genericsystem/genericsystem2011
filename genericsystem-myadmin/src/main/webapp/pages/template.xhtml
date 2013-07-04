@@ -10,29 +10,57 @@
 	xmlns:rich="http://richfaces.org/rich">
 
 <h:head>
-	<f:loadBundle basename="bundles/message" var="msg" />
+	<!-- f:loadBundle basename="bundles/messages" var="msg" /-->
 	<title><h:outputText value="#{msg.application_title}" /></title>
 	<link rel="stylesheet" type="text/css"
 		href="#{facesContext.externalContext.requestContextPath}/resources/css/myadmin.css" />
+	<link rel="stylesheet" type="text/css"
+		href="#{facesContext.externalContext.requestContextPath}/resources/css/codemirror.css" />
+	<script
+		src="#{facesContext.externalContext.requestContextPath}/resources/js/codemirror.js" />
+	<script
+		src="#{facesContext.externalContext.requestContextPath}/resources/js/xml.js" />
+	<script type="text/javascript">
+		var rightClick = false;
+		var posx = 0;
+		var posy = 0;
+		document.oncontextmenu = function() {
+			return false;
+		}
+		function posSouris(e) {
+			if (!e)
+				var e = window.event;
+			if (e.pageX || e.pageY) {
+				posx = e.pageX;
+				posy = e.pageY;
+			} else if (e.clientX || e.clientY) {
+				posx = e.clientX + document.body.scrollLeft
+						+ document.documentElement.scrollLeft;
+				posy = e.clientY + document.body.scrollTop
+						+ document.documentElement.scrollTop;
+			}
+		}
+		/* var cumulativeOffset = function(element) {
+		    var top = 0, left = 0;
+		    do {
+		        top += element.offsetTop  || 0;
+		        left += element.offsetLeft || 0;
+		        element = element.offsetParent;
+		    } while(element);
+
+		    return {
+		        top: top,
+		        left: left
+		    };
+		}; */
+	</script>
 </h:head>
 
 <h:body>
-	<f:metadata>
-		<f:event type="preRenderView"
-			listener="#{conversationManager.beginConversation}" />
-	</f:metadata>
-
-	<h:form>
-		<ui:include src="header/header.xhtml"></ui:include>
-
-		<rich:messages ajaxRendered="true" styleClass="richMessages" />
-
-		<h:panelGrid styleClass="menu" columns="2" columnClasses="leftColumn, rightColumn">
-			<ui:include src="menu/menu.xhtml" />
-			<ui:insert name="bodySection" />
-		</h:panelGrid>
+	<a4j:queue requestDelay="50" ignoreDupResponses="true" />
+	<h:form id="form">
+		<ui:insert name="bodySection" />
 	</h:form>
-
 </h:body>
 
 </html>

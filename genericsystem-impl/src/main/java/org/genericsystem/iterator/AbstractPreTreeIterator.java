@@ -5,6 +5,11 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 
+/**
+ * @author Nicolas Feybesse
+ * 
+ * @param <T>
+ */
 public abstract class AbstractPreTreeIterator<T> extends HashSet<T> implements Iterator<T> {
 
 	private static final long serialVersionUID = -518282246760045090L;

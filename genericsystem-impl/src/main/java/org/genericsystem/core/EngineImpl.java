@@ -5,38 +5,34 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.constraints.axed.RequiredConstraintImpl;
-import org.genericsystem.constraints.axed.SingularConstraintImpl;
-import org.genericsystem.constraints.simple.AliveConstraintImpl;
-import org.genericsystem.constraints.simple.ConcreteInheritanceConstraintImpl;
-import org.genericsystem.constraints.simple.DuplicateStructuralValueConstraintImpl;
-import org.genericsystem.constraints.simple.EngineConsistencyConstraintImpl;
-import org.genericsystem.constraints.simple.NotNullConstraintImpl;
-import org.genericsystem.constraints.simple.OptimisticLockConstraintImpl;
-import org.genericsystem.constraints.simple.PhantomConstraintImpl;
-import org.genericsystem.constraints.simple.PropertyConstraintImpl;
-import org.genericsystem.constraints.simple.SingularInstanceConstraintImpl;
-import org.genericsystem.constraints.simple.SuperRuleConstraintImpl;
-import org.genericsystem.constraints.simple.UnduplicateBindingConstraintImpl;
-import org.genericsystem.constraints.simple.UniqueConstraintImpl;
-import org.genericsystem.constraints.simple.VirtualConstraintImpl;
-import org.genericsystem.core.Cache;
-import org.genericsystem.core.Config;
-import org.genericsystem.core.Context;
-import org.genericsystem.core.Engine;
-import org.genericsystem.core.Factory;
-import org.genericsystem.core.Generic;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
-import org.genericsystem.system.CascadeRemoveSystemProperty;
-import org.genericsystem.system.MetaAttribute;
-import org.genericsystem.system.MetaRelation;
-import org.genericsystem.system.MultiDirectionalSystemProperty;
-import org.genericsystem.system.NoInheritanceSystemProperty;
-import org.genericsystem.system.ReferentialIntegritySystemProperty;
+import org.genericsystem.map.PropertiesMapProvider;
+import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
+import org.genericsystem.systemproperties.MetaAttribute;
+import org.genericsystem.systemproperties.MetaRelation;
+import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
+import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
+import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
+import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
+import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
+import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.AloneAutomaticsConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.EngineConsistencyConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.OptimisticLockConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.PhantomConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.SingularInstanceConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.UnduplicateBindingConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.UniqueConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.UniqueStructuralValueConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -66,17 +62,23 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	final void restoreEngine(long designTs, long birthTs, long lastReadTs, long deathTs) {
-		restore(ENGINE_VALUE, SystemGeneric.META, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
+		restore(ENGINE_VALUE, SystemGeneric.META, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY, false);
 		assert components.length == 0;
 	}
 
+	@Override
 	public Factory getFactory() {
 		return factory;
 	}
 
+	@SuppressWarnings("unchecked")
+	<T extends Generic> T buildComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
+		return (T) ((GenericImpl) getFactory().newGeneric(clazz)).initializeComplex(implicit, supers, components, automatic);
+	}
+
 	@Override
 	public Cache newCache() {
-		return getFactory().newCache(new Transaction(this));
+		return getFactory().newCache(this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -92,8 +94,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T find(Context context, Class<?> clazz) {
-		return (T) systemCache.get(context, clazz);
+	public <T extends Generic> T find(Class<?> clazz) {
+		return (T) systemCache.get(clazz);
 	}
 
 	@Override
@@ -120,6 +122,31 @@ public class EngineImpl extends GenericImpl implements Engine {
 		return this.equals(generic);
 	}
 
+	@Override
+	public int getMetaLevel() {
+		return SystemGeneric.META;
+	}
+
+	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
+
+	public Cache start(Cache cache) {
+		cacheLocal.set(cache);
+		return cache;
+	}
+
+	public void stop(Cache cache) {
+		assert cacheLocal.get() == cache;
+		cacheLocal.set(null);
+	}
+
+	@Override
+	public CacheImpl getCurrentCache() {
+		Cache currentCache = cacheLocal.get();
+		if (currentCache == null)
+			currentCache = start(factory.getCacheLocal());
+		return (CacheImpl) currentCache;
+	}
+
 	private class SystemCache extends HashMap<Class<?>, Generic> {
 
 		private static final long serialVersionUID = 1150085123612887245L;
@@ -128,49 +155,52 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
-			CacheImpl cache = new CacheImpl(new Transaction(EngineImpl.this));
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
-					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, NotNullConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class,
-					AliveConstraintImpl.class, UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
-					UnduplicateBindingConstraintImpl.class, DuplicateStructuralValueConstraintImpl.class);
+					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class,
+					UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
+					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class, AloneAutomaticsConstraintImpl.class);
+
+			CacheImpl cache = (CacheImpl) start(newCache());
 			for (Class<?> clazz : classes)
 				if (get(clazz) == null)
-					bind(cache, clazz);
+					bind(clazz);
 			for (Class<?> clazz : userClasses)
 				if (get(clazz) == null)
-					bind(cache, clazz);
+					bind(clazz);
 			cache.flush();
+			stop(cache);
 			startupTime = false;
 			return this;
 		}
 
 		@SuppressWarnings("unchecked")
-		public <T extends Generic> T get(Context context, Class<?> clazz) {
+		public <T extends Generic> T get(Class<?> clazz) {
 			T systemProperty = (T) super.get(clazz);
 			if (systemProperty != null)
 				return systemProperty;
-			if (startupTime && context instanceof Cache)
-				return bind((CacheImpl) context, clazz);
+			if (startupTime && getCurrentCache() instanceof Cache)
+				return bind(clazz);
 			throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T extends Generic> T bind(CacheImpl cache, Class<?> clazz) {
+		private <T extends Generic> T bind(Class<?> clazz) {
 			T result;
+			CacheImpl cache = getCurrentCache();
 			if (Engine.class.equals(clazz))
 				result = (T) EngineImpl.this;
 			if (MetaAttribute.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this });
 				if (result == null)
-					result = cache.insert(new GenericImpl().initializeComplex(EngineImpl.this, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }));
+					result = cache.insert(new GenericImpl().initializeComplex(EngineImpl.this, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }, false));
 			} else if (MetaRelation.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (result == null)
-					result = cache.insert(new GenericImpl().initializeComplex(get(MetaAttribute.class), new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }));
+					result = cache.insert(new GenericImpl().initializeComplex(get(MetaAttribute.class).getImplicit(), new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }, false));
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);
-			((GenericImpl) result).mountConstraints(cache, clazz);
+			((GenericImpl) result).mountConstraints(clazz);
 			cache.triggersDependencies(clazz);
 			return result;
 		}
@@ -180,4 +210,5 @@ public class EngineImpl extends GenericImpl implements Engine {
 	public void close() {
 		archiver.close();
 	}
+
 }

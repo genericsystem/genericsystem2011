@@ -6,7 +6,7 @@
 		<groupId>org.genericsystem</groupId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>genericsystem-file</artifactId>
 	<name>Generic System File</name>
 	<packaging>jar</packaging>
@@ -16,10 +16,25 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.genericsystem</groupId>
 			<artifactId>genericsystem-api</artifactId>
 			<version>1.0-SNAPSHOT</version>
-			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.genericsystem</groupId>
+			<artifactId>genericsystem-impl</artifactId>
+			<version>1.0-SNAPSHOT</version>
+<!-- 			<scope>test</scope> -->
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
