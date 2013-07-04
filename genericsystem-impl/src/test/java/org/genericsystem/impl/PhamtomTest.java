@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Iterator;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -36,19 +35,13 @@ public class PhamtomTest extends AbstractTest {
 		myCar.cancelAll(power, true);
 	}
 
-	public void test2() {
+	public void incoherentGetHolderIsEmpty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType("Car");
-		Attribute power = vehicle.setAttribute("power");
+		Type car = cache.newType("Car");
+		Attribute power = car.setAttribute("power");
 		Holder holder = car.setValue(power, "123");
-
 		Generic myCar = car.newInstance("myCar");
-
-		myCar.clearAllConcrete(holder);
-
-		Holder holder2 = myCar.setValue(power, "200");
-		myCar.cancelAll(holder2, true);
+		assert myCar.getHolders(holder).isEmpty();
 	}
 
 	public void testAliveWithStructural() {
