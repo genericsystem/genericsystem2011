@@ -732,27 +732,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (Iterator<T>) new AbstractSelectableLeafIterator(origin) {
 
 			@Override
-			protected Iterator<Generic> children(final Generic father) {
-				return new AbstractFilterIterator<Generic>(((GenericImpl) father).directInheritingsIterator()) {
-					@Override
-					public boolean isSelected() {
-						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
-						if (selected && ((GenericImpl) next).isPseudoStructural(pos))
-							if (getCurrentCache() instanceof CacheImpl)
-								((GenericImpl) next).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) next.getImplicit()).supers[0], null, SystemGeneric.CONCRETE));
-						return selected;
-					}
-				};
-			}
-
-			@Override
 			public boolean isSelectable() {
 				return next.isConcrete();
 			}
 
 			@Override
 			public final boolean isSelected(Generic candidate) {
-				throw new IllegalStateException();
+				boolean selected = ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos);
+				if (selected && ((GenericImpl) candidate).isPseudoStructural(pos))
+					if (getCurrentCache() instanceof CacheImpl)
+						((GenericImpl) candidate).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) candidate.getImplicit()).supers[0], null, SystemGeneric.CONCRETE));
+				return selected;
 			}
 		};
 	}
@@ -976,12 +966,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic superGeneric : supers)
 			s += "super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
 		s += "**********************************************************************\n";
-		for (Attribute attribute : getAttributes())
-			if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
-				s += "attribute : " + attribute + "\n";
-				for (Holder holder : getHolders(attribute))
-					s += "                          ----------> holder : " + holder + "\n";
-			}
+		// for (Attribute attribute : getAttributes())
+		// if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
+		// s += "attribute : " + attribute + "\n";
+		// for (Holder holder : getHolders(attribute))
+		// s += "                          ----------> holder : " + holder + "\n";
+		// }
 		s += "**********************************************************************\n";
 		return s;
 	}
