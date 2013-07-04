@@ -1,8 +1,10 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -953,11 +955,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		s += "toString    : " + this + "\n";
 		s += "meta        : " + getMeta() + "\n";
 		s += "value       : " + getValue() + "\n";
-		// s += "metaLevel   : " + getMetaLevel() + "\n";
+		s += "metaLevel   : " + getMetaLevel() + "\n";
 		s += "**********************************************************************\n";
-		// s += "design date : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
-		// s += "birth date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
-		// s += "death date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDeathTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "design date : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "birth date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "death date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDeathTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
 		s += "**********************************************************************\n";
 		for (Generic primary : getPrimaries())
 			s += "primary     : " + primary + " (" + System.identityHashCode(primary) + ")\n";
