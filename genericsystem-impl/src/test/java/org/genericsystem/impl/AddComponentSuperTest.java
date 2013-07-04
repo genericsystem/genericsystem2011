@@ -15,7 +15,6 @@ public class AddComponentSuperTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type power = cache.newType("power");
 		assert vehicle.getAttribute("power") == null;
-		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		power.addComponent(0, vehicle);
 		assert vehicle.getAttribute("power") != null;
 		assert vehicle.getAttribute("power").inheritsFrom(cache.getMetaAttribute());

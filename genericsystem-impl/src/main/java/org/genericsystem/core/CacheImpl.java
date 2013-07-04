@@ -131,7 +131,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	void removeWithAutomatics(Generic generic) throws RollbackException {
 		remove(generic);
 		Generic automatic = findAutomaticAlone(generic);
-		if (null != automatic)
+		if (null != automatic && isAlive(automatic))
 			remove(automatic);
 	}
 
@@ -380,7 +380,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}
 		}
 		T result = fastFindByInterfaces(implicit, interfaces, components);
-		log.info("implicit " + implicit.info() + " interfaces " + Arrays.toString(interfaces) + " / " + interfaces[0].info() + " components " + Arrays.toString(components) + " ### " + result);
 		if (result != null) {
 			if (!Objects.equals(result.getValue(), implicit.getValue()))
 				rollback(new FunctionalConsistencyViolationException(result.info()));
