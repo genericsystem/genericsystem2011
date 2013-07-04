@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Iterator;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -34,21 +33,6 @@ public class PhamtomTest extends AbstractTest {
 		Holder holder2 = myCar.setValue(power, "200");
 		assert holder2.isAlive();
 		myCar.cancelAll(power, true);
-	}
-
-	public void test2() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType("Car");
-		Attribute power = vehicle.setAttribute("power");
-		Holder holder = car.setValue(power, "123");
-
-		Generic myCar = car.newInstance("myCar");
-
-		myCar.clearAllConcrete(holder);
-
-		Holder holder2 = myCar.setValue(power, "200");
-		myCar.cancelAll(holder2, true);
 	}
 
 	public void testAliveWithStructural() {
