@@ -129,9 +129,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	void removeWithAutomatics(Generic generic) throws RollbackException {
+		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
+			throw new IllegalStateException();
 		remove(generic);
 		Generic automatic = findAutomaticAlone(generic);
-		if (null != automatic && isAlive(automatic))
+		if (null != automatic)
 			remove(automatic);
 	}
 
@@ -319,7 +321,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components) {
-		T result = bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, superTypes.length > 0, Generic.class), superTypes, components, false, null, false);
+		T result = bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, isAutomatic(superTypes, components), Generic.class), superTypes, components, false, null, false);
 		assert Objects.equals(value, result.getValue());
 		return result;
 	}
@@ -351,7 +353,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Class<?> specialize = Generic.class;
 		if (clazz.getSuperclass().equals(GenericImpl.class))
 			specialize = clazz;
-		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), true, specialize), findSupers(clazz), findComponents(clazz), false, clazz, false);
+		Generic[] components = findComponents(clazz);
+		Generic[] supers = findSupers(clazz);
+		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), findMetaLevel(clazz), isAutomatic(supers, components), specialize), supers, components, false, clazz, false);
+	}
+
+	boolean isAutomatic(Generic[] supers, Generic[] components) {
+		return components.length > 0 || ((supers.length == 1 && !supers[0].isEngine()) || supers.length > 1);
 	}
 
 	<T extends Generic> T bind(Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {
@@ -408,7 +416,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			implicit = newImplicit;
 			directSupers = connectionMap.adjust(directSupers);
 		}
-		log.info("implicit " + implicit.info() + " directSupers " + Arrays.toString(directSupers) + " components " + Arrays.toString(components));
 		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric(specializeGeneric)).initializeComplex(implicit, directSupers, components, automatic);
 		T superGeneric = this.<T> insert(newGeneric);
 		connectionMap.reBuild(orderedDependencies);

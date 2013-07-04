@@ -1,6 +1,5 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -8,6 +7,7 @@ import org.genericsystem.exception.ReferentialIntegrityConstraintViolationExcept
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.impl.ApiTest.Vehicle;
 import org.testng.annotations.Test;
 
 @Test
@@ -118,12 +118,13 @@ public class RemoveTest extends AbstractTest {
 
 	public void testRemoveSystemGeneric() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
-		cache.find(Vehicle.class).remove();
-	}
-
-	@SystemGeneric
-	public static class Vehicle {
-
+		boolean ignore = false;
+		try {
+			cache.find(Vehicle.class).remove();
+		} catch (IllegalStateException e) {
+			ignore = true;
+		}
+		assert ignore;
 	}
 
 }
