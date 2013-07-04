@@ -41,6 +41,6 @@ public class UniqueStructuralValueConstraintImpl extends Constraint implements B
 			return;
 		iterator.next();
 		if (iterator.hasNext() || !primary.isAutomatic())
-			throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());// + " direct : " + iterator.next().info());
+			throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
 	}
 }

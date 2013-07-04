@@ -30,7 +30,6 @@ public class PhamtomTest extends AbstractTest {
 
 		myCar.removeHolder(defaultPower);
 		assert myCar.getValue(power) == null;
-
 		myCar.setValue(power, "200");
 		myCar.clearAllConcrete(power);
 		assert myCar.getValue(power) == "123" : myCar.getValue(power);

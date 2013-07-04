@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
@@ -35,7 +36,7 @@ public class AddComponentSuperTest extends AbstractTest {
 		assert vehicleColor.getComponents().contains(color) : vehicleColor.getComponents();
 	}
 
-	public void removeComponentOnType() {
+	public void removeComponentOnAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute power = vehicle.addAttribute("power");
@@ -43,31 +44,15 @@ public class AddComponentSuperTest extends AbstractTest {
 		assert vehicle.getAttribute("power") == null;
 	}
 
-	public void addAndRemoveComponentOnType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type power = cache.newType("power");
-		assert vehicle.getAttribute("power") == null;
-		power = power.addComponent(0, vehicle);
-		assert vehicle.getAttribute("power") != null;
-		assert vehicle.getAttribute("power").inheritsFrom(cache.getMetaAttribute());
-		assert vehicle.getAttribute("power").getBaseComponent().equals(vehicle);
-		power.removeComponent(0, vehicle);
-		assert vehicle.getAttribute("power") == null;
-	}
-
-	public void addAndRemoveComponentOnArribute() {
+	public void removeComponentOnRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
-		Type vehicleColor = vehicle.addAttribute("VehicleColor");
-		assert vehicle.getRelation("VehicleColor") == null;
-		vehicleColor = vehicleColor.addComponent(1, color);
-		assert vehicle.getRelation("VehicleColor") != null;
-		assert vehicle.getRelation("VehicleColor").getComponent(0).equals(vehicle);
-		assert vehicle.getRelation("VehicleColor").getComponent(1).equals(color);
-		assert vehicle.getRelation("VehicleColor").inheritsFrom(cache.getMetaRelation());
-		assert vehicleColor.getComponents().contains(vehicle) : vehicleColor.getComponents();
-		assert vehicleColor.getComponents().contains(color) : vehicleColor.getComponents();
+		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
+		assert color.getAttribute("VehicleColor") != null;
+		vehicleColor.removeComponent(1, color);
+		assert color.getAttribute("VehicleColor") == null : color.getAttribute("VehicleColor");
+		assert vehicle.getAttribute("VehicleColor") != null;
 	}
+
 }

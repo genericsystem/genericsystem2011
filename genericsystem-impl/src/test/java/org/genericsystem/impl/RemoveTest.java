@@ -7,6 +7,7 @@ import org.genericsystem.exception.ReferentialIntegrityConstraintViolationExcept
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.impl.ApiTest.Vehicle;
 import org.testng.annotations.Test;
 
 @Test
@@ -26,7 +27,7 @@ public class RemoveTest extends AbstractTest {
 			public void intercept() {
 				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 				Type vehicle = cache.newType("Vehicle");
-				vehicle.newSubType( "Car");
+				vehicle.newSubType("Car");
 				vehicle.remove();
 			}
 		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
@@ -35,7 +36,7 @@ public class RemoveTest extends AbstractTest {
 	public void testRemoveAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute power = vehicle.setAttribute( "power");
+		Attribute power = vehicle.setAttribute("power");
 		power.remove();
 		assert !power.isAlive();
 		assert !cache.getEngine().getInheritings().contains(power);
@@ -63,9 +64,9 @@ public class RemoveTest extends AbstractTest {
 	public void testRemoveProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
-		Attribute height = window.setProperty( "Height");
-		Generic myWindow = window.newInstance( "MyWindow");
-		Holder myHeight1 = ((Attribute) myWindow).setValue( height, 165);
+		Attribute height = window.setProperty("Height");
+		Generic myWindow = window.newInstance("MyWindow");
+		Holder myHeight1 = ((Attribute) myWindow).setValue(height, 165);
 		myHeight1.remove();
 		assert cache.getEngine().getInheritings().contains(window);
 		assert cache.getEngine().getInheritings().contains(height.getImplicit());
@@ -99,7 +100,7 @@ public class RemoveTest extends AbstractTest {
 	public void testRemoveInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
-		Generic myWindow = window.newInstance( "myWindow");
+		Generic myWindow = window.newInstance("myWindow");
 		myWindow.remove();
 	}
 
@@ -109,10 +110,21 @@ public class RemoveTest extends AbstractTest {
 			public void intercept() {
 				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 				Type window = cache.newType("Window");
-				window.newInstance( "myWindow");
+				window.newInstance("myWindow");
 				window.remove();
 			}
 		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
+	}
+
+	public void testRemoveSystemGeneric() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
+		boolean ignore = false;
+		try {
+			cache.find(Vehicle.class).remove();
+		} catch (IllegalStateException e) {
+			ignore = true;
+		}
+		assert ignore;
 	}
 
 }
