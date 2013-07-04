@@ -35,15 +35,6 @@ public class PhamtomTest extends AbstractTest {
 		myCar.cancelAll(power, true);
 	}
 
-	public void incoherentGetHolderIsEmpty() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Attribute power = car.setAttribute("power");
-		Holder holder = car.setValue(power, "123");
-		Generic myCar = car.newInstance("myCar");
-		assert myCar.getHolders(holder).isEmpty();
-	}
-
 	public void testAliveWithStructural() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");

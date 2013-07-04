@@ -1,8 +1,10 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -679,10 +681,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (((GenericImpl) origin).safeIsEnabled(getMultiDirectionalSystemProperty())) {
 			Iterator<T>[] iterators = new Iterator[origin.getComponentsSize()];
 			for (basePos = 0; basePos < iterators.length; basePos++)
-				iterators[basePos] = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : ((GenericImpl) origin).thisFilter(this.<T> inheritanceConcreteIterator(origin, basePos));
+				iterators[basePos] = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : this.<T> inheritanceConcreteIterator(origin, basePos);
 			iterator = new ConcateIterator<T>(iterators);
 		} else
-			iterator = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : ((GenericImpl) origin).thisFilter(this.<T> inheritanceConcreteIterator(origin, basePos));
+			iterator = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : this.<T> inheritanceConcreteIterator(origin, basePos);
 		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
 	}
 
@@ -942,11 +944,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		s += "toString    : " + this + "\n";
 		s += "meta        : " + getMeta() + "\n";
 		s += "value       : " + getValue() + "\n";
-		// s += "metaLevel   : " + getMetaLevel() + "\n";
+		s += "metaLevel   : " + getMetaLevel() + "\n";
 		s += "**********************************************************************\n";
-		// s += "design date : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
-		// s += "birth date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
-		// s += "death date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDeathTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "design date : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "birth date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "death date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDeathTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
 		s += "**********************************************************************\n";
 		for (Generic primary : getPrimaries())
 			s += "primary     : " + primary + " (" + System.identityHashCode(primary) + ")\n";
@@ -955,12 +957,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic superGeneric : supers)
 			s += "super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
 		s += "**********************************************************************\n";
-		// for (Attribute attribute : getAttributes())
-		// if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
-		// s += "attribute : " + attribute + "\n";
-		// for (Holder holder : getHolders(attribute))
-		// s += "                          ----------> holder : " + holder + "\n";
-		// }
+//		for (Attribute attribute : getAttributes())
+//			if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
+//				s += "attribute : " + attribute + "\n";
+//				for (Holder holder : getHolders(attribute))
+//					s += "                          ----------> holder : " + holder + "\n";
+//			}
 		s += "**********************************************************************\n";
 		return s;
 	}
