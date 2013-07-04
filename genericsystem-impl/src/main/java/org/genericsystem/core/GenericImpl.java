@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -682,10 +681,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (((GenericImpl) origin).safeIsEnabled(getMultiDirectionalSystemProperty())) {
 			Iterator<T>[] iterators = new Iterator[origin.getComponentsSize()];
 			for (basePos = 0; basePos < iterators.length; basePos++)
-				iterators[basePos] = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : this.<T> inheritanceConcreteIterator(origin, basePos);
+				iterators[basePos] = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : ((GenericImpl) origin).thisFilter(this.<T> inheritanceConcreteIterator(origin, basePos));
 			iterator = new ConcateIterator<T>(iterators);
 		} else
-			iterator = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : this.<T> inheritanceConcreteIterator(origin, basePos);
+			iterator = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : ((GenericImpl) origin).thisFilter(this.<T> inheritanceConcreteIterator(origin, basePos));
 		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
 	}
 
@@ -724,27 +723,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (Iterator<T>) new AbstractSelectableLeafIterator(origin) {
 
 			@Override
-			protected Iterator<Generic> children(final Generic father) {
-				return new AbstractFilterIterator<Generic>(((GenericImpl) father).directInheritingsIterator()) {
-					@Override
-					public boolean isSelected() {
-						boolean selected = ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos);
-						if (selected && ((GenericImpl) next).isPseudoStructural(pos))
-							if (getCurrentCache() instanceof CacheImpl)
-								((GenericImpl) next).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) next.getImplicit()).supers[0], null, SystemGeneric.CONCRETE));
-						return selected;
-					}
-				};
-			}
-
-			@Override
 			public boolean isSelectable() {
 				return next.isConcrete();
 			}
 
 			@Override
 			public final boolean isSelected(Generic candidate) {
-				throw new IllegalStateException();
+				boolean selected = ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos);
+				if (selected && ((GenericImpl) candidate).isPseudoStructural(pos))
+					if (getCurrentCache() instanceof CacheImpl)
+						((GenericImpl) candidate).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) candidate.getImplicit()).supers[0], null, SystemGeneric.CONCRETE));
+				return selected;
 			}
 		};
 	}
