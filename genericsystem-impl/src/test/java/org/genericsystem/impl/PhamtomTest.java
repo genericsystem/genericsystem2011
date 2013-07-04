@@ -1,5 +1,6 @@
 package org.genericsystem.impl;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.genericsystem.core.Cache;
@@ -24,31 +25,84 @@ public class PhamtomTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Attribute power = vehicle.setAttribute("power");
-		Holder holder = car.setValue(power, "123");
+		Holder defaultPower = car.setValue(power, "123");
 
 		Generic myCar = car.newInstance("myCar");
 
-		myCar.clearAllConcrete(holder);
-		// assert myCar.getValue(holder) == null : myCar.getValue(power);
+		myCar.removeHolder(defaultPower);
+		assert myCar.getValue(power) == null;
 
-		Holder holder2 = myCar.setValue(power, "200");
-		assert holder2.isAlive();
-		myCar.cancelAll(power, true);
+		myCar.setValue(power, "200");
+		myCar.clearAllConcrete(power);
+		assert myCar.getValue(power) == "123" : myCar.getValue(power);
 	}
 
-	public void test2() {
+	public void test3() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Attribute power = vehicle.setAttribute("power");
-		Holder holder = car.setValue(power, "123");
+		Holder defaultPower = car.setValue(power, "123");
 
 		Generic myCar = car.newInstance("myCar");
 
-		myCar.clearAllConcrete(holder);
+		myCar.removeHolder(defaultPower);
+		assert myCar.getValue(power) == null;
 
-		Holder holder2 = myCar.setValue(power, "200");
-		myCar.cancelAll(holder2, true);
+		Holder holder100 = myCar.setValue(power, "100");
+		Holder holder200 = myCar.setValue(power, "200");
+		assert myCar.getValues(power).size() == 2 : myCar.getValues(power).size();
+		assert myCar.getValues(power).containsAll(Arrays.asList("100", "200")) : myCar.getValues(power);
+
+		myCar.removeHolder(holder100);
+		assert myCar.getValues(power).size() == 1 : myCar.getValues(power).size();
+		assert myCar.getValues(power).containsAll(Arrays.asList("200")) : myCar.getValues(power);
+
+		myCar.removeHolder(holder200);
+		assert myCar.getValues(power).size() == 0 : myCar.getValues(power).size();
+		assert myCar.getValues(power).containsAll(Arrays.asList()) : myCar.getValues(power);
+	}
+
+	public void test4() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.newType("Car");
+		Attribute power = car.setAttribute("power");
+		Holder defaultHolder = car.setValue(power, "123");
+
+		Generic myCar = car.newInstance("myCar");
+		assert myCar.getValue(power).equals("123");
+
+		Holder holder200 = myCar.setValue(power, "200");
+
+		Holder holder100 = myCar.setValue(defaultHolder, "100");
+		assert myCar.getValues(power).containsAll(Arrays.asList("100", "200")) : myCar.getValues(power);
+
+		myCar.removeHolder(holder200);
+		assert myCar.getValue(power).equals("100") : myCar.getValues(power);
+
+		myCar.removeHolder(holder100);
+		assert myCar.getValue(power).equals("123") : myCar.getValues(power);
+	}
+
+	public void test5() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.newType("Car");
+		Attribute power = car.setAttribute("power");
+		Holder defaultHolder = car.setValue(power, "123");
+
+		Generic myCar = car.newInstance("myCar");
+		assert myCar.getValue(power).equals("123");
+
+		Holder holder200 = myCar.setValue(power, "200");
+
+		Holder holder100 = myCar.setValue(defaultHolder, "100");
+		assert myCar.getValues(power).containsAll(Arrays.asList("100", "200")) : myCar.getValues(power);
+
+		myCar.removeHolder(holder100);
+		assert myCar.getValues(power).containsAll(Arrays.asList("123", "200")) : myCar.getValues(power);
+
+		myCar.removeHolder(holder200);
+		assert myCar.getValue(power).equals("123") : myCar.getValues(power);
 	}
 
 	public void testAliveWithStructural() {

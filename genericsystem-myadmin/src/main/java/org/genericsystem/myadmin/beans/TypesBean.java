@@ -19,6 +19,8 @@ import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
 import org.richfaces.event.DropEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
@@ -27,7 +29,7 @@ public class TypesBean implements Serializable {
 	private static final long serialVersionUID = 8042406937175946234L;
 
 	// TODO clean
-	// private static Logger log = LoggerFactory.getLogger(TypesBean.class);
+	private static Logger log = LoggerFactory.getLogger(TypesBean.class);
 
 	@Inject
 	private transient Cache cache;
@@ -54,7 +56,8 @@ public class TypesBean implements Serializable {
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Generic yellow = color.newInstance("yellow");
-		vehicle.setValue(power, 123);
+		// vehicle.setValue(power, 123);
+		car.setValue(power, 123);
 		myVehicle.setValue(power, 136);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		myVehicle.bind(vehicleColorTime, red, time.newInstance("myTime"));
@@ -121,15 +124,9 @@ public class TypesBean implements Serializable {
 		messages.info("addValue", newValue, attribute, currentInstance);
 	}
 
-	// TODO call clearAll...
 	public void removeHolder(Holder holder) {
-		if (holder.getBaseComponent().equals(genericTreeBean.getSelectedTreeNodeGeneric())) {
-			holder.remove();
-			messages.info("remove", holder);
-		} else {
-			genericTreeBean.getSelectedTreeNodeGeneric().cancel(holder, true);
-			messages.info("cancel", holder);
-		}
+		genericTreeBean.getSelectedTreeNodeGeneric().removeHolder(holder);
+		messages.info("remove", holder);
 	}
 
 	public void removeAttribute(Attribute attribute) {

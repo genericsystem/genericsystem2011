@@ -386,6 +386,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
+	@Override
+	public void removeHolder(Holder holder) {
+		if (equals(holder.getBaseComponent()))
+			holder.remove();
+		else
+			cancel(holder, true);
+	}
+
 	public <T extends Holder> T getHolderByValue(Holder attribute, Serializable value, final Generic... targets) {
 		return getHolderByValue(attribute, value, getBasePos(attribute), targets);
 	}
