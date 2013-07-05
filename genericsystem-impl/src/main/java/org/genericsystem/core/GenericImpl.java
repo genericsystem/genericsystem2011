@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -385,6 +386,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
+	@Override
+	public void removeHolder(Holder holder) {
+		if (equals(holder.getBaseComponent()))
+			holder.remove();
+		else
+			cancel(holder, true);
+	}
+
 	public <T extends Holder> T getHolderByValue(Holder attribute, Serializable value, final Generic... targets) {
 		return getHolderByValue(attribute, value, getBasePos(attribute), targets);
 	}
@@ -412,6 +421,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return holdersIterator((Attribute) attribute, basePos, false, targets);
 			}
 		};
+	}
+
+	@Override
+	public <T extends Holder> Snapshot<T> getHolders(Holder attribute, boolean readPhantoms, Generic... targets) {
+		return getHolders(attribute, getBasePos(attribute), readPhantoms, targets);
+	}
+
+	@Override
+	public <T extends Holder> Snapshot<T> getHolders(final Holder attribute, final int basePos, final boolean readPhantoms, final Generic... targets) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return holdersIterator((Attribute) attribute, basePos, readPhantoms, targets);
+			}
+		};
+	}
+
+	@Override
+	public void removePhantoms(Attribute attribute) {
+		Snapshot<Holder> holders = getHolders(attribute, true);
+		Iterator<Holder> iterator = holders.iterator();
+		while (iterator.hasNext()) {
+			Holder holder = iterator.next();
+			if (holder.getValue() == null)
+				holder.remove();
+		}
 	}
 
 	@Override
@@ -957,12 +992,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic superGeneric : supers)
 			s += "super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
 		s += "**********************************************************************\n";
-//		for (Attribute attribute : getAttributes())
-//			if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
-//				s += "attribute : " + attribute + "\n";
-//				for (Holder holder : getHolders(attribute))
-//					s += "                          ----------> holder : " + holder + "\n";
-//			}
+		// for (Attribute attribute : getAttributes())
+		// if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
+		// s += "attribute : " + attribute + "\n";
+		// for (Holder holder : getHolders(attribute))
+		// s += "                          ----------> holder : " + holder + "\n";
+		// }
 		s += "**********************************************************************\n";
 		return s;
 	}
@@ -1678,7 +1713,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public boolean isSelected() {
-				return !GenericImpl.this.equals(components[next.intValue()]);
+				return !GenericImpl.this.equals(components[next]) && !GenericImpl.this.inheritsFrom(components[next]);
 			}
 
 			@Override

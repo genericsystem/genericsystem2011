@@ -33,6 +33,10 @@ body {
 	color: #949595 !important;
 }
 
+.phantom {
+	text-decoration: line-through;
+}
+
 .inplaceInput {
 	min-width: 50px;
 }

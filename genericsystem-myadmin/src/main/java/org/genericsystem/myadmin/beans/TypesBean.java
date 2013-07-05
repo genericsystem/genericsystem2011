@@ -19,6 +19,8 @@ import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
 import org.richfaces.event.DropEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
@@ -27,7 +29,7 @@ public class TypesBean implements Serializable {
 	private static final long serialVersionUID = 8042406937175946234L;
 
 	// TODO clean
-	// private static Logger log = LoggerFactory.getLogger(TypesBean.class);
+	private static Logger log = LoggerFactory.getLogger(TypesBean.class);
 
 	@Inject
 	private transient Cache cache;
@@ -40,6 +42,8 @@ public class TypesBean implements Serializable {
 
 	@Inject
 	private GenericTreeBean genericTreeBean;
+
+	private boolean readPhantoms;
 
 	@PostConstruct
 	public void init() {
@@ -54,8 +58,9 @@ public class TypesBean implements Serializable {
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Generic yellow = color.newInstance("yellow");
-		vehicle.setValue(power, 123);
-		myVehicle.setValue(power, 136);
+		vehicle.setValue(power, 1);
+		car.setValue(power, 2);
+		// myVehicle.setValue(power, 136);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		myVehicle.bind(vehicleColorTime, red, time.newInstance("myTime"));
 		vehicle.bind(vehicleColor, yellow);
@@ -76,6 +81,14 @@ public class TypesBean implements Serializable {
 		nicolas.bind(isBossOf, michael);
 
 		michael.getProperties().put("KEY TEST", "VALUE TEST");
+	}
+
+	public boolean isReadPhantoms() {
+		return readPhantoms;
+	}
+
+	public void setReadPhantoms(boolean readPhantoms) {
+		this.readPhantoms = readPhantoms;
 	}
 
 	public void newType(String newValue) {
@@ -108,7 +121,17 @@ public class TypesBean implements Serializable {
 	}
 
 	public List<Holder> getHolders(Structural structural) {
-		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structural.getAttribute(), structural.getPosition());
+		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structural.getAttribute(), structural.getPosition(), readPhantoms);
+	}
+
+	// TODO in GS core ?
+	public boolean isPhantom(Holder holder) {
+		return holder.getValue() == null;
+	}
+
+	public void removePhantoms(Attribute attribute) {
+		genericTreeBean.getSelectedTreeNodeGeneric().removePhantoms(attribute);
+		messages.info("phantomsRemoved", attribute);
 	}
 
 	public List<Generic> getOtherTargets(Holder holder) {
@@ -121,15 +144,9 @@ public class TypesBean implements Serializable {
 		messages.info("addValue", newValue, attribute, currentInstance);
 	}
 
-	// TODO call clearAll...
 	public void removeHolder(Holder holder) {
-		if (holder.getBaseComponent().equals(genericTreeBean.getSelectedTreeNodeGeneric())) {
-			holder.remove();
-			messages.info("remove", holder);
-		} else {
-			genericTreeBean.getSelectedTreeNodeGeneric().cancel(holder, true);
-			messages.info("cancel", holder);
-		}
+		genericTreeBean.getSelectedTreeNodeGeneric().removeHolder(holder);
+		messages.info("remove", holder);
 	}
 
 	public void removeAttribute(Attribute attribute) {
@@ -226,7 +243,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public String getHolderStyle(Holder holder) {
-		return holder.getBaseComponent().equals(genericTreeBean.getSelectedTreeNodeGeneric()) ? "" : "italic";
+		return !holder.getBaseComponent().equals(genericTreeBean.getSelectedTreeNodeGeneric()) ? "italic" : (isPhantom(holder) ? "phantom" : "");
 	}
 
 	// TODO no more used
