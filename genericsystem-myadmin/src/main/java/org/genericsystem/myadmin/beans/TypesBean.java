@@ -56,8 +56,7 @@ public class TypesBean implements Serializable {
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Generic yellow = color.newInstance("yellow");
-		// vehicle.setValue(power, 123);
-		car.setValue(power, 123);
+		vehicle.setValue(power, 123);
 		myVehicle.setValue(power, 136);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		myVehicle.bind(vehicleColorTime, red, time.newInstance("myTime"));
