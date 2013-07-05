@@ -129,6 +129,10 @@ public class TypesBean implements Serializable {
 		return holder.getValue() == null;
 	}
 
+	public boolean isMeta() {
+		return genericTreeBean.getSelectedTreeNodeGeneric().isMeta();
+	}
+
 	public void removePhantoms(Attribute attribute) {
 		genericTreeBean.getSelectedTreeNodeGeneric().removePhantoms(attribute);
 		messages.info("phantomsRemoved", attribute);

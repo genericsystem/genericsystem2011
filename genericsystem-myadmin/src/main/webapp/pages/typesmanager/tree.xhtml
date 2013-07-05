@@ -87,7 +87,7 @@
 						changedClass="blackcolor" styleClass="#{genericTreeBean.getStyle(item)}">
 						<a4j:ajax event="change" render="typesmanager" />
 					</rich:inplaceInput>
-					<h:outputText value="#{genericTreeBean.getGenericTreeNodeWrapper(item).value}"
+					<h:outputText value="#{item.getValue}"
 						title="#{genericTreeBean.getTypeIconTitle(item)}"
 						rendered="#{item.isReadOnly}"
 						styleClass="#{genericTreeBean.getStyle(item)}" />

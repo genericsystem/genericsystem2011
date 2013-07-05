@@ -19,9 +19,12 @@
 				value="#{msg.edit} " />
 			<rich:inplaceInput
 				value="#{genericTreeBean.getGenericTreeNodeWrapper(genericTreeBean.selectedTreeNode).value}"
-				editEvent="dblclick" rendered="true">
+				rendered="#{!typesBean.isMeta()}"
+				editEvent="dblclick">
 				<a4j:ajax event="change" render="typesmanager" />
 			</rich:inplaceInput>
+			<h:outputText value="#{genericTreeBean.selectedTreeNodeValue}"
+				rendered="#{typesBean.isMeta()}" />
 		</f:facet>
 
 		<rich:dropTarget acceptedTypes="std"
@@ -86,7 +89,7 @@
 											styleClass="#{typesBean.getHolderStyle(currentHolder)}">
 											<a4j:ajax event="change" render="edittypesmanager" />
 										</rich:inplaceInput>
-										<h:outputText value="#{typesBean.getGenericWrapper(currentHolder).value}"
+										<h:outputText value="#{currentHolder}"
 											rendered="#{typesBean.isPhantom(currentHolder)}"
 											styleClass="#{typesBean.getHolderStyle(currentHolder)}" />
 										<a4j:commandLink action="#{genericTreeBean.view(currentHolder)}"
