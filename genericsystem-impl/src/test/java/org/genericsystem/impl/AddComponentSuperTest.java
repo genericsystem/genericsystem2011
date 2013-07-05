@@ -55,4 +55,16 @@ public class AddComponentSuperTest extends AbstractTest {
 		assert vehicle.getAttribute("VehicleColor") != null;
 	}
 
+	public void addSuperOnType() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Type robot = cache.newType("Robot");
+		car.addSuper(1, robot).log();
+		robot.log();
+		assert car.inheritsFrom(robot);
+		assert car.inheritsFrom(car.getImplicit());
+		assert car.inheritsFrom(vehicle);
+	}
+
 }
