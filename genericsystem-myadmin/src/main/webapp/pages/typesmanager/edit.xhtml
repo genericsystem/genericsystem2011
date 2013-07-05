@@ -40,7 +40,7 @@
 							value="#{typesBean.getHolders(currentStructural)}" id="id#{status.index}">
 							<f:facet name="header">
 								<h:panelGrid styleClass="fullWidth" rowClasses="fullWidth"
-									columnClasses="fullWidth,," columns="6">
+									columnClasses="fullWidth,," columns="7">
 										<h:outputText
 											value="#{currentStructural.attribute} (#{currentStructural.position})" />
 										<a4j:commandLink
@@ -68,6 +68,11 @@
 											title="#{msg.readPhantoms}" style="vertical-align: middle;">
 											<a4j:ajax event="change" execute="id#{status.index}" render="id#{status.index}" />
 										</h:selectBooleanCheckbox>
+										<a4j:commandLink
+											action="#{typesBean.removePhantoms(currentStructural.attribute)}"
+											execute="id#{status.index}" render="id#{status.index}">
+											<h:graphicImage value="#{infos.imgGarb}" title="#{msg.removePhantoms}" />
+										</a4j:commandLink>
 								</h:panelGrid>
 							</f:facet>
 							<rich:column>

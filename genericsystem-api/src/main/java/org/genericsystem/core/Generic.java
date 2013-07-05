@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.MapProvider;
@@ -635,4 +636,6 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> Snapshot<T> getHolders(Holder attribute, boolean readPhantoms, Generic... targets);
 
 	<T extends Holder> Snapshot<T> getHolders(Holder attribute, int basePos, boolean readPhantoms, Generic... targets);
+
+	void removePhantoms(Attribute attribute);
 }

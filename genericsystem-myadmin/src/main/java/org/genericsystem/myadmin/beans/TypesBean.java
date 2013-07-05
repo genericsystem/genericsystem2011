@@ -58,8 +58,9 @@ public class TypesBean implements Serializable {
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Generic yellow = color.newInstance("yellow");
-		vehicle.setValue(power, 123);
-		myVehicle.setValue(power, 136);
+		vehicle.setValue(power, 1);
+		car.setValue(power, 2);
+		// myVehicle.setValue(power, 136);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		myVehicle.bind(vehicleColorTime, red, time.newInstance("myTime"));
 		vehicle.bind(vehicleColor, yellow);
@@ -123,8 +124,14 @@ public class TypesBean implements Serializable {
 		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structural.getAttribute(), structural.getPosition(), readPhantoms);
 	}
 
+	// TODO in GS core ?
 	public boolean isPhantom(Holder holder) {
 		return holder.getValue() == null;
+	}
+
+	public void removePhantoms(Attribute attribute) {
+		genericTreeBean.getSelectedTreeNodeGeneric().removePhantoms(attribute);
+		messages.info("phantomsRemoved", attribute);
 	}
 
 	public List<Generic> getOtherTargets(Holder holder) {

@@ -1,5 +1,6 @@
 package org.genericsystem.impl;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -19,6 +20,32 @@ import org.testng.annotations.Test;
 
 @Test
 public class PhamtomTest extends AbstractTest {
+
+	public void testRemovePhantoms() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Attribute power = vehicle.setAttribute("power");
+		Holder defaultPowerForVehicule = vehicle.setValue(power, "1");
+		Holder defaultPowerForCar = car.setValue(power, "2");
+		Generic myCar = car.newInstance("myCar");
+
+		Snapshot<Serializable> powerValues = myCar.getValues(power);
+		assert powerValues.size() == 2 : powerValues.size();
+		assert powerValues.containsAll(Arrays.asList("1", "2")) : powerValues;
+
+		myCar.removeHolder(defaultPowerForVehicule);
+		myCar.removeHolder(defaultPowerForCar);
+
+		Snapshot<Serializable> powerValues2 = myCar.getValues(power);
+		assert powerValues2.isEmpty() : powerValues2.size();
+
+		myCar.removePhantoms(power);
+
+		Snapshot<Serializable> powerValues3 = myCar.getValues(power);
+		assert powerValues3.size() == 2 : powerValues3.size();
+		assert powerValues3.containsAll(Arrays.asList("1", "2")) : powerValues3;
+	}
 
 	public void testGetHolders() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();

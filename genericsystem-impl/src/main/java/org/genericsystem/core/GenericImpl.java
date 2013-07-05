@@ -439,6 +439,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
+	public void removePhantoms(Attribute attribute) {
+		Snapshot<Holder> holders = getHolders(attribute, true);
+		Iterator<Holder> iterator = holders.iterator();
+		while (iterator.hasNext()) {
+			Holder holder = iterator.next();
+			if (holder.getValue() == null)
+				holder.remove();
+		}
+	}
+
+	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Relation relation, final Generic... targets) {
 		return getLinks(relation, getBasePos(relation), targets);
 	}
