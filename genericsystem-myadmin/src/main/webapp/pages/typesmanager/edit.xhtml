@@ -28,7 +28,7 @@
 			dropListener="#{typesBean.processDrop}" render="edittypesmanager,typestree" />
 
 		<h:panelGrid styleClass="fullWidth" columns="2">
-			<c:forEach var="currentStructural" items="#{typesBean.structurals}">
+			<c:forEach var="currentStructural" items="#{typesBean.structurals}" varStatus="status">
 				<h:panelGroup>
 					<a4j:outputPanel>
 						<rich:dropTarget acceptedTypes="std2" dropValue="#{currentStructural}"
@@ -37,10 +37,10 @@
 						<rich:dataTable var="currentHolder" headerClass="fullWidth,"
 							columnClasses="middleWidth,fullWidth,veryLittleWidth,"
 							styleClass="fullWidth"
-							value="#{typesBean.getHolders(currentStructural)}">
+							value="#{typesBean.getHolders(currentStructural)}" id="id#{status.index}">
 							<f:facet name="header">
 								<h:panelGrid styleClass="fullWidth" rowClasses="fullWidth"
-									columnClasses="fullWidth,," columns="4">
+									columnClasses="fullWidth,," columns="6">
 										<h:outputText
 											value="#{currentStructural.attribute} (#{currentStructural.position})" />
 										<a4j:commandLink
@@ -63,6 +63,11 @@
 											rendered="#{!typesBean.hasValues(currentStructural.attribute)}">
 											<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 										</a4j:commandLink>
+										<h:outputText value="#{msg.readPhantoms}" styleClass="bold" />
+										<h:selectBooleanCheckbox value="#{typesBean.readPhantoms}"
+											title="#{msg.readPhantoms}" style="vertical-align: middle;">
+											<a4j:ajax event="change" execute="id#{status.index}" render="id#{status.index}" />
+										</h:selectBooleanCheckbox>
 								</h:panelGrid>
 							</f:facet>
 							<rich:column>
@@ -71,10 +76,14 @@
 									<h:panelGroup>
 										<rich:inplaceInput
 											value="#{typesBean.getGenericWrapper(currentHolder).value}"
-											editEvent="dblclick" rendered="true"
+											editEvent="dblclick"
+											rendered="#{!typesBean.isPhantom(currentHolder)}"
 											styleClass="#{typesBean.getHolderStyle(currentHolder)}">
 											<a4j:ajax event="change" render="edittypesmanager" />
 										</rich:inplaceInput>
+										<h:outputText value="#{typesBean.getGenericWrapper(currentHolder).value}"
+											rendered="#{typesBean.isPhantom(currentHolder)}"
+											styleClass="#{typesBean.getHolderStyle(currentHolder)}" />
 										<a4j:commandLink action="#{genericTreeBean.view(currentHolder)}"
 											render="menutypesmanager, edittypesmanager, paneltitletypesmanager, typestree"
 											style="padding-left : 5%;">

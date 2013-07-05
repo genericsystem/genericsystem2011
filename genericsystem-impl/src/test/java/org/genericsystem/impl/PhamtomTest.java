@@ -20,6 +20,27 @@ import org.testng.annotations.Test;
 @Test
 public class PhamtomTest extends AbstractTest {
 
+	public void testGetHolders() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Attribute power = vehicle.setAttribute("power");
+		Holder defaultPower = vehicle.setValue(power, "123");
+
+		Generic myVehicle = vehicle.newInstance("myCar");
+		assert myVehicle.getValue(power) == "123";
+
+		Snapshot<Holder> holdersWithoutPhantoms = myVehicle.getHolders(power, false);
+		assert holdersWithoutPhantoms.size() == 1 : holdersWithoutPhantoms.size();
+		assert holdersWithoutPhantoms.get(0).getValue().equals("123") : holdersWithoutPhantoms.get(0).getValue();
+
+		myVehicle.removeHolder(defaultPower);
+		assert myVehicle.getValue(power) == null;
+
+		Snapshot<Holder> holdersWithPhantoms = myVehicle.getHolders(power, true);
+		assert holdersWithPhantoms.size() == 1 : holdersWithPhantoms.size();
+		assert holdersWithPhantoms.get(0).getValue() == null : holdersWithPhantoms.get(0).getValue();
+	}
+
 	public void testRemoveHolder() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");

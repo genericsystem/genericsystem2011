@@ -631,4 +631,8 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Generic> Snapshot<T> getOtherTargets(Holder holder);
 
 	void removeHolder(Holder holder);
+
+	<T extends Holder> Snapshot<T> getHolders(Holder attribute, boolean readPhantoms, Generic... targets);
+
+	<T extends Holder> Snapshot<T> getHolders(Holder attribute, int basePos, boolean readPhantoms, Generic... targets);
 }

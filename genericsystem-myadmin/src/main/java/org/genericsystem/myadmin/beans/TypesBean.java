@@ -43,6 +43,8 @@ public class TypesBean implements Serializable {
 	@Inject
 	private GenericTreeBean genericTreeBean;
 
+	private boolean readPhantoms;
+
 	@PostConstruct
 	public void init() {
 		// TODO TEST
@@ -80,6 +82,14 @@ public class TypesBean implements Serializable {
 		michael.getProperties().put("KEY TEST", "VALUE TEST");
 	}
 
+	public boolean isReadPhantoms() {
+		return readPhantoms;
+	}
+
+	public void setReadPhantoms(boolean readPhantoms) {
+		this.readPhantoms = readPhantoms;
+	}
+
 	public void newType(String newValue) {
 		cache.newType(newValue);
 		messages.info("createRootType", newValue);
@@ -110,7 +120,11 @@ public class TypesBean implements Serializable {
 	}
 
 	public List<Holder> getHolders(Structural structural) {
-		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structural.getAttribute(), structural.getPosition());
+		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structural.getAttribute(), structural.getPosition(), readPhantoms);
+	}
+
+	public boolean isPhantom(Holder holder) {
+		return holder.getValue() == null;
 	}
 
 	public List<Generic> getOtherTargets(Holder holder) {
@@ -222,7 +236,7 @@ public class TypesBean implements Serializable {
 	}
 
 	public String getHolderStyle(Holder holder) {
-		return holder.getBaseComponent().equals(genericTreeBean.getSelectedTreeNodeGeneric()) ? "" : "italic";
+		return !holder.getBaseComponent().equals(genericTreeBean.getSelectedTreeNodeGeneric()) ? "italic" : (isPhantom(holder) ? "phantom" : "");
 	}
 
 	// TODO no more used
