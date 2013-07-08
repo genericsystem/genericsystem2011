@@ -60,11 +60,39 @@ public class AddComponentSuperTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Type robot = cache.newType("Robot");
-		car.addSuper(1, robot).log();
-		robot.log();
+		car = car.addSuper(robot);
 		assert car.inheritsFrom(robot);
 		assert car.inheritsFrom(car.getImplicit());
 		assert car.inheritsFrom(vehicle);
+	}
+
+	public void removeSuperOnType() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Type robot = cache.newType("Robot");
+		Type transformer = cache.newSubType("Transformer", robot, car);
+		transformer = transformer.removeSuper(1);
+		assert !transformer.inheritsFrom(robot);
+		assert transformer.inheritsFrom(transformer.getImplicit());
+		assert transformer.inheritsFrom(car);
+		assert transformer.inheritsFrom(vehicle);
+	}
+
+	public void addRemoveComplexSuperOnType() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Type robot = cache.newType("Robot");
+		Type transformer = cache.newSubType("Transformer", robot, car);
+		Type clonable = cache.newType("Clonable");
+		Type transformerClonable = cache.newSubType("TransformerClonable", transformer, clonable);
+		transformerClonable = transformerClonable.removeSuper(2);
+		assert transformerClonable.inheritsFrom(transformerClonable.getImplicit());
+		assert transformerClonable.inheritsFrom(clonable);
+		assert !transformerClonable.inheritsFrom(robot);
+		assert !transformerClonable.inheritsFrom(car);
+		assert !transformerClonable.inheritsFrom(vehicle);
 	}
 
 }

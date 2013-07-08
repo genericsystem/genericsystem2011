@@ -1616,7 +1616,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T addSuper(int pos, Generic newSuper) {
+	// TODO clean
+	public <T extends Generic> T addSuper(/* int pos, */Generic newSuper) {
 		return getCurrentCache().addSuper(this, newSuper);
 	}
 
