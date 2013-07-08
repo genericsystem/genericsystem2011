@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.InstanceClassConstraintViolationException;
-import org.genericsystem.file.AbstractTest.RollbackCatcher;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType;
 import org.genericsystem.file.FileSystem.FileType.File;
@@ -15,7 +15,7 @@ import org.genericsystem.generic.Node;
 import org.testng.annotations.Test;
 
 @Test
-public class FileSystemTest {
+public class FileSystemTest extends AbstractTest {
 
 	public void testUpdateRootDirectory() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class).start();
@@ -107,5 +107,18 @@ public class FileSystemTest {
 				rootDirectory.setValue(fileSystem, 2L);
 			}
 		}.assertIsCausedBy(InstanceClassConstraintViolationException.class);
+	}
+
+	public void testGetRootDirectories() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class).start();
+		FileSystem fileSystem = cache.find(FileSystem.class);
+		Node rootDirectory = fileSystem.addRootDirectory("root");
+		// log.info("rootDirectory " + rootDirectory.info());
+		// log.info("fileSystem " + fileSystem.info());
+		assert rootDirectory != null : rootDirectory;
+		assert rootDirectory.isAlive();
+		Snapshot<Directory> rootDirectories = fileSystem.getRootDirectories();
+		// log.info("rootDirectories " + rootDirectories);
+		assert !rootDirectories.isEmpty() : rootDirectories;
 	}
 }
