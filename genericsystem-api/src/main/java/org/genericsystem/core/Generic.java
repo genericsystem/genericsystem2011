@@ -621,7 +621,7 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Generic> T removeComponent(int pos, Generic newComponent);
 
-	<T extends Generic> T addSuper(int pos, Generic newSuper);
+	<T extends Generic> T addSuper(Generic newSuper);
 
 	<T extends Generic> T removeSuper(int pos);
 
