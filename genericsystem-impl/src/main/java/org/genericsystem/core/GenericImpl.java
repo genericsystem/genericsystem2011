@@ -26,6 +26,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.MapProvider;
+import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
@@ -1602,7 +1603,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isRoot() {
-		return isTree() && equals(getBaseComponent());
+		return (this instanceof Node) && equals(getBaseComponent());
 	}
 
 	@Override

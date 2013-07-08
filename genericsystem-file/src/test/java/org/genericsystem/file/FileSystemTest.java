@@ -113,12 +113,9 @@ public class FileSystemTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class).start();
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Node rootDirectory = fileSystem.addRootDirectory("root");
-		// log.info("rootDirectory " + rootDirectory.info());
-		// log.info("fileSystem " + fileSystem.info());
 		assert rootDirectory != null : rootDirectory;
 		assert rootDirectory.isAlive();
 		Snapshot<Directory> rootDirectories = fileSystem.getRootDirectories();
-		// log.info("rootDirectories " + rootDirectories);
 		assert !rootDirectories.isEmpty() : rootDirectories;
 	}
 }
