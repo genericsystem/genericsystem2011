@@ -52,6 +52,11 @@
 			<artifactId>genericsystem-file</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.genericsystem</groupId>
+			<artifactId>genericsystem-example</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>

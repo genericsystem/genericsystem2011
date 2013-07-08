@@ -41,6 +41,7 @@
 		<module>genericsystem-file</module>
 		<module>genericsystem-impl</module>
 		<module>genericsystem-myadmin</module>
+		<module>genericsystem-example</module>
 	</modules>
 
 	<distributionManagement>

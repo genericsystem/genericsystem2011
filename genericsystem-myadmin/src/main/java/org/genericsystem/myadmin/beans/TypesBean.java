@@ -48,39 +48,39 @@ public class TypesBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		// TODO TEST
-		Type vehicle = cache.newType("Vehicle");
-		Type car = vehicle.newSubType("Car");
-		Type color = cache.newType("Color");
-		Type time = cache.newType("Time");
-		Attribute power = vehicle.setAttribute("power");
-		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
-		Relation vehicleColorTime = vehicle.setRelation("vehicleColorTime", color, time);
-		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic red = color.newInstance("red");
-		Generic yellow = color.newInstance("yellow");
-		vehicle.setValue(power, 1);
-		car.setValue(power, 2);
-		// myVehicle.setValue(power, 136);
-		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
-		myVehicle.bind(vehicleColorTime, red, time.newInstance("myTime"));
-		vehicle.bind(vehicleColor, yellow);
-		car.newInstance("myCar");
-
-		Type human = cache.newType("Human");
-		Generic nicolas = human.newInstance("Nicolas");
-		Generic michael = human.newInstance("Michael");
-		Generic quentin = human.newInstance("Quentin");
-		Relation isTallerOrEqualThan = human.setRelation("isTallerOrEqualThan", human);
-		nicolas.bind(isTallerOrEqualThan, michael);
-		nicolas.bind(isTallerOrEqualThan, nicolas);
-		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
-		isBrotherOf.enableMultiDirectional();
-		// quentin.bind(isBrotherOf, michael);
-		quentin.setLink(isBrotherOf, "link", michael);
-		Relation isBossOf = human.setRelation("isBossOf", human);
-		nicolas.bind(isBossOf, michael);
-
-		michael.getProperties().put("KEY TEST", "VALUE TEST");
+		// Type vehicle = cache.newType("Vehicle");
+		// Type car = vehicle.newSubType("Car");
+		// Type color = cache.newType("Color");
+		// Type time = cache.newType("Time");
+		// Attribute power = vehicle.setAttribute("power");
+		// Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
+		// Relation vehicleColorTime = vehicle.setRelation("vehicleColorTime", color, time);
+		// Generic myVehicle = vehicle.newInstance("myVehicle");
+		// Generic red = color.newInstance("red");
+		// Generic yellow = color.newInstance("yellow");
+		// vehicle.setValue(power, 1);
+		// car.setValue(power, 2);
+		// // myVehicle.setValue(power, 136);
+		// myVehicle.setLink(vehicleColor, "myVehicleRed", red);
+		// myVehicle.bind(vehicleColorTime, red, time.newInstance("myTime"));
+		// vehicle.bind(vehicleColor, yellow);
+		// car.newInstance("myCar");
+		//
+		// Type human = cache.newType("Human");
+		// Generic nicolas = human.newInstance("Nicolas");
+		// Generic michael = human.newInstance("Michael");
+		// Generic quentin = human.newInstance("Quentin");
+		// Relation isTallerOrEqualThan = human.setRelation("isTallerOrEqualThan", human);
+		// nicolas.bind(isTallerOrEqualThan, michael);
+		// nicolas.bind(isTallerOrEqualThan, nicolas);
+		// Relation isBrotherOf = human.setRelation("isBrotherOf", human);
+		// isBrotherOf.enableMultiDirectional();
+		// // quentin.bind(isBrotherOf, michael);
+		// quentin.setLink(isBrotherOf, "link", michael);
+		// Relation isBossOf = human.setRelation("isBossOf", human);
+		// nicolas.bind(isBossOf, michael);
+		//
+		// michael.getProperties().put("KEY TEST", "VALUE TEST");
 	}
 
 	public boolean isReadPhantoms() {

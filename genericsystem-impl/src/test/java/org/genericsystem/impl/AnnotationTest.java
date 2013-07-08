@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
@@ -22,6 +23,8 @@ public class AnnotationTest extends AbstractTest {
 		Type vehicle = cache.find(Vehicle.class);
 		Type human = cache.find(Human.class);
 		Type myck = cache.find(Myck.class);
+		assert !human.isAutomatic();
+		assert !myck.isAutomatic();
 		assert vehicle.isStructural();
 		assert human.isStructural();
 		assert myck.isConcrete();
@@ -47,6 +50,13 @@ public class AnnotationTest extends AbstractTest {
 		Attribute power = cache.find(Power.class);
 		assert power.isStructural();
 		assert vehicle.getAttributes().contains(power);
+	}
+
+	public void testAttributeValue() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(V123.class).start();
+		Type myVehicle = cache.find(MyVehicle.class);
+		cache.find(V123.class).log();
+		assert myVehicle.getValue(cache.<Attribute> find(Power.class)).equals(new Integer(123)) : myVehicle.getValue(cache.<Attribute> find(Power.class));
 	}
 
 	public void testSubAttribute() {
@@ -341,6 +351,13 @@ public class AnnotationTest extends AbstractTest {
 	@SystemGeneric
 	@Components(Vehicle.class)
 	public static class Power {
+
+	}
+
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Components(MyVehicle.class)
+	@IntValue(123)
+	public static class V123 extends Power {
 
 	}
 
