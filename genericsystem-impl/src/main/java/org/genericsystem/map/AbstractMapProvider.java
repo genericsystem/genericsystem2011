@@ -17,7 +17,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
-import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl.AxedConstraintClass;
 
 /**
  * @author Nicolas Feybesse
@@ -54,22 +53,10 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				GenericImpl map = generic.getHolder(AbstractMapProvider.this);
 				if (map == null)
 					return null;
-				int axe = -1;
-				if (key instanceof AxedConstraintClass) {
-					axe = ((AxedConstraintClass) key).getAxe();
-					key = ((AxedConstraintClass) key).getClazz();
-				}
 				Holder keyHolder = map.getHolderByValue(getCurrentCache().<Attribute> find(getKeyAttributeClass()), (Serializable) key);
-				if (axe != -1)
-					for (Holder holder : keyHolder.<Holder> getInheritings())
-						if (((AxedConstraintClass) holder.getValue()).getAxe() == axe) {
-							keyHolder = holder;
-							break;
-						}
 				if (keyHolder == null)
 					return null;
 				Holder valueHolder = keyHolder.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
-				log.info("keyHolder " + keyHolder + " valueHolder " + valueHolder + " " + keyHolder.info());
 				return (Value) (valueHolder != null ? valueHolder.getValue() : null);
 			}
 
@@ -78,12 +65,6 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				assert null != value;
 				Value oldValue = get(key);
 				Holder keyHolder = generic.setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getCurrentCache().<Attribute> find(getKeyAttributeClass()), (Serializable) key);
-
-				log.info("ZZZZZZ " + keyHolder.info());
-
-				// AxedConstraintClass key = new AxedConstraintClass(getClass(), pos);
-				// getCurrentCache().<GenericImpl> find(MapInstance.class).setSubAttribute(this, key);
-
 				setSingularHolder(keyHolder, getCurrentCache().<Attribute> find(getValueAttributeClass()), (Serializable) value);
 				return oldValue;
 			}
@@ -95,22 +76,17 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		int basePos = keyHolder.getBasePos(attribute);
 		T holder = keyHolder.getHolder((Attribute) attribute, basePos);
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(keyHolder.getClass(), value, SystemGeneric.CONCRETE, true);
-		if (holder == null) {
-			log.info("CAS 1");
+		if (holder == null)
 			return null != value ? ((GenericImpl) keyHolder).<T> bind(implicit, attribute, basePos, true, targets) : null;
-		}
 		if (!keyHolder.equals(holder.getComponent(basePos))) {
-			log.info("CAS 2");
 			if (value == null)
 				return keyHolder.cancel(holder, basePos, true);
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
 				keyHolder.cancel(holder, basePos, true);
 			return ((GenericImpl) keyHolder).<T> bind(implicit, attribute, basePos, true, targets);
 		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(keyHolder, targets, basePos))) {
-			log.info("CAS 3");
+		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(keyHolder, targets, basePos)))
 			return holder;
-		}
 		holder.remove();
 		return setSingularHolder(keyHolder, attribute, value, targets);
 	}

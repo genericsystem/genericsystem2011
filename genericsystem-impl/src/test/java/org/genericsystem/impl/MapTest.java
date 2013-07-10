@@ -163,9 +163,7 @@ public class MapTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		assert Boolean.FALSE.equals(vehicle.getContraints().get(SingularConstraintImpl.class));
-		log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color).<Relation> enableSingularConstraint(Statics.TARGET_POSITION);
-		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION) : vehicleColor.getContraints().get(cache.<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.TARGET_POSITION));
 		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION) : vehicleColor.getContraints().get(cache.<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.BASE_POSITION));
 		assert Boolean.FALSE.equals(vehicle.getContraints().get(SingularConstraintImpl.class));
