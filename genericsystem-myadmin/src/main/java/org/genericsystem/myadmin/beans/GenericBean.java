@@ -1,6 +1,7 @@
 package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -14,22 +15,15 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Structural;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
-import org.richfaces.event.DropEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
-public class TypesBean implements Serializable {
+public class GenericBean implements Serializable {
 
 	private static final long serialVersionUID = 8042406937175946234L;
-
-	// TODO clean
-	private static Logger log = LoggerFactory.getLogger(TypesBean.class);
 
 	@Inject
 	private transient Cache cache;
@@ -43,7 +37,12 @@ public class TypesBean implements Serializable {
 	@Inject
 	private GenericTreeBean genericTreeBean;
 
-	private boolean readPhantoms;
+	// private boolean readPhantoms;
+
+	@Inject
+	private WrapperBean wrapperBean;
+
+	private List<StructuralWrapper> structuralWrappers = new ArrayList<>();
 
 	@PostConstruct
 	public void init() {
@@ -83,13 +82,13 @@ public class TypesBean implements Serializable {
 		// michael.getProperties().put("KEY TEST", "VALUE TEST");
 	}
 
-	public boolean isReadPhantoms() {
-		return readPhantoms;
-	}
-
-	public void setReadPhantoms(boolean readPhantoms) {
-		this.readPhantoms = readPhantoms;
-	}
+	// public boolean isReadPhantoms() {
+	// return readPhantoms;
+	// }
+	//
+	// public void setReadPhantoms(boolean readPhantoms) {
+	// this.readPhantoms = readPhantoms;
+	// }
 
 	public void newType(String newValue) {
 		cache.newType(newValue);
@@ -116,21 +115,44 @@ public class TypesBean implements Serializable {
 		messages.info("createRootInstance", newValue, genericTreeBean.getSelectedTreeNodeGeneric().getValue());
 	}
 
-	public List<Structural> getStructurals() {
-		return genericTreeBean.getSelectedTreeNodeGeneric().getStructurals();
+	public List<StructuralWrapper> getStructurals() {
+		List<StructuralWrapper> list = new ArrayList<>();
+		for (Structural structural : genericTreeBean.getSelectedTreeNodeGeneric().getStructurals())
+			list.add(getStructuralWrapper(structural));
+		structuralWrappers = list;
+		return list;
 	}
 
-	public List<Holder> getHolders(Structural structural) {
-		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structural.getAttribute(), structural.getPosition(), readPhantoms);
+	private StructuralWrapper getStructuralWrapper(Structural structural) {
+		for (StructuralWrapper old : structuralWrappers)
+			if (old.getStructural().equals(structural))
+				return old;
+		return new StructuralWrapper(structural);
 	}
 
-	// TODO in GS core ?
-	public boolean isPhantom(Holder holder) {
-		return holder.getValue() == null;
+	public class StructuralWrapper {
+		private Structural structural;
+		private boolean readPhantoms;
+
+		public StructuralWrapper(Structural structural) {
+			this.structural = structural;
+		}
+
+		public Structural getStructural() {
+			return structural;
+		}
+
+		public boolean isReadPhantoms() {
+			return readPhantoms;
+		}
+
+		public void setReadPhantoms(boolean readPhantoms) {
+			this.readPhantoms = readPhantoms;
+		}
 	}
 
-	public boolean isMeta() {
-		return genericTreeBean.getSelectedTreeNodeGeneric().isMeta();
+	public List<Holder> getHolders(StructuralWrapper structuralWrapper) {
+		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structuralWrapper.getStructural().getAttribute(), structuralWrapper.getStructural().getPosition(), structuralWrapper.isReadPhantoms());
 	}
 
 	public void removePhantoms(Attribute attribute) {
@@ -172,54 +194,6 @@ public class TypesBean implements Serializable {
 		return "";
 	}
 
-	public void processDrop(DropEvent dropEvent) {
-		Object dragValue = dropEvent.getDragValue();
-		Type type = (Type) genericTreeBean.getSelectedTreeNodeGeneric();
-		Attribute attribute = type.setAttribute("new_attribute");
-		// if (!(dragValue instanceof GenericTreeNode)) {
-		if (dragValue.equals("int"))
-			attribute.setConstraintClass(Integer.class);
-		if (dragValue.equals("long"))
-			attribute.setConstraintClass(Long.class);
-		if (dragValue.equals("float"))
-			attribute.setConstraintClass(Float.class);
-		if (dragValue.equals("double"))
-			attribute.setConstraintClass(Double.class);
-		if (dragValue.equals("boolean"))
-			attribute.setConstraintClass(Boolean.class);
-		if (dragValue.equals("string"))
-			attribute.setConstraintClass(String.class);
-		// }
-		String msg = /* dragValue instanceof GenericTreeNode ? "" + ((GenericTreeNode) dragValue).getGeneric() : */(String) dragValue;
-		messages.info("dropValue", msg);
-	}
-
-	public void processDrop2(DropEvent dropEvent) {
-		Object dragValue = dropEvent.getDragValue();
-		// if (!(dragValue instanceof GenericTreeNode)) {
-		// log.info("Targets for relation cannot be simple type");
-		// return;
-		// }
-
-		Generic target = ((GenericTreeNode) dragValue).getGeneric();
-		if (target.isStructural()) {
-			Object dropValue = dropEvent.getDropValue();
-			Attribute attribute = ((Structural) dropValue).getAttribute();
-			attribute = attribute.addComponent(attribute.getComponentsSize(), target);
-			messages.info("targetRelation", target, attribute);
-		} else if (target.isConcrete()) {
-			Object dropValue = dropEvent.getDropValue();
-			Attribute attribute = ((Structural) dropValue).getAttribute();
-			if (attribute.getClass() == Relation.class) {
-				Generic base = genericTreeBean.getSelectedTreeNodeGeneric();
-				base.bind((Relation) attribute, target);
-				messages.info("targetLink", target, attribute);
-			} else {
-				messages.info("errorTargetLink");
-			}
-		}
-	}
-
 	public List<Entry<Serializable, Serializable>> getProperties() {
 		return (List) genericTreeBean.getSelectedTreeNodeGeneric().getProperties().entrySet();
 	}
@@ -227,14 +201,6 @@ public class TypesBean implements Serializable {
 	public void removeProperty(Entry<Serializable, Serializable> entry) {
 		genericTreeBean.getSelectedTreeNodeGeneric().getProperties().remove(entry.getKey());
 		messages.info("remove", entry.getKey());
-	}
-
-	public PropertyWrapper getPropertyWrapper(Entry<Serializable, Serializable> entry) {
-		return new PropertyWrapper(entry);
-	}
-
-	public GenericWrapper getGenericWrapper(Generic generic) {
-		return new GenericWrapper(generic);
 	}
 
 	// TODO in GS CORE
@@ -250,82 +216,15 @@ public class TypesBean implements Serializable {
 		return !holder.getBaseComponent().equals(genericTreeBean.getSelectedTreeNodeGeneric()) ? "italic" : (isPhantom(holder) ? "phantom" : "");
 	}
 
-	// TODO no more used
-	// public boolean isBaseComponent(Holder holder) {
-	// return holder.getBaseComponent().equals(genericTreeBean.getSelectedTreeNodeGeneric());
-	// }
-
 	public boolean hasValues(Attribute attribute) {
 		return !genericTreeBean.getSelectedTreeNodeGeneric().getValues(attribute).isEmpty();
 	}
 
-	public class GenericWrapper {
-		private Generic wrappedGeneric;
-
-		public GenericWrapper(Generic wrappedGeneric) {
-			this.wrappedGeneric = wrappedGeneric;
-		}
-
-		public String getValue() {
-			return wrappedGeneric.toString();
-		}
-
-		public void setValue(String newValue) {
-			if (!newValue.equals(wrappedGeneric.toString())) {
-				wrappedGeneric.updateKey(newValue);
-				messages.info("updateValue", wrappedGeneric, newValue);
-			}
-		}
+	public boolean isPhantom(Holder holder) {
+		return holder.getValue() == null;
 	}
 
-	// TODO no more used
-	// public class TargetWrapper {
-	// private Generic generic;
-	//
-	// private Holder holder;
-	//
-	// public TargetWrapper(Generic generic, Holder holder) {
-	// this.generic = generic;
-	// this.holder = holder;
-	// }
-	//
-	// public boolean isBaseComponent() {
-	// return holder.getBaseComponent().equals(generic);
-	// }
-	//
-	// public Generic getGeneric() {
-	// return generic;
-	// }
-	//
-	// public void setGeneric(Generic generic) {
-	// this.generic = generic;
-	// }
-	//
-	// public Holder getHolder() {
-	// return holder;
-	// }
-	//
-	// public void setHolder(Holder holder) {
-	// this.holder = holder;
-	// }
-	// }
-
-	public class PropertyWrapper {
-		private Entry<Serializable, Serializable> entry;
-
-		public PropertyWrapper(Entry<Serializable, Serializable> entry) {
-			this.entry = entry;
-		}
-
-		public String getValue() {
-			return (String) entry.getValue();
-		}
-
-		public void setValue(String newValue) {
-			if (!newValue.equals(entry.getValue().toString())) {
-				genericTreeBean.getSelectedTreeNodeGeneric().getProperties().put(entry.getKey(), newValue);
-				messages.info("updateValue", entry.getValue(), newValue);
-			}
-		}
+	public boolean isMeta() {
+		return genericTreeBean.getSelectedTreeNodeGeneric().isMeta();
 	}
 }

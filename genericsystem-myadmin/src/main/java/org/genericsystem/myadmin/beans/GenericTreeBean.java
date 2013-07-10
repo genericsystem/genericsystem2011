@@ -48,7 +48,6 @@ public class GenericTreeBean implements Serializable {
 	private GsMessages messages;
 
 	@Inject
-	// @TreeSelection
 	private Event<TreeSelectionEvent> launcher;
 
 	private TreeSelectionEvent event;
@@ -105,7 +104,7 @@ public class GenericTreeBean implements Serializable {
 		return genericTreeNode.getChildrens(implicitShow);
 	}
 
-	public void changeType(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
+	public void changeType(@Observes TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			selectedTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
 			internalChangeType();
@@ -181,90 +180,6 @@ public class GenericTreeBean implements Serializable {
 		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) || (isValue(genericTreeNode.getGeneric()) && !((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(getSelectedTreeNodeGeneric())) ? "implicitColor" : "";
 	}
 
-	// TODO no more used
-	// public String getExpandedIcon() {
-	// return getExpandedIcon(selectedTreeNode);
-	// }
-
-	// TODO no more used
-	// public String getExpandedIcon(GenericTreeNode genericTreeNode) {
-	// switch (genericTreeNode.getTreeType()) {
-	// case SUPERS:
-	// return messages.getInfos("up_green_arrow");
-	// case INSTANCES:
-	// return messages.getInfos("down_green_arrow");
-	// case INHERITINGS:
-	// return messages.getInfos("down_right_green_arrow");
-	// case COMPONENTS:
-	// return messages.getInfos("left_green_arrow");
-	// case COMPOSITES:
-	// return messages.getInfos("right_green_arrow");
-	// case ATTRIBUTES:
-	// return messages.getInfos("up_right_green_arrow");
-	// case VALUES:
-	// return messages.getInfos("right_green_arrow");
-	// default:
-	// break;
-	// }
-	// throw new IllegalStateException();
-	// }
-
-	// TODO no more used
-	// public String getCollapsedIcon() {
-	// return getCollapsedIcon(selectedTreeNode);
-	// }
-
-	// TODO no more used
-	// public String getCollapsedIcon(GenericTreeNode genericTreeNode) {
-	// switch (genericTreeNode.getTreeType()) {
-	// case SUPERS:
-	// return messages.getInfos("up_red_arrow");
-	// case INSTANCES:
-	// return messages.getInfos("down_red_arrow");
-	// case INHERITINGS:
-	// return messages.getInfos("down_right_red_arrow");
-	// case COMPONENTS:
-	// return messages.getInfos("left_red_arrow");
-	// case COMPOSITES:
-	// return messages.getInfos("right_red_arrow");
-	// case ATTRIBUTES:
-	// return messages.getInfos("up_right_red_arrow");
-	// case VALUES:
-	// return messages.getInfos("right_red_arrow");
-	// default:
-	// break;
-	// }
-	// throw new IllegalStateException();
-	// }
-
-	// TODO no more used
-	// public String getIconTitle() {
-	// return getIconTitle(selectedTreeNode);
-	// }
-
-	// TODO no more used
-	// public String getIconTitle(GenericTreeNode genericTreeNode) {
-	// switch (genericTreeNode.getTreeType()) {
-	// case SUPERS:
-	// return messages.getMessage("super");
-	// case INSTANCES:
-	// return messages.getMessage("instance");
-	// case INHERITINGS:
-	// return messages.getMessage("inheriting");
-	// case COMPONENTS:
-	// return messages.getMessage("component");
-	// case COMPOSITES:
-	// return messages.getMessage("composite");
-	// case ATTRIBUTES:
-	// return messages.getMessage("attribute");
-	// case VALUES:
-	// return messages.getMessage("value");
-	// default:
-	// break;
-	// }
-	// throw new IllegalStateException();
-	// }
-
 	public String getTypeIcon(GenericTreeNode genericTreeNode) {
 		Generic generic = genericTreeNode.getGeneric();
 		if (generic.isMeta()) {
@@ -315,10 +230,6 @@ public class GenericTreeBean implements Serializable {
 		throw new IllegalStateException();
 	}
 
-	public GenericTreeNodeWrapper getGenericTreeNodeWrapper(GenericTreeNode genericTreeNode) {
-		return new GenericTreeNodeWrapper(genericTreeNode);
-	}
-
 	public static class TreeSelectionEvent {
 		private final String id;
 		private final Object object;
@@ -336,27 +247,6 @@ public class GenericTreeBean implements Serializable {
 			return object;
 		}
 
-	}
-
-	public class GenericTreeNodeWrapper {
-		private GenericTreeNode genericTreeNode;
-
-		public GenericTreeNodeWrapper(GenericTreeNode genericTreeNode) {
-			this.genericTreeNode = genericTreeNode;
-		}
-
-		public String getValue() {
-			return genericTreeNode.getValue();
-		}
-
-		public void setValue(String newValue) {
-			Generic generic = genericTreeNode.getGeneric();
-			if (!newValue.equals(generic.toString())) {
-				genericTreeNode.setGeneric(generic.updateKey(newValue));
-				messages.info("updateGeneric", newValue, generic.getValue());
-				panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
-			}
-		}
 	}
 
 }

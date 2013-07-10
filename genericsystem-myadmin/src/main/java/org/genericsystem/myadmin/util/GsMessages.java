@@ -83,12 +83,6 @@ public class GsMessages implements Serializable {
 		messagesToRedirect.add(message);
 	}
 
-	// public void redirectStringError(String simpleMessage, Object... params) {
-	// Message message = factory.error(simpleMessage, params).build();
-	// log.info(message.getDetail());
-	// messagesToRedirect.add(message);
-	// }
-
 	public void redirectThrowable(Throwable t) {
 		Message message = factory.error(t.toString()).build();
 		log.error("\n" + toString(t));

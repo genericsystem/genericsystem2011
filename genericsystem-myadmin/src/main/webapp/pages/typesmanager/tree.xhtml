@@ -36,13 +36,13 @@
 				styleClass="capitalize bold" />
 			<h:selectBooleanCheckbox value="#{genericTreeBean.implicitShow}"
 				title="#{msg.show} #{msg.implicits}" style="vertical-align: middle;">
-				<a4j:ajax event="change" render="typestree" />
+				<a4j:ajax event="change" execute="@this" render="typestree" />
 			</h:selectBooleanCheckbox>
 			<h:outputText value="#{msg.lockSelection}"
 				styleClass="bold" />
 			<h:selectBooleanCheckbox value="#{genericTreeBean.selectionLocked}"
 				title="#{msg.lockSelection}" style="vertical-align: middle;">
-				<a4j:ajax event="change" render="typestree" />
+				<a4j:ajax event="change" execute="typestree" render="typestree" />
 			</h:selectBooleanCheckbox>
 		</f:facet>
 
@@ -60,32 +60,19 @@
 			selectionType="ajax"
 			oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
 			selectionChangeListener="#{genericTreeBean.change}"
-			render="menutypesmanager, edittypesmanager, paneltitletypesmanager">
+			execute="typestree" render="paneltitletypesmanager,menutypesmanager,edittypesmanager">
 			<rich:treeModelRecursiveAdaptor roots="#{genericTreeBean.root}"
 				nodes="#{genericTreeBean.getChildrens(item)}">
-				<!-- 			iconCollapsed="#{genericTreeBean.getCollapsedIcon(item)}" -->
-				<!-- 				iconExpanded="#{genericTreeBean.getExpandedIcon(item)}" -->
-				<!-- title="#{genericTreeBean.getIconTitle(item)}" -->
 				<rich:treeNode iconCollapsed="#{genericTreeBean.getTypeIcon(item)}"
 					iconExpanded="#{genericTreeBean.getTypeIcon(item)}"
 					onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}"
 					title="#{genericTreeBean.getTypeIconTitle(item)}">
-					<!-- 				<h:graphicImage value="#{genericTreeBean.getTypeIcon(item)}" -->
-					<!-- 					styleClass="middleAlign" -->
-					<!-- 					title="#{genericTreeBean.getTypeIconTitle(item)}" /> -->
-<!-- 					<a4j:outputPanel layout="block"> -->
-<!-- 						<h:outputText value="item"/> -->
-						<rich:dragIndicator id="item" acceptClass="accept" rejectClass="reject" draggingClass="default">
-					    	#{item}
-					    </rich:dragIndicator>
-						<rich:dragSource type="std2" dragValue="#{item}"/>
-<!-- 						dragIndicator="item"/> -->
-<!-- 					</a4j:outputPanel> -->
-					<rich:inplaceInput value="#{genericTreeBean.getGenericTreeNodeWrapper(item).value}"
+					<rich:dragSource type="genericTreeNode" dragValue="#{item}"/>
+					<rich:inplaceInput value="#{wrapperBean.getGenericTreeNodeWrapper(item).value}"
 						title="#{genericTreeBean.getTypeIconTitle(item)}" editEvent="dblclick"
 						rendered="#{!item.isReadOnly}" activeClass="blackcolor"
 						changedClass="blackcolor" styleClass="#{genericTreeBean.getStyle(item)}">
-						<a4j:ajax event="change" render="typesmanager" />
+						<a4j:ajax event="change" execute="typestree" render="typesmanager" />
 					</rich:inplaceInput>
 					<h:outputText value="#{item.getValue}"
 						title="#{genericTreeBean.getTypeIconTitle(item)}"
@@ -105,42 +92,42 @@
 				<rich:dragIndicator id="int" acceptClass="accept" rejectClass="reject" draggingClass="default">
 		        	int
 		    	</rich:dragIndicator>
-				<rich:dragSource type="std" dragValue="int" dragIndicator="int"/>
+				<rich:dragSource type="primitive" dragValue="int" dragIndicator="int"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="long" />
 				<rich:dragIndicator id="long" acceptClass="accept" rejectClass="reject" draggingClass="default">
 			        long
 			    </rich:dragIndicator>
-				<rich:dragSource type="std" dragValue="long" dragIndicator="long"/>
+				<rich:dragSource type="primitive" dragValue="long" dragIndicator="long"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="float" />
 				<rich:dragIndicator id="float" acceptClass="accept" rejectClass="reject" draggingClass="default">
 			        float
 			    </rich:dragIndicator>
-				<rich:dragSource type="std" dragValue="float" dragIndicator="float"/>
+				<rich:dragSource type="primitive" dragValue="float" dragIndicator="float"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="double" />
 				<rich:dragIndicator id="double" acceptClass="accept" rejectClass="reject" draggingClass="default">
 			        double
 			    </rich:dragIndicator>
-				<rich:dragSource type="std" dragValue="double" dragIndicator="double"/>
+				<rich:dragSource type="primitive" dragValue="double" dragIndicator="double"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="boolean" />
 				<rich:dragIndicator id="boolean" acceptClass="accept" rejectClass="reject" draggingClass="default">
 			        boolean
 			    </rich:dragIndicator>
-				<rich:dragSource type="std" dragValue="boolean" dragIndicator="boolean"/>
+				<rich:dragSource type="primitive" dragValue="boolean" dragIndicator="boolean"/>
 			</a4j:outputPanel>
 			<a4j:outputPanel layout="block">
 				<h:outputText value="string" />
 				<rich:dragIndicator id="string" acceptClass="accept" rejectClass="reject" draggingClass="default">
 			        string
 			    </rich:dragIndicator>
-				<rich:dragSource type="std" dragValue="string" dragIndicator="string"/>
+				<rich:dragSource type="primitive" dragValue="string" dragIndicator="string"/>
 			</a4j:outputPanel>
 		</rich:panel>
 	</rich:panel>

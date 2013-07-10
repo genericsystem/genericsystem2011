@@ -13,14 +13,11 @@ import org.genericsystem.example.Example.Vehicle;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.myadmin.beans.TypesBean;
 import org.testng.annotations.Test;
 
 @Test
 public class TypesTest extends AbstractTest {
 
-	@Inject
-	private TypesBean typesBean;
 	@Inject
 	private Cache cache;
 

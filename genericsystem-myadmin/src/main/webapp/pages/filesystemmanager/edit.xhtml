@@ -15,7 +15,7 @@
 		<h:inputTextarea id="code" name="code"
 			value="#{fileSystemBean.content}"
 			rendered="#{fileSystemBean.fileSelected}">
-			<f:ajax render="editfilesystemmanager" execute="code" event="change" />
+			<f:ajax event="change" execute="code" render="editfilesystemmanager" />
 		</h:inputTextarea>
 
 		<script>
