@@ -11,9 +11,6 @@ import org.genericsystem.generic.Type;
 
 public class GenericTreeNode {
 
-	// TODO clean
-	// private static Logger log = LoggerFactory.getLogger(GenericTreeNode.class);
-
 	private final GenericTreeNode parent;
 
 	private Generic generic;

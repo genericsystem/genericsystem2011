@@ -69,6 +69,13 @@ public interface Generic extends Comparable<Generic> {
 	boolean isReallyAttribute();
 
 	/**
+	 * Returns true if this Generic is really a Relation.
+	 * 
+	 * @return True if the Generic is really a Relation.
+	 */
+	boolean isReallyRelation();
+
+	/**
 	 * Returns true if this Generic is an Attribute for the checked Generic.
 	 * 
 	 * @param Generic

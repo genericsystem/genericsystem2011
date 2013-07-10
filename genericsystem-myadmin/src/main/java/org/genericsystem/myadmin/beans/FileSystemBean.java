@@ -52,7 +52,7 @@ public class FileSystemBean implements Serializable {
 		return directory.getFiles();
 	}
 
-	public void changeFile(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
+	public void changeFile(@Observes TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("directorytree")) {
 			selectedFile = (Generic) treeSelectionEvent.getObject();
 			panelTitleChangeEvent.fire(new PanelTitleChangeEvent("filesystemmanager", getShortPath()));

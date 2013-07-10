@@ -238,6 +238,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
+	public boolean isReallyRelation() {
+		return components.length == 2;
+	}
+
+	@Override
 	public <S extends Serializable> S getValue() {
 		return (S) value;
 	}

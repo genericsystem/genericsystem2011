@@ -1,5 +1,7 @@
 package org.genericsystem.impl;
 
+import java.util.List;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -11,12 +13,59 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
 public class AnnotationTest extends AbstractTest {
+
+	public void testMultiDirectionalRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type human = cache.newType("Human");
+		Generic michael = human.newInstance("Michael");
+		Generic quentin = human.newInstance("Quentin");
+		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
+		isBrotherOf.enableMultiDirectional();
+		Link link = quentin.bind(isBrotherOf, michael);
+
+		List<Generic> targetsFromQuentin = quentin.getOtherTargets(link);
+		assert targetsFromQuentin.size() == 1 : targetsFromQuentin.size();
+		assert targetsFromQuentin.contains(michael) : targetsFromQuentin;
+		assert !targetsFromQuentin.contains(quentin) : targetsFromQuentin;
+
+		List<Generic> targetsFromMichael = michael.getOtherTargets(link);
+		assert targetsFromMichael.size() == 1 : targetsFromMichael.size();
+		assert targetsFromMichael.contains(quentin) : targetsFromMichael;
+		assert !targetsFromMichael.contains(michael) : targetsFromMichael;
+
+		assert michael.getTargets(isBrotherOf, 0).contains(quentin) : michael.getTargets(isBrotherOf);
+	}
+
+	public void testSimpleDirectionalRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type color = cache.newType("Color");
+		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic red = color.newInstance("red");
+		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
+		vehicleColor.enableMultiDirectional();
+		Link link = myVehicle.bind(vehicleColor, red);
+
+		List<Generic> targetsFromMyVehicle = myVehicle.getOtherTargets(link);
+		assert targetsFromMyVehicle.size() == 1 : targetsFromMyVehicle.size();
+		assert targetsFromMyVehicle.contains(red) : targetsFromMyVehicle;
+		assert !targetsFromMyVehicle.contains(myVehicle) : targetsFromMyVehicle;
+
+		List<Generic> targetsFromRed = red.getOtherTargets(link);
+		assert targetsFromRed.size() == 1 : targetsFromRed.size();
+		assert targetsFromRed.contains(myVehicle) : targetsFromRed;
+		assert !targetsFromRed.contains(red) : targetsFromRed;
+
+		red.getLinks(vehicleColor).log();
+		assert red.getTargets(vehicleColor).contains(myVehicle) : red.getTargets(vehicleColor);
+	}
 
 	public void testType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, Myck.class);
