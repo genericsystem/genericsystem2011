@@ -328,27 +328,25 @@ public class RelationTest extends AbstractTest {
 	}
 
 	public void testToOneInheritanceReverse() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
-
-		final Relation carOwner = car.setRelation("CarOwner", owner);
-		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
-		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
+		Type color = cache.newType("Color");
+		final Relation carColor = car.setRelation("CarColor", color);
+		carColor.enableSingularConstraint(Statics.BASE_POSITION);
+		assert carColor.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
 		final Generic myBmw = car.newInstance("myBmw");
-		Generic me = owner.newInstance("me");
-		final Generic you = owner.newInstance("you");
+		Generic red = color.newInstance("red");
+		final Generic yellow = color.newInstance("yellow");
 
-		me.setLink(carOwner, "defaultOwner", car);
-		assert myBmw.getLink(carOwner).getBaseComponent().equals(car);
+		red.setLink(carColor, "defaultColor", car);
+		assert myBmw.getLink(carColor).getBaseComponent().equals(car);
 
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				you.bind(carOwner, myBmw);
+				yellow.bind(carColor, myBmw);
 			}
 
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
@@ -729,7 +727,7 @@ public class RelationTest extends AbstractTest {
 		Generic pierre = person.newInstance("pierre");
 
 		Link carPierre = pierre.setLink(carPerson, "defaultPerson", car);
-		assert myBmw.getLink(carPerson).getBaseComponent().equals(myBmw);
+		assert myBmw.getLink(carPerson).getBaseComponent().equals(myBmw) : myBmw.getLink(carPerson);
 
 		Link myBmwMichael = michael.bind(carPerson, myBmw);
 		Link myBmwNicolas = nicolas.bind(carPerson, myBmw);

@@ -7,32 +7,36 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
+import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl.AxedConstraintClass;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
-public abstract class AbstractMapProvider extends GenericImpl implements MapProvider {
+public abstract class AbstractMapProvider<Key extends Serializable, Value extends Serializable> extends GenericImpl implements MapProvider {
 
-	private static final String MAP_VALUE = "map";
+	static final String MAP_VALUE = "map";
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Map<Serializable, Serializable> getMap(final Generic generic) {
-		return new AbstractMap<Serializable, Serializable>() {
+	public Map<Key, Value> getMap(final Generic generic) {
+		return new AbstractMap<Key, Value>() {
 
 			@Override
-			public Set<Map.Entry<Serializable, Serializable>> entrySet() {
-				return new AbstractSnapshot<Entry<Serializable, Serializable>>() {
+			public Set<Map.Entry<Key, Value>> entrySet() {
+				return new AbstractSnapshot<Entry<Key, Value>>() {
 					@Override
-					public Iterator<Entry<Serializable, Serializable>> iterator() {
+					public Iterator<Entry<Key, Value>> iterator() {
 						return entriesIterator(generic);
 					}
 				};
@@ -44,34 +48,79 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 			}
 
 			@Override
-			public Serializable get(Object key) {
+			public Value get(Object key) {
 				if (!(key instanceof Serializable))
 					return null;
 				GenericImpl map = generic.getHolder(AbstractMapProvider.this);
 				if (map == null)
 					return null;
-				Holder keyHolder = map.getHolderByValue(getEngine().getCurrentCache().<Attribute> find(getKeyAttributeClass()), (Serializable) key);
+				int axe = -1;
+				if (key instanceof AxedConstraintClass) {
+					axe = ((AxedConstraintClass) key).getAxe();
+					key = ((AxedConstraintClass) key).getClazz();
+				}
+				Holder keyHolder = map.getHolderByValue(getCurrentCache().<Attribute> find(getKeyAttributeClass()), (Serializable) key);
+				if (axe != -1)
+					for (Holder holder : keyHolder.<Holder> getInheritings())
+						if (((AxedConstraintClass) holder.getValue()).getAxe() == axe) {
+							keyHolder = holder;
+							break;
+						}
 				if (keyHolder == null)
 					return null;
-				return keyHolder.getHolder(getEngine().getCurrentCache().<Attribute> find(getValueAttributeClass())).getValue();
+				Holder valueHolder = keyHolder.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
+				log.info("keyHolder " + keyHolder + " valueHolder " + valueHolder + " " + keyHolder.info());
+				return (Value) (valueHolder != null ? valueHolder.getValue() : null);
 			}
 
 			@Override
-			public Serializable put(Serializable key, Serializable value) {
+			public Value put(Key key, Value value) {
 				assert null != value;
-				Serializable oldValue = get(key);
-				generic.setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getEngine().getCurrentCache().<Attribute> find(getKeyAttributeClass()), key).setHolder(getEngine().getCurrentCache().<Attribute> find(getValueAttributeClass()), value);
+				Value oldValue = get(key);
+				Holder keyHolder = generic.setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getCurrentCache().<Attribute> find(getKeyAttributeClass()), (Serializable) key);
+
+				log.info("ZZZZZZ " + keyHolder.info());
+
+				// AxedConstraintClass key = new AxedConstraintClass(getClass(), pos);
+				// getCurrentCache().<GenericImpl> find(MapInstance.class).setSubAttribute(this, key);
+
+				setSingularHolder(keyHolder, getCurrentCache().<Attribute> find(getValueAttributeClass()), (Serializable) value);
 				return oldValue;
 			}
 		};
 	}
 
-	private Iterator<Entry<Serializable, Serializable>> entriesIterator(final Generic generic) {
+	// TODO KK code copier du setHolder
+	private static <T extends Holder> T setSingularHolder(Holder keyHolder, Holder attribute, Serializable value, Generic... targets) {
+		int basePos = keyHolder.getBasePos(attribute);
+		T holder = keyHolder.getHolder((Attribute) attribute, basePos);
+		Generic implicit = ((GenericImpl) attribute).bindPrimary(keyHolder.getClass(), value, SystemGeneric.CONCRETE, true);
+		if (holder == null) {
+			log.info("CAS 1");
+			return null != value ? ((GenericImpl) keyHolder).<T> bind(implicit, attribute, basePos, true, targets) : null;
+		}
+		if (!keyHolder.equals(holder.getComponent(basePos))) {
+			log.info("CAS 2");
+			if (value == null)
+				return keyHolder.cancel(holder, basePos, true);
+			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+				keyHolder.cancel(holder, basePos, true);
+			return ((GenericImpl) keyHolder).<T> bind(implicit, attribute, basePos, true, targets);
+		}
+		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(keyHolder, targets, basePos))) {
+			log.info("CAS 3");
+			return holder;
+		}
+		holder.remove();
+		return setSingularHolder(keyHolder, attribute, value, targets);
+	}
+
+	private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {
 		Holder map = generic.getHolder(this);
 		if (map == null)
 			return Statics.emptyIterator();
-		Attribute key = getEngine().getCurrentCache().<Attribute> find(getKeyAttributeClass());
-		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Serializable, Serializable>>(((GenericImpl) map).<Holder> holdersIterator(key, getBasePos(key), false)) {
+		Attribute key = getCurrentCache().<Attribute> find(getKeyAttributeClass());
+		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Key, Value>>(((GenericImpl) map).<Holder> holdersIterator(key, getBasePos(key), false)) {
 
 			@Override
 			public boolean isSelected() {
@@ -91,9 +140,10 @@ public abstract class AbstractMapProvider extends GenericImpl implements MapProv
 				}
 			}
 
+			@SuppressWarnings("unchecked")
 			@Override
-			protected Map.Entry<Serializable, Serializable> project() {
-				return new AbstractMap.SimpleEntry<Serializable, Serializable>(next.getValue(), next.getHolder(getEngine().getCurrentCache().<Attribute> find(getValueAttributeClass())).getValue());
+			protected Map.Entry<Key, Value> project() {
+				return new AbstractMap.SimpleEntry<Key, Value>((Key) next.getValue(), (Value) next.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass())).getValue());
 			}
 		};
 	}

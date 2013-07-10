@@ -565,12 +565,19 @@ public class CacheImpl extends AbstractContext implements Cache {
 		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
+		checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, false, adds);
+		checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Constraint constraint : getSortedConstraints(checkingType, immediatlyCheckable))
 			for (Generic generic : generics)
 				constraint.check(generic);
+	}
+
+	private void checkConstraints2(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
+		// for (Generic generic : generics)
+		// generic.getContraints().keySet()
 	}
 
 	@Override

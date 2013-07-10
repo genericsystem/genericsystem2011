@@ -1,5 +1,7 @@
 package org.genericsystem.impl;
 
+import java.io.Serializable;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
@@ -8,14 +10,13 @@ import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.impl.MyMapProvider.MyKey;
 import org.genericsystem.impl.MyMapProvider.MyValue;
 import org.genericsystem.map.AbstractMapProvider;
 
 @SystemGeneric
 @Components(Engine.class)
-@Dependencies({ MyKey.class, MyValue.class })
-public class MyMapProvider extends AbstractMapProvider {
+@Dependencies(MyValue.class)
+public class MyMapProvider extends AbstractMapProvider<Serializable, Serializable> {
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -42,4 +43,5 @@ public class MyMapProvider extends AbstractMapProvider {
 	public static class MyValue extends GenericImpl implements Attribute {
 
 	}
+
 }

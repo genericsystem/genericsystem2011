@@ -11,6 +11,6 @@ import org.genericsystem.core.Generic;
  */
 public interface MapProvider extends Type {
 
-	Map<Serializable, Serializable> getMap(Generic generic);
+	<Key extends Serializable, Value extends Serializable> Map<Key, Value> getMap(Generic generic);
 
 }

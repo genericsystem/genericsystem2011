@@ -41,6 +41,8 @@ import org.genericsystem.iterator.ArrayIterator;
 import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
+import org.genericsystem.map.ConstraintsMapProvider;
+import org.genericsystem.map.ConstraintsMapProvider.SingularConstraintImpl;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
@@ -48,9 +50,9 @@ import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
+import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.SingularInstanceConstraintImpl;
@@ -238,6 +240,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
+	public boolean isReallyRelation() {
+		return components.length == 2;
+	}
+
+	@Override
 	public <S extends Serializable> S getValue() {
 		return (S) value;
 	}
@@ -318,7 +325,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	}
 
-	protected <T extends Holder> T bind(Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
+	public <T extends Holder> T bind(Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
 		return getCurrentCache().bind(implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
 	}
 
@@ -1355,32 +1362,37 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableSingularConstraint() {
-		return enableSystemProperty(SingularConstraintImpl.class);
+		return enableSingularConstraint(Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint() {
-		return disableSystemProperty(SingularConstraintImpl.class);
+		return disableSingularConstraint(Statics.BASE_POSITION);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(SingularConstraintImpl.class);
+		return isSingularConstraintEnabled(Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T enableSingularConstraint(int basePos) {
-		return enableSystemProperty(SingularConstraintImpl.class, basePos);
+		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(basePos), true);
+		return (T) this;
+		// return enableSystemProperty(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint(int basePos) {
-		return disableSystemProperty(SingularConstraintImpl.class, basePos);
+		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(basePos), false);
+		return (T) this;
+		// return disableSystemProperty(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled(int basePos) {
-		return isBooleanSystemPropertyEnabled(SingularConstraintImpl.class, basePos);
+		return Boolean.TRUE.equals(getContraints().get(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(basePos)));
+		// return isBooleanSystemPropertyEnabled(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
@@ -1539,7 +1551,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return result;
 	}
 
-	boolean equiv(Generic[] interfaces, Generic[] components) {
+	public boolean equiv(Generic[] interfaces, Generic[] components) {
 		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullToSelfComponent(components), this.components);
 	}
 
@@ -1594,6 +1606,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public Map<Serializable, Serializable> getProperties() {
 		return getMap(PropertiesMapProvider.class);
+	}
+
+	@Override
+	public Map<Serializable, Serializable> getContraints() {
+		return getMap(ConstraintsMapProvider.class);
 	}
 
 	@Override
