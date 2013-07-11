@@ -97,9 +97,12 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		Attribute key = getCurrentCache().<Attribute> find(getKeyAttributeClass());
 		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Key, Value>>(((GenericImpl) map).<Holder> holdersIterator(key, getBasePos(key), false)) {
 
+			private Holder valueHolder;
+
 			@Override
 			public boolean isSelected() {
-				return true;
+				valueHolder = next.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
+				return valueHolder != null;
 			}
 
 			@Override
@@ -118,8 +121,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 			@SuppressWarnings("unchecked")
 			@Override
 			protected Map.Entry<Key, Value> project() {
-				Holder value = next.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
-				return new AbstractMap.SimpleEntry<Key, Value>((Key) next.getValue(), value != null ? (Value) value.getValue() : null);
+				return new AbstractMap.SimpleEntry<Key, Value>((Key) next.getValue(), valueHolder.<Value> getValue());
 			}
 		};
 	}
