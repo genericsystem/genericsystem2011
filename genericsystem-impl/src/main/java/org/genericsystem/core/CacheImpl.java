@@ -33,8 +33,8 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
-import org.genericsystem.systemproperties.constraints.AxedConstraintImpl;
-import org.genericsystem.systemproperties.constraints.AxedConstraintImpl.AxedConstraintClass;
+import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl.AxedConstraintClass;
 import org.genericsystem.systemproperties.constraints.Constraint;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 import org.genericsystem.tree.TreeImpl;
@@ -590,7 +590,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				Class<? extends Serializable> keyClazz;
 				if (key instanceof AxedConstraintClass) {
 					keyClazz = ((AxedConstraintClass) key).getClazz();
-					constraint = ((AxedConstraintImpl) find(keyClazz)).bindAxedConstraint(keyClazz, ((AxedConstraintClass) key).getAxe());
+					constraint = ((AbstractAxedConstraintImpl) find(keyClazz)).bindAxedConstraint(keyClazz, ((AxedConstraintClass) key).getAxe());
 					assert constraint != null;
 					if (constraint == null)
 						continue;
@@ -617,8 +617,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 								// log.info("holder " + holder.info() + " " + holder.<GenericImpl> getBaseComponent().getBaseComponent());
 								holder.getHolder(this.<Holder> find(ConstraintValue.class)).log();
 								if (Boolean.TRUE.equals(holder.getValue(this.<Holder> find(ConstraintValue.class))))
-									if (constraint instanceof AxedConstraintImpl)
-										((AxedConstraintImpl) constraint).check(holder.<GenericImpl> getBaseComponent().getBaseComponent(), generic, ((AxedConstraintClass) key).getAxe());
+									if (constraint instanceof AbstractAxedConstraintImpl)
+										((AbstractAxedConstraintImpl) constraint).check(holder.<GenericImpl> getBaseComponent().getBaseComponent(), generic, ((AxedConstraintClass) key).getAxe());
 								// else
 								// constraint.check(holder.<GenericImpl> getBaseComponent().getBaseComponent(), generic);
 							}

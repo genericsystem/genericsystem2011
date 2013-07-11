@@ -7,7 +7,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
-public abstract class AxedConstraintImpl extends AbstractConstraintImpl {
+public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl {
 
 	private static final long serialVersionUID = 6417651505947151178L;
 
@@ -25,7 +25,7 @@ public abstract class AxedConstraintImpl extends AbstractConstraintImpl {
 		Generic implicit = findPrimary(new AxedConstraintClass((Class<Serializable>) getClass(), pos), SystemGeneric.STRUCTURAL);
 		if (implicit == null)
 			return null;
-		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AxedConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
+		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AbstractAxedConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
 	}
 
 	public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {

@@ -22,7 +22,7 @@ import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.map.ConstraintsMapProvider.SingularConstraintImpl;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
-import org.genericsystem.systemproperties.constraints.AxedConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -70,7 +70,7 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 	@Extends(ConstraintKey.class)
 	@Dependencies(SingularConstraintImpl.DefaultValue.class)
 	// TODO KK Singular is axed
-	public static class SingularConstraintImpl extends AxedConstraintImpl implements Holder, BooleanSystemProperty {
+	public static class SingularConstraintImpl extends AbstractAxedConstraintImpl implements Holder, BooleanSystemProperty {
 
 		private static final long serialVersionUID = 5155132185576732814L;
 

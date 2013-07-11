@@ -49,7 +49,7 @@ import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.AxedConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
@@ -1384,21 +1384,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableSingularConstraint(int basePos) {
-		getContraints().put(getCurrentCache().<AxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue(), true);
+		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue(), true);
 		return (T) this;
 		// return enableSystemProperty(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint(int basePos) {
-		getContraints().put(getCurrentCache().<AxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue(), false);
+		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue(), false);
 		return (T) this;
 		// return disableSystemProperty(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled(int basePos) {
-		return Boolean.TRUE.equals(getContraints().get(getCurrentCache().<AxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue()));
+		return Boolean.TRUE.equals(getContraints().get(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue()));
 		// return isBooleanSystemPropertyEnabled(SingularConstraintImpl.class, basePos);
 	}
 
