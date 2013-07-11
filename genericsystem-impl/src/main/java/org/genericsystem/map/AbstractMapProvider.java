@@ -119,7 +119,8 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 			@SuppressWarnings("unchecked")
 			@Override
 			protected Map.Entry<Key, Value> project() {
-				return new AbstractMap.SimpleEntry<Key, Value>((Key) next.getValue(), (Value) next.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass())).getValue());
+				Holder value = next.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
+				return new AbstractMap.SimpleEntry<Key, Value>((Key) next.getValue(), value != null ? (Value) value.getValue() : null);
 			}
 		};
 	}

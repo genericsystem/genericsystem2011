@@ -571,7 +571,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
-		log.info("#################################");
 		checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 		checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 	}
@@ -585,14 +584,19 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@SuppressWarnings("unchecked")
 	private void checkConstraints2(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics) {
-			log.info("================> generic " + generic + " " + generic.getContraints());
 			for (Serializable key : generic.getContraints().keySet()) {
 				log.info("================> key " + key);
 				AbstractConstraintImpl constraint;
 				Class<? extends Serializable> keyClazz;
 				if (key instanceof AxedConstraintClass) {
 					keyClazz = ((AxedConstraintClass) key).getClazz();
+					Generic t = find(keyClazz);
+					t.log();
+					for (Generic g : t.getInheritings())
+						g.log();
 					constraint = ((AbstractAxedConstraintImpl) find(keyClazz)).findConstraint(((AxedConstraintClass) key).getAxe());
+
+					log.info("OOO constraint " + constraint + " " + keyClazz);
 
 					if (constraint == null)
 						continue;
@@ -648,12 +652,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 		simpleAdd((GenericImpl) generic);
 		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
+		checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
 	}
 
 	private void removeGeneric(Generic generic) throws ConstraintViolationException {
 		removeOrCancelAdd(generic);
 		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
+		checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
 	}
 
 	private void removeOrCancelAdd(Generic generic) throws ConstraintViolationException {
