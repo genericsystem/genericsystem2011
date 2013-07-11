@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -12,7 +11,7 @@ import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider.SingularConstraintImpl;
-import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AxedConstraintImpl;
 import org.testng.annotations.Test;
 
 @Test
@@ -164,8 +163,8 @@ public class MapTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		assert Boolean.FALSE.equals(vehicle.getContraints().get(SingularConstraintImpl.class));
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color).<Relation> enableSingularConstraint(Statics.TARGET_POSITION);
-		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION) : vehicleColor.getContraints().get(cache.<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.TARGET_POSITION));
-		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION) : vehicleColor.getContraints().get(cache.<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.BASE_POSITION));
+		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION) : vehicleColor.getContraints().get(cache.<AxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, Statics.TARGET_POSITION));
+		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION) : vehicleColor.getContraints().get(cache.<AxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, Statics.BASE_POSITION));
 		assert Boolean.FALSE.equals(vehicle.getContraints().get(SingularConstraintImpl.class));
 		vehicleColor.disableSingularConstraint(Statics.TARGET_POSITION);
 		assert !vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);

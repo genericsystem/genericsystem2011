@@ -1,35 +1,36 @@
 package org.genericsystem.systemproperties.constraints;
 
 import java.io.Serializable;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
-public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl {
+public abstract class AxedConstraintImpl extends AbstractConstraintImpl {
 
 	private static final long serialVersionUID = 6417651505947151178L;
 
-	public AxedConstraintClass bindAxedConstraint(int pos) {
+	public AbstractConstraintImpl bindAxedConstraint(Class<?> specializationClass, int pos) {
 		@SuppressWarnings("unchecked")
 		AxedConstraintClass key = new AxedConstraintClass((Class<Serializable>) getClass(), pos);
 		// getCurrentCache().<GenericImpl> find(MapInstance.class).setSubAttribute(this, key);
 
-		getCurrentCache().<GenericImpl> find(MapInstance.class).bind(getEngine().bindPrimary(Generic.class, key, SystemGeneric.STRUCTURAL, true), this, getBasePos(this), false, new Generic[] {});
-		return key;
+		return getCurrentCache().<GenericImpl> find(MapInstance.class).bind(specializationClass, getEngine().bindPrimary(Generic.class, key, SystemGeneric.STRUCTURAL, true), this, getBasePos(this), false, new Generic[] {});
+
 	}
 
 	@SuppressWarnings("unchecked")
-	public AbstractAxedConstraintImpl findConstraint(int pos) {
+	public AbstractConstraintImpl findConstraint(int pos) {
 		Generic implicit = findPrimary(new AxedConstraintClass((Class<Serializable>) getClass(), pos), SystemGeneric.STRUCTURAL);
 		if (implicit == null)
 			return null;
-		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AbstractAxedConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
+		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AxedConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
 	}
 
-	public abstract void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException;
+	public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
+
+	}
 
 	public static class AxedConstraintClass implements Serializable {
 		private static final long serialVersionUID = 182492104604984855L;
@@ -67,6 +68,12 @@ public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl 
 		public String toString() {
 			return "class : " + clazz + ", axe : " + axe;
 		}
+	}
+
+	@Override
+	public void check(Generic modified) throws ConstraintViolationException {
+		// TODO Auto-generated method stub
+
 	}
 
 }

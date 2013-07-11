@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -77,13 +76,13 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		T holder = keyHolder.getHolder((Attribute) attribute, basePos);
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(keyHolder.getClass(), value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
-			return null != value ? ((GenericImpl) keyHolder).<T> bind(implicit, attribute, basePos, true, targets) : null;
+			return null != value ? ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets) : null;
 		if (!keyHolder.equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return keyHolder.cancel(holder, basePos, true);
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
 				keyHolder.cancel(holder, basePos, true);
-			return ((GenericImpl) keyHolder).<T> bind(implicit, attribute, basePos, true, targets);
+			return ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets);
 		}
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(keyHolder, targets, basePos)))
 			return holder;
