@@ -276,6 +276,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().bindPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel, automatic, specializeGeneric);
 	}
 
+	public <T extends Generic> T findPrimary(Serializable value, int metaLevel) {
+		return getCurrentCache().findPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel);
+	}
+
 	@Override
 	public <T extends Link> T setLink(Link relation, Serializable value, Generic... targets) {
 		return setHolder(relation, value, targets);
@@ -327,6 +331,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Holder> T bind(Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
 		return getCurrentCache().bind(implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
+	}
+
+	public <T extends Holder> T find(Generic implicit, Holder directSuper, int basePos, Generic... targets) {
+		return getCurrentCache().fastFindByInterfaces(implicit, new Primaries(implicit, directSuper).toArray(), Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {

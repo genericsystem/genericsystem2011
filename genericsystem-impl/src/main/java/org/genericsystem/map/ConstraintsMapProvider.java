@@ -84,17 +84,25 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 		@Override
 		public void check(Generic modified) throws ConstraintViolationException {
 			assert false;
-			for (ConstraintValue constraintValue : getConstraintValues(modified, getClass())) {
-				// TODO KK because InstanceClassConstraint, see GenericImpl::setConstraintClass
-				Serializable value = constraintValue.getValue();
-				if (value instanceof Integer) {
-					Integer axe = (Integer) value;
-					final Generic component = ((Link) modified).getComponent(axe);
-					Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) constraintValue.getConstraintBaseType(), axe);
-					if (holders.size() > 1)
-						throw new SingularConstraintViolationException("Multiple links of type " + constraintValue.getConstraintBaseType() + " on target " + component + " (n° " + axe + ") : " + holders);
-				}
-			}
+			// for (ConstraintValue constraintValue : getConstraintValues(modified, getClass())) {
+			// // TODO KK because InstanceClassConstraint, see GenericImpl::setConstraintClass
+			// Serializable value = constraintValue.getValue();
+			// if (value instanceof Integer) {
+			// Integer axe = (Integer) value;
+			// final Generic component = ((Link) modified).getComponent(axe);
+			// Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) constraintValue.getConstraintBaseType(), axe);
+			// if (holders.size() > 1)
+			// throw new SingularConstraintViolationException("Multiple links of type " + constraintValue.getConstraintBaseType() + " on target " + component + " (n° " + axe + ") : " + holders);
+			// }
+			// }
+		}
+
+		@Override
+		public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
+			Generic component = ((Link) modified).getComponent(axe);
+			Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
+			if (holders.size() > 1)
+				throw new SingularConstraintViolationException("Multiple links of type " + baseComponent + " on target " + component + " (n° " + axe + ") : " + holders);
 		}
 	}
 }

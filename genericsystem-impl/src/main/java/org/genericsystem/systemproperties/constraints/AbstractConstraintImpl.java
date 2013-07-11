@@ -17,14 +17,11 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractProjectionIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 public abstract class AbstractConstraintImpl extends GenericImpl implements /* Comparable<AbstractConstraintImpl>, */Serializable {
 
 	private static final long serialVersionUID = -3257819220762195050L;
-
-	public enum CheckingType {
-		CHECK_ON_ADD_NODE, CHECK_ON_REMOVE_NODE
-	}
 
 	public abstract void check(Generic modified) throws ConstraintViolationException;
 
@@ -33,8 +30,8 @@ public abstract class AbstractConstraintImpl extends GenericImpl implements /* C
 		return annotation != null ? annotation.value() : 0;
 	}
 
-	public boolean isCheckedAt(CheckingType type) {
-		return type.equals(CheckingType.CHECK_ON_ADD_NODE);
+	public boolean isCheckedAt(CheckingType checkingType) {
+		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE);
 	}
 
 	public boolean isImmediatelyCheckable() {
