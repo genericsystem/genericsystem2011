@@ -25,10 +25,14 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	static final String MAP_VALUE = "map";
 
+	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {
+
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<Key, Value> getMap(final Generic generic) {
-		return new AbstractMap<Key, Value>() {
+	public ExtendedMap<Key, Value> getMap(final Generic generic) {
+		return new AbstractExtendedMap<Key, Value>() {
 
 			@Override
 			public Set<Map.Entry<Key, Value>> entrySet() {
@@ -47,16 +51,27 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Value get(Object key) {
+				Holder keyHolder = getKeyHolder((Serializable) key);
+				if (keyHolder == null)
+					return null;
+				Holder valueHolder = keyHolder.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
+				return (Value) (valueHolder != null ? valueHolder.getValue() : null);
+			}
+
+			@Override
+			public Holder getKeyHolder(Serializable key) {
 				if (!(key instanceof Serializable))
 					return null;
 				GenericImpl map = generic.getHolder(AbstractMapProvider.this);
 				if (map == null)
 					return null;
-				Holder keyHolder = map.getHolderByValue(getCurrentCache().<Attribute> find(getKeyAttributeClass()), (Serializable) key);
-				if (keyHolder == null)
-					return null;
-				Holder valueHolder = keyHolder.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
-				return (Value) (valueHolder != null ? valueHolder.getValue() : null);
+				return map.getHolderByValue(getCurrentCache().<Attribute> find(getKeyAttributeClass()), key);
+			}
+
+			@Override
+			public <T extends Generic> T getKeyBaseComponent(Key key) {
+				Holder holder = getKeyHolder(key);
+				return holder != null ? holder.<Holder> getBaseComponent().<T> getBaseComponent() : null;
 			}
 
 			@Override

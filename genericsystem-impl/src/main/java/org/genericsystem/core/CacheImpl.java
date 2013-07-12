@@ -28,12 +28,15 @@ import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
+import org.genericsystem.map.ConstraintsMapProvider;
+import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl.AxedConstraintClass;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AbstractSimpleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.Constraint;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 import org.genericsystem.tree.TreeImpl;
@@ -582,28 +585,76 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private void checkConstraints2(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics) {
 			for (Serializable key : generic.getContraints().keySet()) {
+				ConstraintsMapProvider mapProvider = this.<ConstraintsMapProvider> find(ConstraintsMapProvider.class);
+				Serializable value = generic.getContraints().get(key);
+				Generic baseComponent = generic.getContraints().getKeyBaseComponent(key);
 				AbstractConstraintImpl constraint;
 				Class<? extends Serializable> keyClazz;
 				if (key instanceof AxedConstraintClass) {
 					keyClazz = ((AxedConstraintClass) key).getClazz();
 					constraint = ((AbstractAxedConstraintImpl) find(keyClazz)).bindAxedConstraint(keyClazz, ((AxedConstraintClass) key).getAxe());
 					assert constraint != null;
+					if (constraint == null)
+						continue;
+					((AbstractAxedConstraintImpl) constraint).check(baseComponent, generic, ((AxedConstraintClass) key).getAxe());
+
 				} else {
 					keyClazz = (Class<? extends Serializable>) key;
 					constraint = find(keyClazz);
+					constraint.check(generic);
+					((AbstractSimpleConstraintImpl) constraint).check(baseComponent, generic);
+
 				}
 
-				if (!constraint.isCheckedAt(checkingType))
-					continue;
-				if (BooleanSystemProperty.class.isAssignableFrom(keyClazz)) {
-					if (Boolean.TRUE.equals(generic.getContraints().get(key)))
-						if (constraint instanceof AbstractAxedConstraintImpl)
-							((AbstractAxedConstraintImpl) constraint).check(constraint.<GenericImpl> getBaseComponent().getBaseComponent(), generic, ((AxedConstraintClass) key).getAxe());
-						else
-							constraint.check(generic);
-				} else
-					constraint.check(generic);
 			}
+
+			// {
+			// log.info("================> key " + key);
+			// AbstractConstraintImpl constraint;
+			// Class<? extends Serializable> keyClazz;
+			// if (key instanceof AxedConstraintClass) {
+			// keyClazz = ((AxedConstraintClass) key).getClazz();
+			// constraint = ((AbstractAxedConstraintImpl) find(keyClazz)).bindAxedConstraint(keyClazz, ((AxedConstraintClass) key).getAxe());
+			// assert constraint != null;
+			// if (constraint == null)
+			// continue;
+			//
+			// } else {
+			// keyClazz = (Class<? extends Serializable>) key;
+			// constraint = find(keyClazz);
+			//
+			// }
+			//
+			// log.info("AAA " + generic.info() + " constraint " + constraint + " " + checkingType);
+			// if (constraint.isCheckedAt(checkingType)) {
+			// Serializable value = generic.getContraints().get(key);
+			// if (BooleanSystemProperty.class.isAssignableFrom(keyClazz)) {
+			// log.info("BBB " + value);
+			// if (Boolean.TRUE.equals(value)) {
+			//
+			// ConstraintsMapProvider mapType = this.<ConstraintsMapProvider> find(ConstraintsMapProvider.class)
+			// mapType.getKeyHolder(key);
+			// GenericImpl map = generic.getHolder(this.<Holder> find(ConstraintsMapProvider.class));
+			// log.info("zzzzzzzzz" + map);
+			// if (map == null)
+			// assert false;
+			//
+			// log.info(generic + " constraint " + constraint + " map " + map + " holders : " + map.getHolders(constraint) + " " + value);
+			// // log.info("zzzzzzzzz");
+			// for (Holder holder : map.getValueHolder(constraint) {
+			// log.info("coucou " + holder.info() + " " + holder.<GenericImpl> getBaseComponent().getBaseComponent());
+			// holder.getHolder(this.<Holder> find(ConstraintValue.class)).log();
+			// if (Boolean.TRUE.equals(holder.getValue(this.<Holder> find(ConstraintValue.class))))
+			// if (constraint instanceof AbstractAxedConstraintImpl)
+			// ((AbstractAxedConstraintImpl) constraint).check(holder.<GenericImpl> getBaseComponent().getBaseComponent(), generic, ((AxedConstraintClass) key).getAxe());
+			// // else
+			// // constraint.check(holder.<GenericImpl> getBaseComponent().getBaseComponent(), generic);
+			// }
+			// }
+			// } else
+			// this.<AbstractConstraintImpl> find(keyClazz).check(generic);
+			// }
+			// }
 		}
 	}
 
