@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -29,10 +28,8 @@ import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
-import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
-import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl.AxedConstraintClass;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
@@ -571,6 +568,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
+		log.info("#################################");
 		checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 		checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 	}
@@ -601,8 +599,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 				} else {
 					keyClazz = (Class<? extends Serializable>) key;
 					constraint = find(keyClazz);
-					constraint.check(generic);
-					((AbstractSimpleConstraintImpl) constraint).check(baseComponent, generic);
+					if (constraint instanceof AbstractSimpleConstraintImpl)
+						((AbstractSimpleConstraintImpl) constraint).check(baseComponent, generic);
 
 				}
 

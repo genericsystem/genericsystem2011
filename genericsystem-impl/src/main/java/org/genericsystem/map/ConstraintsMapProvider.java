@@ -94,21 +94,6 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 
 		@Override
 		public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
-//			Generic component = ((Link) modified).getComponent(axe);
-//
-//			final Generic constraintValue = ((GenericImpl) modified).getCurrentCache().find(ConstraintsMapProvider.ConstraintValue.class);
-//			Iterator<Holder> filterIterator = new AbstractFilterIterator<Holder>(holdersIterator((Attribute) baseComponent, axe, false, new Generic[] {})) {
-//				@Override
-//				public boolean isSelected() {
-//					return next.inheritsFrom(constraintValue);
-//				}
-//			};
-//
-//			if (filterIterator.hasNext()) {
-//				Holder first = filterIterator.next();
-//				if (filterIterator.hasNext())
-//					throw new SingularConstraintViolationException("Multiple links of type " + baseComponent + " on target " + component + " (n° " + axe + ") : " + first + ", " + filterIterator.next() + " ...");
-//			}
 			Generic component = ((Link) modified).getComponent(axe);
 			Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
 			if (holders.size() > 1)
