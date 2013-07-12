@@ -94,7 +94,6 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 
 		@Override
 		public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
-			assert false;
 			Generic component = ((Link) modified).getComponent(axe);
 			Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
 			if (holders.size() > 1)

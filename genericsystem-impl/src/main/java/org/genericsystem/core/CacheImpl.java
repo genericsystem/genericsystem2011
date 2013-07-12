@@ -599,8 +599,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 				} else {
 					keyClazz = (Class<? extends Serializable>) key;
 					constraint = find(keyClazz);
-					constraint.check(generic);
-					((AbstractSimpleConstraintImpl) constraint).check(baseComponent, generic);
+					if (constraint instanceof AbstractSimpleConstraintImpl)
+						((AbstractSimpleConstraintImpl) constraint).check(baseComponent, generic);
 
 				}
 
