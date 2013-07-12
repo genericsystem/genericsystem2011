@@ -1,6 +1,7 @@
 package org.genericsystem.map;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -13,13 +14,12 @@ import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
-import org.genericsystem.generic.Relation;
+import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider.SingularConstraintImpl;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
@@ -99,11 +99,24 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 
 		@Override
 		public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
-			assert false;
 			Generic component = ((Link) modified).getComponent(axe);
-			Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
-			if (holders.size() > 1)
-				throw new SingularConstraintViolationException("Multiple links of type " + baseComponent + " on target " + component + " (n° " + axe + ") : " + holders);
+
+			final Generic constraintValue = ((GenericImpl) modified).getCurrentCache().find(ConstraintsMapProvider.ConstraintValue.class);
+			Iterator<Holder> filterIterator = new AbstractFilterIterator<Holder>(holdersIterator((Attribute) baseComponent, axe, false, new Generic[] {})) {
+				@Override
+				public boolean isSelected() {
+					return next.inheritsFrom(constraintValue);
+				}
+			};
+
+			if (filterIterator.hasNext()) {
+				Holder first = filterIterator.next();
+				if (filterIterator.hasNext())
+					throw new SingularConstraintViolationException("Multiple links of type " + baseComponent + " on target " + component + " (n° " + axe + ") : " + first + ", " + filterIterator.next() + " ...");
+			}
+			// Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
+			// if (holders.size() > 1)
+			// throw new SingularConstraintViolationException("Multiple links of type " + baseComponent + " on target " + component + " (n° " + axe + ") : " + holders);
 		}
 	}
 }
