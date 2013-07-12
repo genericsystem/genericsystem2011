@@ -26,9 +26,7 @@ public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl 
 		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AbstractAxedConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
 	}
 
-	public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
-
-	}
+	public abstract void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException;
 
 	public static class AxedConstraintClass implements Serializable {
 		private static final long serialVersionUID = 182492104604984855L;

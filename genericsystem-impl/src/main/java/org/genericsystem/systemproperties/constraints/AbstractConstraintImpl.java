@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.EngineImpl;
@@ -19,9 +18,7 @@ import org.genericsystem.iterator.AbstractProjectionIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
-public abstract class AbstractConstraintImpl extends GenericImpl implements /* Comparable<AbstractConstraintImpl>, */Serializable {
-
-	private static final long serialVersionUID = -3257819220762195050L;
+public abstract class AbstractConstraintImpl extends GenericImpl {
 
 	public abstract void check(Generic modified) throws ConstraintViolationException;
 
