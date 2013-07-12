@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -624,7 +623,13 @@ public interface Generic extends Comparable<Generic> {
 
 	Map<Serializable, Serializable> getProperties();
 
-	Map<Serializable, Serializable> getContraints();
+	ExtendedMap<Serializable, Serializable> getContraints();
+
+	interface ExtendedMap<K, V> extends Map<K, V> {
+		Holder getKeyHolder(K key);
+
+		<T extends Generic> T getKeyBaseComponent(K key);
+	}
 
 	<T extends Generic> T addComponent(int pos, Generic newComponent);
 

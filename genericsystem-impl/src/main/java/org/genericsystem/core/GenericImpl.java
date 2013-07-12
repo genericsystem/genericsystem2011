@@ -1606,7 +1606,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends MapProvider> Map<Serializable, Serializable> getMap(Class<T> mapClass) {
+	public <T extends MapProvider> ExtendedMap<Serializable, Serializable> getMap(Class<T> mapClass) {
 		return getCurrentCache().<MapProvider> find(mapClass).getMap(this);
 	}
 
@@ -1616,7 +1616,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public Map<Serializable, Serializable> getContraints() {
+	public ExtendedMap<Serializable, Serializable> getContraints() {
 		return getMap(ConstraintsMapProvider.class);
 	}
 

@@ -9,8 +9,6 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl {
 
-	private static final long serialVersionUID = 6417651505947151178L;
-
 	public AbstractConstraintImpl bindAxedConstraint(Class<?> specializationClass, int pos) {
 		@SuppressWarnings("unchecked")
 		AxedConstraintClass key = new AxedConstraintClass((Class<Serializable>) getClass(), pos);

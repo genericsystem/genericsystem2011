@@ -1,7 +1,6 @@
 package org.genericsystem.map;
 
 import java.io.Serializable;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -48,22 +47,19 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 
 	@SystemGeneric
 	@Components(ConstraintsMapProvider.class)
-	public static class ConstraintKey extends GenericImpl implements Attribute {
-	}
+	public static class ConstraintKey extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Components(ConstraintKey.class)
 	@SingularConstraint
 	@RequiredConstraint
-	public static class ConstraintValue extends GenericImpl implements Attribute {
-	}
+	public static class ConstraintValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Extends(ConstraintsMapProvider.class)
 	@Components(Engine.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
-	}
+	public static class MapInstance extends GenericImpl implements Holder {}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(MapInstance.class)
@@ -78,8 +74,7 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 		@Components(SingularConstraintImpl.class)
 		@Extends(ConstraintsMapProvider.ConstraintValue.class)
 		@BooleanValue(false)
-		public static class DefaultValue extends GenericImpl implements Holder {
-		}
+		public static class DefaultValue extends GenericImpl implements Holder {}
 
 		@Override
 		public void check(Generic modified) throws ConstraintViolationException {
@@ -106,4 +101,5 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 				throw new SingularConstraintViolationException("Multiple links of type " + baseComponent + " on target " + component + " (n° " + axe + ") : " + holders);
 		}
 	}
+
 }
