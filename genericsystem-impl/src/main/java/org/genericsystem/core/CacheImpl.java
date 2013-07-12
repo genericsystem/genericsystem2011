@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -56,12 +55,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private Set<Generic> removes;
 
 	public CacheImpl(Cache cache) {
-		this.subContext = (CacheImpl) cache;
+		subContext = (CacheImpl) cache;
 		clear();
 	}
 
 	public CacheImpl(Engine engine) {
-		this.subContext = new Transaction(engine);
+		subContext = new Transaction(engine);
 		clear();
 	}
 
@@ -371,19 +370,18 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return components.length > 0 || ((supers.length == 1 && !supers[0].isEngine() && metaLevel == SystemGeneric.STRUCTURAL) || supers.length > 1);
 	}
 
-	<T extends Generic> T bind(Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {
-		Class<?> clazz = null;
+	<T extends Generic> T bind(Class<?> specializationClass, Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {
 		if (implicit.isConcrete()) {
 			components = ((GenericImpl) directSuper).sortAndCheck(components);
 			Generic meta = directSuper.getMetaLevel() == implicit.getMetaLevel() ? directSuper.getMeta() : directSuper;
 			InstanceGenericClass instanceClass = meta.getClass().getAnnotation(InstanceGenericClass.class);
 			if (instanceClass != null)
-				clazz = instanceClass.value();
+				specializationClass = instanceClass.value();
 		}
-		return bind(implicit, new Generic[] { directSuper }, components, automatic, clazz, existsException);
+		return bind(implicit, new Generic[] { directSuper }, components, automatic, specializationClass, existsException);
 	}
 
-	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> specializeGeneric, boolean existsException) {
+	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> specializationClass, boolean existsException) {
 		final Primaries primaries = new Primaries(supers);
 		primaries.add(implicit);
 		Generic[] interfaces = primaries.toArray();
@@ -404,7 +402,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				rollback(new ExistsException(result + " already exists !"));
 			return result;
 		}
-		return internalBind(implicit, interfaces, components, automatic, specializeGeneric);
+		return internalBind(implicit, interfaces, components, automatic, specializationClass);
 	}
 
 	private <T extends Generic> T internalBind(Generic implicit, Generic[] interfaces, Generic[] components, boolean automatic, Class<?> specializeGeneric) {
@@ -571,6 +569,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
+		log.info("#################################");
 		checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 		checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 	}
@@ -584,20 +583,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@SuppressWarnings("unchecked")
 	private void checkConstraints2(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics) {
+			// log.info("================> generic " + generic + " " + generic.getContraints());
 			for (Serializable key : generic.getContraints().keySet()) {
 				log.info("================> key " + key);
 				AbstractConstraintImpl constraint;
 				Class<? extends Serializable> keyClazz;
 				if (key instanceof AxedConstraintClass) {
 					keyClazz = ((AxedConstraintClass) key).getClazz();
-					Generic t = find(keyClazz);
-					t.log();
-					for (Generic g : t.getInheritings())
-						g.log();
-					constraint = ((AbstractAxedConstraintImpl) find(keyClazz)).findConstraint(((AxedConstraintClass) key).getAxe());
-
-					log.info("OOO constraint " + constraint + " " + keyClazz);
-
+					constraint = ((AbstractAxedConstraintImpl) find(keyClazz)).bindAxedConstraint(keyClazz, ((AxedConstraintClass) key).getAxe());
+					assert constraint != null;
 					if (constraint == null)
 						continue;
 

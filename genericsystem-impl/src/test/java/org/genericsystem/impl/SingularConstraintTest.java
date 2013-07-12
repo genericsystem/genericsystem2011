@@ -255,6 +255,7 @@ public class SingularConstraintTest extends AbstractTest {
 
 		final Generic yellow = color.newInstance("yellow");
 		myBmw.setLink(carColor, "myBmwYellow", yellow);
+		assert carColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {

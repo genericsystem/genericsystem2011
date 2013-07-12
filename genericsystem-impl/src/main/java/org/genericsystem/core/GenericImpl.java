@@ -1384,21 +1384,33 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableSingularConstraint(int basePos) {
+<<<<<<< HEAD
 		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraintClass(basePos).getValue(), true);
+=======
+		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue(), true);
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 		return (T) this;
 		// return enableSystemProperty(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint(int basePos) {
+<<<<<<< HEAD
 		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraintClass(basePos).getValue(), false);
+=======
+		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue(), false);
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 		return (T) this;
 		// return disableSystemProperty(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled(int basePos) {
+<<<<<<< HEAD
 		return Boolean.TRUE.equals(getContraints().get(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraintClass(basePos).getValue()));
+=======
+		return Boolean.TRUE.equals(getContraints().get(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue()));
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 		// return isBooleanSystemPropertyEnabled(SingularConstraintImpl.class, basePos);
 	}
 

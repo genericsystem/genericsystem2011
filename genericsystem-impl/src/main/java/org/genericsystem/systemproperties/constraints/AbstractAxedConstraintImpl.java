@@ -1,7 +1,6 @@
 package org.genericsystem.systemproperties.constraints;
 
 import java.io.Serializable;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -29,7 +28,9 @@ public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl 
 		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AbstractAxedConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
 	}
 
-	public abstract void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException;
+	public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
+
+	}
 
 	public static class AxedConstraintClass implements Serializable {
 		private static final long serialVersionUID = 182492104604984855L;
@@ -67,6 +68,12 @@ public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl 
 		public String toString() {
 			return "class : " + clazz + ", axe : " + axe;
 		}
+	}
+
+	@Override
+	public void check(Generic modified) throws ConstraintViolationException {
+		// TODO Auto-generated method stub
+
 	}
 
 }
