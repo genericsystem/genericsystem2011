@@ -6,7 +6,7 @@ import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.exception.UniqueConstraintViolationException;
+import org.genericsystem.exception.UniqueValueConstraintViolationException;
 import org.genericsystem.generic.Type;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.Constraint;
@@ -18,7 +18,7 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @SystemGeneric
 @Components(Engine.class)
 @SingularConstraint
-public class UniqueConstraintImpl extends Constraint implements BooleanSystemProperty {
+public class UniqueValueConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -6429972259714036057L;
 
@@ -28,7 +28,7 @@ public class UniqueConstraintImpl extends Constraint implements BooleanSystemPro
 			Type constraintBaseType = (Type) constraintValue.getConstraintBaseType();
 			for (Generic generic : constraintBaseType.getAllInstances())
 				if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
-					throw new UniqueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + constraintBaseType + ".");
+					throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + constraintBaseType + ".");
 		}
 	}
 }

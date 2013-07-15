@@ -1,8 +1,8 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
 import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;

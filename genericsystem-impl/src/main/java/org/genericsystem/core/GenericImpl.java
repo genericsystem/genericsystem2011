@@ -11,14 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
+import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
-import org.genericsystem.annotation.constraints.UniqueConstraint;
+import org.genericsystem.annotation.constraints.SingletonConstraint;
+import org.genericsystem.annotation.constraints.UniqueValueConstraint;
 import org.genericsystem.annotation.constraints.VirtualConstraint;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
@@ -57,8 +56,8 @@ import org.genericsystem.systemproperties.constraints.AbstractSimpleConstraintIm
 import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.SingularInstanceConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.UniqueConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1255,8 +1254,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (clazz.getAnnotation(VirtualConstraint.class) != null)
 			enableVirtualConstraint();
 
-		if (clazz.getAnnotation(UniqueConstraint.class) != null)
-			enableUniqueConstraint();
+		if (clazz.getAnnotation(UniqueValueConstraint.class) != null)
+			enableUniqueValueConstraint();
 
 		InstanceValueClassConstraint instanceClass = clazz.getAnnotation(InstanceValueClassConstraint.class);
 		if (instanceClass != null)
@@ -1265,8 +1264,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (clazz.getAnnotation(PropertyConstraint.class) != null)
 			enablePropertyConstraint();
 
-		if (clazz.getAnnotation(SingularInstanceConstraint.class) != null)
-			enableSingularInstanceConstraint();
+		if (clazz.getAnnotation(SingletonConstraint.class) != null)
+			enableSingletonConstraint();
 
 		SingularConstraint singularTarget = clazz.getAnnotation(SingularConstraint.class);
 		if (singularTarget != null)
@@ -1481,18 +1480,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Type> T enableUniqueConstraint() {
-		return enableSystemProperty(UniqueConstraintImpl.class);
+	public <T extends Type> T enableUniqueValueConstraint() {
+		return enableSystemProperty(UniqueValueConstraintImpl.class);
 	}
 
 	@Override
-	public <T extends Type> T disableUniqueConstraint() {
-		return disableSystemProperty(UniqueConstraintImpl.class);
+	public <T extends Type> T disableUniqueValueConstraint() {
+		return disableSystemProperty(UniqueValueConstraintImpl.class);
 	}
 
 	@Override
-	public boolean isUniqueConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(UniqueConstraintImpl.class);
+	public boolean isUniqueValueConstraintEnabled() {
+		return isBooleanSystemPropertyEnabled(UniqueValueConstraintImpl.class);
 	}
 
 	@Override
@@ -1524,18 +1523,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Type> T enableSingularInstanceConstraint() {
-		return enableSystemProperty(SingularInstanceConstraintImpl.class);
+	public <T extends Type> T enableSingletonConstraint() {
+		return enableSystemProperty(SingletonConstraintImpl.class);
 	}
 
 	@Override
-	public <T extends Type> T disableSingularInstanceConstraint() {
-		return disableSystemProperty(SingularInstanceConstraintImpl.class);
+	public <T extends Type> T disableSingletonConstraint() {
+		return disableSystemProperty(SingletonConstraintImpl.class);
 	}
 
 	@Override
-	public boolean isSingularInstanceConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(SingularInstanceConstraintImpl.class);
+	public boolean isSingletonConstraintEnabled() {
+		return isBooleanSystemPropertyEnabled(SingletonConstraintImpl.class);
 	}
 
 	@Override

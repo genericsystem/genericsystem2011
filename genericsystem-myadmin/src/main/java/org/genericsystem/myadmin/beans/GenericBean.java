@@ -37,8 +37,6 @@ public class GenericBean implements Serializable {
 	@Inject
 	private GenericTreeBean genericTreeBean;
 
-	// private boolean readPhantoms;
-
 	@Inject
 	private WrapperBean wrapperBean;
 
@@ -81,14 +79,6 @@ public class GenericBean implements Serializable {
 		//
 		// michael.getProperties().put("KEY TEST", "VALUE TEST");
 	}
-
-	// public boolean isReadPhantoms() {
-	// return readPhantoms;
-	// }
-	//
-	// public void setReadPhantoms(boolean readPhantoms) {
-	// this.readPhantoms = readPhantoms;
-	// }
 
 	public void newType(String newValue) {
 		cache.newType(newValue);

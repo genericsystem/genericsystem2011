@@ -3,20 +3,20 @@ package org.genericsystem.impl;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.exception.UniqueConstraintViolationException;
+import org.genericsystem.exception.UniqueValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
-public class UniqueConstraintTest extends AbstractTest {
+public class UniqueValueConstraintTest extends AbstractTest {
 
 	public void testPropertySimpleAttributeKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Attribute registration = car.setAttribute( "Registration");
-		registration.enableUniqueConstraint();
+		registration.enableUniqueValueConstraint();
 		final Generic myCar = car.newInstance( "myCar");
 		final Generic yourCar = car.newInstance( "yourCar");
 		myCar.setValue( registration, "315DT75");
@@ -27,7 +27,7 @@ public class UniqueConstraintTest extends AbstractTest {
 			public void intercept() {
 				yourCar.setValue( registration, "315DT75");
 			}
-		}.assertIsCausedBy(UniqueConstraintViolationException.class);
+		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
 
 	public void testPropertySimpleRelationKO() {
@@ -37,7 +37,7 @@ public class UniqueConstraintTest extends AbstractTest {
 		Type human = cache.newType("Human");
 
 		final Relation driving = car.setRelation( "DrivingAlong", human, road);
-		driving.enableUniqueConstraint();
+		driving.enableUniqueValueConstraint();
 
 		final Generic myCar = car.newInstance( "myCar");
 		final Generic myHuman = human.newInstance( "myHuman");
@@ -54,6 +54,6 @@ public class UniqueConstraintTest extends AbstractTest {
 			public void intercept() {
 				yourCar.setLink( driving, "_MY_driving", yourHuman, yourRoad);
 			}
-		}.assertIsCausedBy(UniqueConstraintViolationException.class);
+		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
 }
