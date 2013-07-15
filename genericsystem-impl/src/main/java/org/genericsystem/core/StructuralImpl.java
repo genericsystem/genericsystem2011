@@ -7,6 +7,7 @@ import org.genericsystem.generic.Attribute;
  * 
  */
 public class StructuralImpl implements Structural {
+
 	private final Attribute attribute;
 	private final int position;
 

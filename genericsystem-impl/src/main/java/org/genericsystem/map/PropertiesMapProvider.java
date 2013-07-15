@@ -1,5 +1,7 @@
 package org.genericsystem.map;
 
+import java.io.Serializable;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
@@ -18,7 +20,7 @@ import org.genericsystem.map.PropertiesMapProvider.PropertyValue;
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies({ PropertyKey.class, PropertyValue.class })
-public class PropertiesMapProvider extends AbstractMapProvider {
+public class PropertiesMapProvider extends AbstractMapProvider<Serializable, Serializable> {
 
 	@Override
 	@SuppressWarnings("unchecked")

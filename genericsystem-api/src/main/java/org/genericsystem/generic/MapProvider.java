@@ -1,8 +1,6 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
-import java.util.Map;
-
 import org.genericsystem.core.Generic;
 
 /**
@@ -11,6 +9,6 @@ import org.genericsystem.core.Generic;
  */
 public interface MapProvider extends Type {
 
-	Map<Serializable, Serializable> getMap(Generic generic);
+	<Key extends Serializable, Value extends Serializable> ExtendedMap<Key, Value> getMap(Generic generic);
 
 }
