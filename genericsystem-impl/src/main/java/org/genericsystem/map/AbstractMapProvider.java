@@ -51,27 +51,24 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Value get(Object key) {
-				Holder keyHolder = getKeyHolder((Serializable) key);
-				if (keyHolder == null)
-					return null;
-				Holder valueHolder = keyHolder.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
+				Holder valueHolder = getValueHolder((Serializable) key);
 				return (Value) (valueHolder != null ? valueHolder.getValue() : null);
 			}
 
 			@Override
-			public Holder getKeyHolder(Serializable key) {
-				if (!(key instanceof Serializable))
+			public Holder getValueHolder(Serializable key) {
+				Holder keyHolder = getKeyHolder(key);
+				if (keyHolder == null)
 					return null;
+				return keyHolder.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
+			}
+
+			// @Override
+			private Holder getKeyHolder(Serializable key) {
 				GenericImpl map = generic.getHolder(AbstractMapProvider.this);
 				if (map == null)
 					return null;
 				return map.getHolderByValue(getCurrentCache().<Attribute> find(getKeyAttributeClass()), key);
-			}
-
-			@Override
-			public <T extends Generic> T getKeyBaseComponent(Key key) {
-				Holder holder = getKeyHolder(key);
-				return holder != null ? holder.<Holder> getBaseComponent().<T> getBaseComponent() : null;
 			}
 
 			@Override
