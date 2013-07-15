@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -160,9 +161,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			throw new AliveConstraintViolationException(node + " is not alive");
 		for (Generic generic : orderRemoves(node).descendingSet()) {
 			removeGeneric(generic);
-			for (int axe = 0; axe < ((GenericImpl) generic).components.length; axe++)
-				if (((GenericImpl) generic).isCascadeRemove(axe))
-					internalRemove(((GenericImpl) generic).components[axe]);
 		}
 	}
 
