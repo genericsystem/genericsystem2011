@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.EngineImpl;
@@ -11,7 +12,6 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractProjectionIterator;
@@ -19,8 +19,6 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 public abstract class AbstractConstraintImpl extends GenericImpl {
-
-	public abstract void check(Generic modified) throws ConstraintViolationException;
 
 	public final int getPriority() {
 		Priority annotation = getClass().getAnnotation(Priority.class);

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
