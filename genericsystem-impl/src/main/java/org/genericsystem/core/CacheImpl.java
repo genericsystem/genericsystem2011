@@ -625,7 +625,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	void simpleRemove(GenericImpl generic) {
-		removes.add(generic);
+		if (adds.contains(generic))
+			adds.remove(generic);
+		else
+			removes.add(generic);
 		super.simpleRemove(generic);
 	}
 
@@ -637,18 +640,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void removeGeneric(Generic generic) throws ConstraintViolationException {
-		removeOrCancelAdd(generic);
+		simpleRemove((GenericImpl) generic);
 		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
 		checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
-	}
-
-	private void removeOrCancelAdd(Generic generic) throws ConstraintViolationException {
-		if (adds.contains(generic)) {
-			adds.remove(generic);
-			unplug((GenericImpl) generic);
-		} else
-			simpleRemove((GenericImpl) generic);
 	}
 
 	private void checkConstraints() throws ConstraintViolationException {
