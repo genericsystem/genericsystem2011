@@ -6,8 +6,8 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
-import org.genericsystem.annotation.constraints.UniqueConstraint;
+import org.genericsystem.annotation.constraints.SingletonConstraint;
+import org.genericsystem.annotation.constraints.UniqueValueConstraint;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -113,7 +113,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 
 	@SystemGeneric
 	// Everyone is unique !
-	@UniqueConstraint
+	@UniqueValueConstraint
 	public static class Human {
 	}
 
@@ -123,7 +123,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 
 	@SystemGeneric
 	// There can be only one time...
-	@SingularInstanceConstraint
+	@SingletonConstraint
 	public static class Time {
 	}
 

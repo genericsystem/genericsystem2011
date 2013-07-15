@@ -7,7 +7,7 @@ import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.exception.SingularInstanceConstraintViolationException;
+import org.genericsystem.exception.SingletonConstraintViolationException;
 import org.genericsystem.generic.Type;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.Constraint;
@@ -20,7 +20,7 @@ import org.genericsystem.systemproperties.constraints.Constraint;
 @Components(Engine.class)
 @SingularConstraint
 @Priority(10)
-public class SingularInstanceConstraintImpl extends Constraint implements BooleanSystemProperty {
+public class SingletonConstraintImpl extends Constraint implements BooleanSystemProperty {
 
 	private static final long serialVersionUID = -7689576125534105005L;
 
@@ -30,7 +30,7 @@ public class SingularInstanceConstraintImpl extends Constraint implements Boolea
 			Type constraintBaseType = (Type) constraintValue.getConstraintBaseType();
 			int instanceNumber = constraintBaseType.getAllInstances().size();
 			if (instanceNumber > 1)
-				throw new SingularInstanceConstraintViolationException("Singular instance constraint violation : type " + constraintBaseType + " has " + instanceNumber + " instances.");
+				throw new SingletonConstraintViolationException("Singular instance constraint violation : type " + constraintBaseType + " has " + instanceNumber + " instances.");
 		}
 	}
 

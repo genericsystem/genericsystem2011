@@ -305,25 +305,25 @@ public interface Type extends Generic {
 	// boolean isNotNullConstraintEnabled(Context context);
 
 	/**
-	 * Enable singular instance constraint.
+	 * Enable singleton constraint.
 	 * 
 	 * @return Return this.
 	 */
-	<T extends Type> T enableSingularInstanceConstraint();
+	<T extends Type> T enableSingletonConstraint();
 
 	/**
-	 * Disable singular instance constraint
+	 * Disable singleton constraint
 	 * 
 	 * @return this
 	 */
-	<T extends Type> T disableSingularInstanceConstraint();
+	<T extends Type> T disableSingletonConstraint();
 
 	/**
-	 * Returns true if the singular instance constraint enabled
+	 * Returns true if the singleton constraint enabled
 	 * 
-	 * @return true if the singular instance constraint enabled
+	 * @return true if the singleton constraint enabled
 	 */
-	boolean isSingularInstanceConstraintEnabled();
+	boolean isSingletonConstraintEnabled();
 
 	/**
 	 * Enable required constraint.
@@ -374,25 +374,25 @@ public interface Type extends Generic {
 	boolean isRequiredConstraintEnabled(int componentPos);
 
 	/**
-	 * Enable distinct constraint.
+	 * Enable unique value constraint.
 	 * 
 	 * @return Return this.
 	 */
-	<T extends Type> T enableUniqueConstraint();
+	<T extends Type> T enableUniqueValueConstraint();
 
 	/**
-	 * Disable distinct constraint.
+	 * Disable unique value constraint.
 	 * 
 	 * @return Return this.
 	 */
-	<T extends Type> T disableUniqueConstraint();
+	<T extends Type> T disableUniqueValueConstraint();
 
 	/**
-	 * Returns true if the distinct constraint enabled
+	 * Returns true if the unique value constraint enabled.
 	 * 
-	 * @return true if the distinct constraint enabled
+	 * @return true if the unique value constraint enabled.
 	 */
-	boolean isUniqueConstraintEnabled();
+	boolean isUniqueValueConstraintEnabled();
 
 	/**
 	 * Enable virtual constraint.
