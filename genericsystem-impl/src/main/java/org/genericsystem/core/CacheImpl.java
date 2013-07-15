@@ -23,6 +23,7 @@ import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
@@ -30,6 +31,7 @@ import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
+import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl.AxedConstraintClass;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
@@ -221,9 +223,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T updateKey(final Generic old, final Serializable value) {
-		if (Objects.equals(value, old.getValue()))
-			return (T) old;
+	<T extends Generic> T updateValue(final Generic old, final Serializable value) {
+		// TODO rebind => updateValue ?
+		// if (Objects.equals(value, old.getValue()))
+		// return (T) old;
 		return new Restructurator() {
 			@Override
 			Generic rebuild() {
@@ -565,7 +568,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
-		log.info("#################################");
 		checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, false, adds);
 		checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, false, removes);
 	}
@@ -580,28 +582,37 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private void checkConstraints2(CheckingType checkingType, boolean immediatlyCheckable, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics) {
 			for (Serializable key : generic.getContraints().keySet()) {
-				// ConstraintsMapProvider mapProvider = this.<ConstraintsMapProvider> find(ConstraintsMapProvider.class);
-				Holder valueHolder = generic.getContraints().getValueHolder(key);
-				Holder valueBaseComponent = valueHolder.getBaseComponent();
-				Generic baseComponent = valueBaseComponent != null ? valueBaseComponent.getBaseComponent() : null;
-				AbstractConstraintImpl constraint;
-				Class<? extends Serializable> keyClazz;
-				if (key instanceof AxedConstraintClass) {
-					keyClazz = ((AxedConstraintClass) key).getClazz();
-					constraint = ((AbstractAxedConstraintImpl) find(keyClazz)).bindAxedConstraint(keyClazz, ((AxedConstraintClass) key).getAxe());
-					assert constraint != null;
-					if (constraint == null)
+				Holder valueBaseComponent = generic.getContraints().getValueHolder(key).getBaseComponent();
+				Generic baseComponent = valueBaseComponent != null ? valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent() : null;
+				Class<? extends Serializable> keyClazz = key instanceof AxedConstraintClass ? ((AxedConstraintClass) key).getClazz() : (Class<? extends Serializable>) key;
+				AbstractConstraintImpl constraint = find(keyClazz);
+				assert constraint != null;
+				if (immediatlyCheckable) {
+					if (!constraint.isCheckedAt(checkingType) || immediatlyCheckable != constraint.isImmediatelyCheckable())
 						continue;
-					((AbstractAxedConstraintImpl) constraint).check(baseComponent, generic, ((AxedConstraintClass) key).getAxe());
-
+				} else if (!constraint.isCheckedAt(checkingType))
+					continue;
+				if (constraint instanceof AbstractAxedConstraintImpl) {
+					if (!(key instanceof AxedConstraintClass))
+						continue;
+					constraint = ((AbstractAxedConstraintImpl) constraint).findAxedConstraint(((AxedConstraintClass) key).getAxe());
+					if (BooleanSystemProperty.class.isAssignableFrom(keyClazz)) {
+						if (Boolean.TRUE.equals(generic.getContraints().get(key))) {
+							for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
+								((AbstractAxedConstraintImpl) constraint).check(baseComponent, inheriting, ((AxedConstraintClass) key).getAxe());
+						}
+					} else
+						for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
+							((AbstractAxedConstraintImpl) constraint).check(baseComponent, inheriting, ((AxedConstraintClass) key).getAxe());
 				} else {
-					assert key instanceof Class;
-					keyClazz = (Class<? extends Serializable>) key;
-					constraint = find(keyClazz);
-					if (constraint instanceof AbstractSimpleConstraintImpl)
-						((AbstractSimpleConstraintImpl) constraint).check(baseComponent, generic);
+					if (BooleanSystemProperty.class.isAssignableFrom(keyClazz)) {
+						if (Boolean.TRUE.equals(generic.getContraints().get(key)))
+							for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
+								((AbstractSimpleConstraintImpl) constraint).check(baseComponent, inheriting);
+					} else
+						for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
+							((AbstractSimpleConstraintImpl) constraint).check(baseComponent, inheriting);
 				}
-
 			}
 		}
 	}
