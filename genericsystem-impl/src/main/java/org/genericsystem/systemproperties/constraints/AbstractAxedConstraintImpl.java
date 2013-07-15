@@ -10,15 +10,13 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl {
 
-	@SuppressWarnings("unchecked")
 	public AbstractAxedConstraintImpl bindAxedConstraint(int pos) {
-		Generic implicit = getEngine().bindPrimary(Generic.class, new AxedConstraintClass((Class<Serializable>) getClass(), pos), SystemGeneric.STRUCTURAL, true);
+		Generic implicit = getEngine().bindPrimary(Generic.class, new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL, true);
 		return getCurrentCache().<GenericImpl> find(MapInstance.class).bind(getClass(), implicit, this, getBasePos(this), false, new Generic[] {});
 	}
 
-	@SuppressWarnings("unchecked")
 	public AbstractAxedConstraintImpl findAxedConstraint(int pos) {
-		Generic implicit = getEngine().findPrimary(new AxedConstraintClass((Class<Serializable>) getClass(), pos), SystemGeneric.STRUCTURAL);
+		Generic implicit = getEngine().findPrimary(new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL);
 		if (implicit == null)
 			return null;
 		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AbstractAxedConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
@@ -29,15 +27,15 @@ public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl 
 	public static class AxedConstraintClass implements Serializable {
 		private static final long serialVersionUID = 182492104604984855L;
 
-		private final Class<Serializable> clazz;
+		private final Class<?> clazz;
 		private final int axe;
 
-		public AxedConstraintClass(Class<Serializable> clazz, int axe) {
+		public AxedConstraintClass(Class<?> clazz, int axe) {
 			this.clazz = clazz;
 			this.axe = axe;
 		}
 
-		public Class<Serializable> getClazz() {
+		public Class<?> getClazz() {
 			return clazz;
 		}
 

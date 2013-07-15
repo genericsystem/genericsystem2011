@@ -587,7 +587,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Serializable key : generic.getContraints().keySet()) {
 				Holder valueBaseComponent = generic.getContraints().getValueHolder(key).getBaseComponent();
 				Generic baseComponent = valueBaseComponent != null ? valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent() : null;
-				Class<? extends Serializable> keyClazz = key instanceof AxedConstraintClass ? ((AxedConstraintClass) key).getClazz() : (Class<? extends Serializable>) key;
+				Class<? extends Serializable> keyClazz = (Class<? extends Serializable>) (key instanceof AxedConstraintClass ? ((AxedConstraintClass) key).getClazz() : key);
 				AbstractConstraintImpl constraint = find(keyClazz);
 				assert constraint != null;
 				if (immediatlyCheckable) {
