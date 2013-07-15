@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -584,7 +583,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Serializable key : generic.getContraints().keySet()) {
 				Holder valueBaseComponent = generic.getContraints().getValueHolder(key).getBaseComponent();
 				Generic baseComponent = valueBaseComponent != null ? valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent() : null;
-				Class<? extends Serializable> keyClazz = key instanceof AxedConstraintClass ? ((AxedConstraintClass) key).getClazz() : (Class<? extends Serializable>) key;
+				Class<? extends Serializable> keyClazz = (Class<? extends Serializable>) (key instanceof AxedConstraintClass ? ((AxedConstraintClass) key).getClazz() : key);
+
 				AbstractConstraintImpl constraint = find(keyClazz);
 				assert constraint != null;
 				if (immediatlyCheckable) {
