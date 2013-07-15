@@ -420,7 +420,6 @@ public class ApiTest extends AbstractTest {
 		Type superCar = car.newSubType("SuperCar");
 
 		Snapshot<Type> types = cache.getEngine().getAllInstances();
-		types.log();
 		assert types.size() >= 4;
 		assert types.containsAll(Arrays.asList(car, bus, moto, superCar));
 	}

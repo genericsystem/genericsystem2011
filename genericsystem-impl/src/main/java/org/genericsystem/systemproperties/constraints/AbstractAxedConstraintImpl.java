@@ -1,7 +1,6 @@
 package org.genericsystem.systemproperties.constraints;
 
 import java.io.Serializable;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -11,7 +10,6 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl {
 
 	public AbstractConstraintImpl bindAxedConstraint(Class<?> specializationClass, int pos) {
-		assert specializationClass == getClass();
 		@SuppressWarnings("unchecked")
 		AxedConstraintClass key = new AxedConstraintClass((Class<Serializable>) getClass(), pos);
 		// getCurrentCache().<GenericImpl> find(MapInstance.class).setSubAttribute(this, key);
@@ -66,6 +64,12 @@ public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl 
 		public String toString() {
 			return "class : " + clazz + ", axe : " + axe;
 		}
+	}
+
+	@Override
+	public void check(Generic modified) throws ConstraintViolationException {
+		// TODO Auto-generated method stub
+
 	}
 
 }
