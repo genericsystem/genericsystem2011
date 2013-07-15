@@ -1,6 +1,7 @@
 package org.genericsystem.systemproperties.constraints;
 
 import java.io.Serializable;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -9,18 +10,13 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl {
 
-	public AbstractConstraintImpl bindAxedConstraint(Class<?> specializationClass, int pos) {
-		@SuppressWarnings("unchecked")
-		AxedConstraintClass key = new AxedConstraintClass((Class<Serializable>) getClass(), pos);
-		// getCurrentCache().<GenericImpl> find(MapInstance.class).setSubAttribute(this, key);
-
-		return getCurrentCache().<GenericImpl> find(MapInstance.class).bind(specializationClass, getEngine().bindPrimary(Generic.class, key, SystemGeneric.STRUCTURAL, true), this, getBasePos(this), false, new Generic[] {});
-
+	public AbstractAxedConstraintImpl bindAxedConstraint(int pos) {
+		Generic implicit = getEngine().bindPrimary(Generic.class, new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL, true);
+		return getCurrentCache().<GenericImpl> find(MapInstance.class).bind(getClass(), implicit, this, getBasePos(this), false, new Generic[] {});
 	}
 
-	@SuppressWarnings("unchecked")
-	public AbstractConstraintImpl findConstraint(int pos) {
-		Generic implicit = findPrimary(new AxedConstraintClass((Class<Serializable>) getClass(), pos), SystemGeneric.STRUCTURAL);
+	public AbstractAxedConstraintImpl findAxedConstraint(int pos) {
+		Generic implicit = getEngine().findPrimary(new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL);
 		if (implicit == null)
 			return null;
 		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AbstractAxedConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
@@ -31,15 +27,15 @@ public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl 
 	public static class AxedConstraintClass implements Serializable {
 		private static final long serialVersionUID = 182492104604984855L;
 
-		private final Class<Serializable> clazz;
+		private final Class<?> clazz;
 		private final int axe;
 
-		public AxedConstraintClass(Class<Serializable> clazz, int axe) {
+		public AxedConstraintClass(Class<?> clazz, int axe) {
 			this.clazz = clazz;
 			this.axe = axe;
 		}
 
-		public Class<Serializable> getClazz() {
+		public Class<?> getClazz() {
 			return clazz;
 		}
 
@@ -64,12 +60,6 @@ public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl 
 		public String toString() {
 			return "class : " + clazz + ", axe : " + axe;
 		}
-	}
-
-	@Override
-	public void check(Generic modified) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-
 	}
 
 }

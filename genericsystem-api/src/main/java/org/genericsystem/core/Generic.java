@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
+
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -643,7 +644,7 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Generic> T removeSuper(int pos);
 
-	<T extends Generic> T updateKey(Serializable key);
+	<T extends Generic> T updateValue(Serializable value);
 
 	Snapshot<Structural> getStructurals();
 

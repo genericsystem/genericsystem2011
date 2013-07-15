@@ -26,7 +26,6 @@ import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritance
 import org.genericsystem.systemproperties.constraints.simple.EngineConsistencyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.OptimisticLockConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PhantomConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UnduplicateBindingConstraintImpl;
@@ -155,10 +154,10 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
-			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
-					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingletonConstraintImpl.class, /* SingularConstraintImpl.class, */InstanceClassConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class,
-					UniqueValueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
-					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class, AloneAutomaticsConstraintImpl.class, ConstraintsMapProvider.class);
+			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, ReferentialIntegritySystemProperty.class, OptimisticLockConstraintImpl.class,
+					RequiredConstraintImpl.class, SingletonConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class, UniqueValueConstraintImpl.class, CascadeRemoveSystemProperty.class,
+					ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class,
+					SizeConstraintImpl.class, PropertiesMapProvider.class, AloneAutomaticsConstraintImpl.class, ConstraintsMapProvider.class);
 
 			CacheImpl cache = (CacheImpl) start(newCache());
 			for (Class<?> clazz : classes)

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -42,6 +41,7 @@ import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
+import org.genericsystem.map.ConstraintsMapProvider.PropertyConstraintImpl;
 import org.genericsystem.map.ConstraintsMapProvider.SingularConstraintImpl;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
@@ -51,10 +51,11 @@ import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AbstractSimpleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
@@ -268,7 +269,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Holder> T setValue(Holder attribute, Serializable value) {
 		T holder = setHolder(attribute, value);
-		assert value == null || getValues(attribute).contains(value) : holder;
+		assert value == null || getValues(attribute).contains(value) : "holder : " + holder.info() + " value : " + value + " => " + getValues(attribute);
 		return holder;
 	}
 
@@ -657,7 +658,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Attribute> T setSubProperty(Attribute property, Serializable value, Type... targets) {
-		return setSubAttribute(property, value, targets).enablePropertyConstraint();
+		return setSubAttribute(property, value, targets).enableSingularConstraint();
 	}
 
 	@Override
@@ -1385,22 +1386,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableSingularConstraint(int basePos) {
-		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue(), true);
+		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(basePos).getValue(), true);
 		return (T) this;
-		// return enableSystemProperty(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint(int basePos) {
-		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue(), false);
+		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(basePos).getValue(), false);
 		return (T) this;
-		// return disableSystemProperty(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled(int basePos) {
-		return Boolean.TRUE.equals(getContraints().get(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(SingularConstraintImpl.class, basePos).getValue()));
-		// return isBooleanSystemPropertyEnabled(SingularConstraintImpl.class, basePos);
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).findAxedConstraint(basePos);
+		if (null == constraint)
+			return false;
+		return Boolean.TRUE.equals(getContraints().get(constraint.getValue()));
 	}
 
 	@Override
@@ -1427,17 +1428,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enablePropertyConstraint() {
-		return enableSystemProperty(PropertyConstraintImpl.class);
+		// return enableSystemProperty(PropertyConstraintImpl.class);
+		getContraints().put(getCurrentCache().<AbstractSimpleConstraintImpl> find(PropertyConstraintImpl.class).getValue(), true);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Type> T disablePropertyConstraint() {
-		return disableSystemProperty(PropertyConstraintImpl.class);
+		// return disableSystemProperty(PropertyConstraintImpl.class);
+		getContraints().put(getCurrentCache().<AbstractSimpleConstraintImpl> find(PropertyConstraintImpl.class).getValue(), false);
+		return (T) this;
 	}
 
 	@Override
 	public boolean isPropertyConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(PropertyConstraintImpl.class);
+		// return isBooleanSystemPropertyEnabled(PropertyConstraintImpl.class);
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(PropertyConstraintImpl.class);
+		if (null == constraint)
+			return false;
+		return Boolean.TRUE.equals(getContraints().get(constraint.getValue()));
 	}
 
 	@Override
@@ -1653,8 +1662,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T updateKey(Serializable key) {
-		return getCurrentCache().updateKey(this, key);
+	public <T extends Generic> T updateValue(Serializable value) {
+		return getCurrentCache().updateValue(this, value);
 	}
 
 	public List<Integer> getComponentsPositions(Generic... components) {

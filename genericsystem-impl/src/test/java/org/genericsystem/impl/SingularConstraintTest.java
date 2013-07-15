@@ -259,7 +259,6 @@ public class SingularConstraintTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				myAudi.setLink(carColor, "myAudiYellow", yellow);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
