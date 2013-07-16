@@ -285,6 +285,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public void flush() throws RollbackException {
+		assert equals(getEngine().getCurrentCache());
 		Exception cause = null;
 		for (int attempt = 0; attempt < Statics.ATTEMPTS; attempt++)
 			try {
