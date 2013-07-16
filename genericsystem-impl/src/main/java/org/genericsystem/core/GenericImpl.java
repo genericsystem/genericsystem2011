@@ -42,7 +42,6 @@ import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
-import org.genericsystem.map.ConstraintsMapProvider.PropertyConstraintImpl;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
@@ -55,6 +54,7 @@ import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImp
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
@@ -1285,7 +1285,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
 
-	private <T extends Type> T setConstraint(Class<?> constraintClass, int pos, boolean value) {
+	private <T extends Type> T setConstraint(Class<?> constraintClass, int pos, Serializable value) {
 		getContraints().put(getCurrentCache().<AbstractConstraintImpl> find(constraintClass).bindAxedConstraint(pos).getValue(), value);
 		return (T) this;
 	}
@@ -1436,6 +1436,23 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return valuedHolder.getValue(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE));
 	}
 
+	// TODO pas comme les autres contraintes
+	@Override
+	public Class<?> getConstraintClass() {
+		// Holder holder = getHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class));
+		// return (Class<?>) (holder == null ? Object.class : holder.getValue());
+
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(InstanceClassConstraintImpl.class).findAxedConstraint(Statics.NO_POSITION);
+		return null == constraint ? Object.class : (Class<?>) getContraints().get(constraint.getValue());
+	}
+
+	// TODO pas comme les autres contraintes
+	@Override
+	public <T extends Type> T setConstraintClass(Class<?> constraintClass) {
+		// return setHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class), constraintClass);
+		return setConstraint(InstanceClassConstraintImpl.class, Statics.NO_POSITION, constraintClass);
+	}
+
 	@Override
 	public <T extends Type> T enablePropertyConstraint() {
 		return setConstraint(PropertyConstraintImpl.class, Statics.NO_POSITION, true);
@@ -1509,19 +1526,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isVirtualConstraintEnabled() {
 		return isBooleanSystemPropertyEnabled(VirtualConstraintImpl.class);
-	}
-
-	// TODO pas comme les autres contraintes
-	@Override
-	public Class<?> getConstraintClass() {
-		Holder holder = getHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class));
-		return (Class<?>) (holder == null ? Object.class : holder.getValue());
-	}
-
-	// TODO pas comme les autres contraintes
-	@Override
-	public <T extends Type> T setConstraintClass(Class<?> constraintClass) {
-		return setHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class), constraintClass);
 	}
 
 	@Override
