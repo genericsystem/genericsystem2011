@@ -1,7 +1,6 @@
 package org.genericsystem.file;
 
 import java.util.Arrays;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
@@ -21,7 +20,7 @@ public class FileSystemTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class).start();
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
-		assert rootDirectory.updateKey("rootDirectory2").getValue().equals("rootDirectory2");
+		assert rootDirectory.updateValue("rootDirectory2").getValue().equals("rootDirectory2");
 		assert !rootDirectory.isAlive();
 	}
 
@@ -30,7 +29,7 @@ public class FileSystemTest extends AbstractTest {
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
 		rootDirectory.addFile("file");
-		assert rootDirectory.updateKey("rootDirectory2").getValue().equals("rootDirectory2");
+		assert rootDirectory.updateValue("rootDirectory2").getValue().equals("rootDirectory2");
 		assert !rootDirectory.isAlive();
 	}
 
@@ -39,7 +38,7 @@ public class FileSystemTest extends AbstractTest {
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
 		Directory directory = rootDirectory.addDirectory("directory");
-		assert directory.updateKey("directory2").getValue().equals("directory2");
+		assert directory.updateValue("directory2").getValue().equals("directory2");
 		assert !directory.isAlive();
 	}
 
@@ -49,7 +48,7 @@ public class FileSystemTest extends AbstractTest {
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
 		Directory directory = rootDirectory.addDirectory("directory");
 		directory.addFile("file");
-		assert directory.updateKey("directory2").getValue().equals("directory2");
+		assert directory.updateValue("directory2").getValue().equals("directory2");
 		assert !directory.isAlive();
 	}
 
@@ -58,7 +57,7 @@ public class FileSystemTest extends AbstractTest {
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
 		File file = rootDirectory.addFile("file");
-		assert file.updateKey("file2").getValue().equals("file2");
+		assert file.updateValue("file2").getValue().equals("file2");
 		assert !file.isAlive();
 	}
 
