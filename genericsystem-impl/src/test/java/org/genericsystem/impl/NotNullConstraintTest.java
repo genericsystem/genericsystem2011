@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
@@ -35,16 +36,14 @@ public class NotNullConstraintTest extends AbstractTest {
 		sportCar.setValue(vehiclePower, 250);
 		assert car.getValue(vehiclePower).equals(80);
 		assert sportCar.getValue(vehiclePower).equals(250);
-		log.info("@@@@@@@@@@@@@@@@@@@@@@@");
 		car.setValue(vehiclePower, 90);
 		assert car.getValue(vehiclePower).equals(90);
 
-		// sportCar.clearAllConcrete(vehiclePower);
-		// assert Objects.equals(80, sportCar.getValue(vehiclePower)) : sportCar.getHolder(vehiclePower);
-		// sportCar.setValue(vehiclePower, 250);
-		// sportCar.cancelAll(vehiclePower, true);
-		// assert sportCar.getValue(vehiclePower) == null : sportCar.getValue(vehiclePower);
-
+		sportCar.clearAllConcrete(vehiclePower);
+		assert Objects.equals(80, sportCar.getValue(vehiclePower)) : sportCar.getHolder(vehiclePower);
+		sportCar.setValue(vehiclePower, 250);
+		sportCar.cancelAll(vehiclePower, true);
+		assert sportCar.getValue(vehiclePower) == null : sportCar.getValue(vehiclePower);
 	}
 
 	public void testPropertySimpleRelationKO() {
