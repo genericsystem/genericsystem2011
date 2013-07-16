@@ -10,12 +10,14 @@ import org.genericsystem.generic.Holder;
 
 public abstract class AbstractSimpleConstraintImpl extends AbstractConstraintImpl {
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void check(Holder valueBaseComponent, Serializable key, Class<? extends Serializable> keyClazz) throws ConstraintViolationException {
+	public void check(Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException {
+		AbstractSimpleConstraintImpl constraint = (AbstractSimpleConstraintImpl) findAxedConstraint(key.getAxe());
 		Generic baseComponent = valueBaseComponent != null ? valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent() : null;
-		if (isBooleanConstraintEnabledOrNotBoolean(valueBaseComponent, keyClazz))
+		if (isBooleanConstraintEnabledOrNotBoolean(valueBaseComponent, (Class<? extends Serializable>) key.getClazz()))
 			for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
-				check(baseComponent, inheriting);
+				constraint.check(baseComponent, inheriting);
 	}
 
 	public abstract void check(Generic baseComponent, Generic modified) throws ConstraintViolationException;

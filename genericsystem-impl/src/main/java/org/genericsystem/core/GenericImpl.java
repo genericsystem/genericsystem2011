@@ -51,9 +51,7 @@ import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
-import org.genericsystem.systemproperties.constraints.AbstractSimpleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
@@ -1287,6 +1285,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
 
+	private <T extends Type> T setConstraint(Class<?> constraintClass, int pos, boolean value) {
+		getContraints().put(getCurrentCache().<AbstractConstraintImpl> find(constraintClass).bindAxedConstraint(pos).getValue(), value);
+		return (T) this;
+	}
+
+	private boolean isConstraintEnabled(Class<?> constraintClass, int pos) {
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(constraintClass).findAxedConstraint(pos);
+		if (null == constraint)
+			return false;
+		return Boolean.TRUE.equals(getContraints().get(constraint.getValue()));
+	}
+
 	public <T extends Generic> T enableSystemProperty(Class<?> systemPropertyClass) {
 		return enableSystemProperty(systemPropertyClass, Statics.BASE_POSITION);
 	}
@@ -1391,22 +1401,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableSingularConstraint(int basePos) {
-		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(basePos).getValue(), true);
-		return (T) this;
+		return setConstraint(SingularConstraintImpl.class, basePos, true);
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint(int basePos) {
-		getContraints().put(getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(basePos).getValue(), false);
-		return (T) this;
+		return setConstraint(SingularConstraintImpl.class, basePos, false);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled(int basePos) {
-		AbstractConstraintImpl constraint = getCurrentCache().<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).findAxedConstraint(basePos);
-		if (null == constraint)
-			return false;
-		return Boolean.TRUE.equals(getContraints().get(constraint.getValue()));
+		return isConstraintEnabled(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
@@ -1433,25 +1438,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enablePropertyConstraint() {
-		// return enableSystemProperty(PropertyConstraintImpl.class);
-		getContraints().put(getCurrentCache().<AbstractSimpleConstraintImpl> find(PropertyConstraintImpl.class).getValue(), true);
-		return (T) this;
+		return setConstraint(PropertyConstraintImpl.class, Statics.NO_POSITION, true);
 	}
 
 	@Override
 	public <T extends Type> T disablePropertyConstraint() {
-		// return disableSystemProperty(PropertyConstraintImpl.class);
-		getContraints().put(getCurrentCache().<AbstractSimpleConstraintImpl> find(PropertyConstraintImpl.class).getValue(), false);
-		return (T) this;
+		return setConstraint(PropertyConstraintImpl.class, Statics.NO_POSITION, false);
 	}
 
 	@Override
 	public boolean isPropertyConstraintEnabled() {
-		// return isBooleanSystemPropertyEnabled(PropertyConstraintImpl.class);
-		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(PropertyConstraintImpl.class);
-		if (null == constraint)
-			return false;
-		return Boolean.TRUE.equals(getContraints().get(constraint.getValue()));
+		return isConstraintEnabled(PropertyConstraintImpl.class, Statics.NO_POSITION);
 	}
 
 	@Override

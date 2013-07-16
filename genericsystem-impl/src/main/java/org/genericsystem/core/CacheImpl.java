@@ -30,8 +30,8 @@ import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
-import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl.AxedConstraintClass;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
 import org.genericsystem.systemproperties.constraints.Constraint;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 import org.genericsystem.tree.TreeImpl;
@@ -582,20 +582,18 @@ public class CacheImpl extends AbstractContext implements Cache {
 				constraint.check(generic);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void checkConstraints2(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		for (Generic generic : generics) {
-			for (Serializable key : generic.getContraints().keySet()) {
-				Class<? extends Serializable> keyClazz = (Class<? extends Serializable>) (key instanceof AxedConstraintClass ? ((AxedConstraintClass) key).getClazz() : key);
-				AbstractConstraintImpl constraint = find(keyClazz);
-				if (isCheckable(constraint, generic, checkingType, isFlushTime))
-					constraint.check(generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), key, keyClazz);
-			}
-		}
+		for (Generic generic : generics)
+			for (Serializable key : generic.getContraints().keySet())
+				if (key instanceof AxedConstraintClass) {
+					AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
+					if (isCheckable(constraint, generic, checkingType, isFlushTime))
+						constraint.check(generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
+				}
 	}
 
 	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-		return isFlushTime ? constraint.isCheckedAt(generic, checkingType) : constraint.isCheckedAt(generic, checkingType) && constraint.isImmediatelyCheckable();
+		return constraint.isCheckedAt(generic, checkingType) && (isFlushTime || constraint.isImmediatelyCheckable());
 	}
 
 	@Override
