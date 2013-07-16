@@ -208,10 +208,13 @@ public abstract class AbstractContext implements Serializable {
 					for (T compositeDependency : generic.<T> getComposites())
 						if (!generic.equals(compositeDependency)) {
 							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components.length; componentPos++)
-								if (((GenericImpl) compositeDependency).components[componentPos].equals(generic) && compositeDependency.isReferentialIntegrity(componentPos))
+								if (((GenericImpl) compositeDependency).components[componentPos].equals(generic) && !contains(compositeDependency) && compositeDependency.isReferentialIntegrity(componentPos))
 									throw new ReferentialIntegrityConstraintViolationException(compositeDependency + " is Referential Integrity for ancestor " + generic + " by component position : " + componentPos);
 							addDependencies(compositeDependency);
 						}
+					for (int axe = 0; axe < ((GenericImpl) generic).components.length; axe++)
+						if (((GenericImpl) generic).isCascadeRemove(axe))
+							addDependencies(((GenericImpl) generic).components[axe]);
 				}
 			}
 		};

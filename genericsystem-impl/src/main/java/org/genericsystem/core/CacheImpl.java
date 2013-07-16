@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -594,6 +593,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				Holder valueBaseComponent = generic.getContraints().getValueHolder(key).getBaseComponent();
 				Generic baseComponent = valueBaseComponent != null ? valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent() : null;
 				Class<? extends Serializable> keyClazz = (Class<? extends Serializable>) (key instanceof AxedConstraintClass ? ((AxedConstraintClass) key).getClazz() : key);
+
 				AbstractConstraintImpl constraint = find(keyClazz);
 				assert constraint != null;
 				if (immediatlyCheckable) {
@@ -632,9 +632,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		super.simpleAdd(generic);
 	}
 
-	@Override
-	void simpleRemove(Generic generic) {
-		removes.add(generic);
+
+	void simpleRemove(GenericImpl generic) {
+		if (adds.contains(generic))
+			adds.remove(generic);
+		else
+			removes.add(generic);
 		super.simpleRemove(generic);
 	}
 
@@ -645,21 +648,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 		checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
 	}
 
+
 	private void removeGeneric(Generic generic, boolean checkConstraint) throws ConstraintViolationException {
-		removeOrCancelAdd(generic);
+		simpleRemove((GenericImpl) generic);
 		if (checkConstraint) {
 			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
 			checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
 			checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
 		}
-	}
-
-	private void removeOrCancelAdd(Generic generic) throws ConstraintViolationException {
-		if (adds.contains(generic)) {
-			adds.remove(generic);
-			unplug((GenericImpl) generic);
-		} else
-			simpleRemove(generic);
 	}
 
 	private void checkConstraints() throws ConstraintViolationException {
