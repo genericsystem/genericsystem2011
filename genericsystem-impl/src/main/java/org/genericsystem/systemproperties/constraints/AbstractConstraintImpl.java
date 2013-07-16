@@ -12,10 +12,13 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractProjectionIterator;
+import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 public abstract class AbstractConstraintImpl extends GenericImpl {
@@ -30,6 +33,14 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 	}
 
 	public boolean isImmediatelyCheckable() {
+		return true;
+	}
+
+	public abstract void check(Holder valueBaseComponent, Serializable key, Class<? extends Serializable> keyClazz) throws ConstraintViolationException;
+
+	protected boolean isBooleanConstraintEnabledOrNotBoolean(Holder valueBaseComponent, Class<? extends Serializable> keyClazz) {
+		if (BooleanSystemProperty.class.isAssignableFrom(keyClazz))
+			return valueBaseComponent.getValue(getCurrentCache().<Holder> find(ConstraintsMapProvider.ConstraintValue.class));
 		return true;
 	}
 

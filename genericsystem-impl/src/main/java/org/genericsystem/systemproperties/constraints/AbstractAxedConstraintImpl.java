@@ -6,6 +6,8 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
+import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl {
@@ -20,6 +22,17 @@ public abstract class AbstractAxedConstraintImpl extends AbstractConstraintImpl 
 		if (implicit == null)
 			return null;
 		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AbstractAxedConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
+	}
+
+	@Override
+	public void check(Holder valueBaseComponent, Serializable key, Class<? extends Serializable> keyClazz) throws ConstraintViolationException {
+		if (key instanceof AxedConstraintClass) {
+			AbstractAxedConstraintImpl constraint = findAxedConstraint(((AxedConstraintClass) key).getAxe());
+			Generic baseComponent = valueBaseComponent != null ? valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent() : null;
+			if (isBooleanConstraintEnabledOrNotBoolean(valueBaseComponent, keyClazz))
+				for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
+					constraint.check(baseComponent, inheriting, ((AxedConstraintClass) key).getAxe());
+		}
 	}
 
 	public abstract void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException;
