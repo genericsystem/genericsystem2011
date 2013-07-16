@@ -28,6 +28,7 @@ import org.genericsystem.map.ConstraintsMapProvider.SingularConstraintImpl;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.AbstractSimpleConstraintImpl;
+import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 /**
  * @author Nicolas Feybesse
@@ -84,11 +85,16 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 		}
 
 		@Override
+		public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
+			return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
+		}
+
+		@Override
 		public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
 			Generic component = ((Link) modified).getComponent(axe);
 			Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
 			if (holders.size() > 1)
-				throw new SingularConstraintViolationException("Multiple links of type " + baseComponent + " on target " + component + " (n° " + axe + ") : " + holders);
+				throw new SingularConstraintViolationException("Multiple links of attribute " + baseComponent + " on component " + component + " (n° " + axe + ") : " + holders);
 		}
 	}
 
@@ -99,12 +105,12 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 	public static class PropertyConstraintImpl extends AbstractSimpleConstraintImpl implements Holder, BooleanSystemProperty {
 
 		@Override
-		public void check(final Generic baseComponent, final Generic modified) throws ConstraintViolationException {
-			// Generic component = ((Link) modified).getComponent(axe);
-			// Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
-			// if (holders.size() > 1)
-			// throw new PropertyConstraintViolationException("Multiple links of type " + baseComponent + " on target " + component + " (n° " + axe + ") : " + holders);
+		public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
+			return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
+		}
 
+		@Override
+		public void check(final Generic baseComponent, final Generic modified) throws ConstraintViolationException {
 			if (modified.isAttribute()) {
 				// TODO KK
 				for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {

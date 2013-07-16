@@ -25,7 +25,7 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 		return annotation != null ? annotation.value() : 0;
 	}
 
-	public boolean isCheckedAt(CheckingType checkingType) {
+	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
 		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE);
 	}
 

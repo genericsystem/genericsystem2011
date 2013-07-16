@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
-import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
+import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.UniqueValueConstraint;
 import org.genericsystem.annotation.constraints.VirtualConstraint;
 import org.genericsystem.core.Snapshot.Projector;
@@ -317,7 +318,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
-		holder.remove();
+		log.info("holder " + holder.info());
+		Generic updateValue = holder.updateValue(value);
+		log.info("UPDATE");
+		updateValue.log();
+		// holder.remove();
 		return this.<T> setHolder(attribute, value, basePos, targets);
 	}
 

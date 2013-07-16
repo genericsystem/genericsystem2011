@@ -41,25 +41,25 @@ public abstract class AbstractContext implements Serializable {
 
 	abstract <T extends Engine> T getEngine();
 
-	<T extends GenericImpl> T plug(T generic) {
+	<T extends Generic> T plug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
-		for (Generic component : generic.components)
+		for (Generic component : ((GenericImpl) generic).components)
 			if (componentSet.add(component))
 				getCompositeDependencies(component).add(generic);
 		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : generic.supers)
+		for (Generic effectiveSuper : ((GenericImpl) generic).supers)
 			if (effectiveSupersSet.add(effectiveSuper))
 				getDirectInheritingsDependencies(effectiveSuper).add(generic);
 		return generic;
 	}
 
-	<T extends GenericImpl> T unplug(T generic) {
+	<T extends Generic> T unplug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
-		for (Generic component : generic.components)
+		for (Generic component : ((GenericImpl) generic).components)
 			if (componentSet.add(component))
 				getCompositeDependencies(component).remove(generic);
 		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : generic.supers)
+		for (Generic effectiveSuper : ((GenericImpl) generic).supers)
 			if (effectiveSupersSet.add(effectiveSuper))
 				getDirectInheritingsDependencies(effectiveSuper).remove(generic);
 		return generic;
@@ -203,7 +203,7 @@ public abstract class AbstractContext implements Serializable {
 					for (T inheritingDependency : generic.<T> getInheritings())
 						if (inheritingDependency.getValue() == null)
 							addDependencies(inheritingDependency);
-						else
+						else if (!contains(inheritingDependency))
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
 					for (T compositeDependency : generic.<T> getComposites())
 						if (!generic.equals(compositeDependency)) {
@@ -317,19 +317,19 @@ public abstract class AbstractContext implements Serializable {
 
 	void addAll(Iterable<Generic> generics) {
 		for (Generic generic : generics)
-			simpleAdd((GenericImpl) generic);
+			simpleAdd(generic);
 	}
 
 	void removeAll(Iterable<Generic> generics) {
 		for (Generic generic : generics)
-			simpleRemove((GenericImpl) generic);
+			simpleRemove(generic);
 	}
 
-	void simpleAdd(GenericImpl generic) {
+	void simpleAdd(Generic generic) {
 		plug(generic);
 	}
 
-	void simpleRemove(GenericImpl generic) {
+	void simpleRemove(Generic generic) {
 		unplug(generic);
 	}
 

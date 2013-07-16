@@ -144,8 +144,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void remove(Generic generic) throws RollbackException {
+		remove(generic, true);
+	}
+
+	private void remove(Generic generic, boolean checkConstraint) throws RollbackException {
 		try {
-			internalRemove(generic);
+			internalRemove(generic, checkConstraint);
 		} catch (ConstraintViolationException e) {
 			rollback(e);
 		}
@@ -158,25 +162,27 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return null;
 	}
 
-	private void internalRemove(Generic node) throws ConstraintViolationException {
+	private void internalRemove(Generic node, boolean checkConstraint) throws ConstraintViolationException {
 		if (!isAlive(node))
 			throw new AliveConstraintViolationException(node + " is not alive");
-		for (Generic generic : orderRemoves(node).descendingSet()) {
-			removeGeneric(generic);
-			for (int axe = 0; axe < ((GenericImpl) generic).components.length; axe++)
-				if (((GenericImpl) generic).isCascadeRemove(axe))
-					internalRemove(((GenericImpl) generic).components[axe]);
-		}
+		for (Generic generic : orderRemoves(node).descendingSet())
+			removeGeneric(generic, checkConstraint);
 	}
 
 	private abstract class Restructurator {
 		@SuppressWarnings("unchecked")
 		<T extends Generic> T rebuildAll(Generic old) {
-			NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old);
+			NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old, false);
 			dependencies.remove(old);
 			ConnectionMap map = new ConnectionMap();
 			map.put(old, rebuild());
-			return (T) map.reBind(dependencies).get(old);
+			Generic generic = map.reBind(dependencies).get(old);
+			try {
+				checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
+			} catch (ConstraintViolationException e) {
+				rollback(e);
+			}
+			return (T) generic;
 		}
 
 		abstract Generic rebuild();
@@ -349,10 +355,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<EngineImpl> getEngine().getFactory().newCache(this);
 	}
 
-	<T extends Generic> NavigableSet<T> orderAndRemoveDependencies(final T old) {
+	<T extends Generic> NavigableSet<T> orderAndRemoveDependencies(final T old, boolean checkConstraint) {
 		NavigableSet<T> orderedGenerics = orderDependencies(old);
 		for (T generic : orderedGenerics.descendingSet())
-			remove(generic);
+			remove(generic, checkConstraint);
 		return orderedGenerics;
 	}
 
@@ -442,7 +448,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	public <T extends Generic> T reBind(Generic generic) {
-		return (T) (generic.isAlive() ? new ConnectionMap().reBind(orderAndRemoveDependencies(generic)).get(generic) : internalReBind(generic));
+		return (T) (generic.isAlive() ? new ConnectionMap().reBind(orderAndRemoveDependencies(generic, true)).get(generic) : internalReBind(generic));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -591,9 +597,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 				AbstractConstraintImpl constraint = find(keyClazz);
 				assert constraint != null;
 				if (immediatlyCheckable) {
-					if (!constraint.isCheckedAt(checkingType) || immediatlyCheckable != constraint.isImmediatelyCheckable())
+					if (!constraint.isCheckedAt(generic, checkingType) || immediatlyCheckable != constraint.isImmediatelyCheckable())
 						continue;
-				} else if (!constraint.isCheckedAt(checkingType))
+				} else if (!constraint.isCheckedAt(generic, checkingType))
 					continue;
 				if (constraint instanceof AbstractAxedConstraintImpl) {
 					if (!(key instanceof AxedConstraintClass))
@@ -621,29 +627,31 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	void simpleAdd(GenericImpl generic) {
+	void simpleAdd(Generic generic) {
 		adds.add(generic);
 		super.simpleAdd(generic);
 	}
 
 	@Override
-	void simpleRemove(GenericImpl generic) {
+	void simpleRemove(Generic generic) {
 		removes.add(generic);
 		super.simpleRemove(generic);
 	}
 
 	private void addGeneric(Generic generic) throws ConstraintViolationException {
-		simpleAdd((GenericImpl) generic);
+		simpleAdd(generic);
 		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
 		checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, true, Arrays.asList(generic));
 	}
 
-	private void removeGeneric(Generic generic) throws ConstraintViolationException {
+	private void removeGeneric(Generic generic, boolean checkConstraint) throws ConstraintViolationException {
 		removeOrCancelAdd(generic);
-		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
-		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
-		checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
+		if (checkConstraint) {
+			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
+			checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
+			checkConstraints2(CheckingType.CHECK_ON_REMOVE_NODE, true, Arrays.asList(generic));
+		}
 	}
 
 	private void removeOrCancelAdd(Generic generic) throws ConstraintViolationException {
@@ -651,7 +659,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			adds.remove(generic);
 			unplug((GenericImpl) generic);
 		} else
-			simpleRemove((GenericImpl) generic);
+			simpleRemove(generic);
 	}
 
 	private void checkConstraints() throws ConstraintViolationException {
