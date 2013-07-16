@@ -172,7 +172,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			dependencies.remove(old);
 			ConnectionMap map = new ConnectionMap();
 			map.put(old, rebuild());
-			Generic generic = map.reBind(dependencies).get(old);
+			Generic generic = map.reBind(dependencies, false).get(old);
 			try {
 				checkConstraints2(CheckingType.CHECK_ON_ADD_NODE, false, Arrays.asList(generic));
 			} catch (ConstraintViolationException e) {
@@ -182,6 +182,19 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		abstract Generic rebuild();
+	}
+
+	<T extends Generic> T updateValue(final Generic old, final Serializable value) {
+		return new Restructurator() {
+			@Override
+			Generic rebuild() {
+				Generic engineCandidate = old.<GenericImpl> getImplicit().supers[0];
+				Generic newImplicit = bindPrimaryByValue(engineCandidate.isEngine() ? engineCandidate : reBind(engineCandidate), value, old.getMetaLevel(), old.getImplicit().isAutomatic(), old.getClass());
+				if (((GenericImpl) old).isPrimary())
+					return newImplicit;
+				return bind(newImplicit, Statics.replace(0, reBind(((GenericImpl) old).supers), newImplicit), reBind(((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);
+			}
+		}.rebuildAll(old);
 	}
 
 	<T extends Generic> T addComponent(final Generic old, final Generic newComponent, final int pos) {
@@ -227,19 +240,47 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}.rebuildAll(old);
 	}
 
-	<T extends Generic> T updateValue(final Generic old, final Serializable value) {
-		// TODO rebind => updateValue ?
-		// if (Objects.equals(value, old.getValue()))
-		// return (T) old;
-		return new Restructurator() {
-			@Override
-			Generic rebuild() {
-				Generic newImplicit = bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], value, old.getMetaLevel(), old.getImplicit().isAutomatic(), old.getClass());
-				if (((GenericImpl) old).isPrimary())
-					return newImplicit;
-				return bind(newImplicit, Statics.replace(0, ((GenericImpl) old).supers, newImplicit), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+	private class ConnectionMap extends HashMap<Generic, Generic> {
+		private static final long serialVersionUID = 8257917150315417734L;
+
+		private ConnectionMap reBind(Set<Generic> orderedDependencies, boolean computeDirectSupers) {
+			for (Generic orderedDependency : orderedDependencies) {
+				Generic generic;
+				if (((GenericImpl) orderedDependency).isPrimary())
+					generic = bindPrimaryByValue(adjust(((GenericImpl) orderedDependency).supers)[0], orderedDependency.getValue(), orderedDependency.getMetaLevel(), orderedDependency.isAutomatic(), orderedDependency.getClass());
+				else {
+					generic = buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0],
+							computeDirectSupers ? getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
+							adjust(((GenericImpl) orderedDependency).components), orderedDependency.isAutomatic());
+				}
+				put(orderedDependency, generic);
 			}
-		}.rebuildAll(old);
+			return this;
+		}
+
+		private Generic[] adjust(Generic... oldComponents) {
+			Generic[] newComponents = new Generic[oldComponents.length];
+			for (int i = 0; i < newComponents.length; i++) {
+				Generic newComponent = get(oldComponents[i]);
+				assert newComponent == null ? isAlive(oldComponents[i]) : !isAlive(oldComponents[i]) : newComponent + " / " + oldComponents[i].info();
+				newComponents[i] = newComponent == null ? oldComponents[i] : newComponent;
+				assert isAlive(newComponents[i]);
+			}
+			return newComponents;
+		}
+	}
+
+	public <T extends Generic> T reBind(Generic generic) {
+		return updateValue(generic, generic.getValue());
+	}
+
+	private Generic[] reBind(Generic[] generics) {
+		Generic[] reBind = new Generic[generics.length];
+		for (int i = 0; i < generics.length; i++) {
+			Generic generic = generics[i];
+			reBind[i] = generic.isAlive() ? generic : updateValue(generic, generic.getValue());
+		}
+		return reBind;
 	}
 
 	@Override
@@ -353,7 +394,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	<T extends Generic> NavigableSet<T> orderAndRemoveDependencies(final T old, boolean checkConstraint) {
 		NavigableSet<T> orderedGenerics = orderDependencies(old);
 		for (T generic : orderedGenerics.descendingSet())
-			remove(generic, checkConstraint);
+			if (generic.isAlive())
+				remove(generic, checkConstraint);
 		return orderedGenerics;
 	}
 
@@ -365,7 +407,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] components = findComponents(clazz);
 		Generic[] supers = findSupers(clazz);
 		int metaLevel = findMetaLevel(clazz);
-
 		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), metaLevel, isAutomatic(supers, components, metaLevel), specialize), supers, components, false, clazz, false);
 	}
 
@@ -428,7 +469,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric(specializeGeneric)).initializeComplex(implicit, directSupers, components, automatic);
 		T superGeneric = this.<T> insert(newGeneric);
-		connectionMap.reBuild(orderedDependencies);
+		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
 	}
 
@@ -441,68 +482,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		};
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends Generic> T reBind(Generic generic) {
-		return (T) (generic.isAlive() ? new ConnectionMap().reBind(orderAndRemoveDependencies(generic, true)).get(generic) : internalReBind(generic));
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T extends Generic> T internalReBind(Generic generic) {
-		if (generic.isEngine() || generic.isAlive())
-			return (T) generic;
-		if (((GenericImpl) generic).isPrimary())
-			return bindPrimaryByValue(((GenericImpl) generic).supers[0], generic.getValue(), generic.getMetaLevel(), generic.isAutomatic(), generic.getClass());
-		return bind(internalReBind(generic.getImplicit()), reBind(((GenericImpl) generic).supers), reBind(((GenericImpl) generic).components), generic.isAutomatic(), generic.getClass(), false);
-	}
-
-	private Generic[] reBind(Generic[] generics) {
-		Generic[] reBind = new Generic[generics.length];
-		for (int i = 0; i < generics.length; i++)
-			reBind[i] = internalReBind(generics[i]);
-		return reBind;
-	}
-
 	private <T extends Generic> T buildAndInsertComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
 		return insert(this.<EngineImpl> getEngine().buildComplex(clazz, implicit, supers, components, automatic));
-	}
-
-	private class ConnectionMap extends HashMap<Generic, Generic> {
-		private static final long serialVersionUID = 8257917150315417734L;
-
-		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
-			for (Generic orderedDependency : orderedDependencies) {
-				Generic generic;
-				if (((GenericImpl) orderedDependency).isPrimary())
-					generic = bindPrimaryByValue(adjust(((GenericImpl) orderedDependency).supers)[0], orderedDependency.getValue(), orderedDependency.getMetaLevel(), orderedDependency.isAutomatic(), orderedDependency.getClass());
-				else {
-					generic = buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0], adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components),
-							orderedDependency.isAutomatic());
-				}
-				put(orderedDependency, generic);
-			}
-			return this;
-		}
-
-		private void reBuild(NavigableSet<Generic> orderedDependencies) {
-			for (Generic orderedDependency : orderedDependencies) {
-				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).components);
-				put(orderedDependency,
-						buildAndInsertComplex(orderedDependency.getClass(), orderedDependency.getImplicit(),
-								((GenericImpl) orderedDependency).isPrimary() ? adjust(((GenericImpl) orderedDependency).supers[0]) : getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), newComponents), newComponents,
-								orderedDependency.isAutomatic()));
-			}
-		}
-
-		private Generic[] adjust(Generic... oldComponents) {
-			Generic[] newComponents = new Generic[oldComponents.length];
-			for (int i = 0; i < newComponents.length; i++) {
-				Generic newComponent = get(oldComponents[i]);
-				assert newComponent == null ? isAlive(oldComponents[i]) : !isAlive(oldComponents[i]) : newComponent + " / " + oldComponents[i].info();
-				newComponents[i] = newComponent == null ? oldComponents[i] : newComponent;
-				assert isAlive(newComponents[i]);
-			}
-			return newComponents;
-		}
 	}
 
 	protected void triggersDependencies(Class<?> clazz) {
@@ -584,12 +565,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private void checkConstraints2(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics)
-			for (Serializable key : generic.getContraints().keySet())
-				if (key instanceof AxedConstraintClass) {
-					AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
-					if (isCheckable(constraint, generic, checkingType, isFlushTime))
-						constraint.check(generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
-				}
+			for (Serializable key : generic.getContraints().keySet()) {
+				AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
+				if (isCheckable(constraint, generic, checkingType, isFlushTime))
+					constraint.check(generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
+			}
 	}
 
 	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {

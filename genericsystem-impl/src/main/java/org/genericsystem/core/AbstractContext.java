@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
@@ -26,6 +27,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -297,6 +299,9 @@ public abstract class AbstractContext implements Serializable {
 		StringValue stringValue = clazz.getAnnotation(StringValue.class);
 		if (stringValue != null)
 			return stringValue.value();
+		AxedConstraintValue axedConstraintValue = clazz.getAnnotation(AxedConstraintValue.class);
+		if (axedConstraintValue != null)
+			return new AxedConstraintClass(axedConstraintValue.value(), Statics.NO_POSITION);
 		return clazz;
 	}
 

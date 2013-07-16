@@ -10,25 +10,20 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.RequiredConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.annotation.value.BooleanValue;
+import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.PropertyConstraintViolationException;
-import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Link;
-import org.genericsystem.generic.Relation;
 import org.genericsystem.iterator.AbstractFilterIterator;
-import org.genericsystem.map.ConstraintsMapProvider.SingularConstraintImpl;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
-import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.AbstractSimpleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
+import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -74,34 +69,8 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(MapInstance.class)
 	@Extends(ConstraintKey.class)
-	@Dependencies(SingularConstraintImpl.DefaultValue.class)
-	public static class SingularConstraintImpl extends AbstractAxedConstraintImpl implements Holder, BooleanSystemProperty {
-
-		@SystemGeneric(SystemGeneric.CONCRETE)
-		@Components(SingularConstraintImpl.class)
-		@Extends(ConstraintsMapProvider.ConstraintValue.class)
-		@BooleanValue(false)
-		public static class DefaultValue extends GenericImpl implements Holder {
-		}
-
-		@Override
-		public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
-			return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
-		}
-
-		@Override
-		public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
-			Generic component = ((Link) modified).getComponent(axe);
-			Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
-			if (holders.size() > 1)
-				throw new SingularConstraintViolationException("Multiple links of attribute " + baseComponent + " on component " + component + " (n° " + axe + ") : " + holders);
-		}
-	}
-
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	@Components(MapInstance.class)
-	@Extends(ConstraintKey.class)
 	@SingularConstraint
+	@AxedConstraintValue(PropertyConstraintImpl.class)
 	public static class PropertyConstraintImpl extends AbstractSimpleConstraintImpl implements Holder, BooleanSystemProperty {
 
 		@Override
