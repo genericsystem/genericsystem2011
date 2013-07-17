@@ -17,8 +17,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
-import org.genericsystem.systemproperties.BooleanSystemProperty;
-import org.genericsystem.systemproperties.constraints.AbstractSimpleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 @SystemGeneric(SystemGeneric.CONCRETE)
@@ -26,7 +24,7 @@ import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 @Extends(ConstraintKey.class)
 @SingularConstraint
 @AxedConstraintValue(PropertyConstraintImpl.class)
-public class PropertyConstraintImpl extends AbstractSimpleConstraintImpl implements Holder, BooleanSystemProperty {
+public class PropertyConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {

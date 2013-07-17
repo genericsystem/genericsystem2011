@@ -17,8 +17,6 @@ import org.genericsystem.generic.Relation;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
-import org.genericsystem.systemproperties.BooleanSystemProperty;
-import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 @SystemGeneric(SystemGeneric.CONCRETE)
@@ -26,7 +24,7 @@ import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 @Extends(ConstraintKey.class)
 @Dependencies(SingularConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(SingularConstraintImpl.class)
-public class SingularConstraintImpl extends AbstractAxedConstraintImpl implements Holder, BooleanSystemProperty {
+public class SingularConstraintImpl extends AbstractBooleanAxedConstraintImpl implements Holder {
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(SingularConstraintImpl.class)

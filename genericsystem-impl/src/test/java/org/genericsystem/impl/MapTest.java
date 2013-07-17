@@ -11,7 +11,7 @@ import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.constraints.AbstractAxedConstraintImpl;
+import org.genericsystem.systemproperties.constraints.axed.AbstractNoBooleanAxedConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.testng.annotations.Test;
 
@@ -164,8 +164,8 @@ public class MapTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		assert !vehicle.isSingularConstraintEnabled();
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color).<Relation> enableSingularConstraint(Statics.TARGET_POSITION);
-		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION) : vehicleColor.getContraints().get(cache.<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.TARGET_POSITION));
-		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION) : vehicleColor.getContraints().get(cache.<AbstractAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.BASE_POSITION));
+		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION) : vehicleColor.getContraints().get(cache.<AbstractNoBooleanAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.TARGET_POSITION));
+		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION) : vehicleColor.getContraints().get(cache.<AbstractNoBooleanAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.BASE_POSITION));
 		assert !vehicle.isSingularConstraintEnabled();
 		vehicleColor.disableSingularConstraint(Statics.TARGET_POSITION);
 		assert !vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);

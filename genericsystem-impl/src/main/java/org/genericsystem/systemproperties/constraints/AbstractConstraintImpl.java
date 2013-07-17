@@ -16,10 +16,8 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractProjectionIterator;
-import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 import org.genericsystem.snapshot.AbstractSnapshot;
-import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 public abstract class AbstractConstraintImpl extends GenericImpl {
@@ -38,12 +36,6 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 	}
 
 	public abstract void check(Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException;
-
-	protected boolean isBooleanConstraintEnabledOrNotBoolean(Holder valueBaseComponent, Class<? extends Serializable> keyClazz) {
-		if (BooleanSystemProperty.class.isAssignableFrom(keyClazz))
-			return valueBaseComponent.getValue(getCurrentCache().<Holder> find(ConstraintsMapProvider.ConstraintValue.class));
-		return true;
-	}
 
 	// @Override
 	// public int compareTo(AbstractConstraintImpl otherConstraint) {
@@ -103,11 +95,11 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 		return getCurrentCache().<GenericImpl> find(MapInstance.class).bind(getClass(), implicit, this, getBasePos(this), false, new Generic[] {});
 	}
 
-	public AbstractConstraintImpl findAxedConstraint(int pos) {
+	public <T extends AbstractConstraintImpl> T findAxedConstraint(int pos) {
 		Generic implicit = getEngine().findPrimary(new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL);
 		if (implicit == null)
 			return null;
-		return getCurrentCache().<GenericImpl> find(MapInstance.class).<AbstractConstraintImpl> find(implicit, this, getBasePos(this), new Generic[] {});
+		return getCurrentCache().<GenericImpl> find(MapInstance.class).<T> find(implicit, this, getBasePos(this), new Generic[] {});
 	}
 
 	public static class AxedConstraintClass implements Serializable {

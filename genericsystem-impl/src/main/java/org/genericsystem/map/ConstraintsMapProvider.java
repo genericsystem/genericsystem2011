@@ -13,8 +13,8 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.InstanceClassConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
 
 /**
