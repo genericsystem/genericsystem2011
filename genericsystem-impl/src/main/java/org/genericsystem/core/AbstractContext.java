@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
@@ -26,6 +27,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,25 +43,25 @@ public abstract class AbstractContext implements Serializable {
 
 	abstract <T extends Engine> T getEngine();
 
-	<T extends GenericImpl> T plug(T generic) {
+	<T extends Generic> T plug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
-		for (Generic component : generic.components)
+		for (Generic component : ((GenericImpl) generic).components)
 			if (componentSet.add(component))
 				getCompositeDependencies(component).add(generic);
 		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : generic.supers)
+		for (Generic effectiveSuper : ((GenericImpl) generic).supers)
 			if (effectiveSupersSet.add(effectiveSuper))
 				getDirectInheritingsDependencies(effectiveSuper).add(generic);
 		return generic;
 	}
 
-	<T extends GenericImpl> T unplug(T generic) {
+	<T extends Generic> T unplug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
-		for (Generic component : generic.components)
+		for (Generic component : ((GenericImpl) generic).components)
 			if (componentSet.add(component))
 				getCompositeDependencies(component).remove(generic);
 		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : generic.supers)
+		for (Generic effectiveSuper : ((GenericImpl) generic).supers)
 			if (effectiveSupersSet.add(effectiveSuper))
 				getDirectInheritingsDependencies(effectiveSuper).remove(generic);
 		return generic;
@@ -297,6 +299,9 @@ public abstract class AbstractContext implements Serializable {
 		StringValue stringValue = clazz.getAnnotation(StringValue.class);
 		if (stringValue != null)
 			return stringValue.value();
+		AxedConstraintValue axedConstraintValue = clazz.getAnnotation(AxedConstraintValue.class);
+		if (axedConstraintValue != null)
+			return new AxedConstraintClass(axedConstraintValue.value(), Statics.NO_POSITION);
 		return clazz;
 	}
 
@@ -320,19 +325,19 @@ public abstract class AbstractContext implements Serializable {
 
 	void addAll(Iterable<Generic> generics) {
 		for (Generic generic : generics)
-			simpleAdd((GenericImpl) generic);
+			simpleAdd(generic);
 	}
 
 	void removeAll(Iterable<Generic> generics) {
 		for (Generic generic : generics)
-			simpleRemove((GenericImpl) generic);
+			simpleRemove(generic);
 	}
 
-	void simpleAdd(GenericImpl generic) {
+	void simpleAdd(Generic generic) {
 		plug(generic);
 	}
 
-	void simpleRemove(GenericImpl generic) {
+	void simpleRemove(Generic generic) {
 		unplug(generic);
 	}
 

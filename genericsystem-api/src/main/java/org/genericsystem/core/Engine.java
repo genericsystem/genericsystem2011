@@ -51,4 +51,6 @@ public interface Engine extends Type {
 	 * @return The timestamp.
 	 */
 	long pickNewTs();
+
+	Cache getCurrentCache();
 }

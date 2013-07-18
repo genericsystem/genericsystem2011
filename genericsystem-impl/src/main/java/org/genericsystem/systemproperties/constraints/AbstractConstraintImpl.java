@@ -12,9 +12,11 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractProjectionIterator;
+import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
@@ -25,13 +27,15 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 		return annotation != null ? annotation.value() : 0;
 	}
 
-	public boolean isCheckedAt(CheckingType checkingType) {
+	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
 		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE);
 	}
 
 	public boolean isImmediatelyCheckable() {
 		return true;
 	}
+
+	public abstract void check(Generic modified, Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException;
 
 	// @Override
 	// public int compareTo(AbstractConstraintImpl otherConstraint) {
@@ -84,5 +88,55 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 				return iterator;
 			}
 		};
+	}
+
+	public AbstractConstraintImpl bindAxedConstraint(int pos) {
+		Generic implicit = getEngine().bindPrimary(Generic.class, new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL, true);
+		return getCurrentCache().<GenericImpl> find(MapInstance.class).bind(getClass(), implicit, this, getBasePos(this), false, new Generic[] {});
+	}
+
+	public <T extends AbstractConstraintImpl> T findAxedConstraint(int pos) {
+		Generic implicit = getEngine().findPrimary(new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL);
+		if (implicit == null)
+			return null;
+		return getCurrentCache().<GenericImpl> find(MapInstance.class).<T> find(implicit, this, getBasePos(this), new Generic[] {});
+	}
+
+	public static class AxedConstraintClass implements Serializable {
+		private static final long serialVersionUID = 182492104604984855L;
+
+		private final Class<?> clazz;
+		private final int axe;
+
+		public AxedConstraintClass(Class<?> clazz, int axe) {
+			this.clazz = clazz;
+			this.axe = axe;
+		}
+
+		public Class<?> getClazz() {
+			return clazz;
+		}
+
+		public int getAxe() {
+			return axe;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof AxedConstraintClass))
+				return false;
+			AxedConstraintClass compare = (AxedConstraintClass) obj;
+			return clazz.equals(compare.getClazz()) && axe == compare.axe;
+		}
+
+		@Override
+		public int hashCode() {
+			return clazz.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return "class : " + clazz + ", axe : " + axe;
+		}
 	}
 }

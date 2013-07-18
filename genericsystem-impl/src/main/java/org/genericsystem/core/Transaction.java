@@ -77,14 +77,14 @@ public class Transaction extends AbstractContext {
 	}
 
 	@Override
-	protected void simpleAdd(GenericImpl generic) {
-		generic.getLifeManager().beginLife(getTs());
+	protected void simpleAdd(Generic generic) {
+		((GenericImpl) generic).getLifeManager().beginLife(getTs());
 		super.simpleAdd(generic);
 	}
 
 	@Override
-	protected void simpleRemove(GenericImpl generic) {
-		generic.getLifeManager().kill(getTs());
+	protected void simpleRemove(Generic generic) {
+		((GenericImpl) generic).getLifeManager().kill(getTs());
 	}
 
 	private class LockedLifeManager extends HashSet<LifeManager> {

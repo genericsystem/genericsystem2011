@@ -65,9 +65,6 @@ public class ApiTest extends AbstractTest {
 			vehicle.remove();
 		} catch (Exception e) {
 			assert e.getCause() instanceof ReferentialIntegrityConstraintViolationException;
-			// We suppose to have a logger
-			// Logger log = ...
-			log.info(e.getMessage()); // vehicleColor is Referential Integrity for ancestor Vehicle by component position : 0
 		}
 	}
 

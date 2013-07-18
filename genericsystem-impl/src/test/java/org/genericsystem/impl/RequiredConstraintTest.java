@@ -7,6 +7,7 @@ import org.genericsystem.core.Statics;
 import org.genericsystem.exception.RequiredConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -17,11 +18,11 @@ public class RequiredConstraintTest extends AbstractTest {
 	public void requiredAddedAndRemoved() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myFiat = vehicle.newInstance( "myFiat");
-		Attribute wheel = vehicle.setAttribute( "wheel");
+		Generic myFiat = vehicle.newInstance("myFiat");
+		Attribute wheel = vehicle.setAttribute("wheel");
 		wheel.enableRequiredConstraint();
 		assert wheel.isRequiredConstraintEnabled();
-		Holder wheelMyFiat = myFiat.setValue( wheel, "BigWheel");
+		Holder wheelMyFiat = myFiat.setValue(wheel, "BigWheel");
 		cache.flush();
 		wheelMyFiat.remove();
 		assert !wheelMyFiat.isAlive();
@@ -39,8 +40,8 @@ public class RequiredConstraintTest extends AbstractTest {
 	public void requiredNeverAdded() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		vehicle.newInstance( "myFiat");
-		vehicle.setAttribute( "wheel").enableRequiredConstraint();
+		vehicle.newInstance("myFiat");
+		vehicle.setAttribute("wheel").enableRequiredConstraint();
 		new RollbackCatcher() {
 
 			@Override
@@ -53,9 +54,9 @@ public class RequiredConstraintTest extends AbstractTest {
 	public void addOneRequired() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myFiat = vehicle.newInstance( "myFiat");
-		Attribute vehicleWheel = vehicle.setAttribute( "wheel").enableRequiredConstraint();
-		myFiat.setValue( vehicleWheel, "BigWheel");
+		Generic myFiat = vehicle.newInstance("myFiat");
+		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
+		myFiat.setValue(vehicleWheel, "myFiatWheel");
 		cache.flush();
 	}
 
@@ -72,10 +73,10 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void addRequiredOnSubType() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicleType = cache.newType("Vehicle");
-		vehicleType.setAttribute( "wheel").enableRequiredConstraint();
-		Type carType = vehicleType.newSubType( "Car");
-		carType.newInstance( "myFiat");
+		Type vehicle = cache.newType("Vehicle");
+		vehicle.setAttribute("power").enableRequiredConstraint();
+		Type car = vehicle.newSubType("Car");
+		car.newInstance("myFiat");
 
 		new RollbackCatcher() {
 
@@ -90,11 +91,9 @@ public class RequiredConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation( "carColor", color);
-		carColor.enableRequiredConstraint( Statics.BASE_POSITION);
-		cache.flush();
-		assert carColor.isRequiredConstraintEnabled( Statics.BASE_POSITION);
-		car.newInstance( "myFiat");
+		Relation carColor = car.setRelation("carColor", color);
+		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
+		color.newInstance("red");
 
 		new RollbackCatcher() {
 
@@ -109,10 +108,10 @@ public class RequiredConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation( "carColor", color);
-		carColor.enableRequiredConstraint( Statics.TARGET_POSITION);
-		assert carColor.isRequiredConstraintEnabled( Statics.TARGET_POSITION);
-		color.newInstance( "red");
+		Relation carColor = car.setRelation("carColor", color);
+		carColor.enableRequiredConstraint(Statics.TARGET_POSITION);
+		assert carColor.isRequiredConstraintEnabled(Statics.TARGET_POSITION);
+		color.newInstance("red");
 
 		new RollbackCatcher() {
 
@@ -127,21 +126,40 @@ public class RequiredConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation( "carColor", color);
-		carColor.enableRequiredConstraint( Statics.BASE_POSITION);
-		assert carColor.isRequiredConstraintEnabled( Statics.BASE_POSITION);
-		color.newInstance( "red");
+		Relation carColor = car.setRelation("carColor", color);
+		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
+		car.newInstance("myFiat").bind(carColor, color);
 		cache.flush();
+	}
+
+	public void addRequiredOnRelationBaseSideOk2() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation("carColor", color);
+		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
+		Generic myFiat = car.newInstance("myFiat");
+		Generic red = color.newInstance("red");
+		Link myFiatRed = myFiat.setLink(carColor, "myFiatRed", red);
+		cache.flush();
+		myFiatRed.remove();
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				cache.flush();
+			}
+		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
 
 	public void addRequiredOnRelationOk() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation( "carColor", color);
-		carColor.enableRequiredConstraint( Statics.TARGET_POSITION);
-		assert carColor.isRequiredConstraintEnabled( Statics.TARGET_POSITION);
-		car.newInstance( "myFiat");
+		Relation carColor = car.setRelation("carColor", color);
+		carColor.enableRequiredConstraint(Statics.TARGET_POSITION);
+		car.bind(carColor, color.newInstance("red"));
 		cache.flush();
 	}
+
 }
