@@ -8,13 +8,13 @@ import org.genericsystem.systemproperties.constraints.AbstractBooleanConstraintI
 public abstract class AbstractBooleanAxedConstraintImpl extends AbstractBooleanConstraintImpl {
 
 	@Override
-	public void check(Generic baseComponent, AxedConstraintClass key) throws ConstraintViolationException {
+	public void check(Generic modified, Generic baseComponent, AxedConstraintClass key) throws ConstraintViolationException {
 		AbstractBooleanAxedConstraintImpl constraint = (AbstractBooleanAxedConstraintImpl) findAxedConstraint(key.getAxe());
 		if (null != constraint)
 			for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
-				constraint.check(baseComponent, inheriting, key.getAxe());
+				constraint.check(modified, inheriting, key.getAxe());
 	}
 
-	public abstract void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException;
+	public abstract void check(Generic modified, Generic baseComponent, int axe) throws ConstraintViolationException;
 
 }

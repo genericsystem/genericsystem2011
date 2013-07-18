@@ -32,7 +32,7 @@ public class PropertyConstraintImpl extends AbstractBooleanSimpleConstraintImpl 
 	}
 
 	@Override
-	public void check(final Generic baseComponent, final Generic modified) throws ConstraintViolationException {
+	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
 		if (modified.isAttribute()) {
 			// TODO KK
 			for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {

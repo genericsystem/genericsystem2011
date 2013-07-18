@@ -8,10 +8,10 @@ import org.genericsystem.map.ConstraintsMapProvider;
 
 public abstract class AbstractBooleanConstraintImpl extends AbstractConstraintImpl {
 	@Override
-	public void check(Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException {
+	public void check(Generic modified, Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException {
 		if (valueBaseComponent.getValue(getCurrentCache().<Holder> find(ConstraintsMapProvider.ConstraintValue.class)))
-			check(valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent(), key);
+			check(modified, valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent(), key);
 	}
 
-	public abstract void check(Generic baseComponent, AxedConstraintClass key) throws ConstraintViolationException;
+	public abstract void check(Generic modified, Generic baseComponent, AxedConstraintClass key) throws ConstraintViolationException;
 }

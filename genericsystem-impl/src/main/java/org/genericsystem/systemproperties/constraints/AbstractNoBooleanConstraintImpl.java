@@ -11,9 +11,9 @@ import org.genericsystem.map.ConstraintsMapProvider;
 public abstract class AbstractNoBooleanConstraintImpl extends AbstractConstraintImpl {
 
 	@Override
-	public void check(Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException {
-		check(valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent(), key, valueBaseComponent.getValue(getCurrentCache().<Holder> find(ConstraintsMapProvider.ConstraintValue.class)));
+	public void check(Generic modified, Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException {
+		check(modified, valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent(), key, valueBaseComponent.getValue(getCurrentCache().<Holder> find(ConstraintsMapProvider.ConstraintValue.class)));
 	}
 
-	public abstract void check(Generic baseComponent, AxedConstraintClass key, Serializable value) throws ConstraintViolationException;
+	public abstract void check(Generic modified, Generic baseComponent, AxedConstraintClass key, Serializable value) throws ConstraintViolationException;
 }

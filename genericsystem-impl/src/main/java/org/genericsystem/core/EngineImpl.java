@@ -17,7 +17,6 @@ import org.genericsystem.systemproperties.MetaRelation;
 import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AloneAutomaticsConstraintImpl;
@@ -154,9 +153,9 @@ public class EngineImpl extends GenericImpl implements Engine {
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, ReferentialIntegritySystemProperty.class, OptimisticLockConstraintImpl.class,
-					RequiredConstraintImpl.class, SingletonConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class, UniqueValueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class,
-					SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class,
-					PropertiesMapProvider.class, AloneAutomaticsConstraintImpl.class, ConstraintsMapProvider.class);
+					SingletonConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class, UniqueValueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class,
+					EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class,
+					AloneAutomaticsConstraintImpl.class, ConstraintsMapProvider.class);
 
 			CacheImpl cache = (CacheImpl) start(newCache());
 			for (Class<?> clazz : classes)

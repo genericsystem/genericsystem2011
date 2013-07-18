@@ -29,7 +29,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class InstanceClassConstraintImpl extends AbstractNoBooleanSimpleConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic baseComponent, Generic modified, Serializable value) throws ConstraintViolationException {
+	public void check(Generic modified, Generic baseComponent, Serializable value) throws ConstraintViolationException {
 		if (SystemGeneric.CONCRETE == modified.getMetaLevel() && ((GenericImpl) modified.getMeta()).getValue(((EngineImpl) modified.getEngine()).getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class)) != null) {
 			Class<?> clazz = (Class<?>) value;
 			if (modified.getValue() != null && !clazz.isAssignableFrom(modified.getValue().getClass()))

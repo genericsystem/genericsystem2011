@@ -1470,32 +1470,35 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableRequiredConstraint() {
-		return enableSystemProperty(RequiredConstraintImpl.class);
+		return enableRequiredConstraint(Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T disableRequiredConstraint() {
-		return disableSystemProperty(RequiredConstraintImpl.class);
+		return disableRequiredConstraint(Statics.BASE_POSITION);
 	}
 
 	@Override
 	public boolean isRequiredConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(RequiredConstraintImpl.class);
+		return isRequiredConstraintEnabled(Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T enableRequiredConstraint(int basePos) {
-		return enableSystemProperty(RequiredConstraintImpl.class, basePos);
+		// return enableSystemProperty(RequiredConstraintImpl.class, basePos);
+		return setConstraint(RequiredConstraintImpl.class, basePos, true);
 	}
 
 	@Override
 	public <T extends Type> T disableRequiredConstraint(int basePos) {
-		return disableSystemProperty(RequiredConstraintImpl.class, basePos);
+		// return disableSystemProperty(RequiredConstraintImpl.class, basePos);
+		return setConstraint(RequiredConstraintImpl.class, basePos, false);
 	}
 
 	@Override
 	public boolean isRequiredConstraintEnabled(int basePos) {
-		return isBooleanSystemPropertyEnabled(RequiredConstraintImpl.class, basePos);
+		// return isBooleanSystemPropertyEnabled(RequiredConstraintImpl.class, basePos);
+		return isConstraintEnabled(RequiredConstraintImpl.class, basePos);
 	}
 
 	@Override

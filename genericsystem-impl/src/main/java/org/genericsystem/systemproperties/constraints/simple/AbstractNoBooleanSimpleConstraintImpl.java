@@ -10,12 +10,12 @@ import org.genericsystem.systemproperties.constraints.AbstractNoBooleanConstrain
 public abstract class AbstractNoBooleanSimpleConstraintImpl extends AbstractNoBooleanConstraintImpl {
 
 	@Override
-	public void check(Generic baseComponent, AxedConstraintClass key, Serializable value) throws ConstraintViolationException {
+	public void check(Generic modified, Generic baseComponent, AxedConstraintClass key, Serializable value) throws ConstraintViolationException {
 		AbstractNoBooleanSimpleConstraintImpl constraint = (AbstractNoBooleanSimpleConstraintImpl) findAxedConstraint(key.getAxe());
 		if (null != constraint)
 			for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
-				constraint.check(baseComponent, inheriting, value);
+				constraint.check(modified, inheriting, value);
 	}
 
-	public abstract void check(Generic baseComponent, Generic modified, Serializable value) throws ConstraintViolationException;
+	public abstract void check(Generic modified, Generic baseComponent, Serializable value) throws ConstraintViolationException;
 }

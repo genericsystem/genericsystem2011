@@ -35,7 +35,7 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 		return true;
 	}
 
-	public abstract void check(Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException;
+	public abstract void check(Generic modified, Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException;
 
 	// @Override
 	// public int compareTo(AbstractConstraintImpl otherConstraint) {

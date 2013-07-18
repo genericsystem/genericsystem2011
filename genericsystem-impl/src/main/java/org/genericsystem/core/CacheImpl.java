@@ -569,7 +569,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Serializable key : generic.getContraints().keySet()) {
 				AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
 				if (isCheckable(constraint, generic, checkingType, isFlushTime))
-					constraint.check(generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
+					constraint.check(generic, generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
 			}
 	}
 

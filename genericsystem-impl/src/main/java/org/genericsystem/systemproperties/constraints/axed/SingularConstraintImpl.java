@@ -39,7 +39,7 @@ public class SingularConstraintImpl extends AbstractBooleanAxedConstraintImpl im
 	}
 
 	@Override
-	public void check(Generic baseComponent, Generic modified, int axe) throws ConstraintViolationException {
+	public void check(Generic modified, Generic baseComponent, int axe) throws ConstraintViolationException {
 		Generic component = ((Link) modified).getComponent(axe);
 		Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
 		if (holders.size() > 1)
