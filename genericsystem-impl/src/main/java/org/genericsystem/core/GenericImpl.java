@@ -1533,17 +1533,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableSingletonConstraint() {
-		return enableSystemProperty(SingletonConstraintImpl.class);
+		// return enableSystemProperty(SingletonConstraintImpl.class);
+		return setConstraint(SingletonConstraintImpl.class, Statics.NO_POSITION, true);
 	}
 
 	@Override
 	public <T extends Type> T disableSingletonConstraint() {
-		return disableSystemProperty(SingletonConstraintImpl.class);
+		// return disableSystemProperty(SingletonConstraintImpl.class);
+		return setConstraint(SingletonConstraintImpl.class, Statics.NO_POSITION, false);
 	}
 
 	@Override
 	public boolean isSingletonConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(SingletonConstraintImpl.class);
+		// return isBooleanSystemPropertyEnabled(SingletonConstraintImpl.class);
+		return isConstraintEnabled(SingletonConstraintImpl.class, Statics.NO_POSITION);
 	}
 
 	@Override

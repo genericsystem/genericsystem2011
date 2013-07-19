@@ -18,7 +18,6 @@ import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UnduplicateBindingConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueStructuralValueConstraintImpl;
@@ -148,9 +147,9 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
-			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, ReferentialIntegritySystemProperty.class, SingletonConstraintImpl.class,
-					VirtualConstraintImpl.class, UniqueValueConstraintImpl.class, CascadeRemoveSystemProperty.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class,
-					SizeConstraintImpl.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
+			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, ReferentialIntegritySystemProperty.class, VirtualConstraintImpl.class,
+					UniqueValueConstraintImpl.class, CascadeRemoveSystemProperty.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class,
+					PropertiesMapProvider.class, ConstraintsMapProvider.class);
 
 			CacheImpl cache = (CacheImpl) start(newCache());
 			for (Class<?> clazz : classes)
