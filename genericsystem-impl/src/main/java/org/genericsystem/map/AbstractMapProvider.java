@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -79,6 +78,31 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				Holder keyHolder = generic.setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getCurrentCache().<Attribute> find(getKeyAttributeClass()), (Serializable) key);
 				setSingularHolder(keyHolder, getCurrentCache().<Attribute> find(getValueAttributeClass()), (Serializable) value);
 				return oldValue;
+			}
+
+			@Override
+			public Set<Key> keySet() {
+				return new AbstractSnapshot<Key>() {
+					@Override
+					public Iterator<Key> iterator() {
+						Holder map = generic.getHolder(AbstractMapProvider.this);
+						if (map == null)
+							return Statics.emptyIterator();
+						Attribute key = getCurrentCache().<Attribute> find(getKeyAttributeClass());
+						return new AbstractProjectorAndFilterIterator<Holder, Key>(((GenericImpl) map).<Holder> holdersIterator(key, getBasePos(key), false)) {
+
+							@Override
+							public boolean isSelected() {
+								return next.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass())) != null;
+							}
+
+							@Override
+							protected Key project() {
+								return next.getValue();
+							}
+						};
+					}
+				};
 			}
 		};
 	}
