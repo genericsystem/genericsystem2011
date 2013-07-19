@@ -11,10 +11,8 @@ public abstract class AbstractNoBooleanSimpleConstraintImpl extends AbstractNoBo
 
 	@Override
 	public void check(Generic modified, Generic baseComponent, AxedConstraintClass key, Serializable value) throws ConstraintViolationException {
-		AbstractNoBooleanSimpleConstraintImpl constraint = (AbstractNoBooleanSimpleConstraintImpl) findAxedConstraint(key.getAxe());
-		if (null != constraint)
-			for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
-				constraint.check(modified, inheriting, value);
+		for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
+			check(modified, inheriting, value);
 	}
 
 	public abstract void check(Generic modified, Generic baseComponent, Serializable value) throws ConstraintViolationException;

@@ -235,7 +235,7 @@ public abstract class AbstractContext implements Serializable {
 		return null;
 	}
 
-	Generic[] findSupers(Class<?> clazz) {
+	Generic[] findUserSupers(Class<?> clazz) {
 		int i = 0;
 		LinkedHashSet<Class<?>> supersClasses = getSupersClasses(clazz);
 		Type[] supers = new Type[supersClasses.size()];
@@ -273,7 +273,7 @@ public abstract class AbstractContext implements Serializable {
 	Generic findImplicitSuper(Class<?> clazz) {
 		if (SystemGeneric.STRUCTURAL == clazz.getAnnotation(SystemGeneric.class).value())
 			return getEngine();
-		Generic[] supers = findSupers(clazz);
+		Generic[] supers = findUserSupers(clazz);
 		assert supers.length == 1;
 		return supers[0].getImplicit();
 	}

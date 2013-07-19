@@ -9,10 +9,8 @@ public abstract class AbstractBooleanSimpleConstraintImpl extends AbstractBoolea
 
 	@Override
 	public void check(Generic modified, Generic baseComponent, AxedConstraintClass key) throws ConstraintViolationException {
-		AbstractBooleanSimpleConstraintImpl constraint = (AbstractBooleanSimpleConstraintImpl) findAxedConstraint(key.getAxe());
-		if (null != constraint)
-			for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
-				constraint.check(modified, inheriting);
+		for (Generic inheriting : ((GenericImpl) baseComponent).getAllInheritings())
+			check(modified, inheriting);
 	}
 
 	public abstract void check(Generic modified, Generic baseComponent) throws ConstraintViolationException;

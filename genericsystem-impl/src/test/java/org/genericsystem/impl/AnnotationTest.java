@@ -81,11 +81,18 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	public void testSubType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Car.class).start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Car.class, myCar.class).start();
 		Type vehicle = cache.find(Vehicle.class);
 		Type car = cache.find(Car.class);
+		Generic myCar = cache.find(myCar.class);
+
 		assert vehicle.isStructural();
 		assert car.isStructural();
+		assert !vehicle.isAutomatic();
+		assert !car.isAutomatic();
+		assert car.getImplicit().isAutomatic();
+		assert !myCar.isAutomatic();
+		assert myCar.getImplicit().isAutomatic();
 		assert vehicle.getDirectSubTypes().size() == 1;
 		assert vehicle.getDirectSubTypes().contains(car);
 		assert car.getSupers().size() == 2 : car.getSupers();
@@ -414,6 +421,10 @@ public class AnnotationTest extends AbstractTest {
 	@SystemGeneric
 	public static class Car extends Vehicle {
 
+	}
+
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	public static class myCar extends Car {
 	}
 
 	@SystemGeneric
