@@ -18,7 +18,6 @@ import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.AloneAutomaticsConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.EngineConsistencyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.OptimisticLockConstraintImpl;
@@ -153,8 +152,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			put(Engine.class, EngineImpl.this);
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, ReferentialIntegritySystemProperty.class, OptimisticLockConstraintImpl.class,
 					SingletonConstraintImpl.class, VirtualConstraintImpl.class, UniqueValueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class,
-					EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class,
-					AloneAutomaticsConstraintImpl.class, ConstraintsMapProvider.class);
+					EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
 
 			CacheImpl cache = (CacheImpl) start(newCache());
 			for (Class<?> clazz : classes)
