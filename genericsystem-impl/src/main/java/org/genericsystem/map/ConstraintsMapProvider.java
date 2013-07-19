@@ -17,6 +17,7 @@ import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImp
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AloneAutomaticsConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.InstanceClassConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
 
@@ -27,7 +28,7 @@ import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintI
  */
 @SystemGeneric
 @Components(Engine.class)
-@Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, InstanceClassConstraintImpl.class, PropertyConstraintImpl.class })
+@Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class, PropertyConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Boolean> {
 
 	@Override
