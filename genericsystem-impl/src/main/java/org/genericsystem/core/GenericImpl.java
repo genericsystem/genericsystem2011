@@ -1503,32 +1503,38 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableUniqueValueConstraint() {
-		return enableSystemProperty(UniqueValueConstraintImpl.class);
+		// return enableSystemProperty(UniqueValueConstraintImpl.class);
+		return setConstraint(UniqueValueConstraintImpl.class, Statics.NO_POSITION, true);
 	}
 
 	@Override
 	public <T extends Type> T disableUniqueValueConstraint() {
-		return disableSystemProperty(UniqueValueConstraintImpl.class);
+		// return disableSystemProperty(UniqueValueConstraintImpl.class);
+		return setConstraint(UniqueValueConstraintImpl.class, Statics.NO_POSITION, true);
 	}
 
 	@Override
 	public boolean isUniqueValueConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(UniqueValueConstraintImpl.class);
+		// return isBooleanSystemPropertyEnabled(UniqueValueConstraintImpl.class);
+		return isConstraintEnabled(UniqueValueConstraintImpl.class, Statics.NO_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T enableVirtualConstraint() {
-		return enableSystemProperty(VirtualConstraintImpl.class);
+		// return enableSystemProperty(VirtualConstraintImpl.class);
+		return setConstraint(VirtualConstraintImpl.class, Statics.NO_POSITION, true);
 	}
 
 	@Override
 	public <T extends Type> T disableVirtualConstraint() {
-		return disableSystemProperty(VirtualConstraintImpl.class);
+		// return disableSystemProperty(VirtualConstraintImpl.class);
+		return setConstraint(VirtualConstraintImpl.class, Statics.NO_POSITION, false);
 	}
 
 	@Override
 	public boolean isVirtualConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(VirtualConstraintImpl.class);
+		// return isBooleanSystemPropertyEnabled(VirtualConstraintImpl.class);
+		return isConstraintEnabled(VirtualConstraintImpl.class, Statics.NO_POSITION);
 	}
 
 	@Override
