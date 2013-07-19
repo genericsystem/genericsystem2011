@@ -22,6 +22,8 @@ import org.genericsystem.systemproperties.constraints.simple.InstanceClassConstr
 import org.genericsystem.systemproperties.constraints.simple.OptimisticLockConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PhantomConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -31,7 +33,7 @@ import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintI
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class, OptimisticLockConstraintImpl.class,
-		PhantomConstraintImpl.class, PropertyConstraintImpl.class })
+		PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Boolean> {
 
 	@Override

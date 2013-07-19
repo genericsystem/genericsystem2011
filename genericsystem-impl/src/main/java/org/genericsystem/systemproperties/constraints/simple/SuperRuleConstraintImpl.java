@@ -1,30 +1,42 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
 import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.Dependencies;
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Engine;
+import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SuperRuleConstraintViolationException;
-import org.genericsystem.systemproperties.BooleanSystemProperty;
-import org.genericsystem.systemproperties.constraints.Constraint;
+import org.genericsystem.generic.Holder;
+import org.genericsystem.map.ConstraintsMapProvider;
+import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
+import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric(defaultBehavior = true)
-@Components(Engine.class)
+@SystemGeneric(SystemGeneric.CONCRETE)
+@Components(MapInstance.class)
+@Extends(ConstraintKey.class)
 @SingularConstraint
-public class SuperRuleConstraintImpl extends Constraint implements BooleanSystemProperty {
+@Dependencies(SuperRuleConstraintImpl.DefaultValue.class)
+@AxedConstraintValue(SuperRuleConstraintImpl.class)
+public class SuperRuleConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
-	private static final long serialVersionUID = 6874090673594299362L;
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Components(SuperRuleConstraintImpl.class)
+	@Extends(ConstraintsMapProvider.ConstraintValue.class)
+	@BooleanValue(true)
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
 	@Override
-	public void check(Generic modified) throws ConstraintViolationException {
-		// if (!getConstraintValues(context, modified, getClass()).isEmpty())
+	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
 		for (Generic directSuper : modified.getSupers())
 			if (!((GenericImpl) directSuper).isSuperOf(modified))
 				throw new SuperRuleConstraintViolationException(modified.info() + " should inherits from : " + directSuper.info());
