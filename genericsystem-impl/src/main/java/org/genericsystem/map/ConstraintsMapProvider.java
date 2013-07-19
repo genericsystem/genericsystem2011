@@ -15,8 +15,15 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.AloneAutomaticsConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.InstanceClassConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.OptimisticLockConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.PhantomConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -25,7 +32,8 @@ import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintI
  */
 @SystemGeneric
 @Components(Engine.class)
-@Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, PropertyConstraintImpl.class, InstanceClassConstraintImpl.class })
+@Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class, OptimisticLockConstraintImpl.class,
+		PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Boolean> {
 
 	@Override

@@ -18,14 +18,6 @@ import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.AloneAutomaticsConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.EngineConsistencyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.OptimisticLockConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.PhantomConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UnduplicateBindingConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueStructuralValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
@@ -127,6 +119,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
 
 	public Cache start(Cache cache) {
+		if (!equals(cache.getEngine()))
+			throw new IllegalStateException();
 		cacheLocal.set(cache);
 		return cache;
 	}
@@ -152,10 +146,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
-			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, ReferentialIntegritySystemProperty.class, OptimisticLockConstraintImpl.class,
-					SingletonConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class, UniqueValueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class,
-					EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class,
-					AloneAutomaticsConstraintImpl.class, ConstraintsMapProvider.class);
+			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, ReferentialIntegritySystemProperty.class, VirtualConstraintImpl.class,
+					UniqueValueConstraintImpl.class, CascadeRemoveSystemProperty.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
 
 			CacheImpl cache = (CacheImpl) start(newCache());
 			for (Class<?> clazz : classes)
