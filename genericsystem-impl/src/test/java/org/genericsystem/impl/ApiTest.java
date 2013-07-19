@@ -22,7 +22,6 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl.Size;
 import org.testng.annotations.Test;
 
 @Test
@@ -112,12 +111,6 @@ public class ApiTest extends AbstractTest {
 		Attribute power = cache.find(Power.class);
 		assert power instanceof Power;
 		assert power.getImplicit() instanceof Generic;
-	}
-
-	public void testUpdateSize() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Generic size = cache.find(Size.class);
-		assert size.getImplicit().updateValue("Size2").getValue().equals("Size2");
 	}
 
 	public void testUpdate() {

@@ -1416,24 +1416,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T enableSizeConstraint(final int basePos, Integer size) {
-		Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
-		T holder = setBooleanSystemProperty(sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
-		holder.setHolder(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE), size);
-		return (T) this;
+		// Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
+		// T holder = setBooleanSystemProperty(sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
+		// holder.setHolder(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE), size);
+		// return (T) this;
+		return setConstraint(SizeConstraintImpl.class, basePos, size);
 	}
 
 	@Override
 	public <T extends Generic> T disableSizeConstraint(final int basePos) {
-		return disableSystemProperty(SizeConstraintImpl.class, basePos);
+		// return disableSystemProperty(SizeConstraintImpl.class, basePos);
+		getContraints().remove(getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).bindAxedConstraint(basePos).getValue());
+		return (T) this;
 	}
 
 	@Override
 	public Integer getSizeConstraint(final int basePos) {
-		Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
-		Link valuedHolder = getHolderByValue(sizeConstraint, basePos);
-		if (valuedHolder == null)
-			return null;
-		return valuedHolder.getValue(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE));
+		// Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
+		// Link valuedHolder = getHolderByValue(sizeConstraint, basePos);
+		// if (valuedHolder == null)
+		// return null;
+		// return valuedHolder.getValue(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE));
+
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).findAxedConstraint(basePos);
+		return null == constraint ? null : (Integer) getContraints().get(constraint.getValue());
 	}
 
 	// TODO pas comme les autres contraintes

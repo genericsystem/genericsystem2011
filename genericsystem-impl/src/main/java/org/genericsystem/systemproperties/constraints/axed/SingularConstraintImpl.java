@@ -17,7 +17,6 @@ import org.genericsystem.generic.Relation;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
-import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 @SystemGeneric(SystemGeneric.CONCRETE)
 @Components(MapInstance.class)
