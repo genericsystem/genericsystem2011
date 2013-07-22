@@ -26,21 +26,16 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class PropertyConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
 	@Override
-	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
-		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
-	}
-
-	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(final Generic modified, final Generic type) throws ConstraintViolationException {
 		if (modified.isAttribute()) {
 			// TODO KK
 			for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {
 				@SuppressWarnings({ "unchecked", "rawtypes" })
-				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders((Attribute) baseComponent).iterator()) {
+				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders((Attribute) type).iterator()) {
 					@Override
 					public boolean isSelected() {
 						for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
-							if (!Objects.equals(((Holder) next).getComponent(componentPos), ((Holder) baseComponent).getComponent(componentPos)))
+							if (!Objects.equals(((Holder) next).getComponent(componentPos), ((Holder) type).getComponent(componentPos)))
 								return false;
 						return true;
 					}
@@ -53,13 +48,18 @@ public class PropertyConstraintImpl extends AbstractBooleanSimpleConstraintImpl 
 			}
 			return;
 		}
-		if (new AbstractFilterIterator<Generic>(((GenericImpl) baseComponent).getAllInstances().iterator()) {
+		if (new AbstractFilterIterator<Generic>(((GenericImpl) type).getAllInstances().iterator()) {
 			@Override
 			public boolean isSelected() {
 				return !next.equals(modified) && Objects.equals(next.getValue(), modified.getValue());
 			}
 		}.hasNext())
 			throw new PropertyConstraintViolationException("");
+	}
+
+	@Override
+	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
+		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
 	}
 
 }

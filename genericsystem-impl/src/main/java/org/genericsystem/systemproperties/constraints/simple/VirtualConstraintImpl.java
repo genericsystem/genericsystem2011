@@ -27,7 +27,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class VirtualConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (((Type) modified.getMeta()).isVirtualConstraintEnabled())
 			throw new VirtualConstraintException(modified.getMeta() + "Problem should not be instanciated");
 	}

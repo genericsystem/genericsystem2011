@@ -12,7 +12,6 @@ import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
@@ -33,15 +32,20 @@ public class SingularConstraintImpl extends AbstractBooleanAxedConstraintImpl im
 	}
 
 	@Override
-	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
-		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
+	public void check(Generic base, Generic attribute, int axe) throws ConstraintViolationException {
+		// log.info("base " + base + " attribute " + attribute);
+		Snapshot<Holder> holders = base.getHolders((Relation) attribute, axe);
+		if (holders.size() > 1)
+			throw new SingularConstraintViolationException("Multiple links of attribute " + attribute + " on component " + base + " (n° " + axe + ") : " + holders);
+		for (Generic generic : ((GenericImpl) base).getAllInheritings()) {
+			holders = generic.getHolders((Relation) attribute, axe);
+			if (holders.size() > 1)
+				throw new SingularConstraintViolationException("Multiple links of attribute " + attribute + " on component " + base + " (n° " + axe + ") : " + holders);
+		}
 	}
 
 	@Override
-	public void check(Generic modified, Generic baseComponent, int axe) throws ConstraintViolationException {
-		Generic component = ((Link) modified).getComponent(axe);
-		Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent, axe);
-		if (holders.size() > 1)
-			throw new SingularConstraintViolationException("Multiple links of attribute " + baseComponent + " on component " + component + " (n° " + axe + ") : " + holders);
+	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
+		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
 	}
 }

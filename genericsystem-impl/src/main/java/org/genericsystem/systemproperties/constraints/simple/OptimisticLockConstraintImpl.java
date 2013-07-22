@@ -41,7 +41,7 @@ public class OptimisticLockConstraintImpl extends AbstractBooleanSimpleConstrain
 	}
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		Cache cache = ((EngineImpl) modified.getEngine()).getCurrentCache();
 		if (cache instanceof CacheImpl && ((CacheImpl) cache).isScheduledToRemove(modified) && (!((CacheImpl) cache).getSubContext().isAlive(modified) || ((GenericImpl) modified).getLifeManager().willDie()))
 			throw new OptimisticLockConstraintViolationException("Generic : " + modified + " has already been removed by another thread");

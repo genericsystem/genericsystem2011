@@ -316,11 +316,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
-		// TODO KK
-		// log.info("holder " + holder.info());
-		// Generic updateValue = holder.updateValue(value);
-		// log.info("UPDATE");
-		// updateValue.log();
+		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+			return holder.updateValue(value);
 		holder.remove();
 		return this.<T> setHolder(attribute, value, basePos, targets);
 	}

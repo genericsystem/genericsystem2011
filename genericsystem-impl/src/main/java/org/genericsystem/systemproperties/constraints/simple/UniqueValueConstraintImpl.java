@@ -25,9 +25,9 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class UniqueValueConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
-		for (Generic generic : ((Type) baseComponent).getAllInstances())
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
+		for (Generic generic : ((Type) type).getAllInstances())
 			if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
-				throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + baseComponent + ".");
+				throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
 	}
 }

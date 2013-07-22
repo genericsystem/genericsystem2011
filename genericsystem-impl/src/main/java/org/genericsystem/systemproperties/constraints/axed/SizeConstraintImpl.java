@@ -14,7 +14,6 @@ import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SizeConstraintViolationException;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
@@ -40,14 +39,11 @@ public class SizeConstraintImpl extends AbstractNoBooleanAxedConstraintImpl impl
 	}
 
 	@Override
-	public void check(Generic modified, Generic baseComponent, int pos, Serializable value) throws ConstraintViolationException {
+	public void check(Generic base, Generic attribute, int pos, Serializable value) throws ConstraintViolationException {
 		// TODO KK because InstanceClassConstraint, see GenericImpl::setConstraintClass
-		Generic component = ((Link) modified).getComponent(pos);
-		if (null != component) {
-			Snapshot<Holder> holders = ((GenericImpl) component).getHolders((Relation) baseComponent);
-			if (value != null && holders.size() > (Integer) value)
-				throw new SizeConstraintViolationException("Multiple links of type " + baseComponent + ", and the maximum size is " + value);
-		}
+		Snapshot<Holder> holders = ((GenericImpl) base).getHolders((Relation) attribute);
+		if (holders.size() > (Integer) value)
+			throw new SizeConstraintViolationException("Multiple links of type " + attribute + ", and the maximum size is " + value);
 	}
 
 }

@@ -170,6 +170,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			ConnectionMap map = new ConnectionMap();
 			map.put(old, rebuild());
 			Generic generic = map.reBind(dependencies, false).get(old);
+			try {
+				checkConstraints();
+			} catch (ConstraintViolationException e) {
+				rollback(e);
+			}
 			return (T) generic;
 		}
 
@@ -180,8 +185,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new Restructurator() {
 			@Override
 			Generic rebuild() {
-				Generic engineCandidate = old.<GenericImpl> getImplicit().supers[0];
-				Generic newImplicit = bindPrimaryByValue(engineCandidate.isEngine() ? engineCandidate : reBind(engineCandidate), value, old.getMetaLevel(), old.getImplicit().isAutomatic(), old.getClass());
+				Generic newImplicit = bindPrimaryByValue(reBind(old.<GenericImpl> getImplicit().supers)[0], value, old.getMetaLevel(), old.getImplicit().isAutomatic(), old.getClass());
 				if (((GenericImpl) old).isPrimary())
 					return newImplicit;
 				return bind(newImplicit, Statics.replace(0, reBind(((GenericImpl) old).supers), newImplicit), reBind(((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);

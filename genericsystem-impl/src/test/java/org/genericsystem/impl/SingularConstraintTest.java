@@ -62,9 +62,19 @@ public class SingularConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Attribute vehiclePower = vehicle.setProperty("Power");
-		Holder car50 = car.setValue(vehiclePower, 50);
+		car.setValue(vehiclePower, 50);
 		vehicle.setValue(vehiclePower, 125);
-		assert car50.isAlive();
+		assert car.getValue(vehiclePower).equals(50);
+	}
+
+	public void testConstraintCheckOK3() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Attribute vehiclePower = vehicle.setProperty("Power");
+		vehicle.setValue(vehiclePower, 125);
+		car.setValue(vehiclePower, 50);
+		vehicle.setValue(vehiclePower, 250);
 		assert car.getValue(vehiclePower).equals(50);
 	}
 
@@ -81,6 +91,17 @@ public class SingularConstraintTest extends AbstractTest {
 		Holder myVehiclePowerValue2 = myVehicle.setValue(vehiclePower, 2);
 		assert myVehicle.getHolders(vehiclePower).size() == 1;
 		assert myVehicle.getHolders(vehiclePower).get(0).equals(myVehiclePowerValue2);
+	}
+
+	public void testConsistency() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Attribute vehiclePower = vehicle.setAttribute("Power");
+		Generic myVehicle = vehicle.newInstance("myVehicle");
+		myVehicle.setValue(vehiclePower, 123);
+		myVehicle.setValue(vehiclePower, 50);
+		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		vehiclePower.enableSingularConstraint(Statics.BASE_POSITION);
 	}
 
 	public void testRelationOK() {
@@ -116,6 +137,7 @@ public class SingularConstraintTest extends AbstractTest {
 		cache.flush();
 		Link humanDriveVehicleLink2 = myck.setLink(humanDriveVehicle, "myckDrive", nicoVehicle);
 		assert !humanDriveVehicleLink1.isAlive();
+		assert myck.getLink(humanDriveVehicle).equals(humanDriveVehicleLink2);
 		assert myck.getLink(humanDriveVehicle, nicoVehicle).equals(humanDriveVehicleLink2);
 		nico.setLink(humanDriveVehicle, "nicoDrive", myckVehicle);
 		assert humanDriveVehicle.isSingularConstraintEnabled(Statics.BASE_POSITION);

@@ -36,7 +36,7 @@ public class SuperRuleConstraintImpl extends AbstractBooleanSimpleConstraintImpl
 	}
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		for (Generic directSuper : modified.getSupers())
 			if (!((GenericImpl) directSuper).isSuperOf(modified))
 				throw new SuperRuleConstraintViolationException(modified.info() + " should inherits from : " + directSuper.info());
