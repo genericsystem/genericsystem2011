@@ -1308,7 +1308,10 @@ public class RelationTest extends AbstractTest {
 		assert ((GenericImpl) brother).getComponentsPositions(michael, quentin, otherType).equals(Arrays.asList(0, 1, 2));
 		assert ((GenericImpl) brother).getComponentsPositions(otherType, michael, quentin).equals(Arrays.asList(2, 0, 1));
 
-		assert ((GenericImpl) michael).getPositions(brother).equals(Arrays.asList(0, 1));
+		Snapshot<Integer> positions = ((GenericImpl) michael).getPositions(brother);
+		assert positions.size() == 2;
+		assert positions.get(0) == 0;
+		assert positions.get(1) == 1;
 	}
 
 	public void testGetLinkFromTarget() {
