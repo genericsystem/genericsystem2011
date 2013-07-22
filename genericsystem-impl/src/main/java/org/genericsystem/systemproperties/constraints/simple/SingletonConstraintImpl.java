@@ -27,10 +27,10 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class SingletonConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
-		int instanceNumber = ((Type) baseComponent).getAllInstances().size();
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
+		int instanceNumber = ((Type) type).getAllInstances().size();
 		if (instanceNumber > 1)
-			throw new SingletonConstraintViolationException("Singular instance constraint violation : type " + baseComponent + " has " + instanceNumber + " instances.");
+			throw new SingletonConstraintViolationException("Singular instance constraint violation : type " + type + " has " + instanceNumber + " instances.");
 	}
 
 }

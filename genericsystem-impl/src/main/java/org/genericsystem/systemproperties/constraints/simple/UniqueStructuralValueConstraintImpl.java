@@ -40,7 +40,7 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 	}
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (!modified.isStructural())
 			return;
 		final Generic primary = modified.getImplicit();

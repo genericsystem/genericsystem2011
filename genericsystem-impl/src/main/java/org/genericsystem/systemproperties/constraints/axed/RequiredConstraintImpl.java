@@ -6,13 +6,11 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.RequiredConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
@@ -29,20 +27,17 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class RequiredConstraintImpl extends AbstractBooleanAxedConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic modified, Generic baseComponent, int axe) throws ConstraintViolationException {
-		if (modified.isConcrete()) {
-			if (!modified.isAlive() && ((GenericImpl) baseComponent).getLinks(modified.<Relation> getMeta(), axe).size() < 1)
-				throw new RequiredConstraintViolationException(modified.getMeta().getValue() + " is required for " + baseComponent.getMeta() + " " + baseComponent);
+	public void check(Generic base, Generic attribute, int axe) throws ConstraintViolationException {
+		if (base.isConcrete()) {
+			if (base.getHolders((Holder) attribute).isEmpty())
+				throw new RequiredConstraintViolationException(attribute + " is required");
 		} else {
-			Type type = ((GenericImpl) baseComponent).getComponent(axe);
-			if (type.isStructural()) {
-				Snapshot<Generic> instances = type.getAllInstances();
-				if (instances.isEmpty())
-					throw new RequiredConstraintViolationException(baseComponent + " is required");
-				for (Generic generic : instances)
-					if (null == generic.getHolder((Attribute) baseComponent, axe))
-						throw new RequiredConstraintViolationException(generic + " is required for " + baseComponent);
-			}
+			Snapshot<Generic> instances = ((Type) base).getAllInstances();
+			if (instances.isEmpty())
+				throw new RequiredConstraintViolationException(attribute + " is required");
+			for (Generic generic : instances)
+				if (null == generic.getHolder((Attribute) attribute, axe))
+					throw new RequiredConstraintViolationException(generic + " is required for " + attribute);
 		}
 	}
 

@@ -36,7 +36,7 @@ public class AloneAutomaticsConstraintImpl extends AbstractBooleanSimpleConstrai
 	}
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (modified.isAlive() && modified.isAutomatic() && modified.getInheritings().isEmpty() && modified.getComposites().isEmpty())
 			throw new AloneAutomaticsConstraintViolationException();
 

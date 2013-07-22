@@ -43,7 +43,7 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanSimpleConst
 	}
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(final Generic modified, Generic type) throws ConstraintViolationException {
 		final Generic[] supers = ((GenericImpl) modified).getSupersArray();
 		final Generic[] components = ((GenericImpl) modified).getComponentsArray();
 		Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((EngineImpl) modified.getEngine()).getCurrentCache().compositesIterator(components[0])
