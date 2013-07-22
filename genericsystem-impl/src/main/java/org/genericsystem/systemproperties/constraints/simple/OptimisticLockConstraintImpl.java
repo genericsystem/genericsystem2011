@@ -19,7 +19,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
-import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 /**
  * @author Nicolas Feybesse
@@ -42,7 +41,7 @@ public class OptimisticLockConstraintImpl extends AbstractBooleanSimpleConstrain
 	}
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		Cache cache = ((EngineImpl) modified.getEngine()).getCurrentCache();
 		if (cache instanceof CacheImpl && ((CacheImpl) cache).isScheduledToRemove(modified) && (!((CacheImpl) cache).getSubContext().isAlive(modified) || ((GenericImpl) modified).getLifeManager().willDie()))
 			throw new OptimisticLockConstraintViolationException("Generic : " + modified + " has already been removed by another thread");

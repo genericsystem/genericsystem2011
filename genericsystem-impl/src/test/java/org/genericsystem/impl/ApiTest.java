@@ -17,76 +17,14 @@ import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.FunctionalConsistencyViolationException;
-import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl.Size;
 import org.testng.annotations.Test;
 
 @Test
 public class ApiTest extends AbstractTest {
-
-	public void test() {
-		// We suppose to already have a cache
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-
-		// Create a type Vehicle
-		Type vehicle = cache.newType("Vehicle");
-		// Create a type Color
-		Type color = cache.newType("Color");
-		// Create the relation vehicleColor between Vehicle and Color
-		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
-		// Referential integrity disabled by default for vehicle in vehicleColor
-
-		// Remove the type vehicle
-		vehicle.remove();
-		assert !vehicle.isAlive();
-		assert !vehicleColor.isAlive();
-		assert color.isAlive();
-	}
-
-	public void test2() {
-		// We suppose to already have a cache
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-
-		// Create a type Vehicle
-		Type vehicle = cache.newType("Vehicle");
-		// Create a type Color
-		Type color = cache.newType("Color");
-		// Create the relation vehicleColor between Vehicle and Color
-		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
-		// Enable referential integrity for base in vehicleColor
-		vehicleColor.enableReferentialIntegrity(0);
-
-		// Remove the type Vehicle
-		try {
-			vehicle.remove();
-		} catch (Exception e) {
-			assert e.getCause() instanceof ReferentialIntegrityConstraintViolationException;
-		}
-	}
-
-	public void test3() {
-		// We suppose to already have a cache
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-
-		// Create a type Vehicle
-		Type vehicle = cache.newType("Vehicle");
-		// Create a type Color
-		Type color = cache.newType("Color");
-		// Create the relation vehicleColor between Vehicle and Color
-		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
-		// Enable cascade remove for Color in vehicleColor
-		vehicleColor.enableCascadeRemove(Statics.TARGET_POSITION);
-
-		// Remove the type vehicle
-		vehicle.remove();
-		assert !vehicle.isAlive();
-		assert !vehicleColor.isAlive();
-		assert !color.isAlive();
-	}
 
 	@SystemGeneric
 	public static class Vehicle extends GenericImpl {
@@ -112,12 +50,6 @@ public class ApiTest extends AbstractTest {
 		Attribute power = cache.find(Power.class);
 		assert power instanceof Power;
 		assert power.getImplicit() instanceof Generic;
-	}
-
-	public void testUpdateSize() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Generic size = cache.find(Size.class);
-		assert size.getImplicit().updateValue("Size2").getValue().equals("Size2");
 	}
 
 	public void testUpdate() {
@@ -480,7 +412,7 @@ public class ApiTest extends AbstractTest {
 
 		Type superCar = car.newSubType("SuperCar");
 
-		Snapshot<Type> types = cache.getEngine().getAllInstances();
+		Snapshot<Type> types = cache.getAllTypes();
 		assert types.size() >= 4;
 		assert types.containsAll(Arrays.asList(car, bus, moto, superCar));
 	}

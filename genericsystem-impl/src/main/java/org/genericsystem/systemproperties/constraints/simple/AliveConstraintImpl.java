@@ -36,7 +36,7 @@ public class AliveConstraintImpl extends AbstractBooleanSimpleConstraintImpl imp
 	}
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		for (Generic generic : ((GenericImpl) modified).getComponents())
 			if (!generic.isAlive())
 				throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");

@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
@@ -158,4 +159,5 @@ public interface Cache {
 
 	Cache start();
 
+	Snapshot<Type> getAllTypes();
 }

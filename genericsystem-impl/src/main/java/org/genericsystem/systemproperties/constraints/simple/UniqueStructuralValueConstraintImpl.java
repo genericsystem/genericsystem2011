@@ -3,31 +3,44 @@ package org.genericsystem.systemproperties.constraints.simple;
 import java.util.Iterator;
 
 import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.Dependencies;
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Engine;
+import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractFilterIterator;
-import org.genericsystem.systemproperties.BooleanSystemProperty;
-import org.genericsystem.systemproperties.constraints.Constraint;
+import org.genericsystem.map.ConstraintsMapProvider;
+import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
+import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric(defaultBehavior = true)
-@Components(Engine.class)
+@SystemGeneric(SystemGeneric.CONCRETE)
+@Components(MapInstance.class)
+@Extends(ConstraintKey.class)
 @SingularConstraint
-public class UniqueStructuralValueConstraintImpl extends Constraint implements BooleanSystemProperty {
+@Dependencies(UniqueStructuralValueConstraintImpl.DefaultValue.class)
+@AxedConstraintValue(UniqueStructuralValueConstraintImpl.class)
+public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
-	private static final long serialVersionUID = -7212219694902616927L;
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Components(UniqueStructuralValueConstraintImpl.class)
+	@Extends(ConstraintsMapProvider.ConstraintValue.class)
+	@BooleanValue(true)
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
 	@Override
-	public void check(Generic modified) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (!modified.isStructural())
 			return;
 		final Generic primary = modified.getImplicit();

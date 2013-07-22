@@ -316,10 +316,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
-		// log.info("holder " + holder.info());
-		// Generic updateValue = holder.updateValue(value);
-		// log.info("UPDATE");
-		// updateValue.log();
+		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+			return holder.updateValue(value);
 		holder.remove();
 		return this.<T> setHolder(attribute, value, basePos, targets);
 	}
@@ -1416,24 +1414,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T enableSizeConstraint(final int basePos, Integer size) {
-		Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
-		T holder = setBooleanSystemProperty(sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
-		holder.setHolder(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE), size);
-		return (T) this;
+		// Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
+		// T holder = setBooleanSystemProperty(sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
+		// holder.setHolder(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE), size);
+		// return (T) this;
+		return setConstraint(SizeConstraintImpl.class, basePos, size);
 	}
 
 	@Override
 	public <T extends Generic> T disableSizeConstraint(final int basePos) {
-		return disableSystemProperty(SizeConstraintImpl.class, basePos);
+		// return disableSystemProperty(SizeConstraintImpl.class, basePos);
+		getContraints().remove(getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).bindAxedConstraint(basePos).getValue());
+		return (T) this;
 	}
 
 	@Override
 	public Integer getSizeConstraint(final int basePos) {
-		Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
-		Link valuedHolder = getHolderByValue(sizeConstraint, basePos);
-		if (valuedHolder == null)
-			return null;
-		return valuedHolder.getValue(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE));
+		// Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
+		// Link valuedHolder = getHolderByValue(sizeConstraint, basePos);
+		// if (valuedHolder == null)
+		// return null;
+		// return valuedHolder.getValue(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE));
+
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).findAxedConstraint(basePos);
+		return null == constraint ? null : (Integer) getContraints().get(constraint.getValue());
 	}
 
 	// TODO pas comme les autres contraintes
@@ -1503,32 +1507,38 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableUniqueValueConstraint() {
-		return enableSystemProperty(UniqueValueConstraintImpl.class);
+		// return enableSystemProperty(UniqueValueConstraintImpl.class);
+		return setConstraint(UniqueValueConstraintImpl.class, Statics.NO_POSITION, true);
 	}
 
 	@Override
 	public <T extends Type> T disableUniqueValueConstraint() {
-		return disableSystemProperty(UniqueValueConstraintImpl.class);
+		// return disableSystemProperty(UniqueValueConstraintImpl.class);
+		return setConstraint(UniqueValueConstraintImpl.class, Statics.NO_POSITION, true);
 	}
 
 	@Override
 	public boolean isUniqueValueConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(UniqueValueConstraintImpl.class);
+		// return isBooleanSystemPropertyEnabled(UniqueValueConstraintImpl.class);
+		return isConstraintEnabled(UniqueValueConstraintImpl.class, Statics.NO_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T enableVirtualConstraint() {
-		return enableSystemProperty(VirtualConstraintImpl.class);
+		// return enableSystemProperty(VirtualConstraintImpl.class);
+		return setConstraint(VirtualConstraintImpl.class, Statics.NO_POSITION, true);
 	}
 
 	@Override
 	public <T extends Type> T disableVirtualConstraint() {
-		return disableSystemProperty(VirtualConstraintImpl.class);
+		// return disableSystemProperty(VirtualConstraintImpl.class);
+		return setConstraint(VirtualConstraintImpl.class, Statics.NO_POSITION, false);
 	}
 
 	@Override
 	public boolean isVirtualConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(VirtualConstraintImpl.class);
+		// return isBooleanSystemPropertyEnabled(VirtualConstraintImpl.class);
+		return isConstraintEnabled(VirtualConstraintImpl.class, Statics.NO_POSITION);
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
-import org.genericsystem.systemproperties.constraints.Constraint.CheckingType;
 
 /**
  * @author Nicolas Feybesse
@@ -37,7 +36,7 @@ public class AloneAutomaticsConstraintImpl extends AbstractBooleanSimpleConstrai
 	}
 
 	@Override
-	public void check(final Generic modified, final Generic baseComponent) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (modified.isAlive() && modified.isAutomatic() && modified.getInheritings().isEmpty() && modified.getComposites().isEmpty())
 			throw new AloneAutomaticsConstraintViolationException();
 
