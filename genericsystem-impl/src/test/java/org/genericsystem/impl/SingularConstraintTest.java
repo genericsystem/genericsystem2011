@@ -68,6 +68,17 @@ public class SingularConstraintTest extends AbstractTest {
 		assert car.getValue(vehiclePower).equals(50);
 	}
 
+	public void testConstraintCheckOK3() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Attribute vehiclePower = vehicle.setProperty("Power");
+		vehicle.setValue(vehiclePower, 125);
+		car.setValue(vehiclePower, 50);
+		vehicle.setValue(vehiclePower, 250);
+		assert car.getValue(vehiclePower).equals(50);
+	}
+
 	public void testConstraintCheckKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");

@@ -42,7 +42,7 @@ public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl i
 		if (modified.getValue() == null)
 			if (modified.getComponentsSize() != 0) {
 				if (supers.length != 2 || (modified.isStructural() ? supers[1].isConcrete() : supers[1].isStructural()))
-					throw new PhantomConstraintViolationException(modified.info());
+					throw new PhantomConstraintViolationException(modified.info() + " " + supers[1].info());
 
 				Generic[] components = ((GenericImpl) supers[1]).getComponentsArray();
 				Generic[] subComponents = ((GenericImpl) modified).getComponentsArray();
