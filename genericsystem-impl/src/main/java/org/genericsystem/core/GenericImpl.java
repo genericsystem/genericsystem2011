@@ -316,6 +316,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
+		// TODO KK
 		// log.info("holder " + holder.info());
 		// Generic updateValue = holder.updateValue(value);
 		// log.info("UPDATE");
