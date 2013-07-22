@@ -518,23 +518,23 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		for (Serializable key : getEngine().getContraints().keySet())
-			for (Generic generic : generics) {
-				AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
-				Serializable value = generic.getContraints().get(key);
-				log.info("generic " + generic + " key " + key + " value " + value);
-				if (test(value)) {
-					if (isCheckable(constraint, generic, checkingType, isFlushTime))
-						constraint.check(generic, generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
-				}
-			}
-
-		// for (Generic generic : generics)
-		// for (Serializable key : generic.getContraints().keySet()) {
+		// for (Serializable key : getEngine().getContraints().keySet())
+		// for (Generic generic : generics) {
 		// AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
+		// Serializable value = generic.getContraints().get(key);
+		// log.info("generic " + generic + " key " + key + " value " + value);
+		// if (test(value)) {
 		// if (isCheckable(constraint, generic, checkingType, isFlushTime))
 		// constraint.check(generic, generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
 		// }
+		// }
+
+		for (Generic generic : generics)
+			for (Serializable key : generic.getContraints().keySet()) {
+				AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
+				if (isCheckable(constraint, generic, checkingType, isFlushTime))
+					constraint.check(generic, generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
+			}
 	}
 
 	private boolean test(Serializable value) {
