@@ -643,6 +643,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
+	@Override
+	public Snapshot<Type> getAllTypes() {
+		return getEngine().getAllInstances();
+	}
+
 	// public <T extends Generic> Iterator<T> queryIterator(Context context, final int levelFilter, Generic[] supers, final Generic... components) {
 	// final Primaries primaries = new Primaries(supers);
 	// final Generic[] interfaces = primaries.toArray();
