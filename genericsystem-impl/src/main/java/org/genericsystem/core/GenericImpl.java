@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -711,7 +710,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	Generic[] sortAndCheck(Generic... components) {
 		if (getComponentsSize() != components.length)
-			throw new IllegalStateException("Illegal components size");
+			throw new IllegalStateException("Illegal components size : " + components.length);
 		List<Integer> positions = getComponentsPositions(components);
 		Generic[] orderedComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++) {
@@ -755,6 +754,63 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			public boolean isSelected() {
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
 			}
+		};
+	}
+
+	public <T extends Generic> Snapshot<T> mainSnaphot(final Generic origin, final boolean readPhantoms) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return mainConcreteIterator(origin, readPhantoms);
+			}
+		};
+
+	}
+
+	private <T extends Generic> Iterator<T> simpleIterator(final Generic origin) {
+		return new AbstractFilterIterator<T>(this.<T> compositesIterator()) {
+			@Override
+			public boolean isSelected() {
+				return next.isConcrete() && next.inheritsFrom(origin);
+			}
+		};
+	}
+
+	private Iterator<Generic> allSupersIterator() {
+		return new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+
+			private static final long serialVersionUID = -6254209580316166416L;
+
+			@Override
+			public Iterator<Generic> children(Generic node) {
+				return new ArrayIterator<Generic>(((GenericImpl) node).supers);
+			}
+		};
+	}
+
+	private <T extends Generic> Iterator<T> mainConcreteIterator(final Generic origin, final boolean readPhantom) {
+		return new AbstractFilterIterator<T>(new AbstractConcateIterator<Generic, T>(allSupersIterator()) {
+			@Override
+			protected Iterator<T> getIterator(Generic superGeneric) {
+				return ((GenericImpl) superGeneric).simpleIterator(origin);
+			}
+		}) {
+
+			private Set<T> alreadyComputed = new HashSet<>();
+
+			@Override
+			public boolean isSelected() {
+				return isNewLeaf(next) && alreadyComputed.add(next) && (readPhantom || next.getValue() != null); // test phantom after add
+			}
+
+			private boolean isNewLeaf(Generic candidate) {
+				for (Generic generic : alreadyComputed) {
+					if (generic.inheritsFrom(candidate))
+						return false;
+				}
+				return true;
+			}
+
 		};
 	}
 
@@ -1619,7 +1675,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Relation> T addRelation(Serializable value, Type... targets) {
-		return addSubRelation(getEngine(), value);
+		return addSubRelation(getEngine(), value, targets);
 	}
 
 	@Override
