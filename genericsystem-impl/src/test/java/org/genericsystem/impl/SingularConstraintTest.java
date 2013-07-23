@@ -100,7 +100,7 @@ public class SingularConstraintTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		myVehicle.setValue(vehiclePower, 123);
 		myVehicle.setValue(vehiclePower, 50);
-		// log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		vehiclePower.enableSingularConstraint(Statics.BASE_POSITION);
 	}
 

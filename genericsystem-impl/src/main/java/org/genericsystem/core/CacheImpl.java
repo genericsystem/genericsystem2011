@@ -493,7 +493,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		// TODO implements
 		// for (Generic constraint : getConstraints()) {
 		// Constraint constraintInstance;
 		// try {
