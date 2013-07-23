@@ -14,5 +14,10 @@ public abstract class AbstractNoBooleanSimpleConstraintImpl extends AbstractNoBo
 		check(modified, type, value);
 	}
 
+	@Override
+	public void checkConsistency(Generic base, Generic attribute, AxedConstraintClass key, Serializable value) throws ConstraintViolationException {
+		check(base, attribute, value);
+	}
+
 	public abstract void check(Generic modified, Generic type, Serializable value) throws ConstraintViolationException;
 }

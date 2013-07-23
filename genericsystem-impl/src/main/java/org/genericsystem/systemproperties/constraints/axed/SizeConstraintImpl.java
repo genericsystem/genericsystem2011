@@ -42,8 +42,9 @@ public class SizeConstraintImpl extends AbstractNoBooleanAxedConstraintImpl impl
 	public void check(Generic base, Generic attribute, int pos, Serializable value) throws ConstraintViolationException {
 		// TODO KK because InstanceClassConstraint, see GenericImpl::setConstraintClass
 		Snapshot<Holder> holders = ((GenericImpl) base).getHolders((Relation) attribute);
-		if (holders.size() > (Integer) value)
-			throw new SizeConstraintViolationException("Multiple links of type " + attribute + ", and the maximum size is " + value);
+		if (value instanceof Integer)
+			if (holders.size() > (Integer) value)
+				throw new SizeConstraintViolationException("Multiple links of type " + attribute + ", and the maximum size is " + value);
 	}
 
 }

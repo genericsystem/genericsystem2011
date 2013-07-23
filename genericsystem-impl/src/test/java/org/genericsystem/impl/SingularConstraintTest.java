@@ -96,12 +96,17 @@ public class SingularConstraintTest extends AbstractTest {
 	public void testConsistency() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute vehiclePower = vehicle.setAttribute("Power");
+		final Attribute vehiclePower = vehicle.setAttribute("Power");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		myVehicle.setValue(vehiclePower, 123);
 		myVehicle.setValue(vehiclePower, 50);
-		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		vehiclePower.enableSingularConstraint(Statics.BASE_POSITION);
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				vehiclePower.enableSingularConstraint(Statics.BASE_POSITION);
+			}
+		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
 
 	public void testRelationOK() {

@@ -31,6 +31,8 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 
 	public abstract void check(Generic modified, Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException;
 
+	public abstract void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedConstraintClass key) throws ConstraintViolationException;
+
 	// @Override
 	// public int compareTo(AbstractConstraintImpl otherConstraint) {
 	// int result = Integer.valueOf(getPriority()).compareTo(Integer.valueOf(otherConstraint.getPriority()));

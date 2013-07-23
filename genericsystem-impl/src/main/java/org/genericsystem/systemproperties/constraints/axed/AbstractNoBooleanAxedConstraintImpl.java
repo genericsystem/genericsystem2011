@@ -17,6 +17,11 @@ public abstract class AbstractNoBooleanAxedConstraintImpl extends AbstractNoBool
 			check(((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), attribute, key.getAxe(), value);
 	}
 
+	@Override
+	public void checkConsistency(Generic base, Generic attribute, AxedConstraintClass key, Serializable value) throws ConstraintViolationException {
+		check(base, attribute, key.getAxe(), value);
+	}
+
 	public abstract void check(Generic base, Generic attribute, int pos, Serializable value) throws ConstraintViolationException;
 
 }
