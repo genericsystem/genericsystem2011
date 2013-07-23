@@ -301,7 +301,7 @@ public abstract class AbstractContext implements Serializable {
 			return stringValue.value();
 		AxedConstraintValue axedConstraintValue = clazz.getAnnotation(AxedConstraintValue.class);
 		if (axedConstraintValue != null)
-			return new AxedConstraintClass(axedConstraintValue.value(), Statics.NO_POSITION);
+			return new AxedConstraintClass(axedConstraintValue.value(), Statics.MULTIDIRECTIONAL);
 		return clazz;
 	}
 

@@ -723,7 +723,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Iterator<T> attributesIterator(Attribute origin, boolean readPhantom) {
-		Iterator<T> iterator = ((GenericImpl) origin).safeIsEnabled(getNoInheritanceSystemProperty()) ? this.<T> noInheritanceIterator(origin, Statics.NO_POSITION, SystemGeneric.STRUCTURAL) : this.<T> inheritanceStructuralIterator(origin);
+		Iterator<T> iterator = ((GenericImpl) origin).safeIsEnabled(getNoInheritanceSystemProperty()) ? this.<T> noInheritanceIterator(origin, Statics.MULTIDIRECTIONAL, SystemGeneric.STRUCTURAL) : this.<T> inheritanceStructuralIterator(origin);
 		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
 	}
 
@@ -749,7 +749,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final Generic origin, int pos, final int metaLevel) {
-		return new AbstractFilterIterator<T>(Statics.NO_POSITION == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
+		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
 			@Override
 			public boolean isSelected() {
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
@@ -757,21 +757,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	public <T extends Generic> Snapshot<T> mainSnaphot(final Generic origin, final boolean readPhantoms) {
+	public <T extends Generic> Snapshot<T> mainSnaphot(final Generic origin, final int level, final int pos, final boolean readPhantoms) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return mainConcreteIterator(origin, readPhantoms);
+				return mainConcreteIterator(origin, level, pos, readPhantoms);
 			}
 		};
 
 	}
 
-	private <T extends Generic> Iterator<T> simpleIterator(final Generic origin) {
-		return new AbstractFilterIterator<T>(this.<T> compositesIterator()) {
+	private <T extends Generic> Iterator<T> simpleIterator(final Generic origin, final int level, final int pos) {
+		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
 			@Override
 			public boolean isSelected() {
-				return next.isConcrete() && next.inheritsFrom(origin);
+				return level == next.getMetaLevel() && next.inheritsFrom(origin);
 			}
 		};
 	}
@@ -788,11 +788,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> mainConcreteIterator(final Generic origin, final boolean readPhantom) {
+	private <T extends Generic> Iterator<T> mainConcreteIterator(final Generic origin, final int level, final int pos, final boolean readPhantom) {
 		return new AbstractFilterIterator<T>(new AbstractConcateIterator<Generic, T>(allSupersIterator()) {
 			@Override
 			protected Iterator<T> getIterator(Generic superGeneric) {
-				return ((GenericImpl) superGeneric).simpleIterator(origin);
+				return ((GenericImpl) superGeneric).simpleIterator(origin, level, pos);
 			}
 		}) {
 
@@ -804,10 +804,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 
 			private boolean isNewLeaf(Generic candidate) {
-				for (Generic generic : alreadyComputed) {
+				for (Generic generic : alreadyComputed)
 					if (generic.inheritsFrom(candidate))
 						return false;
-				}
 				return true;
 			}
 
@@ -1502,7 +1501,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		// Holder holder = getHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class));
 		// return (Class<?>) (holder == null ? Object.class : holder.getValue());
 
-		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(InstanceClassConstraintImpl.class).findAxedConstraint(Statics.NO_POSITION);
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(InstanceClassConstraintImpl.class).findAxedConstraint(Statics.MULTIDIRECTIONAL);
 		return null == constraint ? Object.class : (Class<?>) getContraints().get(constraint.getValue());
 	}
 
@@ -1510,22 +1509,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Type> T setConstraintClass(Class<?> constraintClass) {
 		// return setHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class), constraintClass);
-		return setConstraint(InstanceClassConstraintImpl.class, Statics.NO_POSITION, constraintClass);
+		return setConstraint(InstanceClassConstraintImpl.class, Statics.MULTIDIRECTIONAL, constraintClass);
 	}
 
 	@Override
 	public <T extends Type> T enablePropertyConstraint() {
-		return setConstraint(PropertyConstraintImpl.class, Statics.NO_POSITION, true);
+		return setConstraint(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
 	}
 
 	@Override
 	public <T extends Type> T disablePropertyConstraint() {
-		return setConstraint(PropertyConstraintImpl.class, Statics.NO_POSITION, false);
+		return setConstraint(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
 	}
 
 	@Override
 	public boolean isPropertyConstraintEnabled() {
-		return isConstraintEnabled(PropertyConstraintImpl.class, Statics.NO_POSITION);
+		return isConstraintEnabled(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL);
 	}
 
 	@Override
@@ -1564,55 +1563,55 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Type> T enableUniqueValueConstraint() {
 		// return enableSystemProperty(UniqueValueConstraintImpl.class);
-		return setConstraint(UniqueValueConstraintImpl.class, Statics.NO_POSITION, true);
+		return setConstraint(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
 	}
 
 	@Override
 	public <T extends Type> T disableUniqueValueConstraint() {
 		// return disableSystemProperty(UniqueValueConstraintImpl.class);
-		return setConstraint(UniqueValueConstraintImpl.class, Statics.NO_POSITION, true);
+		return setConstraint(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
 	}
 
 	@Override
 	public boolean isUniqueValueConstraintEnabled() {
 		// return isBooleanSystemPropertyEnabled(UniqueValueConstraintImpl.class);
-		return isConstraintEnabled(UniqueValueConstraintImpl.class, Statics.NO_POSITION);
+		return isConstraintEnabled(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL);
 	}
 
 	@Override
 	public <T extends Type> T enableVirtualConstraint() {
 		// return enableSystemProperty(VirtualConstraintImpl.class);
-		return setConstraint(VirtualConstraintImpl.class, Statics.NO_POSITION, true);
+		return setConstraint(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
 	}
 
 	@Override
 	public <T extends Type> T disableVirtualConstraint() {
 		// return disableSystemProperty(VirtualConstraintImpl.class);
-		return setConstraint(VirtualConstraintImpl.class, Statics.NO_POSITION, false);
+		return setConstraint(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
 	}
 
 	@Override
 	public boolean isVirtualConstraintEnabled() {
 		// return isBooleanSystemPropertyEnabled(VirtualConstraintImpl.class);
-		return isConstraintEnabled(VirtualConstraintImpl.class, Statics.NO_POSITION);
+		return isConstraintEnabled(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL);
 	}
 
 	@Override
 	public <T extends Type> T enableSingletonConstraint() {
 		// return enableSystemProperty(SingletonConstraintImpl.class);
-		return setConstraint(SingletonConstraintImpl.class, Statics.NO_POSITION, true);
+		return setConstraint(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
 	}
 
 	@Override
 	public <T extends Type> T disableSingletonConstraint() {
 		// return disableSystemProperty(SingletonConstraintImpl.class);
-		return setConstraint(SingletonConstraintImpl.class, Statics.NO_POSITION, false);
+		return setConstraint(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
 	}
 
 	@Override
 	public boolean isSingletonConstraintEnabled() {
 		// return isBooleanSystemPropertyEnabled(SingletonConstraintImpl.class);
-		return isConstraintEnabled(SingletonConstraintImpl.class, Statics.NO_POSITION);
+		return isConstraintEnabled(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL);
 	}
 
 	@Override

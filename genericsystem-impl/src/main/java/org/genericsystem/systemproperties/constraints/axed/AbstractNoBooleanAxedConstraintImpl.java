@@ -12,7 +12,7 @@ public abstract class AbstractNoBooleanAxedConstraintImpl extends AbstractNoBool
 
 	@Override
 	public void check(Generic modified, Generic attribute, AxedConstraintClass key, Serializable value) throws ConstraintViolationException {
-		if (key.getAxe() != Statics.NO_POSITION)
+		if (key.getAxe() != Statics.MULTIDIRECTIONAL)
 			// for (Generic base : ((GenericImpl) attribute).<GenericImpl> getComponent(key.getAxe()).getAllInheritings())
 			check(((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), attribute, key.getAxe(), value);
 	}
