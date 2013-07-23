@@ -23,7 +23,7 @@ import org.genericsystem.myadmin.util.GsRedirect;
 @SessionScoped
 public class GenericBean implements Serializable {
 
-	private static final long serialVersionUID = 8042406937175946234L;
+	private static final long serialVersionUID = 2108715680116264876L;
 
 	@Inject
 	private transient Cache cache;
