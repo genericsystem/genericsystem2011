@@ -96,7 +96,7 @@ public class FileSystemBean implements Serializable {
 
 		public void setShortPath(String newValue) {
 			if (!newValue.equals(generic.getValue())) {
-				selectedFile = generic.updateKey(newValue);
+				selectedFile = generic.updateValue(newValue);
 				messages.info("updateShortPath", newValue, generic.getValue());
 			}
 		}
