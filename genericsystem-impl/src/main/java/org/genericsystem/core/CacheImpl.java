@@ -511,6 +511,19 @@ public class CacheImpl extends AbstractContext implements Cache {
 		//
 		// }
 		// }
+
+		// for (Serializable key : getEngine().getContraints().keySet()) {
+		// for (Generic generic : generics) {
+		// Holder valueBaseComponent = generic.getContraints().getValueHolder(key).<Holder> getBaseComponent();
+		// Holder valueConstraint = valueBaseComponent.getHolder(this.<Holder> find(ConstraintsMapProvider.ConstraintValue.class));
+		// if (generic.isInstanceOf(valueConstraint)) {
+		// AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
+		// for (Generic baseInheriting : ((GenericImpl) base).getAllInheritings())
+		// constraint.check(generic, valueBaseComponent, (AxedConstraintClass) key);
+		//
+		// }
+		// }
+		// }
 	}
 
 	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {

@@ -14,8 +14,9 @@ import org.genericsystem.example.Example.MyVehicle;
 import org.genericsystem.example.Example.Power;
 import org.genericsystem.example.Example.V123;
 import org.genericsystem.example.Example.Vehicle;
-import org.genericsystem.myadmin.beans.GenericTreeBean;
 import org.genericsystem.myadmin.beans.GenericBean;
+import org.genericsystem.myadmin.beans.GenericTreeBean;
+import org.genericsystem.myadmin.beans.WrapperBean;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -37,8 +38,8 @@ public abstract class AbstractTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createTestArchive() {
-		return new Archiver(GenericBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class, MessageFactory.class,
-				CdiFactory.class, GenericTreeBean.class, V123.class, MyVehicle.class, Vehicle.class, Power.class).archive();
+		return new Archiver(WrapperBean.class, GenericBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class,
+				MessageFactory.class, CdiFactory.class, GenericTreeBean.class, V123.class, MyVehicle.class, Vehicle.class, Power.class).archive();
 	}
 
 	@Inject
