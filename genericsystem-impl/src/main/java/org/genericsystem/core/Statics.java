@@ -29,7 +29,7 @@ public class Statics {
 	public static final Flag FLAG = new Flag();
 	public static final Generic[] EMPTY_GENERIC_ARRAY = new Generic[] {};
 
-	public static final int NO_POSITION = -1;
+	public static final int MULTIDIRECTIONAL = -1;
 	public static final int BASE_POSITION = 0;
 	public static final int TARGET_POSITION = 1;
 	public static final int SECOND_TARGET_POSITION = 2;
