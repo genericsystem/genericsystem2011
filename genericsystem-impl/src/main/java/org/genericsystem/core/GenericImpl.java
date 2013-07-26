@@ -1172,7 +1172,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T getInstanceByValue(final Serializable value) {
+	public <T extends Generic> T getInstance(final Serializable value) {
 		return Statics.unambigousFirst(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(), value));
 	}
 
