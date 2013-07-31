@@ -1,53 +1,49 @@
 package org.genericsystem.systemproperties.constraints.axed;
 
 import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Engine;
+import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.RequiredConstraintViolationException;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Relation;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.BooleanSystemProperty;
-import org.genericsystem.systemproperties.constraints.Constraint;
+import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
+import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric
-@Components(Engine.class)
+@SystemGeneric(SystemGeneric.CONCRETE)
+@Components(MapInstance.class)
+@Extends(ConstraintKey.class)
+@AxedConstraintValue(RequiredConstraintImpl.class)
 @SingularConstraint
-public class RequiredConstraintImpl extends Constraint implements BooleanSystemProperty {
-
-	private static final long serialVersionUID = 2837810754525623146L;
+public class RequiredConstraintImpl extends AbstractBooleanAxedConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic modified) throws ConstraintViolationException {
-		if (modified.isConcrete()) {
-			if (!modified.isAlive()) {
-				for (ConstraintValue constraintValue : getConstraintValues(modified, RequiredConstraintImpl.class)) {
-					Integer componentPos = (Integer) constraintValue.getValue();
-					Generic base = ((Attribute) modified).getComponent(componentPos);
-					if (base != null && ((GenericImpl) base).getLinks(modified.<Relation> getMeta(), componentPos).size() < 1)
-						throw new RequiredConstraintViolationException(modified.getMeta().getValue() + " is required for " + base.getMeta() + " " + base);
-				}
-			} else
-				for (Attribute requiredAttribute : ((Type) modified).getAttributes()) {
-					for (ConstraintValue constraintValue : getConstraintValues(requiredAttribute, RequiredConstraintImpl.class))
-						// TODO KK getComponent(int pos) <= (Integer) constraintValue.getValue() : autoboxing !!!
-						if (modified.inheritsFrom(requiredAttribute.<Type> getComponent((Integer) constraintValue.getValue())) && modified.getHolders(requiredAttribute).size() < 1)
-							throw new RequiredConstraintViolationException(requiredAttribute.getValue() + " is required for new " + modified.getMeta() + " " + modified);
-				}
+	public void check(Generic base, Generic attribute, int axe) throws ConstraintViolationException {
+		if (base.isConcrete()) {
+			if (base.getHolders((Holder) attribute).isEmpty())
+				throw new RequiredConstraintViolationException(attribute + " is required");
+		} else {
+			Snapshot<Generic> instances = ((Type) base).getAllInstances();
+			if (instances.isEmpty())
+				throw new RequiredConstraintViolationException(attribute + " is required");
+			for (Generic generic : instances)
+				if (null == generic.getHolder((Attribute) attribute, axe))
+					throw new RequiredConstraintViolationException(generic + " is required for " + attribute);
 		}
 	}
 
 	@Override
-	public boolean isCheckedAt(CheckingType type) {
-		return type.equals(CheckingType.CHECK_ON_REMOVE_NODE) || type.equals(CheckingType.CHECK_ON_ADD_NODE);
+	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
+		return checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE) || checkingType.equals(CheckingType.CHECK_ON_ADD_NODE);
 	}
 
 	@Override

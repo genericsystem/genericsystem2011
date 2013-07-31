@@ -9,6 +9,7 @@ import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
+import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.MetaAttribute;
@@ -16,23 +17,7 @@ import org.genericsystem.systemproperties.MetaRelation;
 import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.AloneAutomaticsConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.EngineConsistencyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.OptimisticLockConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.PhantomConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.SingularInstanceConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.UnduplicateBindingConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.UniqueConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.UniqueStructuralValueConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -130,6 +115,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
 
 	public Cache start(Cache cache) {
+		if (!equals(cache.getEngine()))
+			throw new IllegalStateException();
 		cacheLocal.set(cache);
 		return cache;
 	}
@@ -155,10 +142,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
-			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, PropertyConstraintImpl.class, ReferentialIntegritySystemProperty.class,
-					OptimisticLockConstraintImpl.class, RequiredConstraintImpl.class, SingularInstanceConstraintImpl.class, SingularConstraintImpl.class, InstanceClassConstraintImpl.class, VirtualConstraintImpl.class, AliveConstraintImpl.class,
-					UniqueConstraintImpl.class, CascadeRemoveSystemProperty.class, ConcreteInheritanceConstraintImpl.class, SuperRuleConstraintImpl.class, EngineConsistencyConstraintImpl.class, PhantomConstraintImpl.class,
-					UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, SizeConstraintImpl.class, PropertiesMapProvider.class, AloneAutomaticsConstraintImpl.class);
+			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, ReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class,
+					SizeConstraintImpl.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
 
 			CacheImpl cache = (CacheImpl) start(newCache());
 			for (Class<?> clazz : classes)

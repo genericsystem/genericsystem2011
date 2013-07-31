@@ -1,15 +1,20 @@
 package org.genericsystem.impl;
 
+import java.util.List;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -17,22 +22,77 @@ import org.testng.annotations.Test;
 @Test
 public class AnnotationTest extends AbstractTest {
 
+	public void testMultiDirectionalRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type human = cache.newType("Human");
+		Generic michael = human.newInstance("Michael");
+		Generic quentin = human.newInstance("Quentin");
+		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
+		isBrotherOf.enableMultiDirectional();
+		Link link = quentin.bind(isBrotherOf, michael);
+
+		List<Generic> targetsFromQuentin = quentin.getOtherTargets(link);
+		assert targetsFromQuentin.size() == 1 : targetsFromQuentin.size();
+		assert targetsFromQuentin.contains(michael) : targetsFromQuentin;
+		assert !targetsFromQuentin.contains(quentin) : targetsFromQuentin;
+
+		List<Generic> targetsFromMichael = michael.getOtherTargets(link);
+		assert targetsFromMichael.size() == 1 : targetsFromMichael.size();
+		assert targetsFromMichael.contains(quentin) : targetsFromMichael;
+		assert !targetsFromMichael.contains(michael) : targetsFromMichael;
+
+		assert michael.getTargets(isBrotherOf, 0).contains(quentin) : michael.getTargets(isBrotherOf);
+	}
+
+	public void testSimpleDirectionalRelation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type color = cache.newType("Color");
+		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic red = color.newInstance("red");
+		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
+		vehicleColor.enableMultiDirectional();
+		Link link = myVehicle.bind(vehicleColor, red);
+
+		List<Generic> targetsFromMyVehicle = myVehicle.getOtherTargets(link);
+		assert targetsFromMyVehicle.size() == 1 : targetsFromMyVehicle.size();
+		assert targetsFromMyVehicle.contains(red) : targetsFromMyVehicle;
+		assert !targetsFromMyVehicle.contains(myVehicle) : targetsFromMyVehicle;
+
+		List<Generic> targetsFromRed = red.getOtherTargets(link);
+		assert targetsFromRed.size() == 1 : targetsFromRed.size();
+		assert targetsFromRed.contains(myVehicle) : targetsFromRed;
+		assert !targetsFromRed.contains(red) : targetsFromRed;
+
+		red.getLinks(vehicleColor).get(0);
+		assert red.getTargets(vehicleColor, Statics.BASE_POSITION).contains(myVehicle) : red.getTargets(vehicleColor);
+	}
+
 	public void testType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, Myck.class);
 		Type vehicle = cache.find(Vehicle.class);
 		Type human = cache.find(Human.class);
 		Type myck = cache.find(Myck.class);
+		assert !human.isAutomatic();
+		assert !myck.isAutomatic();
 		assert vehicle.isStructural();
 		assert human.isStructural();
 		assert myck.isConcrete();
 	}
 
 	public void testSubType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Car.class).start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Car.class, myCar.class).start();
 		Type vehicle = cache.find(Vehicle.class);
 		Type car = cache.find(Car.class);
+		Generic myCar = cache.find(myCar.class);
+
 		assert vehicle.isStructural();
 		assert car.isStructural();
+		assert !vehicle.isAutomatic();
+		assert !car.isAutomatic();
+		assert car.getImplicit().isAutomatic();
+		assert !myCar.isAutomatic();
+		assert myCar.getImplicit().isAutomatic();
 		assert vehicle.getDirectSubTypes().size() == 1;
 		assert vehicle.getDirectSubTypes().contains(car);
 		assert car.getSupers().size() == 2 : car.getSupers();
@@ -47,6 +107,13 @@ public class AnnotationTest extends AbstractTest {
 		Attribute power = cache.find(Power.class);
 		assert power.isStructural();
 		assert vehicle.getAttributes().contains(power);
+	}
+
+	public void testAttributeValue() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(V123.class).start();
+		Type myVehicle = cache.find(MyVehicle.class);
+		cache.find(V123.class);
+		assert myVehicle.getValue(cache.<Attribute> find(Power.class)).equals(new Integer(123)) : myVehicle.getValue(cache.<Attribute> find(Power.class));
 	}
 
 	public void testSubAttribute() {
@@ -344,9 +411,20 @@ public class AnnotationTest extends AbstractTest {
 
 	}
 
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Components(MyVehicle.class)
+	@IntValue(123)
+	public static class V123 extends Power {
+
+	}
+
 	@SystemGeneric
 	public static class Car extends Vehicle {
 
+	}
+
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	public static class myCar extends Car {
 	}
 
 	@SystemGeneric

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
@@ -23,12 +23,12 @@
 			}
 		</script>
 
-		<rich:tree id="directorytree" toggleType="client" var="item"
-			execute="code" status="status" selectionType="ajax"
+		<rich:tree id="directorytree" toggleType="client" var="item" status="status"
+			selectionType="ajax"
 			onbeforeselectionchange="if(typeof editor!='undefined') {editor.save();}return true;"
 			oncomplete="#{rich:component('menufilesystemmanager')}.hide();if(rightClick==true){#{rich:component('menufilesystemmanager')}.show();menuFS();}"
-			selectionChangeListener="#{treeBean.change}"
-			render="menufilesystemmanager, editfilesystemmanager, paneltitlefilesystemmanager">
+			selectionChangeListener="#{genericTreeBean.change}"
+			execute="code" render="paneltitlefilesystemmanager,menufilesystemmanager,editfilesystemmanager">
 			<rich:treeModelRecursiveAdaptor
 				roots="#{fileSystemBean.rootDirectories}"
 				nodes="#{fileSystemBean.getDirectories(item)}">
@@ -37,7 +37,7 @@
 					<rich:inplaceInput
 						value="#{fileSystemBean.getWrapper(item).shortPath}"
 						editEvent="dblclick">
-						<a4j:ajax event="change" render="filesystemmanager" />
+						<a4j:ajax event="change" execute="directorytree" render="filesystemmanager" />
 					</rich:inplaceInput>
 				</rich:treeNode>
 				<rich:treeModelAdaptor nodes="#{fileSystemBean.getFiles(item)}">
@@ -46,7 +46,7 @@
 						<rich:inplaceInput
 							value="#{fileSystemBean.getWrapper(item).shortPath}"
 							editEvent="dblclick">
-							<a4j:ajax event="change" render="filesystemmanager" />
+							<a4j:ajax event="change" execute="directorytree" render="filesystemmanager" />
 						</rich:inplaceInput>
 					</rich:treeNode>
 				</rich:treeModelAdaptor>

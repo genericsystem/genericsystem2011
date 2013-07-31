@@ -6,13 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This constraint represent the singleton notion.
+ * The value can not be used that by a single instance.
  * 
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-public @interface SingularInstanceConstraint {
+public @interface UniqueValueConstraint {
 
 }

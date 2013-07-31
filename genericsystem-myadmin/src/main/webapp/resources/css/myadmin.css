@@ -1,5 +1,5 @@
 body {
-	width: 960px;
+	width: 1100px;
 	margin: 0 auto;
 	text-align: left;
 	float: none;
@@ -31,6 +31,10 @@ body {
 
 .implicitColor>span {
 	color: #949595 !important;
+}
+
+.phantom {
+	text-decoration: line-through;
 }
 
 .inplaceInput {
@@ -102,6 +106,7 @@ body {
 
 td {
 	vertical-align: middle;
+	text-align: left;
 }
 
 li.info {

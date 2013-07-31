@@ -6,15 +6,15 @@ package org.genericsystem.exception;
  * 
  * @author Nicolas Feybesse
  */
-public class SingularInstanceConstraintViolationException extends ConstraintViolationException {
+public class SingletonConstraintViolationException extends ConstraintViolationException {
 
 	private static final long serialVersionUID = -7293718200418992241L;
 
-	public SingularInstanceConstraintViolationException() {
+	public SingletonConstraintViolationException() {
 		super();
 	}
 
-	public SingularInstanceConstraintViolationException(String msg) {
+	public SingletonConstraintViolationException(String msg) {
 		super(msg);
 	}
 

@@ -21,7 +21,6 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl.Size;
 import org.testng.annotations.Test;
 
 @Test
@@ -53,16 +52,10 @@ public class ApiTest extends AbstractTest {
 		assert power.getImplicit() instanceof Generic;
 	}
 
-	public void testUpdateSize() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Generic size = cache.find(Size.class);
-		assert size.getImplicit().updateKey("Size2").getValue().equals("Size2");
-	}
-
 	public void testUpdate() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		assert vehicle.updateKey("Vehicle2").getValue().equals("Vehicle2");
+		assert vehicle.updateValue("Vehicle2").getValue().equals("Vehicle2");
 		assert !vehicle.isAlive();
 	}
 
@@ -70,7 +63,7 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
-		Type vehicle2 = vehicle.updateKey("Vehicle2");
+		Type vehicle2 = vehicle.updateValue("Vehicle2");
 		assert vehicle2.getValue().equals("Vehicle2");
 		assert !vehicle.isAlive();
 		assert !car.isAlive();
@@ -82,7 +75,7 @@ public class ApiTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
-		Relation vehicleColor2 = vehicleColor.updateKey("VehicleColor2");
+		Relation vehicleColor2 = vehicleColor.updateValue("VehicleColor2");
 		assert vehicleColor2.getValue().equals("VehicleColor2");
 		assert !vehicleColor.isAlive();
 		assert vehicle.getRelation("VehicleColor2").isAlive();
@@ -96,7 +89,7 @@ public class ApiTest extends AbstractTest {
 		Type matColor = color.newSubType("MatColor");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		car.setRelation("CarMatColor", matColor);
-		Relation vehicleColor2 = vehicleColor.updateKey("VehicleColor2");
+		Relation vehicleColor2 = vehicleColor.updateValue("VehicleColor2");
 		assert vehicleColor2.getValue().equals("VehicleColor2");
 		assert !vehicleColor.isAlive();
 		assert car.getRelation("CarMatColor").isAlive();
@@ -419,8 +412,7 @@ public class ApiTest extends AbstractTest {
 
 		Type superCar = car.newSubType("SuperCar");
 
-		Snapshot<Type> types = cache.getEngine().getAllInstances();
-		types.log();
+		Snapshot<Type> types = cache.getAllTypes();
 		assert types.size() >= 4;
 		assert types.containsAll(Arrays.asList(car, bus, moto, superCar));
 	}
@@ -435,10 +427,10 @@ public class ApiTest extends AbstractTest {
 		Generic myMercedes = car.newInstance("myMercedes");
 		Generic myPeugeot = car.newInstance("myPeugeot");
 
-		assert car.getInstanceByValue("myBmw") == myBmw;
-		assert car.getInstanceByValue("myAudi") == myAudi;
-		assert car.getInstanceByValue("myMercedes") == myMercedes;
-		assert car.getInstanceByValue("myPeugeot") == myPeugeot;
+		assert car.getInstance("myBmw") == myBmw;
+		assert car.getInstance("myAudi") == myAudi;
+		assert car.getInstance("myMercedes") == myMercedes;
+		assert car.getInstance("myPeugeot") == myPeugeot;
 	}
 
 	public void test_get_non_existing_instances() {
@@ -446,7 +438,7 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 
-		assert car.getInstanceByValue("myAudi") == null;
+		assert car.getInstance("myAudi") == null;
 	}
 
 	// getLink() tests

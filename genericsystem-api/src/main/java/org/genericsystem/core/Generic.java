@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.MapProvider;
@@ -66,6 +67,13 @@ public interface Generic extends Comparable<Generic> {
 	 * @return True if the Generic is an Really Attribute.
 	 */
 	boolean isReallyAttribute();
+
+	/**
+	 * Returns true if this Generic is really a Relation.
+	 * 
+	 * @return True if the Generic is really a Relation.
+	 */
+	boolean isReallyRelation();
 
 	/**
 	 * Returns true if this Generic is an Attribute for the checked Generic.
@@ -616,19 +624,37 @@ public interface Generic extends Comparable<Generic> {
 
 	Map<Serializable, Serializable> getProperties();
 
+	ExtendedMap<Serializable, Serializable> getContraints();
+
+	interface ExtendedMap<K, V> extends Map<K, V> {
+		Holder getValueHolder(Serializable key);
+
+		// @Deprecated
+		// Holder getKeyHolder(K key);
+		//
+		// @Deprecated
+		// <T extends Generic> T getKeyBaseComponent(K key);
+	}
+
 	<T extends Generic> T addComponent(int pos, Generic newComponent);
 
 	<T extends Generic> T removeComponent(int pos, Generic newComponent);
 
-	<T extends Generic> T addSuper(int pos, Generic newSuper);
+	<T extends Generic> T addSuper(Generic newSuper);
 
 	<T extends Generic> T removeSuper(int pos);
 
-	<T extends Generic> T updateKey(Serializable key);
+	<T extends Generic> T updateValue(Serializable value);
 
 	Snapshot<Structural> getStructurals();
 
 	<T extends Generic> Snapshot<T> getOtherTargets(Holder holder);
 
 	void removeHolder(Holder holder);
+
+	<T extends Holder> Snapshot<T> getHolders(Holder attribute, boolean readPhantoms, Generic... targets);
+
+	<T extends Holder> Snapshot<T> getHolders(Holder attribute, int basePos, boolean readPhantoms, Generic... targets);
+
+	void removePhantoms(Attribute attribute);
 }

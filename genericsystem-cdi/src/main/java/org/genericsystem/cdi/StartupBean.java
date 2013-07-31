@@ -25,7 +25,7 @@ public class StartupBean implements Extension {
 	public void onStartup(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
 
 		// BoundSessionContext ctx = Container.instance().deploymentManager().instance().select(BoundSessionContext.class).get();
-		// Map<String, Object> map = new HashMap<>();
+		// MapInstance<String, Object> map = new HashMap<>();
 		// ctx.associate(map);
 		// ctx.activate();
 

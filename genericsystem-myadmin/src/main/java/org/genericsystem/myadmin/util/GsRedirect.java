@@ -1,9 +1,11 @@
 package org.genericsystem.myadmin.util;
 
 import java.io.IOException;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +22,6 @@ public class GsRedirect {
 
 	public void redirect() {
 		try {
-			// facesContext.getApplication().getNavigationHandler().handleNavigation(facesContext, null, "HOME");
 			facesContext.getExternalContext().redirect(HOME_URL);
 		} catch (IOException e) {
 			log.error(GsMessages.toString(e));

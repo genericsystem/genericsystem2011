@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -34,13 +33,16 @@ public class NotNullConstraintTest extends AbstractTest {
 		final Attribute vehiclePower = vehicle.setProperty("Power");
 		car.setValue(vehiclePower, 80);
 		sportCar.setValue(vehiclePower, 250);
-
+		assert car.getValue(vehiclePower).equals(80);
+		assert sportCar.getValue(vehiclePower).equals(250);
+		car.setValue(vehiclePower, 90);
+		assert car.getValue(vehiclePower).equals(90);
+		assert sportCar.getValue(vehiclePower).equals(250);
 		sportCar.clearAllConcrete(vehiclePower);
-		assert Objects.equals(80, sportCar.getValue(vehiclePower)) : sportCar.getHolder(vehiclePower);
+		assert Objects.equals(90, sportCar.getValue(vehiclePower)) : sportCar.getHolders(vehiclePower);
 		sportCar.setValue(vehiclePower, 250);
 		sportCar.cancelAll(vehiclePower, true);
 		assert sportCar.getValue(vehiclePower) == null : sportCar.getValue(vehiclePower);
-
 	}
 
 	public void testPropertySimpleRelationKO() {
@@ -66,7 +68,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert myCar.getLinks(driving).isEmpty();
 		test = myCar.setLink(driving, "test", myHuman, myRoad);
 		test2 = myCar.setLink(driving, "test2", myHuman, myRoad);
-		final Cache superCache = cache.newSuperCache().start();
+		cache.newSuperCache().start();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
@@ -79,14 +81,12 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert myCar.getLinks(driving).isEmpty();
 	}
 
-	@Test
 	public void testEnabledConstraintOnASimpleTypeThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		car.newSubType(null);
 	}
 
-	@Test
 	public void testEnableThenDisableConstraintOnASimpleTypeThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
@@ -95,21 +95,18 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert expected == actual;
 	}
 
-	@Test
 	public void testEnableSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		car.newSubType(null);
 	}
 
-	@Test
 	public void testDisabledSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-		Type expected = car.newSubType(null);
+		car.newSubType(null);
 	}
 
-	@Test
 	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateAnAttribute() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
@@ -124,7 +121,6 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert myBmw.getValues(registration).isEmpty();
 	}
 
-	@Test
 	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
@@ -133,7 +129,6 @@ public class NotNullConstraintTest extends AbstractTest {
 		car.setValue(registration, null);
 	}
 
-	@Test
 	public void testEnableConstraintOnAComplexeHierarchyOfTypes() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");

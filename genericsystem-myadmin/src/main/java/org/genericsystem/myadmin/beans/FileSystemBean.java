@@ -52,7 +52,7 @@ public class FileSystemBean implements Serializable {
 		return directory.getFiles();
 	}
 
-	public void changeFile(@Observes/* @TreeSelection */TreeSelectionEvent treeSelectionEvent) {
+	public void changeFile(@Observes TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("directorytree")) {
 			selectedFile = (Generic) treeSelectionEvent.getObject();
 			panelTitleChangeEvent.fire(new PanelTitleChangeEvent("filesystemmanager", getShortPath()));
@@ -96,7 +96,7 @@ public class FileSystemBean implements Serializable {
 
 		public void setShortPath(String newValue) {
 			if (!newValue.equals(generic.getValue())) {
-				selectedFile = generic.updateKey(newValue);
+				selectedFile = generic.updateValue(newValue);
 				messages.info("updateShortPath", newValue, generic.getValue());
 			}
 		}

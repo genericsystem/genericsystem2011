@@ -4,6 +4,7 @@ import javax.faces.application.ViewExpiredException;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+
 import org.genericsystem.exception.RollbackException;
 import org.jboss.solder.exception.control.CaughtException;
 import org.jboss.solder.exception.control.Handles;
@@ -16,9 +17,6 @@ public class GsExceptionHandlers {
 
 	@Inject
 	private FacesContext facesContext;
-
-	// @Inject
-	// private GsMessages gsMessages;
 
 	@Inject
 	GsRedirect redirect;

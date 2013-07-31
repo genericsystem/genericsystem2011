@@ -1,7 +1,9 @@
 package org.genericsystem.impl;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -19,7 +21,54 @@ import org.testng.annotations.Test;
 @Test
 public class PhamtomTest extends AbstractTest {
 
-	public void test() {
+	public void testRemovePhantoms() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Attribute power = vehicle.setAttribute("power");
+		Holder defaultPowerForVehicule = vehicle.setValue(power, "1");
+		Holder defaultPowerForCar = car.setValue(power, "2");
+		Generic myCar = car.newInstance("myCar");
+
+		Snapshot<Serializable> powerValues = myCar.getValues(power);
+		assert powerValues.size() == 2 : powerValues.size();
+		assert powerValues.containsAll(Arrays.asList("1", "2")) : powerValues;
+
+		myCar.removeHolder(defaultPowerForVehicule);
+		myCar.removeHolder(defaultPowerForCar);
+
+		Snapshot<Serializable> powerValues2 = myCar.getValues(power);
+		assert powerValues2.isEmpty() : powerValues2.size();
+
+		myCar.removePhantoms(power);
+
+		Snapshot<Serializable> powerValues3 = myCar.getValues(power);
+		assert powerValues3.size() == 2 : powerValues3.size();
+		assert powerValues3.containsAll(Arrays.asList("1", "2")) : powerValues3;
+	}
+
+	public void testGetHolders() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Attribute power = vehicle.setAttribute("power");
+		Holder defaultPower = vehicle.setValue(power, "123");
+
+		Generic myVehicle = vehicle.newInstance("myCar");
+		assert myVehicle.getValue(power) == "123";
+
+		Snapshot<Holder> holdersWithoutPhantoms = myVehicle.getHolders(power, false);
+		assert holdersWithoutPhantoms.size() == 1 : holdersWithoutPhantoms.size();
+		assert holdersWithoutPhantoms.get(0).getValue().equals("123") : holdersWithoutPhantoms.get(0).getValue();
+
+		myVehicle.removeHolder(defaultPower);
+		assert myVehicle.getValue(power) == null;
+
+		Snapshot<Holder> holdersWithPhantoms = myVehicle.getHolders(power, true);
+		assert holdersWithPhantoms.size() == 1 : holdersWithPhantoms.size();
+		assert holdersWithPhantoms.get(0).getValue() == null : holdersWithPhantoms.get(0).getValue();
+	}
+
+	public void testRemoveHolder() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
@@ -30,12 +79,14 @@ public class PhamtomTest extends AbstractTest {
 
 		myCar.removeHolder(defaultPower);
 		assert myCar.getValue(power) == null;
-		myCar.setValue(power, "200");
-		myCar.clearAllConcrete(power);
-		assert myCar.getValue(power) == "123" : myCar.getValue(power);
+
+		Holder holder200 = myCar.setValue(power, "200");
+
+		myCar.removeHolder(holder200);
+		assert myCar.getValue(power) == null : myCar.getValue(power);
 	}
 
-	public void test3() {
+	public void testRemoveHolderMultipleValues() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
@@ -54,14 +105,14 @@ public class PhamtomTest extends AbstractTest {
 
 		myCar.removeHolder(holder100);
 		assert myCar.getValues(power).size() == 1 : myCar.getValues(power).size();
-		assert myCar.getValues(power).containsAll(Arrays.asList("200")) : myCar.getValues(power);
+		assert myCar.getValue(power).equals("200") : myCar.getValues(power);
 
 		myCar.removeHolder(holder200);
 		assert myCar.getValues(power).size() == 0 : myCar.getValues(power).size();
-		assert myCar.getValues(power).containsAll(Arrays.asList()) : myCar.getValues(power);
+		assert myCar.getValue(power) == null : myCar.getValues(power);
 	}
 
-	public void test4() {
+	public void testRemoveHolderOverrideInheritedValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute("power");
@@ -82,7 +133,7 @@ public class PhamtomTest extends AbstractTest {
 		assert myCar.getValue(power).equals("123") : myCar.getValues(power);
 	}
 
-	public void test5() {
+	public void testRemoveHolderOverrideInheritedValue2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute("power");

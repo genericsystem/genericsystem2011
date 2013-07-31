@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.InheritanceDisabled;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
+import org.genericsystem.annotation.constraints.SingletonConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.annotation.constraints.SingularInstanceConstraint;
-import org.genericsystem.annotation.constraints.UniqueConstraint;
+import org.genericsystem.annotation.constraints.UniqueValueConstraint;
 import org.genericsystem.annotation.constraints.VirtualConstraint;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
@@ -25,6 +25,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.MapProvider;
+import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
@@ -39,6 +40,7 @@ import org.genericsystem.iterator.ArrayIterator;
 import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
+import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
@@ -46,13 +48,14 @@ import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.InstanceClassConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.SingularInstanceConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.UniqueConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
+import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -236,6 +239,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
+	public boolean isReallyRelation() {
+		return components.length == 2;
+	}
+
+	@Override
 	public <S extends Serializable> S getValue() {
 		return (S) value;
 	}
@@ -259,12 +267,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Holder> T setValue(Holder attribute, Serializable value) {
 		T holder = setHolder(attribute, value);
-		assert value == null || getValues(attribute).contains(value) : holder;
+		assert value == null || getValues(attribute).contains(value) : "holder : " + holder.info() + " value : " + value + " => " + getValues(attribute);
 		return holder;
 	}
 
 	public <T extends Generic> T bindPrimary(Class<?> specializeGeneric, Serializable value, int metaLevel, boolean automatic) {
 		return getCurrentCache().bindPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel, automatic, specializeGeneric);
+	}
+
+	public <T extends Generic> T findPrimary(Serializable value, int metaLevel) {
+		return getCurrentCache().findPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, metaLevel);
 	}
 
 	@Override
@@ -293,16 +305,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		T holder = getSelectedHolder(attribute, value, basePos, targets);
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(getClass(), value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
-			return null != value ? this.<T> bind(implicit, attribute, basePos, true, targets) : null;
+			return null != value ? this.<T> bind(null, implicit, attribute, basePos, true, targets) : null;
 		if (!equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(holder, basePos, true);
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
 				cancel(holder, basePos, true);
-			return this.<T> bind(implicit, attribute, basePos, true, targets);
+			return this.<T> bind(null, implicit, attribute, basePos, true, targets);
 		}
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
+		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+			return holder.updateValue(value);
 		holder.remove();
 		return this.<T> setHolder(attribute, value, basePos, targets);
 	}
@@ -312,12 +326,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (value == null)
 			return null;
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(getClass(), value, SystemGeneric.CONCRETE, true);
-		return bind(implicit, attribute, basePos, true, targets);
+		return bind(null, implicit, attribute, basePos, true, targets);
 
 	}
 
-	protected <T extends Holder> T bind(Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
-		return getCurrentCache().bind(implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
+	public <T extends Holder> T bind(Class<?> specializationClass, Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
+		return getCurrentCache().bind(specializationClass, implicit, false, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
+	}
+
+	public <T extends Holder> T find(Generic implicit, Holder directSuper, int basePos, Generic... targets) {
+		return getCurrentCache().fastFindByInterfaces(implicit, new Primaries(implicit, directSuper).toArray(), Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
@@ -337,7 +355,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Generic> T cancel(Holder attribute, int basePos, boolean concrete, Generic... targets) {
 		Generic implicit = concrete ? ((GenericImpl) attribute.getMeta()).bindPrimary(getClass(), null, SystemGeneric.CONCRETE, true) : getEngine().bindPrimary(getClass(), null, SystemGeneric.STRUCTURAL, true);
-		return bind(implicit, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		return bind(null, implicit, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override
@@ -420,6 +438,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return holdersIterator((Attribute) attribute, basePos, false, targets);
 			}
 		};
+	}
+
+	@Override
+	public <T extends Holder> Snapshot<T> getHolders(Holder attribute, boolean readPhantoms, Generic... targets) {
+		return getHolders(attribute, getBasePos(attribute), readPhantoms, targets);
+	}
+
+	@Override
+	public <T extends Holder> Snapshot<T> getHolders(final Holder attribute, final int basePos, final boolean readPhantoms, final Generic... targets) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return holdersIterator((Attribute) attribute, basePos, readPhantoms, targets);
+			}
+		};
+	}
+
+	@Override
+	public void removePhantoms(Attribute attribute) {
+		Snapshot<Holder> holders = getHolders(attribute, true);
+		Iterator<Holder> iterator = holders.iterator();
+		while (iterator.hasNext()) {
+			Holder holder = iterator.next();
+			if (holder.getValue() == null)
+				holder.remove();
+		}
 	}
 
 	@Override
@@ -614,7 +658,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Attribute> T setSubProperty(Attribute property, Serializable value, Type... targets) {
-		return setSubAttribute(property, value, targets).enablePropertyConstraint();
+		return setSubAttribute(property, value, targets).enableSingularConstraint();
 	}
 
 	@Override
@@ -631,11 +675,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		return bind(getEngine().bindPrimary(Generic.class, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), false, targets);
+		return bind(null, getEngine().bindPrimary(Generic.class, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), false, targets);
 	}
 
 	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		return bind(getEngine().bindPrimary(Generic.class, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), true, targets);
+		return bind(null, getEngine().bindPrimary(Generic.class, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), true, targets);
 	}
 
 	@Override
@@ -650,13 +694,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Serializable value, Generic... components) {
-		return getCurrentCache().bind(bindPrimary(getClass(), value, getMetaLevel() + 1, !isPrimary()), false, this, false, components);
+		return getCurrentCache().bind(null, bindPrimary(getClass(), value, getMetaLevel() + 1, !isPrimary()), false, this, false, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
 		Generic implicit = getEngine().bindPrimary(Generic.class, value, SystemGeneric.STRUCTURAL, !isEngine() || components.length != 0);
-		return getCurrentCache().bind(implicit, false, this, false, components);
+		return getCurrentCache().bind(null, implicit, false, this, false, components);
 	}
 
 	@Override
@@ -666,7 +710,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	Generic[] sortAndCheck(Generic... components) {
 		if (getComponentsSize() != components.length)
-			throw new IllegalStateException("Illegal components size");
+			throw new IllegalStateException("Illegal components size : " + components.length);
 		List<Integer> positions = getComponentsPositions(components);
 		Generic[] orderedComponents = new Generic[components.length];
 		for (int i = 0; i < components.length; i++) {
@@ -679,7 +723,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Iterator<T> attributesIterator(Attribute origin, boolean readPhantom) {
-		Iterator<T> iterator = ((GenericImpl) origin).safeIsEnabled(getNoInheritanceSystemProperty()) ? this.<T> noInheritanceIterator(origin, Statics.NO_POSITION, SystemGeneric.STRUCTURAL) : this.<T> inheritanceStructuralIterator(origin);
+		Iterator<T> iterator = ((GenericImpl) origin).safeIsEnabled(getNoInheritanceSystemProperty()) ? this.<T> noInheritanceIterator(origin, Statics.MULTIDIRECTIONAL, SystemGeneric.STRUCTURAL) : this.<T> inheritanceStructuralIterator(origin);
 		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
 	}
 
@@ -705,11 +749,67 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final Generic origin, int pos, final int metaLevel) {
-		return new AbstractFilterIterator<T>(Statics.NO_POSITION == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
+		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
 			@Override
 			public boolean isSelected() {
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
 			}
+		};
+	}
+
+	public <T extends Generic> Snapshot<T> mainSnaphot(final Generic origin, final int level, final int pos, final boolean readPhantoms) {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return mainConcreteIterator(origin, level, pos, readPhantoms);
+			}
+		};
+
+	}
+
+	private <T extends Generic> Iterator<T> simpleIterator(final Generic origin, final int level, final int pos) {
+		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
+			@Override
+			public boolean isSelected() {
+				return level == next.getMetaLevel() && next.inheritsFrom(origin);
+			}
+		};
+	}
+
+	private Iterator<Generic> allSupersIterator() {
+		return new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+
+			private static final long serialVersionUID = -6254209580316166416L;
+
+			@Override
+			public Iterator<Generic> children(Generic node) {
+				return new ArrayIterator<Generic>(((GenericImpl) node).supers);
+			}
+		};
+	}
+
+	private <T extends Generic> Iterator<T> mainConcreteIterator(final Generic origin, final int level, final int pos, final boolean readPhantom) {
+		return new AbstractFilterIterator<T>(new AbstractConcateIterator<Generic, T>(allSupersIterator()) {
+			@Override
+			protected Iterator<T> getIterator(Generic superGeneric) {
+				return ((GenericImpl) superGeneric).simpleIterator(origin, level, pos);
+			}
+		}) {
+
+			private Set<T> alreadyComputed = new HashSet<>();
+
+			@Override
+			public boolean isSelected() {
+				return isNewLeaf(next) && alreadyComputed.add(next) && (readPhantom || next.getValue() != null); // test phantom after add
+			}
+
+			private boolean isNewLeaf(Generic candidate) {
+				for (Generic generic : alreadyComputed)
+					if (generic.inheritsFrom(candidate))
+						return false;
+				return true;
+			}
+
 		};
 	}
 
@@ -751,7 +851,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = (Generic[]) cartesianIterator.next();
 			if (!findPhantom(phantom, components))
-				getCurrentCache().bind(getImplicit(), true, this, false, components);
+				getCurrentCache().bind(null, getImplicit(), true, this, false, components);
 		}
 	}
 
@@ -1072,7 +1172,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T getInstanceByValue(final Serializable value) {
+	public <T extends Generic> T getInstance(final Serializable value) {
 		return Statics.unambigousFirst(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(), value));
 	}
 
@@ -1210,8 +1310,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (clazz.getAnnotation(VirtualConstraint.class) != null)
 			enableVirtualConstraint();
 
-		if (clazz.getAnnotation(UniqueConstraint.class) != null)
-			enableUniqueConstraint();
+		if (clazz.getAnnotation(UniqueValueConstraint.class) != null)
+			enableUniqueValueConstraint();
 
 		InstanceValueClassConstraint instanceClass = clazz.getAnnotation(InstanceValueClassConstraint.class);
 		if (instanceClass != null)
@@ -1220,8 +1320,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (clazz.getAnnotation(PropertyConstraint.class) != null)
 			enablePropertyConstraint();
 
-		if (clazz.getAnnotation(SingularInstanceConstraint.class) != null)
-			enableSingularInstanceConstraint();
+		if (clazz.getAnnotation(SingletonConstraint.class) != null)
+			enableSingletonConstraint();
 
 		SingularConstraint singularTarget = clazz.getAnnotation(SingularConstraint.class);
 		if (singularTarget != null)
@@ -1237,6 +1337,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/*********************************************/
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
+
+	private <T extends Type> T setConstraint(Class<?> constraintClass, int pos, Serializable value) {
+		getContraints().put(getCurrentCache().<AbstractConstraintImpl> find(constraintClass).bindAxedConstraint(pos).getValue(), value);
+		return (T) this;
+	}
+
+	private boolean isConstraintEnabled(Class<?> constraintClass, int pos) {
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(constraintClass).findAxedConstraint(pos);
+		if (null == constraint)
+			return false;
+		return Boolean.TRUE.equals(getContraints().get(constraint.getValue()));
+	}
 
 	public <T extends Generic> T enableSystemProperty(Class<?> systemPropertyClass) {
 		return enableSystemProperty(systemPropertyClass, Statics.BASE_POSITION);
@@ -1327,157 +1439,179 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableSingularConstraint() {
-		return enableSystemProperty(SingularConstraintImpl.class);
+		return enableSingularConstraint(Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint() {
-		return disableSystemProperty(SingularConstraintImpl.class);
+		return disableSingularConstraint(Statics.BASE_POSITION);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(SingularConstraintImpl.class);
+		return isSingularConstraintEnabled(Statics.BASE_POSITION);
 	}
 
 	@Override
 	public <T extends Type> T enableSingularConstraint(int basePos) {
-		return enableSystemProperty(SingularConstraintImpl.class, basePos);
+		return setConstraint(SingularConstraintImpl.class, basePos, true);
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint(int basePos) {
-		return disableSystemProperty(SingularConstraintImpl.class, basePos);
+		return setConstraint(SingularConstraintImpl.class, basePos, false);
 	}
 
 	@Override
 	public boolean isSingularConstraintEnabled(int basePos) {
-		return isBooleanSystemPropertyEnabled(SingularConstraintImpl.class, basePos);
+		return isConstraintEnabled(SingularConstraintImpl.class, basePos);
 	}
 
 	@Override
 	public <T extends Generic> T enableSizeConstraint(final int basePos, Integer size) {
-		Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
-		T holder = setBooleanSystemProperty(sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
-		holder.setHolder(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE), size);
-		return (T) this;
+		// Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
+		// T holder = setBooleanSystemProperty(sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
+		// holder.setHolder(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE), size);
+		// return (T) this;
+		return setConstraint(SizeConstraintImpl.class, basePos, size);
 	}
 
 	@Override
 	public <T extends Generic> T disableSizeConstraint(final int basePos) {
-		return disableSystemProperty(SizeConstraintImpl.class, basePos);
+		// return disableSystemProperty(SizeConstraintImpl.class, basePos);
+		getContraints().remove(getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).bindAxedConstraint(basePos).getValue());
+		return (T) this;
 	}
 
 	@Override
 	public Integer getSizeConstraint(final int basePos) {
-		Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
-		Link valuedHolder = getHolderByValue(sizeConstraint, basePos);
-		if (valuedHolder == null)
-			return null;
-		return valuedHolder.getValue(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE));
-	}
+		// Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
+		// Link valuedHolder = getHolderByValue(sizeConstraint, basePos);
+		// if (valuedHolder == null)
+		// return null;
+		// return valuedHolder.getValue(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE));
 
-	@Override
-	public <T extends Type> T enablePropertyConstraint() {
-		return enableSystemProperty(PropertyConstraintImpl.class);
-	}
-
-	@Override
-	public <T extends Type> T disablePropertyConstraint() {
-		return disableSystemProperty(PropertyConstraintImpl.class);
-	}
-
-	@Override
-	public boolean isPropertyConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(PropertyConstraintImpl.class);
-	}
-
-	@Override
-	public <T extends Type> T enableRequiredConstraint() {
-		return enableSystemProperty(RequiredConstraintImpl.class);
-	}
-
-	@Override
-	public <T extends Type> T disableRequiredConstraint() {
-		return disableSystemProperty(RequiredConstraintImpl.class);
-	}
-
-	@Override
-	public boolean isRequiredConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(RequiredConstraintImpl.class);
-	}
-
-	@Override
-	public <T extends Type> T enableRequiredConstraint(int basePos) {
-		return enableSystemProperty(RequiredConstraintImpl.class, basePos);
-	}
-
-	@Override
-	public <T extends Type> T disableRequiredConstraint(int basePos) {
-		return disableSystemProperty(RequiredConstraintImpl.class, basePos);
-	}
-
-	@Override
-	public boolean isRequiredConstraintEnabled(int basePos) {
-		return isBooleanSystemPropertyEnabled(RequiredConstraintImpl.class, basePos);
-	}
-
-	@Override
-	public <T extends Type> T enableUniqueConstraint() {
-		return enableSystemProperty(UniqueConstraintImpl.class);
-	}
-
-	@Override
-	public <T extends Type> T disableUniqueConstraint() {
-		return disableSystemProperty(UniqueConstraintImpl.class);
-	}
-
-	@Override
-	public boolean isUniqueConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(UniqueConstraintImpl.class);
-	}
-
-	@Override
-	public <T extends Type> T enableVirtualConstraint() {
-		return enableSystemProperty(VirtualConstraintImpl.class);
-	}
-
-	@Override
-	public <T extends Type> T disableVirtualConstraint() {
-		return disableSystemProperty(VirtualConstraintImpl.class);
-	}
-
-	@Override
-	public boolean isVirtualConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(VirtualConstraintImpl.class);
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).findAxedConstraint(basePos);
+		return null == constraint ? null : (Integer) getContraints().get(constraint.getValue());
 	}
 
 	// TODO pas comme les autres contraintes
 	@Override
 	public Class<?> getConstraintClass() {
-		Holder holder = getHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class));
-		return (Class<?>) (holder == null ? Object.class : holder.getValue());
+		// Holder holder = getHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class));
+		// return (Class<?>) (holder == null ? Object.class : holder.getValue());
+
+		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(InstanceClassConstraintImpl.class).findAxedConstraint(Statics.MULTIDIRECTIONAL);
+		return null == constraint ? Object.class : (Class<?>) getContraints().get(constraint.getValue());
 	}
 
 	// TODO pas comme les autres contraintes
 	@Override
 	public <T extends Type> T setConstraintClass(Class<?> constraintClass) {
-		return setHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class), constraintClass);
+		// return setHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class), constraintClass);
+		return setConstraint(InstanceClassConstraintImpl.class, Statics.MULTIDIRECTIONAL, constraintClass);
 	}
 
 	@Override
-	public <T extends Type> T enableSingularInstanceConstraint() {
-		return enableSystemProperty(SingularInstanceConstraintImpl.class);
+	public <T extends Type> T enablePropertyConstraint() {
+		return setConstraint(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
 	}
 
 	@Override
-	public <T extends Type> T disableSingularInstanceConstraint() {
-		return disableSystemProperty(SingularInstanceConstraintImpl.class);
+	public <T extends Type> T disablePropertyConstraint() {
+		return setConstraint(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
 	}
 
 	@Override
-	public boolean isSingularInstanceConstraintEnabled() {
-		return isBooleanSystemPropertyEnabled(SingularInstanceConstraintImpl.class);
+	public boolean isPropertyConstraintEnabled() {
+		return isConstraintEnabled(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL);
+	}
+
+	@Override
+	public <T extends Type> T enableRequiredConstraint() {
+		return enableRequiredConstraint(Statics.BASE_POSITION);
+	}
+
+	@Override
+	public <T extends Type> T disableRequiredConstraint() {
+		return disableRequiredConstraint(Statics.BASE_POSITION);
+	}
+
+	@Override
+	public boolean isRequiredConstraintEnabled() {
+		return isRequiredConstraintEnabled(Statics.BASE_POSITION);
+	}
+
+	@Override
+	public <T extends Type> T enableRequiredConstraint(int basePos) {
+		// return enableSystemProperty(RequiredConstraintImpl.class, basePos);
+		return setConstraint(RequiredConstraintImpl.class, basePos, true);
+	}
+
+	@Override
+	public <T extends Type> T disableRequiredConstraint(int basePos) {
+		// return disableSystemProperty(RequiredConstraintImpl.class, basePos);
+		return setConstraint(RequiredConstraintImpl.class, basePos, false);
+	}
+
+	@Override
+	public boolean isRequiredConstraintEnabled(int basePos) {
+		// return isBooleanSystemPropertyEnabled(RequiredConstraintImpl.class, basePos);
+		return isConstraintEnabled(RequiredConstraintImpl.class, basePos);
+	}
+
+	@Override
+	public <T extends Type> T enableUniqueValueConstraint() {
+		// return enableSystemProperty(UniqueValueConstraintImpl.class);
+		return setConstraint(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+	}
+
+	@Override
+	public <T extends Type> T disableUniqueValueConstraint() {
+		// return disableSystemProperty(UniqueValueConstraintImpl.class);
+		return setConstraint(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+	}
+
+	@Override
+	public boolean isUniqueValueConstraintEnabled() {
+		// return isBooleanSystemPropertyEnabled(UniqueValueConstraintImpl.class);
+		return isConstraintEnabled(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL);
+	}
+
+	@Override
+	public <T extends Type> T enableVirtualConstraint() {
+		// return enableSystemProperty(VirtualConstraintImpl.class);
+		return setConstraint(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+	}
+
+	@Override
+	public <T extends Type> T disableVirtualConstraint() {
+		// return disableSystemProperty(VirtualConstraintImpl.class);
+		return setConstraint(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+	}
+
+	@Override
+	public boolean isVirtualConstraintEnabled() {
+		// return isBooleanSystemPropertyEnabled(VirtualConstraintImpl.class);
+		return isConstraintEnabled(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL);
+	}
+
+	@Override
+	public <T extends Type> T enableSingletonConstraint() {
+		// return enableSystemProperty(SingletonConstraintImpl.class);
+		return setConstraint(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+	}
+
+	@Override
+	public <T extends Type> T disableSingletonConstraint() {
+		// return disableSystemProperty(SingletonConstraintImpl.class);
+		return setConstraint(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+	}
+
+	@Override
+	public boolean isSingletonConstraintEnabled() {
+		// return isBooleanSystemPropertyEnabled(SingletonConstraintImpl.class);
+		return isConstraintEnabled(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL);
 	}
 
 	@Override
@@ -1511,7 +1645,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return result;
 	}
 
-	boolean equiv(Generic[] interfaces, Generic[] components) {
+	public boolean equiv(Generic[] interfaces, Generic[] components) {
 		return Arrays.equals(getPrimariesArray(), interfaces) && Arrays.equals(nullToSelfComponent(components), this.components);
 	}
 
@@ -1540,7 +1674,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Relation> T addRelation(Serializable value, Type... targets) {
-		return addSubRelation(getEngine(), value);
+		return addSubRelation(getEngine(), value, targets);
 	}
 
 	@Override
@@ -1559,7 +1693,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends MapProvider> Map<Serializable, Serializable> getMap(Class<T> mapClass) {
+	public <T extends MapProvider> ExtendedMap<Serializable, Serializable> getMap(Class<T> mapClass) {
 		return getCurrentCache().<MapProvider> find(mapClass).getMap(this);
 	}
 
@@ -1569,13 +1703,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
+	public ExtendedMap<Serializable, Serializable> getContraints() {
+		return getMap(ConstraintsMapProvider.class);
+	}
+
+	@Override
 	public boolean isTree() {
 		return this instanceof Tree;
 	}
 
 	@Override
 	public boolean isRoot() {
-		return isTree() && equals(getBaseComponent());
+		return (this instanceof Node) && equals(getBaseComponent());
 	}
 
 	@Override
@@ -1589,7 +1728,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T addSuper(int pos, Generic newSuper) {
+	// TODO clean
+	public <T extends Generic> T addSuper(/* int pos, */Generic newSuper) {
 		return getCurrentCache().addSuper(this, newSuper);
 	}
 
@@ -1599,8 +1739,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T updateKey(Serializable key) {
-		return getCurrentCache().updateKey(this, key);
+	public <T extends Generic> T updateValue(Serializable value) {
+		return getCurrentCache().updateValue(this, value);
 	}
 
 	public List<Integer> getComponentsPositions(Generic... components) {
@@ -1686,7 +1826,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public boolean isSelected() {
-				return !GenericImpl.this.equals(components[next.intValue()]);
+				return !GenericImpl.this.equals(components[next]) && !GenericImpl.this.inheritsFrom(components[next]);
 			}
 
 			@Override

@@ -1,35 +1,49 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
 import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.Dependencies;
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Engine;
+import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.AloneAutomaticsConstraintViolationException;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.systemproperties.BooleanSystemProperty;
-import org.genericsystem.systemproperties.constraints.Constraint;
+import org.genericsystem.generic.Holder;
+import org.genericsystem.map.ConstraintsMapProvider;
+import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
+import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-@SystemGeneric(defaultBehavior = true)
-@Components(Engine.class)
+@SystemGeneric(SystemGeneric.CONCRETE)
+@Components(MapInstance.class)
+@Extends(ConstraintKey.class)
 @SingularConstraint
-public class AloneAutomaticsConstraintImpl extends Constraint implements BooleanSystemProperty {
+@Dependencies(AloneAutomaticsConstraintImpl.DefaultValue.class)
+@AxedConstraintValue(AloneAutomaticsConstraintImpl.class)
+public class AloneAutomaticsConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
-	private static final long serialVersionUID = -6429972259714036057L;
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Components(AloneAutomaticsConstraintImpl.class)
+	@Extends(ConstraintsMapProvider.ConstraintValue.class)
+	@BooleanValue(true)
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
 	@Override
-	public void check(Generic modified) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (modified.isAlive() && modified.isAutomatic() && modified.getInheritings().isEmpty() && modified.getComposites().isEmpty())
 			throw new AloneAutomaticsConstraintViolationException();
 
 	}
 
 	@Override
-	public boolean isCheckedAt(CheckingType type) {
+	public boolean isCheckedAt(Generic modified, CheckingType type) {
 		return type.equals(CheckingType.CHECK_ON_REMOVE_NODE);
 	}
 

@@ -1,41 +1,48 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
 import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.Dependencies;
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Engine;
+import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.PhantomConstraintViolationException;
-import org.genericsystem.systemproperties.BooleanSystemProperty;
-import org.genericsystem.systemproperties.constraints.Constraint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.genericsystem.generic.Holder;
+import org.genericsystem.map.ConstraintsMapProvider;
+import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
+import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric(defaultBehavior = true)
-@Components(Engine.class)
+@SystemGeneric(SystemGeneric.CONCRETE)
+@Components(MapInstance.class)
+@Extends(ConstraintKey.class)
 @SingularConstraint
+@Dependencies(PhantomConstraintImpl.DefaultValue.class)
+@AxedConstraintValue(PhantomConstraintImpl.class)
 // @NotNullConstraint
-public class PhantomConstraintImpl extends Constraint implements BooleanSystemProperty {
+public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
-	private static final long serialVersionUID = -1175582355395269087L;
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Components(PhantomConstraintImpl.class)
+	@Extends(ConstraintsMapProvider.ConstraintValue.class)
+	@BooleanValue(true)
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
-	protected static Logger log = LoggerFactory.getLogger(PhantomConstraintImpl.class);
-
-	// TODO KK
 	@Override
-	public void check(Generic modified) throws ConstraintViolationException {
-		// if (!getConstraintValues(context, modified, getClass()).isEmpty())
+	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		Generic[] supers = ((GenericImpl) modified).getSupersArray();
 		if (modified.getValue() == null)
 			if (modified.getComponentsSize() != 0) {
 				if (supers.length != 2 || (modified.isStructural() ? supers[1].isConcrete() : supers[1].isStructural()))
-					throw new PhantomConstraintViolationException(modified.info());
+					throw new PhantomConstraintViolationException(modified.info() + " " + supers[1].info());
 
 				Generic[] components = ((GenericImpl) supers[1]).getComponentsArray();
 				Generic[] subComponents = ((GenericImpl) modified).getComponentsArray();

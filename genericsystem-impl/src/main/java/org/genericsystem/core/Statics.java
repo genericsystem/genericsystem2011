@@ -12,7 +12,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ public class Statics {
 	public static final Flag FLAG = new Flag();
 	public static final Generic[] EMPTY_GENERIC_ARRAY = new Generic[] {};
 
-	public static final int NO_POSITION = -1;
+	public static final int MULTIDIRECTIONAL = -1;
 	public static final int BASE_POSITION = 0;
 	public static final int TARGET_POSITION = 1;
 	public static final int SECOND_TARGET_POSITION = 2;
@@ -54,22 +53,6 @@ public class Statics {
 	public static final long SNAPSHOTS_PERIOD = 1000L;
 	public static final long SESSION_TIMEOUT = 1000L;
 	public static final long ARCHIVER_COEFF = 5L;
-
-	// public static final Serializable PHAMTOM = new Phantom();
-
-	// private static class Phantom implements Serializable {
-	// private static final long serialVersionUID = -5467290057275284040L;
-	//
-	// @Override
-	// public boolean equals(Object obj) {
-	// return obj instanceof Phantom;
-	// }
-	//
-	// @Override
-	// public int hashCode() {
-	// return 0;
-	// }
-	// }
 
 	@SuppressWarnings("rawtypes")
 	private static final Iterator EMPTY_ITERATOR = new Iterator<Object>() {
@@ -153,8 +136,7 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {
-		}
+		private Flag() {}
 
 		@Override
 		public String toString() {
@@ -189,26 +171,6 @@ public class Statics {
 			return (int) (reference ^ (reference >>> 32));
 		}
 	}
-
-	// static class ThreadContextManager implements ContextManager {
-	//
-	// private ThreadLocal<Context> contextLocal = new ThreadLocal<Context>() {
-	// @Override
-	// protected Context initialValue() {
-	// return null;
-	// }
-	// };
-	//
-	// @Override
-	// public Context get() {
-	// return contextLocal.get();
-	// }
-	//
-	// @Override
-	// public void set(Context newContext) {
-	// contextLocal.set(newContext);
-	// }
-	// }
 
 	static class TsGenerator {
 		private final long startTime = System.currentTimeMillis() * Statics.MILLI_TO_NANOSECONDS - System.nanoTime();

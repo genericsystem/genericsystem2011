@@ -8,30 +8,25 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Structural;
 import org.genericsystem.core.StructuralImpl;
+import org.genericsystem.example.Example.MyVehicle;
+import org.genericsystem.example.Example.Vehicle;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.myadmin.beans.TypesBean;
 import org.testng.annotations.Test;
 
 @Test
 public class TypesTest extends AbstractTest {
 
 	@Inject
-	private TypesBean typesBean;
-	@Inject
 	private Cache cache;
 
-	// public void testTree() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine();
-	// directSubTypes(cache, cache.getEngine());
-	// }
-	//
-	// private void directSubTypes(Cache cache, Type parent) {
-	// log.info("DirectSubTypes " + parent.toString());
-	// for (Type childen : parent.<Type> getDirectSubTypes())
-	// directSubTypes(cache, childen);
-	// }
+	public void testExample() {
+		Generic vehicle = cache.find(Vehicle.class);
+		Generic myVehicle = cache.find(MyVehicle.class);
+		assert myVehicle.inheritsFrom(vehicle);
+		assert vehicle.getInheritings().contains(myVehicle);
+	}
 
 	public void testGetAttributes() {
 		Type human = cache.newType("Human");
