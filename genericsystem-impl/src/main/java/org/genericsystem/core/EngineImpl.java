@@ -3,8 +3,8 @@ package org.genericsystem.core;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
 import org.genericsystem.generic.Attribute;
@@ -145,13 +145,13 @@ public class EngineImpl extends GenericImpl implements Engine {
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemProperty.class, MultiDirectionalSystemProperty.class, ReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class,
 					SizeConstraintImpl.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
 
-			CacheImpl cache = (CacheImpl) start(newCache());
+			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
+			// Statics.logTimeIfCurrentThreadDebugged("Before loading classes");
 			for (Class<?> clazz : classes)
-				if (get(clazz) == null)
-					bind(clazz);
+				get(clazz);
 			for (Class<?> clazz : userClasses)
-				if (get(clazz) == null)
-					bind(clazz);
+				get(clazz);
+			// Statics.logTimeIfCurrentThreadDebugged("Before flush");
 			cache.flush();
 			stop(cache);
 			startupTime = false;
@@ -163,8 +163,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 			T systemProperty = (T) super.get(clazz);
 			if (systemProperty != null)
 				return systemProperty;
-			if (startupTime && getCurrentCache() instanceof Cache)
+			if (startupTime && getCurrentCache() instanceof Cache) {
+				// Statics.logTimeIfCurrentThreadDebugged("Before loading class : " + clazz);
+				// assert !clazz.equals(ConstraintsMapProvider.ConstraintKey.class);
 				return bind(clazz);
+			}
 			throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
 		}
 
@@ -185,6 +188,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);
+			log.info("===> put" + clazz);
 			((GenericImpl) result).mountConstraints(clazz);
 			cache.triggersDependencies(clazz);
 			return result;

@@ -5,6 +5,7 @@ import java.util.AbstractMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
@@ -75,6 +76,8 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 			public Value put(Key key, Value value) {
 				assert null != value;
 				Value oldValue = get(key);
+				if (Objects.equals(oldValue, value))
+					return oldValue;
 				Holder keyHolder = generic.setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getCurrentCache().<Attribute> find(getKeyAttributeClass()), (Serializable) key);
 				setSingularHolder(keyHolder, getCurrentCache().<Attribute> find(getValueAttributeClass()), (Serializable) value);
 				return oldValue;
@@ -155,10 +158,9 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				}
 			}
 
-			@SuppressWarnings("unchecked")
 			@Override
 			protected Map.Entry<Key, Value> project() {
-				return new AbstractMap.SimpleEntry<Key, Value>((Key) next.getValue(), valueHolder.<Value> getValue());
+				return new AbstractMap.SimpleImmutableEntry<Key, Value>(next.<Key> getValue(), valueHolder.<Value> getValue());
 			}
 		};
 	}

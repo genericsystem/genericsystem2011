@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -952,7 +951,7 @@ public class RelationTest extends AbstractTest {
 
 		Relation carColor = car.setRelation("CarColor", color);
 		red.setLink(carColor, "defaultColor", car);
-		assert red.getLink(carColor).getBaseComponent().equals(yourAudi);
+		assert red.getLink(carColor).getBaseComponent().equals(yourAudi) : red.getLink(carColor).info();
 
 		Link yourAudiRed = red.bind(carColor, yourAudi);
 

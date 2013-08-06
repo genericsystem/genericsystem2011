@@ -1,7 +1,6 @@
 package org.genericsystem.systemproperties.constraints;
 
 import java.io.Serializable;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Attribute;
@@ -12,7 +11,7 @@ public abstract class AbstractNoBooleanConstraintImpl extends AbstractConstraint
 
 	@Override
 	public void check(Generic modified, Holder valueBaseComponent, AxedConstraintClass key) throws ConstraintViolationException {
-		check(modified, valueBaseComponent.<Attribute> getBaseComponent().getBaseComponent(), key, valueBaseComponent.getValue(getCurrentCache().<Holder> find(ConstraintsMapProvider.ConstraintValue.class)));
+		check(modified, valueBaseComponent.<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent(), key, valueBaseComponent.getValue());
 	}
 
 	@Override

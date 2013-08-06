@@ -10,10 +10,10 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.core.Generic.ExtendedMap;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
@@ -138,12 +138,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void remove(Generic generic) throws RollbackException {
-		remove(generic, true);
-	}
-
-	private void remove(Generic generic, boolean checkConstraint) throws RollbackException {
 		try {
-			internalRemove(generic, checkConstraint);
+			internalRemove(generic);
 		} catch (ConstraintViolationException e) {
 			rollback(e);
 		}
@@ -156,85 +152,70 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return null;
 	}
 
-	private void internalRemove(Generic node, boolean checkConstraint) throws ConstraintViolationException {
+	private void internalRemove(Generic node) throws ConstraintViolationException {
 		if (!isAlive(node))
 			throw new AliveConstraintViolationException(node + " is not alive");
 		for (Generic generic : orderRemoves(node).descendingSet())
-			removeGeneric(generic, checkConstraint);
+			removeGeneric(generic);
 	}
 
-	private abstract class Restructurator {
-		@SuppressWarnings("unchecked")
-		<T extends Generic> T rebuildAll(Generic old) {
-			NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old, false);
-			dependencies.remove(old);
-			ConnectionMap map = new ConnectionMap();
-			map.put(old, rebuild());
-			Generic generic = map.reBind(dependencies, false).get(old);
-			try {
-				checkConstraints();
-			} catch (ConstraintViolationException e) {
-				rollback(e);
-			}
-			return (T) generic;
+	private abstract class UnsafeCacheManager<T> {
+		private UnsafeCache unsafeCache = new UnsafeCache(CacheImpl.this);
+
+		T doWork() {
+			unsafeCache.start();
+			T result = internalWork(unsafeCache);
+			unsafeCache.flush();
+			start();
+			return result;
 		}
 
-		abstract Generic rebuild();
+		abstract T internalWork(UnsafeCache unsafeCache);
 	}
 
 	<T extends Generic> T updateValue(final Generic old, final Serializable value) {
-		return new Restructurator() {
+		return new UnsafeCacheManager<T>() {
 			@Override
-			Generic rebuild() {
-				Generic newImplicit = bindPrimaryByValue(reBind(old.<GenericImpl> getImplicit().supers)[0], value, old.getMetaLevel(), old.getImplicit().isAutomatic(), old.getClass());
-				if (((GenericImpl) old).isPrimary())
-					return newImplicit;
-				return bind(newImplicit, Statics.replace(0, reBind(((GenericImpl) old).supers), newImplicit), reBind(((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);
+			T internalWork(UnsafeCache unsafeCache) {
+				return unsafeCache.updateValue(old, value);
 			}
-		}.rebuildAll(old);
+		}.doWork();
 	}
 
 	<T extends Generic> T addComponent(final Generic old, final Generic newComponent, final int pos) {
-		return new Restructurator() {
+		return new UnsafeCacheManager<T>() {
 			@Override
-			Generic rebuild() {
-				// TODO KK
-				if (((GenericImpl) old).isPrimary()) {
-					Generic newPrimary = bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], old.getValue(), old.getMetaLevel(), true, old.getClass());
-					return bind(newPrimary, Statics.replace(0, ((GenericImpl) old).supers, newPrimary), Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.isAutomatic(), old.getClass(), true);
-				}
-				return bind(old.getImplicit(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.isAutomatic(), old.getClass(), false);
+			T internalWork(UnsafeCache unsafeCache) {
+				return unsafeCache.addComponent(old, newComponent, pos);
 			}
-		}.rebuildAll(old);
+		}.doWork();
 	}
 
 	<T extends Generic> T removeComponent(final Generic old, final int pos) {
-		return new Restructurator() {
+		return new UnsafeCacheManager<T>() {
 			@Override
-			Generic rebuild() {
-				return bind(old.getImplicit(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);
+			T internalWork(UnsafeCache unsafeCache) {
+				return unsafeCache.removeComponent(old, pos);
 			}
-		}.rebuildAll(old);
+		}.doWork();
 	}
 
 	<T extends Generic> T addSuper(final Generic old, final Generic newSuper) {
-		return new Restructurator() {
+		return new UnsafeCacheManager<T>() {
 			@Override
-			Generic rebuild() {
-				return bind(old.getImplicit(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+			T internalWork(UnsafeCache unsafeCache) {
+				return unsafeCache.addSuper(old, newSuper);
 			}
-		}.rebuildAll(old);
+		}.doWork();
 	}
 
 	<T extends Generic> T removeSuper(final Generic old, final int pos) {
-		if (pos == 0)
-			throw new UnsupportedOperationException();
-		return new Restructurator() {
+		return new UnsafeCacheManager<T>() {
 			@Override
-			Generic rebuild() {
-				return bind(old.getImplicit(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+			T internalWork(UnsafeCache unsafeCache) {
+				return unsafeCache.removeSuper(old, pos);
 			}
-		}.rebuildAll(old);
+		}.doWork();
 	}
 
 	private class ConnectionMap extends HashMap<Generic, Generic> {
@@ -271,7 +252,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return updateValue(generic, generic.getValue());
 	}
 
-	private Generic[] reBind(Generic[] generics) {
+	Generic[] reBind(Generic[] generics) {
 		Generic[] reBind = new Generic[generics.length];
 		for (int i = 0; i < generics.length; i++) {
 			Generic generic = generics[i];
@@ -389,11 +370,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<EngineImpl> getEngine().getFactory().newCache(this);
 	}
 
-	<T extends Generic> NavigableSet<T> orderAndRemoveDependencies(final T old, boolean checkConstraint) {
+	<T extends Generic> NavigableSet<T> orderAndRemoveDependencies(final T old) {
 		NavigableSet<T> orderedGenerics = orderDependencies(old);
 		for (T generic : orderedGenerics.descendingSet())
 			if (generic.isAlive())
-				remove(generic, checkConstraint);
+				remove(generic);
 		return orderedGenerics;
 	}
 
@@ -495,7 +476,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		Generic constraintValue = find(ConstraintValue.class);
-		for (Serializable key : getEngine().getContraints().keySet())
+		for (Serializable key : getEngine().getContraintsMap().keySet())
 			for (Generic generic : generics)
 				if (generic.isInstanceOf(constraintValue)) {
 					AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
@@ -515,33 +496,18 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		// for (Serializable key : getEngine().getContraints().keySet())
-		// for (Generic generic : generics) {
-		// AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
-		// Serializable value = generic.getContraints().get(key);
-		// log.info("generic " + generic + " key " + key + " value " + value);
-		// if (test(value)) {
-		// if (isCheckable(constraint, generic, checkingType, isFlushTime))
-		// constraint.check(generic, generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
-		// }
-		// }
-
-		for (Generic generic : generics)
-			for (Serializable key : generic.getContraints().keySet()) {
+		for (Generic generic : generics) {
+			ExtendedMap<Serializable, Serializable> constraintMap = generic.getContraintsMap();
+			for (Serializable key : constraintMap.keySet()) {
 				AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
 				if (isCheckable(constraint, generic, checkingType, isFlushTime))
-					constraint.check(generic, generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
+					constraint.check(generic, constraintMap.getValueHolder(key), (AxedConstraintClass) key);
 			}
+		}
 	}
 
-	private boolean test(Serializable value) {
-		if (null != value)
-			return value instanceof Boolean ? (Boolean) value : true;
-		return false;
-	}
-
-	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-		return constraint.isCheckedAt(generic, checkingType) && (isFlushTime || constraint.isImmediatelyCheckable());
+	protected boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
+		return (isFlushTime || constraint.isImmediatelyCheckable()) && constraint.isCheckedAt(generic, checkingType);
 	}
 
 	@Override
@@ -565,12 +531,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, Arrays.asList(generic));
 	}
 
-	private void removeGeneric(Generic generic, boolean checkConstraint) throws ConstraintViolationException {
+	private void removeGeneric(Generic generic) throws ConstraintViolationException {
 		simpleRemove(generic);
-		if (checkConstraint) {
-			checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
-			checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
-		}
+		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
+		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
 	}
 
 	private void checkConstraints() throws ConstraintViolationException {
@@ -658,4 +622,94 @@ public class CacheImpl extends AbstractContext implements Cache {
 	// }
 	// };
 	// }
+	static class UnsafeCache extends CacheImpl {
+		private static final long serialVersionUID = 4843334203915625618L;
+
+		public UnsafeCache(Cache cache) {
+			super(cache);
+		}
+
+		public UnsafeCache(Engine engine) {
+			super(engine);
+		}
+
+		@Override
+		protected boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
+			return isFlushTime && constraint.isCheckedAt(generic, checkingType);
+		}
+
+		@Override
+		<T extends Generic> T updateValue(final Generic old, final Serializable value) {
+			return new Restructurator() {
+				@Override
+				Generic rebuild() {
+					Generic newImplicit = bindPrimaryByValue(reBind(old.<GenericImpl> getImplicit().supers)[0], value, old.getMetaLevel(), old.getImplicit().isAutomatic(), old.getClass());
+					if (((GenericImpl) old).isPrimary())
+						return newImplicit;
+					return bind(newImplicit, Statics.replace(0, reBind(((GenericImpl) old).supers), newImplicit), reBind(((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);
+				}
+			}.rebuildAll(old);
+		}
+
+		@Override
+		<T extends Generic> T addComponent(final Generic old, final Generic newComponent, final int pos) {
+			return new Restructurator() {
+				@Override
+				Generic rebuild() {
+					// TODO KK
+					if (((GenericImpl) old).isPrimary()) {
+						Generic newPrimary = bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], old.getValue(), old.getMetaLevel(), true, old.getClass());
+						return bind(newPrimary, Statics.replace(0, ((GenericImpl) old).supers, newPrimary), Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.isAutomatic(), old.getClass(), true);
+					}
+					return bind(old.getImplicit(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.isAutomatic(), old.getClass(), false);
+				}
+			}.rebuildAll(old);
+		}
+
+		@Override
+		<T extends Generic> T removeComponent(final Generic old, final int pos) {
+			return new Restructurator() {
+				@Override
+				Generic rebuild() {
+					return bind(old.getImplicit(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);
+				}
+			}.rebuildAll(old);
+		}
+
+		@Override
+		<T extends Generic> T addSuper(final Generic old, final Generic newSuper) {
+			return new Restructurator() {
+				@Override
+				Generic rebuild() {
+					return bind(old.getImplicit(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+				}
+			}.rebuildAll(old);
+		}
+
+		@Override
+		<T extends Generic> T removeSuper(final Generic old, final int pos) {
+			if (pos == 0)
+				throw new UnsupportedOperationException();
+			return new Restructurator() {
+				@Override
+				Generic rebuild() {
+					return bind(old.getImplicit(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+				}
+			}.rebuildAll(old);
+		}
+
+		abstract class Restructurator {
+			@SuppressWarnings("unchecked")
+			<T extends Generic> T rebuildAll(Generic old) {
+				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old);
+				dependencies.remove(old);
+				ConnectionMap map = new ConnectionMap();
+				map.put(old, rebuild());
+				return (T) map.reBind(dependencies, false).get(old);
+			}
+
+			abstract Generic rebuild();
+		}
+
+	}
 }
