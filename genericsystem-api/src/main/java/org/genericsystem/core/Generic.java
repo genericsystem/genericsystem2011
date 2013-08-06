@@ -624,7 +624,7 @@ public interface Generic extends Comparable<Generic> {
 
 	Map<Serializable, Serializable> getProperties();
 
-	ExtendedMap<Serializable, Serializable> getContraints();
+	ExtendedMap<Serializable, Serializable> getContraintsMap();
 
 	interface ExtendedMap<K, V> extends Map<K, V> {
 		Holder getValueHolder(Serializable key);
