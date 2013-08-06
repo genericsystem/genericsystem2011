@@ -11,7 +11,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -147,14 +146,14 @@ public abstract class AbstractContext implements Serializable {
 		return reBind;
 	}
 
-	@SuppressWarnings("unchecked")
-	<T extends Generic> T find(Generic[] supers, Generic[] components) {
-		final Generic[] interfaces = new Primaries(supers).toArray();
-		Generic[] directSupers = getDirectSupers(interfaces, components);
-		if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
-			return (T) directSupers[0];
-		return null;
-	}
+	// @SuppressWarnings("unchecked")
+	// <T extends Generic> T find(Generic[] supers, Generic[] components) {
+	// final Generic[] interfaces = new Primaries(supers).toArray();
+	// Generic[] directSupers = getDirectSupers(interfaces, components);
+	// if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
+	// return (T) directSupers[0];
+	// return null;
+	// }
 
 	// <T extends Generic> T fastFind(Generic implicit, Generic[] supers, Generic[] components) {
 	// assert supers[0].getImplicit().equals(implicit);
@@ -163,13 +162,17 @@ public abstract class AbstractContext implements Serializable {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFindByInterfaces(Generic implicit, Generic[] interfaces, Generic[] components) {
+		// Statics.logTimeIfCurrentThreadDebugged("start" + implicit);
 		if (components.length == 0 && interfaces.length == 1) {
 			assert implicit.equals(interfaces[0]);
 			return (T) implicit;
 		}
 		for (Generic generic : components.length == 0 || components[0] == null ? implicit.getInheritings() : components[0].getComposites())
-			if (((GenericImpl) generic).equiv(interfaces, components))
+			if (((GenericImpl) generic).equiv(interfaces, components)) {
+				// Statics.logTimeIfCurrentThreadDebugged("stop" + implicit);
 				return (T) generic;
+			}
+		// Statics.logTimeIfCurrentThreadDebugged("stop" + implicit);
 		return null;
 	}
 

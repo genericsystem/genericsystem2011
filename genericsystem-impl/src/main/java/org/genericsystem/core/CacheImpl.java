@@ -13,6 +13,7 @@ import java.util.TreeSet;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.core.Generic.ExtendedMap;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
@@ -475,7 +476,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		Generic constraintValue = find(ConstraintValue.class);
-		for (Serializable key : getEngine().getContraints().keySet())
+		for (Serializable key : getEngine().getContraintsMap().keySet())
 			for (Generic generic : generics)
 				if (generic.isInstanceOf(constraintValue)) {
 					AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
@@ -495,12 +496,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		for (Generic generic : generics)
-			for (Serializable key : generic.getContraints().keySet()) {
+		for (Generic generic : generics) {
+			ExtendedMap<Serializable, Serializable> constraintMap = generic.getContraintsMap();
+			for (Serializable key : constraintMap.keySet()) {
 				AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
 				if (isCheckable(constraint, generic, checkingType, isFlushTime))
-					constraint.check(generic, generic.getContraints().getValueHolder(key).<Holder> getBaseComponent(), (AxedConstraintClass) key);
+					constraint.check(generic, constraintMap.getValueHolder(key), (AxedConstraintClass) key);
 			}
+		}
 	}
 
 	protected boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
@@ -626,10 +629,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 			super(cache);
 		}
 
-		@Override
-		protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-			// TODO Auto-generated method stub
-			super.checkConstraints(adds, removes);
+		public UnsafeCache(Engine engine) {
+			super(engine);
 		}
 
 		@Override

@@ -1,7 +1,6 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
 import java.io.Serializable;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;

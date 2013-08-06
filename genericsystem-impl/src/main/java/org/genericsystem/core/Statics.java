@@ -24,7 +24,7 @@ public class Statics {
 
 	private static Logger log = LoggerFactory.getLogger(Statics.class);
 
-	private static ThreadLocal<Boolean> threadDebugged = new ThreadLocal<Boolean>();
+	private static ThreadLocal<Long> threadDebugged = new ThreadLocal<Long>();
 
 	public static final Flag FLAG = new Flag();
 	public static final Generic[] EMPTY_GENERIC_ARRAY = new Generic[] {};
@@ -116,7 +116,7 @@ public class Statics {
 	}
 
 	public static void debugCurrentThread() {
-		threadDebugged.set(true);
+		threadDebugged.set(System.currentTimeMillis());
 	}
 
 	public static void stopDebugCurrentThread() {
@@ -124,12 +124,12 @@ public class Statics {
 	}
 
 	public static boolean isCurrentThreadDebugged() {
-		return Boolean.TRUE.equals(threadDebugged.get());
+		return threadDebugged.get() != null;
 	}
 
-	public static void logIfCurrentThreadDebugged(String message) {
+	public static void logTimeIfCurrentThreadDebugged(String message) {
 		if (isCurrentThreadDebugged())
-			log.info(message);
+			log.info(message + " : " + (System.currentTimeMillis() - threadDebugged.get()));
 	}
 
 	private static class Flag implements Serializable {
@@ -332,9 +332,9 @@ public class Statics {
 			return null;
 		T result = iterator.next();
 		if (iterator.hasNext()) {
-			String message = "" + result;
+			String message = "" + ((Generic) result).info();
 			while (iterator.hasNext())
-				message += iterator.next();
+				message += " / " + ((Generic) iterator.next()).info();
 			throw new IllegalStateException("Ambigous selection : " + message);
 		}
 		return result;
