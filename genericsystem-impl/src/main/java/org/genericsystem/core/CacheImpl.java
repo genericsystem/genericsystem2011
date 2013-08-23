@@ -431,6 +431,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private <T extends Generic> T internalBind(Generic implicit, Generic[] interfaces, Generic[] components, boolean automatic, Class<?> specializeGeneric) {
+		assert implicit.isAlive();
 		Generic[] directSupers = getDirectSupers(interfaces, components);
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
@@ -442,12 +443,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 			remove(generic);
 
 		ConnectionMap connectionMap = new ConnectionMap();
-		if (!implicit.isAlive()) {
-			Generic newImplicit = bindPrimaryByValue(((GenericImpl) implicit).supers[0], implicit.getValue(), implicit.getMetaLevel(), implicit.isAutomatic(), implicit.getClass());
-			connectionMap.put(implicit, newImplicit);
-			implicit = newImplicit;
-			directSupers = connectionMap.adjust(directSupers);
-		}
+//		if (!implicit.isAlive()) {
+//			Generic newImplicit = bindPrimaryByValue(((GenericImpl) implicit).supers[0], implicit.getValue(), implicit.getMetaLevel(), implicit.isAutomatic(), implicit.getClass());
+//			connectionMap.put(implicit, newImplicit);
+//			implicit = newImplicit;
+//			directSupers = connectionMap.adjust(directSupers);
+//		}
 		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric(specializeGeneric)).initializeComplex(implicit, directSupers, components, automatic);
 		T superGeneric = this.<T> insert(newGeneric);
 		connectionMap.reBind(orderedDependencies, true);
@@ -458,7 +459,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new AbstractFilterIterator<T>(this.<T> directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
-				return next.getValue() != null && GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
+				return /*next.getValue() != null &&*/ GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
 			}
 		};
 	}

@@ -132,14 +132,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 
-		if (getMetaLevel() != metaLevel)
-			throw new IllegalStateException(info() + " : META LEVEL ERROR getMetaLevel() " + getMetaLevel() + " / metaLevel " + metaLevel);
-		if (!isPrimary())
-			assert Objects.equals(directSupers[0].getValue(), value);
-		if (value != null)
-			for (Generic primary : getPrimaries())
-				assert primary.getValue() != null : this.info();
-		return this;
+					if (getMetaLevel() != metaLevel)
+						throw new IllegalStateException(info() + " : META LEVEL ERROR getMetaLevel() " + getMetaLevel() + " / metaLevel " + metaLevel);
+					if (!isPrimary())
+						assert Objects.equals(directSupers[0].getValue(), value);
+					if (value != null)
+						for (Generic primary : getPrimaries())
+							assert primary.getValue() != null : this.info();
+					return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -309,28 +309,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(getClass(), value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
 			return null != value ? this.<T> bind(null, implicit, attribute, basePos, true, targets) : null;
-		if (!equals(holder.getComponent(basePos))) {
-			if (value == null)
-				return cancel(holder, basePos, true);
-			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
-				cancel(holder, basePos, true);
-			return this.<T> bind(null, implicit, attribute, basePos, true, targets);
-		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
-			return holder;
-		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
-			return holder.updateValue(value);
-		holder.remove();
-		return this.<T> setHolder(attribute, value, basePos, targets);
+			if (!equals(holder.getComponent(basePos))) {
+				if (value == null)
+					return cancel(holder, basePos, true);
+				if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+					cancel(holder, basePos, true);
+				return this.<T> bind(null, implicit, attribute, basePos, true, targets);
+			}
+			if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+				return holder;
+			if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+				return holder.updateValue(value);
+			holder.remove();
+			return this.<T> setHolder(attribute, value, basePos, targets);
 	}
 
 	@Override
 	public <T extends Holder> T addHolder(Holder attribute, int basePos, Serializable value, Generic... targets) {
-		if (value == null)
-			return null;
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(null, value, SystemGeneric.CONCRETE, true);
 		return bind(null, implicit, attribute, basePos, true, targets);
-
 	}
 
 	public <T extends Holder> T bind(Class<?> specializationClass, Generic implicit, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
@@ -398,7 +395,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public void internalClearAll(Holder attribute, int basePos, boolean isConcrete, Generic... targets) {
-		Iterator<Holder> holders = isConcrete ? holdersIterator(attribute, basePos, true, targets) : this.<Holder> attributesIterator((Attribute) attribute, true);
+		Iterator<Holder> holders = isConcrete ? holdersIterator(attribute, basePos, true, targets) : this.<Holder> holdersIterator(SystemGeneric.STRUCTURAL,(Attribute) attribute,basePos, true);
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
 			if (this.equals(holder.getComponent(basePos)))
@@ -488,7 +485,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(relation, basePos, false, targets)) {
 			@Override
 			public boolean isSelected() {
-				return next.isConcrete() && next.isRelation();
+				return next.isRelation();
 			}
 		};
 	}
@@ -522,7 +519,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int basePos, boolean readPhantoms, Generic... targets) {
-		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(attribute, basePos, readPhantoms), attribute, targets);
+		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(SystemGeneric.CONCRETE,attribute, basePos, readPhantoms), attribute, targets);
 	}
 
 	@Override
@@ -583,7 +580,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Iterator<T> attributesIterator(boolean readPhantoms) {
-		return this.<T> attributesIterator(getCurrentCache().getMetaAttribute(), readPhantoms);
+		return this.<T> holdersIterator(SystemGeneric.STRUCTURAL,getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL,readPhantoms);
 	}
 
 	@Override
@@ -601,7 +598,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return attributesIterator(attribute, false);
+				return holdersIterator(SystemGeneric.STRUCTURAL,attribute,Statics.MULTIDIRECTIONAL, false);
 			}
 		};
 	}
@@ -613,7 +610,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Attribute> T getAttribute(Attribute attribute, final Serializable value, Generic... targets) {
-		return Statics.unambigousFirst(this.targetsFilter(Statics.valueFilter(this.<T> attributesIterator(attribute, value == null), value), attribute, targets));
+		return Statics.unambigousFirst(this.targetsFilter(Statics.valueFilter(this.<T> holdersIterator(SystemGeneric.STRUCTURAL,attribute,Statics.MULTIDIRECTIONAL, value == null), value), attribute, targets));
 	}
 
 	private <T extends Relation> Iterator<T> relationsIterator(boolean readPhantom) {
@@ -725,27 +722,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return orderedComponents;
 	}
 
-	public <T extends Generic> Iterator<T> attributesIterator(Attribute origin, boolean readPhantom) {
-		Iterator<T> iterator = ((GenericImpl) origin).safeIsEnabled(getNoInheritanceSystemProperty()) ? this.<T> noInheritanceIterator(origin, Statics.MULTIDIRECTIONAL, SystemGeneric.STRUCTURAL) : /*
-																																																	 * this.<T> mainIterator(origin, SystemGeneric.STRUCTURAL,
-																																																	 * Statics.MULTIDIRECTIONAL, readPhantom)
-																																																	 */this.<T> inheritanceStructuralIterator(origin);
-		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
-	}
-
-	public <T extends Generic> Iterator<T> holdersIterator(Holder origin, int basePos, boolean readPhantom) {
-		Iterator<T> iterator = null;
+	public <T extends Generic> Iterator<T> holdersIterator(final int level,Holder origin, int basePos, boolean readPhantom) {
+		if (SystemGeneric.STRUCTURAL==level || ((GenericImpl) origin).safeIsEnabled(getMultiDirectionalSystemProperty())) 
+			basePos = Statics.MULTIDIRECTIONAL;
 		boolean noInheritance = ((GenericImpl) origin).safeIsEnabled(getNoInheritanceSystemProperty());
-		if (((GenericImpl) origin).safeIsEnabled(getMultiDirectionalSystemProperty())) {
-			Iterator<T>[] iterators = new Iterator[origin.getComponentsSize()];
-			for (basePos = 0; basePos < iterators.length; basePos++)
-				iterators[basePos] = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : this.<T> inheritanceConcreteIterator(origin, basePos) /*
-																																													 * this.<T> mainIterator(origin, SystemGeneric.CONCRETE, basePos,
-																																													 * readPhantom)
-																																													 */;
-			iterator = new ConcateIterator<T>(iterators);
-		} else
-			iterator = noInheritance ? this.<T> noInheritanceIterator(origin, basePos, SystemGeneric.CONCRETE) : this.<T> inheritanceConcreteIterator(origin, basePos) /* this.<T> mainIterator(origin, SystemGeneric.CONCRETE, basePos, readPhantom) */;
+		Iterator<T> iterator = noInheritance ? this.<T> noInheritanceIterator(level, basePos, origin) : this.<T> inheritanceIterator( level,origin, basePos);
 		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
 	}
 
@@ -757,7 +738,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().<Attribute> find(MultiDirectionalSystemProperty.class);
 	}
 
-	private <T extends Generic> Iterator<T> noInheritanceIterator(final Generic origin, int pos, final int metaLevel) {
+	private <T extends Generic> Iterator<T> noInheritanceIterator(final int metaLevel, int pos, final Generic origin) {
 		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
 			@Override
 			public boolean isSelected() {
@@ -766,100 +747,86 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	public <T extends Generic> Snapshot<T> mainSnaphot(final Generic origin, final int level, final int pos, final boolean readPhantoms) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return mainIterator(origin, level, pos, readPhantoms);
-			}
-		};
-	}
+	//	public <T extends Generic> Snapshot<T> mainSnaphot(final Generic origin, final int level, final int pos, final boolean readPhantoms) {
+	//		return new AbstractSnapshot<T>() {
+	//			@Override
+	//			public Iterator<T> iterator() {
+	//				return mainIterator(origin, level, pos, readPhantoms);
+	//			}
+	//		};
+	//	}
 
-	private Iterator<Generic> allSupersIterator() {
-		NavigableSet<Generic> set = new TreeSet<>();
-		Iterator<Generic> iterator = new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+	//	private Iterator<Generic> allSupersIterator() {
+	//		NavigableSet<Generic> set = new TreeSet<>();
+	//		Iterator<Generic> iterator = new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+	//
+	//			private static final long serialVersionUID = -6254209580316166416L;
+	//
+	//			@Override
+	//			public Iterator<Generic> children(Generic node) {
+	//				return new ArrayIterator<Generic>(((GenericImpl) node).supers);
+	//			}
+	//		};
+	//
+	//		while (iterator.hasNext())
+	//			set.add(iterator.next());
+	//
+	//		return set.descendingIterator();
+	//	}
+	//
+	//	private <T extends Generic> Iterator<T> noInheritanceIterator2(final Generic origin, int pos, final int metaLevel) {
+	//		Set<T> alreadyComputed = new LinkedHashSet<>();
+	//		Iterator<T> iterator = noInheritanceIterator(origin, pos, metaLevel);
+	//		while (iterator.hasNext()) {
+	//			T candidate = iterator.next();
+	//			for (T computed : alreadyComputed) {
+	//				if (candidate.inheritsFrom(computed)) {
+	//					alreadyComputed.remove(computed);
+	//					break;
+	//				}
+	//			}
+	//			alreadyComputed.add(candidate);
+	//		}
+	//		return alreadyComputed.iterator();
+	//	}
+	//
+	//	private <T extends Generic> Iterator<T> mainIterator(final Generic origin, final int level, final int pos, final boolean readPhantom) {
+	//		return new AbstractFilterIterator<T>(new AbstractConcateIterator<Generic, T>(allSupersIterator()) {
+	//			@Override
+	//			protected Iterator<T> getIterator(Generic superGeneric) {
+	//				return ((GenericImpl) superGeneric).noInheritanceIterator2(origin, pos, level);
+	//			}
+	//		}) {
+	//
+	//			private Set<T> alreadyComputed = new HashSet<>();
+	//
+	//			@Override
+	//			public boolean isSelected() {
+	//				return isNewLeaf(next) && alreadyComputed.add(next) && (readPhantom || next.getValue() != null); // test phantom after add
+	//			}
+	//
+	//			private boolean isNewLeaf(Generic candidate) {
+	//				for (Generic generic : alreadyComputed)
+	//					if (generic.inheritsFrom(candidate))
+	//						return false;
+	//				return true;
+	//			}
+	//
+	//		};
+	//	}
 
-			private static final long serialVersionUID = -6254209580316166416L;
-
-			@Override
-			public Iterator<Generic> children(Generic node) {
-				return new ArrayIterator<Generic>(((GenericImpl) node).supers);
-			}
-		};
-
-		while (iterator.hasNext())
-			set.add(iterator.next());
-
-		return set.descendingIterator();
-	}
-
-	private <T extends Generic> Iterator<T> noInheritanceIterator2(final Generic origin, int pos, final int metaLevel) {
-		Set<T> alreadyComputed = new LinkedHashSet<>();
-		Iterator<T> iterator = noInheritanceIterator(origin, pos, metaLevel);
-		while (iterator.hasNext()) {
-			T candidate = iterator.next();
-			for (T computed : alreadyComputed) {
-				if (candidate.inheritsFrom(computed)) {
-					alreadyComputed.remove(computed);
-					break;
-				}
-			}
-			alreadyComputed.add(candidate);
-		}
-		return alreadyComputed.iterator();
-	}
-
-	private <T extends Generic> Iterator<T> mainIterator(final Generic origin, final int level, final int pos, final boolean readPhantom) {
-		return new AbstractFilterIterator<T>(new AbstractConcateIterator<Generic, T>(allSupersIterator()) {
-			@Override
-			protected Iterator<T> getIterator(Generic superGeneric) {
-				return ((GenericImpl) superGeneric).noInheritanceIterator2(origin, pos, level);
-			}
-		}) {
-
-			private Set<T> alreadyComputed = new HashSet<>();
-
-			@Override
-			public boolean isSelected() {
-				return isNewLeaf(next) && alreadyComputed.add(next) && (readPhantom || next.getValue() != null); // test phantom after add
-			}
-
-			private boolean isNewLeaf(Generic candidate) {
-				for (Generic generic : alreadyComputed)
-					if (generic.inheritsFrom(candidate))
-						return false;
-				return true;
-			}
-
-		};
-	}
-
-	private <T extends Generic> Iterator<T> inheritanceStructuralIterator(final Generic origin) {
-		return (Iterator<T>) new AbstractSelectableLeafIterator(origin) {
-			@Override
-			public boolean isSelected(Generic candidate) {
-				return candidate.getMetaLevel() <= SystemGeneric.STRUCTURAL && candidate.isAttributeOf(GenericImpl.this);
-			}
-
-			@Override
-			public boolean isSelectable() {
-				return next.isStructural();
-			}
-		};
-	}
-
-	public <T extends Generic> Iterator<T> inheritanceConcreteIterator(final Generic origin, final int pos) {
+	public <T extends Generic> Iterator<T> inheritanceIterator(final int level,final Generic origin, final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(origin) {
 
 			@Override
 			public boolean isSelectable() {
-				return next.isConcrete();
+				return level==next.getMetaLevel();
 			}
 
 			@Override
 			public final boolean isSelected(Generic candidate) {
-				boolean selected = ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos);
-				if (selected && ((GenericImpl) candidate).isPseudoStructural(pos))
+				boolean selected = candidate.getMetaLevel() <= level && (pos != Statics.MULTIDIRECTIONAL? ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos): ((GenericImpl) candidate).isAttributeOf(GenericImpl.this));
+				if (pos != Statics.MULTIDIRECTIONAL && selected && ((GenericImpl) candidate).isPseudoStructural(pos))
 					if (getCurrentCache() instanceof CacheImpl)
 						((GenericImpl) candidate).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) candidate.getImplicit()).supers[0], null, SystemGeneric.CONCRETE));
 				return selected;
@@ -917,8 +884,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
 			return false;
 		boolean inheritance = ((GenericImpl) generic).new InheritanceCalculator().isSuperOf(this);
-		// boolean superOf = ((GenericImpl) generic).isSuperOf(this);// ,false
-		// assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
+		boolean superOf = ((GenericImpl) generic).isSuperOf(this);
+		assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
 		return inheritance;
 	}
 

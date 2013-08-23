@@ -138,11 +138,25 @@ public class GetSubTypeTest extends AbstractTest {
 		Relation carColor = car.setRelation( "CarColor", color);
 		Type electricCar = car.newSubType( "ElectricCar");
 		Type subColor = color.newSubType( "SubColor");
-		((GenericImpl) electricCar).setSubAttribute( carColor, "ElectricCarSubColor", electricCar, subColor);
+		((GenericImpl) electricCar).setSubAttribute( carColor, "ElectricCarSubColor", subColor);
 		Type plane = cache.newType("Plane");
 		Type human = cache.newType("Human");
 		Relation pilot = plane.setRelation( "Pilot", human);
 		assert pilot.getSubType( "ElectricCarSubColor") == null;
+	}
+	
+	public void testGetSubTypeDoubleHierarchyRelationWithOtherTargetType() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type color = cache.newType("Color");
+		Relation vehicleColor = vehicle.setRelation( "VehicleColor", color);
+		Type car = vehicle.newSubType( "Car");
+		Type subColor = color.newSubType( "SubColor");
+		((GenericImpl) car).setSubAttribute( vehicleColor, "CarSubColor", subColor).log();
+		
+		Type otherType = cache.newType( "OtherType");
+		((GenericImpl) car).setSubAttribute( vehicleColor, "CarOtherType",otherType).log();
+		
 	}
 
 	public void testGetSubTypeNonExistingRelation() {

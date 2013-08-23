@@ -3,6 +3,7 @@ package org.genericsystem.tree;
 import java.io.Serializable;
 import java.util.Iterator;
 
+import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
@@ -36,7 +37,7 @@ public class NodeImpl extends GenericImpl implements Node {
 
 	<T extends Generic> Iterator<T> childrenIterator() {
 		Tree attribute = getMeta();
-		return thisFilter(this.<T> holdersIterator(attribute, getBasePos(attribute), false));
+		return thisFilter(this.<T> holdersIterator(SystemGeneric.CONCRETE,attribute, getBasePos(attribute), false));
 	}
 
 	@Override

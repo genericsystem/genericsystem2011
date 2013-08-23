@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
+import org.genericsystem.core.Statics;
 import org.genericsystem.exception.PhantomConstraintViolationException;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
@@ -162,7 +164,7 @@ public class PhamtomTest extends AbstractTest {
 
 		assert car.getAttributes().contains(vehiclePower);
 		car.cancelAll(vehiclePower, false);
-		Iterator<Generic> iterator = ((GenericImpl) car).attributesIterator(vehiclePower, true);
+		Iterator<Generic> iterator = ((GenericImpl) car).holdersIterator(SystemGeneric.STRUCTURAL,vehiclePower, Statics.MULTIDIRECTIONAL,true);
 		Generic phantom = iterator.next();
 		// car.restore( vehiclePower);
 		car.clearAllStructural(vehiclePower);
