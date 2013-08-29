@@ -13,9 +13,10 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
+import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AloneAutomaticsConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.ConcreteInheritanceConstraintImpl;
@@ -37,9 +38,9 @@ import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintIm
  */
 @SystemGeneric
 @Components(Engine.class)
-@Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class, OptimisticLockConstraintImpl.class,
-		PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class, UniqueValueConstraintImpl.class,
-		VirtualConstraintImpl.class })
+@Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
+		OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class,
+		UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Boolean> {
 
 	@Override
@@ -56,7 +57,7 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 
 	@Override
 	protected Class<?> getKeyClass(Serializable key) {
-		return ((AxedConstraintClass) key).getClazz();
+		return ((AxedPropertyClass) key).getClazz();
 	}
 
 	@SystemGeneric

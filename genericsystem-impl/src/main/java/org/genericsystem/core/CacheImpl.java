@@ -31,7 +31,7 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.tree.TreeImpl;
 
@@ -441,7 +441,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				orderedDependencies.addAll(orderDependencies(removeIterator.next()));
 		}
 		for (Generic generic : orderedDependencies.descendingSet())
-			remove(generic);
+			simpleRemove(generic);
 
 		ConnectionMap connectionMap = new ConnectionMap();
 		// if (!implicit.isAlive()) {
@@ -481,11 +481,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Serializable key : getEngine().getContraintsMap().keySet())
 			for (Generic generic : generics)
 				if (generic.isInstanceOf(constraintValue)) {
-					AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
+					AbstractConstraintImpl constraint = find(((AxedPropertyClass) key).getClazz());
 					if (isCheckable(constraint, generic, checkingType, isFlushTime)) {
 						GenericImpl base = ((GenericImpl) generic).<GenericImpl> getBaseComponent().<GenericImpl> getBaseComponent().<GenericImpl> getBaseComponent();
 						if (null != base)
-							constraint.checkConsistency(base, (Holder) generic, base, (AxedConstraintClass) ((GenericImpl) generic).<GenericImpl> getBaseComponent().getValue());
+							constraint.checkConsistency(base, (Holder) generic, base, (AxedPropertyClass) ((GenericImpl) generic).<GenericImpl> getBaseComponent().getValue());
 					}
 				}
 	}
@@ -501,9 +501,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 	// for (Generic generic : generics) {
 	// ExtendedMap<Serializable, Serializable> constraintMap = generic.getContraintsMap();
 	// for (Serializable key : constraintMap.keySet()) {
-	// AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
+	// AbstractConstraintImpl constraint = find(((AxedPropertyClass) key).getClazz());
 	// if (isCheckable(constraint, generic, checkingType, isFlushTime))
-	// constraint.check(generic, constraintMap.getValueHolder(key), (AxedConstraintClass) key);
+	// constraint.check(generic, constraintMap.getValueHolder(key), (AxedPropertyClass) key);
 	// }
 	// }
 	// }
@@ -512,11 +512,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : generics) {
 			ExtendedMap<Serializable, Serializable> constraintMap = generic.getContraintsMap();
 			for (Serializable key : constraintMap.keySet()) {
-				// AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClass());
+				// AbstractConstraintImpl constraint = find(((AxedPropertyClass) key).getClass());
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl constraint = valueHolder.getBaseComponent();
 				if (isCheckable(constraint, generic, checkingType, isFlushTime))
-					constraint.check(generic, valueHolder, (AxedConstraintClass) key);
+					constraint.check(generic, valueHolder, (AxedPropertyClass) key);
 			}
 		}
 	}

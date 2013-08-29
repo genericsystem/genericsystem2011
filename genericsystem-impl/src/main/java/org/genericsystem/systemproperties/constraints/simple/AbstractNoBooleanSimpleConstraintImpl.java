@@ -9,13 +9,13 @@ import org.genericsystem.systemproperties.constraints.AbstractNoBooleanConstrain
 public abstract class AbstractNoBooleanSimpleConstraintImpl extends AbstractNoBooleanConstraintImpl {
 
 	@Override
-	public void check(Generic modified, Generic type, AxedConstraintClass key, Serializable value) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type, AxedPropertyClass key, Serializable value) throws ConstraintViolationException {
 		// for (Generic inheritingType : ((GenericImpl) type).getAllInheritings())
 		check(modified, type, value);
 	}
 
 	@Override
-	public void checkConsistency(Generic base, Generic attribute, AxedConstraintClass key, Serializable value) throws ConstraintViolationException {
+	public void checkConsistency(Generic base, Generic attribute, AxedPropertyClass key, Serializable value) throws ConstraintViolationException {
 		check(base, attribute, value);
 	}
 

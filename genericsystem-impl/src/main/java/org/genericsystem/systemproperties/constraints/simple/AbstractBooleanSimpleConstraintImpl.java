@@ -8,13 +8,13 @@ import org.genericsystem.systemproperties.constraints.AbstractBooleanConstraintI
 public abstract class AbstractBooleanSimpleConstraintImpl extends AbstractBooleanConstraintImpl {
 
 	@Override
-	public void check(Generic modified, Generic type, AxedConstraintClass key) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type, AxedPropertyClass key) throws ConstraintViolationException {
 		// for (Generic inheritingType : ((GenericImpl) type).getAllInheritings())
 		check(modified, type);
 	}
 
 	@Override
-	public void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedConstraintClass key) throws ConstraintViolationException {
+	public void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedPropertyClass key) throws ConstraintViolationException {
 		check(base, attribute);
 	}
 

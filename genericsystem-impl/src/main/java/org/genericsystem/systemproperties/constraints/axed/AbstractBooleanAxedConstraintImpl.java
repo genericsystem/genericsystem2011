@@ -10,14 +10,14 @@ import org.genericsystem.systemproperties.constraints.AbstractBooleanConstraintI
 public abstract class AbstractBooleanAxedConstraintImpl extends AbstractBooleanConstraintImpl {
 
 	@Override
-	public void check(Generic modified, Generic attribute, AxedConstraintClass key) throws ConstraintViolationException {
+	public void check(Generic modified, Generic attribute, AxedPropertyClass key) throws ConstraintViolationException {
 		if (key.getAxe() != Statics.MULTIDIRECTIONAL)
 			// for (Generic base : ((GenericImpl) attribute).<GenericImpl> getComponent(key.getAxe()).getAllInheritings())
 			check(((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), attribute, key.getAxe());
 	}
 
 	@Override
-	public void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedConstraintClass key) throws ConstraintViolationException {
+	public void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedPropertyClass key) throws ConstraintViolationException {
 		GenericImpl component = ((GenericImpl) attribute).<GenericImpl> getComponent(key.getAxe());
 		if (null != component)
 			for (Generic inheriting : component.getAllInheritings())

@@ -21,7 +21,7 @@ import org.genericsystem.map.SystemPropertiesMapProvider.SystemPropertyValue;
 @Extends(SystemPropertyKey.class)
 @Dependencies(NoReferentialIntegritySystemProperty.DefaultValue.class)
 @AxedConstraintValue(value = NoReferentialIntegritySystemProperty.class, axe = 0)
-public class NoReferentialIntegritySystemProperty {
+public class NoReferentialIntegritySystemProperty extends AbstractSystemPropertyImpl {
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components(NoReferentialIntegritySystemProperty.class)

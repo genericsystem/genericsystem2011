@@ -13,8 +13,9 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 
 /**
  * @author Nicolas Feybesse
@@ -23,7 +24,7 @@ import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.Axe
  */
 @SystemGeneric
 @Components(Engine.class)
-@Dependencies({ NoReferentialIntegritySystemProperty.class })
+@Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class })
 public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializable, Boolean> {
 
 	@Override
@@ -40,7 +41,7 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializabl
 
 	@Override
 	protected Class<?> getKeyClass(Serializable key) {
-		return ((AxedConstraintClass) key).getClazz();
+		return ((AxedPropertyClass) key).getClazz();
 	}
 
 	@SystemGeneric

@@ -27,7 +27,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -305,7 +305,7 @@ public abstract class AbstractContext implements Serializable {
 			return stringValue.value();
 		AxedConstraintValue axedConstraintValue = clazz.getAnnotation(AxedConstraintValue.class);
 		if (axedConstraintValue != null)
-			return new AxedConstraintClass(axedConstraintValue.value(), axedConstraintValue.axe());
+			return new AxedPropertyClass(axedConstraintValue.value(), axedConstraintValue.axe());
 		return clazz;
 	}
 
