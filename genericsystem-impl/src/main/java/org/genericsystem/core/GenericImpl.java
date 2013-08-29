@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -676,7 +675,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		return bind(null, getEngine().bindPrimary(Generic.class, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), false, targets);
+		T bind = bind(null, getEngine().bindPrimary(Generic.class, value, SystemGeneric.STRUCTURAL, true), attribute, getBasePos(attribute), false, targets);
+		assert bind.inheritsFrom(attribute);
+		return bind;
 	}
 
 	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Type... targets) {
