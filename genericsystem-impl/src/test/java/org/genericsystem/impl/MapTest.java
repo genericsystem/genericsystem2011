@@ -4,14 +4,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.constraints.axed.AbstractNoBooleanAxedConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.testng.annotations.Test;
 
 @Test
@@ -166,8 +165,8 @@ public class MapTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		assert !vehicle.isSingularConstraintEnabled();
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color).<Relation> enableSingularConstraint(Statics.TARGET_POSITION);
-		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION) : vehicleColor.getContraintsMap().get(cache.<AbstractNoBooleanAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.TARGET_POSITION));
-		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION) : vehicleColor.getContraintsMap().get(cache.<AbstractNoBooleanAxedConstraintImpl> find(SingularConstraintImpl.class).bindAxedConstraint(Statics.BASE_POSITION));
+		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION);
 		assert !vehicle.isSingularConstraintEnabled();
 		vehicleColor.disableSingularConstraint(Statics.TARGET_POSITION);
 		assert !vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);

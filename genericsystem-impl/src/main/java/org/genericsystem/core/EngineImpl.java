@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
@@ -188,7 +189,6 @@ public class EngineImpl extends GenericImpl implements Engine {
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);
-			log.info("===> put" + clazz);
 			((GenericImpl) result).mountConstraints(clazz);
 			cache.triggersDependencies(clazz);
 			return result;

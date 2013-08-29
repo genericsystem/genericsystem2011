@@ -4,12 +4,15 @@ import java.io.Serializable;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
+import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.RequiredConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
+import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.map.PropertiesMapProvider.PropertyKey;
 import org.genericsystem.map.PropertiesMapProvider.PropertyValue;
 
@@ -37,15 +40,21 @@ public class PropertiesMapProvider extends AbstractMapProvider<Serializable, Ser
 	@SystemGeneric
 	@Components(PropertiesMapProvider.class)
 	public static class PropertyKey extends GenericImpl implements Attribute {
-
 	}
 
 	@SystemGeneric
 	@Components(PropertyKey.class)
 	@SingularConstraint
-	@RequiredConstraint
+	// @RequiredConstraint
+	@InheritanceDisabled
 	public static class PropertyValue extends GenericImpl implements Attribute {
+	}
 
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	@Extends(PropertiesMapProvider.class)
+	@Components(Engine.class)
+	@StringValue(AbstractMapProvider.MAP_VALUE)
+	public static class MapInstance extends GenericImpl implements Holder {
 	}
 
 }

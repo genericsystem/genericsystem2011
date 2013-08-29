@@ -1,6 +1,7 @@
 package org.genericsystem.map;
 
 import java.io.Serializable;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -12,6 +13,7 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.AliveConstraintImpl;
@@ -52,20 +54,28 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 		return (Class<T>) ConstraintValue.class;
 	}
 
+	@Override
+	protected Class<?> getKeyClass(Serializable key) {
+		return ((AxedConstraintClass) key).getClazz();
+	}
+
 	@SystemGeneric
 	@Components(ConstraintsMapProvider.class)
-	public static class ConstraintKey extends GenericImpl implements Attribute {}
+	public static class ConstraintKey extends GenericImpl implements Attribute {
+	}
 
 	@SystemGeneric
 	@Components(ConstraintKey.class)
 	@SingularConstraint
 	// @RequiredConstraint
 	@InheritanceDisabled
-	public static class ConstraintValue extends GenericImpl implements Attribute {}
+	public static class ConstraintValue extends GenericImpl implements Attribute {
+	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Extends(ConstraintsMapProvider.class)
 	@Components(Engine.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {}
+	public static class MapInstance extends GenericImpl implements Holder {
+	}
 }

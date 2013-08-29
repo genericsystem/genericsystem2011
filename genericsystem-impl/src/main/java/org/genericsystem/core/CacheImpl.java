@@ -10,6 +10,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
@@ -443,12 +444,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 			remove(generic);
 
 		ConnectionMap connectionMap = new ConnectionMap();
-//		if (!implicit.isAlive()) {
-//			Generic newImplicit = bindPrimaryByValue(((GenericImpl) implicit).supers[0], implicit.getValue(), implicit.getMetaLevel(), implicit.isAutomatic(), implicit.getClass());
-//			connectionMap.put(implicit, newImplicit);
-//			implicit = newImplicit;
-//			directSupers = connectionMap.adjust(directSupers);
-//		}
+		// if (!implicit.isAlive()) {
+		// Generic newImplicit = bindPrimaryByValue(((GenericImpl) implicit).supers[0], implicit.getValue(), implicit.getMetaLevel(), implicit.isAutomatic(), implicit.getClass());
+		// connectionMap.put(implicit, newImplicit);
+		// implicit = newImplicit;
+		// directSupers = connectionMap.adjust(directSupers);
+		// }
 		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric(specializeGeneric)).initializeComplex(implicit, directSupers, components, automatic);
 		T superGeneric = this.<T> insert(newGeneric);
 		connectionMap.reBind(orderedDependencies, true);
@@ -459,7 +460,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new AbstractFilterIterator<T>(this.<T> directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
-				return /*next.getValue() != null &&*/ GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
+				return /* next.getValue() != null && */GenericImpl.isSuperOf(interfaces, components, ((GenericImpl) next).getPrimariesArray(), ((GenericImpl) next).components);
 			}
 		};
 	}
@@ -496,13 +497,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 	}
 
+	// private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+	// for (Generic generic : generics) {
+	// ExtendedMap<Serializable, Serializable> constraintMap = generic.getContraintsMap();
+	// for (Serializable key : constraintMap.keySet()) {
+	// AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
+	// if (isCheckable(constraint, generic, checkingType, isFlushTime))
+	// constraint.check(generic, constraintMap.getValueHolder(key), (AxedConstraintClass) key);
+	// }
+	// }
+	// }
+
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics) {
 			ExtendedMap<Serializable, Serializable> constraintMap = generic.getContraintsMap();
 			for (Serializable key : constraintMap.keySet()) {
-				AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClazz());
+				// AbstractConstraintImpl constraint = find(((AxedConstraintClass) key).getClass());
+				Holder valueHolder = constraintMap.getValueHolder(key);
+				AbstractConstraintImpl constraint = valueHolder.getBaseComponent();
 				if (isCheckable(constraint, generic, checkingType, isFlushTime))
-					constraint.check(generic, constraintMap.getValueHolder(key), (AxedConstraintClass) key);
+					constraint.check(generic, valueHolder, (AxedConstraintClass) key);
 			}
 		}
 	}

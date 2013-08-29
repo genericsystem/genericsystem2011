@@ -7,13 +7,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
+
 import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -33,7 +31,6 @@ import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractConcateIterator;
-import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractProjectionIterator;
@@ -51,7 +48,7 @@ import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
@@ -132,14 +129,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 
-					if (getMetaLevel() != metaLevel)
-						throw new IllegalStateException(info() + " : META LEVEL ERROR getMetaLevel() " + getMetaLevel() + " / metaLevel " + metaLevel);
-					if (!isPrimary())
-						assert Objects.equals(directSupers[0].getValue(), value);
-					if (value != null)
-						for (Generic primary : getPrimaries())
-							assert primary.getValue() != null : this.info();
-					return this;
+		if (getMetaLevel() != metaLevel)
+			throw new IllegalStateException(info() + " : META LEVEL ERROR getMetaLevel() " + getMetaLevel() + " / metaLevel " + metaLevel);
+		if (!isPrimary())
+			assert Objects.equals(directSupers[0].getValue(), value);
+		if (value != null)
+			for (Generic primary : getPrimaries())
+				assert primary.getValue() != null : this.info();
+		return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -305,23 +302,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Holder> T setHolder(Holder attribute, Serializable value, int basePos, Generic... targets) {
+		return this.<T> setHolder(null, attribute, value, basePos, targets);
+	}
+
+	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		T holder = getSelectedHolder(attribute, value, basePos, targets);
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(getClass(), value, SystemGeneric.CONCRETE, true);
+		Generic implicit = ((GenericImpl) attribute).bindPrimary(null, value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
-			return null != value ? this.<T> bind(null, implicit, attribute, basePos, true, targets) : null;
-			if (!equals(holder.getComponent(basePos))) {
-				if (value == null)
-					return cancel(holder, basePos, true);
-				if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
-					cancel(holder, basePos, true);
-				return this.<T> bind(null, implicit, attribute, basePos, true, targets);
-			}
-			if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
-				return holder;
-			if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
-				return holder.updateValue(value);
-			holder.remove();
-			return this.<T> setHolder(attribute, value, basePos, targets);
+			return null != value ? this.<T> bind(specializationClass, implicit, attribute, basePos, true, targets) : null;
+		if (!equals(holder.getComponent(basePos))) {
+			if (value == null)
+				return cancel(holder, basePos, true);
+			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+				cancel(holder, basePos, true);
+			return this.<T> bind(specializationClass, implicit, attribute, basePos, true, targets);
+		}
+		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+			return holder;
+		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+			return holder.updateValue(value);
+		holder.remove();
+		return this.<T> setHolder(specializationClass, attribute, value, basePos, targets);
 	}
 
 	@Override
@@ -395,7 +396,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public void internalClearAll(Holder attribute, int basePos, boolean isConcrete, Generic... targets) {
-		Iterator<Holder> holders = isConcrete ? holdersIterator(attribute, basePos, true, targets) : this.<Holder> holdersIterator(SystemGeneric.STRUCTURAL,(Attribute) attribute,basePos, true);
+		Iterator<Holder> holders = isConcrete ? holdersIterator(attribute, basePos, true, targets) : this.<Holder> holdersIterator(SystemGeneric.STRUCTURAL, (Attribute) attribute, basePos, true);
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
 			if (this.equals(holder.getComponent(basePos)))
@@ -519,7 +520,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int basePos, boolean readPhantoms, Generic... targets) {
-		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(SystemGeneric.CONCRETE,attribute, basePos, readPhantoms), attribute, targets);
+		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(SystemGeneric.CONCRETE, attribute, basePos, readPhantoms), attribute, targets);
 	}
 
 	@Override
@@ -580,7 +581,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Iterator<T> attributesIterator(boolean readPhantoms) {
-		return this.<T> holdersIterator(SystemGeneric.STRUCTURAL,getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL,readPhantoms);
+		return this.<T> holdersIterator(SystemGeneric.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL, readPhantoms);
 	}
 
 	@Override
@@ -598,7 +599,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return holdersIterator(SystemGeneric.STRUCTURAL,attribute,Statics.MULTIDIRECTIONAL, false);
+				return holdersIterator(SystemGeneric.STRUCTURAL, attribute, Statics.MULTIDIRECTIONAL, false);
 			}
 		};
 	}
@@ -610,7 +611,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Attribute> T getAttribute(Attribute attribute, final Serializable value, Generic... targets) {
-		return Statics.unambigousFirst(this.targetsFilter(Statics.valueFilter(this.<T> holdersIterator(SystemGeneric.STRUCTURAL,attribute,Statics.MULTIDIRECTIONAL, value == null), value), attribute, targets));
+		return Statics.unambigousFirst(this.targetsFilter(Statics.valueFilter(this.<T> holdersIterator(SystemGeneric.STRUCTURAL, attribute, Statics.MULTIDIRECTIONAL, value == null), value), attribute, targets));
 	}
 
 	private <T extends Relation> Iterator<T> relationsIterator(boolean readPhantom) {
@@ -722,11 +723,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return orderedComponents;
 	}
 
-	public <T extends Generic> Iterator<T> holdersIterator(final int level,Holder origin, int basePos, boolean readPhantom) {
-		if (SystemGeneric.STRUCTURAL==level || ((GenericImpl) origin).safeIsEnabled(getMultiDirectionalSystemProperty())) 
+	public <T extends Generic> Iterator<T> holdersIterator(final int level, Holder origin, int basePos, boolean readPhantom) {
+		if (SystemGeneric.STRUCTURAL == level || ((GenericImpl) origin).safeIsEnabled(getMultiDirectionalSystemProperty()))
 			basePos = Statics.MULTIDIRECTIONAL;
 		boolean noInheritance = ((GenericImpl) origin).safeIsEnabled(getNoInheritanceSystemProperty());
-		Iterator<T> iterator = noInheritance ? this.<T> noInheritanceIterator(level, basePos, origin) : this.<T> inheritanceIterator( level,origin, basePos);
+		Iterator<T> iterator = noInheritance ? this.<T> noInheritanceIterator(level, basePos, origin) : this.<T> inheritanceIterator(level, origin, basePos);
 		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
 	}
 
@@ -747,85 +748,85 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	//	public <T extends Generic> Snapshot<T> mainSnaphot(final Generic origin, final int level, final int pos, final boolean readPhantoms) {
-	//		return new AbstractSnapshot<T>() {
-	//			@Override
-	//			public Iterator<T> iterator() {
-	//				return mainIterator(origin, level, pos, readPhantoms);
-	//			}
-	//		};
-	//	}
+	// public <T extends Generic> Snapshot<T> mainSnaphot(final Generic origin, final int level, final int pos, final boolean readPhantoms) {
+	// return new AbstractSnapshot<T>() {
+	// @Override
+	// public Iterator<T> iterator() {
+	// return mainIterator(origin, level, pos, readPhantoms);
+	// }
+	// };
+	// }
 
-	//	private Iterator<Generic> allSupersIterator() {
-	//		NavigableSet<Generic> set = new TreeSet<>();
-	//		Iterator<Generic> iterator = new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+	// private Iterator<Generic> allSupersIterator() {
+	// NavigableSet<Generic> set = new TreeSet<>();
+	// Iterator<Generic> iterator = new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 	//
-	//			private static final long serialVersionUID = -6254209580316166416L;
+	// private static final long serialVersionUID = -6254209580316166416L;
 	//
-	//			@Override
-	//			public Iterator<Generic> children(Generic node) {
-	//				return new ArrayIterator<Generic>(((GenericImpl) node).supers);
-	//			}
-	//		};
+	// @Override
+	// public Iterator<Generic> children(Generic node) {
+	// return new ArrayIterator<Generic>(((GenericImpl) node).supers);
+	// }
+	// };
 	//
-	//		while (iterator.hasNext())
-	//			set.add(iterator.next());
+	// while (iterator.hasNext())
+	// set.add(iterator.next());
 	//
-	//		return set.descendingIterator();
-	//	}
+	// return set.descendingIterator();
+	// }
 	//
-	//	private <T extends Generic> Iterator<T> noInheritanceIterator2(final Generic origin, int pos, final int metaLevel) {
-	//		Set<T> alreadyComputed = new LinkedHashSet<>();
-	//		Iterator<T> iterator = noInheritanceIterator(origin, pos, metaLevel);
-	//		while (iterator.hasNext()) {
-	//			T candidate = iterator.next();
-	//			for (T computed : alreadyComputed) {
-	//				if (candidate.inheritsFrom(computed)) {
-	//					alreadyComputed.remove(computed);
-	//					break;
-	//				}
-	//			}
-	//			alreadyComputed.add(candidate);
-	//		}
-	//		return alreadyComputed.iterator();
-	//	}
+	// private <T extends Generic> Iterator<T> noInheritanceIterator2(final Generic origin, int pos, final int metaLevel) {
+	// Set<T> alreadyComputed = new LinkedHashSet<>();
+	// Iterator<T> iterator = noInheritanceIterator(origin, pos, metaLevel);
+	// while (iterator.hasNext()) {
+	// T candidate = iterator.next();
+	// for (T computed : alreadyComputed) {
+	// if (candidate.inheritsFrom(computed)) {
+	// alreadyComputed.remove(computed);
+	// break;
+	// }
+	// }
+	// alreadyComputed.add(candidate);
+	// }
+	// return alreadyComputed.iterator();
+	// }
 	//
-	//	private <T extends Generic> Iterator<T> mainIterator(final Generic origin, final int level, final int pos, final boolean readPhantom) {
-	//		return new AbstractFilterIterator<T>(new AbstractConcateIterator<Generic, T>(allSupersIterator()) {
-	//			@Override
-	//			protected Iterator<T> getIterator(Generic superGeneric) {
-	//				return ((GenericImpl) superGeneric).noInheritanceIterator2(origin, pos, level);
-	//			}
-	//		}) {
+	// private <T extends Generic> Iterator<T> mainIterator(final Generic origin, final int level, final int pos, final boolean readPhantom) {
+	// return new AbstractFilterIterator<T>(new AbstractConcateIterator<Generic, T>(allSupersIterator()) {
+	// @Override
+	// protected Iterator<T> getIterator(Generic superGeneric) {
+	// return ((GenericImpl) superGeneric).noInheritanceIterator2(origin, pos, level);
+	// }
+	// }) {
 	//
-	//			private Set<T> alreadyComputed = new HashSet<>();
+	// private Set<T> alreadyComputed = new HashSet<>();
 	//
-	//			@Override
-	//			public boolean isSelected() {
-	//				return isNewLeaf(next) && alreadyComputed.add(next) && (readPhantom || next.getValue() != null); // test phantom after add
-	//			}
+	// @Override
+	// public boolean isSelected() {
+	// return isNewLeaf(next) && alreadyComputed.add(next) && (readPhantom || next.getValue() != null); // test phantom after add
+	// }
 	//
-	//			private boolean isNewLeaf(Generic candidate) {
-	//				for (Generic generic : alreadyComputed)
-	//					if (generic.inheritsFrom(candidate))
-	//						return false;
-	//				return true;
-	//			}
+	// private boolean isNewLeaf(Generic candidate) {
+	// for (Generic generic : alreadyComputed)
+	// if (generic.inheritsFrom(candidate))
+	// return false;
+	// return true;
+	// }
 	//
-	//		};
-	//	}
+	// };
+	// }
 
-	public <T extends Generic> Iterator<T> inheritanceIterator(final int level,final Generic origin, final int pos) {
+	public <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(origin) {
 
 			@Override
 			public boolean isSelectable() {
-				return level==next.getMetaLevel();
+				return level == next.getMetaLevel();
 			}
 
 			@Override
 			public final boolean isSelected(Generic candidate) {
-				boolean selected = candidate.getMetaLevel() <= level && (pos != Statics.MULTIDIRECTIONAL? ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos): ((GenericImpl) candidate).isAttributeOf(GenericImpl.this));
+				boolean selected = candidate.getMetaLevel() <= level && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) candidate).isAttributeOf(GenericImpl.this));
 				if (pos != Statics.MULTIDIRECTIONAL && selected && ((GenericImpl) candidate).isPseudoStructural(pos))
 					if (getCurrentCache() instanceof CacheImpl)
 						((GenericImpl) candidate).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) candidate.getImplicit()).supers[0], null, SystemGeneric.CONCRETE));
@@ -1328,16 +1329,31 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
 
+	// private <T extends Type> T setConstraint(Class<?> constraintClass, int pos, Serializable value) {
+	// getContraintsMap().put(getCurrentCache().<AbstractConstraintImpl> find(constraintClass).bindAxedConstraint(pos).getValue(), value);
+	// return (T) this;
+	// }
+	//
+	// private boolean isConstraintEnabled(Class<?> constraintClass, int pos) {
+	// AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(constraintClass).findAxedConstraint(pos);
+	// if (null == constraint)
+	// return false;
+	// return Boolean.TRUE.equals(getContraintsMap().get(constraint.getValue()));
+	// }
+
 	private <T extends Type> T setConstraint(Class<?> constraintClass, int pos, Serializable value) {
-		getContraintsMap().put(getCurrentCache().<AbstractConstraintImpl> find(constraintClass).bindAxedConstraint(pos).getValue(), value);
+		// if (AbstractConstraintImpl.class.isAssignableFrom(constraintClass))
+		getContraintsMap().put(new AxedConstraintClass(constraintClass, pos), value);
+		// else
+		// getSystemPropertiesMap().put(new AxedConstraintClass(constraintClass, pos), value);
 		return (T) this;
 	}
 
 	private boolean isConstraintEnabled(Class<?> constraintClass, int pos) {
-		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(constraintClass).findAxedConstraint(pos);
-		if (null == constraint)
-			return false;
-		return Boolean.TRUE.equals(getContraintsMap().get(constraint.getValue()));
+		// if (AbstractConstraintImpl.class.isAssignableFrom(constraintClass))
+		Serializable value = getContraintsMap().get(new AxedConstraintClass(constraintClass, pos));
+		return null != value && !Boolean.FALSE.equals(value);
+		// return Boolean.TRUE.equals(getSystemPropertiesMap().get(new AxedConstraintClass(constraintClass, pos)));
 	}
 
 	public <T extends Generic> T enableSystemProperty(Class<?> systemPropertyClass) {
@@ -1458,7 +1474,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T enableSizeConstraint(final int basePos, Integer size) {
+	public <T extends Generic> T enableSizeConstraint(int basePos, Integer size) {
 		// Attribute sizeConstraint = getCurrentCache().<Attribute> find(SizeConstraintImpl.class);
 		// T holder = setBooleanSystemProperty(sizeConstraint, basePos, !SizeConstraintImpl.class.getAnnotation(SystemGeneric.class).defaultBehavior());
 		// holder.setHolder(sizeConstraint.getAttribute(SizeConstraintImpl.SIZE), size);
@@ -1467,16 +1483,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T disableSizeConstraint(final int basePos) {
+	public <T extends Generic> T disableSizeConstraint(int basePos) {
 		// return disableSystemProperty(SizeConstraintImpl.class, basePos);
-		getContraintsMap().remove(getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).bindAxedConstraint(basePos).getValue());
-		return (T) this;
+		// getContraintsMap().remove(getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).bindAxedConstraint(basePos).getValue());
+		// return (T) this;
+		return setConstraint(SizeConstraintImpl.class, basePos, -1);
 	}
 
 	@Override
-	public Integer getSizeConstraint(final int basePos) {
-		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).findAxedConstraint(basePos);
-		return null == constraint ? null : (Integer) getContraintsMap().get(constraint.getValue());
+	public Integer getSizeConstraint(int basePos) {
+		// AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(SizeConstraintImpl.class).findAxedConstraint(basePos);
+		// return null == constraint ? null : (Integer) getContraintsMap().get(constraint.getValue());
+
+		return (Integer) getContraintsMap().get(new AxedConstraintClass(SizeConstraintImpl.class, basePos));
 	}
 
 	// TODO pas comme les autres contraintes
@@ -1485,8 +1504,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		// Holder holder = getHolder(getCurrentCache().<Attribute> find(InstanceClassConstraintImpl.class));
 		// return (Class<?>) (holder == null ? Object.class : holder.getValue());
 
-		AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(InstanceClassConstraintImpl.class).findAxedConstraint(Statics.MULTIDIRECTIONAL);
-		return null == constraint ? Object.class : (Class<?>) getContraintsMap().get(constraint.getValue());
+		// AbstractConstraintImpl constraint = getCurrentCache().<AbstractConstraintImpl> find(InstanceClassConstraintImpl.class).findAxedConstraint(Statics.MULTIDIRECTIONAL);
+		// return null == constraint ? Object.class : (Class<?>) getContraintsMap().get(constraint.getValue());
+
+		Serializable value = getContraintsMap().get(new AxedConstraintClass(InstanceClassConstraintImpl.class, Statics.MULTIDIRECTIONAL));
+		return null == value ? Object.class : (Class<?>) value;
 	}
 
 	// TODO pas comme les autres contraintes

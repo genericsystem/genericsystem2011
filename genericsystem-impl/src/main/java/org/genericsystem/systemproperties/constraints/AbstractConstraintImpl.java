@@ -3,12 +3,10 @@ package org.genericsystem.systemproperties.constraints;
 import java.io.Serializable;
 
 import org.genericsystem.annotation.Priority;
-import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 public abstract class AbstractConstraintImpl extends GenericImpl {
 
@@ -41,17 +39,17 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 	// return this.getClass().getName().compareTo(otherConstraint.getClass().getName());
 	// }
 
-	public AbstractConstraintImpl bindAxedConstraint(int pos) {
-		Generic implicit = getEngine().bindPrimary(Generic.class, new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL, true);
-		return getCurrentCache().<GenericImpl> find(MapInstance.class).bind(getClass(), implicit, this, getBasePos(this), false, new Generic[] {});
-	}
-
-	public <T extends AbstractConstraintImpl> T findAxedConstraint(int pos) {
-		Generic implicit = getEngine().findPrimary(new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL);
-		if (implicit == null)
-			return null;
-		return getCurrentCache().<GenericImpl> find(MapInstance.class).<T> find(implicit, this, getBasePos(this), new Generic[] {});
-	}
+	// public AbstractConstraintImpl bindAxedConstraint(int pos) {
+	// Generic implicit = getEngine().bindPrimary(Generic.class, new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL, true);
+	// return getCurrentCache().<GenericImpl> find(MapInstance.class).bind(getClass(), implicit, this, getBasePos(this), false, new Generic[] {});
+	// }
+	//
+	// public <T extends AbstractConstraintImpl> T findAxedConstraint(int pos) {
+	// Generic implicit = getEngine().findPrimary(new AxedConstraintClass(getClass(), pos), SystemGeneric.STRUCTURAL);
+	// if (implicit == null)
+	// return null;
+	// return getCurrentCache().<GenericImpl> find(MapInstance.class).<T> find(implicit, this, getBasePos(this), new Generic[] {});
+	// }
 
 	public static class AxedConstraintClass implements Serializable {
 		private static final long serialVersionUID = 182492104604984855L;

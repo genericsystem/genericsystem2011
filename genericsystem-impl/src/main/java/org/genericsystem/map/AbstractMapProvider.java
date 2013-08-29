@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -78,7 +79,8 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				Value oldValue = get(key);
 				if (Objects.equals(oldValue, value))
 					return oldValue;
-				Holder keyHolder = generic.setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getCurrentCache().<Attribute> find(getKeyAttributeClass()), (Serializable) key);
+				Holder attribute = getCurrentCache().<Attribute> find(getKeyAttributeClass());
+				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getKeyClass(key), attribute, (Serializable) key, getBasePos(attribute));
 				setSingularHolder(keyHolder, getCurrentCache().<Attribute> find(getValueAttributeClass()), (Serializable) value);
 				return oldValue;
 			}
@@ -110,11 +112,15 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		};
 	}
 
+	protected Class<?> getKeyClass(Key key) {
+		return null;
+	}
+
 	// TODO KK code copier du setHolder
 	private static <T extends Holder> T setSingularHolder(Holder keyHolder, Holder attribute, Serializable value, Generic... targets) {
 		int basePos = keyHolder.getBasePos(attribute);
 		T holder = keyHolder.getHolder((Attribute) attribute, basePos);
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(keyHolder.getClass(), value, SystemGeneric.CONCRETE, true);
+		Generic implicit = ((GenericImpl) attribute).bindPrimary(null, value, SystemGeneric.CONCRETE, true);
 		if (holder == null)
 			return null != value ? ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets) : null;
 		if (!keyHolder.equals(holder.getComponent(basePos))) {
