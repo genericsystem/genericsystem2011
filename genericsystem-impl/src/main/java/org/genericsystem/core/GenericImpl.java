@@ -42,12 +42,14 @@ import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
+import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
-import org.genericsystem.systemproperties.ReferentialIntegritySystemProperty;
+import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
+import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedConstraintClass;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
@@ -1343,7 +1345,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private <T extends Type> T setConstraint(Class<?> constraintClass, int pos, Serializable value) {
 		// if (AbstractConstraintImpl.class.isAssignableFrom(constraintClass))
-		getContraintsMap().put(new AxedConstraintClass(constraintClass, pos), value);
+		Map<Serializable, Serializable> map = AbstractConstraintImpl.class.isAssignableFrom(constraintClass) ? getContraintsMap() : getSystemPropertiesMap();
+		map.put(new AxedConstraintClass(constraintClass, pos), value);
 		// else
 		// getSystemPropertiesMap().put(new AxedConstraintClass(constraintClass, pos), value);
 		return (T) this;
@@ -1351,7 +1354,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private boolean isConstraintEnabled(Class<?> constraintClass, int pos) {
 		// if (AbstractConstraintImpl.class.isAssignableFrom(constraintClass))
-		Serializable value = getContraintsMap().get(new AxedConstraintClass(constraintClass, pos));
+		Map<Serializable, Serializable> map = AbstractConstraintImpl.class.isAssignableFrom(constraintClass) ? getContraintsMap() : getSystemPropertiesMap();
+		Serializable value = map.get(new AxedConstraintClass(constraintClass, pos));
 		return null != value && !Boolean.FALSE.equals(value);
 		// return Boolean.TRUE.equals(getSystemPropertiesMap().get(new AxedConstraintClass(constraintClass, pos)));
 	}
@@ -1430,17 +1434,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T enableReferentialIntegrity(int componentPos) {
-		return enableSystemProperty(ReferentialIntegritySystemProperty.class, componentPos);
+		// return enableSystemProperty(NoReferentialIntegritySystemProperty.class, componentPos);
+		return setConstraint(NoReferentialIntegritySystemProperty.class, componentPos, false);
 	}
 
 	@Override
 	public <T extends Generic> T disableReferentialIntegrity(int componentPos) {
-		return disableSystemProperty(ReferentialIntegritySystemProperty.class, componentPos);
+		// return disableSystemProperty(NoReferentialIntegritySystemProperty.class, componentPos);
+		return setConstraint(NoReferentialIntegritySystemProperty.class, componentPos, true);
 	}
 
 	@Override
 	public boolean isReferentialIntegrity(int basePos) {
-		return isBooleanSystemPropertyEnabled(ReferentialIntegritySystemProperty.class, basePos);
+		// return isBooleanSystemPropertyEnabled(NoReferentialIntegritySystemProperty.class, basePos);
+		return !isConstraintEnabled(NoReferentialIntegritySystemProperty.class, basePos);
 	}
 
 	@Override
@@ -1711,6 +1718,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public ExtendedMap<Serializable, Serializable> getContraintsMap() {
 		return getMap(ConstraintsMapProvider.class);
+	}
+
+	@Override
+	public ExtendedMap<Serializable, Serializable> getSystemPropertiesMap() {
+		return getMap(SystemPropertiesMapProvider.class);
 	}
 
 	@Override

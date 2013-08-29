@@ -25,7 +25,7 @@
 // */
 //@SystemGeneric(SystemGeneric.CONCRETE)
 //@Components(MapInstance.class)
-//@Extends(ConstraintKey.class)
+//@Extends(SystemPropertyKey.class)
 //@SingularConstraint
 //@Dependencies(EngineConsistencyConstraintImpl.DefaultValue.class)
 //@AxedConstraintValue(EngineConsistencyConstraintImpl.class)
