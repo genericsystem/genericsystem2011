@@ -16,14 +16,14 @@ public class InstanceAndLinkTest extends AbstractTest {
 	public void testInstanceIsConcrete() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic audi = car.newInstance( "audi");
+		Generic audi = car.newInstance("audi");
 		assert audi.isConcrete();
 	}
 
 	public void testCountAncestor() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic audi = car.newInstance( "audi");
+		Generic audi = car.newInstance("audi");
 		Snapshot<Generic> snapshot = audi.getSupers();
 		assert snapshot.size() == 1;
 		assert snapshot.contains(car);
@@ -33,10 +33,10 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation( "outsideColor", color);
-		Generic audi = car.newInstance( "audi");
-		Generic red = color.newInstance( "red");
-		Link audiIsRed = audi.setLink( carColor, "audiRed", red);
+		Relation carColor = car.setRelation("outsideColor", color);
+		Generic audi = car.newInstance("audi");
+		Generic red = color.newInstance("red");
+		Link audiIsRed = audi.setLink(carColor, "audiRed", red);
 		assert audiIsRed.isConcrete();
 	}
 
@@ -44,34 +44,34 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carColor = car.setRelation( "outsideColor", color);
-		Generic audi = car.newInstance( "audi");
-		Generic red = color.newInstance( "red");
-		Link audiIsRed = audi.setLink( carColor, "audiRed", red);
+		Relation carColor = car.setRelation("outsideColor", color);
+		Generic audi = car.newInstance("audi");
+		Generic red = color.newInstance("red");
+		Link audiIsRed = audi.setLink(carColor, "audiRed", red);
 		assert audiIsRed.getComponents().size() == 2;
 	}
 
 	public void testTargetsAncestor() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myVehicle = vehicle.newInstance( "myVehicle");
+		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Type human = cache.newType("Human");
-		Generic myck = human.newInstance( "myck");
-		Relation possessVehicle = human.setRelation( "HumanPossessVehicle", vehicle);
-		Link myckPossessMyVehicle = myck.setLink( possessVehicle, "myckPossessMyVehicle", myVehicle);
+		Generic myck = human.newInstance("myck");
+		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
+		Link myckPossessMyVehicle = myck.setLink(possessVehicle, "myckPossessMyVehicle", myVehicle);
 		assert myckPossessMyVehicle.getTargetComponent().equals(myVehicle);
 	}
 
 	public void testTargetsAncestorWithMultipleTarget() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myVehicle1 = vehicle.newInstance( "myVehicle1");
-		Generic myVehicle2 = vehicle.newInstance( "myVehicle2");
+		Generic myVehicle1 = vehicle.newInstance("myVehicle1");
+		Generic myVehicle2 = vehicle.newInstance("myVehicle2");
 		Type human = cache.newType("Human");
-		Generic myck = human.newInstance( "myck");
-		Relation possessVehicle = human.setRelation( "HumanPossessVehicle", vehicle);
-		Link myckPossessMyVehicle1 = myck.setLink( possessVehicle, "myckPossessMyVehicle1", myVehicle1);
-		Link myckPossessMyVehicle2 = myck.setLink( possessVehicle, "myckPossessMyVehicle2", myVehicle2);
+		Generic myck = human.newInstance("myck");
+		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
+		Link myckPossessMyVehicle1 = myck.setLink(possessVehicle, "myckPossessMyVehicle1", myVehicle1);
+		Link myckPossessMyVehicle2 = myck.setLink(possessVehicle, "myckPossessMyVehicle2", myVehicle2);
 		assert myckPossessMyVehicle1.getTargetComponent().equals(myVehicle1);
 		assert myckPossessMyVehicle1.getComponent(Statics.TARGET_POSITION).equals(myVehicle1) : myckPossessMyVehicle1.getComponent(Statics.TARGET_POSITION);
 		assert myckPossessMyVehicle2.getTargetComponent().equals(myVehicle2);
@@ -81,90 +81,90 @@ public class InstanceAndLinkTest extends AbstractTest {
 	public void testUnidirectionalRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myVehicle = vehicle.newInstance( "myVehicle");
+		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Type human = cache.newType("Human");
-		Generic myck = human.newInstance( "myck");
-		Relation possessVehicle = human.setRelation( "HumanPossessVehicle", vehicle);
-		Link myckPossessMyVehicle = myck.setLink( possessVehicle, "myckPossessMyVehicle", myVehicle);
-		assert myck.getLinks( possessVehicle).size() == 1;
-		assert myck.getLinks( possessVehicle).contains(myckPossessMyVehicle);
-		assert myVehicle.getLinks( possessVehicle).size() == 1 : myVehicle.getLinks( possessVehicle);
-		assert myVehicle.getLinks( possessVehicle).contains(myckPossessMyVehicle);
+		Generic myck = human.newInstance("myck");
+		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
+		Link myckPossessMyVehicle = myck.setLink(possessVehicle, "myckPossessMyVehicle", myVehicle);
+		assert myck.getLinks(possessVehicle).size() == 1;
+		assert myck.getLinks(possessVehicle).contains(myckPossessMyVehicle);
+		assert myVehicle.getLinks(possessVehicle).size() == 1 : myVehicle.getLinks(possessVehicle);
+		assert myVehicle.getLinks(possessVehicle).contains(myckPossessMyVehicle);
 	}
 
 	public void testBidirectionalRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myVehicle = vehicle.newInstance( "myVehicle");
+		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Type human = cache.newType("Human");
-		Generic myck = human.newInstance( "myck");
-		Relation possessVehicle = human.setRelation( "HumanPossessVehicle", vehicle);
-		assert !possessVehicle.isMultiDirectional();
-		possessVehicle.enableMultiDirectional();
-		assert possessVehicle.isMultiDirectional();
+		Generic myck = human.newInstance("myck");
+		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
+		// assert !possessVehicle.isMultiDirectional();
+		// possessVehicle.enableMultiDirectional();
+		// assert possessVehicle.isMultiDirectional();
 		assert human.getRelations().contains(possessVehicle);
 		assert vehicle.getRelations().contains(possessVehicle) : vehicle.getRelations();
 
-		Link myckPossessMyVehicle = myck.setLink( possessVehicle, "myckPossessMyVehicle", myVehicle);
+		Link myckPossessMyVehicle = myck.setLink(possessVehicle, "myckPossessMyVehicle", myVehicle);
 
 		myckPossessMyVehicle.isAttributeOf(myVehicle);
-		assert ((Relation) myckPossessMyVehicle).isMultiDirectional();
-		assert myck.getLinks( possessVehicle).contains(myckPossessMyVehicle);
-		assert myVehicle.getLinks( possessVehicle).contains(myckPossessMyVehicle);
+		// assert ((Relation) myckPossessMyVehicle).isMultiDirectional();
+		assert myck.getLinks(possessVehicle).contains(myckPossessMyVehicle);
+		assert myVehicle.getLinks(possessVehicle).contains(myckPossessMyVehicle);
 	}
 
 	public void testRelationToHimself() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
-		Generic myck = human.newInstance( "myck");
-		Generic quentin = human.newInstance( "quentin");
-		Relation brother = human.setRelation( "brother", human);
-		brother.enableMultiDirectional();
-		Link myBrother = myck.setLink( brother, "myBrother", quentin);
-		assert myck.getLinks( brother).size() == 1;
-		assert myck.getLinks( brother).contains(myBrother);
-		assert quentin.getLinks( brother).size() == 1 : quentin.getLinks( brother);
-		assert quentin.getLinks( brother).contains(myBrother);
+		Generic myck = human.newInstance("myck");
+		Generic quentin = human.newInstance("quentin");
+		Relation brother = human.setRelation("brother", human);
+		// brother.enableMultiDirectional();
+		Link myBrother = myck.setLink(brother, "myBrother", quentin);
+		assert myck.getLinks(brother).size() == 1;
+		assert myck.getLinks(brother).contains(myBrother);
+		assert quentin.getLinks(brother, 1).size() == 1 : quentin.getLinks(brother, 1);
+		assert quentin.getLinks(brother, 1).contains(myBrother);
 	}
 
 	public void testRelationToHimselfUnidirectional() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
-		Generic myck = human.newInstance( "myck");
-		Generic quentin = human.newInstance( "quentin");
-		Relation littleBrother = human.setRelation( "littleBrother", human);
-		Link myBrother = myck.setLink( littleBrother, "myLittleBrother", quentin);
-		assert myck.getLinks( littleBrother).size() == 1;
-		assert myck.getLinks( littleBrother).contains(myBrother);
-		assert quentin.getLinks( littleBrother).size() == 0;
+		Generic myck = human.newInstance("myck");
+		Generic quentin = human.newInstance("quentin");
+		Relation littleBrother = human.setRelation("littleBrother", human);
+		Link myBrother = myck.setLink(littleBrother, "myLittleBrother", quentin);
+		assert myck.getLinks(littleBrother).size() == 1;
+		assert myck.getLinks(littleBrother).contains(myBrother);
+		assert quentin.getLinks(littleBrother).size() == 0 : quentin.getLinks(littleBrother);
 	}
 
 	public void testNewInstanceBinaryRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myBMW = car.newInstance( "myBMW");
+		Generic myBMW = car.newInstance("myBMW");
 		Type pilot = cache.newType("Pilot");
-		Generic myck = pilot.newInstance( "Pilot");
+		Generic myck = pilot.newInstance("Pilot");
 
-		Relation carPilot = car.setRelation( "CarPilot", pilot);
-		Link linkCarPilot = (Link) carPilot.newInstance( "35%", myBMW, myck);
-		assert myBMW.getLinks( carPilot).size() == 1 : myBMW.getLinks( carPilot);
-		assert myBMW.getLinks( carPilot).contains(linkCarPilot);
+		Relation carPilot = car.setRelation("CarPilot", pilot);
+		Link linkCarPilot = (Link) carPilot.newInstance("35%", myBMW, myck);
+		assert myBMW.getLinks(carPilot).size() == 1 : myBMW.getLinks(carPilot);
+		assert myBMW.getLinks(carPilot).contains(linkCarPilot);
 	}
 
 	public void testNewInstanceTernaryRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
-		Generic myBMW = car.newInstance( "myBMW");
+		Generic myBMW = car.newInstance("myBMW");
 		Type color = cache.newType("Color");
-		Generic blue = color.newInstance( "Blue");
+		Generic blue = color.newInstance("Blue");
 		Type element = cache.newType("Element");
-		Generic door = element.newInstance( "Door");
+		Generic door = element.newInstance("Door");
 
-		Relation carElementColor = car.setRelation( "CarElementColor", element, color);
-		Link myMBWBlueDoor = carElementColor.newInstance( "droite", myBMW, door, blue);
-		assert myBMW.getLinks( carElementColor).size() == 1;
-		assert myBMW.getLinks( carElementColor).contains(myMBWBlueDoor);
+		Relation carElementColor = car.setRelation("CarElementColor", element, color);
+		Link myMBWBlueDoor = carElementColor.newInstance("droite", myBMW, door, blue);
+		assert myBMW.getLinks(carElementColor).size() == 1;
+		assert myBMW.getLinks(carElementColor).contains(myMBWBlueDoor);
 	}
 
 }

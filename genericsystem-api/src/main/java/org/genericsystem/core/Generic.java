@@ -300,13 +300,15 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param relation
 	 *            The relation.
+	 * @param basePos
+	 *            The position of this in components
 	 * @param targetPos
 	 *            The target component position.
 	 * 
 	 * @see Snapshot
 	 * @return The targets.
 	 */
-	<T extends Generic> Snapshot<T> getTargets(Relation relation, int targetPos);
+	<T extends Generic> Snapshot<T> getTargets(Relation relation, int basePos, int targetPos);
 
 	/**
 	 * Returns the values holders.

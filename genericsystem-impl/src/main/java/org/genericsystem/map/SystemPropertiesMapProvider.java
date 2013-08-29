@@ -24,7 +24,7 @@ import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.Axe
  */
 @SystemGeneric
 @Components(Engine.class)
-@Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class })
+@Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class /* , MultiDirectionalSystemProperty.class */})
 public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializable, Boolean> {
 
 	@Override

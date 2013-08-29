@@ -130,11 +130,11 @@ public class TreeTest extends AbstractTest {
 		father.setNode("son", mother);
 		assert grandFather.getChildren().contains(father);
 		assert grandFather.getChildren().contains(fatherSister);
-		bitree.enableMultiDirectional();
-		assert grandMother.getChildren().contains(father);
-		assert grandMother.getChildren().contains(fatherSister);
-		bitree.disableMultiDirectional();
-		assert !bitree.isMultiDirectional() : bitree.getComposites();
+		// bitree.enableMultiDirectional();
+		assert grandMother.getChildren(1).contains(father);
+		assert grandMother.getChildren(1).contains(fatherSister);
+		// bitree.disableMultiDirectional();
+		// assert !bitree.isMultiDirectional() : bitree.getComposites();
 		assert grandMother.getChildren().isEmpty() : grandMother.getChildren();
 	}
 

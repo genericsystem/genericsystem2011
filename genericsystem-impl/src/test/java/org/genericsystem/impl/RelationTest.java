@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -1052,57 +1053,57 @@ public class RelationTest extends AbstractTest {
 
 	}
 
-	public void testSimpleRelationReverse() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-
-		Type car = cache.newType("Car");
-		Type sportsCar = car.newSubType("SportsCar");
-
-		Type person = cache.newType("Person");
-		Type pilot = person.newSubType("Pilot");
-
-		Relation carDriver = car.setRelation("driver", person);
-		Relation sportsCarPilot = sportsCar.setRelation("driver", pilot);
-
-		Generic myBmw = car.newInstance("myBmw");
-		Generic yourAudi = car.newInstance("yourAudi");
-		Generic ourFerrari = sportsCar.newInstance("ourFerrari");
-
-		Generic me = person.newInstance("me");
-		Generic you = person.newInstance("you");
-		Generic ayrton = pilot.newInstance("Ayrton");
-
-		me.bind(carDriver, myBmw);
-		ayrton.bind(carDriver, myBmw);
-
-		you.bind(carDriver, yourAudi);
-		ayrton.bind(carDriver, yourAudi);
-		me.bind(carDriver, ourFerrari);
-		you.bind(carDriver, ourFerrari);
-		ayrton.bind(sportsCarPilot, ourFerrari);
-
-		assert myBmw.getTargets(carDriver).contains(me);
-		assert myBmw.getTargets(carDriver).contains(ayrton);
-		assert myBmw.getTargets(carDriver).size() == 2;
-		assert yourAudi.getTargets(carDriver).contains(you);
-		assert yourAudi.getTargets(carDriver).contains(ayrton);
-		assert yourAudi.getTargets(carDriver).size() == 2;
-		assert ourFerrari.getTargets(carDriver).contains(me);
-		assert ourFerrari.getTargets(carDriver).contains(you);
-		assert ourFerrari.getTargets(carDriver).contains(ayrton);
-
-		assert me.getTargets(carDriver, Statics.BASE_POSITION).contains(myBmw);
-		assert ayrton.getTargets(carDriver, Statics.BASE_POSITION).contains(myBmw);
-		assert !ayrton.getTargets(sportsCarPilot, Statics.BASE_POSITION).contains(myBmw) : ayrton.getTargets(carDriver);
-		assert me.getTargets(carDriver, Statics.BASE_POSITION).size() == 2;
-		assert you.getTargets(carDriver, Statics.BASE_POSITION).contains(yourAudi);
-		assert ayrton.getTargets(carDriver, Statics.BASE_POSITION).contains(yourAudi);
-		assert you.getTargets(carDriver, Statics.BASE_POSITION).size() == 2;
-		assert me.getTargets(carDriver, Statics.BASE_POSITION).contains(ourFerrari);
-		assert you.getTargets(carDriver, Statics.BASE_POSITION).contains(ourFerrari);
-		assert ayrton.getTargets(carDriver, Statics.BASE_POSITION).contains(ourFerrari);
-
-	}
+	// public void testSimpleRelationReverse() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+	//
+	// Type car = cache.newType("Car");
+	// Type sportsCar = car.newSubType("SportsCar");
+	//
+	// Type person = cache.newType("Person");
+	// Type pilot = person.newSubType("Pilot");
+	//
+	// Relation carDriver = car.setRelation("driver", person);
+	// Relation sportsCarPilot = sportsCar.setRelation("driver", pilot);
+	//
+	// Generic myBmw = car.newInstance("myBmw");
+	// Generic yourAudi = car.newInstance("yourAudi");
+	// Generic ourFerrari = sportsCar.newInstance("ourFerrari");
+	//
+	// Generic me = person.newInstance("me");
+	// Generic you = person.newInstance("you");
+	// Generic ayrton = pilot.newInstance("Ayrton");
+	//
+	// me.bind(carDriver, myBmw);
+	// ayrton.bind(carDriver, myBmw);
+	//
+	// you.bind(carDriver, yourAudi);
+	// ayrton.bind(carDriver, yourAudi);
+	// me.bind(carDriver, ourFerrari);
+	// you.bind(carDriver, ourFerrari);
+	// ayrton.bind(sportsCarPilot, ourFerrari);
+	//
+	// assert myBmw.getTargets(carDriver).contains(me);
+	// assert myBmw.getTargets(carDriver).contains(ayrton);
+	// assert myBmw.getTargets(carDriver).size() == 2;
+	// assert yourAudi.getTargets(carDriver).contains(you);
+	// assert yourAudi.getTargets(carDriver).contains(ayrton);
+	// assert yourAudi.getTargets(carDriver).size() == 2;
+	// assert ourFerrari.getTargets(carDriver).contains(me);
+	// assert ourFerrari.getTargets(carDriver).contains(you);
+	// assert ourFerrari.getTargets(carDriver).contains(ayrton);
+	//
+	// assert me.getTargets(carDriver).contains(myBmw);
+	// assert ayrton.getTargets(carDriver).contains(myBmw);
+	// assert !ayrton.getTargets(sportsCarPilot).contains(myBmw) : ayrton.getTargets(carDriver);
+	// assert me.getTargets(carDriver).size() == 2;
+	// assert you.getTargets(carDriver).contains(yourAudi);
+	// assert ayrton.getTargets(carDriver).contains(yourAudi);
+	// assert you.getTargets(carDriver).size() == 2;
+	// assert me.getTargets(carDriver).contains(ourFerrari);
+	// assert you.getTargets(carDriver).contains(ourFerrari);
+	// assert ayrton.getTargets(carDriver).contains(ourFerrari);
+	//
+	// }
 
 	public void testCountAncestor() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
@@ -1283,7 +1284,7 @@ public class RelationTest extends AbstractTest {
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 
 		Snapshot<Relation> vehicleRelations = vehicle.getRelations();
-		possessVehicle.enableMultiDirectional();
+		// possessVehicle.enableMultiDirectional();
 		assert human.getRelations().contains(possessVehicle);
 		assert vehicleRelations.contains(possessVehicle) : vehicleRelations + " " + possessVehicle;
 	}
@@ -1292,7 +1293,7 @@ public class RelationTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Relation brother = human.setRelation("brother", human);
-		brother.enableMultiDirectional();
+		// brother.enableMultiDirectional();
 		assert human.getRelations().size() == 1;
 		assert human.getRelations().contains(brother);
 		assert human.getRelation("brother").equals(brother);
@@ -1361,8 +1362,8 @@ public class RelationTest extends AbstractTest {
 		Relation carColor = car.setRelation("carColor", color);
 		car.bind(carColor, red);
 
-		assert red.getLinks(carColor).size() == 3 : red.getLinks(carColor);
-		assert red.getTargets(carColor, Statics.BASE_POSITION).containsAll(Arrays.asList(new Generic[] { myBmw, myAudi, myMercedes }));
+		assert red.getLinks(carColor, 1).size() == 3 : red.getLinks(carColor);
+		assert red.getTargets(carColor, 1, 0).containsAll(Arrays.asList(new Generic[] { myBmw, myAudi, myMercedes }));
 	}
 
 	public void testDefaultReverseLinks() {
@@ -1380,8 +1381,8 @@ public class RelationTest extends AbstractTest {
 		myAudi.setLink(carRed, null, red);
 		myAudi.bind(carColor, blue);
 
-		assert red.getLinks(carColor).size() == 2 : red.getLinks(carColor);
-		assert red.getTargets(carColor, Statics.BASE_POSITION).containsAll(Arrays.asList(new Generic[] { myMercedes, myBmw }));
+		assert red.getLinks(carColor, 1).size() == 2 : red.getLinks(carColor);
+		assert red.getTargets(carColor, 1, 0).containsAll(Arrays.asList(new Generic[] { myMercedes, myBmw }));
 	}
 
 	public void testDiamantKO() {

@@ -27,17 +27,21 @@ public class NodeImpl extends GenericImpl implements Node {
 
 	@Override
 	public <T extends Node> Snapshot<T> getChildren() {
+		return getChildren(getBasePos(this.<Tree> getMeta()));
+	}
+
+	@Override
+	public <T extends Node> Snapshot<T> getChildren(final int basePos) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return childrenIterator();
+				return childrenIterator(basePos);
 			}
 		};
 	}
 
-	<T extends Generic> Iterator<T> childrenIterator() {
-		Tree attribute = getMeta();
-		return thisFilter(this.<T> holdersIterator(SystemGeneric.CONCRETE,attribute, getBasePos(attribute), false));
+	<T extends Generic> Iterator<T> childrenIterator(int basePos) {
+		return thisFilter(this.<T> holdersIterator(SystemGeneric.CONCRETE, this.<Tree> getMeta(), basePos, false));
 	}
 
 	@Override

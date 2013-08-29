@@ -33,7 +33,7 @@ public class TypesTest extends AbstractTest {
 		Generic michael = human.newInstance("Michael");
 		Generic quentin = human.newInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
-		isBrotherOf.enableMultiDirectional();
+		// isBrotherOf.enableMultiDirectional();
 		quentin.bind(isBrotherOf, michael);
 
 		List<Structural> structurals = quentin.getStructurals();
@@ -50,7 +50,7 @@ public class TypesTest extends AbstractTest {
 		Generic michael = human.newInstance("Michael");
 		Generic quentin = human.newInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
-		isBrotherOf.enableMultiDirectional();
+		// isBrotherOf.enableMultiDirectional();
 		Link link = quentin.bind(isBrotherOf, michael);
 
 		List<Generic> targets = quentin.getOtherTargets(link);

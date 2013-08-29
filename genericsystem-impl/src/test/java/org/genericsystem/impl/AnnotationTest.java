@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.List;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -10,7 +11,6 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -27,7 +27,7 @@ public class AnnotationTest extends AbstractTest {
 		Generic michael = human.newInstance("Michael");
 		Generic quentin = human.newInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
-		isBrotherOf.enableMultiDirectional();
+		// isBrotherOf.enableMultiDirectional();
 		Link link = quentin.bind(isBrotherOf, michael);
 
 		List<Generic> targetsFromQuentin = quentin.getOtherTargets(link);
@@ -40,7 +40,7 @@ public class AnnotationTest extends AbstractTest {
 		assert targetsFromMichael.contains(quentin) : targetsFromMichael;
 		assert !targetsFromMichael.contains(michael) : targetsFromMichael;
 
-		assert michael.getTargets(isBrotherOf, 0).contains(quentin) : michael.getTargets(isBrotherOf);
+		assert michael.getTargets(isBrotherOf, 1, 0).contains(quentin) : michael.getTargets(isBrotherOf);
 	}
 
 	public void testSimpleDirectionalRelation() {
@@ -50,7 +50,7 @@ public class AnnotationTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
-		vehicleColor.enableMultiDirectional();
+		// vehicleColor.enableMultiDirectional();
 		Link link = myVehicle.bind(vehicleColor, red);
 
 		List<Generic> targetsFromMyVehicle = myVehicle.getOtherTargets(link);
@@ -63,8 +63,7 @@ public class AnnotationTest extends AbstractTest {
 		assert targetsFromRed.contains(myVehicle) : targetsFromRed;
 		assert !targetsFromRed.contains(red) : targetsFromRed;
 
-		red.getLinks(vehicleColor).get(0);
-		assert red.getTargets(vehicleColor, Statics.BASE_POSITION).contains(myVehicle) : red.getTargets(vehicleColor);
+		assert red.getTargets(vehicleColor, 1, 0).contains(myVehicle) : red.getTargets(vehicleColor);
 	}
 
 	public void testType() {
@@ -314,37 +313,47 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Games {}
+	public static class Games {
+	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyGames extends Games {}
+	public static class MyGames extends Games {
+	}
 
 	@SystemGeneric
-	public static class Children {}
+	public static class Children {
+	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyChildren extends Children {}
+	public static class MyChildren extends Children {
+	}
 
 	@SystemGeneric
 	@Extends(value = Engine.class, others = { Games.class, Children.class })
-	public static class ChildrenGames {}
+	public static class ChildrenGames {
+	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyChildrenGames extends ChildrenGames {}
+	public static class MyChildrenGames extends ChildrenGames {
+	}
 
 	@SystemGeneric
 	@Extends(value = Engine.class, others = { Human.class, Vehicle.class })
-	public static class Transformer {}
+	public static class Transformer {
+	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyTransformer extends Transformer {}
+	public static class MyTransformer extends Transformer {
+	}
 
 	@SystemGeneric
 	@Extends(value = Transformer.class, others = { Transformer.class, ChildrenGames.class })
-	public static class TransformerChildrenGames {}
+	public static class TransformerChildrenGames {
+	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyTransformerChildrenGames extends TransformerChildrenGames {}
+	public static class MyTransformerChildrenGames extends TransformerChildrenGames {
+	}
 
 	@SystemGeneric
 	public static class GraphicComponent {
@@ -392,7 +401,8 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyVehicle extends Vehicle {}
+	public static class MyVehicle extends Vehicle {
+	}
 
 	@SystemGeneric
 	@Components(Vehicle.class)
@@ -413,7 +423,8 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class myCar extends Car {}
+	public static class myCar extends Car {
+	}
 
 	@SystemGeneric
 	@Components(Car.class)
@@ -428,31 +439,39 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Human {}
+	public static class Human {
+	}
 
 	@SystemGeneric
-	public static class Man extends Human {}
+	public static class Man extends Human {
+	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class Myck extends Human {}
+	public static class Myck extends Human {
+	}
 
 	@SystemGeneric
-	public static class Time {}
+	public static class Time {
+	}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class })
-	public static class HumanPossessVehicle {}
+	public static class HumanPossessVehicle {
+	}
 
 	@SystemGeneric
 	@Components({ Human.class, Car.class })
-	public static class HumanPossessCar extends HumanPossessVehicle {}
+	public static class HumanPossessCar extends HumanPossessVehicle {
+	}
 
 	@SystemGeneric
 	@Components({ Man.class, Car.class })
-	public static class ManPossessCar extends HumanPossessVehicle {}
+	public static class ManPossessCar extends HumanPossessVehicle {
+	}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class, Time.class })
-	public static class HumanPossessVehicleTime {}
+	public static class HumanPossessVehicleTime {
+	}
 
 }

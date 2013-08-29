@@ -33,7 +33,6 @@ import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
-import org.genericsystem.iterator.AbstractProjectionIterator;
 import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.iterator.ArrayIterator;
@@ -46,7 +45,6 @@ import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
-import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
@@ -494,12 +492,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> Snapshot<T> getTargets(Relation relation) {
-		return getTargets(relation, Statics.TARGET_POSITION);
+		return getTargets(relation, Statics.BASE_POSITION, Statics.TARGET_POSITION);
 	}
 
 	@Override
-	public <T extends Generic> Snapshot<T> getTargets(Relation relation, final int targetPos) {
-		return getLinks(relation).project(new Projector<T, Link>() {
+	public <T extends Generic> Snapshot<T> getTargets(Relation relation, int basePos, final int targetPos) {
+		return getLinks(relation, basePos).project(new Projector<T, Link>() {
 			@Override
 			public T project(Link element) {
 				return element.getComponent(targetPos);
@@ -726,8 +724,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return orderedComponents;
 	}
 
+	// TODO clean
 	public <T extends Generic> Iterator<T> holdersIterator(final int level, Holder origin, int basePos, boolean readPhantom) {
-		if (SystemGeneric.STRUCTURAL == level || ((GenericImpl) origin).safeIsEnabled(getMultiDirectionalSystemProperty()))
+		if (SystemGeneric.STRUCTURAL == level)// || ((GenericImpl) origin).safeIsEnabled(getMultiDirectionalSystemProperty()))
 			basePos = Statics.MULTIDIRECTIONAL;
 		boolean noInheritance = ((GenericImpl) origin).safeIsEnabled(getNoInheritanceSystemProperty());
 		Iterator<T> iterator = noInheritance ? this.<T> noInheritanceIterator(level, basePos, origin) : this.<T> inheritanceIterator(level, origin, basePos);
@@ -738,9 +737,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().<Attribute> find(NoInheritanceSystemProperty.class);
 	}
 
-	private Attribute getMultiDirectionalSystemProperty() {
-		return getCurrentCache().<Attribute> find(MultiDirectionalSystemProperty.class);
-	}
+	// TODO clean
+	// private Attribute getMultiDirectionalSystemProperty() {
+	// return getCurrentCache().<Attribute> find(MultiDirectionalSystemProperty.class);
+	// }
 
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final int metaLevel, int pos, final Generic origin) {
 		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
@@ -1371,20 +1371,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getHolderByValue(getCurrentCache().<Attribute> find(systemPropertyClass), basePos) == null ? defaultBehavior : !defaultBehavior;
 	}
 
-	@Override
-	public <T extends Attribute> T enableMultiDirectional() {
-		return enableSystemProperty(MultiDirectionalSystemProperty.class);
-	}
-
-	@Override
-	public <T extends Attribute> T disableMultiDirectional() {
-		return disableSystemProperty(MultiDirectionalSystemProperty.class);
-	}
-
-	@Override
-	public boolean isMultiDirectional() {
-		return isBooleanSystemPropertyEnabled(MultiDirectionalSystemProperty.class);
-	}
+	// TODO clean
+	// @Override
+	// public <T extends Attribute> T enableMultiDirectional() {
+	// return setSystemPropertyValue(MultiDirectionalSystemProperty.class, Statics.MULTIDIRECTIONAL, true);
+	// }
+	//
+	// @Override
+	// public <T extends Attribute> T disableMultiDirectional() {
+	// return setSystemPropertyValue(MultiDirectionalSystemProperty.class, Statics.MULTIDIRECTIONAL, false);
+	// }
+	//
+	// @Override
+	// public boolean isMultiDirectional() {
+	// return isSystemPropertyEnabled(MultiDirectionalSystemProperty.class, Statics.MULTIDIRECTIONAL);
+	// }
 
 	@Override
 	public <T extends Relation> T enableCascadeRemove(int basePos) {
@@ -1753,12 +1754,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractConcateIterator<Attribute, Structural>(GenericImpl.this.getAttributes().iterator()) {
 			@Override
 			protected Iterator<Structural> getIterator(final Attribute attribute) {
-				return attribute.isMultiDirectional() ? new SingletonIterator<Structural>(new StructuralImpl(attribute, getBasePos(attribute))) : new AbstractProjectionIterator<Integer, Structural>(positionsIterator(attribute)) {
-					@Override
-					public Structural project(Integer pos) {
-						return new StructuralImpl(attribute, pos);
-					}
-				};
+				// TODO clean
+				return /* attribute.isMultiDirectional() ? */new SingletonIterator<Structural>(new StructuralImpl(attribute, getBasePos(attribute)));/*
+																																					 * : new AbstractProjectionIterator<Integer, Structural>(positionsIterator(attribute)) {
+																																					 * 
+																																					 * @Override public Structural project(Integer pos) { return new StructuralImpl(attribute, pos); } };
+																																					 */
 			}
 		};
 	}

@@ -56,6 +56,17 @@ public interface Node extends Holder {
 	<T extends Node> Snapshot<T> getChildren();
 
 	/**
+	 * Returns the children of this.
+	 * 
+	 * @param basePos
+	 *            The base position.
+	 * 
+	 * @see Snapshot
+	 * @return Return the children.
+	 */
+	<T extends Node> Snapshot<T> getChildren(int basePos);
+
+	/**
 	 * Returns the child of this.
 	 * 
 	 * @Param value The value

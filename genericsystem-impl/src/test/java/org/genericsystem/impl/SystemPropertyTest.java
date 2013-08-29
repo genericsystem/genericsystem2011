@@ -2,35 +2,32 @@ package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.testng.annotations.Test;
 
 @Test
 public class SystemPropertyTest extends AbstractTest {
 
-	public void multiDirectionalIsProperty() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		assert cache.<Type> find(MultiDirectionalSystemProperty.class).isSingularConstraintEnabled();
-	}
+	// public void multiDirectionalIsProperty() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+	// assert cache.<Type> find(MultiDirectionalSystemProperty.class).isSingularConstraintEnabled();
+	// }
 
-	public void relationMultiDirectionalTest() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
-		Type vehicle = cache.newType("Vehicle");
-		Relation humanPossessVehicle = human.setRelation("possess", vehicle);
-		assert !humanPossessVehicle.isMultiDirectional();
-		humanPossessVehicle.enableMultiDirectional();
-		assert humanPossessVehicle.isMultiDirectional();
-		humanPossessVehicle.disableMultiDirectional();
-		assert !humanPossessVehicle.isMultiDirectional();
-	}
+	// public void relationMultiDirectionalTest() {
+	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+	// Type human = cache.newType("Human");
+	// Type vehicle = cache.newType("Vehicle");
+	// Relation humanPossessVehicle = human.setRelation("possess", vehicle);
+	// assert !humanPossessVehicle.isMultiDirectional();
+	// humanPossessVehicle.enableMultiDirectional();
+	// assert humanPossessVehicle.isMultiDirectional();
+	// humanPossessVehicle.disableMultiDirectional();
+	// assert !humanPossessVehicle.isMultiDirectional();
+	// }
 
 	// public void relationMultiDirectionalTestWithJump() {
 	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
@@ -89,32 +86,23 @@ public class SystemPropertyTest extends AbstractTest {
 	// assert !manDriveCar.isCascadeRemove( 0);
 	// }
 
-	public void test() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Generic multiDirectionalSystemProperty = cache.find(MultiDirectionalSystemProperty.class);
-		assert ((GenericImpl) multiDirectionalSystemProperty.getImplicit()).isPrimary();
-		Type vehicle = cache.newType("Vehicle");
-		assert !vehicle.isTree();
-		assert vehicle.getAttributes().contains(multiDirectionalSystemProperty) : vehicle.getAttributes();
-	}
-
 	public void isEnabledSystemPropertyTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.newType("Human");
 		Type vehicle = cache.newType("Vehicle");
 		Relation humanOwnVehicle = human.setRelation("ownership", vehicle);
-		humanOwnVehicle.enableMultiDirectional();
-		assert humanOwnVehicle.isMultiDirectional();
+		// humanOwnVehicle.enableMultiDirectional();
+		// assert humanOwnVehicle.isMultiDirectional();
 		assert !humanOwnVehicle.isCascadeRemove(Statics.BASE_POSITION);
 		humanOwnVehicle.enableCascadeRemove(0);
-		assert humanOwnVehicle.isMultiDirectional();
+		// assert humanOwnVehicle.isMultiDirectional();
 		assert humanOwnVehicle.isCascadeRemove(Statics.BASE_POSITION);
-		humanOwnVehicle.disableMultiDirectional();
-		assert cache.<Attribute> find(MultiDirectionalSystemProperty.class).isSingularConstraintEnabled();
-		assert !humanOwnVehicle.isMultiDirectional();
+		// humanOwnVehicle.disableMultiDirectional();
+		// assert cache.<Attribute> find(MultiDirectionalSystemProperty.class).isSingularConstraintEnabled();
+		// assert !humanOwnVehicle.isMultiDirectional();
 		assert humanOwnVehicle.isCascadeRemove(Statics.BASE_POSITION);
 		humanOwnVehicle.disableCascadeRemove(0);
-		assert !humanOwnVehicle.isMultiDirectional();
+		// assert !humanOwnVehicle.isMultiDirectional();
 		assert !humanOwnVehicle.isCascadeRemove(Statics.BASE_POSITION);
 	}
 

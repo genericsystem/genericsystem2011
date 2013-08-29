@@ -7,7 +7,6 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
-import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -15,7 +14,6 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.MultiDirectionalSystemProperty;
 import org.testng.annotations.Test;
 
 @Test
@@ -29,10 +27,6 @@ public class AutomaticTest extends AbstractTest {
 		assert ((CacheImpl) cache).isFlushable(cache.getEngine());
 		assert !((GenericImpl) cache.getEngine().getMetaRelation()).isAutomatic();
 		assert ((CacheImpl) cache).isFlushable(cache.getEngine());
-		Generic multiDirectional = cache.find(MultiDirectionalSystemProperty.class);
-		assert !((GenericImpl) multiDirectional).isAutomatic();
-		assert ((CacheImpl) cache).isFlushable(multiDirectional);
-		assert ((CacheImpl) cache).isFlushable(multiDirectional.getImplicit());
 	}
 
 	public void testAttribut() {
@@ -178,8 +172,8 @@ public class AutomaticTest extends AbstractTest {
 
 		assert myAudi.getTargets(carColor).size() == 1;
 		assert myAudi.getTargets(carColor).contains(red);
-		assert red.getTargets(carColor, Statics.BASE_POSITION).size() == 1;
-		assert red.getTargets(carColor, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(carColor, Statics.BASE_POSITION);
+		assert red.getTargets(carColor, 1, 0).size() == 1;
+		assert red.getTargets(carColor, 1, 0).contains(myAudi) : red.getTargets(carColor);
 	}
 
 	public void ternaryDeduct() {
@@ -234,7 +228,7 @@ public class AutomaticTest extends AbstractTest {
 		car.setLink(carColorTime, "carRed", red, time);
 
 		assert myAudi.getTargets(carColorTime).contains(red);
-		assert red.getTargets(carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(carColorTime, Statics.BASE_POSITION);
+		assert red.getTargets(carColorTime, 1, 0).contains(myAudi) : red.getTargets(carColorTime);
 
 		// assert myAudi.getComposites().isEmpty() : myAudi.getComposites();
 
@@ -247,10 +241,10 @@ public class AutomaticTest extends AbstractTest {
 		// }
 		// }).isEmpty();
 		cache.getEngine().newCache().start();
-		assert red.getTargets(carColorTime, Statics.BASE_POSITION).contains(myAudi);
+		assert red.getTargets(carColorTime, 1, 0).contains(myAudi);
 		cache.start();
 		assert myAudi.getTargets(carColorTime).contains(red);
-		assert red.getTargets(carColorTime, Statics.BASE_POSITION).contains(myAudi) : red.getTargets(carColorTime, Statics.BASE_POSITION);
+		assert red.getTargets(carColorTime, 1, 0).contains(myAudi) : red.getTargets(carColorTime);
 	}
 
 	public void rebuild() {
