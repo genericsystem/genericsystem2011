@@ -751,18 +751,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	// public <T extends Generic> Snapshot<T> mainSnaphot(final Generic origin, final int level, final int pos, final boolean readPhantoms) {
-	// return new AbstractSnapshot<T>() {
-	// @Override
-	// public Iterator<T> iterator() {
-	// return mainIterator(origin, level, pos, readPhantoms);
-	// }
-	// };
-	// }
-
 	// private Iterator<Generic> allSupersIterator() {
-	// NavigableSet<Generic> set = new TreeSet<>();
-	// Iterator<Generic> iterator = new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
+	// return new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 	//
 	// private static final long serialVersionUID = -6254209580316166416L;
 	//
@@ -771,34 +761,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	// return new ArrayIterator<Generic>(((GenericImpl) node).supers);
 	// }
 	// };
-	//
-	// while (iterator.hasNext())
-	// set.add(iterator.next());
-	//
-	// return set.descendingIterator();
 	// }
 	//
-	// private <T extends Generic> Iterator<T> noInheritanceIterator2(final Generic origin, int pos, final int metaLevel) {
-	// Set<T> alreadyComputed = new LinkedHashSet<>();
-	// Iterator<T> iterator = noInheritanceIterator(origin, pos, metaLevel);
-	// while (iterator.hasNext()) {
-	// T candidate = iterator.next();
-	// for (T computed : alreadyComputed) {
-	// if (candidate.inheritsFrom(computed)) {
-	// alreadyComputed.remove(computed);
-	// break;
-	// }
-	// }
-	// alreadyComputed.add(candidate);
-	// }
-	// return alreadyComputed.iterator();
-	// }
-	//
-	// private <T extends Generic> Iterator<T> mainIterator(final Generic origin, final int level, final int pos, final boolean readPhantom) {
+	// private <T extends Generic> Iterator<T> mainIterator2(final Generic origin, final int level, final int pos, final boolean readPhantom) {
 	// return new AbstractFilterIterator<T>(new AbstractConcateIterator<Generic, T>(allSupersIterator()) {
 	// @Override
 	// protected Iterator<T> getIterator(Generic superGeneric) {
-	// return ((GenericImpl) superGeneric).noInheritanceIterator2(origin, pos, level);
+	// return ((GenericImpl) superGeneric).noInheritanceIterator(pos, level, origin);
 	// }
 	// }) {
 	//
@@ -806,7 +775,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	//
 	// @Override
 	// public boolean isSelected() {
-	// return isNewLeaf(next) && alreadyComputed.add(next) && (readPhantom || next.getValue() != null); // test phantom after add
+	// return isNewLeaf(next) && (readPhantom || next.getValue() != null); // test phantom after add
 	// }
 	//
 	// private boolean isNewLeaf(Generic candidate) {
