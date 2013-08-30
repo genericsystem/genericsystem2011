@@ -30,6 +30,7 @@ import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
+import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.CheckingType;
@@ -363,7 +364,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, true, TreeImpl.class), Statics.EMPTY_GENERIC_ARRAY, new Generic[dim], false, TreeImpl.class, false).<T> disableInheritance();
+		return this.<T> bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, true, TreeImpl.class), new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], false, TreeImpl.class, false);// .<T> disableInheritance();
 	}
 
 	@Override

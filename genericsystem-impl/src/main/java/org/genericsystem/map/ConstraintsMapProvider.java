@@ -5,7 +5,6 @@ import java.io.Serializable;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
-import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
@@ -13,6 +12,7 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
@@ -68,8 +68,9 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 	@SystemGeneric
 	@Components(ConstraintKey.class)
 	@SingularConstraint
+	@Extends(NoInheritanceSystemType.class)
 	// @RequiredConstraint
-	@InheritanceDisabled
+	// @InheritanceDisabled
 	public static class ConstraintValue extends GenericImpl implements Attribute {
 	}
 

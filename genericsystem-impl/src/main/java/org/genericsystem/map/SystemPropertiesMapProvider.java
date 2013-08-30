@@ -5,7 +5,6 @@ import java.io.Serializable;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
-import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
@@ -14,6 +13,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
+import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 
@@ -24,7 +24,7 @@ import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.Axe
  */
 @SystemGeneric
 @Components(Engine.class)
-@Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class /* , MultiDirectionalSystemProperty.class */})
+@Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class, /* NoInheritanceSystemType.class , MultiDirectionalSystemProperty.class */})
 public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializable, Boolean> {
 
 	@Override
@@ -52,8 +52,9 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializabl
 	@SystemGeneric
 	@Components(SystemPropertyKey.class)
 	@SingularConstraint
+	@Extends(NoInheritanceSystemType.class)
 	// @RequiredConstraint
-	@InheritanceDisabled
+	// @InheritanceDisabled
 	public static class SystemPropertyValue extends GenericImpl implements Attribute {
 	}
 

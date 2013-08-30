@@ -11,6 +11,8 @@ import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.map.PropertiesMapProvider.PropertyValue;
+import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.testng.annotations.Test;
 
 @Test
@@ -90,15 +92,21 @@ public class MapTest extends AbstractTest {
 
 	public void testOnInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Generic myBmw = car.newInstance("myBmw");
-		myBmw.getProperties().put("power", 123);
-		assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
-		myBmw.getProperties().put("wheel", 4);
-		assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
-		assert myBmw.getProperties().get("wheel").equals(4);
-		myBmw.getProperties().remove("power");
-		assert myBmw.getProperties().get("power") == null;
+		cache.find(NoInheritanceSystemType.class).log();
+		cache.find(PropertyValue.class).log();
+		assert !cache.getEngine().isReferentialIntegrity(0);
+		assert !cache.newType("Vehicle").isReferentialIntegrity(0);
+		log.info("" + cache.find(NoInheritanceSystemType.class).getSystemPropertiesMap());
+		assert !cache.find(NoInheritanceSystemType.class).isReferentialIntegrity(0);
+		// Type car = cache.newType("Car");
+		// Generic myBmw = car.newInstance("myBmw");
+		// myBmw.getProperties().put("power", 123);
+		// assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
+		// myBmw.getProperties().put("wheel", 4);
+		// assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
+		// assert myBmw.getProperties().get("wheel").equals(4);
+		// myBmw.getProperties().remove("power");
+		// assert myBmw.getProperties().get("power") == null;
 	}
 
 	public void testProperty() {

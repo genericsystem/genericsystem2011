@@ -2,7 +2,6 @@ package org.genericsystem.systemproperties.constraints.simple;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
-import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
@@ -22,7 +21,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @Extends(ConstraintKey.class)
 @SingularConstraint
-@InheritanceDisabled
+// @InheritanceDisabled
 @AxedConstraintValue(VirtualConstraintImpl.class)
 public class VirtualConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 

@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.genericsystem.annotation.InheritanceDisabled;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -45,7 +44,7 @@ import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.BooleanSystemProperty;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
-import org.genericsystem.systemproperties.NoInheritanceSystemProperty;
+import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
@@ -724,23 +723,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return orderedComponents;
 	}
 
-	// TODO clean
 	public <T extends Generic> Iterator<T> holdersIterator(final int level, Holder origin, int basePos, boolean readPhantom) {
-		if (SystemGeneric.STRUCTURAL == level)// || ((GenericImpl) origin).safeIsEnabled(getMultiDirectionalSystemProperty()))
+		if (SystemGeneric.STRUCTURAL == level)
 			basePos = Statics.MULTIDIRECTIONAL;
-		boolean noInheritance = ((GenericImpl) origin).safeIsEnabled(getNoInheritanceSystemProperty());
-		Iterator<T> iterator = noInheritance ? this.<T> noInheritanceIterator(level, basePos, origin) : this.<T> inheritanceIterator(level, origin, basePos);
+		Iterator<T> iterator = origin.inheritsFrom(getEngine().getCurrentCache().find(NoInheritanceSystemType.class)) ? this.<T> noInheritanceIterator(level, basePos, origin) : this.<T> inheritanceIterator(level, origin, basePos);
 		return !readPhantom ? Statics.<T> nullFilter(iterator) : iterator;
 	}
-
-	private Attribute getNoInheritanceSystemProperty() {
-		return getCurrentCache().<Attribute> find(NoInheritanceSystemProperty.class);
-	}
-
-	// TODO clean
-	// private Attribute getMultiDirectionalSystemProperty() {
-	// return getCurrentCache().<Attribute> find(MultiDirectionalSystemProperty.class);
-	// }
 
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final int metaLevel, int pos, final Generic origin) {
 		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
@@ -832,21 +820,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private boolean findPhantom(Generic phantom, Generic[] components) {
 		return phantom != null && getCurrentCache().fastFindByInterfaces(phantom, new Primaries(Statics.insertFirst(phantom, supers)).toArray(), components) != null;
-	}
-
-	boolean safeIsEnabled(Attribute attribute) {
-		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(attribute) {
-			@Override
-			public boolean isSelected(Generic candidate) {
-				return (candidate.getMetaLevel() <= SystemGeneric.CONCRETE) && candidate.isAttributeOf(GenericImpl.this);
-			}
-
-			@Override
-			public boolean isSelectable() {
-				return next.isConcrete();
-			}
-		};
-		return iterator.hasNext();
 	}
 
 	@Override
@@ -1267,8 +1240,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	void mountConstraints(Class<?> clazz) {
-		if (clazz.getAnnotation(InheritanceDisabled.class) != null)
-			disableInheritance();
+		// if (clazz.getAnnotation(InheritanceDisabled.class) != null)
+		// disableInheritance();
 
 		if (clazz.getAnnotation(VirtualConstraint.class) != null)
 			enableVirtualConstraint();
@@ -1417,6 +1390,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return !isSystemPropertyEnabled(NoReferentialIntegritySystemProperty.class, basePos);
 	}
 
+	// @Override
+	// public <T extends Type> T enableInheritance() {
+	// // TODO clean
+	// // return disableSystemProperty(NoInheritanceSystemType.class);
+	// return setSystemPropertyValue(NoInheritanceSystemType.class, Statics.MULTIDIRECTIONAL, false);
+	// }
+	//
+	// @Override
+	// public <T extends Type> T disableInheritance() {
+	// // return enableSystemProperty(NoInheritanceSystemType.class);
+	// return setSystemPropertyValue(NoInheritanceSystemType.class, Statics.MULTIDIRECTIONAL, true);
+	// }
+	//
+	// @Override
+	// public boolean isInheritanceEnabled() {
+	// // return !isBooleanSystemPropertyEnabled(NoInheritanceSystemType.class);
+	// return !isSystemPropertyEnabled(NoInheritanceSystemType.class, Statics.MULTIDIRECTIONAL);
+	// }
+
 	@Override
 	public <T extends Type> T enableSingularConstraint() {
 		return enableSingularConstraint(Statics.BASE_POSITION);
@@ -1561,21 +1553,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isSingletonConstraintEnabled() {
 		return isConstraintEnabled(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL);
-	}
-
-	@Override
-	public <T extends Type> T enableInheritance() {
-		return disableSystemProperty(NoInheritanceSystemProperty.class);
-	}
-
-	@Override
-	public <T extends Type> T disableInheritance() {
-		return enableSystemProperty(NoInheritanceSystemProperty.class);
-	}
-
-	@Override
-	public boolean isInheritanceEnabled() {
-		return !isBooleanSystemPropertyEnabled(NoInheritanceSystemProperty.class);
 	}
 
 	Generic[] nullToSelfComponent(Generic[] components) {

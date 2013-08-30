@@ -415,26 +415,27 @@ public interface Type extends Generic {
 	 */
 	boolean isVirtualConstraintEnabled();
 
-	/**
-	 * Enable inheritance.
-	 * 
-	 * @return Return this.
-	 */
-	<T extends Type> T enableInheritance();
-
-	/**
-	 * Disable inheritance.
-	 * 
-	 * @return Return this.
-	 */
-	<T extends Type> T disableInheritance();
-
-	/**
-	 * Returns true if the inheritance enabled
-	 * 
-	 * @return true if the inheritance enabled
-	 */
-	boolean isInheritanceEnabled();
+	// TODO clean
+	// /**
+	// * Enable inheritance.
+	// *
+	// * @return Return this.
+	// */
+	// <T extends Type> T enableInheritance();
+	//
+	// /**
+	// * Disable inheritance.
+	// *
+	// * @return Return this.
+	// */
+	// <T extends Type> T disableInheritance();
+	//
+	// /**
+	// * Returns true if the inheritance enabled
+	// *
+	// * @return true if the inheritance enabled
+	// */
+	// boolean isInheritanceEnabled();
 
 	/**
 	 * Returns the type constraint imposed by the InstanceClassConstraint. By default is Object.
