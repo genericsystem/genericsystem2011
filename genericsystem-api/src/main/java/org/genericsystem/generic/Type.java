@@ -394,26 +394,27 @@ public interface Type extends Generic {
 	 */
 	boolean isUniqueValueConstraintEnabled();
 
-	/**
-	 * Enable virtual constraint.
-	 * 
-	 * @return Return this.
-	 */
-	<T extends Type> T enableVirtualConstraint();
-
-	/**
-	 * Disable virtual constraint.
-	 * 
-	 * @return Return this.
-	 */
-	<T extends Type> T disableVirtualConstraint();
-
-	/**
-	 * Returns true if the virtual constraint enabled
-	 * 
-	 * @return true if the virtual constraint enabled
-	 */
-	boolean isVirtualConstraintEnabled();
+	// TODO clean
+	// /**
+	// * Enable virtual constraint.
+	// *
+	// * @return Return this.
+	// */
+	// <T extends Type> T enableVirtualConstraint();
+	//
+	// /**
+	// * Disable virtual constraint.
+	// *
+	// * @return Return this.
+	// */
+	// <T extends Type> T disableVirtualConstraint();
+	//
+	// /**
+	// * Returns true if the virtual constraint enabled
+	// *
+	// * @return true if the virtual constraint enabled
+	// */
+	// boolean isVirtualConstraintEnabled();
 
 	// TODO clean
 	// /**

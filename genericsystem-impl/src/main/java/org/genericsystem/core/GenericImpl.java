@@ -18,7 +18,6 @@ import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.UniqueValueConstraint;
-import org.genericsystem.annotation.constraints.VirtualConstraint;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
@@ -54,7 +53,6 @@ import org.genericsystem.systemproperties.constraints.simple.InstanceClassConstr
 import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1239,12 +1237,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	// TODO clean
 	void mountConstraints(Class<?> clazz) {
 		// if (clazz.getAnnotation(InheritanceDisabled.class) != null)
 		// disableInheritance();
 
-		if (clazz.getAnnotation(VirtualConstraint.class) != null)
-			enableVirtualConstraint();
+		// if (clazz.getAnnotation(VirtualConstraint.class) != null)
+		// enableVirtualConstraint();
 
 		if (clazz.getAnnotation(UniqueValueConstraint.class) != null)
 			enableUniqueValueConstraint();
@@ -1525,20 +1524,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isConstraintEnabled(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL);
 	}
 
-	@Override
-	public <T extends Type> T enableVirtualConstraint() {
-		return setConstraintValue(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
-	}
-
-	@Override
-	public <T extends Type> T disableVirtualConstraint() {
-		return setConstraintValue(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
-	}
-
-	@Override
-	public boolean isVirtualConstraintEnabled() {
-		return isConstraintEnabled(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL);
-	}
+	// TODO clean
+	// @Override
+	// public <T extends Type> T enableVirtualConstraint() {
+	// return setConstraintValue(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+	// }
+	//
+	// @Override
+	// public <T extends Type> T disableVirtualConstraint() {
+	// return setConstraintValue(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+	// }
+	//
+	// @Override
+	// public boolean isVirtualConstraintEnabled() {
+	// return isConstraintEnabled(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL);
+	// }
 
 	@Override
 	public <T extends Type> T enableSingletonConstraint() {

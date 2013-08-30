@@ -29,7 +29,6 @@ import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraint
 import org.genericsystem.systemproperties.constraints.simple.UnduplicateBindingConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueStructuralValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -40,7 +39,7 @@ import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintIm
 @Components(Engine.class)
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
 		OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class,
-		UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
+		UniqueValueConstraintImpl.class /* , VirtualConstraintImpl.class */})
 public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Boolean> {
 
 	@Override
