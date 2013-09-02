@@ -278,7 +278,7 @@ public abstract class AbstractContext implements Serializable {
 		if (SystemGeneric.STRUCTURAL == clazz.getAnnotation(SystemGeneric.class).value())
 			return getEngine();
 		Generic[] supers = findUserSupers(clazz);
-		assert supers.length == 1;
+		// assert supers.length == 1;
 		return supers[0].getImplicit();
 	}
 

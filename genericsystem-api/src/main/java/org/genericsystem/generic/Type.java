@@ -394,49 +394,26 @@ public interface Type extends Generic {
 	 */
 	boolean isUniqueValueConstraintEnabled();
 
-	// TODO clean
-	// /**
-	// * Enable virtual constraint.
-	// *
-	// * @return Return this.
-	// */
-	// <T extends Type> T enableVirtualConstraint();
-	//
-	// /**
-	// * Disable virtual constraint.
-	// *
-	// * @return Return this.
-	// */
-	// <T extends Type> T disableVirtualConstraint();
-	//
-	// /**
-	// * Returns true if the virtual constraint enabled
-	// *
-	// * @return true if the virtual constraint enabled
-	// */
-	// boolean isVirtualConstraintEnabled();
+	/**
+	 * Enable virtual constraint.
+	 * 
+	 * @return Return this.
+	 */
+	<T extends Type> T enableVirtualConstraint();
 
-	// TODO clean
-	// /**
-	// * Enable inheritance.
-	// *
-	// * @return Return this.
-	// */
-	// <T extends Type> T enableInheritance();
-	//
-	// /**
-	// * Disable inheritance.
-	// *
-	// * @return Return this.
-	// */
-	// <T extends Type> T disableInheritance();
-	//
-	// /**
-	// * Returns true if the inheritance enabled
-	// *
-	// * @return true if the inheritance enabled
-	// */
-	// boolean isInheritanceEnabled();
+	/**
+	 * Disable virtual constraint.
+	 * 
+	 * @return Return this.
+	 */
+	<T extends Type> T disableVirtualConstraint();
+
+	/**
+	 * Returns true if the virtual constraint enabled
+	 * 
+	 * @return true if the virtual constraint enabled
+	 */
+	boolean isVirtualConstraintEnabled();
 
 	/**
 	 * Returns the type constraint imposed by the InstanceClassConstraint. By default is Object.

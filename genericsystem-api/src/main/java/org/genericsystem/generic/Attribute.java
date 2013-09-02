@@ -10,28 +10,6 @@ import org.genericsystem.core.Generic;
  */
 public interface Attribute extends Holder, Type {
 
-	// TODO clean
-	// /**
-	// * Enable multidirectional.
-	// *
-	// * @return Return this.
-	// */
-	// <T extends Attribute> T enableMultiDirectional();
-	//
-	// /**
-	// * Disable multidirectional.
-	// *
-	// * @return Return this.
-	// */
-	// <T extends Attribute> T disableMultiDirectional();
-	//
-	// /**
-	// * Returns true if the multidirectional system property enabled.
-	// *
-	// * @return Return true if the multidirectional system propertyt enabled.
-	// */
-	// boolean isMultiDirectional();
-
 	/**
 	 * Enable Size Constraint.
 	 * 

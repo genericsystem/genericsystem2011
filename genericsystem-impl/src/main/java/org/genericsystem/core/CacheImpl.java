@@ -498,26 +498,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 	}
 
-	// private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-	// for (Generic generic : generics) {
-	// ExtendedMap<Serializable, Serializable> constraintMap = generic.getContraintsMap();
-	// for (Serializable key : constraintMap.keySet()) {
-	// AbstractConstraintImpl constraint = find(((AxedPropertyClass) key).getClazz());
-	// if (isCheckable(constraint, generic, checkingType, isFlushTime))
-	// constraint.check(generic, constraintMap.getValueHolder(key), (AxedPropertyClass) key);
-	// }
-	// }
-	// }
-
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics) {
 			ExtendedMap<Serializable, Serializable> constraintMap = generic.getContraintsMap();
 			for (Serializable key : constraintMap.keySet()) {
-				// AbstractConstraintImpl constraint = find(((AxedPropertyClass) key).getClass());
 				Holder valueHolder = constraintMap.getValueHolder(key);
-				AbstractConstraintImpl constraint = valueHolder.getBaseComponent();
-				if (isCheckable(constraint, generic, checkingType, isFlushTime))
-					constraint.check(generic, valueHolder, (AxedPropertyClass) key);
+				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
+				if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
+					keyHolder.check(generic, valueHolder);
 			}
 		}
 	}

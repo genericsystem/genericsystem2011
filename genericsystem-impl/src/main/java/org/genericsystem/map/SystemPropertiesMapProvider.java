@@ -1,6 +1,7 @@
 package org.genericsystem.map;
 
 import java.io.Serializable;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -24,7 +25,7 @@ import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.Axe
  */
 @SystemGeneric
 @Components(Engine.class)
-@Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class, /* NoInheritanceSystemType.class , MultiDirectionalSystemProperty.class */})
+@Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class })
 public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializable, Boolean> {
 
 	@Override
@@ -47,7 +48,8 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializabl
 	@SystemGeneric
 	@Components(SystemPropertiesMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class SystemPropertyKey extends GenericImpl implements Attribute {}
+	public static class SystemPropertyKey extends GenericImpl implements Attribute {
+	}
 
 	@SystemGeneric
 	@Components(SystemPropertyKey.class)
@@ -55,11 +57,13 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializabl
 	@Extends(NoInheritanceSystemType.class)
 	// @RequiredConstraint
 	// @InheritanceDisabled
-	public static class SystemPropertyValue extends GenericImpl implements Attribute {}
+	public static class SystemPropertyValue extends GenericImpl implements Attribute {
+	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Extends(SystemPropertiesMapProvider.class)
 	@Components(Engine.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {}
+	public static class MapInstance extends GenericImpl implements Holder {
+	}
 }

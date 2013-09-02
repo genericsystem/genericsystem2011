@@ -4,11 +4,11 @@ import java.io.Serializable;
 
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.systemproperties.AbstractSystemPropertyImpl;
 
-public abstract class AbstractConstraintImpl extends AbstractSystemPropertyImpl {
+public abstract class AbstractConstraintImpl extends GenericImpl {
 
 	public enum CheckingType {
 		CHECK_ON_ADD_NODE, CHECK_ON_REMOVE_NODE
@@ -27,7 +27,7 @@ public abstract class AbstractConstraintImpl extends AbstractSystemPropertyImpl 
 		return true;
 	}
 
-	public abstract void check(Generic modified, Holder valueBaseComponent, AxedPropertyClass key) throws ConstraintViolationException;
+	public abstract void check(Generic modified, Holder valueBaseComponent) throws ConstraintViolationException;
 
 	public abstract void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedPropertyClass key) throws ConstraintViolationException;
 

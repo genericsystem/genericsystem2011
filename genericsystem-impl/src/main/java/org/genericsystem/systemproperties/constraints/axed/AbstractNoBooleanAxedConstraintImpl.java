@@ -11,9 +11,9 @@ import org.genericsystem.systemproperties.constraints.AbstractNoBooleanConstrain
 public abstract class AbstractNoBooleanAxedConstraintImpl extends AbstractNoBooleanConstraintImpl {
 
 	@Override
-	public void check(Generic modified, Generic attribute, AxedPropertyClass key, Serializable value) throws ConstraintViolationException {
+	public void check(Generic modified, Generic attribute, Serializable value) throws ConstraintViolationException {
+		AxedPropertyClass key = getValue();
 		if (key.getAxe() != Statics.MULTIDIRECTIONAL)
-			// for (Generic base : ((GenericImpl) attribute).<GenericImpl> getComponent(key.getAxe()).getAllInheritings())
 			check(((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), attribute, key.getAxe(), value);
 	}
 

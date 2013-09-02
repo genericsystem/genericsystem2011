@@ -23,15 +23,6 @@ public @interface SystemGeneric {
 	int value() default STRUCTURAL;
 
 	/**
-	 * The default behavior defined the nature of the position values of the SystemProperty.<br/>
-	 * it defines if the positioning activates or deactivates the SystemProperty.<br/>
-	 * By default it's false. The positioning activates the SystemProperty.
-	 * 
-	 * @return The default behavior.
-	 */
-	boolean defaultBehavior() default false;
-
-	/**
 	 * for engine, meta-attribute.
 	 */
 	static final int META = 0;
