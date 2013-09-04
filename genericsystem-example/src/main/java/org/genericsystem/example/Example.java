@@ -148,12 +148,12 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	@Components({ Nicolas.class, Nicolas.class })
-	@StringValue("nicolasIsTallerOrEqualThanNicolas")
-	public static class NicolasIsTallerOrEqualThanNicolas extends IsTallerOrEqualThan {
-
-	}
+	// @SystemGeneric(SystemGeneric.CONCRETE)
+	// @Components({ Nicolas.class, Nicolas.class })
+	// @StringValue("nicolasIsTallerOrEqualThanNicolas")
+	// public static class NicolasIsTallerOrEqualThanNicolas extends IsTallerOrEqualThan {
+	//
+	// }
 
 	@SystemGeneric
 	@Components({ Human.class, Human.class })
@@ -163,8 +163,8 @@ public class Example {
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
 	@Components({ Quentin.class, Michael.class })
-	@StringValue("quentinIsBrotherOfNicolas")
-	public static class QuentinIsBrotherOfNicolas extends IsBrotherOf {
+	@StringValue("quentinIsBrotherOfMichael")
+	public static class QuentinIsBrotherOfMichael extends IsBrotherOf {
 
 	}
 
