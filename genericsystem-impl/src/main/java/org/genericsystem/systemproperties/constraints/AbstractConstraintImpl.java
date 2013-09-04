@@ -1,8 +1,7 @@
 package org.genericsystem.systemproperties.constraints;
 
-import java.io.Serializable;
-
 import org.genericsystem.annotation.Priority;
+import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -29,7 +28,7 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 
 	public abstract void check(Generic modified, Holder valueBaseComponent) throws ConstraintViolationException;
 
-	public abstract void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedPropertyClass key) throws ConstraintViolationException;
+	public abstract void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedPropertyClass<?> key) throws ConstraintViolationException;
 
 	// @Override
 	// public int compareTo(AbstractConstraintImpl otherConstraint) {
@@ -51,41 +50,4 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 	// return getCurrentCache().<GenericImpl> find(MapInstance.class).<T> find(implicit, this, getBasePos(this), new Generic[] {});
 	// }
 
-	public static class AxedPropertyClass implements Serializable {
-		private static final long serialVersionUID = 182492104604984855L;
-
-		private final Class<?> clazz;
-		private final int axe;
-
-		public AxedPropertyClass(Class<?> clazz, int axe) {
-			this.clazz = clazz;
-			this.axe = axe;
-		}
-
-		public Class<?> getClazz() {
-			return clazz;
-		}
-
-		public int getAxe() {
-			return axe;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof AxedPropertyClass))
-				return false;
-			AxedPropertyClass compare = (AxedPropertyClass) obj;
-			return clazz.equals(compare.getClazz()) && axe == compare.axe;
-		}
-
-		@Override
-		public int hashCode() {
-			return clazz.hashCode();
-		}
-
-		@Override
-		public String toString() {
-			return "class : " + clazz + ", axe : " + axe;
-		}
-	}
 }

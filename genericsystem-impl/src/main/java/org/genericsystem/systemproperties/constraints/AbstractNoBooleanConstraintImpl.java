@@ -2,6 +2,7 @@ package org.genericsystem.systemproperties.constraints;
 
 import java.io.Serializable;
 
+import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Attribute;

@@ -1,7 +1,5 @@
 package org.genericsystem.map;
 
-import java.io.Serializable;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -9,6 +7,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
+import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
@@ -16,7 +15,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 
 /**
  * @author Nicolas Feybesse
@@ -26,7 +24,7 @@ import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.Axe
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class })
-public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializable, Boolean> {
+public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropertyClass<?>, Boolean> {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -40,9 +38,10 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<Serializabl
 		return (Class<T>) SystemPropertyValue.class;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	protected Class<?> getKeyClass(Serializable key) {
-		return ((AxedPropertyClass) key).getClazz();
+	protected <T extends GenericImpl> Class<T> getKeyClass(AxedPropertyClass<?> key) {
+		return (Class<T>) key.getClazz();
 	}
 
 	@SystemGeneric

@@ -112,7 +112,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		};
 	}
 
-	protected Class<?> getKeyClass(Key key) {
+	protected <T extends GenericImpl> Class<T> getKeyClass(Key key) {
 		return null;
 	}
 

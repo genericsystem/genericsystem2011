@@ -1,7 +1,5 @@
 package org.genericsystem.map;
 
-import java.io.Serializable;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -9,12 +7,12 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
+import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
@@ -35,6 +33,7 @@ import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintIm
 /**
  * @author Nicolas Feybesse
  * @author Michael Ory
+ * @param <T>
  * 
  */
 @SystemGeneric
@@ -42,7 +41,7 @@ import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintIm
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
 		OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class,
 		UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
-public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Boolean> {
+public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass<?>, Boolean> {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -56,9 +55,10 @@ public class ConstraintsMapProvider extends AbstractMapProvider<Serializable, Bo
 		return (Class<T>) ConstraintValue.class;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	protected Class<?> getKeyClass(Serializable key) {
-		return ((AxedPropertyClass) key).getClazz();
+	protected <T extends GenericImpl> Class<T> getKeyClass(AxedPropertyClass<?> key) {
+		return (Class<T>) key.getClazz();
 	}
 
 	@SystemGeneric

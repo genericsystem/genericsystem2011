@@ -1,5 +1,6 @@
 package org.genericsystem.systemproperties.constraints.axed;
 
+import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -11,7 +12,7 @@ public abstract class AbstractBooleanAxedConstraintImpl extends AbstractBooleanC
 
 	@Override
 	public void check(Generic modified, Generic attribute) throws ConstraintViolationException {
-		AxedPropertyClass key = getValue();
+		AxedPropertyClass<GenericImpl> key = getValue();
 		if (key.getAxe() != Statics.MULTIDIRECTIONAL)
 			check(((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), attribute, key.getAxe());
 	}

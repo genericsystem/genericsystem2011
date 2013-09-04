@@ -45,7 +45,6 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
 import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
@@ -1270,42 +1269,42 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
 
-	private Serializable getSystemPropertyValue(Class<?> constraintClass, int pos) {
-		return getSystemPropertiesMap().get(new AxedPropertyClass(constraintClass, pos));
+	private <T extends Generic> Serializable getSystemPropertyValue(Class<T> constraintClass, int pos) {
+		return getSystemPropertiesMap().get(new AxedPropertyClass<T>(constraintClass, pos));
 	}
 
-	private <T extends Type> T setSystemPropertyValue(Class<?> constraintClass, int pos, Serializable value) {
-		getSystemPropertiesMap().put(new AxedPropertyClass(constraintClass, pos), value);
-		return (T) this;
+	private <T extends Generic> void setSystemPropertyValue(Class<T> constraintClass, int pos, Serializable value) {
+		getSystemPropertiesMap().put(new AxedPropertyClass<T>(constraintClass, pos), value);
 	}
 
-	private boolean isSystemPropertyEnabled(Class<?> constraintClass, int pos) {
+	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getSystemPropertyValue(constraintClass, pos);
 		return null != value && !Boolean.FALSE.equals(value);
 	}
 
-	private Serializable getConstraintValue(Class<?> constraintClass, int pos) {
-		return getContraintsMap().get(new AxedPropertyClass(constraintClass, pos));
+	private <T extends Generic> Serializable getConstraintValue(Class<T> constraintClass, int pos) {
+		return getContraintsMap().get(new AxedPropertyClass<T>(constraintClass, pos));
 	}
 
-	private <T extends Type> T setConstraintValue(Class<?> constraintClass, int pos, Serializable value) {
-		getContraintsMap().put(new AxedPropertyClass(constraintClass, pos), value);
-		return (T) this;
+	private <T extends Generic> void setConstraintValue(Class<T> constraintClass, int pos, Serializable value) {
+		getContraintsMap().put(new AxedPropertyClass<T>(constraintClass, pos), value);
 	}
 
-	private boolean isConstraintEnabled(Class<?> constraintClass, int pos) {
+	private <T extends Generic> boolean isConstraintEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getConstraintValue(constraintClass, pos);
 		return null != value && !Boolean.FALSE.equals(value);
 	}
 
 	@Override
 	public <T extends Relation> T enableCascadeRemove(int basePos) {
-		return setSystemPropertyValue(CascadeRemoveSystemProperty.class, basePos, true);
+		setSystemPropertyValue(CascadeRemoveSystemProperty.class, basePos, true);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Relation> T disableCascadeRemove(int basePos) {
-		return setSystemPropertyValue(CascadeRemoveSystemProperty.class, basePos, false);
+		setSystemPropertyValue(CascadeRemoveSystemProperty.class, basePos, false);
+		return (T) this;
 	}
 
 	@Override
@@ -1315,12 +1314,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T enableReferentialIntegrity(int componentPos) {
-		return setSystemPropertyValue(NoReferentialIntegritySystemProperty.class, componentPos, false);
+		setSystemPropertyValue(NoReferentialIntegritySystemProperty.class, componentPos, false);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Generic> T disableReferentialIntegrity(int componentPos) {
-		return setSystemPropertyValue(NoReferentialIntegritySystemProperty.class, componentPos, true);
+		setSystemPropertyValue(NoReferentialIntegritySystemProperty.class, componentPos, true);
+		return (T) this;
 	}
 
 	@Override
@@ -1345,12 +1346,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableSingularConstraint(int basePos) {
-		return setConstraintValue(SingularConstraintImpl.class, basePos, true);
+		setConstraintValue(SingularConstraintImpl.class, basePos, true);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Type> T disableSingularConstraint(int basePos) {
-		return setConstraintValue(SingularConstraintImpl.class, basePos, false);
+		setConstraintValue(SingularConstraintImpl.class, basePos, false);
+		return (T) this;
 	}
 
 	@Override
@@ -1360,12 +1363,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T enableSizeConstraint(int basePos, Integer size) {
-		return setConstraintValue(SizeConstraintImpl.class, basePos, size);
+		setConstraintValue(SizeConstraintImpl.class, basePos, size);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Generic> T disableSizeConstraint(int basePos) {
-		return setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
+		setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
+		return (T) this;
 	}
 
 	@Override
@@ -1381,17 +1386,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T setConstraintClass(Class<?> constraintClass) {
-		return setConstraintValue(InstanceClassConstraintImpl.class, Statics.MULTIDIRECTIONAL, constraintClass);
+		setConstraintValue(InstanceClassConstraintImpl.class, Statics.MULTIDIRECTIONAL, constraintClass);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Type> T enablePropertyConstraint() {
-		return setConstraintValue(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		setConstraintValue(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Type> T disablePropertyConstraint() {
-		return setConstraintValue(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+		setConstraintValue(PropertyConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+		return (T) this;
 	}
 
 	@Override
@@ -1416,12 +1424,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableRequiredConstraint(int basePos) {
-		return setConstraintValue(RequiredConstraintImpl.class, basePos, true);
+		setConstraintValue(RequiredConstraintImpl.class, basePos, true);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Type> T disableRequiredConstraint(int basePos) {
-		return setConstraintValue(RequiredConstraintImpl.class, basePos, false);
+		setConstraintValue(RequiredConstraintImpl.class, basePos, false);
+		return (T) this;
 	}
 
 	@Override
@@ -1431,12 +1441,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableUniqueValueConstraint() {
-		return setConstraintValue(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		setConstraintValue(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Type> T disableUniqueValueConstraint() {
-		return setConstraintValue(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		setConstraintValue(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		return (T) this;
 	}
 
 	@Override
@@ -1446,12 +1458,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableVirtualConstraint() {
-		return setConstraintValue(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		setConstraintValue(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Type> T disableVirtualConstraint() {
-		return setConstraintValue(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+		setConstraintValue(VirtualConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+		return (T) this;
 	}
 
 	@Override
@@ -1461,12 +1475,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T enableSingletonConstraint() {
-		return setConstraintValue(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		setConstraintValue(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		return (T) this;
 	}
 
 	@Override
 	public <T extends Type> T disableSingletonConstraint() {
-		return setConstraintValue(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+		setConstraintValue(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+		return (T) this;
 	}
 
 	@Override

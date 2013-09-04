@@ -32,7 +32,6 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.AxedPropertyClass;
 import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.tree.TreeImpl;
 
@@ -394,7 +393,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	boolean isManuel(Generic[] userSupers, Generic[] components, int metaLevel) {
-		return components.length == 0 && (userSupers.length == 0 || (userSupers.length == 1 && userSupers[0].isEngine()));
+		return metaLevel == SystemGeneric.CONCRETE || (components.length == 0 && (userSupers.length == 0 || (userSupers.length == 1 && userSupers[0].isEngine())));
 	}
 
 	<T extends Generic> T bind(Class<?> specializationClass, Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {
@@ -477,16 +476,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		Generic constraintValue = find(ConstraintValue.class);
 		for (Serializable key : getEngine().getContraintsMap().keySet())
 			for (Generic generic : generics)
 				if (generic.isInstanceOf(constraintValue)) {
-					AbstractConstraintImpl constraint = find(((AxedPropertyClass) key).getClazz());
+					AbstractConstraintImpl constraint = find(((AxedPropertyClass<GenericImpl>) key).getClazz());
 					if (isCheckable(constraint, generic, checkingType, isFlushTime)) {
 						GenericImpl base = ((GenericImpl) generic).<GenericImpl> getBaseComponent().<GenericImpl> getBaseComponent().<GenericImpl> getBaseComponent();
 						if (null != base)
-							constraint.checkConsistency(base, (Holder) generic, base, (AxedPropertyClass) ((GenericImpl) generic).<GenericImpl> getBaseComponent().getValue());
+							constraint.checkConsistency(base, (Holder) generic, base, (AxedPropertyClass<GenericImpl>) ((GenericImpl) generic).<GenericImpl> getBaseComponent().getValue());
 					}
 				}
 	}

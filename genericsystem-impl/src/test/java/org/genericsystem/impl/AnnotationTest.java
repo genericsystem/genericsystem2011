@@ -90,7 +90,6 @@ public class AnnotationTest extends AbstractTest {
 		assert !car.isAutomatic();
 		assert car.getImplicit().isAutomatic();
 		assert !myCar.isAutomatic();
-		assert myCar.getImplicit().isAutomatic();
 		assert vehicle.getDirectSubTypes().size() == 1;
 		assert vehicle.getDirectSubTypes().contains(car);
 		assert car.getSupers().size() == 2 : car.getSupers();
