@@ -15,7 +15,6 @@ import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
@@ -44,12 +43,7 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 		if (!modified.isStructural())
 			return;
 		final Generic primary = modified.getImplicit();
-		Iterator<Generic> iterator = Statics.<Generic> valueFilter(new AbstractFilterIterator<Generic>((((GenericImpl) primary).<Generic> directInheritingsIterator())) {
-			@Override
-			public boolean isSelected() {
-				return next.inheritsFrom(primary);
-			}
-		}, modified.getValue());
+		Iterator<Generic> iterator = Statics.<Generic> valueFilter(((GenericImpl) primary).<Generic> directInheritingsIterator(), modified.getValue());
 		if (!iterator.hasNext())
 			return;
 		iterator.next();

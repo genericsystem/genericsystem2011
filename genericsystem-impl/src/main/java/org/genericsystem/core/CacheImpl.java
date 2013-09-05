@@ -394,13 +394,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private boolean isAutomatic(Generic[] userSupers, Generic[] components, int metaLevel) {
-		if (metaLevel == SystemGeneric.CONCRETE)
-			return false;
 		if (components.length > 0)
 			return true;
-		if (userSupers.length > 0)
-			return !userSupers[0].isEngine();
-		return false;
+		Generic[] primaries = new Primaries(userSupers).toArray();
+		if (primaries.length == 1)
+			return metaLevel != SystemGeneric.CONCRETE && !primaries[0].isEngine();
+		return !(primaries.length == 0);
 	}
 
 	<T extends Generic> T bind(Class<?> specializationClass, Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {

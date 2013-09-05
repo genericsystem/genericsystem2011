@@ -279,7 +279,7 @@ public class AutomaticTest extends AbstractTest {
 		Generic vehicle = cache.find(Vehicle.class);
 		Generic myVehicle = cache.find(MyVehicle.class);
 		assert !vehicle.isAutomatic();
-		assert myVehicle.isAutomatic();
+		assert !myVehicle.isAutomatic();
 		assert myVehicle.inheritsFrom(vehicle);
 		assert vehicle.getInheritings().contains(myVehicle);
 	}
