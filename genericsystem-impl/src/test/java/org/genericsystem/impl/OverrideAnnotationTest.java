@@ -50,7 +50,7 @@ public class OverrideAnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Extends(value = Color.class, others = { Engine.class })
+	@Extends(Color.class)
 	public static class OutsideColor {
 
 	}

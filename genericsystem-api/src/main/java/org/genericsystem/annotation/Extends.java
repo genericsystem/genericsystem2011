@@ -15,17 +15,23 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface Extends {
 
-	/**
-	 * Returns the class of the mainSuper.
-	 * 
-	 * @return The class of the mainSuper.
-	 */
-	Class<?> value();
-
+	// /**
+	// * Returns the class of the mainSuper.
+	// *
+	// * @return The class of the mainSuper.
+	// */
+	// Class<?> value();
 	/**
 	 * Returns the class of the supers.
 	 * 
 	 * @return An array of class of the supers.
 	 */
-	Class<?>[] others() default {};
+	Class<?>[] value();
+	//
+	// /**
+	// * Returns the class of the supers.
+	// *
+	// * @return An array of class of the supers.
+	// */
+	// Class<?>[] others() default {};
 }

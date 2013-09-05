@@ -1,5 +1,6 @@
 package org.genericsystem.impl;
 
+import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -271,6 +272,24 @@ public class AutomaticTest extends AbstractTest {
 		assert carPowerUnit.getImplicit().isAlive();
 		assert carPower.getImplicit() == vehiclePower.getImplicit();
 		((GenericImpl) carPowerUnit).reBind().remove();
+	}
+
+	public void testAnnotation() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(MyVehicle.class).start();
+		Generic vehicle = cache.find(Vehicle.class);
+		Generic myVehicle = cache.find(MyVehicle.class);
+		assert !vehicle.isAutomatic();
+		assert myVehicle.isAutomatic();
+		assert myVehicle.inheritsFrom(vehicle);
+		assert vehicle.getInheritings().contains(myVehicle);
+	}
+
+	@SystemGeneric
+	public static class Vehicle {
+	}
+
+	@SystemGeneric(SystemGeneric.CONCRETE)
+	public static class MyVehicle extends Vehicle {
 	}
 
 }

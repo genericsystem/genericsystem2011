@@ -7,7 +7,6 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.core.Cache;
-import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
@@ -328,7 +327,7 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Extends(value = Engine.class, others = { Games.class, Children.class })
+	@Extends({ Games.class, Children.class })
 	public static class ChildrenGames {
 	}
 
@@ -337,7 +336,7 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Extends(value = Engine.class, others = { Human.class, Vehicle.class })
+	@Extends({ Human.class, Vehicle.class })
 	public static class Transformer {
 	}
 
@@ -346,7 +345,7 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Extends(value = Transformer.class, others = { Transformer.class, ChildrenGames.class })
+	@Extends({ Transformer.class, ChildrenGames.class })
 	public static class TransformerChildrenGames {
 	}
 
@@ -371,7 +370,7 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Extends(value = GraphicComponent.class, others = { GraphicComponent.class })
+	@Extends(GraphicComponent.class)
 	public static class Selectable {
 
 	}
@@ -383,13 +382,13 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	@Extends(value = Engine.class, others = { Selectable.class, Window.class })
+	@Extends({ Selectable.class, Window.class })
 	public static class SelectableWindow {
 
 	}
 
 	@SystemGeneric(SystemGeneric.CONCRETE)
-	@Extends(value = SelectableWindow.class, others = { SelectableWindow.class })
+	@Extends(SelectableWindow.class)
 	public static class MySelectableWindow {
 
 	}

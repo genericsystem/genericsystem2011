@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -98,5 +99,20 @@ public class FlushTest {
 		assert snapshot.containsAll(Arrays.asList(human, car)) : snapshot;
 
 		engine.close();
+	}
+
+	public void testMultipleCache3() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Engine engine = cache.getEngine();
+		Type vehicle = cache.newType("Vehicle");
+
+		Cache cache2 = engine.newCache().start();
+		assert cache2.getType("Vehicle") == null;
+
+		cache.start().flush();
+
+		cache2.start();
+		((CacheImpl) cache2).pickNewTs();
+		assert cache2.getType("Vehicle").equals(vehicle);
 	}
 }

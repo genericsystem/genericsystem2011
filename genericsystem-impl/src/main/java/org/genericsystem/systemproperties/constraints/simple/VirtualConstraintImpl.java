@@ -20,7 +20,9 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
  */
 @SystemGeneric(SystemGeneric.CONCRETE)
 @Components(MapInstance.class)
-@Extends(value = ConstraintKey.class, others = NoInheritanceSystemType.class)
+// TODO clean
+// @Extends(value = ConstraintKey.class, others = NoInheritanceSystemType.class)
+@Extends({ ConstraintKey.class, NoInheritanceSystemType.class })
 @SingularConstraint
 @AxedConstraintValue(VirtualConstraintImpl.class)
 public class VirtualConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {

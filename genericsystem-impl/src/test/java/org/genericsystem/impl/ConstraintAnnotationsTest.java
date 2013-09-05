@@ -5,8 +5,8 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
-import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
+import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.UniqueValueConstraint;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
@@ -27,14 +27,14 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 		assert String.class.equals(unit.getConstraintClass());
 		Type car = cache.find(Car.class);
 		Attribute electrikPower = cache.find(ElectrikPower.class);
-		final Generic myBMW = car.newInstance( "myBMW");
+		final Generic myBMW = car.newInstance("myBMW");
 		assert electrikPower.getBaseComponent() != null : electrikPower.info();
-		final Holder electrikPowerMyBMW = myBMW.setValue( electrikPower, 106);
-		electrikPowerMyBMW.setValue( unit, "Nm");
+		final Holder electrikPowerMyBMW = myBMW.setValue(electrikPower, 106);
+		electrikPowerMyBMW.setValue(unit, "Nm");
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				electrikPowerMyBMW.setValue( unit, 27);
+				electrikPowerMyBMW.setValue(unit, 27);
 			}
 		}.assertIsCausedBy(InstanceClassConstraintViolationException.class);
 	}
@@ -71,7 +71,9 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 
 	@SystemGeneric
 	@PropertyConstraint
-	@Extends(value = GraphicComponent.class, others = { GraphicComponent.class })
+	// TODO clean
+	// @Extends(value = GraphicComponent.class, others = { GraphicComponent.class })
+	@Extends(GraphicComponent.class)
 	public static class Selectable {
 
 	}

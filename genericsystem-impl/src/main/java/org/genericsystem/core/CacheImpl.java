@@ -351,7 +351,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] userSupers, Generic... components) {
-		T result = bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, !isManuel(userSupers, components, SystemGeneric.STRUCTURAL), Generic.class), userSupers, components, false, null, false);
+		T result = bind(bindPrimaryByValue(getEngine(), value, SystemGeneric.STRUCTURAL, isAutomatic(userSupers, components, SystemGeneric.STRUCTURAL), Generic.class), userSupers, components, false, null, false);
 		assert Objects.equals(value, result.getValue());
 		return result;
 	}
@@ -379,21 +379,28 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return orderedGenerics;
 	}
 
-	// TODO KK findImplicitSuper
 	<T extends Generic> T bind(Class<?> clazz) {
 		Class<?> specialize = Generic.class;
 		if (clazz.getSuperclass().equals(GenericImpl.class))
 			specialize = clazz;
 		Generic[] components = findComponents(clazz);
-		// TODO return not Engine
 		Generic[] userSupers = findUserSupers(clazz);
-		assert userSupers.length >= 0;
 		int metaLevel = findMetaLevel(clazz);
-		return bind(bindPrimaryByValue(findImplicitSuper(clazz), findImplictValue(clazz), metaLevel, !isManuel(userSupers, components, metaLevel), specialize), userSupers, components, false, clazz, false);
+		return bind(bindPrimaryByValue(getImplicitSuper(metaLevel, userSupers), findImplictValue(clazz), metaLevel, isAutomatic(userSupers, components, metaLevel), specialize), userSupers, components, false, clazz, false);
 	}
 
-	boolean isManuel(Generic[] userSupers, Generic[] components, int metaLevel) {
-		return metaLevel == SystemGeneric.CONCRETE || (components.length == 0 && (userSupers.length == 0 || (userSupers.length == 1 && userSupers[0].isEngine())));
+	private Generic getImplicitSuper(int metaLevel, Generic[] userSupers) {
+		return metaLevel == SystemGeneric.CONCRETE ? userSupers[0].getImplicit() : getEngine();
+	}
+
+	private boolean isAutomatic(Generic[] userSupers, Generic[] components, int metaLevel) {
+		if (metaLevel == SystemGeneric.CONCRETE)
+			return false;
+		if (components.length > 0)
+			return true;
+		if (userSupers.length > 0)
+			return !userSupers[0].isEngine();
+		return false;
 	}
 
 	<T extends Generic> T bind(Class<?> specializationClass, Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {

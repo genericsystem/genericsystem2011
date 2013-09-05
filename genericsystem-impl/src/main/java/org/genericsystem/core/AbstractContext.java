@@ -71,12 +71,12 @@ public abstract class AbstractContext implements Serializable {
 	abstract TimestampedDependencies getCompositeDependencies(Generic component);
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> Iterator<T> compositesIterator(final Generic component) {
+	public <T extends Generic> Iterator<T> compositesIterator(Generic component) {
 		return (Iterator<T>) getCompositeDependencies(component).iterator(getTs());
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> Iterator<T> directInheritingsIterator(final Generic component) {
+	public <T extends Generic> Iterator<T> directInheritingsIterator(Generic component) {
 		return (Iterator<T>) getDirectInheritingsDependencies(component).iterator(getTs());
 	}
 
@@ -247,38 +247,18 @@ public abstract class AbstractContext implements Serializable {
 		return supers;
 	}
 
-	int findMetaLevel(Class<?> clazz) {
-		return clazz.getAnnotation(SystemGeneric.class).value();
-	}
-
 	LinkedHashSet<Class<?>> getSupersClasses(Class<?> clazz) {
 		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
 		LinkedHashSet<Class<?>> extendsClasses = new LinkedHashSet<>();
 		if (extendsAnnotation != null) {
-			extendsClasses.add(extendsAnnotation.value());
-			extendsClasses.addAll(Arrays.asList(extendsAnnotation.others()));
+			extendsClasses.addAll(Arrays.asList(extendsAnnotation.value()));
 			return extendsClasses;
 		}
-		extendsClasses = new LinkedHashSet<>(Arrays.asList(new Class<?>[] {}));
 		Class<?> javaSuperclass = clazz.getSuperclass();
-		if (Object.class.equals(javaSuperclass)) {
-			extendsClasses.add(Engine.class);
+		if (Object.class.equals(javaSuperclass))
 			return extendsClasses;
-		}
-		if (javaSuperclass.getAnnotation(SystemGeneric.class) == null)
-			extendsClasses.addAll(getSupersClasses(javaSuperclass));
-		else
-			extendsClasses.add(javaSuperclass);
+		extendsClasses.addAll(javaSuperclass.getAnnotation(SystemGeneric.class) == null ? getSupersClasses(javaSuperclass) : Arrays.asList(javaSuperclass));
 		return extendsClasses;
-	}
-
-	// TODO KK
-	Generic findImplicitSuper(Class<?> clazz) {
-		if (SystemGeneric.STRUCTURAL == clazz.getAnnotation(SystemGeneric.class).value())
-			return getEngine();
-		Generic[] supers = findUserSupers(clazz);
-		// assert supers.length == 1;
-		return supers[0].getImplicit();
 	}
 
 	Generic[] findComponents(Class<?> clazz) {
@@ -290,6 +270,10 @@ public abstract class AbstractContext implements Serializable {
 		for (int index = 0; index < componentClasses.length; index++)
 			components[index] = !clazz.equals(componentClasses[index]) ? find(componentClasses[index]) : null;
 		return components;
+	}
+
+	int findMetaLevel(Class<?> clazz) {
+		return clazz.getAnnotation(SystemGeneric.class).value();
 	}
 
 	@SuppressWarnings("unchecked")
