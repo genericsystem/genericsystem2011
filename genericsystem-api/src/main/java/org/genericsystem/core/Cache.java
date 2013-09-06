@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 
-import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;

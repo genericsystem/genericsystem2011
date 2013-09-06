@@ -1,15 +1,11 @@
 package org.genericsystem.impl;
 
-import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
-import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
@@ -26,9 +22,9 @@ public class FunctionalTest extends AbstractTest {
 //		car.setValue(vehiculePower, 80);
 //		Generic myCar = car.newInstance("myCar");
 //		myCar.setValue(vehiculePower, 233);
-//		((GenericImpl) myCar).mainSnaphot(vehiculePower, SystemGeneric.CONCRETE, Statics.BASE_POSITION, true).log();
+//		((GenericImpl) myCar).mainSnaphot(vehiculePower, Statics.CONCRETE, Statics.BASE_POSITION, true).log();
 //		((GenericImpl) myCar).getHolders(vehiculePower).log();
-//		((GenericImpl) car).mainSnaphot(vehiculePower, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false).log();
+//		((GenericImpl) car).mainSnaphot(vehiculePower, Statics.CONCRETE, Statics.BASE_POSITION, false).log();
 //		((GenericImpl) car).getHolders(vehiculePower).log();
 //	}
 
@@ -45,22 +41,22 @@ public class FunctionalTest extends AbstractTest {
 //
 //		long time = System.currentTimeMillis();
 //		for (int i = 0; i < 10000; i++)
-//			for (Generic generic : ((GenericImpl) myCar).mainSnaphot(larger, SystemGeneric.STRUCTURAL, Statics.MULTIDIRECTIONAL, false));
+//			for (Generic generic : ((GenericImpl) myCar).mainSnaphot(larger, Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false));
 //		log.info("time : " + (System.currentTimeMillis() - time));
 //		time = System.currentTimeMillis();
 //		for (int i = 0; i < 10000; i++)
 //			for (Generic generic : ((GenericImpl) yourCar).getAttributes());
 //		log.info("time : " + (System.currentTimeMillis() - time));
 //
-//		assert ((GenericImpl) myCar).mainSnaphot(larger, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false).equals(((GenericImpl) myCar).getHolders(larger)) : ((GenericImpl) myCar).mainSnaphot(larger, SystemGeneric.CONCRETE, Statics.BASE_POSITION,
+//		assert ((GenericImpl) myCar).mainSnaphot(larger, Statics.CONCRETE, Statics.BASE_POSITION, false).equals(((GenericImpl) myCar).getHolders(larger)) : ((GenericImpl) myCar).mainSnaphot(larger, Statics.CONCRETE, Statics.BASE_POSITION,
 //				false);
-//		assert ((GenericImpl) yourCar).mainSnaphot(larger, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false).equals(((GenericImpl) yourCar).getHolders(larger));
-//		assert ((GenericImpl) car).mainSnaphot(larger, SystemGeneric.CONCRETE, Statics.BASE_POSITION, false).equals(((GenericImpl) car).getHolders(larger));
+//		assert ((GenericImpl) yourCar).mainSnaphot(larger, Statics.CONCRETE, Statics.BASE_POSITION, false).equals(((GenericImpl) yourCar).getHolders(larger));
+//		assert ((GenericImpl) car).mainSnaphot(larger, Statics.CONCRETE, Statics.BASE_POSITION, false).equals(((GenericImpl) car).getHolders(larger));
 //
-//		assert ((GenericImpl) myCar).mainSnaphot(cache.getMetaAttribute(), SystemGeneric.STRUCTURAL, Statics.MULTIDIRECTIONAL, false).equals(((GenericImpl) myCar).getAttributes()) : ((GenericImpl) myCar).mainSnaphot(cache.getMetaAttribute(),
-//				SystemGeneric.STRUCTURAL, Statics.MULTIDIRECTIONAL, false) + " " + ((GenericImpl) myCar).getAttributes();
-//		assert ((GenericImpl) yourCar).mainSnaphot(cache.getMetaAttribute(), SystemGeneric.STRUCTURAL, Statics.MULTIDIRECTIONAL, false).equals(((GenericImpl) yourCar).getAttributes());
-//		assert ((GenericImpl) car).mainSnaphot(cache.getMetaAttribute(), SystemGeneric.STRUCTURAL, Statics.MULTIDIRECTIONAL, false).equals(((GenericImpl) car).getAttributes());
+//		assert ((GenericImpl) myCar).mainSnaphot(cache.getMetaAttribute(), Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false).equals(((GenericImpl) myCar).getAttributes()) : ((GenericImpl) myCar).mainSnaphot(cache.getMetaAttribute(),
+//				Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false) + " " + ((GenericImpl) myCar).getAttributes();
+//		assert ((GenericImpl) yourCar).mainSnaphot(cache.getMetaAttribute(), Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false).equals(((GenericImpl) yourCar).getAttributes());
+//		assert ((GenericImpl) car).mainSnaphot(cache.getMetaAttribute(), Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false).equals(((GenericImpl) car).getAttributes());
 //
 //	}
 

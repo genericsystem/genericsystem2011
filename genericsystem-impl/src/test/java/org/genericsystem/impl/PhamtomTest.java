@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -164,7 +163,7 @@ public class PhamtomTest extends AbstractTest {
 
 		assert car.getAttributes().contains(vehiclePower);
 		car.cancelAll(vehiclePower, false);
-		Iterator<Generic> iterator = ((GenericImpl) car).holdersIterator(SystemGeneric.STRUCTURAL,vehiclePower, Statics.MULTIDIRECTIONAL,true);
+		Iterator<Generic> iterator = ((GenericImpl) car).holdersIterator(Statics.STRUCTURAL,vehiclePower, Statics.MULTIDIRECTIONAL,true);
 		Generic phantom = iterator.next();
 		// car.restore( vehiclePower);
 		car.clearAllStructural(vehiclePower);

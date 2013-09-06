@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.genericsystem.core.Engine;
+
 /**
  * Used to declare the Extends of generic. A generic inherits directly of the supers.
  * 
@@ -15,23 +17,17 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface Extends {
 
-	// /**
-	// * Returns the class of the mainSuper.
-	// *
-	// * @return The class of the mainSuper.
-	// */
-	// Class<?> value();
 	/**
-	 * Returns the class of the supers.
+	 * The meta class
 	 * 
-	 * @return An array of class of the supers.
+	 * @return meta class
 	 */
-	Class<?>[] value();
-	//
-	// /**
-	// * Returns the class of the supers.
-	// *
-	// * @return An array of class of the supers.
-	// */
-	// Class<?>[] others() default {};
+	Class<?> meta() default Engine.class;
+
+	/**
+	 * Returns the supers classes.
+	 * 
+	 * @return An array of supers classes.
+	 */
+	Class<?>[] value() default {};
 }

@@ -30,6 +30,11 @@ public class Statics {
 	public static final Flag FLAG = new Flag();
 	public static final Generic[] EMPTY_GENERIC_ARRAY = new Generic[] {};
 
+	public static final int META = 0;
+	public static final int STRUCTURAL = 1;
+	public static final int CONCRETE = 2;
+	public static final int SENSOR = 3;
+
 	public static final int MULTIDIRECTIONAL = -1;
 	public static final int BASE_POSITION = 0;
 	public static final int TARGET_POSITION = 1;
@@ -137,7 +142,8 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {}
+		private Flag() {
+		}
 
 		@Override
 		public String toString() {

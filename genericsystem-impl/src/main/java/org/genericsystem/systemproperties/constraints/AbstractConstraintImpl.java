@@ -39,12 +39,12 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 	// }
 
 	// public AbstractConstraintImpl bindAxedConstraint(int pos) {
-	// Generic implicit = getEngine().bindPrimary(Generic.class, new AxedPropertyClass(getClass(), pos), SystemGeneric.STRUCTURAL, true);
+	// Generic implicit = getEngine().bindPrimary(Generic.class, new AxedPropertyClass(getClass(), pos), Statics.STRUCTURAL, true);
 	// return getCurrentCache().<GenericImpl> find(MapInstance.class).bind(getClass(), implicit, this, getBasePos(this), false, new Generic[] {});
 	// }
 	//
 	// public <T extends AbstractConstraintImpl> T findAxedConstraint(int pos) {
-	// Generic implicit = getEngine().findPrimary(new AxedPropertyClass(getClass(), pos), SystemGeneric.STRUCTURAL);
+	// Generic implicit = getEngine().findPrimary(new AxedPropertyClass(getClass(), pos), Statics.STRUCTURAL);
 	// if (implicit == null)
 	// return null;
 	// return getCurrentCache().<GenericImpl> find(MapInstance.class).<T> find(implicit, this, getBasePos(this), new Generic[] {});

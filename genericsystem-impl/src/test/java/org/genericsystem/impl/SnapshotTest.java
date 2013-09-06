@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.testng.annotations.BeforeTest;

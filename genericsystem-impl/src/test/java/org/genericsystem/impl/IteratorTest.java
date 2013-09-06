@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.Iterator;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;

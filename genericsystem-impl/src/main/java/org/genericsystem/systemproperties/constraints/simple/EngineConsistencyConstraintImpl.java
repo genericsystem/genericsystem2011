@@ -23,7 +23,7 @@
 // * @author Nicolas Feybesse
 // * 
 // */
-//@SystemGeneric(SystemGeneric.CONCRETE)
+//@SystemGeneric(Statics.CONCRETE)
 //@Components(MapInstance.class)
 //@Extends(SystemPropertyKey.class)
 //@SingularConstraint
@@ -32,7 +32,7 @@
 //@Priority(Integer.MIN_VALUE)
 //public class EngineConsistencyConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 //
-//	@SystemGeneric(SystemGeneric.CONCRETE)
+//	@SystemGeneric(Statics.CONCRETE)
 //	@Components(EngineConsistencyConstraintImpl.class)
 //	@Extends(ConstraintsMapProvider.ConstraintValue.class)
 //	@BooleanValue(true)

@@ -18,9 +18,9 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric(SystemGeneric.CONCRETE)
+@SystemGeneric
+@Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@Extends(ConstraintKey.class)
 @SingularConstraint
 @AxedConstraintValue(SingletonConstraintImpl.class)
 @Priority(10)

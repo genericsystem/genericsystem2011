@@ -135,7 +135,7 @@ public abstract class AbstractContext implements Serializable {
 		if (generic.isEngine() || generic.isAlive())
 			return (T) generic;
 		if (((GenericImpl) generic).isPrimary())
-			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue(), generic.getMetaLevel());
+			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue());
 		return fastFindByInterfaces(reFind(generic.getImplicit()), new Primaries(reFind(((GenericImpl) generic).getPrimariesArray())).toArray(), reFind(((GenericImpl) generic).components));
 	}
 
@@ -272,10 +272,6 @@ public abstract class AbstractContext implements Serializable {
 		return components;
 	}
 
-	int findMetaLevel(Class<?> clazz) {
-		return clazz.getAnnotation(SystemGeneric.class).value();
-	}
-
 	@SuppressWarnings("unchecked")
 	protected static Serializable findImplictValue(Class<?> clazz) {
 		BooleanValue booleanValue = clazz.getAnnotation(BooleanValue.class);
@@ -294,13 +290,11 @@ public abstract class AbstractContext implements Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T findPrimaryByValue(Generic primaryAncestor, Serializable value, int metaLevel) {
-		assert metaLevel - primaryAncestor.getMetaLevel() <= 1;
-		assert metaLevel - primaryAncestor.getMetaLevel() >= 0 : metaLevel + " " + primaryAncestor.getMetaLevel();
+	public <T extends Generic> T findPrimaryByValue(Generic primaryAncestor, Serializable value) {
 		Iterator<Generic> it = directInheritingsIterator(primaryAncestor);
 		while (it.hasNext()) {
 			Generic candidate = it.next();
-			if (((GenericImpl) candidate).isPrimary() && (metaLevel == candidate.getMetaLevel()) && (Objects.hashCode(value) == Objects.hashCode(candidate.getValue())) && Objects.equals(value, candidate.getValue()))
+			if (((GenericImpl) candidate).isPrimary() && (Objects.hashCode(value) == Objects.hashCode(candidate.getValue())) && Objects.equals(value, candidate.getValue()))
 				return (T) candidate;
 		}
 		return null;

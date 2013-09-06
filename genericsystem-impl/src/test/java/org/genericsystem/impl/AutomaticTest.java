@@ -1,5 +1,6 @@
 package org.genericsystem.impl;
 
+import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
@@ -288,8 +289,9 @@ public class AutomaticTest extends AbstractTest {
 	public static class Vehicle {
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyVehicle extends Vehicle {
+	@SystemGeneric
+	@Extends(meta = Vehicle.class)
+	public static class MyVehicle {
 	}
 
 }

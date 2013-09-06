@@ -19,9 +19,9 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric(SystemGeneric.CONCRETE)
+@SystemGeneric
+@Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@Extends(ConstraintKey.class)
 @AxedConstraintValue(RequiredConstraintImpl.class)
 @SingularConstraint
 public class RequiredConstraintImpl extends AbstractBooleanAxedConstraintImpl implements Holder {

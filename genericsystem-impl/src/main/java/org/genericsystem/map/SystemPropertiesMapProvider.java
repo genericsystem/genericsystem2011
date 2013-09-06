@@ -59,8 +59,8 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 	public static class SystemPropertyValue extends GenericImpl implements Attribute {
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	@Extends(SystemPropertiesMapProvider.class)
+	@SystemGeneric
+	@Extends(meta = SystemPropertiesMapProvider.class)
 	@Components(Engine.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
 	public static class MapInstance extends GenericImpl implements Holder {

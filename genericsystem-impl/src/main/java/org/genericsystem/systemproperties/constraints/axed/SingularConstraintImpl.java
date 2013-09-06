@@ -17,16 +17,16 @@ import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
-@SystemGeneric(SystemGeneric.CONCRETE)
+@SystemGeneric
+@Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@Extends(ConstraintKey.class)
 @Dependencies(SingularConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(SingularConstraintImpl.class)
 public class SingularConstraintImpl extends AbstractBooleanAxedConstraintImpl implements Holder {
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
+	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(SingularConstraintImpl.class)
-	@Extends(ConstraintsMapProvider.ConstraintValue.class)
 	@BooleanValue(false)
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}

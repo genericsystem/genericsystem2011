@@ -12,9 +12,9 @@ import org.genericsystem.map.SystemPropertiesMapProvider.SystemPropertyKey;
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric(SystemGeneric.CONCRETE)
+@SystemGeneric
+@Extends(meta = SystemPropertyKey.class)
 @Components(MapInstance.class)
-@Extends(SystemPropertyKey.class)
 @AxedConstraintValue(CascadeRemoveSystemProperty.class)
 public class CascadeRemoveSystemProperty extends GenericImpl {
 

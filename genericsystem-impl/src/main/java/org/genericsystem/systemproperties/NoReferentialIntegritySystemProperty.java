@@ -16,16 +16,16 @@ import org.genericsystem.map.SystemPropertiesMapProvider.SystemPropertyValue;
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric(SystemGeneric.CONCRETE)
+@SystemGeneric
+@Extends(meta = SystemPropertyKey.class)
 @Components(MapInstance.class)
-@Extends(SystemPropertyKey.class)
 @Dependencies(NoReferentialIntegritySystemProperty.DefaultValue.class)
 @AxedConstraintValue(value = NoReferentialIntegritySystemProperty.class, axe = 0)
 public class NoReferentialIntegritySystemProperty extends GenericImpl {
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
+	@Extends(meta = SystemPropertyValue.class)
 	@Components(NoReferentialIntegritySystemProperty.class)
-	@Extends(SystemPropertyValue.class)
 	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}

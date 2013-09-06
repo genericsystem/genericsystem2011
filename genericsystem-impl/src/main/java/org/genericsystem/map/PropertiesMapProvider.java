@@ -51,8 +51,8 @@ public class PropertiesMapProvider extends AbstractMapProvider<Serializable, Ser
 	public static class PropertyValue extends GenericImpl implements Attribute {
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	@Extends(PropertiesMapProvider.class)
+	@SystemGeneric
+	@Extends(meta = PropertiesMapProvider.class)
 	@Components(Engine.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
 	public static class MapInstance extends GenericImpl implements Holder {

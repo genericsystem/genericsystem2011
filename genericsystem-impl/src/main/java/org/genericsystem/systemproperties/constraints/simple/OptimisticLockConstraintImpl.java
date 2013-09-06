@@ -24,18 +24,18 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric(SystemGeneric.CONCRETE)
+@SystemGeneric
+@Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@Extends(ConstraintKey.class)
 @SingularConstraint
 @Dependencies(OptimisticLockConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(OptimisticLockConstraintImpl.class)
 @Priority(0)
 public class OptimisticLockConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
+	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(OptimisticLockConstraintImpl.class)
-	@Extends(ConstraintsMapProvider.ConstraintValue.class)
 	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}

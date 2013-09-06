@@ -20,18 +20,18 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric(SystemGeneric.CONCRETE)
+@SystemGeneric
+@Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@Extends(ConstraintKey.class)
 @SingularConstraint
 @Dependencies(PhantomConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(PhantomConstraintImpl.class)
 // @NotNullConstraint
 public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
+	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(PhantomConstraintImpl.class)
-	@Extends(ConstraintsMapProvider.ConstraintValue.class)
 	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}

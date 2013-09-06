@@ -225,7 +225,8 @@ public class Archiver {
 				Engine engine = loadEngine();
 				for (;;)
 					loadGeneric(engine);
-			} catch (EOFException ignore) {} catch (Exception e) {
+			} catch (EOFException ignore) {
+			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
@@ -239,12 +240,13 @@ public class Archiver {
 
 		private void loadGeneric(Engine engine) throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(inputstream);
+			// TODO KK
 			int metaLevel = inputstream.readInt();
 			Serializable value = (Serializable) inputstream.readObject();
 			Generic[] supers = loadAncestors(inputstream);
 			Generic[] components = loadAncestors(inputstream);
 			Generic generic = engine.getFactory().newGeneric((Class<?>) inputstream.readObject());
-			put(ts[0], ((GenericImpl) generic).restore(value, metaLevel, ts[0], ts[1], ts[2], ts[3], supers, components, inputstream.readBoolean()).plug());
+			put(ts[0], ((GenericImpl) generic).restore(value, ts[0], ts[1], ts[2], ts[3], supers, components, inputstream.readBoolean()).plug());
 		}
 
 		private Generic[] loadAncestors(ObjectInputStream in) throws IOException {

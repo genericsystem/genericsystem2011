@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
-import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -120,7 +119,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 	private static <T extends Holder> T setSingularHolder(Holder keyHolder, Holder attribute, Serializable value, Generic... targets) {
 		int basePos = keyHolder.getBasePos(attribute);
 		T holder = keyHolder.getHolder((Attribute) attribute, basePos);
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(null, value, SystemGeneric.CONCRETE, true);
+		Generic implicit = ((GenericImpl) attribute).bindPrimary(null, value, true);
 		if (holder == null)
 			return null != value ? ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets) : null;
 		if (!keyHolder.equals(holder.getComponent(basePos))) {

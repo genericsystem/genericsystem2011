@@ -24,16 +24,16 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
  * @author Michael Ory
  * 
  */
-@SystemGeneric(SystemGeneric.CONCRETE)
+@SystemGeneric
+@Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@Extends(ConstraintKey.class)
 @Dependencies(SizeConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(SizeConstraintImpl.class)
 public class SizeConstraintImpl extends AbstractNoBooleanAxedConstraintImpl implements Holder {
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
+	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(SizeConstraintImpl.class)
-	@Extends(ConstraintsMapProvider.ConstraintValue.class)
 	@BooleanValue(false)
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}

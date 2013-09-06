@@ -272,7 +272,7 @@ public class AnnotationTest extends AbstractTest {
 		Type transformerChildrenGames = cache.find(TransformerChildrenGames.class);
 		Generic myTransformerChildrenGames = cache.find(MyTransformerChildrenGames.class);
 
-		assert myTransformerChildrenGames.inheritsFrom(transformerChildrenGames);
+		assert myTransformerChildrenGames.inheritsFrom(transformerChildrenGames) : myTransformerChildrenGames.info() + transformerChildrenGames.info();
 		assert ((GenericImpl) transformerChildrenGames).isSuperOf(myTransformerChildrenGames);
 
 		assert !myTransformerChildrenGames.inheritsFrom(myGames);
@@ -314,16 +314,18 @@ public class AnnotationTest extends AbstractTest {
 	public static class Games {
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyGames extends Games {
+	@SystemGeneric
+	@Extends(meta = Games.class)
+	public static class MyGames {
 	}
 
 	@SystemGeneric
 	public static class Children {
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyChildren extends Children {
+	@SystemGeneric
+	@Extends(meta = Children.class)
+	public static class MyChildren {
 	}
 
 	@SystemGeneric
@@ -331,8 +333,9 @@ public class AnnotationTest extends AbstractTest {
 	public static class ChildrenGames {
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyChildrenGames extends ChildrenGames {
+	@SystemGeneric
+	@Extends(meta = ChildrenGames.class)
+	public static class MyChildrenGames {
 	}
 
 	@SystemGeneric
@@ -340,8 +343,9 @@ public class AnnotationTest extends AbstractTest {
 	public static class Transformer {
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyTransformer extends Transformer {
+	@SystemGeneric
+	@Extends(meta = Transformer.class)
+	public static class MyTransformer {
 	}
 
 	@SystemGeneric
@@ -349,8 +353,9 @@ public class AnnotationTest extends AbstractTest {
 	public static class TransformerChildrenGames {
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyTransformerChildrenGames extends TransformerChildrenGames {
+	@SystemGeneric
+	@Extends(meta = TransformerChildrenGames.class)
+	public static class MyTransformerChildrenGames {
 	}
 
 	@SystemGeneric
@@ -387,8 +392,8 @@ public class AnnotationTest extends AbstractTest {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	@Extends(SelectableWindow.class)
+	@SystemGeneric
+	@Extends(meta = SelectableWindow.class)
 	public static class MySelectableWindow {
 
 	}
@@ -398,8 +403,9 @@ public class AnnotationTest extends AbstractTest {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class MyVehicle extends Vehicle {
+	@SystemGeneric
+	@Extends(meta = Vehicle.class)
+	public static class MyVehicle {
 	}
 
 	@SystemGeneric
@@ -408,10 +414,11 @@ public class AnnotationTest extends AbstractTest {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
+	@Extends(meta = Power.class)
 	@Components(MyVehicle.class)
 	@IntValue(123)
-	public static class V123 extends Power {
+	public static class V123 {
 
 	}
 
@@ -420,8 +427,9 @@ public class AnnotationTest extends AbstractTest {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class myCar extends Car {
+	@SystemGeneric
+	@Extends(meta = Car.class)
+	public static class myCar {
 	}
 
 	@SystemGeneric
@@ -444,8 +452,9 @@ public class AnnotationTest extends AbstractTest {
 	public static class Man extends Human {
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
-	public static class Myck extends Human {
+	@SystemGeneric
+	@Extends(meta = Human.class)
+	public static class Myck {
 	}
 
 	@SystemGeneric

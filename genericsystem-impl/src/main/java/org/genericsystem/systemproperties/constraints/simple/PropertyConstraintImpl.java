@@ -18,9 +18,9 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
-@SystemGeneric(SystemGeneric.CONCRETE)
+@SystemGeneric
+@Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@Extends(ConstraintKey.class)
 @SingularConstraint
 @AxedConstraintValue(PropertyConstraintImpl.class)
 public class PropertyConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {

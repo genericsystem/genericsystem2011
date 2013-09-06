@@ -15,31 +15,4 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface SystemGeneric {
 
-	/**
-	 * Returns the meta level.
-	 * 
-	 * @return The meta level.
-	 */
-	int value() default STRUCTURAL;
-
-	/**
-	 * for engine, meta-attribute.
-	 */
-	static final int META = 0;
-
-	/**
-	 * for types, attributes, relations...
-	 */
-	static final int STRUCTURAL = 1;
-
-	/**
-	 * for instances, holders, links...
-	 */
-	static final int CONCRETE = 2;
-
-	/**
-	 * No use.
-	 */
-	static final int SENSOR = 3;
-
 }

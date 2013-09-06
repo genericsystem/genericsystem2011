@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
@@ -44,7 +43,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	final void restoreEngine(long designTs, long birthTs, long lastReadTs, long deathTs) {
-		restore(ENGINE_VALUE, SystemGeneric.META, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY, false);
+		restore(ENGINE_VALUE, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY, false);
 		assert components.length == 0;
 	}
 
@@ -106,7 +105,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	@Override
 	public int getMetaLevel() {
-		return SystemGeneric.META;
+		// TODO KK ?
+		return 0;// SystemGeneric.META;
 	}
 
 	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
