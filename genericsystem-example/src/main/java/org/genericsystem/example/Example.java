@@ -5,7 +5,6 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
-import org.genericsystem.core.Engine;
 
 public class Example {
 
@@ -14,9 +13,10 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@StringValue("myVehicle")
-	public static class MyVehicle extends Vehicle {
+	@Extends(meta = Vehicle.class)
+	public static class MyVehicle {
 
 	}
 
@@ -26,17 +26,19 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@Components(Vehicle.class)
 	@IntValue(123)
-	public static class V123 extends Power {
+	@Extends(meta = Power.class)
+	public static class V123 {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@Components(MyVehicle.class)
 	@IntValue(136)
-	public static class V136 extends Power {
+	@Extends(meta = Power.class)
+	public static class V136 {
 
 	}
 
@@ -45,15 +47,17 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@StringValue("red")
-	public static class Red extends Color {
+	@Extends(meta = Color.class)
+	public static class Red {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@StringValue("yellow")
-	public static class Yellow extends Color {
+	@Extends(meta = Color.class)
+	public static class Yellow {
 
 	}
 
@@ -63,17 +67,19 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@Components({ MyVehicle.class, Red.class })
 	@StringValue("myVehicleRed")
-	public static class MyVehicleRed extends VehicleColor {
+	@Extends(meta = VehicleColor.class)
+	public static class MyVehicleRed {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@Components({ Vehicle.class, Yellow.class })
 	@StringValue("myVehicleYellow")
-	public static class MyVehicleYellow extends VehicleColor {
+	@Extends(meta = VehicleColor.class)
+	public static class MyVehicleYellow {
 
 	}
 
@@ -82,9 +88,10 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@StringValue("myCar")
-	public static class MyCar extends Car {
+	@Extends(meta = Car.class)
+	public static class MyCar {
 
 	}
 
@@ -93,9 +100,10 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@StringValue("myTime")
-	public static class MyTime extends Time {
+	@Extends(meta = Time.class)
+	public static class MyTime {
 
 	}
 
@@ -105,10 +113,11 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@Components({ MyVehicle.class, Red.class, MyTime.class })
 	@StringValue("myVehicleColorTime")
-	public static class MyVehicleColorTime extends VehicleColorTime {
+	@Extends(meta = VehicleColorTime.class)
+	public static class MyVehicleColorTime {
 
 	}
 
@@ -117,21 +126,24 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@StringValue("Nicolas")
-	public static class Nicolas extends Human {
+	@Extends(meta = Human.class)
+	public static class Nicolas {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@StringValue("Michael")
-	public static class Michael extends Human {
+	@Extends(meta = Human.class)
+	public static class Michael {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@StringValue("Quentin")
-	public static class Quentin extends Human {
+	@Extends(meta = Human.class)
+	public static class Quentin {
 
 	}
 
@@ -141,10 +153,11 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@Components({ Nicolas.class, Michael.class })
 	@StringValue("nicolasIsTallerOrEqualThanMichael")
-	public static class NicolasIsTallerOrEqualThanMichael extends IsTallerOrEqualThan {
+	@Extends(meta = IsTallerOrEqualThan.class)
+	public static class NicolasIsTallerOrEqualThanMichael {
 
 	}
 
@@ -161,10 +174,11 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@Components({ Quentin.class, Michael.class })
 	@StringValue("quentinIsBrotherOfMichael")
-	public static class QuentinIsBrotherOfMichael extends IsBrotherOf {
+	@Extends(meta = IsBrotherOf.class)
+	public static class QuentinIsBrotherOfMichael {
 
 	}
 
@@ -174,21 +188,23 @@ public class Example {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@Components({ Nicolas.class, Michael.class })
 	@StringValue("nicolasIsBossOfMichael")
+	@Extends(meta = IsBossOf.class)
 	public static class NicolasIsBossOfMichael extends IsBossOf {
 
 	}
 
 	@SystemGeneric
-	@Extends(value = Engine.class, others = { Human.class, Vehicle.class })
+	@Extends({ Human.class, Vehicle.class })
 	public static class Transformer {
 
 	}
 
-	@SystemGeneric(SystemGeneric.CONCRETE)
+	@SystemGeneric
 	@StringValue("myTransformer")
+	@Extends(meta = Transformer.class)
 	public static class MyTransformer extends Transformer {
 
 	}
