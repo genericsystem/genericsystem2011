@@ -2,12 +2,12 @@ package org.genericsystem.map;
 
 import java.io.Serializable;
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -91,7 +91,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 					public Iterator<Key> iterator() {
 						Holder map = generic.getHolder(AbstractMapProvider.this);
 						if (map == null)
-							return Statics.emptyIterator();
+							return Collections.emptyIterator();
 						Attribute key = getCurrentCache().<Attribute> find(getKeyAttributeClass());
 						return new AbstractProjectorAndFilterIterator<Holder, Key>(((GenericImpl) map).<Holder> holdersIterator(key, getBasePos(key), false)) {
 
@@ -138,7 +138,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 	private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {
 		Holder map = generic.getHolder(this);
 		if (map == null)
-			return Statics.emptyIterator();
+			return Collections.emptyIterator();
 		Attribute key = getCurrentCache().<Attribute> find(getKeyAttributeClass());
 		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Key, Value>>(((GenericImpl) map).<Holder> holdersIterator(key, getBasePos(key), false)) {
 
