@@ -163,7 +163,7 @@ public class PhamtomTest extends AbstractTest {
 
 		assert car.getAttributes().contains(vehiclePower);
 		car.cancelAll(vehiclePower, false);
-		Iterator<Generic> iterator = ((GenericImpl) car).holdersIterator(Statics.STRUCTURAL,vehiclePower, Statics.MULTIDIRECTIONAL,true);
+		Iterator<Generic> iterator = ((GenericImpl) car).holdersIterator(Statics.STRUCTURAL, vehiclePower, Statics.MULTIDIRECTIONAL, true);
 		Generic phantom = iterator.next();
 		// car.restore( vehiclePower);
 		car.clearAllStructural(vehiclePower);
@@ -203,7 +203,7 @@ public class PhamtomTest extends AbstractTest {
 		assert vehicle.getAttributes().contains(vehiclePower);
 		((GenericImpl) car).setSubAttribute(vehiclePower, null);
 		assert vehicle.getAttributes().contains(vehiclePower);
-		assert !car.getAttributes().contains(vehiclePower);
+		assert !car.getAttributes().contains(vehiclePower) : car.getAttributes();
 		car.getAttribute(null).remove();
 		assert vehicle.getAttributes().contains(vehiclePower);
 		assert car.getAttributes().contains(vehiclePower);
@@ -255,7 +255,7 @@ public class PhamtomTest extends AbstractTest {
 		((GenericImpl) car).setSubAttribute(vehicleHuman, null, human);
 
 		assert vehicle.getRelations().size() == 1;
-		assert car.getRelations().isEmpty();
+		assert car.getRelations().isEmpty() : car.getRelations();
 
 		// car.restore( vehicleHuman);
 		car.getAttribute(vehicleHuman, null).remove();
@@ -440,15 +440,8 @@ public class PhamtomTest extends AbstractTest {
 		assert defaultColor.isConcrete();
 		final Generic myCar = car.newInstance("myCar");
 		assert myCar.getTargets(carColor).contains(red);
-		// new RollbackCatcher() {
-		// @Override
-		// public void intercept() {
 		myCar.setLink(carColor, null, red);
-		// }
-		// }.assertIsCausedBy(PhantomConstraintViolationException.class);
-
 		myCar.setLink(defaultColor, null, red);
-
 		assert ((GenericImpl) myCar).getHolder(defaultColor, null, red) == null;
 	}
 

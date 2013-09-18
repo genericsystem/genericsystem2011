@@ -282,42 +282,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return setHolder(attribute, value, getBasePos(attribute), targets);
 	}
 
-	private <T extends Holder> T getSelectedHolder(Holder attribute, Serializable value, int basePos, Generic... targets) {
-		T holder;
-		if (((Relation) attribute).isSingularConstraintEnabled(basePos))
-			holder = getHolder((Attribute) attribute, basePos);
-		else if (value == null || ((Type) attribute).isPropertyConstraintEnabled())
-			holder = getHolder(attribute, basePos, targets);
-		else
-			holder = getHolderByValue(attribute, value, basePos, targets);
-		return holder;
-	}
-
-	@Override
-	public <T extends Holder> T setHolder(Holder attribute, Serializable value, int basePos, Generic... targets) {
-		return this.<T> setHolder(null, attribute, value, basePos, targets);
-	}
-
-	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
-		T holder = getSelectedHolder(attribute, value, basePos, targets);
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(null, value, true);
-		if (holder == null)
-			return null != value ? this.<T> bind(specializationClass, implicit, attribute, basePos, true, targets) : null;
-		if (!equals(holder.getComponent(basePos))) {
-			if (value == null)
-				return cancel(holder, basePos, true);
-			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
-				cancel(holder, basePos, true);
-			return this.<T> bind(specializationClass, implicit, attribute, basePos, true, targets);
-		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
-			return holder;
-		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
-			return holder.updateValue(value);
-		holder.remove();
-		return this.<T> setHolder(specializationClass, attribute, value, basePos, targets);
-	}
-
 	@Override
 	public <T extends Holder> T addHolder(Holder attribute, int basePos, Serializable value, Generic... targets) {
 		Generic implicit = ((GenericImpl) attribute).bindPrimary(null, value, true);
@@ -669,13 +633,56 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		T bind = bind(null, getEngine().bindPrimary(Generic.class, value, true), attribute, getBasePos(attribute), false, targets);
-		assert bind.inheritsFrom(attribute);
-		return bind;
+		return internalSetHolder(null, getEngine(), attribute, value, getBasePos(attribute), false, targets);
 	}
 
 	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		return bind(null, getEngine().bindPrimary(Generic.class, value, true), attribute, getBasePos(attribute), true, targets);
+		return internalSetHolder(null, getEngine(), attribute, value, getBasePos(attribute), true, targets);
+	}
+
+	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Generic implicitSuper, Holder attribute, Serializable value, int basePos, boolean existsException, Generic... targets) {
+		T holder = getSelectedHolder(attribute, value, basePos, targets);
+		Generic implicit = ((GenericImpl) implicitSuper).bindPrimary(Generic.class, value, true);
+		if (holder == null) {
+			Generic component = attribute.getComponent(basePos);
+			// log.info(this + " attribute " + attribute + " attribute.getComponent(basePos) " + attribute.getComponent(basePos) + " " + basePos);
+			if (value == null && (isInstanceOf(component) || equals(component)))
+				return null;
+			return this.<T> bind(specializationClass, implicit, attribute, basePos, existsException, targets);
+		}
+		if (!equals(holder.getComponent(basePos))) {
+			if (value == null)
+				return cancel(holder, basePos, true);
+			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+				cancel(holder, basePos, true);
+			return this.<T> bind(specializationClass, implicit, attribute, basePos, existsException, targets);
+		}
+		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+			return holder;
+		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+			return holder.updateValue(value);
+		holder.remove();
+		return this.<T> internalSetHolder(specializationClass, implicitSuper, attribute, value, basePos, existsException, targets);
+	}
+
+	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
+		return this.<T> internalSetHolder(specializationClass, attribute, attribute, value, basePos, false, targets);
+	}
+
+	private <T extends Holder> T getSelectedHolder(Holder attribute, Serializable value, int basePos, Generic... targets) {
+		T holder;
+		if (((Relation) attribute).isSingularConstraintEnabled(basePos))
+			holder = getHolder((Attribute) attribute, basePos);
+		else if (value == null || ((Type) attribute).isPropertyConstraintEnabled())
+			holder = getHolder(attribute, basePos, targets);
+		else
+			holder = getHolderByValue(attribute, value, basePos, targets);
+		return holder;
+	}
+
+	@Override
+	public <T extends Holder> T setHolder(Holder attribute, Serializable value, int basePos, Generic... targets) {
+		return this.<T> setHolder(null, attribute, value, basePos, targets);
 	}
 
 	@Override
@@ -981,9 +988,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
 		s += "toString    : " + this + "\n";
-		// s += "meta        : " + getMeta() + "\n";
+		s += "meta        : " + getMeta() + "\n";
 		s += "value       : " + getValue() + "\n";
-		// s += "metaLevel   : " + getMetaLevel() + "\n";
+		s += "metaLevel   : " + getMetaLevel() + "\n";
 		s += "**********************************************************************\n";
 		s += "design date : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
 		s += "birth date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
