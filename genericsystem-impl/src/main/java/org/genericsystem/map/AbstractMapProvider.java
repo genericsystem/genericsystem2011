@@ -53,23 +53,18 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 			@Override
 			public Value get(Object key) {
 				Holder valueHolder = getValueHolder((Serializable) key);
-				return (Value) (valueHolder != null ? valueHolder.getValue() : null);
+				return valueHolder != null ? valueHolder.<Value> getValue() : null;
 			}
 
 			@Override
 			public Holder getValueHolder(Serializable key) {
 				Holder keyHolder = getKeyHolder(key);
-				if (keyHolder == null)
-					return null;
-				return keyHolder.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
+				return keyHolder != null ? keyHolder.getHolder(getValueAttribute()) : null;
 			}
 
-			// @Override
 			private Holder getKeyHolder(Serializable key) {
 				GenericImpl map = generic.getHolder(AbstractMapProvider.this);
-				if (map == null)
-					return null;
-				return map.getHolderByValue(getCurrentCache().<Attribute> find(getKeyAttributeClass()), key);
+				return map != null ? map.getHolderByValue(getKeyAttribute(), key) : null;
 			}
 
 			@Override
@@ -78,9 +73,9 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				Value oldValue = get(key);
 				if (Objects.equals(oldValue, value))
 					return oldValue;
-				Holder attribute = getCurrentCache().<Attribute> find(getKeyAttributeClass());
-				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getKeyClass(key), attribute, (Serializable) key, getBasePos(attribute));
-				setSingularHolder(keyHolder, getCurrentCache().<Attribute> find(getValueAttributeClass()), (Serializable) value);
+				Holder attribute = getKeyAttribute();
+				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key, getBasePos(attribute));
+				setSingularHolder(keyHolder, getValueAttribute(), (Serializable) value);
 				return oldValue;
 			}
 
@@ -92,12 +87,12 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 						Holder map = generic.getHolder(AbstractMapProvider.this);
 						if (map == null)
 							return Collections.emptyIterator();
-						Attribute key = getCurrentCache().<Attribute> find(getKeyAttributeClass());
+						Attribute key = getKeyAttribute();
 						return new AbstractProjectorAndFilterIterator<Holder, Key>(((GenericImpl) map).<Holder> holdersIterator(key, getBasePos(key), false)) {
 
 							@Override
 							public boolean isSelected() {
-								return next.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass())) != null;
+								return next.getHolder(getValueAttribute()) != null;
 							}
 
 							@Override
@@ -111,9 +106,9 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		};
 	}
 
-	protected <T extends GenericImpl> Class<T> getKeyClass(Key key) {
+	protected <T extends GenericImpl> Class<T> getSpecializationClass(Key key) {
 		return null;
-	}
+	};
 
 	// TODO KK code copier du setHolder
 	private static <T extends Holder> T setSingularHolder(Holder keyHolder, Holder attribute, Serializable value, Generic... targets) {
@@ -139,14 +134,14 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		Holder map = generic.getHolder(this);
 		if (map == null)
 			return Collections.emptyIterator();
-		Attribute key = getCurrentCache().<Attribute> find(getKeyAttributeClass());
+		Attribute key = getKeyAttribute();
 		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Key, Value>>(((GenericImpl) map).<Holder> holdersIterator(key, getBasePos(key), false)) {
 
 			private Holder valueHolder;
 
 			@Override
 			public boolean isSelected() {
-				valueHolder = next.getHolder(getCurrentCache().<Attribute> find(getValueAttributeClass()));
+				valueHolder = next.getHolder(getValueAttribute());
 				return valueHolder != null;
 			}
 
@@ -173,4 +168,12 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 	public abstract <T extends Attribute> Class<T> getKeyAttributeClass();
 
 	public abstract <T extends Attribute> Class<T> getValueAttributeClass();
+
+	private Attribute getKeyAttribute() {
+		return getCurrentCache().<Attribute> find(getKeyAttributeClass());
+	}
+
+	private Attribute getValueAttribute() {
+		return getCurrentCache().<Attribute> find(getValueAttributeClass());
+	}
 }

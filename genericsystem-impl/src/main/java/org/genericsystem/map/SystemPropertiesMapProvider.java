@@ -40,7 +40,7 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <T extends GenericImpl> Class<T> getKeyClass(AxedPropertyClass<?> key) {
+	protected <T extends GenericImpl> Class<T> getSpecializationClass(AxedPropertyClass<?> key) {
 		return (Class<T>) key.getClazz();
 	}
 
