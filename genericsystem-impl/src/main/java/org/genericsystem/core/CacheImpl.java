@@ -10,7 +10,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -381,14 +380,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
-		Class<?> specialize = Generic.class;
-		if (clazz.getSuperclass().equals(GenericImpl.class))
-			specialize = clazz;
+		Class<?> specializationClass = GenericImpl.class.isAssignableFrom(clazz) ? clazz : null;
 		Generic[] userSupers = findUserSupers(clazz);
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz);
 		userSupers = meta.isPrimary() ? userSupers : Statics.insertFirst(meta, userSupers);
-		Generic implicit = bindPrimaryByValue(meta.getImplicit(), findImplictValue(clazz), isAutomatic(userSupers, components), specialize);
+		Generic implicit = bindPrimaryByValue(meta.getImplicit(), findImplictValue(clazz), isAutomatic(userSupers, components), specializationClass);
 		return bind(implicit, userSupers, components, false, clazz, false);
 	}
 
