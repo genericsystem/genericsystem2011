@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -642,7 +641,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Generic implicitSuper, Holder attribute, Serializable value, int basePos, boolean existsException, Generic... targets) {
 		T holder = getSelectedHolder(attribute, value, basePos, targets);
-		Generic implicit = ((GenericImpl) implicitSuper).bindPrimary(Generic.class, value, true);
+		Generic implicit = ((GenericImpl) implicitSuper).bindPrimary(null, value, true);
 		if (holder == null) {
 			Generic component = attribute.getComponent(basePos);
 			// log.info(this + " attribute " + attribute + " attribute.getComponent(basePos) " + attribute.getComponent(basePos) + " " + basePos);
@@ -702,7 +701,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
-		Generic implicit = getEngine().bindPrimary(Generic.class, value, !isEngine() || components.length != 0);
+		Generic implicit = getEngine().bindPrimary(null, value, !isEngine() || components.length != 0);
 		return getCurrentCache().bind(null, implicit, false, this, false, components);
 	}
 
