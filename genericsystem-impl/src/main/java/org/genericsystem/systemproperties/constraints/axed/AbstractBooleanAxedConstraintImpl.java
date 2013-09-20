@@ -12,7 +12,7 @@ public abstract class AbstractBooleanAxedConstraintImpl extends AbstractBooleanC
 
 	@Override
 	public void check(Generic modified, Generic attribute) throws ConstraintViolationException {
-		AxedPropertyClass<GenericImpl> key = getValue();
+		AxedPropertyClass key = getValue();
 		if (key.getAxe() != Statics.MULTIDIRECTIONAL)
 			check(((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), attribute, key.getAxe());
 	}

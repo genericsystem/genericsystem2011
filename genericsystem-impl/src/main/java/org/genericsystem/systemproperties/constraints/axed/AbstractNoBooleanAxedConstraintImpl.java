@@ -1,7 +1,6 @@
 package org.genericsystem.systemproperties.constraints.axed;
 
 import java.io.Serializable;
-
 import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -13,7 +12,7 @@ public abstract class AbstractNoBooleanAxedConstraintImpl extends AbstractNoBool
 
 	@Override
 	public void check(Generic modified, Generic attribute, Serializable value) throws ConstraintViolationException {
-		AxedPropertyClass<GenericImpl> key = getValue();
+		AxedPropertyClass key = getValue();
 		if (key.getAxe() != Statics.MULTIDIRECTIONAL)
 			check(((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), attribute, key.getAxe(), value);
 	}

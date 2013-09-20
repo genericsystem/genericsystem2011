@@ -1273,11 +1273,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/*********************************************/
 
 	private <T extends Generic> Serializable getSystemPropertyValue(Class<T> constraintClass, int pos) {
-		return getSystemPropertiesMap().get(new AxedPropertyClass<T>(constraintClass, pos));
+		return getSystemPropertiesMap().get(new AxedPropertyClass(constraintClass, pos));
 	}
 
 	private <T extends Generic> void setSystemPropertyValue(Class<T> constraintClass, int pos, Serializable value) {
-		getSystemPropertiesMap().put(new AxedPropertyClass<T>(constraintClass, pos), value);
+		getSystemPropertiesMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
 	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
@@ -1286,11 +1286,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Serializable getConstraintValue(Class<T> constraintClass, int pos) {
-		return getContraintsMap().get(new AxedPropertyClass<T>(constraintClass, pos));
+		return getContraintsMap().get(new AxedPropertyClass(constraintClass, pos));
 	}
 
 	private <T extends Generic> void setConstraintValue(Class<T> constraintClass, int pos, Serializable value) {
-		getContraintsMap().put(new AxedPropertyClass<T>(constraintClass, pos), value);
+		getContraintsMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
 	private <T extends Generic> boolean isConstraintEnabled(Class<T> constraintClass, int pos) {
