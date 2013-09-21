@@ -156,11 +156,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T getImplicit() {
-		return isPrimary() ? (T) this : supers[0].<T> getImplicit();
-	}
-
-	@Override
 	public EngineImpl getEngine() {
 		return (EngineImpl) supers[0].getEngine();
 	}
@@ -173,6 +168,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isInstanceOf(Generic generic) {
 		return getMetaLevel() - generic.getMetaLevel() == 1 ? this.inheritsFrom(generic) : false;
+	}
+
+	public boolean isPrimary() {
+		return components.length == 0 && supers.length == 1;
+	}
+
+	@Override
+	public <T extends Generic> T getMeta() {
+		int level = isMeta() ? Statics.META : getMetaLevel() - 1;
+		GenericImpl generic = this;
+		while (level != generic.getMetaLevel())
+			generic = (GenericImpl) generic.supers[generic.supers.length - 1];
+		return (T) generic;
+	}
+
+	@Override
+	public <T extends Generic> T getImplicit() {
+		return isPrimary() ? (T) this : supers[0].<T> getImplicit();
 	}
 
 	@Override
@@ -1064,19 +1077,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		default:
 			throw new IllegalStateException();
 		}
-	}
-
-	public boolean isPrimary() {
-		return components.length == 0 && supers.length == 1;
-	}
-
-	@Override
-	public <T extends Generic> T getMeta() {
-		int level = isMeta() ? Statics.META : getMetaLevel() - 1;
-		GenericImpl generic = this;
-		while (level != generic.getMetaLevel())
-			generic = (GenericImpl) generic.supers[generic.supers.length - 1];
-		return (T) generic;
 	}
 
 	@Override

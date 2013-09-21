@@ -453,14 +453,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			simpleRemove(generic);
 
 		ConnectionMap connectionMap = new ConnectionMap();
-		// if (!implicit.isAlive()) {
-		// Generic newImplicit = bindPrimaryByValue(((GenericImpl) implicit).supers[0], implicit.getValue(), implicit.getMetaLevel(), implicit.isAutomatic(), implicit.getClass());
-		// connectionMap.put(implicit, newImplicit);
-		// implicit = newImplicit;
-		// directSupers = connectionMap.adjust(directSupers);
-		// }
-		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric(specializeGeneric)).initializeComplex(implicit, directSupers, components, automatic);
-		T superGeneric = this.<T> insert(newGeneric);
+		T superGeneric = buildAndInsertComplex(specializeGeneric, implicit, directSupers, components, automatic);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
 	}
@@ -485,7 +478,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		Generic constraintValue = find(ConstraintValue.class);
 		for (Serializable key : getEngine().getContraintsMap().keySet())
