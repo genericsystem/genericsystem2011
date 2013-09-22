@@ -139,14 +139,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
-
 			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
-			// Statics.logTimeIfCurrentThreadDebugged("Before loading classes");
 			for (Class<?> clazz : classes)
 				get(clazz);
 			for (Class<?> clazz : userClasses)
 				get(clazz);
-			// Statics.logTimeIfCurrentThreadDebugged("Before flush");
 			cache.flush();
 			stop(cache);
 			startupTime = false;
@@ -158,12 +155,9 @@ public class EngineImpl extends GenericImpl implements Engine {
 			T systemProperty = (T) super.get(clazz);
 			if (systemProperty != null)
 				return systemProperty;
-			if (startupTime && getCurrentCache() instanceof Cache) {
-				// Statics.logTimeIfCurrentThreadDebugged("Before loading class : " + clazz);
-				// assert !clazz.equals(ConstraintsMapProvider.ConstraintKey.class);
-				return bind(clazz);
-			}
-			throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
+			if (!startupTime)
+				throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
+			return bind(clazz);
 		}
 
 		@SuppressWarnings("unchecked")
