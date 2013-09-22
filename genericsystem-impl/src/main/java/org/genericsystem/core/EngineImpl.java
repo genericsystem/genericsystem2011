@@ -3,7 +3,6 @@ package org.genericsystem.core;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
 import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
@@ -176,11 +175,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 			if (MetaAttribute.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this });
 				if (result == null)
-					result = cache.insert(new GenericImpl().initializeComplex(EngineImpl.this, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }, false));
+					result = cache.buildAndInsertComplex(null, EngineImpl.this, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }, false);
 			} else if (MetaRelation.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (result == null)
-					result = cache.insert(new GenericImpl().initializeComplex(get(MetaAttribute.class).getImplicit(), new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }, false));
+					result = cache.buildAndInsertComplex(null, EngineImpl.this, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }, false);
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);
