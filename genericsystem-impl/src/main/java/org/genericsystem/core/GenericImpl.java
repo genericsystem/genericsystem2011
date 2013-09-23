@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -157,11 +156,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T getImplicit() {
-		return isPrimary() ? (T) this : supers[0].<T> getImplicit();
-	}
-
-	@Override
 	public EngineImpl getEngine() {
 		return (EngineImpl) supers[0].getEngine();
 	}
@@ -174,6 +168,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isInstanceOf(Generic generic) {
 		return getMetaLevel() - generic.getMetaLevel() == 1 ? this.inheritsFrom(generic) : false;
+	}
+
+	public boolean isPrimary() {
+		return components.length == 0 && supers.length == 1;
+	}
+
+	@Override
+	public <T extends Generic> T getMeta() {
+		int level = isMeta() ? Statics.META : getMetaLevel() - 1;
+		GenericImpl generic = this;
+		while (level != generic.getMetaLevel())
+			generic = (GenericImpl) generic.supers[generic.supers.length - 1];
+		return (T) generic;
+	}
+
+	@Override
+	public <T extends Generic> T getImplicit() {
+		return isPrimary() ? (T) this : supers[0].<T> getImplicit();
 	}
 
 	@Override
@@ -694,7 +706,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
-		Generic implicit = getEngine().bindPrimaryByValue(Generic.class, value, !isEngine() || components.length != 0);
+		Generic implicit = getEngine().bindPrimaryByValue(null, value, !isEngine() || components.length != 0);
 		return getCurrentCache().bind(null, implicit, false, this, false, components);
 	}
 
@@ -1059,19 +1071,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	public boolean isPrimary() {
-		return components.length == 0 && supers.length == 1;
-	}
-
-	@Override
-	public <T extends Generic> T getMeta() {
-		int level = isMeta() ? Statics.META : getMetaLevel() - 1;
-		GenericImpl generic = this;
-		while (level != generic.getMetaLevel())
-			generic = (GenericImpl) generic.supers[generic.supers.length - 1];
-		return (T) generic;
-	}
-
 	@Override
 	public <T extends Generic> T getBaseComponent() {
 		return getComponent(Statics.BASE_POSITION);
@@ -1266,11 +1265,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/*********************************************/
 
 	private <T extends Generic> Serializable getSystemPropertyValue(Class<T> constraintClass, int pos) {
-		return getSystemPropertiesMap().get(new AxedPropertyClass<T>(constraintClass, pos));
+		return getSystemPropertiesMap().get(new AxedPropertyClass(constraintClass, pos));
 	}
 
 	private <T extends Generic> void setSystemPropertyValue(Class<T> constraintClass, int pos, Serializable value) {
-		getSystemPropertiesMap().put(new AxedPropertyClass<T>(constraintClass, pos), value);
+		getSystemPropertiesMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
 	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
@@ -1279,11 +1278,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Serializable getConstraintValue(Class<T> constraintClass, int pos) {
-		return getContraintsMap().get(new AxedPropertyClass<T>(constraintClass, pos));
+		return getContraintsMap().get(new AxedPropertyClass(constraintClass, pos));
 	}
 
 	private <T extends Generic> void setConstraintValue(Class<T> constraintClass, int pos, Serializable value) {
-		getContraintsMap().put(new AxedPropertyClass<T>(constraintClass, pos), value);
+		getContraintsMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
 	private <T extends Generic> boolean isConstraintEnabled(Class<T> constraintClass, int pos) {

@@ -10,7 +10,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -381,14 +380,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
-		Class<?> specialize = Generic.class;
-		if (clazz.getSuperclass().equals(GenericImpl.class))
-			specialize = clazz;
+		Class<?> specializationClass = GenericImpl.class.isAssignableFrom(clazz) ? clazz : null;
 		Generic[] userSupers = findUserSupers(clazz);
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz);
 		userSupers = meta.isPrimary() ? userSupers : Statics.insertFirst(meta, userSupers);
-		Generic implicit = bindPrimaryByValue(meta.getImplicit(), findImplictValue(clazz), isAutomatic(userSupers, components), specialize);
+		Generic implicit = bindPrimaryByValue(meta.getImplicit(), findImplictValue(clazz), isAutomatic(userSupers, components), specializationClass);
 		return bind(implicit, userSupers, components, false, clazz, false);
 	}
 
@@ -456,14 +453,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			simpleRemove(generic);
 
 		ConnectionMap connectionMap = new ConnectionMap();
-		// if (!implicit.isAlive()) {
-		// Generic newImplicit = bindPrimaryByValue(((GenericImpl) implicit).supers[0], implicit.getValue(), implicit.getMetaLevel(), implicit.isAutomatic(), implicit.getClass());
-		// connectionMap.put(implicit, newImplicit);
-		// implicit = newImplicit;
-		// directSupers = connectionMap.adjust(directSupers);
-		// }
-		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric(specializeGeneric)).initializeComplex(implicit, directSupers, components, automatic);
-		T superGeneric = this.<T> insert(newGeneric);
+		T superGeneric = buildAndInsertComplex(specializeGeneric, implicit, directSupers, components, automatic);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
 	}
@@ -477,7 +467,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		};
 	}
 
-	private <T extends Generic> T buildAndInsertComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
+	<T extends Generic> T buildAndInsertComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
 		return insert(this.<EngineImpl> getEngine().buildComplex(clazz, implicit, supers, components, automatic));
 	}
 
@@ -488,17 +478,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		Generic constraintValue = find(ConstraintValue.class);
 		for (Serializable key : getEngine().getContraintsMap().keySet())
 			for (Generic generic : generics)
 				if (generic.isInstanceOf(constraintValue)) {
-					AbstractConstraintImpl constraint = find(((AxedPropertyClass<GenericImpl>) key).getClazz());
+					AbstractConstraintImpl constraint = find(((AxedPropertyClass) key).getClazz());
 					if (isCheckable(constraint, generic, checkingType, isFlushTime)) {
 						GenericImpl base = ((GenericImpl) generic).<GenericImpl> getBaseComponent().<GenericImpl> getBaseComponent().<GenericImpl> getBaseComponent();
 						if (null != base)
-							constraint.checkConsistency(base, (Holder) generic, base, (AxedPropertyClass<GenericImpl>) ((GenericImpl) generic).<GenericImpl> getBaseComponent().getValue());
+							constraint.checkConsistency(base, (Holder) generic, base, (AxedPropertyClass) ((GenericImpl) generic).<GenericImpl> getBaseComponent().getValue());
 					}
 				}
 	}
