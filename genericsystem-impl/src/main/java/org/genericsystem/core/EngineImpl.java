@@ -104,8 +104,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	@Override
 	public int getMetaLevel() {
-		// TODO KK ?
-		return 0;// SystemGeneric.META;
+		return Statics.META;
 	}
 
 	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
