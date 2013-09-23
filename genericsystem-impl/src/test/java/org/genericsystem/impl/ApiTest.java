@@ -21,7 +21,6 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.testng.annotations.Test;
 
 @Test
@@ -36,12 +35,6 @@ public class ApiTest extends AbstractTest {
 	@Components(Vehicle.class)
 	public static class Power extends GenericImpl {
 
-	}
-
-	public void test() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		GenericImpl find = cache.find(ConstraintKey.class);
-		log.info(" " + find.getInheritings());
 	}
 
 	public void specializeGeneric() {
@@ -406,8 +399,7 @@ public class ApiTest extends AbstractTest {
 	public void test_get_subtype_with_null_value() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-		Type expected = car.newSubType(null);
-
+		car.newSubType(null);
 	}
 
 	// getAllTypes() tests

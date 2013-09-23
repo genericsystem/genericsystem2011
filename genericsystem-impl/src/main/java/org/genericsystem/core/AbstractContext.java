@@ -290,8 +290,8 @@ public abstract class AbstractContext implements Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T findPrimaryByValue(Generic primaryAncestor, Serializable value) {
-		Iterator<Generic> it = directInheritingsIterator(primaryAncestor);
+	public <T extends Generic> T findPrimaryByValue(Generic meta, Serializable value) {
+		Iterator<Generic> it = directInheritingsIterator(meta);
 		while (it.hasNext()) {
 			Generic candidate = it.next();
 			if (((GenericImpl) candidate).isPrimary() && (Objects.hashCode(value) == Objects.hashCode(candidate.getValue())) && Objects.equals(value, candidate.getValue()))

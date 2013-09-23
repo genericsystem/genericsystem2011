@@ -85,9 +85,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<EngineImpl> getEngine().start(this);
 	}
 
-	<T extends Generic> T bindPrimaryByValue(Generic primaryAncestor, Serializable value, boolean automatic, Class<?> specializeGeneric) {
-		T implicit = findPrimaryByValue(primaryAncestor, value);
-		return implicit != null ? implicit : this.<T> insert(((GenericImpl) getEngine().getFactory().newGeneric(specializeGeneric)).initializePrimary(value, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY, automatic));
+	<T extends Generic> T bindPrimaryByValue(Generic meta, Serializable value, boolean automatic, Class<?> specializeGeneric) {
+		T implicit = findPrimaryByValue(meta, value);
+		return implicit != null ? implicit : this.<T> insert(((GenericImpl) getEngine().getFactory().newGeneric(specializeGeneric)).initializePrimary(value, new Generic[] { meta }, Statics.EMPTY_GENERIC_ARRAY, automatic));
 	}
 
 	@Override
