@@ -478,7 +478,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
+<<<<<<< HEAD
 	@SuppressWarnings("rawtypes")
+=======
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		Generic constraintValue = find(ConstraintValue.class);
 		for (Serializable key : getEngine().getContraintsMap().keySet())

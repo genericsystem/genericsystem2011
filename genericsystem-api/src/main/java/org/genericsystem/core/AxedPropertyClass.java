@@ -6,19 +6,19 @@ import java.io.Serializable;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class AxedPropertyClass<T extends Generic> implements Serializable {
+public class AxedPropertyClass implements Serializable {
 
 	private static final long serialVersionUID = -2631066712866842794L;
 
-	private final Class<T> clazz;
+	private final Class<? extends Generic> clazz;
 	private final int axe;
 
-	public AxedPropertyClass(Class<T> clazz, int axe) {
+	public AxedPropertyClass(Class<? extends Generic> clazz, int axe) {
 		this.clazz = clazz;
 		this.axe = axe;
 	}
 
-	public Class<T> getClazz() {
+	public Class<? extends Generic> getClazz() {
 		return clazz;
 	}
 
@@ -30,8 +30,7 @@ public class AxedPropertyClass<T extends Generic> implements Serializable {
 	public boolean equals(Object obj) {
 		if (!(obj instanceof AxedPropertyClass))
 			return false;
-		@SuppressWarnings("unchecked")
-		AxedPropertyClass<T> compare = (AxedPropertyClass<T>) obj;
+		AxedPropertyClass compare = (AxedPropertyClass) obj;
 		return clazz.equals(compare.getClazz()) && axe == compare.axe;
 	}
 

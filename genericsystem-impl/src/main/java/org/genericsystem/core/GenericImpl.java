@@ -652,11 +652,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
 	}
 
+<<<<<<< HEAD
 	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Generic meta, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
 		Generic implicit = getCurrentCache().bindPrimaryByValue(meta, value, true, null);
 		if (holder == null)
 			return value == null ? null : this.<T> bind(specializationClass, implicit, attribute, basePos, existsException, targets);
+=======
+	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Generic implicitSuper, Holder attribute, Serializable value, int basePos, boolean existsException, Generic... targets) {
+		T holder = getSelectedHolder(attribute, value, basePos, targets);
+		Generic implicit = ((GenericImpl) implicitSuper).bindPrimary(null, value, true);
+		if (holder == null) {
+			Generic component = attribute.getComponent(basePos);
+			// log.info(this + " attribute " + attribute + " attribute.getComponent(basePos) " + attribute.getComponent(basePos) + " " + basePos);
+			if (value == null && (isInstanceOf(component) || equals(component)))
+				return null;
+			return this.<T> bind(specializationClass, implicit, attribute, basePos, existsException, targets);
+		}
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 		if (!equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(holder, basePos, true);
@@ -706,7 +719,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
+<<<<<<< HEAD
 		Generic implicit = getEngine().bindPrimaryByValue(null, value, !isEngine() || components.length != 0);
+=======
+		Generic implicit = getEngine().bindPrimary(null, value, !isEngine() || components.length != 0);
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 		return getCurrentCache().bind(null, implicit, false, this, false, components);
 	}
 
