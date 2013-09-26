@@ -8,6 +8,10 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
+import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.annotation.constraints.VirtualConstraint;
+import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -22,7 +26,10 @@ import org.genericsystem.snapshot.AbstractSnapshot;
  * @author Nicolas Feybesse
  * 
  */
-public abstract class AbstractMapProvider<Key extends Serializable, Value extends Serializable> extends GenericImpl implements MapProvider {
+@SystemGeneric
+@Components(Engine.class)
+@VirtualConstraint
+public class DefaultMapProvider<Key extends Serializable, Value extends Serializable> extends GenericImpl implements MapProvider {
 
 	static final String MAP_VALUE = "map";
 
@@ -66,7 +73,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			// @Override
 			private Holder getKeyHolder(Serializable key) {
-				GenericImpl map = generic.getHolder(AbstractMapProvider.this);
+				GenericImpl map = generic.getHolder(DefaultMapProvider.this);
 				if (map == null)
 					return null;
 				return map.getHolderByValue(getCurrentCache().<Attribute> find(getKeyAttributeClass()), key);
@@ -79,7 +86,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				if (Objects.equals(oldValue, value))
 					return oldValue;
 				Holder attribute = getCurrentCache().<Attribute> find(getKeyAttributeClass());
-				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getKeyClass(key), attribute, (Serializable) key, getBasePos(attribute));
+				Holder keyHolder = generic.<GenericImpl> setHolder(DefaultMapProvider.this, MAP_VALUE).setHolder(getKeyClass(key), attribute, (Serializable) key, getBasePos(attribute));
 				setSingularHolder(keyHolder, getCurrentCache().<Attribute> find(getValueAttributeClass()), (Serializable) value);
 				return oldValue;
 			}
@@ -89,7 +96,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				return new AbstractSnapshot<Key>() {
 					@Override
 					public Iterator<Key> iterator() {
-						Holder map = generic.getHolder(AbstractMapProvider.this);
+						Holder map = generic.getHolder(DefaultMapProvider.this);
 						if (map == null)
 							return Statics.emptyIterator();
 						Attribute key = getCurrentCache().<Attribute> find(getKeyAttributeClass());
@@ -157,7 +164,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				if (generic.equals(map.getBaseComponent()))
 					next.remove();
 				else {
-					map = generic.setHolder(AbstractMapProvider.this, MAP_VALUE);
+					map = generic.setHolder(DefaultMapProvider.this, MAP_VALUE);
 					if (!((GenericImpl) next.getBaseComponent()).equals(map))
 						map.setHolder(next, null);
 				}
@@ -170,7 +177,11 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		};
 	}
 
-	public abstract <T extends Attribute> Class<T> getKeyAttributeClass();
+	public <T extends Attribute> Class<T> getKeyAttributeClass() {
+		throw new UnsupportedOperationException();
+	}
 
-	public abstract <T extends Attribute> Class<T> getValueAttributeClass();
+	public <T extends Attribute> Class<T> getValueAttributeClass() {
+		throw new UnsupportedOperationException();
+	}
 }

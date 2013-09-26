@@ -157,11 +157,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T getImplicit() {
-		return isPrimary() ? (T) this : supers[0].<T> getImplicit();
-	}
-
-	@Override
 	public EngineImpl getEngine() {
 		return (EngineImpl) supers[0].getEngine();
 	}
@@ -174,6 +169,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isInstanceOf(Generic generic) {
 		return getMetaLevel() - generic.getMetaLevel() == 1 ? this.inheritsFrom(generic) : false;
+	}
+
+	public boolean isPrimary() {
+		return components.length == 0 && supers.length == 1;
+	}
+
+	@Override
+	public <T extends Generic> T getMeta() {
+		int level = isMeta() ? Statics.META : getMetaLevel() - 1;
+		GenericImpl generic = this;
+		while (level != generic.getMetaLevel())
+			generic = (GenericImpl) generic.supers[generic.supers.length - 1];
+		return (T) generic;
+	}
+
+	@Override
+	public <T extends Generic> T getImplicit() {
+		return isPrimary() ? (T) this : supers[0].<T> getImplicit();
 	}
 
 	@Override
@@ -253,7 +266,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Serializable> T getValue(Holder attribute) {
-		Link holder = getHolder(attribute);
+		Link holder = getHolder(Statics.CONCRETE, attribute);
 		return holder != null ? holder.<T> getValue() : null;
 	}
 
@@ -264,7 +277,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return holder;
 	}
 
-	public <T extends Generic> T bindPrimary(Class<?> specializeGeneric, Serializable value, boolean automatic) {
+	public <T extends Generic> T bindPrimaryByValue(Class<?> specializeGeneric, Serializable value, boolean automatic) {
 		return getCurrentCache().bindPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, automatic, specializeGeneric);
 	}
 
@@ -282,45 +295,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return setHolder(attribute, value, getBasePos(attribute), targets);
 	}
 
-	private <T extends Holder> T getSelectedHolder(Holder attribute, Serializable value, int basePos, Generic... targets) {
-		T holder;
-		if (((Relation) attribute).isSingularConstraintEnabled(basePos))
-			holder = getHolder((Attribute) attribute, basePos);
-		else if (value == null || ((Type) attribute).isPropertyConstraintEnabled())
-			holder = getHolder(attribute, basePos, targets);
-		else
-			holder = getHolderByValue(attribute, value, basePos, targets);
-		return holder;
-	}
-
-	@Override
-	public <T extends Holder> T setHolder(Holder attribute, Serializable value, int basePos, Generic... targets) {
-		return this.<T> setHolder(null, attribute, value, basePos, targets);
-	}
-
-	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
-		T holder = getSelectedHolder(attribute, value, basePos, targets);
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(null, value, true);
-		if (holder == null)
-			return null != value ? this.<T> bind(specializationClass, implicit, attribute, basePos, true, targets) : null;
-		if (!equals(holder.getComponent(basePos))) {
-			if (value == null)
-				return cancel(holder, basePos, true);
-			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
-				cancel(holder, basePos, true);
-			return this.<T> bind(specializationClass, implicit, attribute, basePos, true, targets);
-		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
-			return holder;
-		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
-			return holder.updateValue(value);
-		holder.remove();
-		return this.<T> setHolder(specializationClass, attribute, value, basePos, targets);
-	}
-
 	@Override
 	public <T extends Holder> T addHolder(Holder attribute, int basePos, Serializable value, Generic... targets) {
-		Generic implicit = ((GenericImpl) attribute).bindPrimary(null, value, true);
+		Generic implicit = ((GenericImpl) attribute).bindPrimaryByValue(null, value, true);
 		return bind(null, implicit, attribute, basePos, true, targets);
 	}
 
@@ -348,7 +325,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T cancel(Holder attribute, int basePos, boolean concrete, Generic... targets) {
-		Generic implicit = concrete ? ((GenericImpl) attribute.getMeta()).bindPrimary(getClass(), null, true) : getEngine().bindPrimary(getClass(), null, true);
+		Generic implicit = concrete ? ((GenericImpl) attribute.getMeta()).bindPrimaryByValue(getClass(), null, true) : getEngine().bindPrimaryByValue(getClass(), null, true);
 		return bind(null, implicit, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
@@ -375,7 +352,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void clearAllConcrete(Holder attribute, int basePos, Generic... targets) {
-		internalClearAll(attribute, basePos, true, targets);
+		internalClearAll(attribute, basePos, Statics.CONCRETE, targets);
 	}
 
 	@Override
@@ -385,11 +362,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void clearAllStructural(Holder attribute, int basePos, Generic... targets) {
-		internalClearAll(attribute, basePos, false, targets);
+		internalClearAll(attribute, basePos, Statics.STRUCTURAL, targets);
 	}
 
-	public void internalClearAll(Holder attribute, int basePos, boolean isConcrete, Generic... targets) {
-		Iterator<Holder> holders = isConcrete ? holdersIterator(attribute, basePos, true, targets) : this.<Holder> holdersIterator(Statics.STRUCTURAL, (Attribute) attribute, basePos, true);
+	public void internalClearAll(Holder attribute, int basePos, int metaLevel, Generic... targets) {
+		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, metaLevel, basePos, true, targets);
 		while (holders.hasNext()) {
 			Holder holder = holders.next();
 			if (this.equals(holder.getComponent(basePos)))
@@ -403,14 +380,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			holder.remove();
 		else
 			cancel(holder, true);
-	}
-
-	public <T extends Holder> T getHolderByValue(Holder attribute, Serializable value, final Generic... targets) {
-		return getHolderByValue(attribute, value, getBasePos(attribute), targets);
-	}
-
-	public <T extends Holder> T getHolderByValue(Holder attribute, Serializable value, int basePos, final Generic... targets) {
-		return Statics.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(attribute, basePos, value == null, targets), value));
 	}
 
 	@Override
@@ -429,7 +398,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return holdersIterator((Attribute) attribute, basePos, false, targets);
+				return holdersIterator((Attribute) attribute, Statics.CONCRETE, basePos, false, targets);
 			}
 		};
 	}
@@ -444,7 +413,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return holdersIterator((Attribute) attribute, basePos, readPhantoms, targets);
+				return holdersIterator((Attribute) attribute, Statics.CONCRETE, basePos, readPhantoms, targets);
 			}
 		};
 	}
@@ -476,7 +445,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Link> Iterator<T> linksIterator(final Link relation, final int basePos, final Generic... targets) {
-		return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(relation, basePos, false, targets)) {
+		return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(relation, Statics.CONCRETE, basePos, false, targets)) {
 			@Override
 			public boolean isSelected() {
 				return next.isRelation();
@@ -512,18 +481,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int basePos, boolean readPhantoms, Generic... targets) {
-		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(Statics.CONCRETE, attribute, basePos, readPhantoms), attribute, targets);
+	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int metaLevel, int basePos, boolean readPhantoms, Generic... targets) {
+		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(metaLevel, attribute, basePos, readPhantoms), attribute, targets);
 	}
 
 	@Override
-	public <T extends Holder> T getHolder(Holder attribute, Generic... targets) {
-		return getHolder(attribute, getBasePos(attribute), targets);
+	public <T extends Holder> T getHolder(int metaLevel, Holder attribute, Generic... targets) {
+		return getHolder(metaLevel, attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
-	public <T extends Holder> T getHolder(Holder attribute, int basePos, Generic... targets) {
-		return Statics.unambigousFirst(this.<T> holdersIterator(attribute, basePos, false, targets));
+	public <T extends Holder> T getHolder(int metaLevel, Holder attribute, int basePos, Generic... targets) {
+		return Statics.unambigousFirst(this.<T> holdersIterator(attribute, metaLevel, basePos, false, targets));
+	}
+
+	public <T extends Holder> T getHolderByValue(int metaLevel, Holder attribute, Serializable value, final Generic... targets) {
+		return getHolderByValue(metaLevel, attribute, value, getBasePos(attribute), targets);
+	}
+
+	public <T extends Holder> T getHolderByValue(int metaLevel, Holder attribute, Serializable value, int basePos, final Generic... targets) {
+		return Statics.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(attribute, metaLevel, basePos, value == null, targets), value));
 	}
 
 	@Override
@@ -669,13 +646,53 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		T bind = bind(null, getEngine().bindPrimary(Generic.class, value, true), attribute, getBasePos(attribute), false, targets);
-		assert bind.inheritsFrom(attribute);
-		return bind;
+		T holder = internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), false, targets);
+		assert holder.inheritsFrom(attribute) : holder.info();
+		return holder;
 	}
 
 	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		return bind(null, getEngine().bindPrimary(Generic.class, value, true), attribute, getBasePos(attribute), true, targets);
+		T holder = internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
+		assert holder.inheritsFrom(attribute) : holder.info();
+		return holder;
+	}
+
+	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Generic meta, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
+		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
+		if (holder == null)
+			return value == null ? null : this.<T> bind(specializationClass, getCurrentCache().bindPrimaryByValue(meta, value, true, null), attribute, basePos, existsException, targets);
+		if (!equals(holder.getComponent(basePos))) {
+			if (value == null)
+				return cancel(holder, basePos, true);
+			Generic implicit = getCurrentCache().bindPrimaryByValue(meta, value, true, null);
+			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+				cancel(holder, basePos, true);
+			return this.<T> bind(specializationClass, implicit, attribute, basePos, existsException, targets);
+		}
+		Generic implicit = getCurrentCache().bindPrimaryByValue(meta, value, true, null);
+		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+			return holder;
+		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+			return holder.updateValue(value);
+		holder.remove();
+		return this.<T> internalSetHolder(specializationClass, meta, attribute, value, metaLevel, basePos, existsException, targets);
+	}
+
+	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
+		return this.<T> internalSetHolder(specializationClass, attribute.isConcrete() ? attribute.<GenericImpl> getImplicit().supers[0] : attribute.getImplicit(), attribute, value, Statics.CONCRETE, basePos, false, targets);
+	}
+
+	private <T extends Holder> T getSelectedHolder(Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
+		if (((Relation) attribute).isSingularConstraintEnabled(basePos))
+			return getHolder(metaLevel, (Attribute) attribute, basePos);
+		if (value == null || ((Type) attribute).isPropertyConstraintEnabled())
+			return this.<T> getHolder(metaLevel, attribute, basePos, targets);
+		return this.<T> getHolderByValue(metaLevel, attribute, value, basePos, targets);
+	}
+
+	@Override
+	public <T extends Holder> T setHolder(Holder attribute, Serializable value, int basePos, Generic... targets) {
+		return this.<T> setHolder(null, attribute, value, basePos, targets);
 	}
 
 	@Override
@@ -690,12 +707,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Serializable value, Generic... components) {
-		return getCurrentCache().bind(null, bindPrimary(getClass(), value, !isPrimary()), false, this, false, components);
+		return getCurrentCache().bind(null, bindPrimaryByValue(getClass(), value, !isPrimary()), false, this, false, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
-		Generic implicit = getEngine().bindPrimary(Generic.class, value, !isEngine() || components.length != 0);
+		Generic implicit = getEngine().bindPrimaryByValue(null, value, !isEngine() || components.length != 0);
 		return getCurrentCache().bind(null, implicit, false, this, false, components);
 	}
 
@@ -878,8 +895,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null) {
-					if (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)
-							|| !Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
+					if (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components) || !Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
 						if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
 							return false;
 				}
@@ -981,9 +997,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
 		s += "toString    : " + this + "\n";
-		// s += "meta        : " + getMeta() + "\n";
+		s += "meta        : " + getMeta() + "\n";
 		s += "value       : " + getValue() + "\n";
-		// s += "metaLevel   : " + getMetaLevel() + "\n";
+		s += "metaLevel   : " + getMetaLevel() + "\n";
 		s += "**********************************************************************\n";
 		s += "design date : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
 		s += "birth date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
@@ -1058,19 +1074,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		default:
 			throw new IllegalStateException();
 		}
-	}
-
-	public boolean isPrimary() {
-		return components.length == 0 && supers.length == 1;
-	}
-
-	@Override
-	public <T extends Generic> T getMeta() {
-		int level = isMeta() ? Statics.META : getMetaLevel() - 1;
-		GenericImpl generic = this;
-		while (level != generic.getMetaLevel())
-			generic = (GenericImpl) generic.supers[generic.supers.length - 1];
-		return (T) generic;
 	}
 
 	@Override
@@ -1267,27 +1270,29 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/*********************************************/
 
 	private <T extends Generic> Serializable getSystemPropertyValue(Class<T> constraintClass, int pos) {
-		return getSystemPropertiesMap().get(new AxedPropertyClass<T>(constraintClass, pos));
+		return getSystemPropertiesMap().get(new AxedPropertyClass(constraintClass, pos));
 	}
 
-	private <T extends Generic> void setSystemPropertyValue(Class<T> constraintClass, int pos, Serializable value) {
-		getSystemPropertiesMap().put(new AxedPropertyClass<T>(constraintClass, pos), value);
+	public <T extends Generic> void setSystemPropertyValue(Class<T> constraintClass, int pos, Serializable value) {
+		getSystemPropertiesMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
+	@SuppressWarnings("hiding")
 	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getSystemPropertyValue(constraintClass, pos);
 		return null != value && !Boolean.FALSE.equals(value);
 	}
 
-	private <T extends Generic> Serializable getConstraintValue(Class<T> constraintClass, int pos) {
-		return getContraintsMap().get(new AxedPropertyClass<T>(constraintClass, pos));
+	public <T extends Generic> Serializable getConstraintValue(Class<T> constraintClass, int pos) {
+		return getContraintsMap().get(new AxedPropertyClass(constraintClass, pos));
 	}
 
-	private <T extends Generic> void setConstraintValue(Class<T> constraintClass, int pos, Serializable value) {
-		getContraintsMap().put(new AxedPropertyClass<T>(constraintClass, pos), value);
+	public <T extends Generic> void setConstraintValue(Class<T> constraintClass, int pos, Serializable value) {
+		getContraintsMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
-	private <T extends Generic> boolean isConstraintEnabled(Class<T> constraintClass, int pos) {
+	@SuppressWarnings("hiding")
+	public <T extends Generic> boolean isConstraintEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getConstraintValue(constraintClass, pos);
 		return null != value && !Boolean.FALSE.equals(value);
 	}
@@ -1556,7 +1561,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public Map<Serializable, Serializable> getProperties() {
+	public Map<Serializable, Serializable> getPropertiesMap() {
 		return getMap(PropertiesMapProvider.class);
 	}
 

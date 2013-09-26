@@ -107,7 +107,7 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Returns true if this Generic has been automatically created.
 	 * 
-	 * @return Trueif this Generic has been automatically created.
+	 * @return True if this Generic has been automatically created.
 	 */
 	boolean isAutomatic();
 
@@ -338,25 +338,29 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * Returns the Holder of value.
-	 * 
+	 * @param metaLevel
+	 *            meta level.
 	 * @param attribute
 	 *            The attribute.
 	 * @param basePos
 	 *            The base position.
 	 * @param targets
 	 *            The targets.
+	 * 
 	 * @return The Holder.
 	 */
-	<T extends Holder> T getHolder(Holder attribute, int basePos, Generic... targets);
+	<T extends Holder> T getHolder(int metaLevel, Holder attribute, int basePos, Generic... targets);
 
 	/**
 	 * Returns the Holder of value.
-	 * 
+	 * @param metaLevel
+	 *            meta level.
 	 * @param attribute
 	 *            The attribute.
+	 * 
 	 * @return The Holder.
 	 */
-	<T extends Holder> T getHolder(Holder attribute, Generic... targets);
+	<T extends Holder> T getHolder(int metaLevel, Holder attribute, Generic... targets);
 
 	/**
 	 * Returns the values.
@@ -624,7 +628,7 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends MapProvider> Map<Serializable, Serializable> getMap(Class<T> mapClass);
 
-	Map<Serializable, Serializable> getProperties();
+	Map<Serializable, Serializable> getPropertiesMap();
 
 	ExtendedMap<Serializable, Serializable> getContraintsMap();
 

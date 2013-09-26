@@ -3,9 +3,9 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -13,18 +13,21 @@ import javax.inject.Named;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Structural;
+import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.map.DefaultMapProvider;
 import org.genericsystem.myadmin.util.GsMessages;
-import org.genericsystem.myadmin.util.GsRedirect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
 public class GenericBean implements Serializable {
 
 	private static final long serialVersionUID = 2108715680116264876L;
-
+	protected static Logger log = LoggerFactory.getLogger(GenericBean.class);
 	@Inject
 	private transient Cache cache;
 
@@ -32,53 +35,9 @@ public class GenericBean implements Serializable {
 	private GsMessages messages;
 
 	@Inject
-	private GsRedirect redirect;
-
-	@Inject
 	private GenericTreeBean genericTreeBean;
 
-	@Inject
-	private WrapperBean wrapperBean;
-
 	private List<StructuralWrapper> structuralWrappers = new ArrayList<>();
-
-	@PostConstruct
-	public void init() {
-		// TODO TEST
-		// Type vehicle = cache.newType("Vehicle");
-		// Type car = vehicle.newSubType("Car");
-		// Type color = cache.newType("Color");
-		// Type time = cache.newType("Time");
-		// Attribute power = vehicle.setAttribute("power");
-		// Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
-		// Relation vehicleColorTime = vehicle.setRelation("vehicleColorTime", color, time);
-		// Generic myVehicle = vehicle.newInstance("myVehicle");
-		// Generic red = color.newInstance("red");
-		// Generic yellow = color.newInstance("yellow");
-		// vehicle.setValue(power, 1);
-		// car.setValue(power, 2);
-		// // myVehicle.setValue(power, 136);
-		// myVehicle.setLink(vehicleColor, "myVehicleRed", red);
-		// myVehicle.bind(vehicleColorTime, red, time.newInstance("myTime"));
-		// vehicle.bind(vehicleColor, yellow);
-		// car.newInstance("myCar");
-		//
-		// Type human = cache.newType("Human");
-		// Generic nicolas = human.newInstance("Nicolas");
-		// Generic michael = human.newInstance("Michael");
-		// Generic quentin = human.newInstance("Quentin");
-		// Relation isTallerOrEqualThan = human.setRelation("isTallerOrEqualThan", human);
-		// nicolas.bind(isTallerOrEqualThan, michael);
-		// nicolas.bind(isTallerOrEqualThan, nicolas);
-		// Relation isBrotherOf = human.setRelation("isBrotherOf", human);
-		// isBrotherOf.enableMultiDirectional();
-		// // quentin.bind(isBrotherOf, michael);
-		// quentin.setLink(isBrotherOf, "link", michael);
-		// Relation isBossOf = human.setRelation("isBossOf", human);
-		// nicolas.bind(isBossOf, michael);
-		//
-		// michael.getProperties().put("KEY TEST", "VALUE TEST");
-	}
 
 	public void newType(String newValue) {
 		cache.newType(newValue);
@@ -96,7 +55,17 @@ public class GenericBean implements Serializable {
 	}
 
 	public void addProperty(String key, String value) {
-		((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getProperties().put(key, value);
+		((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getPropertiesMap().put(key, value);
+		messages.info("createRootProperty", key, value);
+	}
+
+	public void addContraint(String key, String value) {
+		((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getContraintsMap().put(key, value);
+		messages.info("createRootProperty", key, value);
+	}
+
+	public void addSystemProperty(String key, String value) {
+		((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getSystemPropertiesMap().put(key, value);
 		messages.info("createRootProperty", key, value);
 	}
 
@@ -105,10 +74,53 @@ public class GenericBean implements Serializable {
 		messages.info("createRootInstance", newValue, genericTreeBean.getSelectedTreeNodeGeneric().getValue());
 	}
 
+	public void addValue(Attribute attribute, String newValue) {
+		Generic currentInstance = genericTreeBean.getSelectedTreeNodeGeneric();
+		currentInstance.setValue(attribute, newValue);
+		messages.info("addValue", newValue, attribute, currentInstance);
+	}
+
+	public void remove(Holder holder) {
+		genericTreeBean.getSelectedTreeNodeGeneric().removeHolder(holder);
+		messages.info("remove", holder);
+	}
+
+	public String delete() {
+		Generic generic = genericTreeBean.getSelectedTreeNodeGeneric();
+		generic.remove();
+		messages.info("remove", generic);
+		genericTreeBean.setSelectedTreeNode(genericTreeBean.getSelectedTreeNode().getParent());
+		return "";
+	}
+
+	public void removeProperty(Entry<Serializable, Serializable> entry) {
+		removeEntry(genericTreeBean.getSelectedTreeNodeGeneric().getPropertiesMap(), entry);
+	}
+
+	public void removeContraint(Entry<Serializable, Serializable> entry) {
+		removeEntry(genericTreeBean.getSelectedTreeNodeGeneric().getContraintsMap(), entry);
+
+	}
+
+	public void removeSystemProperty(Entry<Serializable, Serializable> entry) {
+		removeEntry(genericTreeBean.getSelectedTreeNodeGeneric().getSystemPropertiesMap(), entry);
+	}
+
+	private void removeEntry(Map<Serializable, Serializable> map, Entry<Serializable, Serializable> entry) {
+		try {
+			map.remove(entry.getKey());
+			messages.info("remove", entry.getKey());
+		} catch (NotRemovableException e) {
+			messages.info("cannotremove", e.getMessage());
+		}
+	}
+
 	public List<StructuralWrapper> getStructurals() {
+		log.info("" + Cache.class.isInstance(cache));
 		List<StructuralWrapper> list = new ArrayList<>();
 		for (Structural structural : genericTreeBean.getSelectedTreeNodeGeneric().getStructurals())
-			list.add(getStructuralWrapper(structural));
+			if (!structural.getAttribute().inheritsFrom(cache.find(DefaultMapProvider.class)))
+				list.add(getStructuralWrapper(structural));
 		structuralWrappers = list;
 		return list;
 	}
@@ -132,6 +144,10 @@ public class GenericBean implements Serializable {
 			return structural;
 		}
 
+		public void setStructural(Structural structural) {
+			this.structural = structural;
+		}
+
 		public boolean isReadPhantoms() {
 			return readPhantoms;
 		}
@@ -145,58 +161,29 @@ public class GenericBean implements Serializable {
 		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structuralWrapper.getStructural().getAttribute(), structuralWrapper.getStructural().getPosition(), structuralWrapper.isReadPhantoms());
 	}
 
-	public void removePhantoms(Attribute attribute) {
-		genericTreeBean.getSelectedTreeNodeGeneric().removePhantoms(attribute);
-		messages.info("phantomsRemoved", attribute);
-	}
-
 	public List<Generic> getOtherTargets(Holder holder) {
 		return genericTreeBean.getSelectedTreeNodeGeneric().getOtherTargets(holder);
 	}
 
-	public void addValue(Attribute attribute, String newValue) {
-		Generic currentInstance = genericTreeBean.getSelectedTreeNodeGeneric();
-		currentInstance.setValue(attribute, newValue);
-		messages.info("addValue", newValue, attribute, currentInstance);
+	@SuppressWarnings("unchecked")
+	public List<Entry<Serializable, Serializable>> getPropertiesMap() {
+		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNodeGeneric().getPropertiesMap().entrySet();
 	}
 
-	public void removeHolder(Holder holder) {
-		genericTreeBean.getSelectedTreeNodeGeneric().removeHolder(holder);
-		messages.info("remove", holder);
+	@SuppressWarnings("unchecked")
+	public List<Entry<Serializable, Serializable>> getContraintsMap() {
+		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNodeGeneric().getContraintsMap().entrySet();
 	}
 
-	public void removeAttribute(Attribute attribute) {
-		attribute.remove();
-		messages.info("remove", attribute);
-	}
-
-	// TODO call clearAll...
-	public String delete() {
-		Generic generic = genericTreeBean.getSelectedTreeNodeGeneric();
-		if (isValue(generic)) {
-			genericTreeBean.setSelectedTreeNode(genericTreeBean.getSelectedTreeNode().getParent());
-			removeHolder((Holder) generic);
-		} else {
-			generic.remove();
-			messages.info("deleteFile", generic.getValue());
-			genericTreeBean.setSelectedTreeNode(genericTreeBean.getSelectedTreeNode().getParent());
-		}
-		return "";
-	}
-
-	public List<Entry<Serializable, Serializable>> getProperties() {
-		return (List) genericTreeBean.getSelectedTreeNodeGeneric().getProperties().entrySet();
-	}
-
-	public void removeProperty(Entry<Serializable, Serializable> entry) {
-		genericTreeBean.getSelectedTreeNodeGeneric().getProperties().remove(entry.getKey());
-		messages.info("remove", entry.getKey());
+	@SuppressWarnings("unchecked")
+	public List<Entry<Serializable, Serializable>> getSystemPropertiesMap() {
+		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNodeGeneric().getSystemPropertiesMap().entrySet();
 	}
 
 	// TODO in GS CORE
-	public boolean isValue(Generic generic) {
-		return generic.isConcrete() && generic.isAttribute();
-	}
+	// public boolean isValue(Generic generic) {
+	// return generic.isConcrete() && generic.isAttribute();
+	// }
 
 	public boolean isSingular(Structural structural) {
 		return structural.getAttribute().isSingularConstraintEnabled();
@@ -217,4 +204,5 @@ public class GenericBean implements Serializable {
 	public boolean isMeta() {
 		return genericTreeBean.getSelectedTreeNodeGeneric().isMeta();
 	}
+
 }

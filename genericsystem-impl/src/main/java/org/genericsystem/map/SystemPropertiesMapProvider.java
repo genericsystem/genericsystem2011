@@ -24,7 +24,7 @@ import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class })
-public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropertyClass<?>, Boolean> {
+public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -40,15 +40,14 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <T extends GenericImpl> Class<T> getKeyClass(AxedPropertyClass<?> key) {
+	protected <T extends GenericImpl> Class<T> getSpecializationClass(AxedPropertyClass key) {
 		return (Class<T>) key.getClazz();
 	}
 
 	@SystemGeneric
 	@Components(SystemPropertiesMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class SystemPropertyKey extends GenericImpl implements Attribute {
-	}
+	public static class SystemPropertyKey extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Components(SystemPropertyKey.class)
@@ -56,13 +55,11 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 	@Extends(NoInheritanceSystemType.class)
 	// @RequiredConstraint
 	// @InheritanceDisabled
-	public static class SystemPropertyValue extends GenericImpl implements Attribute {
-	}
+	public static class SystemPropertyValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(meta = SystemPropertiesMapProvider.class)
 	@Components(Engine.class)
-	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
-	}
+	@StringValue(DefaultMapProvider.MAP_VALUE)
+	public static class MapInstance extends GenericImpl implements Holder {}
 }

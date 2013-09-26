@@ -84,51 +84,14 @@
 
 		<rich:panel id="attributestypesmanager" layout="block">
 			<f:facet name="header">
-				<h:outputText value="#{msg.attribute}s"/>
+				<h:outputText value="#{msg.attribute}" />
 			</f:facet>
-			
-			<a4j:outputPanel layout="block">
-				<h:outputText value="int" />
-				<rich:dragIndicator id="int" acceptClass="accept" rejectClass="reject" draggingClass="default">
-		        	int
-		    	</rich:dragIndicator>
-				<rich:dragSource type="primitive" dragValue="int" dragIndicator="int"/>
-			</a4j:outputPanel>
-			<a4j:outputPanel layout="block">
-				<h:outputText value="long" />
-				<rich:dragIndicator id="long" acceptClass="accept" rejectClass="reject" draggingClass="default">
-			        long
-			    </rich:dragIndicator>
-				<rich:dragSource type="primitive" dragValue="long" dragIndicator="long"/>
-			</a4j:outputPanel>
-			<a4j:outputPanel layout="block">
-				<h:outputText value="float" />
-				<rich:dragIndicator id="float" acceptClass="accept" rejectClass="reject" draggingClass="default">
-			        float
-			    </rich:dragIndicator>
-				<rich:dragSource type="primitive" dragValue="float" dragIndicator="float"/>
-			</a4j:outputPanel>
-			<a4j:outputPanel layout="block">
-				<h:outputText value="double" />
-				<rich:dragIndicator id="double" acceptClass="accept" rejectClass="reject" draggingClass="default">
-			        double
-			    </rich:dragIndicator>
-				<rich:dragSource type="primitive" dragValue="double" dragIndicator="double"/>
-			</a4j:outputPanel>
-			<a4j:outputPanel layout="block">
-				<h:outputText value="boolean" />
-				<rich:dragIndicator id="boolean" acceptClass="accept" rejectClass="reject" draggingClass="default">
-			        boolean
-			    </rich:dragIndicator>
-				<rich:dragSource type="primitive" dragValue="boolean" dragIndicator="boolean"/>
-			</a4j:outputPanel>
-			<a4j:outputPanel layout="block">
-				<h:outputText value="string" />
-				<rich:dragIndicator id="string" acceptClass="accept" rejectClass="reject" draggingClass="default">
-			        string
-			    </rich:dragIndicator>
-				<rich:dragSource type="primitive" dragValue="string" dragIndicator="string"/>
-			</a4j:outputPanel>
+			<gs:dragAttribute type="primitive" key="int" />
+			<gs:dragAttribute type="primitive" key="long" />
+			<gs:dragAttribute type="primitive" key="float" />
+			<gs:dragAttribute type="primitive" key="double" />
+			<gs:dragAttribute type="primitive" key="string" />
+			<gs:dragAttribute type="primitive" key="boolean" />
 		</rich:panel>
 	</rich:panel>
 

@@ -11,12 +11,12 @@ import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.impl.MyMapProvider.MyValue;
-import org.genericsystem.map.AbstractMapProvider;
+import org.genericsystem.map.DefaultMapProvider;
 
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies(MyValue.class)
-public class MyMapProvider extends AbstractMapProvider<Serializable, Serializable> {
+public class MyMapProvider extends DefaultMapProvider<Serializable, Serializable> {
 
 	@SuppressWarnings("unchecked")
 	@Override

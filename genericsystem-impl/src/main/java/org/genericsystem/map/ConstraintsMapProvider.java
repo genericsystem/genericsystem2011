@@ -39,9 +39,9 @@ import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintIm
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
-		OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class,
-		UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
-public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass<?>, Boolean> {
+	OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class,
+	UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
+public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -57,15 +57,14 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <T extends GenericImpl> Class<T> getKeyClass(AxedPropertyClass<?> key) {
+	protected <T extends GenericImpl> Class<T> getSpecializationClass(AxedPropertyClass key) {
 		return (Class<T>) key.getClazz();
 	}
 
 	@SystemGeneric
 	@Components(ConstraintsMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class ConstraintKey extends GenericImpl implements Attribute {
-	}
+	public static class ConstraintKey extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(NoInheritanceSystemType.class)
@@ -73,13 +72,11 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 	@SingularConstraint
 	// @RequiredConstraint
 	// @InheritanceDisabled
-	public static class ConstraintValue extends GenericImpl implements Attribute {
-	}
+	public static class ConstraintValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.class)
 	@Components(Engine.class)
-	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
-	}
+	@StringValue(DefaultMapProvider.MAP_VALUE)
+	public static class MapInstance extends GenericImpl implements Holder {}
 }

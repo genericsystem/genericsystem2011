@@ -71,6 +71,8 @@ body {
 
 .uppercase {
 	text-transform: uppercase;
+	margin-top: 10px;
+	font-weight: bold;
 }
 
 .capitalize:first-letter {
@@ -91,6 +93,10 @@ body {
 
 .scroll {
 	overflow: auto;
+}
+
+.widthAdjust>thead>tr>th {
+	min-width: 90%;
 }
 
 .bigScroll {

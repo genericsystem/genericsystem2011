@@ -23,10 +23,10 @@ public class MapTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Generic myBmw = car.newInstance("myBmw");
-		Map<Serializable, Serializable> vehicleMap = vehicle.getProperties();
+		Map<Serializable, Serializable> vehicleMap = vehicle.getPropertiesMap();
 		Map<Serializable, Serializable> map2 = new HashMap<>();
-		Map<Serializable, Serializable> carMap = car.getProperties();
-		Map<Serializable, Serializable> myBmwMap = myBmw.getProperties();
+		Map<Serializable, Serializable> carMap = car.getPropertiesMap();
+		Map<Serializable, Serializable> myBmwMap = myBmw.getPropertiesMap();
 
 		Statics.logTimeIfCurrentThreadDebugged("starts");
 		for (int i = 0; i < 1000; i++) {
@@ -55,38 +55,38 @@ public class MapTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Generic myBmw = car.newInstance("myBmw");
-		vehicle.getProperties().put("power", 123);
-		assert vehicle.getProperties().get("power").equals(123) : vehicle.getProperties();
-		myBmw.getProperties().put("wheel", 4);
-		assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
-		assert myBmw.getProperties().get("wheel").equals(4);
-		myBmw.getProperties().remove("power");
-		assert vehicle.getProperties().get("power").equals(123);
-		assert myBmw.getProperties().get("power") == null : myBmw.getProperties().get("power");
-		assert myBmw.getProperties().get("wheel").equals(4);
+		vehicle.getPropertiesMap().put("power", 123);
+		assert vehicle.getPropertiesMap().get("power").equals(123) : vehicle.getPropertiesMap();
+		myBmw.getPropertiesMap().put("wheel", 4);
+		assert myBmw.getPropertiesMap().get("power").equals(123) : myBmw.getPropertiesMap();
+		assert myBmw.getPropertiesMap().get("wheel").equals(4);
+		myBmw.getPropertiesMap().remove("power");
+		assert vehicle.getPropertiesMap().get("power").equals(123);
+		assert myBmw.getPropertiesMap().get("power") == null : myBmw.getPropertiesMap().get("power");
+		assert myBmw.getPropertiesMap().get("wheel").equals(4);
 	}
 
 	public void testPropertyInherit2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myBmw = car.newInstance("myBmw");
-		car.getProperties().put("power", 123);
-		assert car.getProperties().get("power").equals(123) : car.getProperties();
-		assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
-		myBmw.getProperties().remove("power");
-		assert car.getProperties().get("power").equals(123);
-		assert myBmw.getProperties().get("power") == null : myBmw.getProperties().get("power");
+		car.getPropertiesMap().put("power", 123);
+		assert car.getPropertiesMap().get("power").equals(123) : car.getPropertiesMap();
+		assert myBmw.getPropertiesMap().get("power").equals(123) : myBmw.getPropertiesMap();
+		myBmw.getPropertiesMap().remove("power");
+		assert car.getPropertiesMap().get("power").equals(123);
+		assert myBmw.getPropertiesMap().get("power") == null : myBmw.getPropertiesMap().get("power");
 	}
 
 	public void testSingleMap() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
-		vehicle.getProperties().put("power", 123);
-		vehicle.getProperties().put("power", 255);
-		assert !vehicle.getProperties().get("power").equals(123);
-		assert vehicle.getProperties().get("power").equals(255);
-		vehicle.getProperties().remove("power");
-		assert vehicle.getProperties().isEmpty();
+		vehicle.getPropertiesMap().put("power", 123);
+		vehicle.getPropertiesMap().put("power", 255);
+		assert !vehicle.getPropertiesMap().get("power").equals(123);
+		assert vehicle.getPropertiesMap().get("power").equals(255);
+		vehicle.getPropertiesMap().remove("power");
+		assert vehicle.getPropertiesMap().isEmpty();
 	}
 
 	public void testOnInstance() {
@@ -109,26 +109,26 @@ public class MapTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
-		vehicle.getProperties().put("power", 123);
-		vehicle.getProperties().put("whell", 4);
-		assert car.getProperties().get("power").equals(123);
-		car.getProperties().put("power", 255);
-		assert vehicle.getProperties().get("power").equals(123);
-		assert !car.getProperties().get("power").equals(123);
-		assert car.getProperties().get("power").equals(255);
+		vehicle.getPropertiesMap().put("power", 123);
+		vehicle.getPropertiesMap().put("whell", 4);
+		assert car.getPropertiesMap().get("power").equals(123);
+		car.getPropertiesMap().put("power", 255);
+		assert vehicle.getPropertiesMap().get("power").equals(123);
+		assert !car.getPropertiesMap().get("power").equals(123);
+		assert car.getPropertiesMap().get("power").equals(255);
 	}
 
 	public void testRemove() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
-		vehicle.getProperties().put("power", 123);
-		assert car.getProperties().get("power").equals(123);
-		car.getProperties().remove("power");
-		car.getProperties().remove("power");
-		assert car.getProperties().get("power") == null : car.getProperties();
-		car.getProperties().put("power", 123);
-		assert car.getProperties().get("power").equals(123);
+		vehicle.getPropertiesMap().put("power", 123);
+		assert car.getPropertiesMap().get("power").equals(123);
+		car.getPropertiesMap().remove("power");
+		car.getPropertiesMap().remove("power");
+		assert car.getPropertiesMap().get("power") == null : car.getPropertiesMap();
+		car.getPropertiesMap().put("power", 123);
+		assert car.getPropertiesMap().get("power").equals(123);
 		// vehicle.getProperties().put("power", null);
 		// assert vehicle.getProperties().get("power") == null;
 		// assert car.getProperties().get("power") == null;
@@ -138,13 +138,13 @@ public class MapTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
-		vehicle.getProperties().put("power", 123);
-		assert car.getProperties().get("power").equals(123);
-		car.getProperties().remove("power");
-		car.getProperties().remove("power");
-		assert car.getProperties().get("power") == null;
-		car.getProperties().put("power", 124);
-		assert car.getProperties().get("power").equals(124);
+		vehicle.getPropertiesMap().put("power", 123);
+		assert car.getPropertiesMap().get("power").equals(123);
+		car.getPropertiesMap().remove("power");
+		car.getPropertiesMap().remove("power");
+		assert car.getPropertiesMap().get("power") == null;
+		car.getPropertiesMap().put("power", 124);
+		assert car.getPropertiesMap().get("power").equals(124);
 		// vehicle.getProperties().put("power", null);
 		// assert vehicle.getProperties().get("power") == null;
 		// assert car.getProperties().get("power").equals(124);
@@ -158,8 +158,8 @@ public class MapTest extends AbstractTest {
 		vehicle.getMap(MyMapProvider.class).remove("power");
 		assert vehicle.getMap(MyMapProvider.class).get("power") == null;
 
-		vehicle.getProperties().put("power", 123);
-		assert vehicle.getProperties().get("power").equals(123);
+		vehicle.getPropertiesMap().put("power", 123);
+		assert vehicle.getPropertiesMap().get("power").equals(123);
 		assert vehicle.getMap(MyMapProvider.class).get("power") == null;
 	}
 

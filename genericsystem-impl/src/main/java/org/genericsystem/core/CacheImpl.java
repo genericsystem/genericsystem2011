@@ -22,6 +22,7 @@ import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.FunctionalConsistencyViolationException;
+import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
@@ -85,9 +86,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<EngineImpl> getEngine().start(this);
 	}
 
-	<T extends Generic> T bindPrimaryByValue(Generic primaryAncestor, Serializable value, boolean automatic, Class<?> specializeGeneric) {
-		T implicit = findPrimaryByValue(primaryAncestor, value);
-		return implicit != null ? implicit : this.<T> insert(((GenericImpl) getEngine().getFactory().newGeneric(specializeGeneric)).initializePrimary(value, new Generic[] { primaryAncestor }, Statics.EMPTY_GENERIC_ARRAY, automatic));
+	<T extends Generic> T bindPrimaryByValue(Generic meta, Serializable value, boolean automatic, Class<?> specializeGeneric) {
+		T implicit = findPrimaryByValue(meta, value);
+		return implicit != null ? implicit : this.<T> insert(((GenericImpl) getEngine().getFactory().newGeneric(specializeGeneric)).initializePrimary(value, new Generic[] { meta }, Statics.EMPTY_GENERIC_ARRAY, automatic));
 	}
 
 	@Override
@@ -132,7 +133,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	void removeWithAutomatics(Generic generic) throws RollbackException {
 		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
-			throw new IllegalStateException();
+			throw new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated");
 		remove(generic);
 		Generic automatic = findAutomaticAlone(generic);
 		if (null != automatic)
@@ -229,9 +230,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				if (((GenericImpl) orderedDependency).isPrimary())
 					generic = bindPrimaryByValue(adjust(((GenericImpl) orderedDependency).supers)[0], orderedDependency.getValue(), orderedDependency.isAutomatic(), orderedDependency.getClass());
 				else {
-					generic = buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0],
-							computeDirectSupers ? getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-							adjust(((GenericImpl) orderedDependency).components), orderedDependency.isAutomatic());
+					generic = buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0], computeDirectSupers ? getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components), orderedDependency.isAutomatic());
 				}
 				put(orderedDependency, generic);
 			}
@@ -381,14 +380,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
-		Class<?> specialize = Generic.class;
-		if (clazz.getSuperclass().equals(GenericImpl.class))
-			specialize = clazz;
+		Class<?> specializationClass = GenericImpl.class.isAssignableFrom(clazz) ? clazz : null;
 		Generic[] userSupers = findUserSupers(clazz);
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz);
 		userSupers = meta.isPrimary() ? userSupers : Statics.insertFirst(meta, userSupers);
-		Generic implicit = bindPrimaryByValue(meta.getImplicit(), findImplictValue(clazz), isAutomatic(userSupers, components), specialize);
+		Generic implicit = bindPrimaryByValue(meta.getImplicit(), findImplictValue(clazz), isAutomatic(userSupers, components), specializationClass);
 		return bind(implicit, userSupers, components, false, clazz, false);
 	}
 
@@ -456,14 +453,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			simpleRemove(generic);
 
 		ConnectionMap connectionMap = new ConnectionMap();
-		// if (!implicit.isAlive()) {
-		// Generic newImplicit = bindPrimaryByValue(((GenericImpl) implicit).supers[0], implicit.getValue(), implicit.getMetaLevel(), implicit.isAutomatic(), implicit.getClass());
-		// connectionMap.put(implicit, newImplicit);
-		// implicit = newImplicit;
-		// directSupers = connectionMap.adjust(directSupers);
-		// }
-		Generic newGeneric = ((GenericImpl) this.<EngineImpl> getEngine().getFactory().newGeneric(specializeGeneric)).initializeComplex(implicit, directSupers, components, automatic);
-		T superGeneric = this.<T> insert(newGeneric);
+		T superGeneric = buildAndInsertComplex(specializeGeneric, implicit, directSupers, components, automatic);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
 	}
@@ -477,7 +467,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		};
 	}
 
-	private <T extends Generic> T buildAndInsertComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
+	<T extends Generic> T buildAndInsertComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
 		return insert(this.<EngineImpl> getEngine().buildComplex(clazz, implicit, supers, components, automatic));
 	}
 
@@ -488,17 +478,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		Generic constraintValue = find(ConstraintValue.class);
 		for (Serializable key : getEngine().getContraintsMap().keySet())
 			for (Generic generic : generics)
 				if (generic.isInstanceOf(constraintValue)) {
-					AbstractConstraintImpl constraint = find(((AxedPropertyClass<GenericImpl>) key).getClazz());
+					AbstractConstraintImpl constraint = find(((AxedPropertyClass) key).getClazz());
 					if (isCheckable(constraint, generic, checkingType, isFlushTime)) {
 						GenericImpl base = ((GenericImpl) generic).<GenericImpl> getBaseComponent().<GenericImpl> getBaseComponent().<GenericImpl> getBaseComponent();
 						if (null != base)
-							constraint.checkConsistency(base, (Holder) generic, base, (AxedPropertyClass<GenericImpl>) ((GenericImpl) generic).<GenericImpl> getBaseComponent().getValue());
+							constraint.checkConsistency(base, (Holder) generic, base, (AxedPropertyClass) ((GenericImpl) generic).<GenericImpl> getBaseComponent().getValue());
 					}
 				}
 	}
