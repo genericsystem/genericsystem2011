@@ -10,9 +10,13 @@ import org.genericsystem.core.Structural;
 import org.genericsystem.core.StructuralImpl;
 import org.genericsystem.example.Example.MyVehicle;
 import org.genericsystem.example.Example.Vehicle;
+import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.myadmin.beans.GenericBean;
+import org.genericsystem.myadmin.beans.GenericTreeBean;
 import org.testng.annotations.Test;
 
 @Test
@@ -21,6 +25,10 @@ public class TypesTest extends AbstractTest {
 	@Inject
 	private Cache cache;
 
+	@Inject
+	private GenericTreeBean genericTreeBean;
+
+	@Test
 	public void testExample() {
 		Generic vehicle = cache.find(Vehicle.class);
 		Generic myVehicle = cache.find(MyVehicle.class);
@@ -28,6 +36,7 @@ public class TypesTest extends AbstractTest {
 		assert vehicle.getInheritings().contains(myVehicle);
 	}
 
+	@Test
 	public void testGetAttributes() {
 		Type human = cache.newType("Human");
 		Generic michael = human.newInstance("Michael");
@@ -45,6 +54,7 @@ public class TypesTest extends AbstractTest {
 		assert structurals2.contains(new StructuralImpl(isBrotherOf, 0));
 	}
 
+	@Test
 	public void testGetOtherTargets() {
 		Type human = cache.newType("Human");
 		Generic michael = human.newInstance("Michael");
@@ -62,5 +72,20 @@ public class TypesTest extends AbstractTest {
 		assert targetsFromMichael.size() == 1 : targetsFromMichael.size();
 		assert targetsFromMichael.contains(quentin);
 		assert !targetsFromMichael.contains(michael);
+	}
+
+	@Test
+	public void testContraint() {
+		Type vehicle = cache.newType("Vehicle");
+		Attribute vehiclePower = vehicle.setProperty("power");
+		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Holder myVehicle123 = myVehicle.setValue(vehiclePower, "123");
+		myVehicle.removeHolder(myVehicle123);
+		assert !myVehicle123.isAlive();
+		assert !myVehicle123.getImplicit().isAlive();
+		vehicle.removeHolder(vehiclePower);
+		assert !vehiclePower.isAlive();
+		assert !vehiclePower.getImplicit().isAlive();
+		GenericBean gb = new GenericBean();
 	}
 }

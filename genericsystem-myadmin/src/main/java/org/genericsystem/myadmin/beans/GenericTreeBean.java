@@ -88,7 +88,7 @@ public class GenericTreeBean implements Serializable {
 		this.selectionLocked = selectionLocked;
 	}
 
-	Generic getSelectedTreeNodeGeneric() {
+	public Generic getSelectedTreeNodeGeneric() {
 		return selectedTreeNode.getGeneric();
 	}
 
@@ -131,6 +131,7 @@ public class GenericTreeBean implements Serializable {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	public void fire(@Observes @InvokeApplication @After PhaseEvent e) {
 		if (event != null) {
 			launcher.fire(event);

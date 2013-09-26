@@ -33,6 +33,7 @@ public class GenericTreeNode {
 		this.treeType = treeType;
 	}
 
+	@SuppressWarnings("hiding")
 	private TreeType getTreeType(Generic generic) {
 		for (GenericTreeNode child : childrens)
 			if (child.getGeneric().equals(generic))
@@ -44,6 +45,7 @@ public class GenericTreeNode {
 		return getChildrens(treeType, implicitShow);
 	}
 
+	@SuppressWarnings("hiding")
 	public List<GenericTreeNode> getChildrens(TreeType treeType, boolean implicitShow) {
 		List<GenericTreeNode> list = new ArrayList<>();
 		for (Generic child : getSnapshot(treeType))
@@ -53,7 +55,7 @@ public class GenericTreeNode {
 		return list;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "hiding" })
 	private <T extends Generic> Snapshot<T> getSnapshot(TreeType treeType) {
 		switch (treeType) {
 		case SUPERS:
@@ -83,6 +85,7 @@ public class GenericTreeNode {
 		return new GenericTreeNode(this, child, getTreeType(child));
 	}
 
+	@SuppressWarnings("hiding")
 	public boolean isImplicitAutomatic(Generic generic) {
 		return generic.isAutomatic() && ((GenericImpl) generic).getComponentsSize() == 0;
 	}

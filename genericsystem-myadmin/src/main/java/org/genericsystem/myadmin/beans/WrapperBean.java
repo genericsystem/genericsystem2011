@@ -26,6 +26,10 @@ public class WrapperBean {
 	@Inject
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
+	public boolean isBoolean(Entry<Serializable, Serializable> entry) {
+		return Boolean.class.isInstance(entry.getValue());
+	}
+
 	public GenericWrapper getGenericWrapper(Generic generic) {
 		return new GenericWrapper(generic);
 	}
@@ -78,6 +82,14 @@ public class WrapperBean {
 		return new PropertyWrapper(entry);
 	}
 
+	public ContraintWrapper getContraintWrapper(Entry<Serializable, Serializable> entry) {
+		return new ContraintWrapper(entry);
+	}
+
+	public SystemPropertiesWrapper getSystemPropertiesWrapper(Entry<Serializable, Serializable> entry) {
+		return new SystemPropertiesWrapper(entry);
+	}
+
 	public class PropertyWrapper {
 		private Entry<Serializable, Serializable> entry;
 
@@ -90,8 +102,46 @@ public class WrapperBean {
 		}
 
 		public void setValue(String newValue) {
-			if (!newValue.equals(entry.getValue().toString())) {
-				genericTreeBean.getSelectedTreeNodeGeneric().getProperties().put(entry.getKey(), newValue);
+			if (!newValue.equals(entry.getValue())) {
+				genericTreeBean.getSelectedTreeNodeGeneric().getPropertiesMap().put(entry.getKey(), newValue);
+				messages.info("updateValue", entry.getValue(), newValue);
+			}
+		}
+	}
+
+	public class ContraintWrapper {
+		private Entry<Serializable, Serializable> entry;
+
+		public ContraintWrapper(Entry<Serializable, Serializable> entry) {
+			this.entry = entry;
+		}
+
+		public Boolean getValue() {
+			return (Boolean) entry.getValue();
+		}
+
+		public void setValue(Boolean newValue) {
+			if (!newValue.equals(entry.getValue())) {
+				genericTreeBean.getSelectedTreeNodeGeneric().getContraintsMap().put(entry.getKey(), newValue);
+				messages.info("updateValue", entry.getValue(), newValue);
+			}
+		}
+	}
+
+	public class SystemPropertiesWrapper {
+		private Entry<Serializable, Serializable> entry;
+
+		public SystemPropertiesWrapper(Entry<Serializable, Serializable> entry) {
+			this.entry = entry;
+		}
+
+		public Boolean getValue() {
+			return (Boolean) entry.getValue();
+		}
+
+		public void setValue(Boolean newValue) {
+			if (!newValue.equals(entry.getValue())) {
+				genericTreeBean.getSelectedTreeNodeGeneric().getSystemPropertiesMap().put(entry.getKey(), newValue);
 				messages.info("updateValue", entry.getValue(), newValue);
 			}
 		}

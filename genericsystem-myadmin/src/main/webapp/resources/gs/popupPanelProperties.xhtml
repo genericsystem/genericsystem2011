@@ -15,9 +15,7 @@
 	<composite:attribute name="action" method-signature="void action()"
 		required="true" />
 	<composite:attribute name="render" required="true" />
-	<composite:attribute name="getList" required="true" />
 	<composite:attribute name="keyInput" />
-
 </composite:interface>
 
 <composite:implementation>
@@ -36,25 +34,20 @@
 		<h:panelGrid styleClass="fullWidth" style="min-width: 600"
 			rowClasses="fullWidth" columnClasses="fullWidth">
 			<h:panelGroup>
-				<h:outputText styleClass="uppercase" value="#{msg.ConstraintClass}" />
-				<h:selectOneMenu id="inputPopupPanelKey" style="min-width:150" value="#{popupPanelBean.popupClass}"  > 
-					<f:selectItems  value="#{cc.attrs.getList}"  />
-				</h:selectOneMenu>
-				<h:outputText styleClass="uppercase" value="#{msg.position}"
+				<h:outputText styleClass="uppercase" value="#{msg.type}" />
+				<h:inputText id="inputPopupPanelType"
+					value="#{popupPanelBean.popupkey}" />
+				<h:outputText styleClass="uppercase" value="#{msg.value}"
 					rendered="#{not empty cc.attrs.keyInput}" />
-				<h:inputText id="inputPopupPanelPos" style="width:20px"
-					value="#{popupPanelBean.popupPos}"
+				<h:inputText id="inputPopupPanelValeur" style="width:20px"
+					value="#{popupPanelBean.popupValueProp}"
 					rendered="#{not empty cc.attrs.keyInput}" />
-				<h:outputText styleClass="uppercase" value="#{msg.value}" />
-				<h:outputText rendered="#{not empty cc.attrs.keyInput}" />
-				<h:selectBooleanCheckbox id="inputPopupPanel"
-					style="margin-top:100; vertical-align: bottom;"
-					value="#{popupPanelBean.popupValue}" />
+
 				<a4j:commandButton id="apply" action="#{cc.attrs.action}"
 					image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
 					render="#{cc.attrs.render}" style="vertical-align: bottom;"
 					onbeforedomupdate="#{rich:component(cc.attrs.key)}.hide();"
-					oncomplete="#{rich:element('inputPopupPanelKey')}.value=''; #{rich:element('inputPopupPanel')}.value='';#{rich:element('inputPopupPanelPos')}.value=''; return false;" />
+					oncomplete="#{rich:element('inputPopupPanelValeur')}.value='';#{rich:element('inputPopupPanelType')}.value=''; return false;" />
 			</h:panelGroup>
 		</h:panelGrid>
 	</rich:popupPanel>

@@ -107,7 +107,7 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Returns true if this Generic has been automatically created.
 	 * 
-	 * @return Trueif this Generic has been automatically created.
+	 * @return True if this Generic has been automatically created.
 	 */
 	boolean isAutomatic();
 
@@ -628,7 +628,7 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends MapProvider> Map<Serializable, Serializable> getMap(Class<T> mapClass);
 
-	Map<Serializable, Serializable> getProperties();
+	Map<Serializable, Serializable> getPropertiesMap();
 
 	ExtendedMap<Serializable, Serializable> getContraintsMap();
 

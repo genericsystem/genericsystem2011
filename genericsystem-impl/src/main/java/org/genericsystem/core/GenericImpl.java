@@ -1274,24 +1274,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getSystemPropertiesMap().get(new AxedPropertyClass(constraintClass, pos));
 	}
 
-	private <T extends Generic> void setSystemPropertyValue(Class<T> constraintClass, int pos, Serializable value) {
+	public <T extends Generic> void setSystemPropertyValue(Class<T> constraintClass, int pos, Serializable value) {
 		getSystemPropertiesMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
+	@SuppressWarnings("hiding")
 	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getSystemPropertyValue(constraintClass, pos);
 		return null != value && !Boolean.FALSE.equals(value);
 	}
 
-	private <T extends Generic> Serializable getConstraintValue(Class<T> constraintClass, int pos) {
+	public <T extends Generic> Serializable getConstraintValue(Class<T> constraintClass, int pos) {
 		return getContraintsMap().get(new AxedPropertyClass(constraintClass, pos));
 	}
 
-	private <T extends Generic> void setConstraintValue(Class<T> constraintClass, int pos, Serializable value) {
+	public <T extends Generic> void setConstraintValue(Class<T> constraintClass, int pos, Serializable value) {
 		getContraintsMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
-	private <T extends Generic> boolean isConstraintEnabled(Class<T> constraintClass, int pos) {
+	@SuppressWarnings("hiding")
+	public <T extends Generic> boolean isConstraintEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getConstraintValue(constraintClass, pos);
 		return null != value && !Boolean.FALSE.equals(value);
 	}
@@ -1560,7 +1562,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public Map<Serializable, Serializable> getProperties() {
+	public Map<Serializable, Serializable> getPropertiesMap() {
 		return getMap(PropertiesMapProvider.class);
 	}
 

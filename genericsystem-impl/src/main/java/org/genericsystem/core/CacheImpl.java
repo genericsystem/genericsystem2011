@@ -22,6 +22,7 @@ import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.FunctionalConsistencyViolationException;
+import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
@@ -132,7 +133,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	void removeWithAutomatics(Generic generic) throws RollbackException {
 		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
-			throw new IllegalStateException();
+			throw new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated");
 		remove(generic);
 		Generic automatic = findAutomaticAlone(generic);
 		if (null != automatic)
@@ -229,9 +230,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				if (((GenericImpl) orderedDependency).isPrimary())
 					generic = bindPrimaryByValue(adjust(((GenericImpl) orderedDependency).supers)[0], orderedDependency.getValue(), orderedDependency.isAutomatic(), orderedDependency.getClass());
 				else {
-					generic = buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0],
-							computeDirectSupers ? getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-							adjust(((GenericImpl) orderedDependency).components), orderedDependency.isAutomatic());
+					generic = buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0], computeDirectSupers ? getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components), orderedDependency.isAutomatic());
 				}
 				put(orderedDependency, generic);
 			}
