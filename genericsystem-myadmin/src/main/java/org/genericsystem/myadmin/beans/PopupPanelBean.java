@@ -48,17 +48,17 @@ public class PopupPanelBean implements Serializable {
 
 	public void addProperties() {
 		genericTreeBean.getSelectedTreeNode().getGeneric().getPropertiesMap().put(getPopupkey(), getPopupValue());
-		messages.info("Property successfully added");
+		messages.info("successadd", getClazz().getSimpleName());
 	}
 
 	public void addConstraints() {
 		((GenericImpl) genericTreeBean.getSelectedTreeNodeGeneric()).setConstraintValue(getClazz(), popupPos, popupValue);
-		messages.info("Constraint successfully added");
+		messages.info("successadd", getClazz().getSimpleName());
 	}
 
 	public void addSystemProperty() {
 		((GenericImpl) genericTreeBean.getSelectedTreeNodeGeneric()).setSystemPropertyValue(getClazz(), popupPos, popupValue);
-		messages.info("System property successfully added");
+		messages.info("successadd", getClazz().getSimpleName());
 	}
 
 	@SuppressWarnings("unchecked")
