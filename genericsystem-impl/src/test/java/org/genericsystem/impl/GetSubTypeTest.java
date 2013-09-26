@@ -151,12 +151,9 @@ public class GetSubTypeTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		Type car = vehicle.newSubType("Car");
-		Type subColor = color.newSubType("SubColor");
-		((GenericImpl) car).setSubAttribute(vehicleColor, "CarSubColor", subColor);
-
-		Type otherType = cache.newType("OtherType");
-		((GenericImpl) car).setSubAttribute(vehicleColor, "CarOtherType", otherType);
-
+		// ((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", color.newSubType("OutsideColor"));
+		// ((GenericImpl) car).setSubAttribute(vehicleColor, "CarPercent", cache.newType("Percent"));
+		((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.newType("Percent"));
 	}
 
 	public void testGetSubTypeNonExistingRelation() {

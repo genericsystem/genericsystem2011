@@ -23,7 +23,7 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies({ PropertyKey.class, PropertyValue.class })
-public class PropertiesMapProvider extends DefaultMapProvider<Serializable, Serializable> {
+public class PropertiesMapProvider extends AbstractMapProvider<Serializable, Serializable> {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -54,7 +54,7 @@ public class PropertiesMapProvider extends DefaultMapProvider<Serializable, Seri
 	@SystemGeneric
 	@Extends(meta = PropertiesMapProvider.class)
 	@Components(Engine.class)
-	@StringValue(DefaultMapProvider.MAP_VALUE)
+	@StringValue(AbstractMapProvider.MAP_VALUE)
 	public static class MapInstance extends GenericImpl implements Holder {
 	}
 

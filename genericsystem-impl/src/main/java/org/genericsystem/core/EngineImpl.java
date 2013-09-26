@@ -3,7 +3,6 @@ package org.genericsystem.core;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
 import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
@@ -105,8 +104,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	@Override
 	public int getMetaLevel() {
-		// TODO KK ?
-		return 0;// SystemGeneric.META;
+		return Statics.META;
 	}
 
 	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
@@ -140,14 +138,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
 			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
-
 			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
-			// Statics.logTimeIfCurrentThreadDebugged("Before loading classes");
 			for (Class<?> clazz : classes)
 				get(clazz);
 			for (Class<?> clazz : userClasses)
 				get(clazz);
-			// Statics.logTimeIfCurrentThreadDebugged("Before flush");
 			cache.flush();
 			stop(cache);
 			startupTime = false;
@@ -159,12 +154,9 @@ public class EngineImpl extends GenericImpl implements Engine {
 			T systemProperty = (T) super.get(clazz);
 			if (systemProperty != null)
 				return systemProperty;
-			if (startupTime && getCurrentCache() instanceof Cache) {
-				// Statics.logTimeIfCurrentThreadDebugged("Before loading class : " + clazz);
-				// assert !clazz.equals(ConstraintsMapProvider.ConstraintKey.class);
-				return bind(clazz);
-			}
-			throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
+			if (!startupTime)
+				throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
+			return bind(clazz);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -176,11 +168,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 			if (MetaAttribute.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this });
 				if (result == null)
-					result = cache.insert(new GenericImpl().initializeComplex(EngineImpl.this, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }, false));
+					result = cache.buildAndInsertComplex(null, EngineImpl.this, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }, false);
 			} else if (MetaRelation.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (result == null)
-					result = cache.insert(new GenericImpl().initializeComplex(get(MetaAttribute.class).getImplicit(), new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }, false));
+					result = cache.buildAndInsertComplex(null, EngineImpl.this, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }, false);
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);

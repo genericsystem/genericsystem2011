@@ -399,8 +399,7 @@ public class ApiTest extends AbstractTest {
 	public void test_get_subtype_with_null_value() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-		Type expected = car.newSubType(null);
-
+		car.newSubType(null);
 	}
 
 	// getAllTypes() tests

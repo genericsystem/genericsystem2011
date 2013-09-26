@@ -7,6 +7,7 @@ import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
+import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.RequiredConstraintViolationException;
 import org.genericsystem.generic.Attribute;
@@ -36,7 +37,7 @@ public class RequiredConstraintImpl extends AbstractBooleanAxedConstraintImpl im
 			if (instances.isEmpty())
 				throw new RequiredConstraintViolationException(attribute + " is required");
 			for (Generic generic : instances)
-				if (null == generic.getHolder((Attribute) attribute, axe))
+				if (null == generic.getHolder(Statics.CONCRETE, (Attribute) attribute, axe))
 					throw new RequiredConstraintViolationException(generic + " is required for " + attribute);
 		}
 	}

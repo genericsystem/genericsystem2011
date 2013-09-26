@@ -11,7 +11,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -285,13 +284,13 @@ public abstract class AbstractContext implements Serializable {
 			return stringValue.value();
 		AxedConstraintValue axedConstraintValue = clazz.getAnnotation(AxedConstraintValue.class);
 		if (axedConstraintValue != null)
-			return new AxedPropertyClass<GenericImpl>((Class<GenericImpl>) axedConstraintValue.value(), axedConstraintValue.axe());
+			return new AxedPropertyClass((Class<GenericImpl>) axedConstraintValue.value(), axedConstraintValue.axe());
 		return clazz;
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> T findPrimaryByValue(Generic primaryAncestor, Serializable value) {
-		Iterator<Generic> it = directInheritingsIterator(primaryAncestor);
+	public <T extends Generic> T findPrimaryByValue(Generic meta, Serializable value) {
+		Iterator<Generic> it = directInheritingsIterator(meta);
 		while (it.hasNext()) {
 			Generic candidate = it.next();
 			if (((GenericImpl) candidate).isPrimary() && (Objects.hashCode(value) == Objects.hashCode(candidate.getValue())) && Objects.equals(value, candidate.getValue()))

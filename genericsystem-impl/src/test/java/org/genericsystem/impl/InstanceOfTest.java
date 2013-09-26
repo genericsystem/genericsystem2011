@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
@@ -61,36 +62,36 @@ public class InstanceOfTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type vehicle = cache.newType("Vehicle");
-		Generic myVehicle = vehicle.newInstance( "myVehicle");
+		Generic myVehicle = vehicle.newInstance("myVehicle");
 		assert myVehicle.isInstanceOf(vehicle);
 
-		Type car = vehicle.newSubType( "Car");
-		Generic myCar = car.newInstance( "myCar");
+		Type car = vehicle.newSubType("Car");
+		Generic myCar = car.newInstance("myCar");
 		assert myCar.isInstanceOf(car);
 
 		assert myCar.isInstanceOf(vehicle);
 		assert !myVehicle.isInstanceOf(car);
 
-		Attribute vehiclePower = vehicle.setProperty( "Power");
+		Attribute vehiclePower = vehicle.setProperty("Power");
 
-		Holder v90 = myVehicle.setValue( vehiclePower, 90);
-		Holder v235 = myCar.setValue( vehiclePower, 235);
+		Holder v90 = myVehicle.setValue(vehiclePower, 90);
+		Holder v235 = myCar.setValue(vehiclePower, 235);
 
 		assert v90.isInstanceOf(vehiclePower);
 		assert v235.isInstanceOf(vehiclePower);
 
 		cache.flush();
 
-		assert Objects.equals(myVehicle.getValue( vehiclePower), 90);
-		assert Objects.equals(myCar.getValue( vehiclePower), 235);
+		assert Objects.equals(myVehicle.getValue(vehiclePower), 90);
+		assert Objects.equals(myCar.getValue(vehiclePower), 235);
 
-		assert v90.equals(myVehicle.getHolder( vehiclePower));
-		assert v235.equals(myCar.getHolder( vehiclePower));
+		assert v90.equals(myVehicle.getHolder(Statics.CONCRETE, vehiclePower));
+		assert v235.equals(myCar.getHolder(Statics.CONCRETE, vehiclePower));
 
 		v90.remove();
 
-		assert myVehicle.getValue( vehiclePower) == null;
-		assert myVehicle.getHolder( vehiclePower) == null;
+		assert myVehicle.getValue(vehiclePower) == null;
+		assert myVehicle.getHolder(Statics.CONCRETE, vehiclePower) == null;
 
 		cache.flush();
 	}
@@ -101,10 +102,10 @@ public class InstanceOfTest extends AbstractTest {
 		Type mammal = cache.newType("Mammal");
 
 		Type human = cache.newSubType("Human", animal, mammal);
-		Generic michael = human.newInstance( "Michael");
+		Generic michael = human.newInstance("Michael");
 
 		Type canid = cache.newSubType("Canid", animal, mammal);
-		Generic milou = canid.newInstance( "Milou");
+		Generic milou = canid.newInstance("Milou");
 		assert michael.isInstanceOf(human);
 		assert !michael.isInstanceOf(canid);
 		assert michael.isInstanceOf(animal);
@@ -120,7 +121,7 @@ public class InstanceOfTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car1 = cache.newSubType("Car1", vehicle);
-		Type car2 = vehicle.newSubType( "Car2");
+		Type car2 = vehicle.newSubType("Car2");
 
 		// the first super is implicit => Car1 != Car2
 		assert car1.getSupers().get(1).equals(car2.getSupers().get(1));

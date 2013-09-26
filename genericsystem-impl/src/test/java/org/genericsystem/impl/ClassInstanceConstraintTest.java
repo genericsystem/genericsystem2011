@@ -29,32 +29,32 @@ public class ClassInstanceConstraintTest extends AbstractTest {
 	public void simpleAttributeValueOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class).start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myFiat = vehicle.newInstance( "myFiat");
-		Attribute wheelVehcile = vehicle.setAttribute( "wheel");
-		wheelVehcile.setConstraintClass( Wheel.class);
+		Generic myFiat = vehicle.newInstance("myFiat");
+		Attribute wheelVehcile = vehicle.setAttribute("wheel");
+		wheelVehcile.setConstraintClass(Wheel.class);
 		assert wheelVehcile.getConstraintClass().equals(Wheel.class) : wheelVehcile.getConstraintClass();
-		myFiat.setValue( wheelVehcile, new Wheel());
+		myFiat.setValue(wheelVehcile, new Wheel());
 	}
 
 	public void simpleAttributeValueKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class).start();
 		Type vehicle = cache.newType("Vehicle");
-		Attribute wheelVehcile = vehicle.setAttribute( "wheel");
+		Attribute wheelVehcile = vehicle.setAttribute("wheel");
 		assert wheelVehcile.getConstraintClass().equals(Object.class) : wheelVehcile.getConstraintClass();
 	}
 
 	public void simpleAttributeValueKO2() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Wheel.class).start();
 		Type vehicle = cache.newType("Vehicle");
-		final Generic myFiat = vehicle.newInstance( "myFiat");
-		final Attribute wheelVehcile = vehicle.setAttribute( "wheel");
-		wheelVehcile.setConstraintClass( Wheel.class);
+		final Generic myFiat = vehicle.newInstance("myFiat");
+		final Attribute wheelVehcile = vehicle.setAttribute("wheel");
+		wheelVehcile.setConstraintClass(Wheel.class);
 		assert Wheel.class.equals(wheelVehcile.getConstraintClass());
 
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				myFiat.setValue( wheelVehcile, 23);
+				myFiat.setValue(wheelVehcile, 23);
 			}
 		}.assertIsCausedBy(InstanceClassConstraintViolationException.class);
 	}

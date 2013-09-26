@@ -636,12 +636,6 @@ public interface Generic extends Comparable<Generic> {
 
 	interface ExtendedMap<K, V> extends Map<K, V> {
 		Holder getValueHolder(Serializable key);
-
-		// @Deprecated
-		// Holder getKeyHolder(K key);
-		//
-		// @Deprecated
-		// <T extends Generic> T getKeyBaseComponent(K key);
 	}
 
 	<T extends Generic> T addComponent(int pos, Generic newComponent);

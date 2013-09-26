@@ -10,7 +10,6 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.PhantomConstraintViolationException;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -163,7 +162,7 @@ public class PhamtomTest extends AbstractTest {
 
 		assert car.getAttributes().contains(vehiclePower);
 		car.cancelAll(vehiclePower, false);
-		Iterator<Generic> iterator = ((GenericImpl) car).holdersIterator(Statics.STRUCTURAL,vehiclePower, Statics.MULTIDIRECTIONAL,true);
+		Iterator<Generic> iterator = ((GenericImpl) car).holdersIterator(Statics.STRUCTURAL, vehiclePower, Statics.MULTIDIRECTIONAL, true);
 		Generic phantom = iterator.next();
 		// car.restore( vehiclePower);
 		car.clearAllStructural(vehiclePower);
@@ -203,7 +202,7 @@ public class PhamtomTest extends AbstractTest {
 		assert vehicle.getAttributes().contains(vehiclePower);
 		((GenericImpl) car).setSubAttribute(vehiclePower, null);
 		assert vehicle.getAttributes().contains(vehiclePower);
-		assert !car.getAttributes().contains(vehiclePower);
+		assert !car.getAttributes().contains(vehiclePower) : car.getAttributes();
 		car.getAttribute(null).remove();
 		assert vehicle.getAttributes().contains(vehiclePower);
 		assert car.getAttributes().contains(vehiclePower);
@@ -231,12 +230,8 @@ public class PhamtomTest extends AbstractTest {
 		assert car.getAttributes().contains(carPower);
 		assert carPower.inheritsFrom(vehiclePower);
 
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				((GenericImpl) car).setSubAttribute(vehiclePower, null);
-			}
-		}.assertIsCausedBy(PhantomConstraintViolationException.class);
+		((GenericImpl) car).setSubAttribute(vehiclePower, null);
+		assert !carPower.isAlive();
 	}
 
 	public void cancelAndRestoreRelation() {
@@ -255,7 +250,7 @@ public class PhamtomTest extends AbstractTest {
 		((GenericImpl) car).setSubAttribute(vehicleHuman, null, human);
 
 		assert vehicle.getRelations().size() == 1;
-		assert car.getRelations().isEmpty();
+		assert car.getRelations().isEmpty() : car.getRelations();
 
 		// car.restore( vehicleHuman);
 		car.getAttribute(vehicleHuman, null).remove();
@@ -407,16 +402,16 @@ public class PhamtomTest extends AbstractTest {
 		Attribute carPower = car.setProperty("power");
 		Holder defaultPower = car.setValue(carPower, "233");
 		Generic myCar = car.newInstance("myCar");
-		assert myCar.getHolder(carPower).equals(defaultPower);
+		assert myCar.getHolder(Statics.CONCRETE, carPower).equals(defaultPower);
 
 		Generic cancel = myCar.setValue(carPower, null);
-		assert ((GenericImpl) myCar).getHolderByValue(defaultPower, null) == cancel;
-		assert myCar.getHolder(carPower) == null : myCar.getHolder(carPower);
+		assert ((GenericImpl) myCar).getHolderByValue(Statics.CONCRETE, defaultPower, null) == cancel;
+		assert myCar.getHolder(Statics.CONCRETE, carPower) == null : myCar.getHolder(Statics.CONCRETE, carPower);
 
 		myCar.setValue(carPower, "233");
 		assert !cancel.isAlive();
 		assert myCar.getValue(carPower).equals("233");
-		assert ((GenericImpl) myCar).getHolderByValue(defaultPower, null) == null;
+		assert ((GenericImpl) myCar).getHolderByValue(Statics.CONCRETE, defaultPower, null) == null;
 	}
 
 	public void cancelDefaultAttributeKo() {
@@ -427,7 +422,7 @@ public class PhamtomTest extends AbstractTest {
 		final Generic mycar = car.newInstance("myCar");
 		assert mycar.getValue(carPower).equals("233");
 		mycar.setValue(carPower, null);
-		assert mycar.getHolder(carPower) == null;
+		assert mycar.getHolder(Statics.CONCRETE, carPower) == null;
 	}
 
 	public void cancelDefaultRelation() {
@@ -440,16 +435,9 @@ public class PhamtomTest extends AbstractTest {
 		assert defaultColor.isConcrete();
 		final Generic myCar = car.newInstance("myCar");
 		assert myCar.getTargets(carColor).contains(red);
-		// new RollbackCatcher() {
-		// @Override
-		// public void intercept() {
 		myCar.setLink(carColor, null, red);
-		// }
-		// }.assertIsCausedBy(PhantomConstraintViolationException.class);
-
 		myCar.setLink(defaultColor, null, red);
-
-		assert ((GenericImpl) myCar).getHolder(defaultColor, null, red) == null;
+		assert ((GenericImpl) myCar).getHolder(Statics.CONCRETE, defaultColor, null, red) == null;
 	}
 
 	public void cancelDefaultRelationKo() {
