@@ -118,7 +118,7 @@ public class RemoveTest extends AbstractTest {
 	}
 
 	public void testRemoveSystemGeneric() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
 		try {
 			cache.find(Vehicle.class).remove();
 		} catch (NotRemovableException ignore) {
