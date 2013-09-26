@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -118,13 +119,10 @@ public class RemoveTest extends AbstractTest {
 
 	public void testRemoveSystemGeneric() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
-		boolean ignore = false;
 		try {
 			cache.find(Vehicle.class).remove();
-		} catch (IllegalStateException e) {
-			ignore = true;
+		} catch (NotRemovableException ignore) {
 		}
-		assert ignore;
 	}
 
 }
