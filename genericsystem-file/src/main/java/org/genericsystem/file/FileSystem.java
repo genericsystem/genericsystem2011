@@ -9,6 +9,7 @@ import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
+import org.genericsystem.core.Statics;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType;
 import org.genericsystem.file.FileSystem.FileType.File;
@@ -37,7 +38,7 @@ public class FileSystem extends TreeImpl {
 		}
 
 		public <T extends File> T getFile(String name) {
-			return getHolderByValue(getEngine().getCurrentCache().<Attribute> find(FileType.class), name);
+			return getHolderByValue(Statics.CONCRETE, getEngine().getCurrentCache().<Attribute> find(FileType.class), name);
 		}
 
 		public <T extends File> T addFile(String name) {

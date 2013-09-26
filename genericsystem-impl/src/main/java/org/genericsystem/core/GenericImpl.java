@@ -646,25 +646,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		return internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), false, targets);
+		T holder = internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), false, targets);
+		assert holder.inheritsFrom(attribute) : holder.info();
+		return holder;
 	}
 
 	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		return internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
+		T holder = internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
+		assert holder.inheritsFrom(attribute) : holder.info();
+		return holder;
 	}
 
 	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Generic meta, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
-		Generic implicit = getCurrentCache().bindPrimaryByValue(meta, value, true, null);
 		if (holder == null)
-			return value == null ? null : this.<T> bind(specializationClass, implicit, attribute, basePos, existsException, targets);
+			return value == null ? null : this.<T> bind(specializationClass, getCurrentCache().bindPrimaryByValue(meta, value, true, null), attribute, basePos, existsException, targets);
 		if (!equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(holder, basePos, true);
+			Generic implicit = getCurrentCache().bindPrimaryByValue(meta, value, true, null);
 			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
 				cancel(holder, basePos, true);
 			return this.<T> bind(specializationClass, implicit, attribute, basePos, existsException, targets);
 		}
+		Generic implicit = getCurrentCache().bindPrimaryByValue(meta, value, true, null);
 		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
 		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
