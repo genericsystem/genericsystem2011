@@ -9,9 +9,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
-import org.genericsystem.annotation.Components;
-import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -26,14 +23,11 @@ import org.genericsystem.snapshot.AbstractSnapshot;
  * @author Nicolas Feybesse
  * 
  */
-@SystemGeneric
-@Components(Engine.class)
-public class AbstractMapProvider<Key extends Serializable, Value extends Serializable> extends GenericImpl implements MapProvider {
+public abstract class AbstractMapProvider<Key extends Serializable, Value extends Serializable> extends GenericImpl implements MapProvider {
 
 	static final String MAP_VALUE = "map";
 
 	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -171,13 +165,9 @@ public class AbstractMapProvider<Key extends Serializable, Value extends Seriali
 		};
 	}
 
-	public <T extends Attribute> Class<T> getKeyAttributeClass() {
-		throw new UnsupportedOperationException();
-	}
+	public abstract <T extends Attribute> Class<T> getKeyAttributeClass();
 
-	public <T extends Attribute> Class<T> getValueAttributeClass() {
-		throw new UnsupportedOperationException();
-	}
+	public abstract <T extends Attribute> Class<T> getValueAttributeClass();
 
 	private Attribute getKeyAttribute() {
 		return getCurrentCache().<Attribute> find(getKeyAttributeClass());

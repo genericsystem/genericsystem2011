@@ -2,10 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayDeque;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -177,75 +174,31 @@ public class Statics {
 		private static final long serialVersionUID = 7222889429002770779L;
 
 		public Primaries(Generic... generics) {
-			super(new Comparator<Generic>() {
-
-				@Override
-				public int compare(Generic generic1, Generic generic2) {
-					Deque<Generic> deque1 = getPrimariesStack(generic1);
-					Deque<Generic> deque2 = getPrimariesStack(generic2);
-
-					while (!deque1.isEmpty() && !deque2.isEmpty()) {
-						int compare = deque1.pop().compareTo(deque2.pop());
-						if (compare != 0)
-							return compare;
-					}
-					return deque1.isEmpty() ? !deque2.isEmpty() ? 1 : 0 : -1;
-				}
-			});
-			add(generics);
-		}
-
-		static Deque<Generic> getPrimariesStack(final Generic generic) {
-			return new ArrayDeque<Generic>() {
-				private static final long serialVersionUID = 1525213213728043363L;
-				{
-					push(generic);
-				}
-
-				@Override
-				public void push(Generic generic) {
-					if (!generic.isEngine()) {
-						super.push(generic);
-						push(((GenericImpl) generic).supers[0]);
-					}
-				}
-			};
-		}
-
-		public boolean add(Generic[] generics) {
-			boolean modified = false;
 			for (Generic generic : generics)
-				if (add(generic))
-					modified = true;
-			return modified;
+				add(generic);
 		}
 
 		@Override
 		public boolean add(Generic generic) {
 			if (((GenericImpl) generic).isPrimary())
-				return restrictedAdd(generic);
-			boolean adds = false;
-			for (Generic directSuper : ((GenericImpl) generic).supers)
-				if (add(directSuper))
-					adds = true;
-			return adds;
+				restrictedAdd(generic);
+			else
+				for (Generic directSuper : ((GenericImpl) generic).supers)
+					add(directSuper);
+			return true;
 		}
 
-		private boolean restrictedAdd(Generic candidate) {
-			assert ((GenericImpl) candidate).isPrimary();
-
+		private void restrictedAdd(Generic candidate) {
 			for (Generic generic : this)
-				if (generic.inheritsFrom(candidate)) {
-					return false;
-				}
+				if (generic.inheritsFrom(candidate))
+					return;
 			Iterator<Generic> it = this.iterator();
 			while (it.hasNext()) {
 				Generic next = it.next();
-				if (candidate.inheritsFrom(next)) {
+				if (candidate.inheritsFrom(next))
 					it.remove();
-				}
 			}
-			return super.add(candidate);
+			super.add(candidate);
 		};
 
 		@Override
