@@ -52,4 +52,10 @@ public class RequiredConstraintImpl extends AbstractBooleanAxedConstraintImpl im
 		return false;
 	}
 
+	@Override
+	public void checkConsistency(Generic base, Holder value, int axe) throws ConstraintViolationException {
+		// TODO Auto-generated method stub
+
+	}
+
 }

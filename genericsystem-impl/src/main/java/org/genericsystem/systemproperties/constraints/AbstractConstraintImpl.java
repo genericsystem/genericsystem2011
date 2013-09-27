@@ -1,7 +1,6 @@
 package org.genericsystem.systemproperties.constraints;
 
 import org.genericsystem.annotation.Priority;
-import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -28,7 +27,7 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 
 	public abstract void check(Generic modified, Holder valueBaseComponent) throws ConstraintViolationException;
 
-	public abstract void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedPropertyClass key) throws ConstraintViolationException;
+	public abstract void checkConsistency(Generic base, Holder value, int axe) throws ConstraintViolationException;
 
 	// @Override
 	// public int compareTo(AbstractConstraintImpl otherConstraint) {

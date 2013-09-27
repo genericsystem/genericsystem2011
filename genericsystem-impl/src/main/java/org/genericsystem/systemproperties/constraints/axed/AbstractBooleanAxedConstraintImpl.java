@@ -18,11 +18,8 @@ public abstract class AbstractBooleanAxedConstraintImpl extends AbstractBooleanC
 	}
 
 	@Override
-	public void checkConsistency(Generic base, Holder valueBaseComponent, Generic attribute, AxedPropertyClass key) throws ConstraintViolationException {
-		GenericImpl component = ((GenericImpl) attribute).<GenericImpl> getComponent(key.getAxe());
-		if (null != component)
-			for (Generic inheriting : component.getAllInheritings())
-				check(inheriting, attribute, key.getAxe());
+	public void checkConsistency(Generic base, Holder value, int axe) throws ConstraintViolationException {
+
 	}
 
 	public abstract void check(Generic base, Generic attribute, int axe) throws ConstraintViolationException;

@@ -27,7 +27,6 @@ public class MapTest extends AbstractTest {
 		Map<Serializable, Serializable> map2 = new HashMap<>();
 		Map<Serializable, Serializable> carMap = car.getPropertiesMap();
 		Map<Serializable, Serializable> myBmwMap = myBmw.getPropertiesMap();
-
 		Statics.logTimeIfCurrentThreadDebugged("starts");
 		for (int i = 0; i < 1000; i++) {
 			int key = (int) (Math.random() * 10);

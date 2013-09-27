@@ -1,11 +1,13 @@
 package org.genericsystem.systemproperties.constraints.axed;
 
 import java.io.Serializable;
+
 import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.systemproperties.constraints.AbstractNoBooleanConstraintImpl;
 
 public abstract class AbstractNoBooleanAxedConstraintImpl extends AbstractNoBooleanConstraintImpl {
@@ -18,8 +20,8 @@ public abstract class AbstractNoBooleanAxedConstraintImpl extends AbstractNoBool
 	}
 
 	@Override
-	public void checkConsistency(Generic base, Generic attribute, AxedPropertyClass key, Serializable value) throws ConstraintViolationException {
-		check(base, attribute, key.getAxe(), value);
+	public void checkConsistency(Generic base, Holder value, int axe) throws ConstraintViolationException {
+		// check(base, attribute, key.getAxe(), value);
 	}
 
 	public abstract void check(Generic base, Generic attribute, int pos, Serializable value) throws ConstraintViolationException;
