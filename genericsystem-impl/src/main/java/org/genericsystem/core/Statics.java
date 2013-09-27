@@ -3,11 +3,9 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 import org.genericsystem.iterator.AbstractFilterIterator;
@@ -175,8 +173,6 @@ public class Statics {
 	public static class Primaries extends TreeSet<Generic> {
 		private static final long serialVersionUID = 7222889429002770779L;
 
-		private Set<Generic> alreadyComputed = new HashSet<>();
-
 		public Primaries(Generic... generics) {
 			for (Generic generic : generics)
 				add(generic);
@@ -184,12 +180,11 @@ public class Statics {
 
 		@Override
 		public boolean add(Generic generic) {
-			if (alreadyComputed.add(generic))
-				if (((GenericImpl) generic).isPrimary())
-					restrictedAdd(generic);
-				else
-					for (Generic directSuper : ((GenericImpl) generic).supers)
-						add(directSuper);
+			if (((GenericImpl) generic).isPrimary())
+				restrictedAdd(generic);
+			else
+				for (Generic directSuper : ((GenericImpl) generic).supers)
+					add(directSuper);
 			return true;
 		}
 
