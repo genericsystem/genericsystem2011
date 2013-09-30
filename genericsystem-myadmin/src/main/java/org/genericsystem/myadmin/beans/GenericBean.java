@@ -118,10 +118,10 @@ public class GenericBean implements Serializable {
 	public List<StructuralWrapper> getStructurals() {
 		log.info("" + Cache.class.isInstance(cache));
 		List<StructuralWrapper> list = new ArrayList<>();
-		for (Structural structural : genericTreeBean.getSelectedTreeNodeGeneric().getStructurals())
-			// TODO: fix it!
-			if (!structural.getAttribute().inheritsFrom(cache.find(AbstractMapProvider.class)))
+		for (Structural structural : genericTreeBean.getSelectedTreeNodeGeneric().getStructurals()) {
+			if (!AbstractMapProvider.class.isAssignableFrom((Class<?>) structural.getAttribute().getValue()))
 				list.add(getStructuralWrapper(structural));
+		}
 		structuralWrappers = list;
 		return list;
 	}
