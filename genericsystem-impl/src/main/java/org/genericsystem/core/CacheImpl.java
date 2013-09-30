@@ -481,12 +481,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		for (Generic generic : generics) {
-			if (null != generic.getValue() && generic.isAttribute() && !generic.getValue().equals(ConstraintValue.class) && generic.inheritsFrom(find(ConstraintValue.class))) {
+		for (Generic generic : generics)
+			if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
 				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
 				keyHolder.checkConsistency(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
 			}
-		}
 	}
 
 	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
