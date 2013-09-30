@@ -603,61 +603,67 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	@Override
-	public <T extends Relation> T getRelation(final Serializable value) {
-		return Statics.unambigousFirst(Statics.valueFilter(this.<T> relationsIterator(value == null), value));
-	}
-
 	public <T extends Generic> T reFind() {
 		return getCurrentCache().reFind(this);
 	}
 
 	@Override
-	public <T extends Attribute> T getProperty(Serializable value) {
-		return getAttribute(value);
+	public <T extends Relation> T getRelation(final Serializable value) {
+		return Statics.unambigousFirst(Statics.valueFilter(this.<T> relationsIterator(value == null), value));
 	}
 
 	@Override
-	public <T extends Attribute> T setAttribute(Serializable value) {
-		return setSubAttribute(getEngine(), value);
+	public <T extends Attribute> T getProperty(Serializable value, Generic... targets) {
+		return getAttribute(value, targets);
 	}
 
 	@Override
-	public <T extends Attribute> T setProperty(Serializable value, Type... targets) {
-		return setSubProperty(getEngine(), value, targets);
+	public <T extends Attribute> T setProperty(Serializable value, Generic... targets) {
+		return setAttribute(value, targets).enableSingularConstraint();
 	}
 
-	public <T extends Attribute> T setSubProperty(Attribute property, Serializable value, Type... targets) {
+	public <T extends Attribute> T setSubProperty(Attribute property, Serializable value, Generic... targets) {
 		return setSubAttribute(property, value, targets).enableSingularConstraint();
 	}
 
 	@Override
-	public <T extends Relation> T setRelation(Serializable value, Type... targets) {
-		return setSubRelation(getEngine(), value, targets);
+	public <T extends Relation> T setRelation(Serializable value, Generic... targets) {
+		return setAttribute(value, targets);
 	}
 
-	private <T extends Attribute> T addSubRelation(Relation relation, Serializable value, Type... targets) {
+	public <T extends Attribute> T addSubRelation(Relation relation, Serializable value, Generic... targets) {
 		return addSubAttribute(relation, value, targets);
 	}
 
-	private <T extends Attribute> T setSubRelation(Relation relation, Serializable value, Type... targets) {
+	public <T extends Attribute> T setSubRelation(Relation relation, Serializable value, Generic... targets) {
 		return setSubAttribute(relation, value, targets);
 	}
 
-	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Type... targets) {
+	@Override
+	public <T extends Attribute> T setAttribute(Serializable value, Generic... targets) {
+		return setHolder(null, getEngine(), value, Statics.STRUCTURAL, Statics.BASE_POSITION, false, targets);
+	}
+
+	@Override
+	public <T extends Attribute> T addAttribute(Serializable value, Generic... targets) {
+		return setHolder(null, getEngine(), value, Statics.STRUCTURAL, Statics.BASE_POSITION, true, targets);
+	}
+
+	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Generic... targets) {
 		T holder = setHolder(null, attribute, value, Statics.STRUCTURAL, getBasePos(attribute), false, targets);
 		assert holder.inheritsFrom(attribute) : holder.info();
 		return holder;
 	}
 
-	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Type... targets) {
+	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Generic... targets) {
 		T holder = setHolder(null, attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
 		assert holder.inheritsFrom(attribute) : holder.info();
 		return holder;
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
-		Generic meta = Statics.STRUCTURAL == metaLevel ? getEngine() : (attribute.isConcrete() ? attribute.getMeta().getImplicit() : attribute.getImplicit());
+		// assert attribute.getMetaLevel() >= metaLevel;
+		Generic meta = metaLevel == attribute.getMetaLevel() ? attribute.getMeta().getImplicit() : attribute.getImplicit();
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
 		if (holder == null)
 			return value == null ? null : this.<T> bind(specializationClass, getCurrentCache().bindPrimaryByValue(meta, value, true, null), attribute, basePos, existsException, targets);
@@ -800,8 +806,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			public final boolean isSelected(Generic candidate) {
 				boolean selected = candidate.getMetaLevel() <= level && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) candidate).isAttributeOf(GenericImpl.this));
 				if (pos != Statics.MULTIDIRECTIONAL && selected && ((GenericImpl) candidate).isPseudoStructural(pos))
-					if (getCurrentCache() instanceof CacheImpl)
-						((GenericImpl) candidate).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) candidate.getImplicit()).supers[0], null));
+					((GenericImpl) candidate).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) candidate.getImplicit()).supers[0], null));
 				return selected;
 			}
 		};
@@ -1527,18 +1532,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Attribute> T addAttribute(Serializable value) {
-		return addSubAttribute(getEngine(), value);
+	public <T extends Attribute> T addProperty(Serializable value, Generic... targets) {
+		return addAttribute(value, targets).enableSingularConstraint();
 	}
 
 	@Override
-	public <T extends Attribute> T addProperty(Serializable value, Type... targets) {
-		return addSubAttribute(getEngine(), value).enableSingularConstraint();
-	}
-
-	@Override
-	public <T extends Relation> T addRelation(Serializable value, Type... targets) {
-		return addSubRelation(getEngine(), value, targets);
+	public <T extends Relation> T addRelation(Serializable value, Generic... targets) {
+		return addAttribute(value, targets);
 	}
 
 	@Override
