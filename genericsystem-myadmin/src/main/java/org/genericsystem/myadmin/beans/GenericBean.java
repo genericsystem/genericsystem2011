@@ -17,7 +17,6 @@ import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
-import org.genericsystem.map.AbstractMapProvider;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,12 +115,9 @@ public class GenericBean implements Serializable {
 	}
 
 	public List<StructuralWrapper> getStructurals() {
-		log.info("" + Cache.class.isInstance(cache));
 		List<StructuralWrapper> list = new ArrayList<>();
-		for (Structural structural : genericTreeBean.getSelectedTreeNodeGeneric().getStructurals()) {
-			if (!AbstractMapProvider.class.isAssignableFrom((Class<?>) structural.getAttribute().getValue()))
-				list.add(getStructuralWrapper(structural));
-		}
+		for (Structural structural : genericTreeBean.getSelectedTreeNodeGeneric().getStructurals())
+			list.add(getStructuralWrapper(structural));
 		structuralWrappers = list;
 		return list;
 	}
