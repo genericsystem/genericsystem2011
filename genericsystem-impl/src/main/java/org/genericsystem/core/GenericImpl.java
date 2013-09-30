@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -646,18 +645,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		T holder = internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), false, targets);
+		T holder = setHolder(null, attribute, value, Statics.STRUCTURAL, getBasePos(attribute), false, targets);
 		assert holder.inheritsFrom(attribute) : holder.info();
 		return holder;
 	}
 
 	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		T holder = internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
+		T holder = setHolder(null, attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
 		assert holder.inheritsFrom(attribute) : holder.info();
 		return holder;
 	}
 
-	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Generic meta, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
+	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
+		Generic meta = Statics.STRUCTURAL == metaLevel ? getEngine() : (attribute.isConcrete() ? attribute.getMeta().getImplicit() : attribute.getImplicit());
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
 		if (holder == null)
 			return value == null ? null : this.<T> bind(specializationClass, getCurrentCache().bindPrimaryByValue(meta, value, true, null), attribute, basePos, existsException, targets);
@@ -675,11 +675,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
 			return holder.updateValue(value);
 		holder.remove();
-		return this.<T> internalSetHolder(specializationClass, meta, attribute, value, metaLevel, basePos, existsException, targets);
+		return this.<T> setHolder(specializationClass, attribute, value, metaLevel, basePos, existsException, targets);
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
-		return this.<T> internalSetHolder(specializationClass, attribute.isConcrete() ? attribute.<GenericImpl> getImplicit().supers[0] : attribute.getImplicit(), attribute, value, Statics.CONCRETE, basePos, false, targets);
+		return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, basePos, false, targets);
 	}
 
 	private <T extends Holder> T getSelectedHolder(Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
