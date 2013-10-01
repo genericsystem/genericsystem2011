@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:gs="http://java.sun.com/jsf/composite/gs"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<composite:interface>
+	<composite:attribute name="key" required="true" />
+	<composite:attribute name="wrapper" required="true" />
+	<composite:attribute name="showAddLink" required="false"
+		default="false" />
+	<composite:attribute name="showDeleteLink" required="false"
+		default="false" />
+	<composite:attribute name="genBean" required="true" />
+	<composite:attribute name="genTreeBean" required="true" />
+	<composite:attribute name="wrapBean" required="true" />
+</composite:interface>
+
+<composite:implementation>
+
+	<!-- Parameters -->
+	<ui:param name="key" value="#{cc.attrs.key}" />
+	<ui:param name="wrapper" value="#{cc.attrs.wrapper}" />
+	<ui:param name="showAddLink" value="#{cc.attrs.showAddLink}" />
+	<ui:param name="showDeleteLink" value="#{cc.attrs.showDeleteLink}" />
+	<ui:param name="genBean" value="#{cc.attrs.genBean}" />
+	<ui:param name="genTreeBean" value="#{cc.attrs.genTreeBean}" />
+	<ui:param name="wrapBean" value="#{cc.attrs.wrapBean}" />
+	<ui:param name="structural" value="#{wrapper.structural}" />
+
+	<!-- Body -->
+	<rich:dataTable id="#{key}" value="#{genBean.getHolders(wrapper)}"
+		var="holder" styleClass="fullWidth" headerClass="fullWidth"
+		columnClasses="middleWidth,fullWidth,veryLittleWidth">
+
+		<!-- Header -->
+		<f:facet name="header">
+			<h:panelGrid styleClass="fullWidth" rowClasses="fullWidth"
+				columnClasses="fullWidth,," columns="7">
+
+				<!-- Name of structural -->
+				<h:outputText
+					value="#{structural.attribute} (#{structural.position})" />
+
+				<!-- View link -->
+				<a4j:commandLink action="#{genTreeBean.view(structural.attribute)}"
+					execute="#{key}" render="typesmanager">
+					<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
+				</a4j:commandLink>
+
+				<!-- Add link -->
+				<a4j:commandLink
+					action="#{popupPanelBean.setAttribute(structural.attribute)}"
+					rendered="#{showAddLink}"
+					oncomplete="#{rich:component('addValue')}.show()">
+					<h:graphicImage value="#{infos.add}"
+						title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{structural.attribute}" />
+				</a4j:commandLink>
+
+				<!-- Delete link -->
+				<a4j:commandLink action="#{genBean.remove(structural.attribute)}"
+					rendered="#{showDeleteLink}" execute="#{key}"
+					render="edittypesmanager,typestree">
+					<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
+				</a4j:commandLink>
+
+				<!-- Read phantoms checkbox -->
+				<h:outputText value="#{msg.readPhantoms}" styleClass="bold" />
+				<h:selectBooleanCheckbox value="#{wrapper.readPhantoms}"
+					title="#{msg.readPhantoms}" style="vertical-align: middle;">
+					<a4j:ajax event="change" execute="#{key}" render="#{key}" />
+				</h:selectBooleanCheckbox>
+
+				<!-- Remove phantoms link -->
+				<a4j:commandLink action="#{genBean.remove(structural.attribute)}"
+					execute="#{key}" render="#{key}">
+					<h:graphicImage value="#{infos.imgGarb}"
+						title="#{msg.removePhantoms}" />
+				</a4j:commandLink>
+
+			</h:panelGrid>
+		</f:facet>
+
+		<!-- First column - ??? -->
+		<rich:column>
+			<h:panelGrid styleClass="fullWidth" columnClasses="fullWidth"
+				rowClasses="fullWidth">
+				<h:panelGroup>
+					<rich:inplaceInput
+						value="#{wrapBean.getGenericWrapper(holder).value}"
+						editEvent="dblclick" rendered="#{!genBean.isPhantom(holder)}"
+						styleClass="#{genBean.getHolderStyle(holder)}">
+						<a4j:ajax event="change" execute="#{key}"
+							render="#{key},typestree" />
+					</rich:inplaceInput>
+					<h:outputText value="#{holder}"
+						rendered="#{genBean.isPhantom(holder)}"
+						styleClass="#{genBean.getHolderStyle(holder)}" />
+					<a4j:commandLink action="#{genTreeBean.view(holder)}"
+						execute="#{key}" render="typesmanager" style="padding-left : 5%;">
+						<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:column>
+
+		<!-- Second column - ??? -->
+		<rich:column>
+			<rich:dataTable value="#{genBean.getOtherTargets(holder)}"
+				var="target" styleClass="borderNone"
+				columnClasses="borderNone,borderNone">
+				<rich:column>
+					<rich:inplaceInput
+						value="#{wrapBean.getGenericWrapper(target).value}"
+						editEvent="dblclick" rendered="true"
+						styleClass="#{genBean.getHolderStyle(holder)}">
+						<a4j:ajax event="change" execute="#{key}"
+							render="#{key},typestree" />
+					</rich:inplaceInput>
+				</rich:column>
+				<rich:column>
+					<a4j:commandLink action="#{genTreeBean.view(target)}"
+						execute="#{key}" render="typesmanager">
+						<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
+					</a4j:commandLink>
+				</rich:column>
+			</rich:dataTable>
+		</rich:column>
+		
+		<!-- Third column -->
+		<rich:column>
+			<a4j:commandLink action="#{genBean.remove(holder)}"
+				execute="#{key}"
+				render="#{key},typestree">
+				<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
+			</a4j:commandLink>
+		</rich:column>
+	</rich:dataTable>
+
+</composite:implementation>
