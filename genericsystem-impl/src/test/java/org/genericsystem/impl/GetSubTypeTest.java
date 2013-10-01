@@ -150,7 +150,9 @@ public class GetSubTypeTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		Type car = vehicle.newSubType("Car");
-		((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.newType("Percent"));
+		try {
+			((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.newType("Percent"));
+		} catch (IllegalStateException ignore) {}
 	}
 
 	public void testGetSubTypeNonExistingRelation() {

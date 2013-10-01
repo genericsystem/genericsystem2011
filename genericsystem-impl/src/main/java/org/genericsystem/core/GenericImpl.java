@@ -651,7 +651,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Generic... targets) {
 		T holder = setHolder(null, attribute, value, Statics.STRUCTURAL, getBasePos(attribute), false, targets);
-		assert holder.inheritsFrom(attribute) : holder.info();
+		assert holder.inheritsFrom(attribute) : holder.info() + attribute.info();
 		return holder;
 	}
 
@@ -727,19 +727,47 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return flag(relation, targets);
 	}
 
-	Generic[] sortAndCheck(Generic... components) {
-		if (getComponentsSize() != components.length)
-			throw new IllegalStateException("Illegal components size : " + components.length);
-		List<Integer> positions = getComponentsPositions(components);
-		Generic[] orderedComponents = new Generic[components.length];
-		for (int i = 0; i < components.length; i++) {
-			int pos = positions.get(i);
-			if (pos < 0 || pos >= components.length)
-				throw new IllegalStateException("Unable to find a valid position for : " + components[i]);
-			orderedComponents[pos] = components[i];
+	class TakenPositions extends ArrayList<Integer> {
+		Generic[] superComponents;
+		int max;
+
+		public TakenPositions(int max, Generic... superComponents) {
+			this.superComponents = superComponents;
+			this.max = max;
 		}
-		return orderedComponents;
+
+		public int getFreePosition(Generic component) {
+			int freePosition = 0;
+			while (contains(freePosition) || (freePosition < superComponents.length && !component.inheritsFrom(superComponents[freePosition])))
+				freePosition++;
+			if (freePosition >= max)
+				throw new IllegalStateException("Unable to find a valid position for : " + component);
+			add(freePosition);
+			return freePosition;
+		}
 	}
+
+	Generic[] sortAndCheck(Generic... components) {
+		TakenPositions takenPositions = new TakenPositions(components.length, this.components);
+		Generic[] result = new Generic[components.length];
+		for (Generic component : components)
+			result[takenPositions.getFreePosition(component == null ? GenericImpl.this : component)] = component;
+		return result;
+	}
+
+	// Generic[] sortAndCheck(Generic... components) {
+	// if (getComponentsSize() != components.length)
+	// throw new IllegalStateException("Illegal components size : " + components.length);
+	// List<Integer> positions = getComponentsPositions(components);
+	// Generic[] orderedComponents = new Generic[components.length];
+	// for (int i = 0; i < components.length; i++) {
+	// int pos = positions.get(i);
+	// if (pos < 0 || pos >= components.length)
+	// throw new IllegalStateException("Unable to find a valid position for : " + components[i]);
+	// orderedComponents[pos] = components[i];
+	// }
+	// return orderedComponents;
+	// }
 
 	public <T extends Generic> Iterator<T> holdersIterator(final int level, Holder origin, int basePos, boolean readPhantom) {
 		if (Statics.STRUCTURAL == level)
