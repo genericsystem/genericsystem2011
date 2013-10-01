@@ -41,7 +41,7 @@
 							dropListener="#{dragAndDropBean.addTarget}" execute="typestree"
 							render="holders#{status.index},typestree" />
 
-						<gs:structuralWrapper key="holders#{status.index}"
+						<gs:structuralWrapper id="holders#{status.index}"
 							wrapper="#{currentStructuralWrapper}"
 							showAddLink="#{!genericBean.isSingular(currentStructuralWrapper.structural)}"
 							showDeleteLink="#{!genericBean.hasValues(currentStructuralWrapper.structural.attribute)}"

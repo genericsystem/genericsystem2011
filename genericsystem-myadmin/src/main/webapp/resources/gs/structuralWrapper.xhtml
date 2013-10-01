@@ -12,7 +12,6 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <composite:interface>
-	<composite:attribute name="key" required="true" />
 	<composite:attribute name="wrapper" required="true" />
 	<composite:attribute name="showAddLink" required="false"
 		default="false" />
@@ -26,7 +25,6 @@
 <composite:implementation>
 
 	<!-- Parameters -->
-	<ui:param name="key" value="#{cc.attrs.key}" />
 	<ui:param name="wrapper" value="#{cc.attrs.wrapper}" />
 	<ui:param name="showAddLink" value="#{cc.attrs.showAddLink}" />
 	<ui:param name="showDeleteLink" value="#{cc.attrs.showDeleteLink}" />
@@ -36,7 +34,7 @@
 	<ui:param name="structural" value="#{wrapper.structural}" />
 
 	<!-- Body -->
-	<rich:dataTable id="#{key}" value="#{genBean.getHolders(wrapper)}"
+	<rich:dataTable id="structWrapper" value="#{genBean.getHolders(wrapper)}"
 		var="holder" styleClass="fullWidth" headerClass="fullWidth"
 		columnClasses="middleWidth,fullWidth,veryLittleWidth">
 
@@ -51,7 +49,7 @@
 
 				<!-- View link -->
 				<a4j:commandLink action="#{genTreeBean.view(structural.attribute)}"
-					execute="#{key}" render="typesmanager">
+					execute="structWrapper" render="typesmanager">
 					<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
 				</a4j:commandLink>
 
@@ -66,7 +64,7 @@
 
 				<!-- Delete link -->
 				<a4j:commandLink action="#{genBean.remove(structural.attribute)}"
-					rendered="#{showDeleteLink}" execute="#{key}"
+					rendered="#{showDeleteLink}" execute="structWrapper"
 					render="edittypesmanager,typestree">
 					<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 				</a4j:commandLink>
@@ -75,12 +73,12 @@
 				<h:outputText value="#{msg.readPhantoms}" styleClass="bold" />
 				<h:selectBooleanCheckbox value="#{wrapper.readPhantoms}"
 					title="#{msg.readPhantoms}" style="vertical-align: middle;">
-					<a4j:ajax event="change" execute="#{key}" render="#{key}" />
+					<a4j:ajax event="change" execute="structWrapper" render="structWrapper" />
 				</h:selectBooleanCheckbox>
 
 				<!-- Remove phantoms link -->
 				<a4j:commandLink action="#{genBean.remove(structural.attribute)}"
-					execute="#{key}" render="#{key}">
+					execute="structWrapper" render="structWrapper">
 					<h:graphicImage value="#{infos.imgGarb}"
 						title="#{msg.removePhantoms}" />
 				</a4j:commandLink>
@@ -97,14 +95,14 @@
 						value="#{wrapBean.getGenericWrapper(holder).value}"
 						editEvent="dblclick" rendered="#{!genBean.isPhantom(holder)}"
 						styleClass="#{genBean.getHolderStyle(holder)}">
-						<a4j:ajax event="change" execute="#{key}"
-							render="#{key},typestree" />
+						<a4j:ajax event="change" execute="structWrapper"
+							render="structWrapper,typestree" />
 					</rich:inplaceInput>
 					<h:outputText value="#{holder}"
 						rendered="#{genBean.isPhantom(holder)}"
 						styleClass="#{genBean.getHolderStyle(holder)}" />
 					<a4j:commandLink action="#{genTreeBean.view(holder)}"
-						execute="#{key}" render="typesmanager" style="padding-left : 5%;">
+						execute="structWrapper" render="typesmanager" style="padding-left : 5%;">
 						<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
 					</a4j:commandLink>
 				</h:panelGroup>
@@ -121,13 +119,13 @@
 						value="#{wrapBean.getGenericWrapper(target).value}"
 						editEvent="dblclick" rendered="true"
 						styleClass="#{genBean.getHolderStyle(holder)}">
-						<a4j:ajax event="change" execute="#{key}"
-							render="#{key},typestree" />
+						<a4j:ajax event="change" execute="structWrapper"
+							render="structWrapper,typestree" />
 					</rich:inplaceInput>
 				</rich:column>
 				<rich:column>
 					<a4j:commandLink action="#{genTreeBean.view(target)}"
-						execute="#{key}" render="typesmanager">
+						execute="structWrapper" render="typesmanager">
 						<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
 					</a4j:commandLink>
 				</rich:column>
@@ -137,8 +135,8 @@
 		<!-- Third column -->
 		<rich:column>
 			<a4j:commandLink action="#{genBean.remove(holder)}"
-				execute="#{key}"
-				render="#{key},typestree">
+				execute="structWrapper"
+				render="structWrapper,typestree">
 				<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 			</a4j:commandLink>
 		</rich:column>
