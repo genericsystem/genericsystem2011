@@ -41,6 +41,15 @@
 							dropListener="#{dragAndDropBean.addTarget}" execute="typestree"
 							render="holders#{status.index},typestree" />
 
+						<gs:structuralWrapper key="holders#{status.index}"
+							wrapper="#{currentStructuralWrapper}"
+							showAddLink="#{!genericBean.isSingular(currentStructuralWrapper.structural)}"
+							showDeleteLink="#{!genericBean.hasValues(currentStructuralWrapper.structural.attribute)}"
+							genBean="#{genericBean}" genTreeBean="#{genericTreeBean}"
+							wrapBean="#{wrapperBean}" />
+
+						<!--
+		
 						<rich:dataTable var="currentHolder" headerClass="fullWidth,"
 							columnClasses="middleWidth,fullWidth,veryLittleWidth,"
 							styleClass="fullWidth"
@@ -144,6 +153,9 @@
 								</a4j:commandLink>
 							</rich:column>
 						</rich:dataTable>
+						
+						-->
+
 					</a4j:outputPanel>
 				</h:panelGroup>
 			</c:forEach>
@@ -158,15 +170,15 @@
 			headerName="#{msg.properties}"
 			wrapperGs="#{wrapperBean.getPropertyWrapper(currentEntry).value}"
 			isBooleanValue="#{wrapperBean.isBoolean(currentEntry)}"
-			createGs="#{msg.createproperty}" 
-			addTitle= "#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
+			createGs="#{msg.createproperty}"
+			addTitle="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
 			action="#{genericBean.removeProperty(currentEntry)}" />
 		<gs:dataTable key="contraints" gsMap="#{genericBean.contraintsMap}"
 			headerName="#{msg.contraints}"
 			wrapperGs="#{wrapperBean.getContraintWrapper(currentEntry).value}"
 			isBooleanValue="#{wrapperBean.isBoolean(currentEntry)}"
-			createGs="#{msg.createcontraint}" 
-			addTitle= "#{msg.create} #{msg.a} #{msg.contraint} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
+			createGs="#{msg.createcontraint}"
+			addTitle="#{msg.create} #{msg.a} #{msg.contraint} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
 			action="#{genericBean.removeContraint(currentEntry)}" />
 		<gs:dataTable key="systemProperties"
 			gsMap="#{genericBean.systemPropertiesMap}"
@@ -174,7 +186,7 @@
 			wrapperGs="#{wrapperBean.getSystemPropertiesWrapper(currentEntry).value}"
 			isBooleanValue="#{wrapperBean.isBoolean(currentEntry)}"
 			createGs="#{msg.createsystemproperty}"
-			addTitle= "#{msg.create} #{msg.a} #{msg.systempropety} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
+			addTitle="#{msg.create} #{msg.a} #{msg.systempropety} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
 			action="#{genericBean.removeSystemProperty(currentEntry)}" />
 		<gs:popupPanelProperties key="createproperty"
 			title="#{msg.create} #{msg.a} #{msg.property}"
@@ -182,11 +194,13 @@
 			render="typestree, edittypesmanager" keyInput="true" />
 		<gs:popupPanel key="createcontraint"
 			title="#{msg.create} #{msg.a} #{msg.contraint}"
-			action="#{popupPanelBean.addConstraints}" getList="#{popupPanelBean.getConstraintClass}"
+			action="#{popupPanelBean.addConstraints}"
+			getList="#{popupPanelBean.getConstraintClass}"
 			render="typestree, edittypesmanager" keyInput="true" />
 		<gs:popupPanel key="createsystemproperty"
 			title="#{msg.create} #{msg.a} #{msg.systemproperty}"
-			action="#{popupPanelBean.addSystemProperty}" getList="#{popupPanelBean.getSystemPropertiesClass}"
+			action="#{popupPanelBean.addSystemProperty}"
+			getList="#{popupPanelBean.getSystemPropertiesClass}"
 			render="typestree, edittypesmanager" keyInput="true" />
 	</rich:panel>
 </ui:composition>
