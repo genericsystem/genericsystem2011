@@ -37,6 +37,7 @@ import org.genericsystem.iterator.ArrayIterator;
 import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
+import org.genericsystem.map.AbstractMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
@@ -124,12 +125,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(directSupers);
 
-		if (!isPrimary())
-			assert Objects.equals(directSupers[0].getValue(), value) : "" + value + " " + Arrays.toString(directSupers);
-		if (value != null)
-			for (Generic primary : getPrimaries())
-				assert primary.getValue() != null : this.info();
-		return this;
+					if (!isPrimary())
+						assert Objects.equals(directSupers[0].getValue(), value) : "" + value + " " + Arrays.toString(directSupers);
+						if (value != null)
+							for (Generic primary : getPrimaries())
+								assert primary.getValue() != null : this.info();
+						return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -1702,4 +1703,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public CacheImpl getCurrentCache() {
 		return getEngine().getCurrentCache();
 	}
+
+	@Override
+	public boolean isMapProvider() {
+		return this.getValue() instanceof Class &&
+				AbstractMapProvider.class.isAssignableFrom((Class<?>) this.getValue());
+	}
+
 }

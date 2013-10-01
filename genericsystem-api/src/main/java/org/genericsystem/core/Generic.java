@@ -576,6 +576,13 @@ public interface Generic extends Comparable<Generic> {
 	boolean isMeta();
 
 	/**
+	 * Returns true if the Generic is Map Provider.
+	 * 
+	 * @return true if the Generic is Map Provider.
+	 */
+	boolean isMapProvider();
+
+	/**
 	 * Returns true if the Generic is tree.
 	 * 
 	 * @return True if the Generic is tree.
