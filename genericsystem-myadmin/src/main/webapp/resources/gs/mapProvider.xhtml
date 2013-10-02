@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:gs="http://java.sun.com/jsf/composite/gs"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<composite:interface>
+	<composite:attribute name="wrapper" required="true" />
+	<composite:attribute name="genBean" required="true" />
+	<composite:attribute name="wrapBean" required="true" />
+</composite:interface>
+
+<composite:implementation>
+
+	<!-- Parameters -->
+	<ui:param name="wrapper" value="#{cc.attrs.wrapper}" />
+	<ui:param name="genBean" value="#{cc.attrs.genBean}" />
+	<ui:param name="wrapBean" value="#{cc.attrs.wrapBean}" />
+	<ui:param name="structural" value="#{wrapper.structural}" />
+	<ui:param name="map"
+		value="#{genBean.getListEntries(structural.attribute)}" />
+
+	<rich:dataTable id="mapProvider" value="#{map}" var="entry"
+		styleClass="fullWidth widthAdjust">
+
+		<!-- Header -->
+		<f:facet name="header">
+			<h:outputText
+				value="#{structural.attribute} (#{structural.position})" />
+		</f:facet>
+
+		<!-- Column 1 - Key -->
+		<rich:column>
+			<f:facet name="header">
+				<h:outputText value="#{msg.key}" />
+			</f:facet>
+			<h:outputText value="#{entry.key}" />
+		</rich:column>
+
+
+		<!-- Column 2 - Value -->
+		<rich:column>
+			<f:facet name="header">
+				<h:outputText value="#{msg.value}" />
+			</f:facet>
+			<h:selectBooleanCheckbox value="#{entry.value}"
+				rendered="#{wrapBean.isBoolean(entry)}"
+				style="margin-top:100; vertical-align:bottom;">
+				<a4j:ajax event="change" execute="mapProvider" render="mapProvider" />
+			</h:selectBooleanCheckbox>
+			<rich:inplaceInput value="#{entry.value}"
+				rendered="#{!wrapBean.isBoolean(entry)}" editEvent="dblclick">
+				<a4j:ajax event="change" execute="mapProvider" render="mapProvider" />
+			</rich:inplaceInput>
+		</rich:column>
+
+		<!-- Column 3 - delete link -->
+		<rich:column style="text-align:center;">
+			<f:facet name="header">
+				<!-- Add link -->
+				<a4j:commandLink execute="@none"
+					oncomplete="#{rich:component(msg.createsystemproperty)}.show()">
+					<h:graphicImage value="#{infos.add}" title="" />
+				</a4j:commandLink>
+			</f:facet>
+			<h:commandLink action="#{genBean.removeEntry(map, entry)}">
+				<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
+			</h:commandLink>
+		</rich:column>
+
+	</rich:dataTable>
+
+</composite:implementation>
+
+</html>
