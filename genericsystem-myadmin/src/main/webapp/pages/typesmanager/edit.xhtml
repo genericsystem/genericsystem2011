@@ -33,7 +33,7 @@
 		<!-- //ici tableau1 -->
 		<h:panelGrid styleClass="fullWidth" columns="2">
 			<c:forEach var="currentStructuralWrapper"
-				items="#{genericBean.structurals}" varStatus="status">
+				items="#{genericBean.structuralWrappers}" varStatus="status">
 				<h:panelGroup>
 					<a4j:outputPanel>
 						<rich:dropTarget acceptedTypes="genericTreeNode"
@@ -41,120 +41,34 @@
 							dropListener="#{dragAndDropBean.addTarget}" execute="typestree"
 							render="holders#{status.index},typestree" />
 
-						<gs:structuralWrapper id="holders#{status.index}"
-							wrapper="#{currentStructuralWrapper}"
-							showAddLink="#{!genericBean.isSingular(currentStructuralWrapper.structural)}"
-							showDeleteLink="#{!genericBean.hasValues(currentStructuralWrapper.structural.attribute)}"
-							genBean="#{genericBean}" genTreeBean="#{genericTreeBean}"
-							wrapBean="#{wrapperBean}" />
+						<c:if
+							test="#{!currentStructuralWrapper.structural.attribute.isMapProvider()}">
 
-						<!--
-		
-						<rich:dataTable var="currentHolder" headerClass="fullWidth,"
-							columnClasses="middleWidth,fullWidth,veryLittleWidth,"
-							styleClass="fullWidth"
-							value="#{genericBean.getHolders(currentStructuralWrapper)}"
-							id="holders#{status.index}">
-							<f:facet name="header">
-								<h:panelGrid styleClass="fullWidth" rowClasses="fullWidth"
-									columnClasses="fullWidth,," columns="7">
-									<h:outputText
-										value="#{currentStructuralWrapper.structural.attribute} (#{currentStructuralWrapper.structural.position})" />
-									<a4j:commandLink
-										action="#{genericTreeBean.view(currentStructuralWrapper.structural.attribute)}"
-										execute="holders#{status.index}" render="typesmanager">
-										<h:graphicImage value="#{infos.imgNavigate}"
-											title="#{msg.view}" />
-									</a4j:commandLink>
-									<a4j:commandLink
-										action="#{popupPanelBean.setAttribute(currentStructuralWrapper.structural.attribute)}"
-										rendered="#{!genericBean.isSingular(currentStructuralWrapper.structural)}"
-										oncomplete="#{rich:component('addValue')}.show()">
-										<h:graphicImage value="#{infos.add}"
-											title="#{msg.add} #{msg.a} #{msg.value} #{msg.for} #{currentStructuralWrapper.structural.attribute}" />
-									</a4j:commandLink>
-									<a4j:commandLink
-										action="#{genericBean.remove(currentStructuralWrapper.structural.attribute)}"
-										rendered="#{!genericBean.hasValues(currentStructuralWrapper.structural.attribute)}"
-										execute="holders#{status.index}"
-										render="edittypesmanager,typestree">
-										<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
-									</a4j:commandLink>
-									<h:outputText value="#{msg.readPhantoms}" styleClass="bold" />
-									<h:selectBooleanCheckbox
-										value="#{currentStructuralWrapper.readPhantoms}"
-										title="#{msg.readPhantoms}" style="vertical-align: middle;">
-										<a4j:ajax event="change" execute="holders#{status.index}"
-											render="holders#{status.index}" />
-									</h:selectBooleanCheckbox>
-									<a4j:commandLink
-										action="#{genericBean.remove(currentStructuralWrapper.structural.attribute)}"
-										execute="holders#{status.index}"
-										render="holders#{status.index}">
-										<h:graphicImage value="#{infos.imgGarb}"
-											title="#{msg.removePhantoms}" />
-									</a4j:commandLink>
-								</h:panelGrid>
-							</f:facet>
-							<rich:column>
-								<h:panelGrid styleClass="fullWidth" columnClasses="fullWidth"
-									rowClasses="fullWidth">
-									<h:panelGroup>
-										<rich:inplaceInput
-											value="#{wrapperBean.getGenericWrapper(currentHolder).value}"
-											editEvent="dblclick"
-											rendered="#{!genericBean.isPhantom(currentHolder)}"
-											styleClass="#{genericBean.getHolderStyle(currentHolder)}">
-											<a4j:ajax event="change" execute="holders#{status.index}"
-												render="holders#{status.index},typestree" />
-										</rich:inplaceInput>
-										<h:outputText value="#{currentHolder}"
-											rendered="#{genericBean.isPhantom(currentHolder)}"
-											styleClass="#{genericBean.getHolderStyle(currentHolder)}" />
-										<a4j:commandLink
-											action="#{genericTreeBean.view(currentHolder)}"
-											execute="holders#{status.index}" render="typesmanager"
-											style="padding-left : 5%;">
-											<h:graphicImage value="#{infos.imgNavigate}"
-												title="#{msg.view}" />
-										</a4j:commandLink>
-									</h:panelGroup>
-								</h:panelGrid>
-							</rich:column>
-							<rich:column>
-								<rich:dataTable var="currentTarget" styleClass="borderNone"
-									columnClasses="borderNone,borderNone"
-									value="#{genericBean.getOtherTargets(currentHolder)}">
-									<rich:column>
-										<rich:inplaceInput
-											value="#{wrapperBean.getGenericWrapper(currentTarget).value}"
-											editEvent="dblclick" rendered="true"
-											styleClass="#{genericBean.getHolderStyle(currentHolder)}">
-											<a4j:ajax event="change" execute="holders#{status.index}"
-												render="holders#{status.index},typestree" />
-										</rich:inplaceInput>
-									</rich:column>
-									<rich:column>
-										<a4j:commandLink
-											action="#{genericTreeBean.view(currentTarget)}"
-											execute="holders#{status.index}" render="typesmanager">
-											<h:graphicImage value="#{infos.imgNavigate}"
-												title="#{msg.view}" />
-										</a4j:commandLink>
-									</rich:column>
-								</rich:dataTable>
-							</rich:column>
-							<rich:column>
-								<a4j:commandLink
-									action="#{genericBean.remove(currentHolder)}"
-									execute="holders#{status.index}"
-									render="holders#{status.index},typestree">
-									<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
-								</a4j:commandLink>
-							</rich:column>
-						</rich:dataTable>
-						
-						-->
+
+
+							<gs:structuralWrapper id="holders#{status.index}"
+								wrapper="#{currentStructuralWrapper}"
+								showAddLink="#{!genericBean.isSingular(currentStructuralWrapper.structural)}"
+								showDeleteLink="#{!genericBean.hasValues(currentStructuralWrapper.structural.attribute)}"
+								genBean="#{genericBean}" genTreeBean="#{genericTreeBean}"
+								wrapBean="#{wrapperBean}" />
+
+						</c:if>
+
+						<c:if
+							test="#{currentStructuralWrapper.structural.attribute.isMapProvider()}">
+
+							<gs:mapProvider id="holders#{status.index}"
+								wrapper="#{currentStructuralWrapper}" genBean="#{genericBean}"
+								wrapBean="#{wrapperBean}"
+								
+								newEntryMsg="wkfdwjfdkh"
+								
+								 />
+
+						</c:if>
+
+
 
 					</a4j:outputPanel>
 				</h:panelGroup>
@@ -166,6 +80,8 @@
 
 		<!-- //ici tableau 2-->
 
+		<!--
+		
 		<gs:dataTable key="properties" gsMap="#{genericBean.propertiesMap}"
 			headerName="#{msg.properties}"
 			wrapperGs="#{wrapperBean.getPropertyWrapper(currentEntry).value}"
@@ -173,6 +89,7 @@
 			createGs="#{msg.createproperty}"
 			addTitle="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
 			action="#{genericBean.removeProperty(currentEntry)}" />
+			
 		<gs:dataTable key="contraints" gsMap="#{genericBean.contraintsMap}"
 			headerName="#{msg.contraints}"
 			wrapperGs="#{wrapperBean.getContraintWrapper(currentEntry).value}"
@@ -180,6 +97,7 @@
 			createGs="#{msg.createcontraint}"
 			addTitle="#{msg.create} #{msg.a} #{msg.contraint} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
 			action="#{genericBean.removeContraint(currentEntry)}" />
+			
 		<gs:dataTable key="systemProperties"
 			gsMap="#{genericBean.systemPropertiesMap}"
 			headerName="#{msg.systemProperties}"
@@ -202,5 +120,8 @@
 			action="#{popupPanelBean.addSystemProperty}"
 			getList="#{popupPanelBean.getSystemPropertiesClass}"
 			render="typestree, edittypesmanager" keyInput="true" />
+
+-->
+
 	</rich:panel>
 </ui:composition>
