@@ -28,7 +28,6 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
-import org.genericsystem.iterator.AbstractConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
@@ -1651,25 +1650,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			@Override
 			public boolean isSelected() {
 				return GenericImpl.this.inheritsFrom(components[next]);
-			}
-		};
-	}
-
-	@Override
-	public Snapshot<Structural> getStructurals() {
-		return new AbstractSnapshot<Structural>() {
-			@Override
-			public Iterator<Structural> iterator() {
-				return structuralsIterator();
-			}
-		};
-	}
-
-	public Iterator<Structural> structuralsIterator() {
-		return new AbstractConcateIterator<Attribute, Structural>(GenericImpl.this.getAttributes().iterator()) {
-			@Override
-			protected Iterator<Structural> getIterator(final Attribute attribute) {
-				return new SingletonIterator<Structural>(new StructuralImpl(attribute, getBasePos(attribute)));
 			}
 		};
 	}
