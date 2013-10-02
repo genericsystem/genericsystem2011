@@ -338,6 +338,7 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * Returns the Holder of value.
+	 * 
 	 * @param metaLevel
 	 *            meta level.
 	 * @param attribute
@@ -353,6 +354,7 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * Returns the Holder of value.
+	 * 
 	 * @param metaLevel
 	 *            meta level.
 	 * @param attribute
@@ -654,8 +656,6 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Generic> T removeSuper(int pos);
 
 	<T extends Generic> T updateValue(Serializable value);
-
-	Snapshot<Structural> getStructurals();
 
 	<T extends Generic> Snapshot<T> getOtherTargets(Holder holder);
 
