@@ -61,10 +61,16 @@
 							<gs:mapProvider id="holders#{status.index}"
 								wrapper="#{currentStructuralWrapper}" genBean="#{genericBean}"
 								wrapBean="#{wrapperBean}"
-								
-								newEntryMsg="wkfdwjfdkh"
-								
-								 />
+								popupPanelId="popupPanel#{status.index}" />
+
+							<!-- Popup panel -->
+							<!-- 
+							<gs:popupPanel id="popupPanel#{status.index}"
+								title="#{msg.create} #{msg.a} #{msg.contraint}"
+								action="#{popupPanelBean.addConstraints}"
+								getList="#{popupPanelBean.getConstraintClass}"
+								render="typestree, edittypesmanager" keyInput="true" />
+							-->
 
 						</c:if>
 
@@ -77,6 +83,25 @@
 				action="#{genericBean.addValue(popupPanelBean.getAttribute(),popupValue)}"
 				render="edittypesmanager,typestree" />
 		</h:panelGrid>
+
+
+		<c:forEach var="currentStructuralWrapper"
+			items="#{genericBean.structuralWrappers}" varStatus="status">
+
+			<c:if
+				test="#{currentStructuralWrapper.structural.attribute.isMapProvider()}">
+
+				<!-- Popup panel -->
+				<gs:popupPanel key="popupPanel#{status.index}"
+					title="#{msg.create} #{msg.a} #{msg.contraint}"
+					action="#{popupPanelBean.addConstraints}"
+					getList="#{popupPanelBean.getConstraintClass}"
+					render="typestree, edittypesmanager" keyInput="true" />
+
+			</c:if>
+
+		</c:forEach>
+
 
 		<!-- //ici tableau 2-->
 
@@ -115,12 +140,17 @@
 			action="#{popupPanelBean.addConstraints}"
 			getList="#{popupPanelBean.getConstraintClass}"
 			render="typestree, edittypesmanager" keyInput="true" />
+			
+
+			
 		<gs:popupPanel key="createsystemproperty"
 			title="#{msg.create} #{msg.a} #{msg.systemproperty}"
 			action="#{popupPanelBean.addSystemProperty}"
 			getList="#{popupPanelBean.getSystemPropertiesClass}"
 			render="typestree, edittypesmanager" keyInput="true" />
 
+
+			
 -->
 
 	</rich:panel>

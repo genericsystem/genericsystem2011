@@ -15,6 +15,7 @@
 	<composite:attribute name="wrapper" required="true" />
 	<composite:attribute name="genBean" required="true" />
 	<composite:attribute name="wrapBean" required="true" />
+	<composite:attribute name="popupPanelId" required="true" />
 </composite:interface>
 
 <composite:implementation>
@@ -23,10 +24,9 @@
 	<ui:param name="wrapper" value="#{cc.attrs.wrapper}" />
 	<ui:param name="genBean" value="#{cc.attrs.genBean}" />
 	<ui:param name="wrapBean" value="#{cc.attrs.wrapBean}" />
+	<ui:param name="popupPanelId" value="#{cc.attrs.popupPanelId}" />
 	<ui:param name="structural" value="#{wrapper.structural}" />
 	<ui:param name="map" value="#{genBean.getMap(structural.attribute)}" />
-<!-- 	<ui:param name="listEnteries" -->
-<!-- 		value="#{map.entrySet()}" /> -->
 
 	<rich:dataTable id="mapProvider" value="#{map.entrySet}" var="entry"
 		styleClass="fullWidth widthAdjust">
@@ -67,11 +67,12 @@
 			<f:facet name="header">
 				<!-- Add link -->
 				<a4j:commandLink execute="@none"
-					oncomplete="#{rich:component(msg.createsystemproperty)}.show()">
-					<h:graphicImage value="#{infos.add}" title="" />
+					oncomplete="#{rich:component(popupPanelId)}.show()">
+					<h:graphicImage value="#{infos.add}" title="fhdf" />
 				</a4j:commandLink>
 			</f:facet>
-			<a4j:commandLink execute="@this" action="#{genBean.removeEntry(map, entry)}" render="mapProvider">
+			<a4j:commandLink execute="@this"
+				action="#{genBean.removeEntry(map, entry)}" render="mapProvider">
 				<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 			</a4j:commandLink>
 		</rich:column>
