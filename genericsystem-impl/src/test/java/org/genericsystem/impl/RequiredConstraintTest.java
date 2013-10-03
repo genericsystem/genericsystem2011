@@ -16,46 +16,43 @@ import org.testng.annotations.Test;
 public class RequiredConstraintTest extends AbstractTest {
 
 	public void requiredAddedAndRemoved() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Generic myFiat = vehicle.newInstance("myFiat");
-		Attribute wheel = vehicle.setAttribute("wheel");
-		wheel.enableRequiredConstraint();
-		assert wheel.isRequiredConstraintEnabled();
+		final Attribute wheel = vehicle.setAttribute("wheel");
 		Holder wheelMyFiat = myFiat.setValue(wheel, "BigWheel");
 		cache.flush();
 		wheelMyFiat.remove();
 		assert !wheelMyFiat.isAlive();
-		assert wheel.isRequiredConstraintEnabled();
-
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				cache.flush();
+				
+				wheel.enableRequiredConstraint();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+		cache.flush();
 	}
 
 	public void requiredNeverAdded() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		vehicle.newInstance("myFiat");
-		vehicle.setAttribute("wheel").enableRequiredConstraint();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		final Type vehicle = cache.newType("Vehicle");
+		vehicle.newInstance("myFiat");	
 		new RollbackCatcher() {
-
 			@Override
 			public void intercept() {
-				cache.flush();
+				vehicle.setAttribute("wheel").enableRequiredConstraint();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+		cache.flush();
 	}
 
 	public void addOneRequired() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Generic myFiat = vehicle.newInstance("myFiat");
 		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
+		Generic myFiat = vehicle.newInstance("myFiat");
 		myFiat.setValue(vehicleWheel, "myFiatWheel");
 		cache.flush();
 	}
