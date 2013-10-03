@@ -13,19 +13,19 @@ import org.testng.annotations.Test;
 public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 	public void PropertySimpleAttributeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Attribute registration = car.setAttribute("Registration");
-		Generic myCar = car.newInstance("myCar");
+		Type vehicle = cache.newType("Vehicle");
+		Attribute registration = vehicle.setAttribute("Registration");
+		Generic myCar = vehicle.newInstance("myCar");
 		myCar.setValue(registration, "315DT75");
 		registration.enableUniqueValueConstraint();
 	}
 
 	public void PropertySimpleAttributeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		final Attribute registration = car.setAttribute("Registration");
-		Generic myCar = car.newInstance("myCar");
-		Generic yourCar = car.newInstance("yourCar");
+		Type vehicle = cache.newType("Vehicle");
+		final Attribute registration = vehicle.setAttribute("Registration");
+		Generic myCar = vehicle.newInstance("myCar");
+		Generic yourCar = vehicle.newInstance("yourCar");
 		myCar.setValue(registration, "315DT75");
 		yourCar.setValue(registration, "315DT75");
 		new RollbackCatcher() {
@@ -40,11 +40,11 @@ public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 	public void PropertySimpleRelationOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine()
 				.start();
-		Type car = cache.newType("Car");
+		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		final Relation driving = car.setRelation("DrivingAlong", human);
-		Generic myCar = car.newInstance("myCar");
-		Generic yourCar = car.newInstance("yourCar");
+		final Relation driving = vehicle.setRelation("DrivingAlong", human);
+		Generic myCar = vehicle.newInstance("myCar");
+		Generic yourCar = vehicle.newInstance("yourCar");
 		Generic myHuman = human.newInstance("myHuman");
 		Generic yourHuman = human.newInstance("yourHuman");
 		myCar.setLink(driving, "my_driving", myHuman);
@@ -55,11 +55,11 @@ public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 	public void PropertySimpleRelationKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine()
 				.start();
-		Type car = cache.newType("Car");
+		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
-		final Relation driving = car.setRelation("DrivingAlong", human);
-		Generic myCar = car.newInstance("myCar");
-		Generic yourCar = car.newInstance("yourCar");
+		final Relation driving = vehicle.setRelation("DrivingAlong", human);
+		Generic myCar = vehicle.newInstance("myCar");
+		Generic yourCar = vehicle.newInstance("yourCar");
 		Generic myHuman = human.newInstance("myHuman");
 		Generic yourHuman = human.newInstance("yourHuman");
 		myCar.setLink(driving, "my_driving", myHuman);

@@ -10,7 +10,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -408,8 +407,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(Class<?> specializationClass, Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {
+		components = ((GenericImpl) directSuper).sortAndCheck(components);
 		if (implicit.isConcrete()) {
-			components = ((GenericImpl) directSuper).sortAndCheck(components);
 			Generic meta = directSuper.getMetaLevel() == implicit.getMetaLevel() ? directSuper.getMeta() : directSuper;
 			InstanceGenericClass instanceClass = meta.getClass().getAnnotation(InstanceGenericClass.class);
 			if (instanceClass != null)
@@ -481,10 +480,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		for (Generic g : generics)
-			if (!g.getValue().equals(ConstraintValue.class) && g.inheritsFrom(find(ConstraintValue.class)) && g.getComponentsSize() > 0) {
-				AbstractConstraintImpl keyHolder = ((Holder) g).getBaseComponent();
-				keyHolder.checkConsistency(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) g, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+		for (Generic generic : generics)
+			if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
+				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
+				keyHolder.checkConsistency(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
 			}
 	}
 
