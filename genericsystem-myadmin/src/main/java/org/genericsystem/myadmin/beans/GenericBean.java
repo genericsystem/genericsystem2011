@@ -2,11 +2,9 @@ package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
@@ -144,16 +142,13 @@ public class GenericBean implements Serializable {
 		return (ExtendedMap<Serializable, Serializable>) genericTreeBean.getSelectedTreeNodeGeneric().getMap(mapProvider.getClass());
 	}
 
-	public List<Entry<Serializable, Serializable>> getListEntries(MapProvider mapProvider) {
-		ExtendedMap<Serializable, Serializable> map = getMap(mapProvider);
-		Set<Entry<Serializable, Serializable>> entrySet = map.entrySet();
-		List<Entry<Serializable, Serializable>> entryList = new ArrayList<>();
-		Iterator<Entry<Serializable, Serializable>> iterator = entrySet.iterator();
-		while (iterator.hasNext()) {
-			entryList.add(iterator.next());
-		}
-		return entryList;
+
+
+	/*
+	public Set<Entry<Serializable, Serializable>> getListEntries(MapProvider mapProvider) {
+		return getMap(mapProvider).entrySet();
 	}
+	 */
 
 	/*
 	public Snapshot<Structural> getStructurals() {

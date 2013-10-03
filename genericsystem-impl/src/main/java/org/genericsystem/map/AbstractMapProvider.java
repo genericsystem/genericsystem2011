@@ -56,6 +56,16 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				return valueHolder != null ? valueHolder.<Value> getValue() : null;
 			}
 
+			/**
+			 * Alias to method entrySet() of AstractMap class. Used within
+			 * 'value' attributes to access to entrySet in JSF pages.
+			 * 
+			 * @return set of entries of the map.
+			 */
+			public Set<Entry<Key,Value>> getEntrySet() {
+				return this.entrySet();
+			}
+
 			@Override
 			public Holder getValueHolder(Serializable key) {
 				Holder keyHolder = getKeyHolder(key);
@@ -117,17 +127,17 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		Generic implicit = ((GenericImpl) attribute).bindPrimaryByValue(null, value, true);
 		if (holder == null)
 			return null != value ? ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets) : null;
-		if (!keyHolder.equals(holder.getComponent(basePos))) {
-			if (value == null)
-				return keyHolder.cancel(holder, basePos, true);
-			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
-				keyHolder.cancel(holder, basePos, true);
-			return ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets);
-		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(keyHolder, targets, basePos)))
-			return holder;
-		holder.remove();
-		return setSingularHolder(keyHolder, attribute, value, targets);
+			if (!keyHolder.equals(holder.getComponent(basePos))) {
+				if (value == null)
+					return keyHolder.cancel(holder, basePos, true);
+				if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+					keyHolder.cancel(holder, basePos, true);
+				return ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets);
+			}
+			if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(keyHolder, targets, basePos)))
+				return holder;
+			holder.remove();
+			return setSingularHolder(keyHolder, attribute, value, targets);
 	}
 
 	private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {

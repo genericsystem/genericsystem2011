@@ -24,10 +24,11 @@
 	<ui:param name="genBean" value="#{cc.attrs.genBean}" />
 	<ui:param name="wrapBean" value="#{cc.attrs.wrapBean}" />
 	<ui:param name="structural" value="#{wrapper.structural}" />
-	<ui:param name="map"
-		value="#{genBean.getListEntries(structural.attribute)}" />
+	<ui:param name="map" value="#{genBean.getMap(structural.attribute)}" />
+<!-- 	<ui:param name="listEnteries" -->
+<!-- 		value="#{map.entrySet()}" /> -->
 
-	<rich:dataTable id="mapProvider" value="#{map}" var="entry"
+	<rich:dataTable id="mapProvider" value="#{map.entrySet}" var="entry"
 		styleClass="fullWidth widthAdjust">
 
 		<!-- Header -->
@@ -70,9 +71,9 @@
 					<h:graphicImage value="#{infos.add}" title="" />
 				</a4j:commandLink>
 			</f:facet>
-			<h:commandLink action="#{genBean.removeEntry(map, entry)}">
+			<a4j:commandLink execute="@this" action="#{genBean.removeEntry(map, entry)}" render="mapProvider">
 				<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
-			</h:commandLink>
+			</a4j:commandLink>
 		</rich:column>
 
 	</rich:dataTable>
