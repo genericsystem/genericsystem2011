@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -604,60 +603,67 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	@Override
-	public <T extends Relation> T getRelation(final Serializable value) {
-		return Statics.unambigousFirst(Statics.valueFilter(this.<T> relationsIterator(value == null), value));
-	}
-
 	public <T extends Generic> T reFind() {
 		return getCurrentCache().reFind(this);
 	}
 
 	@Override
-	public <T extends Attribute> T getProperty(Serializable value) {
-		return getAttribute(value);
+	public <T extends Relation> T getRelation(final Serializable value) {
+		return Statics.unambigousFirst(Statics.valueFilter(this.<T> relationsIterator(value == null), value));
 	}
 
 	@Override
-	public <T extends Attribute> T setAttribute(Serializable value) {
-		return setSubAttribute(getEngine(), value);
+	public <T extends Attribute> T getProperty(Serializable value, Generic... targets) {
+		return getAttribute(value, targets);
 	}
 
 	@Override
-	public <T extends Attribute> T setProperty(Serializable value, Type... targets) {
-		return setSubProperty(getEngine(), value, targets);
+	public <T extends Attribute> T setProperty(Serializable value, Generic... targets) {
+		return setAttribute(value, targets).enableSingularConstraint();
 	}
 
-	public <T extends Attribute> T setSubProperty(Attribute property, Serializable value, Type... targets) {
+	public <T extends Attribute> T setSubProperty(Attribute property, Serializable value, Generic... targets) {
 		return setSubAttribute(property, value, targets).enableSingularConstraint();
 	}
 
 	@Override
-	public <T extends Relation> T setRelation(Serializable value, Type... targets) {
-		return setSubRelation(getEngine(), value, targets);
+	public <T extends Relation> T setRelation(Serializable value, Generic... targets) {
+		return setAttribute(value, targets);
 	}
 
-	private <T extends Attribute> T addSubRelation(Relation relation, Serializable value, Type... targets) {
+	public <T extends Attribute> T addSubRelation(Relation relation, Serializable value, Generic... targets) {
 		return addSubAttribute(relation, value, targets);
 	}
 
-	private <T extends Attribute> T setSubRelation(Relation relation, Serializable value, Type... targets) {
+	public <T extends Attribute> T setSubRelation(Relation relation, Serializable value, Generic... targets) {
 		return setSubAttribute(relation, value, targets);
 	}
 
-	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		T holder = internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), false, targets);
+	@Override
+	public <T extends Attribute> T setAttribute(Serializable value, Generic... targets) {
+		return setHolder(null, getEngine(), value, Statics.STRUCTURAL, Statics.BASE_POSITION, false, targets);
+	}
+
+	@Override
+	public <T extends Attribute> T addAttribute(Serializable value, Generic... targets) {
+		return setHolder(null, getEngine(), value, Statics.STRUCTURAL, Statics.BASE_POSITION, true, targets);
+	}
+
+	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Generic... targets) {
+		T holder = setHolder(null, attribute, value, Statics.STRUCTURAL, getBasePos(attribute), false, targets);
+		assert holder.inheritsFrom(attribute) : holder.info() + attribute.info();
+		return holder;
+	}
+
+	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Generic... targets) {
+		T holder = setHolder(null, attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
 		assert holder.inheritsFrom(attribute) : holder.info();
 		return holder;
 	}
 
-	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Type... targets) {
-		T holder = internalSetHolder(null, getEngine(), attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
-		assert holder.inheritsFrom(attribute) : holder.info();
-		return holder;
-	}
-
-	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Generic meta, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
+	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
+		// assert attribute.getMetaLevel() >= metaLevel;
+		Generic meta = metaLevel == attribute.getMetaLevel() ? attribute.getMeta().getImplicit() : attribute.getImplicit();
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
 		if (holder == null)
 			return value == null ? null : this.<T> bind(specializationClass, getCurrentCache().bindPrimaryByValue(meta, value, true, null), attribute, basePos, existsException, targets);
@@ -675,11 +681,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
 			return holder.updateValue(value);
 		holder.remove();
-		return this.<T> internalSetHolder(specializationClass, meta, attribute, value, metaLevel, basePos, existsException, targets);
+		return this.<T> setHolder(specializationClass, attribute, value, metaLevel, basePos, existsException, targets);
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
-		return this.<T> internalSetHolder(specializationClass, attribute.isConcrete() ? attribute.<GenericImpl> getImplicit().supers[0] : attribute.getImplicit(), attribute, value, Statics.CONCRETE, basePos, false, targets);
+		return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, basePos, false, targets);
 	}
 
 	private <T extends Holder> T getSelectedHolder(Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
@@ -721,19 +727,47 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return flag(relation, targets);
 	}
 
-	Generic[] sortAndCheck(Generic... components) {
-		if (getComponentsSize() != components.length)
-			throw new IllegalStateException("Illegal components size : " + components.length);
-		List<Integer> positions = getComponentsPositions(components);
-		Generic[] orderedComponents = new Generic[components.length];
-		for (int i = 0; i < components.length; i++) {
-			int pos = positions.get(i);
-			if (pos < 0 || pos >= components.length)
-				throw new IllegalStateException("Unable to find a valid position for : " + components[i]);
-			orderedComponents[pos] = components[i];
+	class TakenPositions extends ArrayList<Integer> {
+		Generic[] superComponents;
+		int max;
+
+		public TakenPositions(int max, Generic... superComponents) {
+			this.superComponents = superComponents;
+			this.max = max;
 		}
-		return orderedComponents;
+
+		public int getFreePosition(Generic component) {
+			int freePosition = 0;
+			while (contains(freePosition) || (freePosition < superComponents.length && !component.inheritsFrom(superComponents[freePosition])))
+				freePosition++;
+			if (freePosition >= max)
+				throw new IllegalStateException("Unable to find a valid position for : " + component);
+			add(freePosition);
+			return freePosition;
+		}
 	}
+
+	Generic[] sortAndCheck(Generic... components) {
+		TakenPositions takenPositions = new TakenPositions(components.length, this.components);
+		Generic[] result = new Generic[components.length];
+		for (Generic component : components)
+			result[takenPositions.getFreePosition(component == null ? GenericImpl.this : component)] = component;
+		return result;
+	}
+
+	// Generic[] sortAndCheck(Generic... components) {
+	// if (getComponentsSize() != components.length)
+	// throw new IllegalStateException("Illegal components size : " + components.length);
+	// List<Integer> positions = getComponentsPositions(components);
+	// Generic[] orderedComponents = new Generic[components.length];
+	// for (int i = 0; i < components.length; i++) {
+	// int pos = positions.get(i);
+	// if (pos < 0 || pos >= components.length)
+	// throw new IllegalStateException("Unable to find a valid position for : " + components[i]);
+	// orderedComponents[pos] = components[i];
+	// }
+	// return orderedComponents;
+	// }
 
 	public <T extends Generic> Iterator<T> holdersIterator(final int level, Holder origin, int basePos, boolean readPhantom) {
 		if (Statics.STRUCTURAL == level)
@@ -800,8 +834,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			public final boolean isSelected(Generic candidate) {
 				boolean selected = candidate.getMetaLevel() <= level && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) candidate).isAttributeOf(GenericImpl.this));
 				if (pos != Statics.MULTIDIRECTIONAL && selected && ((GenericImpl) candidate).isPseudoStructural(pos))
-					if (getCurrentCache() instanceof CacheImpl)
-						((GenericImpl) candidate).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) candidate.getImplicit()).supers[0], null));
+					((GenericImpl) candidate).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) candidate.getImplicit()).supers[0], null));
 				return selected;
 			}
 		};
@@ -1527,18 +1560,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Attribute> T addAttribute(Serializable value) {
-		return addSubAttribute(getEngine(), value);
+	public <T extends Attribute> T addProperty(Serializable value, Generic... targets) {
+		return addAttribute(value, targets).enableSingularConstraint();
 	}
 
 	@Override
-	public <T extends Attribute> T addProperty(Serializable value, Type... targets) {
-		return addSubAttribute(getEngine(), value).enableSingularConstraint();
-	}
-
-	@Override
-	public <T extends Relation> T addRelation(Serializable value, Type... targets) {
-		return addSubRelation(getEngine(), value, targets);
+	public <T extends Relation> T addRelation(Serializable value, Generic... targets) {
+		return addAttribute(value, targets);
 	}
 
 	@Override

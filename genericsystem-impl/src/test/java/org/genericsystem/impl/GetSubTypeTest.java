@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -151,9 +150,9 @@ public class GetSubTypeTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		Type car = vehicle.newSubType("Car");
-		// ((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", color.newSubType("OutsideColor"));
-		// ((GenericImpl) car).setSubAttribute(vehicleColor, "CarPercent", cache.newType("Percent"));
-		((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.newType("Percent"));
+		try {
+			((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.newType("Percent"));
+		} catch (IllegalStateException ignore) {}
 	}
 
 	public void testGetSubTypeNonExistingRelation() {

@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -338,6 +337,7 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * Returns the Holder of value.
+	 * 
 	 * @param metaLevel
 	 *            meta level.
 	 * @param attribute
@@ -353,6 +353,7 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * Returns the Holder of value.
+	 * 
 	 * @param metaLevel
 	 *            meta level.
 	 * @param attribute

@@ -1,7 +1,6 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 
@@ -61,17 +60,19 @@ public interface Type extends Generic {
 	 * @return Return the attribute.
 	 * @see Attribute
 	 */
-	<T extends Attribute> T addAttribute(Serializable value);
+	<T extends Attribute> T addAttribute(Serializable value, Generic... targets);
 
 	/**
 	 * Creates an attribute for the type or returns this attribute if already exists.
 	 * 
 	 * @param value
 	 *            The attribute value.
+	 * @param targets
+	 *            The targets
 	 * @return Return the attribute.
 	 * @see Attribute
 	 */
-	<T extends Attribute> T setAttribute(Serializable value);
+	<T extends Attribute> T setAttribute(Serializable value, Generic... targets);
 
 	/**
 	 * Find the property by value.
@@ -80,7 +81,7 @@ public interface Type extends Generic {
 	 *            The property value.
 	 * @return Return the property or null if no property find.
 	 */
-	<T extends Attribute> T getProperty(Serializable value);
+	<T extends Attribute> T getProperty(Serializable value, Generic... targets);
 
 	/**
 	 * Creates a property for the type or throws an exception if this property already exists.
@@ -92,7 +93,7 @@ public interface Type extends Generic {
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T addProperty(Serializable value, Type... targets);
+	<T extends Attribute> T addProperty(Serializable value, Generic... targets);
 
 	/**
 	 * Creates a property for the type or returns this property if already exists.
@@ -104,7 +105,7 @@ public interface Type extends Generic {
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T setProperty(Serializable value, Type... targets);
+	<T extends Attribute> T setProperty(Serializable value, Generic... targets);
 
 	/**
 	 * Returns the relations of Generic.
@@ -133,7 +134,7 @@ public interface Type extends Generic {
 	 * @return Return the relation.
 	 * @see Relation
 	 */
-	<T extends Relation> T addRelation(Serializable value, Type... targets);
+	<T extends Relation> T addRelation(Serializable value, Generic... targets);
 
 	/**
 	 * Creates a relation or returns this relation if this relation already exists.
@@ -145,7 +146,7 @@ public interface Type extends Generic {
 	 * @return Return the relation.
 	 * @see Relation
 	 */
-	<T extends Relation> T setRelation(Serializable value, Type... targets);
+	<T extends Relation> T setRelation(Serializable value, Generic... targets);
 
 	/**
 	 * Returns the instances of Generic.
