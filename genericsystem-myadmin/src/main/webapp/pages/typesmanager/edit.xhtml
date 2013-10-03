@@ -32,34 +32,29 @@
 			execute="attributestypesmanager" render="edittypesmanager,typestree" />
 		<!-- //ici tableau1 -->
 		<h:panelGrid styleClass="fullWidth" columns="2">
-			<c:forEach var="currentStructuralWrapper"
-				items="#{genericBean.structuralWrappers}" varStatus="status">
+			<c:forEach var="currentStructural"
+				items="#{genericBean.structurals}" varStatus="status">
 				<h:panelGroup>
 					<a4j:outputPanel>
 						<rich:dropTarget acceptedTypes="genericTreeNode"
-							dropValue="#{currentStructuralWrapper.structural}"
+							dropValue="#{currentStructural}"
 							dropListener="#{dragAndDropBean.addTarget}" execute="typestree"
 							render="holders#{status.index},typestree" />
 
 						<c:if
-							test="#{!currentStructuralWrapper.structural.attribute.isMapProvider()}">
-
-
-
+							test="#{!currentStructural.attribute.isMapProvider()}">
 							<gs:structuralWrapper id="holders#{status.index}"
-								wrapper="#{currentStructuralWrapper}"
-								showAddLink="#{!genericBean.isSingular(currentStructuralWrapper.structural)}"
-								showDeleteLink="#{!genericBean.hasValues(currentStructuralWrapper.structural.attribute)}"
+								wrapper="#{currentStructural}"
+								showAddLink="#{!genericBean.isSingular(currentStructural)}"
+								showDeleteLink="#{!genericBean.hasValues(currentStructural.attribute)}"
 								genBean="#{genericBean}" genTreeBean="#{genericTreeBean}"
 								wrapBean="#{wrapperBean}" />
-
 						</c:if>
 
 						<c:if
-							test="#{currentStructuralWrapper.structural.attribute.isMapProvider()}">
-
+							test="#{currentStructural.attribute.isMapProvider()}">
 							<gs:mapProvider id="holders#{status.index}"
-								wrapper="#{currentStructuralWrapper}" genBean="#{genericBean}"
+								wrapper="#{currentStructural}" genBean="#{genericBean}"
 								wrapBean="#{wrapperBean}"
 								popupPanelId="popupPanel#{status.index}" />
 
@@ -74,33 +69,31 @@
 
 						</c:if>
 
-
-
 					</a4j:outputPanel>
 				</h:panelGroup>
 			</c:forEach>
-			<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}"
-				action="#{genericBean.addValue(popupPanelBean.getAttribute(),popupValue)}"
-				render="edittypesmanager,typestree" />
+<!-- 			<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}" -->
+<!-- 				action="#{genericBean.addValue(popupPanelBean.getAttribute(),popupValue)}" -->
+<!-- 				render="edittypesmanager,typestree" /> -->
 		</h:panelGrid>
 
 
-		<c:forEach var="currentStructuralWrapper"
-			items="#{genericBean.structuralWrappers}" varStatus="status">
+<!-- 		<c:forEach var="currentStructural" -->
+<!-- 			items="#{genericBean.structurals}" varStatus="status"> -->
 
-			<c:if
-				test="#{currentStructuralWrapper.structural.attribute.isMapProvider()}">
+<!-- 			<c:if -->
+<!-- 				test="#{currentStructural.attribute.isMapProvider()}"> -->
 
-				<!-- Popup panel -->
-				<gs:popupPanel key="popupPanel#{status.index}"
-					title="#{msg.create} #{msg.a} #{msg.contraint}"
-					action="#{popupPanelBean.addConstraints}"
-					getList="#{popupPanelBean.getConstraintClass}"
-					render="typestree, edittypesmanager" keyInput="true" />
+<!-- 				Popup panel -->
+<!-- 				<gs:popupPanel key="popupPanel#{status.index}" -->
+<!-- 					title="#{msg.create} #{msg.a} #{msg.contraint}" -->
+<!-- 					action="#{popupPanelBean.addConstraints}" -->
+<!-- 					getList="#{popupPanelBean.getConstraintClass}" -->
+<!-- 					render="typestree, edittypesmanager" keyInput="true" /> -->
 
-			</c:if>
+<!-- 			</c:if> -->
 
-		</c:forEach>
+<!-- 		</c:forEach> -->
 
 
 		<!-- //ici tableau 2-->

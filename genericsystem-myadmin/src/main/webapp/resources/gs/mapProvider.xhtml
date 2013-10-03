@@ -19,34 +19,24 @@
 </composite:interface>
 
 <composite:implementation>
-
-	<!-- Parameters -->
 	<ui:param name="wrapper" value="#{cc.attrs.wrapper}" />
 	<ui:param name="genBean" value="#{cc.attrs.genBean}" />
 	<ui:param name="wrapBean" value="#{cc.attrs.wrapBean}" />
 	<ui:param name="popupPanelId" value="#{cc.attrs.popupPanelId}" />
-	<ui:param name="structural" value="#{wrapper.structural}" />
-	<ui:param name="map" value="#{genBean.getMap(structural.attribute)}" />
+	<ui:param name="map" value="#{genBean.getMap(wrapper.attribute)}" />
 
-	<rich:dataTable id="mapProvider" value="#{map.entrySet}" var="entry"
+	<rich:dataTable id="mapProvider" value="#{map}" var="entry"
 		styleClass="fullWidth widthAdjust">
-
-		<!-- Header -->
 		<f:facet name="header">
-			<h:outputText
-				value="#{structural.attribute} (#{structural.position})" />
+			<h:outputText value="#{wrapper.attribute} (#{wrapper.position})" />
 		</f:facet>
 
-		<!-- Column 1 - Key -->
 		<rich:column>
 			<f:facet name="header">
 				<h:outputText value="#{msg.key}" />
 			</f:facet>
 			<h:outputText value="#{entry.key}" />
 		</rich:column>
-
-
-		<!-- Column 2 - Value -->
 		<rich:column>
 			<f:facet name="header">
 				<h:outputText value="#{msg.value}" />
@@ -61,11 +51,8 @@
 				<a4j:ajax event="change" execute="mapProvider" render="mapProvider" />
 			</rich:inplaceInput>
 		</rich:column>
-
-		<!-- Column 3 - delete link -->
 		<rich:column style="text-align:center;">
 			<f:facet name="header">
-				<!-- Add link -->
 				<a4j:commandLink execute="@none"
 					oncomplete="#{rich:component(popupPanelId)}.show()">
 					<h:graphicImage value="#{infos.add}" title="fhdf" />
@@ -76,9 +63,13 @@
 				<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 			</a4j:commandLink>
 		</rich:column>
-
 	</rich:dataTable>
 
+	<gs:popupPanel key="#{popupPanelId}"
+		title="#{msg.create} #{msg.a} #{msg.contraint}"
+		action="#{popupPanelBean.put(map)}"
+		getList="#{popupPanelBean.getConstraintClass}"
+		render="typestree, edittypesmanager" keyInput="true" />
 </composite:implementation>
 
 </html>

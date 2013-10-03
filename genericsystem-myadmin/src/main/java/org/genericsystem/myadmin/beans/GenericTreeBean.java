@@ -88,8 +88,9 @@ public class GenericTreeBean implements Serializable {
 		this.selectionLocked = selectionLocked;
 	}
 
-	public Generic getSelectedTreeNodeGeneric() {
-		return selectedTreeNode.getGeneric();
+	//TODO KK
+	public <T extends Generic> T getSelectedTreeNodeGeneric() {
+		return (T) selectedTreeNode.getGeneric();
 	}
 
 	public String getSelectedTreeNodeValue() {

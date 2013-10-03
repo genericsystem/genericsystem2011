@@ -56,16 +56,6 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				return valueHolder != null ? valueHolder.<Value> getValue() : null;
 			}
 
-			/**
-			 * Alias to method entrySet() of AstractMap class. Used within
-			 * 'value' attributes to access to entrySet in JSF pages.
-			 * 
-			 * @return set of entries of the map.
-			 */
-			public Set<Entry<Key,Value>> getEntrySet() {
-				return this.entrySet();
-			}
-
 			@Override
 			public Holder getValueHolder(Serializable key) {
 				Holder keyHolder = getKeyHolder(key);
