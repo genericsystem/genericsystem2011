@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Nicolas Feybesse
@@ -14,8 +13,7 @@ public class HomeTreeNode {
 	private HomeTreeNode metaNode;
 	private Serializable value;
 
-	// TODO WEAK or SOFT references ?
-	private ConcurrentHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentHashMap<>();
+	private ConcurrentWeakValueHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentWeakValueHashMap<>();
 
 	private HomeTreeNode(HomeTreeNode metaNode, Serializable value) {
 		this.metaNode = metaNode;
