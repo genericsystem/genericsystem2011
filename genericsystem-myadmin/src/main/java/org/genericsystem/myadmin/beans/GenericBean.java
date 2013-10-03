@@ -142,7 +142,7 @@ public class GenericBean implements Serializable {
 		return (ExtendedMap<Serializable, Serializable>) genericTreeBean.getSelectedTreeNodeGeneric().getMap(mapProvider.getClass());
 	}
 
-
+	/**/
 
 	/*
 	public Set<Entry<Serializable, Serializable>> getListEntries(MapProvider mapProvider) {
