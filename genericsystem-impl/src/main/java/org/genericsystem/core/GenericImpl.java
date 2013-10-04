@@ -17,6 +17,7 @@ import org.genericsystem.annotation.constraints.SingletonConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.UniqueValueConstraint;
 import org.genericsystem.annotation.constraints.VirtualConstraint;
+import org.genericsystem.core.HomeTreeNode.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
@@ -140,6 +141,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (value != null)
 			for (Generic primary : getPrimaries())
 				assert primary.getValue() != null : this.info();
+		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + value + " " + (homeTreeNode instanceof RootTreeNode);
+		assert Objects.equals(value, homeTreeNode.getValue());
 		return this;
 	}
 
@@ -856,7 +859,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = (Generic[]) cartesianIterator.next();
 			if (!findPhantom(phantom, components))
-				getCurrentCache().bind(bindInstanceNode(getImplicit().getValue()), null, getImplicit(), true, this, false, components);
+				getCurrentCache().bind(getHomeTreeNode(), null, getImplicit(), true, this, false, components);
 		}
 	}
 

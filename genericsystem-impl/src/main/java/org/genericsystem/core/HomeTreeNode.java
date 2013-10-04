@@ -11,7 +11,7 @@ public class HomeTreeNode {
 	private static final String ROOT_NODE_VALUE = "Engine";
 
 	HomeTreeNode metaNode;
-	private Serializable value;
+	Serializable value;
 
 	private ConcurrentWeakValueHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentWeakValueHashMap<>();
 
@@ -48,11 +48,17 @@ public class HomeTreeNode {
 	}
 
 	public int getMetaLevel() {
-		return metaNode.getMetaLevel() + 1;
+		assert 1 + metaNode.getMetaLevel() >= 1;
+		return 1 + metaNode.getMetaLevel();
 	}
 
 	public boolean inheritsFrom(HomeTreeNode homeTreeNode) {
 		return equals(homeTreeNode) ? true : metaNode.inheritsFrom(homeTreeNode);
+	}
+
+	@Override
+	public String toString() {
+		return metaNode.toString() + "|" + value;
 	}
 
 	static class RootTreeNode extends HomeTreeNode {
@@ -78,6 +84,11 @@ public class HomeTreeNode {
 		@Override
 		public boolean inheritsFrom(HomeTreeNode homeTreeNode) {
 			return equals(homeTreeNode);
+		}
+
+		@Override
+		public String toString() {
+			return "" + value;
 		}
 	}
 }

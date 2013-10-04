@@ -390,7 +390,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		userSupers = meta.isPrimary() ? userSupers : Statics.insertFirst(meta, userSupers);
 		Serializable value = findImplictValue(clazz);
 		Generic implicit = bindPrimaryByValue(meta.getImplicit(), value, isAutomatic(userSupers, components), specializationClass);
-		HomeTreeNode homeTreeNode = meta.<GenericImpl> getImplicit().bindInstanceNode(value);
+		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
 		return bind(homeTreeNode, implicit, userSupers, components, false, clazz, false);
 	}
 
