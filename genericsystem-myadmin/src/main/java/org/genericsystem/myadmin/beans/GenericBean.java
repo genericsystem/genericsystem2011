@@ -116,11 +116,16 @@ public class GenericBean implements Serializable {
 		}
 	}
 
+	/**
+	 * Create and return structurals created on attributes of selected tree node.
+	 * 
+	 * @return list of structurals.
+	 */
 	public List<StructuralImpl> getStructurals() {
-		List<StructuralImpl> wrappers = new ArrayList<>();
+		List<StructuralImpl> structurals = new ArrayList<>();
 		for (Attribute attribute : genericTreeBean.<Type> getSelectedTreeNodeGeneric().getAttributes())
-			wrappers.add(new StructuralImpl(attribute, genericTreeBean.getSelectedTreeNodeGeneric().getBasePos(attribute)));
-		return wrappers;
+			structurals.add(new StructuralImpl(attribute, genericTreeBean.getSelectedTreeNodeGeneric().getBasePos(attribute)));
+		return structurals;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -153,24 +158,6 @@ public class GenericBean implements Serializable {
 		}
 	}
 
-	// public class StructuralMap extends StructuralImpl{
-	//
-	// public StructuralMap(AbstractMapProvider<Serializable, Serializable> mapProvider, int position) {
-	// super(mapProvider, position);
-	// }
-	//
-	// @Override
-	// public MapProvider getAttribute() {
-	// return (MapProvider) super.getAttribute();
-	// }
-	//
-	// @SuppressWarnings("unchecked")
-	// public Map<Serializable, Serializable> getMap(){
-	// return getAttribute().getMap((Class<AbstractMapProvider<Serializable, Serializable>>)getAttribute().getValue());
-	// }
-	//
-	// }
-
 	public List<Holder> getHolders(StructuralWrapper structuralWrapper) {
 		return ((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getHolders(structuralWrapper.getStructural().getAttribute(), structuralWrapper.getStructural().getPosition(), structuralWrapper.isReadPhantoms());
 	}
@@ -178,19 +165,6 @@ public class GenericBean implements Serializable {
 	public List<Generic> getOtherTargets(Holder holder) {
 		return genericTreeBean.getSelectedTreeNodeGeneric().getOtherTargets(holder);
 	}
-
-	/*
-	 * @SuppressWarnings("unchecked") public List<Entry<Serializable, Serializable>> getPropertiesMap() { return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNodeGeneric().getPropertiesMap().entrySet(); }
-	 * 
-	 * @SuppressWarnings("unchecked") public List<Entry<Serializable, Serializable>> getContraintsMap() { return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNodeGeneric().getContraintsMap().entrySet(); }
-	 * 
-	 * @SuppressWarnings("unchecked") public List<Entry<Serializable, Serializable>> getSystemPropertiesMap() { return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNodeGeneric().getSystemPropertiesMap().entrySet(); }
-	 */
-
-	// TODO in GS CORE
-	// public boolean isValue(Generic generic) {
-	// return generic.isConcrete() && generic.isAttribute();
-	// }
 
 	public boolean isSingular(Structural structural) {
 		return structural.getAttribute().isSingularConstraintEnabled();
