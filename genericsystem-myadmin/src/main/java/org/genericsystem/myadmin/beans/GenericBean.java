@@ -123,44 +123,10 @@ public class GenericBean implements Serializable {
 		return wrappers;
 	}
 
-	// public List<StructuralWrapper> getStructuralWrappers() {
-	// List<StructuralWrapper> wrappers = new ArrayList<>();
-	// Snapshot<Attribute> attributes = ((GenericImpl) genericTreeBean.getSelectedTreeNodeGeneric()).getAttributes();
-	// for (int i = 0; i < attributes.size(); i++)
-	// wrappers.add(new StructuralWrapper(new StructuralImpl(attributes.get(i), i)));
-	// return wrappers;
-	// }
-
 	@SuppressWarnings("unchecked")
-	public List<Entry<Serializable, Serializable>> getMap(MapProvider mapProvider) {
-		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNodeGeneric().getMap(mapProvider.getClass()).entrySet();
+	public List<Entry<Serializable, Serializable>> getMapEntryList(MapProvider mapProvider) {
+		return (List<Entry<Serializable, Serializable>>) mapProvider.getMap(genericTreeBean.getSelectedTreeNodeGeneric()).entrySet();
 	}
-
-	/**/
-
-	/*
-	 * public Set<Entry<Serializable, Serializable>> getListEntries(MapProvider mapProvider) { return getMap(mapProvider).entrySet(); }
-	 */
-
-	/*
-	 * public Snapshot<Structural> getStructurals() { return new AbstractSnapshot<Structural>() {
-	 * 
-	 * @Override public Iterator<Structural> iterator() { return structuralsIterator(); } }; }
-	 */
-
-	/*
-	 * public Iterator<Structural> structuralsIterator() { return new AbstractConcateIterator<Attribute, Structural>(GenericImpl.this.getAttributes().iterator()) {
-	 * 
-	 * @Override protected Iterator<Structural> getIterator(final Attribute attribute) { return new SingletonIterator<Structural>(new StructuralImpl(attribute, getBasePos(attribute))); } }; }
-	 */
-
-	// @SuppressWarnings("unused")
-	// private StructuralWrapper getStructuralWrapper(Structural structural) {
-	// for (StructuralWrapper old : structuralWrappers)
-	// if (old.getStructural().equals(structural))
-	// return old;
-	// return new StructuralWrapper(structural);
-	// }
 
 	public class StructuralWrapper {
 		private Structural structural;
