@@ -10,13 +10,13 @@ public class HomeTreeNode {
 
 	private static final String ROOT_NODE_VALUE = "Engine";
 
-	private HomeTreeNode metaNode;
+	HomeTreeNode metaNode;
 	private Serializable value;
 
 	private ConcurrentWeakValueHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentWeakValueHashMap<>();
 
 	private HomeTreeNode(HomeTreeNode metaNode, Serializable value) {
-		this.metaNode = metaNode;
+		this.metaNode = metaNode == null ? this : metaNode;
 		this.value = value;
 	}
 
@@ -24,8 +24,14 @@ public class HomeTreeNode {
 		return instancesNodes.get(value);
 	}
 
+	private static final String NULL_VALUE = "NULL_VALUE";
+
 	public HomeTreeNode bindInstanceNode(Serializable value) {
-		return instancesNodes.putIfAbsent(value, new HomeTreeNode(this, value));
+		if (value == null)
+			value = NULL_VALUE;
+		HomeTreeNode newHomeTreeNode = new HomeTreeNode(this, value);
+		HomeTreeNode result = instancesNodes.putIfAbsent(value, new HomeTreeNode(this, value));
+		return result == null ? newHomeTreeNode : result;
 	}
 
 	public HomeTreeNode getHomeTree() {
@@ -38,7 +44,7 @@ public class HomeTreeNode {
 
 	@SuppressWarnings("unchecked")
 	public <S extends Serializable> S getValue() {
-		return (S) value;
+		return value == NULL_VALUE ? null : (S) value;
 	}
 
 	public int getMetaLevel() {

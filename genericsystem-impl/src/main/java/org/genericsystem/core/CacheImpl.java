@@ -87,7 +87,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bindPrimaryByValue(Generic meta, Serializable value, boolean automatic, Class<?> specializeGeneric) {
 		T implicit = findPrimaryByValue(meta, value);
-		return implicit != null ? implicit : this.<T> insert(((GenericImpl) getEngine().getFactory().newGeneric(specializeGeneric)).initializePrimary(value, new Generic[] { meta }, Statics.EMPTY_GENERIC_ARRAY, automatic));
+		HomeTreeNode homeTreeNode = ((GenericImpl) meta).bindInstanceNode(value);
+		return implicit != null ? implicit : this.<T> insert(((GenericImpl) getEngine().getFactory().newGeneric(specializeGeneric)).initializePrimary(homeTreeNode, value, new Generic[] { meta }, Statics.EMPTY_GENERIC_ARRAY, automatic));
 	}
 
 	@Override
@@ -229,7 +230,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				if (((GenericImpl) orderedDependency).isPrimary())
 					generic = bindPrimaryByValue(adjust(((GenericImpl) orderedDependency).supers)[0], orderedDependency.getValue(), orderedDependency.isAutomatic(), orderedDependency.getClass());
 				else {
-					generic = buildAndInsertComplex(orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0],
+					generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(), adjust(orderedDependency.getImplicit())[0],
 							computeDirectSupers ? getDirectSupers(adjust(((GenericImpl) orderedDependency).getPrimariesArray()), adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
 							adjust(((GenericImpl) orderedDependency).components), orderedDependency.isAutomatic());
 				}
@@ -352,7 +353,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] userSupers, Generic... components) {
-		T result = bind(bindPrimaryByValue(getEngine(), value, isAutomatic(userSupers, components), Generic.class), userSupers, components, false, null, false);
+		T result = bind(this.<EngineImpl> getEngine().bindInstanceNode(value), bindPrimaryByValue(getEngine(), value, isAutomatic(userSupers, components), Generic.class), userSupers, components, false, null, false);
 		assert Objects.equals(value, result.getValue());
 		return result;
 	}
@@ -364,7 +365,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(bindPrimaryByValue(getEngine(), value, true, TreeImpl.class), new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], false, TreeImpl.class, false);// .<T> disableInheritance();
+		return this.<T> bind(this.<EngineImpl> getEngine().bindInstanceNode(value), bindPrimaryByValue(getEngine(), value, true, TreeImpl.class), new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], false, TreeImpl.class, false);// .<T>
+																																																															// disableInheritance();
 	}
 
 	@Override
@@ -386,8 +388,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz);
 		userSupers = meta.isPrimary() ? userSupers : Statics.insertFirst(meta, userSupers);
-		Generic implicit = bindPrimaryByValue(meta.getImplicit(), findImplictValue(clazz), isAutomatic(userSupers, components), specializationClass);
-		return bind(implicit, userSupers, components, false, clazz, false);
+		Serializable value = findImplictValue(clazz);
+		Generic implicit = bindPrimaryByValue(meta.getImplicit(), value, isAutomatic(userSupers, components), specializationClass);
+		HomeTreeNode homeTreeNode = meta.<GenericImpl> getImplicit().bindInstanceNode(value);
+		return bind(homeTreeNode, implicit, userSupers, components, false, clazz, false);
 	}
 
 	private GenericImpl getMeta(Class<?> clazz) {
@@ -406,7 +410,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return !(userSupers.length == 0);
 	}
 
-	<T extends Generic> T bind(Class<?> specializationClass, Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {
+	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic implicit, boolean automatic, Generic directSuper, boolean existsException, Generic... components) {
 		components = ((GenericImpl) directSuper).sortAndCheck(components);
 		if (implicit.isConcrete()) {
 			Generic meta = directSuper.getMetaLevel() == implicit.getMetaLevel() ? directSuper.getMeta() : directSuper;
@@ -414,10 +418,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 			if (instanceClass != null)
 				specializationClass = instanceClass.value();
 		}
-		return bind(implicit, new Generic[] { directSuper }, components, automatic, specializationClass, existsException);
+		return bind(homeTreeNode, implicit, new Generic[] { directSuper }, components, automatic, specializationClass, existsException);
 	}
 
-	<T extends Generic> T bind(Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> specializationClass, boolean existsException) {
+	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic implicit, Generic[] supers, Generic[] components, boolean automatic, Class<?> specializationClass, boolean existsException) {
 		final Primaries primaries = new Primaries(supers);
 		primaries.add(implicit);
 		Generic[] interfaces = primaries.toArray();
@@ -438,10 +442,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 				rollback(new ExistsException(result + " already exists !"));
 			return result;
 		}
-		return internalBind(implicit, interfaces, components, automatic, specializationClass);
+		return internalBind(homeTreeNode, implicit, interfaces, components, automatic, specializationClass);
 	}
 
-	private <T extends Generic> T internalBind(Generic implicit, Generic[] interfaces, Generic[] components, boolean automatic, Class<?> specializeGeneric) {
+	private <T extends Generic> T internalBind(HomeTreeNode homeTreeNode, Generic implicit, Generic[] interfaces, Generic[] components, boolean automatic, Class<?> specializeGeneric) {
 		assert implicit.isAlive();
 		Generic[] directSupers = getDirectSupers(interfaces, components);
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
@@ -454,7 +458,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			simpleRemove(generic);
 
 		ConnectionMap connectionMap = new ConnectionMap();
-		T superGeneric = buildAndInsertComplex(specializeGeneric, implicit, directSupers, components, automatic);
+		T superGeneric = buildAndInsertComplex(homeTreeNode, specializeGeneric, implicit, directSupers, components, automatic);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
 	}
@@ -468,8 +472,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		};
 	}
 
-	<T extends Generic> T buildAndInsertComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
-		return insert(this.<EngineImpl> getEngine().buildComplex(clazz, implicit, supers, components, automatic));
+	<T extends Generic> T buildAndInsertComplex(HomeTreeNode homeTreeNode, Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
+		return insert(this.<EngineImpl> getEngine().buildComplex(homeTreeNode, clazz, implicit, supers, components, automatic));
 	}
 
 	protected void triggersDependencies(Class<?> clazz) {
@@ -643,10 +647,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
+					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
 					Generic newImplicit = bindPrimaryByValue(reBind(old.<GenericImpl> getImplicit().supers)[0], value, old.getImplicit().isAutomatic(), old.getClass());
 					if (((GenericImpl) old).isPrimary())
 						return newImplicit;
-					return bind(newImplicit, Statics.replace(0, reBind(((GenericImpl) old).supers), newImplicit), reBind(((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);
+					return bind(newHomeTreeNode, newImplicit, Statics.replace(0, reBind(((GenericImpl) old).supers), newImplicit), reBind(((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);
 				}
 			}.rebuildAll(old);
 		}
@@ -659,9 +664,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 					// TODO KK
 					if (((GenericImpl) old).isPrimary()) {
 						Generic newPrimary = bindPrimaryByValue(old.<GenericImpl> getImplicit().supers[0], old.getValue(), true, old.getClass());
-						return bind(newPrimary, Statics.replace(0, ((GenericImpl) old).supers, newPrimary), Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.isAutomatic(), old.getClass(), true);
+						return bind(((GenericImpl) old).getHomeTreeNode(), newPrimary, Statics.replace(0, ((GenericImpl) old).supers, newPrimary), Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.isAutomatic(),
+								old.getClass(), true);
 					}
-					return bind(old.getImplicit(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.isAutomatic(), old.getClass(), false);
+					return bind(((GenericImpl) old).getHomeTreeNode(), old.getImplicit(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.isAutomatic(), old.getClass(), false);
 				}
 			}.rebuildAll(old);
 		}
@@ -671,7 +677,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
-					return bind(old.getImplicit(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);
+					return bind(((GenericImpl) old).getHomeTreeNode(), old.getImplicit(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.isAutomatic(), old.getClass(), false);
 				}
 			}.rebuildAll(old);
 		}
@@ -681,7 +687,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
-					return bind(old.getImplicit(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+					return bind(((GenericImpl) old).getHomeTreeNode(), old.getImplicit(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
 				}
 			}.rebuildAll(old);
 		}
@@ -693,7 +699,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
-					return bind(old.getImplicit(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
+					return bind(((GenericImpl) old).getHomeTreeNode(), old.getImplicit(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.isAutomatic(), old.getClass(), true);
 				}
 			}.rebuildAll(old);
 		}

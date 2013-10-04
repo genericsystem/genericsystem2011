@@ -8,11 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
-import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.MapProvider;
@@ -27,8 +25,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	static final String MAP_VALUE = "map";
 
-	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {
-	}
+	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -75,7 +72,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 					return oldValue;
 				Holder attribute = getKeyAttribute();
 				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key, getBasePos(attribute));
-				setSingularHolder(keyHolder, getValueAttribute(), (Serializable) value);
+				keyHolder.setHolder(getValueAttribute(), (Serializable) value);
 				return oldValue;
 			}
 
@@ -110,25 +107,34 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		return null;
 	};
 
-	// TODO KK code copier du setHolder
-	private static <T extends Holder> T setSingularHolder(Holder keyHolder, Holder attribute, Serializable value, Generic... targets) {
-		int basePos = keyHolder.getBasePos(attribute);
-		T holder = keyHolder.getHolder(Statics.CONCRETE, (Attribute) attribute, basePos);
-		Generic implicit = ((GenericImpl) attribute).bindPrimaryByValue(null, value, true);
-		if (holder == null)
-			return null != value ? ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets) : null;
-		if (!keyHolder.equals(holder.getComponent(basePos))) {
-			if (value == null)
-				return keyHolder.cancel(holder, basePos, true);
-			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
-				keyHolder.cancel(holder, basePos, true);
-			return ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets);
-		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(keyHolder, targets, basePos)))
-			return holder;
-		holder.remove();
-		return setSingularHolder(keyHolder, attribute, value, targets);
+	@Override
+	public <T extends Holder> T getSelectedHolder(Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
+		// if (((Attribute) attribute).isSingularConstraintEnabled(basePos))
+		return getHolder(metaLevel, (Attribute) attribute, basePos);
+		// if (value == null || ((Type) attribute).isPropertyConstraintEnabled())
+		// return this.<T> getHolder(metaLevel, attribute, basePos, targets);
+		// return this.<T> getHolderByValue(metaLevel, attribute, value, basePos, targets);
 	}
+
+	// // TODO KK code copier du setHolder
+	// private static <T extends Holder> T setSingularHolder(Holder keyHolder, Holder attribute, Serializable value, Generic... targets) {
+	// int basePos = keyHolder.getBasePos(attribute);
+	// T holder = keyHolder.getHolder(Statics.CONCRETE, (Attribute) attribute, basePos);
+	// Generic implicit = ((GenericImpl) attribute).bindPrimaryByValue(null, value, true);
+	// if (holder == null)
+	// return null != value ? ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets) : null;
+	// if (!keyHolder.equals(holder.getComponent(basePos))) {
+	// if (value == null)
+	// return keyHolder.cancel(holder, basePos, true);
+	// if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+	// keyHolder.cancel(holder, basePos, true);
+	// return ((GenericImpl) keyHolder).<T> bind(null, implicit, attribute, basePos, true, targets);
+	// }
+	// if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(keyHolder, targets, basePos)))
+	// return holder;
+	// holder.remove();
+	// return setSingularHolder(keyHolder, attribute, value, targets);
+	// }
 
 	private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {
 		Holder map = generic.getHolder(Statics.CONCRETE, this);

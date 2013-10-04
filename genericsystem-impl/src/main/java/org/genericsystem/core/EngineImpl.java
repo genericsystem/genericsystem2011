@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.genericsystem.core.CacheImpl.UnsafeCache;
+import org.genericsystem.core.HomeTreeNode.RootTreeNode;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
 import org.genericsystem.generic.Attribute;
@@ -30,6 +31,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	private Archiver archiver;
 
+	private HomeTreeNode homeTree = new RootTreeNode();
+
 	public EngineImpl(Config config, Class<?>... userClasses) {
 		factory = config.getFactory();
 		archiver = new Archiver(this, config.getDirectoryPath());
@@ -42,7 +45,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	final void restoreEngine(long designTs, long birthTs, long lastReadTs, long deathTs) {
-		restore(ENGINE_VALUE, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY, false);
+		restore(homeTree, ENGINE_VALUE, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY, false);
 		assert components.length == 0;
 	}
 
@@ -52,8 +55,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T buildComplex(Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
-		return (T) ((GenericImpl) getFactory().newGeneric(clazz)).initializeComplex(implicit, supers, components, automatic);
+	<T extends Generic> T buildComplex(HomeTreeNode hometreeNode, Class<?> clazz, Generic implicit, Generic[] supers, Generic[] components, boolean automatic) {
+		return (T) ((GenericImpl) getFactory().newGeneric(clazz)).initializeComplex(homeTreeNode, implicit, supers, components, automatic);
 	}
 
 	@Override
@@ -168,11 +171,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 			if (MetaAttribute.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this });
 				if (result == null)
-					result = cache.buildAndInsertComplex(null, EngineImpl.this, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }, false);
+					result = cache.buildAndInsertComplex(homeTree, null, EngineImpl.this, new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this }, false);
 			} else if (MetaRelation.class.equals(clazz)) {
 				result = cache.<T> findMeta(new Generic[] { EngineImpl.this }, new Generic[] { EngineImpl.this, EngineImpl.this });
 				if (result == null)
-					result = cache.buildAndInsertComplex(null, EngineImpl.this, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }, false);
+					result = cache.buildAndInsertComplex(homeTree, null, EngineImpl.this, new Generic[] { get(MetaAttribute.class) }, new Generic[] { EngineImpl.this, EngineImpl.this }, false);
 			} else
 				result = cache.<T> bind(clazz);
 			put(clazz, result);
