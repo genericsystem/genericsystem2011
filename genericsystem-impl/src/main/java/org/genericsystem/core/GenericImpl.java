@@ -1318,11 +1318,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Serializable getConstraintValue(Class<T> constraintClass, int pos) {
-		return getContraintsMap().get(new AxedPropertyClass(constraintClass, pos));
+		return getConstraintsMap().get(new AxedPropertyClass(constraintClass, pos));
 	}
 
 	public <T extends Generic> void setConstraintValue(Class<T> constraintClass, int pos, Serializable value) {
-		getContraintsMap().put(new AxedPropertyClass(constraintClass, pos), value);
+		getConstraintsMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
 	@SuppressWarnings("hiding")
@@ -1595,7 +1595,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public ExtendedMap<Serializable, Serializable> getContraintsMap() {
+	public ExtendedMap<Serializable, Serializable> getConstraintsMap() {
 		return getMap(ConstraintsMapProvider.class);
 	}
 

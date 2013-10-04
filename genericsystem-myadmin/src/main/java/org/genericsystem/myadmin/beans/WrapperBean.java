@@ -122,7 +122,7 @@ public class WrapperBean {
 
 		public void setValue(Boolean newValue) {
 			if (!newValue.equals(entry.getValue())) {
-				genericTreeBean.getSelectedTreeNodeGeneric().getContraintsMap().put(entry.getKey(), newValue);
+				genericTreeBean.getSelectedTreeNodeGeneric().getConstraintsMap().put(entry.getKey(), newValue);
 				messages.info("updateValue", entry.getValue(), newValue);
 			}
 		}

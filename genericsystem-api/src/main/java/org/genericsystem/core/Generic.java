@@ -631,7 +631,7 @@ public interface Generic extends Comparable<Generic> {
 
 	Map<Serializable, Serializable> getPropertiesMap();
 
-	ExtendedMap<Serializable, Serializable> getContraintsMap();
+	ExtendedMap<Serializable, Serializable> getConstraintsMap();
 
 	ExtendedMap<Serializable, Serializable> getSystemPropertiesMap();
 
