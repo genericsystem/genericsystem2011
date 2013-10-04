@@ -60,7 +60,7 @@ public class GenericBean implements Serializable {
 	}
 
 	public void addContraint(String key, String value) {
-		((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getContraintsMap().put(key, value);
+		((Type) genericTreeBean.getSelectedTreeNodeGeneric()).getConstraintsMap().put(key, value);
 		messages.info("createRootProperty", key, value);
 	}
 
@@ -98,7 +98,7 @@ public class GenericBean implements Serializable {
 	}
 
 	public void removeContraint(Entry<Serializable, Serializable> entry) {
-		removeEntry(genericTreeBean.getSelectedTreeNodeGeneric().getContraintsMap(), entry);
+		removeEntry(genericTreeBean.getSelectedTreeNodeGeneric().getConstraintsMap(), entry);
 
 	}
 
@@ -172,7 +172,7 @@ public class GenericBean implements Serializable {
 
 	@SuppressWarnings("unchecked")
 	public List<Entry<Serializable, Serializable>> getContraintsMap() {
-		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNodeGeneric().getContraintsMap().entrySet();
+		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNodeGeneric().getConstraintsMap().entrySet();
 	}
 
 	@SuppressWarnings("unchecked")

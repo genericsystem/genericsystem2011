@@ -496,7 +496,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics) {
-			ExtendedMap<Serializable, Serializable> constraintMap = generic.getContraintsMap();
+			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
 			for (Serializable key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
