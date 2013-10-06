@@ -103,12 +103,12 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	boolean isRelation();
 
-	/**
-	 * Returns true if this Generic has been automatically created.
-	 * 
-	 * @return True if this Generic has been automatically created.
-	 */
-	boolean isAutomatic();
+	// /**
+	// * Returns true if this Generic has been automatically created.
+	// *
+	// * @return True if this Generic has been automatically created.
+	// */
+	// boolean isAutomatic();
 
 	/**
 	 * Returns the value of this Generic.
@@ -466,12 +466,12 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	boolean isReferentialIntegrity(int componentPos);
 
-	/**
-	 * Returns the implicit.
-	 * 
-	 * @return The implicit.
-	 */
-	<T extends Generic> T getImplicit();
+	// /**
+	// * Returns the implicit.
+	// *
+	// * @return The implicit.
+	// */
+	// <T extends Generic> T getImplicit();
 
 	/**
 	 * Returns the supers of the Generic.
