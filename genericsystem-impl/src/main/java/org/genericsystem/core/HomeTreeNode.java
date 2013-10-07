@@ -1,23 +1,24 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+import org.genericsystem.core.EngineImpl.RootTreeNode;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
-public class HomeTreeNode {
-
-	private static final String ROOT_NODE_VALUE = "Engine";
+public class HomeTreeNode implements Comparable<HomeTreeNode> {
 
 	HomeTreeNode metaNode;
 	Serializable value;
+	long ts;
 
 	private ConcurrentWeakValueHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentWeakValueHashMap<>();
 
-	private HomeTreeNode(HomeTreeNode metaNode, Serializable value) {
+	protected HomeTreeNode(HomeTreeNode metaNode, Serializable value) {
 		this.metaNode = metaNode == null ? this : metaNode;
 		this.value = value;
+		ts = getHomeTree().pickNewTs();
 	}
 
 	public HomeTreeNode findInstanceNode(Serializable value) {
@@ -34,7 +35,7 @@ public class HomeTreeNode {
 		return result == null ? newHomeTreeNode : result;
 	}
 
-	public HomeTreeNode getHomeTree() {
+	public RootTreeNode getHomeTree() {
 		return metaNode.getHomeTree();
 	}
 
@@ -56,39 +57,18 @@ public class HomeTreeNode {
 		return equals(homeTreeNode) ? true : metaNode.inheritsFrom(homeTreeNode);
 	}
 
+	public boolean isSuperOf(HomeTreeNode homeTreeNode) {
+		return equals(homeTreeNode) ? true : homeTreeNode.metaNode.isSuperOf(homeTreeNode);
+	}
+
 	@Override
 	public String toString() {
 		return metaNode.toString() + "|" + value;
 	}
 
-	static class RootTreeNode extends HomeTreeNode {
-		RootTreeNode() {
-			super(null, ROOT_NODE_VALUE);
-		}
-
-		@Override
-		public boolean isRoot() {
-			return true;
-		}
-
-		@Override
-		public HomeTreeNode getHomeTree() {
-			return this;
-		}
-
-		@Override
-		public int getMetaLevel() {
-			return Statics.META;
-		}
-
-		@Override
-		public boolean inheritsFrom(HomeTreeNode homeTreeNode) {
-			return equals(homeTreeNode);
-		}
-
-		@Override
-		public String toString() {
-			return "" + value;
-		}
+	@Override
+	public int compareTo(HomeTreeNode homeTreeNode) {
+		return Long.compare(ts, homeTreeNode.ts);
 	}
+
 }

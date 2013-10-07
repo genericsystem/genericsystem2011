@@ -1,7 +1,6 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
 import java.util.Iterator;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -35,8 +34,7 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(UniqueStructuralValueConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
@@ -47,7 +45,7 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 		if (!iterator.hasNext())
 			return;
 		iterator.next();
-		if (iterator.hasNext() || !primary.isAutomatic())
+		if (iterator.hasNext() /* || !primary.isAutomatic() */)
 			throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
 	}
 }
