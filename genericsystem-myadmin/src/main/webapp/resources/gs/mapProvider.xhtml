@@ -58,7 +58,7 @@
 				</a4j:commandLink>
 			</f:facet>
 			<a4j:commandLink execute="@this"
-				action="#{genBean.removeEntry(map, entry)}" render="mapProvider">
+				action="#{mapProviderBean.removeEntryFromMap(map, entry)}" render="mapProvider">
 				<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 			</a4j:commandLink>
 		</rich:column>

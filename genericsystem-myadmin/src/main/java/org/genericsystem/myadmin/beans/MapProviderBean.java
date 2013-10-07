@@ -82,6 +82,9 @@ public class MapProviderBean implements Serializable {
 	 * @param entry - couple of key and value.
 	 */
 	public void removeEntryFromMap(Map<Serializable, Serializable> map, Entry<Serializable, Serializable> entry) {
+		log.info("==================>");
+		log.info(map.toString());
+		log.info(entry.toString());
 		try {
 			map.remove(entry.getKey());
 			messages.info("remove", entry.getKey());
