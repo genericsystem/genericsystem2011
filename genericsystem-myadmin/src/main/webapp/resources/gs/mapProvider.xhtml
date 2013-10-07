@@ -23,9 +23,9 @@
 	<ui:param name="genBean" value="#{cc.attrs.genBean}" />
 	<ui:param name="wrapBean" value="#{cc.attrs.wrapBean}" />
 	<ui:param name="popupPanelId" value="#{cc.attrs.popupPanelId}" />
-	<ui:param name="mapEntryList" value="#{genBean.getMapEntryList(wrapper.attribute)}" />
+	<ui:param name="map" value="#{mapProviderBean.getMap(wrapper.attribute)}" />
 
-	<rich:dataTable id="mapProvider" value="#{mapEntryList}" var="entry"
+	<rich:dataTable id="mapProvider" value="#{mapProviderBean.getMapEntries(map)}" var="entry"
 		styleClass="fullWidth widthAdjust">
 		<f:facet name="header">
 			<h:outputText value="#{wrapper.attribute} (#{wrapper.position})" />
@@ -64,15 +64,7 @@
 		</rich:column>
 	</rich:dataTable>
 
-	<gs:popupPanel id="popup" mapProvider="#{wrapper.attribute}" map="#{map}" mapProviderId="mapProvider" keyInput="true" />
-
-	<!--
-	<gs:popupPanel key="#{popupPanelId}"
-		title="#{msg.create} #{msg.a} #{msg.contraint}"
-		action="#{popupPanelBean.put(map)}"
-		getList="#{popupPanelBean.getConstraintClass}"
-		render="typestree, edittypesmanager" keyInput="true" />
-	-->
+	<gs:popupPanel id="popup" mapProvider="#{wrapper.attribute}" map="#{wrapper.attribute}" mapProviderId="mapProvider" keyInput="true" />
 
 </composite:implementation>
 

@@ -34,26 +34,26 @@
 				<h:graphicImage value="#{infos.delete}" title="#{msg.close}" />
 			</h:outputLink>
 		</f:facet>
-		<h:panelGrid styleClass="fullWidth" style="min-width: 600"
+		<h:panelGrid styleClass="fullWidth" style="min-width:600"
 			rowClasses="fullWidth" columnClasses="fullWidth">
 			<h:panelGroup>
 				<h:outputText styleClass="uppercase" value="Class" />
 				<h:selectOneMenu id="inputPopupPanelKey" style="min-width:150"
-					value="#{popupPanelBean.popupClass}">
+					value="#{mapProviderBean.key}">
 					<f:selectItems value="#{mapProviderBean.getKeyClasses(mapProvider.value)}" />
 				</h:selectOneMenu>
 				<h:outputText styleClass="uppercase" value="#{msg.position}"
 					rendered="#{keyInput}" />
 				<h:inputText id="inputPopupPanelPos"
-					value="#{popupPanelBean.popupPos}" rendered="#{keyInput}"
+					value="#{mapProviderBean.pos}" rendered="#{keyInput}"
 					style="width:20px" />
 				<h:outputText styleClass="uppercase" value="#{msg.value}" />
 				<h:outputText rendered="#{keyInput}" />
 				<h:selectBooleanCheckbox id="inputPopupPanel"
-					value="#{popupPanelBean.popupValue}"
+					value="#{mapProviderBean.value}"
 					style="margin-top:100;vertical-align:bottom;" />
 				<a4j:commandButton id="apply"
-					action="#{mapProviderBean.addKeyValueToMap(map, popupPanelBean.popupClass, popupPanelBean.popupPos)}"
+					action="#{mapProviderBean.addKeyValueToMap(map)}"
 					execute="popupPanel" image="#{infos.floppy_disk}"
 					render="#{mapProviderId}" style="vertical-align: bottom;"
 					onbeforedomupdate="#{rich:component('popup:popupPanel')}.hide();"

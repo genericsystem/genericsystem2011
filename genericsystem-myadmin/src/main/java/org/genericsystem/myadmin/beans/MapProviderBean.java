@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
 import javax.faces.model.SelectItem;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.genericsystem.core.AxedPropertyClass;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.map.ConstraintsMapProvider;
@@ -44,8 +47,12 @@ public class MapProviderBean implements Serializable {
 	@Inject private PopupPanelBean popupPanelBean;		// Popup Panel bean
 	@Inject private GsMessages messages;				// messages bean
 
+	private String key;
+	private int pos;
+	private boolean value;
+
 	/**
-	 * Return map of map provider.
+	 * Returns map of map provider.
 	 * 
 	 * @param mapProvider - map provider.
 	 * 
@@ -56,41 +63,65 @@ public class MapProviderBean implements Serializable {
 	}
 
 	/**
+	 * Returns set of etries of the map.
+	 * 
+	 * @param map - the map.
+	 * 
+	 * @return set of entries of the map.
+	 */
+	public Set<Entry<Serializable, Serializable>> getMapEntries(Map<Serializable, Serializable> map) {
+		return map.entrySet();
+	}
+
+	/**
+	 * Adds a couple of key and value from the bean to the map.
+	 * 
+	 * @param map - the map.
+	 */
+	public void addKeyValueToMap(Map<Serializable, Serializable> map) {
+		addKeyValueToMap(map, key, pos, value);
+	}
+
+	/**
 	 * Adds a couple of key and value to the map.
 	 * 
 	 * @param key - key.
 	 * @param value - value.
 	 */
-	public void addKeyValueToMap(Map<Serializable, Serializable> map, Serializable key, Serializable value) {
-		map.put(key, value);
+	public void addKeyValueToMap(Map<Serializable, Serializable> map, String key, int pos, boolean value) {
+		map.put(new AxedPropertyClass(getClassByName(key), pos), value);
 	}
 
 	/**
-	 * Adds a couple of key and value to the map.
-	 * 
-	 * @param map - map object.
-	 * @param entry - an entry.
-	 */
-	public void addEntryToMap(Map<Serializable, Serializable> map, Entry<Serializable, Serializable> entry) {
-		map.put(entry.getKey(), entry.getValue());
-	}
-
-	/**
-	 * Remove an entry from the map.
+	 * Removes an entry from the map.
 	 * 
 	 * @param map - map object.
 	 * @param entry - couple of key and value.
 	 */
 	public void removeEntryFromMap(Map<Serializable, Serializable> map, Entry<Serializable, Serializable> entry) {
-		log.info("==================>");
-		log.info(map.toString());
-		log.info(entry.toString());
 		try {
 			map.remove(entry.getKey());
 			messages.info("remove", entry.getKey());
 		} catch (NotRemovableException e) {
 			messages.info("cannotremove", e.getMessage());
 		}
+	}
+
+	/**
+	 * Return an class by it's name.
+	 * 
+	 * @param className - name of the class.
+	 * 
+	 * @return the class.
+	 */
+	@SuppressWarnings({ "unchecked" })
+	private Class<GenericImpl> getClassByName(String className) {
+		try {
+			return (Class<GenericImpl>) Class.forName(className.substring(6, className.length()));
+		} catch (ClassNotFoundException e) {
+			messages.info("ClassNotFoundException " + e.getMessage());
+		}
+		return null;
 	}
 
 	/**
@@ -121,6 +152,30 @@ public class MapProviderBean implements Serializable {
 			}
 		}
 		return items;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public int getPos() {
+		return pos;
+	}
+
+	public void setPos(int pos) {
+		this.pos = pos;
+	}
+
+	public boolean getValue() {
+		return value;
+	}
+
+	public void setValue(boolean value) {
+		this.value = value;
 	}
 
 }
