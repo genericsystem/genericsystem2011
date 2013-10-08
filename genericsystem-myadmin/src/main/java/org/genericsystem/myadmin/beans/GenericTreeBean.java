@@ -16,7 +16,6 @@ import javax.inject.Named;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
 import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
@@ -236,17 +235,17 @@ public class GenericTreeBean implements Serializable {
 		}
 	}
 
-	/**
-	 * Changes attribute of selected tree node.
-	 * 
-	 * @param attributeIndex - index of attribute.
-	 */
-	public void changeAttributeSelected(int attributeIndex) {
-		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
-		selectedTreeNode.setAttribute(attribute);
-		selectedTreeNode.setTreeType(TreeType.VALUES);
-		messages.info("showvalues", attribute);
-	}
+	//	/**
+	//	 * Changes attribute of selected tree node.
+	//	 *
+	//	 * @param attributeIndex - index of attribute.
+	//	 */
+	//	public void changeAttributeSelected(int attributeIndex) {
+	//		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
+	//		selectedTreeNode.setAttribute(attribute);
+	//		selectedTreeNode.setTreeType(TreeType.VALUES);
+	//		messages.info("showvalues", attribute);
+	//	}
 
 	/**
 	 * Changes tree type.

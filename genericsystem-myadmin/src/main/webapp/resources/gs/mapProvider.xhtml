@@ -12,17 +12,19 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <composite:interface>
-	<composite:attribute name="structural" required="true" />
+	<composite:attribute name="wrapper" required="true" />
+	<composite:attribute name="showAddAction" required="false"
+		default="true" />
+	<composite:attribute name="showDeleteAction" required="false"
+		default="true" />
 	<composite:attribute name="genBean" required="true" />
 	<composite:attribute name="wrapBean" required="true" />
-	<composite:attribute name="popupPanelId" required="true" />
 </composite:interface>
 
 <composite:implementation>
-	<ui:param name="structural" value="#{cc.attrs.structural}" />
+	<ui:param name="structural" value="#{cc.attrs.wrapper.structural}" />
 	<ui:param name="genBean" value="#{cc.attrs.genBean}" />
 	<ui:param name="wrapBean" value="#{cc.attrs.wrapBean}" />
-	<ui:param name="popupPanelId" value="#{cc.attrs.popupPanelId}" />
 	<ui:param name="map" value="#{mapProviderBean.getMap(structural.attribute)}" />
 
 	<rich:dataTable id="mapProvider" value="#{mapProviderBean.getMapEntries(map)}" var="entry"

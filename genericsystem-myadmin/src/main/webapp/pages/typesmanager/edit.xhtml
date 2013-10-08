@@ -48,18 +48,21 @@
 						<c:if test="#{!wrapper.structural.attribute.isMapProvider()}">
 							<gs:structuralWrapper id="holders#{status.index}"
 								wrapper="#{wrapper}"
-								showAddLink="#{!genericBean.isSingular(wrapper.structural)}"
-								showDeleteLink="#{!genericBean.hasValues(wrapper.structural.attribute)}"
-								genBean="#{genericBean}" genTreeBean="#{genericTreeBean}"
-								wrapBean="#{wrapperBean}" />
+								showAddAction="#{!genericBean.isSingular(wrapper.structural)}"
+								showDeleteAction="#{!genericBean.hasValues(wrapper.structural.attribute)}"
+								genBean="#{genericBean}"
+								wrapBean="#{wrapperBean}"
+								genTreeBean="#{genericTreeBean}" />
 						</c:if>
 
 						<!-- Map provider -->
 						<c:if test="#{wrapper.structural.attribute.isMapProvider()}">
 							<gs:mapProvider id="holders#{status.index}"
-								structural="#{wrapper.structural}" genBean="#{genericBean}"
-								wrapBean="#{wrapperBean}"
-								popupPanelId="popupPanel#{status.index}" />
+								wrapper="#{wrapper}"
+								showAddAction="true"
+								showDeleteAction="true"
+								genBean="#{genericBean}"
+								wrapBean="#{wrapperBean}"/>
 						</c:if>
 
 					</a4j:outputPanel>
