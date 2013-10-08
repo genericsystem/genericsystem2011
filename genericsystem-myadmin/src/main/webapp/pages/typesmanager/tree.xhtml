@@ -60,7 +60,7 @@
 			selectionType="ajax"
 			oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
 			selectionChangeListener="#{genericTreeBean.change}"
-			execute="typestree" render="paneltitletypesmanager,menutypesmanager,edittypesmanager">
+			execute="typestree" render="paneltitletypesmanager,menutypesmanager,editTypesManager">
 			<rich:treeModelRecursiveAdaptor roots="#{genericTreeBean.root}"
 				nodes="#{genericTreeBean.getChildrens(item)}">
 				<rich:treeNode iconCollapsed="#{genericTreeBean.getTypeIcon(item)}"
