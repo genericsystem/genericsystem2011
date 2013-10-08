@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+import java.util.concurrent.ConcurrentHashMap;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 
 /**
@@ -13,7 +14,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	Serializable value;
 	long ts;
 
-	private ConcurrentWeakValueHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentWeakValueHashMap<>();
+	private ConcurrentHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentHashMap<>();
 
 	protected HomeTreeNode(HomeTreeNode metaNode, Serializable value) {
 		this.metaNode = metaNode == null ? this : metaNode;
@@ -56,11 +57,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	}
 
 	public boolean inheritsFrom(HomeTreeNode homeTreeNode) {
-		return equals(homeTreeNode) ? true : metaNode.inheritsFrom(homeTreeNode);
-	}
-
-	public boolean isSuperOf(HomeTreeNode homeTreeNode) {
-		return equals(homeTreeNode) ? true : homeTreeNode.metaNode.isSuperOf(homeTreeNode);
+		return this.equals(homeTreeNode) ? true : metaNode.inheritsFrom(homeTreeNode);
 	}
 
 	@Override

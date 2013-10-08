@@ -19,8 +19,6 @@ import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.exception.ExistsException;
-import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
@@ -407,25 +405,25 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		final HomeTreeNode[] primaries = new Primaries(supers).toArray();
-		if (homeTreeNode.getValue() != null) {
-			HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
-			if (phantomHomeNode != null) {
-				// KK supers[0] is not a real super...
-				T phantom = fastFindBySuper(phantomHomeNode, primaries, supers[0], components);
-				if (phantom != null)
-					phantom.remove();
-			}
-		}
+		// if (homeTreeNode.getValue() != null) {
+		// HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
+		// if (phantomHomeNode != null) {
+		// // KK supers[0] is not a real super...
+		// T phantom = fastFindBySuper(phantomHomeNode, primaries, supers[0], components);
+		// if (phantom != null)
+		// phantom.remove();
+		// }
+		// }
 		Arrays.sort(supers);
-		// KK supers[0] is not a real super...
-		T result = fastFindBySuper(homeTreeNode, new Primaries(supers).toArray(), supers[0], components);
-		if (result != null) {
-			if (!Arrays.equals(supers, ((GenericImpl) result).supers))
-				rollback(new FunctionalConsistencyViolationException(result.info()));
-			if (existsException)
-				rollback(new ExistsException(result + " already exists !"));
-			return result;
-		}
+		// // KK supers[0] is not a real super...
+		// T result = fastFindBySuper(homeTreeNode, new Primaries(supers).toArray(), supers[0], components);
+		// if (result != null) {
+		// if (!Arrays.equals(supers, ((GenericImpl) result).supers))
+		// rollback(new FunctionalConsistencyViolationException(result.info()));
+		// if (existsException)
+		// rollback(new ExistsException(result + " already exists !"));
+		// return result;
+		// }
 		return internalBind(homeTreeNode, primaries, components, specializationClass);
 	}
 

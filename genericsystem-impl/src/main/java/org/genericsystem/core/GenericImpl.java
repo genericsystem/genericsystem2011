@@ -915,11 +915,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public static boolean isSuperOf(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-		if (!homeTreeNode.isSuperOf(subHomeTreeNode))
+		log.info(System.identityHashCode(homeTreeNode) + " " + System.identityHashCode(subHomeTreeNode) + " " + Arrays.toString(primaries) + " " + Arrays.toString(subPrimaries) + " " + Arrays.toString(subComponents) + " " + Arrays.toString(components));
+		if (!subHomeTreeNode.inheritsFrom(homeTreeNode)) {
+			log.info("UUU");
 			return false;
+		}
+		log.info("XXX");
 		if (primaries.length == subPrimaries.length && components.length == subComponents.length) {
 			for (int i = 0; i < subPrimaries.length; i++) {
-				if (!primaries[i].isSuperOf(subPrimaries[i]))
+				if (!primaries[i].inheritsFrom(subPrimaries[i]))
 					return false;
 			}
 			for (int i = 0; i < subComponents.length; i++) {
@@ -938,6 +942,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 			return true;
 		}
+		log.info("YYY");
 		if (primaries.length < subPrimaries.length)
 			for (int i = 0; i < subPrimaries.length; i++)
 				if (isSuperOf(homeTreeNode, primaries, components, subHomeTreeNode, Statics.truncate(i, subPrimaries), subComponents))
@@ -946,6 +951,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (int i = 0; i < subComponents.length; i++)
 				if (isSuperOf(homeTreeNode, primaries, components, subHomeTreeNode, subPrimaries, Statics.truncate(i, subComponents)))
 					return true;
+		log.info("ZZZ");
 		return false;
 	}
 
