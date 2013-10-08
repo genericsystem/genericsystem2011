@@ -101,7 +101,10 @@ public abstract class AbstractContext implements Serializable {
 
 			@Override
 			public boolean isSelected(Generic candidate) {
-				return GenericImpl.isSuperOf(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, homeTreeNode, primaries, components);
+				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, homeTreeNode, primaries, components);
+				log.info(homeTreeNode + " (" + System.identityHashCode(homeTreeNode) + ") " + ((GenericImpl) candidate).homeTreeNode + " (" + System.identityHashCode(((GenericImpl) candidate).homeTreeNode) + ") " + result);
+				return result;
+
 			}
 		};
 	}

@@ -155,11 +155,6 @@ public class EngineImpl extends GenericImpl implements Engine {
 		}
 
 		@Override
-		public boolean isSuperOf(HomeTreeNode homeTreeNode) {
-			return equals(homeTreeNode);
-		}
-
-		@Override
 		public String toString() {
 			return "" + value;
 		}
