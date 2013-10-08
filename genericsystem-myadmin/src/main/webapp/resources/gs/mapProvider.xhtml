@@ -12,49 +12,61 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <composite:interface>
-	<composite:attribute name="wrapper" required="true" />
+	<composite:attribute name="structural" required="true" />
 	<composite:attribute name="genBean" required="true" />
 	<composite:attribute name="wrapBean" required="true" />
 	<composite:attribute name="popupPanelId" required="true" />
 </composite:interface>
 
 <composite:implementation>
-	<ui:param name="wrapper" value="#{cc.attrs.wrapper}" />
+	<ui:param name="structural" value="#{cc.attrs.structural}" />
 	<ui:param name="genBean" value="#{cc.attrs.genBean}" />
 	<ui:param name="wrapBean" value="#{cc.attrs.wrapBean}" />
 	<ui:param name="popupPanelId" value="#{cc.attrs.popupPanelId}" />
-	<ui:param name="map" value="#{mapProviderBean.getMap(wrapper.attribute)}" />
+	<ui:param name="map" value="#{mapProviderBean.getMap(structural.attribute)}" />
 
 	<rich:dataTable id="mapProvider" value="#{mapProviderBean.getMapEntries(map)}" var="entry"
 		styleClass="fullWidth widthAdjust">
+		
+		<!-- Header with map provider class -->
 		<f:facet name="header">
-			<h:outputText value="#{wrapper.attribute} (#{wrapper.position})" />
+			<h:outputText value="#{structural.attribute} (#{structural.position})" />
 		</f:facet>
+		
+		<!-- First column - Class of property -->
 		<rich:column>
 			<f:facet name="header">
 				<h:outputText value="#{msg.key}" />
 			</f:facet>
 			<h:outputText value="#{entry.key}" />
 		</rich:column>
+		
+		<!-- Second column - value -->
 		<rich:column>
 			<f:facet name="header">
 				<h:outputText value="#{msg.value}" />
 			</f:facet>
+			
+			<!-- If value is boolean -->
 			<h:selectBooleanCheckbox value="#{entry.value}"
 				rendered="#{wrapBean.isBoolean(entry)}"
 				style="margin-top:100; vertical-align:bottom;">
 				<a4j:ajax event="change" execute="mapProvider" render="mapProvider" />
 			</h:selectBooleanCheckbox>
+			
+			<!-- If value is not boolean -->
 			<rich:inplaceInput value="#{entry.value}"
 				rendered="#{!wrapBean.isBoolean(entry)}" editEvent="dblclick">
 				<a4j:ajax event="change" execute="mapProvider" render="mapProvider" />
 			</rich:inplaceInput>
 		</rich:column>
+		
+		<!-- Third column - delete button -->
 		<rich:column style="text-align:center;">
 			<f:facet name="header">
 				<a4j:commandLink execute="@none"
 					oncomplete="#{rich:component('popup:popupPanel')}.show()">
-					<h:graphicImage value="#{infos.add}" title="fhdf" />
+					<h:graphicImage value="#{infos.add}" title="?" />
 				</a4j:commandLink>
 			</f:facet>
 			<a4j:commandLink execute="@this"
@@ -62,9 +74,10 @@
 				<h:graphicImage value="#{infos.imgGarb}" title="#{msg.delete}" />
 			</a4j:commandLink>
 		</rich:column>
+		
 	</rich:dataTable>
 
-	<gs:popupPanel id="popup" mapProvider="#{wrapper.attribute}" map="#{wrapper.attribute}" mapProviderId="mapProvider" keyInput="true" />
+	<gs:popupPanel id="popup" mapProvider="#{structural.attribute}" map="#{structural.attribute}" mapProviderId="mapProvider" keyInput="true" />
 
 </composite:implementation>
 

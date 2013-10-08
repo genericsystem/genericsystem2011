@@ -127,6 +127,19 @@ public class GenericBean implements Serializable {
 		return structurals;
 	}
 
+	/**
+	 * Create and return structural wrappers on attributes of selected tree node.
+	 * 
+	 * @return list of structural wrappers.
+	 */
+	public List<StructuralWrapper> getStructuralWrappers() {
+		List<StructuralWrapper> wrappers = new ArrayList<>();
+		for (Structural structural : getStructurals()) {
+			wrappers.add(new StructuralWrapper(structural));
+		}
+		return wrappers;
+	}
+
 	/*
 	@SuppressWarnings("unchecked")
 	public List<Entry<Serializable, Serializable>> getMapEntryList(MapProvider mapProvider) {

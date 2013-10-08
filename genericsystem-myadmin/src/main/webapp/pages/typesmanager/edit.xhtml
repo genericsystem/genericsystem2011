@@ -10,17 +10,18 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
-	<rich:panel id="edittypesmanager" layout="block"
+	<rich:panel id="editTypesManager" layout="block"
 		styleClass="fullWidth fullHeight" bodyClass="fullHeight"
 		headerClass="height24">
+
+		<!-- Header -->
 		<f:facet name="header">
-			<h:outputText styleClass="capitalize"
-				style="white-space: nowrap; padding-top: 5px; margin-right: 5px;"
-				value="#{msg.edit} " />
-			<rich:inplaceInput id="editHeaderInplaceInput"
+			<h:outputText value="#{msg.edit} " styleClass="capitalize"
+				style="white-space:nowrap; padding-top:5px; margin-right:5px;" />
+			<rich:inplaceInput id="inpInstanceName"
 				value="#{wrapperBean.getGenericTreeNodeWrapper(genericTreeBean.selectedTreeNode).value}"
 				rendered="#{!genericBean.isMeta()}" editEvent="dblclick">
-				<a4j:ajax event="change" execute="editHeaderInplaceInput"
+				<a4j:ajax event="change" execute="inpInstanceName"
 					render="typesmanager" />
 			</rich:inplaceInput>
 			<h:outputText value="#{genericTreeBean.selectedTreeNodeValue}"
@@ -30,111 +31,41 @@
 		<rich:dropTarget acceptedTypes="primitive"
 			dropListener="#{dragAndDropBean.addAttribute}"
 			execute="attributestypesmanager" render="edittypesmanager,typestree" />
-		<!-- //ici tableau1 -->
-		<h:panelGrid styleClass="fullWidth" columns="2">
-			<c:forEach var="currentStructural" items="#{genericBean.structurals}"
+
+		<!-- Grid with structurals -->
+		<h:panelGrid columns="2" styleClass="fullWidth">
+			<c:forEach items="#{genericBean.structuralWrappers}" var="wrapper"
 				varStatus="status">
 				<h:panelGroup>
 					<a4j:outputPanel>
+
 						<rich:dropTarget acceptedTypes="genericTreeNode"
-							dropValue="#{currentStructural}"
+							dropValue="#{wrapper}"
 							dropListener="#{dragAndDropBean.addTarget}" execute="typestree"
 							render="holders#{status.index},typestree" />
 
-						<c:if test="#{!currentStructural.attribute.isMapProvider()}">
+						<!-- Not map provider -->
+						<c:if test="#{!wrapper.structural.attribute.isMapProvider()}">
 							<gs:structuralWrapper id="holders#{status.index}"
-								wrapper="#{currentStructural}"
-								showAddLink="#{!genericBean.isSingular(currentStructural)}"
-								showDeleteLink="#{!genericBean.hasValues(currentStructural.attribute)}"
+								wrapper="#{wrapper}"
+								showAddLink="#{!genericBean.isSingular(wrapper.structural)}"
+								showDeleteLink="#{!genericBean.hasValues(wrapper.structural.attribute)}"
 								genBean="#{genericBean}" genTreeBean="#{genericTreeBean}"
 								wrapBean="#{wrapperBean}" />
 						</c:if>
 
-						<c:if test="#{currentStructural.attribute.isMapProvider()}">
+						<!-- Map provider -->
+						<c:if test="#{wrapper.structural.attribute.isMapProvider()}">
 							<gs:mapProvider id="holders#{status.index}"
-								wrapper="#{currentStructural}" genBean="#{genericBean}"
+								structural="#{wrapper.structural}" genBean="#{genericBean}"
 								wrapBean="#{wrapperBean}"
 								popupPanelId="popupPanel#{status.index}" />
-
-							<!-- Popup panel -->
-
-
 						</c:if>
 
 					</a4j:outputPanel>
 				</h:panelGroup>
 			</c:forEach>
-			<!-- 			<gs:popupPanel key="addValue" title="#{msg.add} #{msg.value}" -->
-			<!-- 				action="#{genericBean.addValue(popupPanelBean.getAttribute(),popupValue)}" -->
-			<!-- 				render="edittypesmanager,typestree" /> -->
 		</h:panelGrid>
-
-
-		<!-- 		<c:forEach var="currentStructural" -->
-		<!-- 			items="#{genericBean.structurals}" varStatus="status"> -->
-
-		<!-- 			<c:if -->
-		<!-- 				test="#{currentStructural.attribute.isMapProvider()}"> -->
-
-		<!-- 				Popup panel -->
-		<!-- 				<gs:popupPanel key="popupPanel#{status.index}" -->
-		<!-- 					title="#{msg.create} #{msg.a} #{msg.contraint}" -->
-		<!-- 					action="#{popupPanelBean.addConstraints}" -->
-		<!-- 					getList="#{popupPanelBean.getConstraintClass}" -->
-		<!-- 					render="typestree, edittypesmanager" keyInput="true" /> -->
-
-		<!-- 			</c:if> -->
-
-		<!-- 		</c:forEach> -->
-
-
-		<!-- //ici tableau 2-->
-
-		<!--
-		
-		<gs:dataTable key="properties" gsMap="#{genericBean.propertiesMap}"
-			headerName="#{msg.properties}"
-			wrapperGs="#{wrapperBean.getPropertyWrapper(currentEntry).value}"
-			isBooleanValue="#{wrapperBean.isBoolean(currentEntry)}"
-			createGs="#{msg.createproperty}"
-			addTitle="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
-			action="#{genericBean.removeProperty(currentEntry)}" />
-			
-		<gs:dataTable key="contraints" gsMap="#{genericBean.contraintsMap}"
-			headerName="#{msg.contraints}"
-			wrapperGs="#{wrapperBean.getContraintWrapper(currentEntry).value}"
-			isBooleanValue="#{wrapperBean.isBoolean(currentEntry)}"
-			createGs="#{msg.createcontraint}"
-			addTitle="#{msg.create} #{msg.a} #{msg.contraint} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
-			action="#{genericBean.removeContraint(currentEntry)}" />
-			
-		<gs:dataTable key="systemProperties"
-			gsMap="#{genericBean.systemPropertiesMap}"
-			headerName="#{msg.systemProperties}"
-			wrapperGs="#{wrapperBean.getSystemPropertiesWrapper(currentEntry).value}"
-			isBooleanValue="#{wrapperBean.isBoolean(currentEntry)}"
-			createGs="#{msg.createsystemproperty}"
-			addTitle="#{msg.create} #{msg.a} #{msg.systempropety} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
-			action="#{genericBean.removeSystemProperty(currentEntry)}" />
-		<gs:popupPanelProperties key="createproperty"
-			title="#{msg.create} #{msg.a} #{msg.property}"
-			action="#{popupPanelBean.addProperties}"
-			render="typestree, edittypesmanager" keyInput="true" />
-		<gs:popupPanel key="createcontraint"
-			title="#{msg.create} #{msg.a} #{msg.contraint}"
-			action="#{popupPanelBean.addConstraints}"
-			getList="#{popupPanelBean.getConstraintClass}"
-			render="typestree, edittypesmanager" keyInput="true" />
-			
-
-			
-		<gs:popupPanel key="createsystemproperty"
-			title="#{msg.create} #{msg.a} #{msg.systemproperty}"
-			action="#{popupPanelBean.addSystemProperty}"
-			getList="#{popupPanelBean.getSystemPropertiesClass}"
-			render="typestree, edittypesmanager" keyInput="true" />
-			
--->
 
 	</rich:panel>
 </ui:composition>
