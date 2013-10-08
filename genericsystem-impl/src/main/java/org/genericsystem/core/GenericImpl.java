@@ -86,6 +86,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return homeTreeNode.bindInstanceNode(value);
 	}
 
+	public HomeTreeNode findInstanceNode(Serializable value) {
+		return homeTreeNode.findInstanceNode(value);
+	}
+
 	public HomeTreeNode getHomeTreeNode() {
 		return homeTreeNode;
 	}
@@ -666,15 +670,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Generic meta = metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute;
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
 		if (holder == null)
-			return value == null ? null : this.<T> bind(((GenericImpl) meta).bindInstanceNode(value), specializationClass, getCurrentCache().bindPrimaryByValue(meta, value, null), attribute, basePos, existsException, targets);
+			return value == null ? null : this.<T> bind(((GenericImpl) meta).bindInstanceNode(value), specializationClass, attribute, basePos, existsException, targets);
 		if (!equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(holder, basePos, true);
-			if (!(((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+			HomeTreeNode homeTreeNode = ((GenericImpl) meta).findInstanceNode(value);
+			if (homeTreeNode != null && !(((GenericImpl) holder).equiv(homeTreeNode, new Primaries(attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
 				cancel(holder, basePos, true);
 			return this.<T> bind(((GenericImpl) meta).bindInstanceNode(value), specializationClass, attribute, basePos, existsException, targets);
 		}
-		if (((GenericImpl) holder).equiv(new Primaries(implicit, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+		if (((GenericImpl) holder).equiv(homeTreeNode, new Primaries(attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
 		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
 			return holder.updateValue(value);
@@ -830,18 +835,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			@Override
 			public final boolean isSelected(Generic candidate) {
 				boolean selected = candidate.getMetaLevel() <= level && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) candidate).isAttributeOf(GenericImpl.this));
-				if (pos != Statics.MULTIDIRECTIONAL && selected && ((GenericImpl) candidate).isPseudoStructural(pos))
-					((GenericImpl) candidate).project(pos, getCurrentCache().findPrimaryByValue(((GenericImpl) candidate.getImplicit()).supers[0], null));
+				if (pos != Statics.MULTIDIRECTIONAL && selected && ((GenericImpl) candidate).isPseudoStructural(pos)) {
+					((GenericImpl) candidate).project(pos);
+				}
 				return selected;
 			}
 		};
 	}
 
-	private void project(final int pos, HomeTreeNode phantom) {
+	private void project(final int pos) {
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = (Generic[]) cartesianIterator.next();
-			if (!findPhantom(phantom, components))
+			if (!findPhantom(components))
 				getCurrentCache().bind(getHomeTreeNode(), null, this, false, components);
 		}
 	}
@@ -860,8 +866,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return projections;
 	}
 
-	private boolean findPhantom(Generic phantom, Generic[] components) {
-		return phantom != null && getCurrentCache().fastFindByInterfaces(phantom, new Primaries(Statics.insertFirst(phantom, supers)).toArray(), components) != null;
+	private boolean findPhantom(Generic[] components) {
+		HomeTreeNode phantom = homeTreeNode.metaNode.findInstanceNode(null);
+		return phantom != null && getCurrentCache().fastFindBySuper(phantom, new Primaries(supers).toArray(), supers[0], components) != null;
 	}
 
 	@Override
@@ -908,34 +915,36 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public static boolean isSuperOf(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-		if (interfaces.length == subInterfaces.length && components.length == subComponents.length) {
-			for (int i = 0; i < subInterfaces.length; i++) {
-				if (!((GenericImpl) interfaces[i]).isSuperOf(subInterfaces[i]))
+		if (!homeTreeNode.isSuperOf(subHomeTreeNode))
+			return false;
+		if (primaries.length == subPrimaries.length && components.length == subComponents.length) {
+			for (int i = 0; i < subPrimaries.length; i++) {
+				if (!primaries[i].isSuperOf(subPrimaries[i]))
 					return false;
 			}
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null) {
-					if (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)
-							|| !Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
+					if (!Arrays.equals(primaries, ((GenericImpl) components[i]).primaries) || !Arrays.equals(components, ((GenericImpl) components[i]).components) || !Arrays.equals(subPrimaries, ((GenericImpl) subComponents[i]).primaries)
+							|| !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
 						if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
 							return false;
 				}
 				if (components[i] == null) {
-					if (!Arrays.equals(subInterfaces, ((GenericImpl) subComponents[i]).getPrimariesArray()) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
+					if (!Arrays.equals(subPrimaries, ((GenericImpl) subComponents[i]).primaries) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
 						return false;
 				} else if (subComponents[i] == null)
-					if (!components[i].isEngine() && (!Arrays.equals(interfaces, ((GenericImpl) components[i]).getPrimariesArray()) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
+					if (!components[i].isEngine() && (!Arrays.equals(primaries, ((GenericImpl) components[i]).primaries) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
 						return false;
 			}
 			return true;
 		}
-		if (subInterfaces.length > 1 && interfaces.length < subInterfaces.length)
-			for (int i = 0; i < subInterfaces.length; i++)
-				if (isSuperOf(interfaces, components, Statics.truncate(i, subInterfaces), subComponents))
+		if (primaries.length < subPrimaries.length)
+			for (int i = 0; i < subPrimaries.length; i++)
+				if (isSuperOf(homeTreeNode, primaries, components, subHomeTreeNode, Statics.truncate(i, subPrimaries), subComponents))
 					return true;
 		if (components.length < subComponents.length)
 			for (int i = 0; i < subComponents.length; i++)
-				if (isSuperOf(interfaces, components, subInterfaces, Statics.truncate(i, subComponents)))
+				if (isSuperOf(homeTreeNode, primaries, components, subHomeTreeNode, subPrimaries, Statics.truncate(i, subComponents)))
 					return true;
 		return false;
 	}
@@ -1284,7 +1293,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		getSystemPropertiesMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
-	@SuppressWarnings("hiding")
 	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getSystemPropertyValue(constraintClass, pos);
 		return null != value && !Boolean.FALSE.equals(value);
@@ -1559,7 +1567,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends MapProvider> ExtendedMap<Serializable, Serializable> getMap(Class<T> mapClass) {
 		return getMap(getCurrentCache().<MapProvider> find(mapClass));
-		// return getCurrentCache().<MapProvider> find(mapClass).getMap(this);
 	}
 
 	public <T extends MapProvider> ExtendedMap<Serializable, Serializable> getMap(MapProvider mapProvider) {

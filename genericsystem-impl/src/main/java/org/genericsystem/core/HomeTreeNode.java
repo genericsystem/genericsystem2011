@@ -22,6 +22,8 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	}
 
 	public HomeTreeNode findInstanceNode(Serializable value) {
+		if (value == null)
+			value = NULL_VALUE;
 		return instancesNodes.get(value);
 	}
 

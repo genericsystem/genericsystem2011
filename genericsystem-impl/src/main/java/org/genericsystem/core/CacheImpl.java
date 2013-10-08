@@ -631,7 +631,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				@Override
 				Generic rebuild() {
 					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
-					return bind(newHomeTreeNode, Statics.remove(((GenericImpl) old).primaries, ((GenericImpl) old).homeTreeNode), reBind(((GenericImpl) old).selfToNullComponents()), old.getClass(), false);
+					return bind(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()), reBind(((GenericImpl) old).selfToNullComponents()), old.getClass(), false);
 				}
 			}.rebuildAll(old);
 		}

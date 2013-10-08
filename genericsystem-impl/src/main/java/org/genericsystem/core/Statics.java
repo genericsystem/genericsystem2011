@@ -87,6 +87,21 @@ public class Statics {
 		return result;
 	}
 
+	static HomeTreeNode[] truncate(int i, HomeTreeNode[] nodes) {
+		HomeTreeNode[] result = new HomeTreeNode[nodes.length - 1];
+		System.arraycopy(nodes, 0, result, 0, i);
+		System.arraycopy(nodes, i + 1, result, i, nodes.length - 1 - i);
+		return result;
+	}
+
+	static HomeTreeNode[] truncate(HomeTreeNode[] nodes, HomeTreeNode node) {
+		for (int i = 0; i < nodes.length; i++) {
+			if (nodes[i].equals(node))
+				return truncate(i, nodes);
+		}
+		return nodes;
+	}
+
 	static Generic[] replace(int i, Generic[] generics, Generic generic) {
 		Generic[] copy = generics.clone();
 		copy[i] = generic;
