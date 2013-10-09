@@ -192,6 +192,9 @@ public class Statics {
 		public Primaries(Generic... generics) {
 			for (Generic generic : generics)
 				add(((GenericImpl) generic).getHomeTreeNode());
+			if (size() == 1 && first().isRoot())
+				clear();
+
 		}
 
 		@Override

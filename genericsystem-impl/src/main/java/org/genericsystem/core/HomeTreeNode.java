@@ -3,12 +3,16 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 public class HomeTreeNode implements Comparable<HomeTreeNode> {
+
+	protected static Logger log = LoggerFactory.getLogger(HomeTreeNode.class);
 
 	HomeTreeNode metaNode;
 	Serializable value;
@@ -20,6 +24,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		this.metaNode = metaNode == null ? this : metaNode;
 		this.value = value;
 		ts = getHomeTree().pickNewTs();
+		log.info("CREATE HOMETREENODE : " + this + "(" + System.identityHashCode(this) + ")");
 	}
 
 	public HomeTreeNode findInstanceNode(Serializable value) {
@@ -34,7 +39,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		if (value == null)
 			value = NULL_VALUE;
 		HomeTreeNode newHomeTreeNode = new HomeTreeNode(this, value);
-		HomeTreeNode result = instancesNodes.putIfAbsent(value, new HomeTreeNode(this, value));
+		HomeTreeNode result = instancesNodes.putIfAbsent(value, newHomeTreeNode);
 		return result == null ? newHomeTreeNode : result;
 	}
 

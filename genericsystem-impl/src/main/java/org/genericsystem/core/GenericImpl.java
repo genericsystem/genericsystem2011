@@ -915,7 +915,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public static boolean isSuperOf(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-		log.info(System.identityHashCode(homeTreeNode) + " " + System.identityHashCode(subHomeTreeNode) + " " + Arrays.toString(primaries) + " " + Arrays.toString(subPrimaries) + " " + Arrays.toString(subComponents) + " " + Arrays.toString(components));
+		log.info(System.identityHashCode(subHomeTreeNode) + " " + System.identityHashCode(homeTreeNode) + " " + Arrays.toString(subPrimaries) + " " + Arrays.toString(primaries) + " " + Arrays.toString(subComponents) + " " + Arrays.toString(components));
 		if (!subHomeTreeNode.inheritsFrom(homeTreeNode)) {
 			log.info("UUU");
 			return false;
@@ -928,6 +928,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null) {
+					log.info("coucou");
 					if (!Arrays.equals(primaries, ((GenericImpl) components[i]).primaries) || !Arrays.equals(components, ((GenericImpl) components[i]).components) || !Arrays.equals(subPrimaries, ((GenericImpl) subComponents[i]).primaries)
 							|| !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
 						if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
@@ -1572,11 +1573,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends MapProvider> ExtendedMap<Serializable, Serializable> getMap(Class<T> mapClass) {
+
+		getCurrentCache().find(mapClass).log();
 		return getMap(getCurrentCache().<MapProvider> find(mapClass));
 	}
 
 	public <T extends MapProvider> ExtendedMap<Serializable, Serializable> getMap(MapProvider mapProvider) {
-		return mapProvider.getMap(this);
+		return mapProvider.getExtendedMap(this);
 	}
 
 	@Override

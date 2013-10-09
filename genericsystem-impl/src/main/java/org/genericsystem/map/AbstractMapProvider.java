@@ -27,9 +27,9 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public ExtendedMap<Key, Value> getMap(final Generic generic) {
+	@SuppressWarnings("unchecked")
+	public ExtendedMap<Key, Value> getExtendedMap(final Generic generic) {
 		return new AbstractExtendedMap<Key, Value>() {
 
 			@Override
@@ -106,7 +106,6 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 	protected <T extends GenericImpl> Class<T> getSpecializationClass(Key key) {
 		return null;
 	};
-
 
 	private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {
 		Holder map = generic.getHolder(Statics.CONCRETE, this);

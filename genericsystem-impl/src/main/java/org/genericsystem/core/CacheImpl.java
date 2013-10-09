@@ -19,6 +19,7 @@ import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
+import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
@@ -392,7 +393,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic directSuper, boolean existsException, Generic... components) {
 		components = ((GenericImpl) directSuper).sortAndCheck(components);
-		Generic meta = directSuper.getMetaLevel() == homeTreeNode.getMetaLevel() ? directSuper : directSuper.getMeta();
+		Generic meta = directSuper.getMetaLevel() != homeTreeNode.getMetaLevel() ? directSuper : directSuper.getMeta();
 		InstanceGenericClass instanceClass = meta.getClass().getAnnotation(InstanceGenericClass.class);
 		if (instanceClass != null)
 			if (specializationClass.isAssignableFrom(instanceClass.value())) {
@@ -405,6 +406,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		final HomeTreeNode[] primaries = new Primaries(supers).toArray();
+		// assert !homeTreeNode.getValue().equals(ConstraintsMapProvider.class) : specializationClass;
 		// if (homeTreeNode.getValue() != null) {
 		// HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
 		// if (phantomHomeNode != null) {
@@ -424,11 +426,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 		// rollback(new ExistsException(result + " already exists !"));
 		// return result;
 		// }
-		return internalBind(homeTreeNode, primaries, components, specializationClass);
+		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
 	}
 
-	private <T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass) {
+	private <T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Generic[] directSupers = getDirectSupers(homeTreeNode, primaries, components);
+		if (directSupers.length == 1) {
+			Generic result = directSupers[0];
+			if (((GenericImpl) result).equiv(homeTreeNode, primaries, components)) {
+				// rollback(new FunctionalConsistencyViolationException(result.info()));
+				if (existsException)
+					rollback(new ExistsException(result + " already exists !"));
+				return (T) result;
+			}
+		}
+
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(homeTreeNode, directSuper, primaries, components);
