@@ -65,6 +65,13 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		return this.equals(homeTreeNode) ? true : metaNode.inheritsFrom(homeTreeNode);
 	}
 
+	public boolean inheritsAtLeastFromOne(HomeTreeNode... homeTreeNodes) {
+		for (HomeTreeNode homeTreeNode : homeTreeNodes)
+			if (inheritsFrom(homeTreeNode))
+				return true;
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return metaNode.toString() + "|" + value;

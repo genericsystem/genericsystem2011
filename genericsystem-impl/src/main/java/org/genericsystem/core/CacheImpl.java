@@ -20,6 +20,7 @@ import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ExistsException;
+import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
@@ -432,21 +433,29 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private <T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Generic[] directSupers = getDirectSupers(homeTreeNode, primaries, components);
+		log.info("ddddddddd" + homeTreeNode);
+		log.info("ddddddddd" + Arrays.toString(primaries));
+		log.info("ddddddddd" + Arrays.toString(directSupers));
 		if (directSupers.length == 1) {
 			Generic result = directSupers[0];
 			if (((GenericImpl) result).equiv(homeTreeNode, primaries, components)) {
-				// rollback(new FunctionalConsistencyViolationException(result.info()));
+				if (!Arrays.equals(primaries, ((GenericImpl) result).primaries))
+					rollback(new FunctionalConsistencyViolationException(result.info() + " " + Arrays.toString(directSupers)));
 				if (existsException)
 					rollback(new ExistsException(result + " already exists !"));
 				return (T) result;
 			}
 		}
+		log.info("uuuuuuuu" + Arrays.toString(directSupers));
 
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(homeTreeNode, directSuper, primaries, components);
-			while (removeIterator.hasNext())
-				orderedDependencies.addAll(orderDependencies(removeIterator.next()));
+			while (removeIterator.hasNext()) {
+				Generic next = removeIterator.next();
+				log.info("eeeeeeee" + next);
+				orderedDependencies.addAll(orderDependencies(next));
+			}
 		}
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
@@ -461,6 +470,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new AbstractFilterIterator<T>(this.<T> directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
+				log.info("directSuper : " + directSuper + System.identityHashCode(directSuper) + " " + next + System.identityHashCode(next) + Arrays.toString(((GenericImpl) next).supers) + Arrays.toString(((GenericImpl) next).components));
 				return GenericImpl.isSuperOf(homeTreeNode, primaries, components, ((GenericImpl) next).homeTreeNode, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
 			}
 		};

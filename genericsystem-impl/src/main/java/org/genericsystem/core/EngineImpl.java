@@ -71,6 +71,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	@SuppressWarnings("unchecked")
 	public <T extends Generic> T find(Class<?> clazz) {
+		log.info("gggggggggg" + clazz);
 		return (T) systemCache.get(clazz);
 	}
 

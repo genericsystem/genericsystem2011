@@ -1,12 +1,10 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -109,13 +107,12 @@ public abstract class AbstractContext implements Serializable {
 		};
 	}
 
-	// TODO clean
 	protected Generic[] getDirectSupers(final HomeTreeNode homeTreeNode, final HomeTreeNode[] primaries, final Generic[] components) {
-		List<Generic> list = new ArrayList<Generic>();
+		TreeSet<Generic> supers = new TreeSet<Generic>();
 		final Iterator<Generic> iterator = getDirectSupersIterator(homeTreeNode, primaries, components);
 		while (iterator.hasNext())
-			list.add(iterator.next());
-		return list.toArray(new Generic[list.size()]);
+			supers.add(iterator.next());
+		return supers.toArray(new Generic[supers.size()]);
 	}
 
 	@SuppressWarnings("unchecked")

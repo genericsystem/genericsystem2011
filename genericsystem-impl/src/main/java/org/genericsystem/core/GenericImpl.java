@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -126,12 +125,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		this.components = nullToSelfComponent(components);
 		lifeManager = new LifeManager(designTs == null ? getEngine().pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
 		primaries = new Primaries(supers).toArray();
+		for (HomeTreeNode primary : primaries)
+			assert !primary.equals(homeTreeNode) : primary;
 		for (Generic g1 : supers)
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-					return this;
+		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+		for (Generic superGeneric : supers)
+			assert !this.equals(superGeneric) || isEngine() : this;
+		// assert !getValue().equals(NoInheritanceSystemType.class) : info();
+		return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -919,7 +923,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public static boolean isSuperOf(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
 		assert i++ < 2000;
 		log.info(System.identityHashCode(subHomeTreeNode) + " " + System.identityHashCode(homeTreeNode) + " " + Arrays.toString(subPrimaries) + " " + Arrays.toString(primaries) + " " + Arrays.toString(subComponents) + " " + Arrays.toString(components));
-		if (!subHomeTreeNode.inheritsFrom(homeTreeNode)) {
+		if (!subHomeTreeNode.inheritsFrom(homeTreeNode) && !subHomeTreeNode.inheritsAtLeastFromOne(primaries)) {
 			log.info("UUU");
 			return false;
 		}
@@ -1710,8 +1714,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public boolean isMapProvider() {
-		return this.getValue() instanceof Class &&
-				AbstractMapProvider.class.isAssignableFrom((Class<?>) this.getValue());
+		return this.getValue() instanceof Class && AbstractMapProvider.class.isAssignableFrom((Class<?>) this.getValue());
 	}
 
 }
