@@ -1,5 +1,6 @@
 package org.genericsystem.test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -46,11 +47,17 @@ public class TypesTest extends AbstractTest {
 		// isBrotherOf.enableMultiDirectional();
 		quentin.bind(isBrotherOf, michael);
 
-		List<Structural> structurals = quentin.getStructurals();
+		List<Structural> structurals = new ArrayList<>();
+		for (Attribute attribute : ((Type) quentin).getAttributes()) {
+			structurals.add(new StructuralImpl(attribute, 0));
+		}
 		assert structurals.size() >= 2 : structurals.size();
 		assert structurals.contains(new StructuralImpl(isBrotherOf, 0));
 
-		List<Structural> structurals2 = michael.getStructurals();
+		List<Structural> structurals2 = new ArrayList<>();
+		for (Attribute attribute : ((Type) quentin).getAttributes()) {
+			structurals2.add(new StructuralImpl(attribute, 0));
+		}
 		assert structurals2.size() >= 2 : structurals2.size();
 		assert structurals2.contains(new StructuralImpl(isBrotherOf, 0));
 	}

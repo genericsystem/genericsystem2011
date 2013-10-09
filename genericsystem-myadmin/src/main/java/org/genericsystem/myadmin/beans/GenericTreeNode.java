@@ -6,7 +6,6 @@ import java.util.List;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 
 public class GenericTreeNode {
@@ -17,7 +16,7 @@ public class GenericTreeNode {
 
 	private TreeType treeType;
 
-	private Attribute attribute;
+	//	private Attribute attribute;
 
 	private List<GenericTreeNode> childrens = new ArrayList<>();
 
@@ -70,8 +69,8 @@ public class GenericTreeNode {
 			return generic.getComposites();
 		case ATTRIBUTES:
 			return (Snapshot<T>) ((Type) generic).getAttributes();
-		case VALUES:
-			return (Snapshot<T>) generic.getHolders(attribute);
+			//		case VALUES:
+			//			return (Snapshot<T>) generic.getHolders(attribute);
 		default:
 			break;
 		}
@@ -87,7 +86,7 @@ public class GenericTreeNode {
 
 	@SuppressWarnings("hiding")
 	public boolean isImplicitAutomatic(Generic generic) {
-		return generic.isAutomatic() && ((GenericImpl) generic).getComponentsSize() == 0;
+		return ((GenericImpl) generic).getComponentsSize() == 0;
 	}
 
 	public String getValue() {
@@ -118,12 +117,12 @@ public class GenericTreeNode {
 		this.treeType = treeType;
 	}
 
-	public Attribute getAttribute() {
-		return attribute;
-	}
-
-	public void setAttribute(Attribute attribute) {
-		this.attribute = attribute;
-	}
+	//	public Attribute getAttribute() {
+	//		return attribute;
+	//	}
+	//
+	//	public void setAttribute(Attribute attribute) {
+	//		this.attribute = attribute;
+	//	}
 
 }

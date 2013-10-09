@@ -577,6 +577,13 @@ public interface Generic extends Comparable<Generic> {
 	boolean isMeta();
 
 	/**
+	 * Returns true if the Generic is Map Provider.
+	 * 
+	 * @return true if the Generic is Map Provider.
+	 */
+	boolean isMapProvider();
+
+	/**
 	 * Returns true if the Generic is tree.
 	 * 
 	 * @return True if the Generic is tree.
@@ -648,8 +655,6 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Generic> T removeSuper(int pos);
 
 	<T extends Generic> T updateValue(Serializable value);
-
-	Snapshot<Structural> getStructurals();
 
 	<T extends Generic> Snapshot<T> getOtherTargets(Holder holder);
 

@@ -16,7 +16,6 @@ import javax.inject.Named;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
 import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
@@ -33,9 +32,8 @@ public class GenericTreeBean implements Serializable {
 
 	private static final long serialVersionUID = -1799171287514605774L;
 
-	private GenericTreeNode rootTreeNode;
-
-	private GenericTreeNode selectedTreeNode;
+	private GenericTreeNode rootTreeNode;					// root node of the tree
+	private GenericTreeNode selectedTreeNode;				// selected tree node
 
 	@Inject
 	private transient Cache cache;
@@ -58,52 +56,138 @@ public class GenericTreeBean implements Serializable {
 	@Inject
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
+	/**
+	 * Event of selection of node of the tree.
+	 * 
+	 * @author middleware
+	 */
+	public static class TreeSelectionEvent {
+
+		private final String id;						// id of event
+		private final Object object;					// concerned object
+
+		public TreeSelectionEvent(String id, Object object) {
+			this.id = id;
+			this.object = object;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public Object getObject() {
+			return object;
+		}
+
+	}
+
+	/**
+	 * Creates the root tree node and selects it.
+	 */
 	@PostConstruct
 	public void init() {
 		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
 		selectedTreeNode = rootTreeNode;
 	}
 
+	/**
+	 * Returns selected tree node.
+	 * 
+	 * @return selected tree node.
+	 */
 	public GenericTreeNode getSelectedTreeNode() {
 		return selectedTreeNode;
 	}
 
+	/**
+	 * Sets selected tree node.
+	 * 
+	 * @param selectedTreeNode - selected tree node.
+	 */
 	void setSelectedTreeNode(GenericTreeNode selectedTreeNode) {
 		this.selectedTreeNode = selectedTreeNode;
 	}
 
+	/**
+	 * Return value of flag implicit show.
+	 * 
+	 * @return value of flag implicit show.
+	 */
 	public boolean isImplicitShow() {
 		return implicitShow;
 	}
 
+	/**
+	 * Sets flag implicit show.
+	 * 
+	 * @param implicitShow - implicit show flag.
+	 */
 	public void setImplicitShow(boolean implicitShow) {
 		this.implicitShow = implicitShow;
 	}
 
+	/**
+	 * Returns value of flag selection locked.
+	 * 
+	 * @return value of flag selection locked.
+	 */
 	public boolean isSelectionLocked() {
 		return selectionLocked;
 	}
 
+	/**
+	 * Sets flag selection locked.
+	 * 
+	 * @param selectionLocked - flag selection locked.
+	 */
 	public void setSelectionLocked(boolean selectionLocked) {
 		this.selectionLocked = selectionLocked;
 	}
 
-	public Generic getSelectedTreeNodeGeneric() {
-		return selectedTreeNode.getGeneric();
+	/**
+	 * Returns generic of selected tree node.
+	 * 
+	 * @return generic of selected tree node.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends Generic> T getSelectedTreeNodeGeneric() {
+		return (T) selectedTreeNode.getGeneric();
 	}
 
+	/**
+	 * Returns the value of selected tree node.
+	 * 
+	 * @return the value of selected tree node.
+	 */
 	public String getSelectedTreeNodeValue() {
 		return selectedTreeNode.getValue();
 	}
 
+	/**
+	 * Returns the list with only root of tree node.
+	 * 
+	 * @return the list with only root of tree node.
+	 */
 	public List<GenericTreeNode> getRoot() {
 		return Collections.singletonList(rootTreeNode);
 	}
 
+	/**
+	 * Returns the list of children of tree node.
+	 * 
+	 * @param genericTreeNode - tree node.
+	 * 
+	 * @return list of children.
+	 */
 	public List<GenericTreeNode> getChildrens(final GenericTreeNode genericTreeNode) {
 		return genericTreeNode.getChildrens(implicitShow);
 	}
 
+	/**
+	 * Changes the type of something. ???
+	 * 
+	 * @param treeSelectionEvent
+	 */
 	public void changeType(@Observes TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			selectedTreeNode = (GenericTreeNode) treeSelectionEvent.getObject();
@@ -112,11 +196,19 @@ public class GenericTreeBean implements Serializable {
 		}
 	}
 
+	/**
+	 * Changes the title of panel typesmanager.
+	 */
 	private void internalChangeType() {
 		menuEvent.fire(new MenuEvent(selectedTreeNode, implicitShow));
 		panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
 	}
 
+	/**
+	 * ???
+	 * 
+	 * @param selectionChangeEvent
+	 */
 	public void change(TreeSelectionChangeEvent selectionChangeEvent) {
 		if (!selectionLocked) {
 			List<Object> selection = new ArrayList<Object>(selectionChangeEvent.getNewSelection());
@@ -131,7 +223,11 @@ public class GenericTreeBean implements Serializable {
 		}
 	}
 
-	@SuppressWarnings("unused")
+	/**
+	 * Fires event.
+	 * 
+	 * @param e - phase of event.
+	 */
 	public void fire(@Observes @InvokeApplication @After PhaseEvent e) {
 		if (event != null) {
 			launcher.fire(event);
@@ -139,48 +235,104 @@ public class GenericTreeBean implements Serializable {
 		}
 	}
 
-	public void changeAttributeSelected(int attributeIndex) {
-		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
-		selectedTreeNode.setAttribute(attribute);
-		selectedTreeNode.setTreeType(TreeType.VALUES);
-		messages.info("showvalues", attribute);
-	}
+	//	/**
+	//	 * Changes attribute of selected tree node.
+	//	 *
+	//	 * @param attributeIndex - index of attribute.
+	//	 */
+	//	public void changeAttributeSelected(int attributeIndex) {
+	//		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
+	//		selectedTreeNode.setAttribute(attribute);
+	//		selectedTreeNode.setTreeType(TreeType.VALUES);
+	//		messages.info("showvalues", attribute);
+	//	}
 
+	/**
+	 * Changes tree type.
+	 * 
+	 * @param treeType - tree type.
+	 */
 	public void changeTreeType(TreeType treeType) {
 		selectedTreeNode.setTreeType(treeType);
 		messages.info("showchanged", treeType);
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param generic
+	 */
 	public void view(Generic generic) {
 		selectedTreeNode = changeView(rootTreeNode, generic);
 		internalChangeType();
 		messages.info("typeselectionchanged", selectedTreeNode.getGeneric());
 	}
 
+	/**
+	 * Retourns tree node ???
+	 * 
+	 * @param genericTreeNode - tree node.
+	 * @param generic - generic.
+	 * 
+	 * @return
+	 */
 	private GenericTreeNode changeView(GenericTreeNode genericTreeNode, Generic generic) {
 		if (genericTreeNode.getGeneric().equals(generic))
 			return genericTreeNode;
 		for (GenericTreeNode tmp : getChildrens(genericTreeNode)) {
 			GenericTreeNode child = changeView(tmp, generic);
-			if (null != child)
+			if (child != null)
 				return child;
 		}
 		return null;
 	}
 
+	/**
+	 * Returns true if tree type of selected tree node is equal to type in parameters. False if not.
+	 * 
+	 * @param treeType - tree type.
+	 * 
+	 * @return true - if tree type of selected tree node is equal to type in parameters,
+	 * false - if not.
+	 */
 	public boolean isTreeTypeSelected(TreeType treeType) {
 		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
 	}
 
+	/**
+	 * Returns true if generic is value. False if not.
+	 * 
+	 * @param generic - generic.
+	 * 
+	 * @return true - if generic is value, false - if not.
+	 */
 	// TODO in GS CORE
 	public boolean isValue(Generic generic) {
 		return generic.isConcrete() && generic.isAttribute();
 	}
 
+	/**
+	 * Returns CSS style of generic tree node.
+	 * 
+	 * @param genericTreeNode - generic tree node.
+	 * 
+	 * @return name of CSS style.
+	 */
 	public String getStyle(GenericTreeNode genericTreeNode) {
-		return genericTreeNode.isImplicitAutomatic(genericTreeNode.getGeneric()) || (isValue(genericTreeNode.getGeneric()) && !((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(getSelectedTreeNodeGeneric())) ? "implicitColor" : "";
+		return genericTreeNode.isImplicitAutomatic(
+				genericTreeNode.getGeneric()) ||
+				(isValue(genericTreeNode.getGeneric()) &&
+						!((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(getSelectedTreeNodeGeneric())
+						) ? "implicitColor" : "";
 	}
 
+	/**
+	 * Returns icon's name of tree node.
+	 * 
+	 * @param genericTreeNode - generic tree node.
+	 * 
+	 * @return name of icon.
+	 */
 	public String getTypeIcon(GenericTreeNode genericTreeNode) {
 		Generic generic = genericTreeNode.getGeneric();
 		if (generic.isMeta()) {
@@ -208,6 +360,13 @@ public class GenericTreeBean implements Serializable {
 		throw new IllegalStateException();
 	}
 
+	/**
+	 * Returns the title of icone.
+	 * 
+	 * @param genericTreeNode - generic tree node.
+	 * 
+	 * @return title of icon.
+	 */
 	public String getTypeIconTitle(GenericTreeNode genericTreeNode) {
 		Generic generic = genericTreeNode.getGeneric();
 		if (generic.isMeta() && generic.isType())
@@ -229,25 +388,6 @@ public class GenericTreeBean implements Serializable {
 		else if (generic.isConcrete() && generic.isRelation())
 			return messages.getMessage("link");
 		throw new IllegalStateException();
-	}
-
-	public static class TreeSelectionEvent {
-		private final String id;
-		private final Object object;
-
-		public TreeSelectionEvent(String id, Object object) {
-			this.id = id;
-			this.object = object;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public Object getObject() {
-			return object;
-		}
-
 	}
 
 }

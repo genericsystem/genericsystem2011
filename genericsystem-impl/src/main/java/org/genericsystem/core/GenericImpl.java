@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -28,7 +29,6 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
-import org.genericsystem.iterator.AbstractConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
@@ -37,6 +37,7 @@ import org.genericsystem.iterator.ArrayIterator;
 import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
+import org.genericsystem.map.AbstractMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
@@ -129,9 +130,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-
-		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-		return this;
+					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+					return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -1679,25 +1679,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public Snapshot<Structural> getStructurals() {
-		return new AbstractSnapshot<Structural>() {
-			@Override
-			public Iterator<Structural> iterator() {
-				return structuralsIterator();
-			}
-		};
-	}
-
-	public Iterator<Structural> structuralsIterator() {
-		return new AbstractConcateIterator<Attribute, Structural>(GenericImpl.this.getAttributes().iterator()) {
-			@Override
-			protected Iterator<Structural> getIterator(final Attribute attribute) {
-				return new SingletonIterator<Structural>(new StructuralImpl(attribute, getBasePos(attribute)));
-			}
-		};
-	}
-
-	@Override
 	public Snapshot<Generic> getOtherTargets(final Holder holder) {
 		return new AbstractSnapshot<Generic>() {
 			@Override
@@ -1726,4 +1707,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public CacheImpl getCurrentCache() {
 		return getEngine().getCurrentCache();
 	}
+
+	@Override
+	public boolean isMapProvider() {
+		return this.getValue() instanceof Class &&
+				AbstractMapProvider.class.isAssignableFrom((Class<?>) this.getValue());
+	}
+
 }
