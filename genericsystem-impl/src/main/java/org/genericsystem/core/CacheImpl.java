@@ -372,6 +372,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
+		log.info("RRRRRRRRRRRR" + clazz);
 		return bind(homeTreeNode, userSupers, components, clazz, false);
 	}
 

@@ -914,7 +914,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isSuperOf(homeTreeNode, primaries, components, ((GenericImpl) generic).homeTreeNode, ((GenericImpl) generic).primaries, ((GenericImpl) generic).components);
 	}
 
+	static int i = 0;
+
 	public static boolean isSuperOf(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
+		assert i++ < 2000;
 		log.info(System.identityHashCode(subHomeTreeNode) + " " + System.identityHashCode(homeTreeNode) + " " + Arrays.toString(subPrimaries) + " " + Arrays.toString(primaries) + " " + Arrays.toString(subComponents) + " " + Arrays.toString(components));
 		if (!subHomeTreeNode.inheritsFrom(homeTreeNode)) {
 			log.info("UUU");
