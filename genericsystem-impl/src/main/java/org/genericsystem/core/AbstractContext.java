@@ -89,7 +89,7 @@ public abstract class AbstractContext implements Serializable {
 
 	public abstract boolean isScheduledToRemove(Generic generic);
 
-	Iterator<Generic> getDirectSupersIterator(final HomeTreeNode homeTreeNode, final HomeTreeNode[] primaries, final Generic[] components) {
+	Iterator<Generic> getDirectSupersIterator(final HomeTreeNode[] primaries, final Generic[] components) {
 		return new AbstractSelectableLeafIterator(getEngine()) {
 
 			@Override
@@ -99,17 +99,18 @@ public abstract class AbstractContext implements Serializable {
 
 			@Override
 			public boolean isSelected(Generic candidate) {
-				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, homeTreeNode, primaries, components);
-				log.info(homeTreeNode + " (" + System.identityHashCode(homeTreeNode) + ") " + ((GenericImpl) candidate).homeTreeNode + " (" + System.identityHashCode(((GenericImpl) candidate).homeTreeNode) + ") " + result);
+				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
+				// log.info("ISSELECTED : " + candidate + "(" + System.identityHashCode(((GenericImpl) candidate).homeTreeNode) + ") " + result);
+				// log.info("Primaries : " + Arrays.toString(((GenericImpl) candidate).primaries) + Arrays.toString(primaries));
 				return result;
 
 			}
 		};
 	}
 
-	protected Generic[] getDirectSupers(final HomeTreeNode homeTreeNode, final HomeTreeNode[] primaries, final Generic[] components) {
+	protected Generic[] getDirectSupers(final HomeTreeNode[] primaries, final Generic[] components) {
 		TreeSet<Generic> supers = new TreeSet<Generic>();
-		final Iterator<Generic> iterator = getDirectSupersIterator(homeTreeNode, primaries, components);
+		final Iterator<Generic> iterator = getDirectSupersIterator(primaries, components);
 		while (iterator.hasNext())
 			supers.add(iterator.next());
 		return supers.toArray(new Generic[supers.size()]);

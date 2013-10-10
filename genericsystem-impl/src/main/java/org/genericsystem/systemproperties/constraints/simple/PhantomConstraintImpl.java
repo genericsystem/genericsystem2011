@@ -26,15 +26,14 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SingularConstraint
 @Dependencies(PhantomConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(PhantomConstraintImpl.class)
-// @NotNullConstraint
 public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(PhantomConstraintImpl.class)
-	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	@BooleanValue(false)
+	// TODO true
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {

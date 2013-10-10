@@ -24,7 +24,6 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		this.metaNode = metaNode == null ? this : metaNode;
 		this.value = value;
 		ts = getHomeTree().pickNewTs();
-		log.info("CREATE HOMETREENODE : " + this + "(" + System.identityHashCode(this) + ")");
 	}
 
 	public HomeTreeNode findInstanceNode(Serializable value) {
@@ -38,8 +37,11 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	public HomeTreeNode bindInstanceNode(Serializable value) {
 		if (value == null)
 			value = NULL_VALUE;
+		HomeTreeNode result = findInstanceNode(value);
+		if (result != null)
+			return result;
 		HomeTreeNode newHomeTreeNode = new HomeTreeNode(this, value);
-		HomeTreeNode result = instancesNodes.putIfAbsent(value, newHomeTreeNode);
+		result = instancesNodes.putIfAbsent(value, newHomeTreeNode);
 		return result == null ? newHomeTreeNode : result;
 	}
 
@@ -65,12 +67,12 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		return this.equals(homeTreeNode) ? true : metaNode.inheritsFrom(homeTreeNode);
 	}
 
-	public boolean inheritsAtLeastFromOne(HomeTreeNode... homeTreeNodes) {
-		for (HomeTreeNode homeTreeNode : homeTreeNodes)
-			if (inheritsFrom(homeTreeNode))
-				return true;
-		return false;
-	}
+	// public boolean inheritsAtLeastFromOne(HomeTreeNode... homeTreeNodes) {
+	// for (HomeTreeNode homeTreeNode : homeTreeNodes)
+	// if (inheritsFrom(homeTreeNode))
+	// return true;
+	// return false;
+	// }
 
 	@Override
 	public String toString() {

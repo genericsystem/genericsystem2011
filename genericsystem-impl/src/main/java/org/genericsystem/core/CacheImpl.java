@@ -227,8 +227,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		private ConnectionMap reBind(Set<Generic> orderedDependencies, boolean computeDirectSupers) {
 			for (Generic orderedDependency : orderedDependencies) {
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
-						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).homeTreeNode, ((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components))
-								: adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components));
+						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
+						adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -407,7 +407,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
-		final HomeTreeNode[] primaries = new Primaries(supers).toArray();
+		Primaries primarySet = new Primaries(homeTreeNode, supers);
+
 		// assert !homeTreeNode.getValue().equals(ConstraintsMapProvider.class) : specializationClass;
 		// if (homeTreeNode.getValue() != null) {
 		// HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
@@ -418,6 +419,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		// phantom.remove();
 		// }
 		// }
+		final HomeTreeNode[] primaries = primarySet.toArray();
+		// log.info("ZZZZZZZ" + Arrays.toString(primaries));
+		assert primaries.length != 0;
 		Arrays.sort(supers);
 		// // KK supers[0] is not a real super...
 		// T result = fastFindBySuper(homeTreeNode, new Primaries(supers).toArray(), supers[0], components);
@@ -431,29 +435,28 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
-		Generic[] directSupers = getDirectSupers(homeTreeNode, primaries, components);
-		log.info("ddddddddd" + homeTreeNode);
-		log.info("ddddddddd" + Arrays.toString(primaries));
-		log.info("ddddddddd" + Arrays.toString(directSupers));
+		Generic[] directSupers = getDirectSupers(primaries, components);
+		log.info("EEEEEE" + Arrays.toString(directSupers));
 		if (directSupers.length == 1) {
 			Generic result = directSupers[0];
 			if (((GenericImpl) result).equiv(homeTreeNode, primaries, components)) {
-				if (!Arrays.equals(primaries, ((GenericImpl) result).primaries))
+				if (!homeTreeNode.equals(((GenericImpl) result).homeTreeNode))
 					rollback(new FunctionalConsistencyViolationException(result.info() + " " + Arrays.toString(directSupers)));
 				if (existsException)
 					rollback(new ExistsException(result + " already exists !"));
 				return (T) result;
 			}
 		}
-		log.info("uuuuuuuu" + Arrays.toString(directSupers));
+		// log.info("uuuuuuuu" + Arrays.toString(directSupers));
 
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
-			Iterator<Generic> removeIterator = concernedDependenciesIterator(homeTreeNode, directSuper, primaries, components);
+			Iterator<Generic> removeIterator = concernedDependenciesIterator(directSuper, primaries, components);
 			while (removeIterator.hasNext()) {
 				Generic next = removeIterator.next();
-				log.info("eeeeeeee" + next);
+				// log.info("eeeeeeee" + next);
 				orderedDependencies.addAll(orderDependencies(next));
 			}
 		}
@@ -466,12 +469,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return superGeneric;
 	}
 
-	<T extends Generic> Iterator<T> concernedDependenciesIterator(final HomeTreeNode homeTreeNode, final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
+	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
 		return new AbstractFilterIterator<T>(this.<T> directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
-				log.info("directSuper : " + directSuper + System.identityHashCode(directSuper) + " " + next + System.identityHashCode(next) + Arrays.toString(((GenericImpl) next).supers) + Arrays.toString(((GenericImpl) next).components));
-				return GenericImpl.isSuperOf(homeTreeNode, primaries, components, ((GenericImpl) next).homeTreeNode, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
+				// log.info("###" + next);
+				// log.info("directSuper : " + directSuper + System.identityHashCode(directSuper) + " " + next + System.identityHashCode(next) + Arrays.toString(((GenericImpl) next).supers) + Arrays.toString(((GenericImpl) next).components));
+				return GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
 			}
 		};
 	}
@@ -495,9 +499,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}
 	}
 
+	static int i = 0;
+
 	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+		// checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
+		// checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 	}

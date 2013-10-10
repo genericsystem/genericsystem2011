@@ -189,12 +189,11 @@ public class Statics {
 	public static class Primaries extends TreeSet<HomeTreeNode> {
 		private static final long serialVersionUID = 7222889429002770779L;
 
-		public Primaries(Generic... generics) {
-			for (Generic generic : generics)
-				add(((GenericImpl) generic).getHomeTreeNode());
-			if (size() == 1 && first().isRoot())
-				clear();
-
+		public Primaries(HomeTreeNode homeTreeNode, Generic... supers) {
+			add(homeTreeNode);
+			for (Generic superGeneric : supers)
+				for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
+					add(primary);
 		}
 
 		@Override
