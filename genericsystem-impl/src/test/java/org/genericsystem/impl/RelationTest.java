@@ -1127,7 +1127,6 @@ public class RelationTest extends AbstractTest {
 		Relation relation = vehicle.setRelation("pilot", human);
 		assert !relation.inheritsFrom(vehicle);
 		assert !relation.inheritsFrom(human);
-		assert relation.inheritsFrom(relation.getImplicit());
 		assert relation.isAttributeOf(vehicle);
 	}
 
