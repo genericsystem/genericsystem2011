@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -1118,8 +1117,7 @@ public class RelationTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		Relation relationPilot = vehicle.setRelation("pilot", human);
-		Type pilot = relationPilot.getImplicit();
-		assert cache.getEngine().getInheritings().containsAll(Arrays.asList(vehicle, human, pilot));
+		assert cache.getEngine().getInheritings().containsAll(Arrays.asList(vehicle, human, relationPilot));
 	}
 
 	public void testIsRelation() {
@@ -1140,7 +1138,6 @@ public class RelationTest extends AbstractTest {
 		Type human = cache.newType("Human");
 		Relation humanGames = human.setRelation("Games", car, level);
 		assert humanGames.isAttributeOf(human);
-		assert humanGames.inheritsFrom(humanGames.getImplicit());
 		assert !humanGames.inheritsFrom(human);
 		assert !humanGames.inheritsFrom(car);
 		assert !humanGames.inheritsFrom(level);

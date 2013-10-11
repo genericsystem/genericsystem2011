@@ -373,7 +373,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
-		log.info("RRRRRRRRRRRR" + clazz);
 		return bind(homeTreeNode, userSupers, components, clazz, false);
 	}
 
@@ -438,7 +437,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@SuppressWarnings("unchecked")
 	private <T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
-		log.info("EEEEEE" + Arrays.toString(directSupers));
 		if (directSupers.length == 1) {
 			Generic result = directSupers[0];
 			if (((GenericImpl) result).equiv(homeTreeNode, primaries, components)) {
@@ -449,7 +447,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 				return (T) result;
 			}
 		}
-		// log.info("uuuuuuuu" + Arrays.toString(directSupers));
 
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {

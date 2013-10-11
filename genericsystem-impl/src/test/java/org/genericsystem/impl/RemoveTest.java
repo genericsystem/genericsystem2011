@@ -7,6 +7,7 @@ import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.impl.ApiTest.Vehicle;
 import org.testng.annotations.Test;
@@ -70,33 +71,32 @@ public class RemoveTest extends AbstractTest {
 		Holder myHeight1 = ((Attribute) myWindow).setValue(height, 165);
 		myHeight1.remove();
 		assert cache.getEngine().getInheritings().contains(window);
-		assert cache.getEngine().getInheritings().contains(height.getImplicit());
 		assert !cache.getEngine().getInheritings().contains(height);
 		assert !cache.getEngine().getSubTypes().contains(myHeight1);
 	}
 
-	// public void testRemoveRelationWithSubRelation() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-	// Type human = cache.newType("Human");
-	// Type man = human.newSubType("Man");
-	// Type vehicle = cache.newType("Vehicle");
-	// Type car = vehicle.newSubType("Car");
-	// final Relation humanDriveVehicle = human.addRelation("drive", vehicle);
-	// Relation manSubDriveCar = man.addSubRelation(humanDriveVehicle, "subDrive", car);
-	// cache.flush();
-	// new RollbackCatcher() {
-	// @Override
-	// public void intercept() {
-	// humanDriveVehicle.remove();
-	// }
-	// }.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
-	// assert humanDriveVehicle.isAlive();
-	// assert human.isAlive();
-	// assert man.isAlive();
-	// assert vehicle.isAlive();
-	// assert car.isAlive();
-	// assert manSubDriveCar.isAlive();
-	// }
+	public void testRemoveRelationWithSubRelation() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type human = cache.newType("Human");
+		Type man = human.newSubType("Man");
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		final Relation humanDriveVehicle = human.addRelation("drive", vehicle);
+		Relation manSubDriveCar = man.addSubRelation(humanDriveVehicle, "subDrive", car);
+		cache.flush();
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				humanDriveVehicle.remove();
+			}
+		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
+		assert humanDriveVehicle.isAlive();
+		assert human.isAlive();
+		assert man.isAlive();
+		assert vehicle.isAlive();
+		assert car.isAlive();
+		assert manSubDriveCar.isAlive();
+	}
 
 	public void testRemoveInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
@@ -121,8 +121,7 @@ public class RemoveTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
 		try {
 			cache.find(Vehicle.class).remove();
-		} catch (NotRemovableException ignore) {
-		}
+		} catch (NotRemovableException ignore) {}
 	}
 
 }

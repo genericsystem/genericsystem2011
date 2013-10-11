@@ -47,7 +47,6 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Power.class);
 		Attribute power = cache.find(Power.class);
 		assert power instanceof Power;
-		assert power.getImplicit() instanceof Generic;
 	}
 
 	public void testUpdate() {
