@@ -418,21 +418,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		// }
 		final HomeTreeNode[] primaries = primarySet.toArray();
 		assert primaries.length != 0;
-		Arrays.sort(supers);
-		// // KK supers[0] is not a real super...
-		// T result = fastFindBySuper(homeTreeNode, new Primaries(supers).toArray(), supers[0], components);
-		// if (result != null) {
-		// if (!Arrays.equals(supers, ((GenericImpl) result).supers))
-		// rollback(new FunctionalConsistencyViolationException(result.info()));
-		// if (existsException)
-		// rollback(new ExistsException(result + " already exists !"));
-		// return result;
-		// }
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
+	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
 		if (directSupers.length == 1) {
 			Generic result = directSupers[0];
@@ -655,7 +645,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 				@Override
 				Generic rebuild() {
 					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
-					return bind(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()), reBind(((GenericImpl) old).selfToNullComponents()), old.getClass(), false);
+					return internalBind(newHomeTreeNode, new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()))).toArray(),
+							reBind(((GenericImpl) old).selfToNullComponents()), old.getClass(), false);
 				}
 			}.rebuildAll(old);
 		}

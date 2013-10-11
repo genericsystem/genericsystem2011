@@ -73,6 +73,13 @@ public class Statics {
 		return result;
 	}
 
+	static HomeTreeNode[] insertFirst(HomeTreeNode first, HomeTreeNode... others) {
+		HomeTreeNode[] result = new HomeTreeNode[others.length + 1];
+		result[0] = first;
+		System.arraycopy(others, 0, result, 1, others.length);
+		return result;
+	}
+
 	public static Generic[] insertLastIntoArray(Generic last, Generic... others) {
 		Generic[] result = new Generic[others.length + 1];
 		result[result.length - 1] = last;
@@ -194,6 +201,11 @@ public class Statics {
 			for (Generic superGeneric : supers)
 				for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
 					add(primary);
+		}
+
+		public Primaries(HomeTreeNode... primaries) {
+			for (HomeTreeNode primary : primaries)
+				add(primary);
 		}
 
 		@Override
