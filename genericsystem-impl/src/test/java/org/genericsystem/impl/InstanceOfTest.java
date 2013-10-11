@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -123,8 +122,7 @@ public class InstanceOfTest extends AbstractTest {
 		Type car1 = cache.newSubType("Car1", vehicle);
 		Type car2 = vehicle.newSubType("Car2");
 
-		// the first super is implicit => Car1 != Car2
-		assert car1.getSupers().get(1).equals(car2.getSupers().get(1));
+		assert !car1.getSupers().get(0).equals(car2.getSupers().get(0));
 	}
 
 	public void testNewSubTypeWithoutSuper() {

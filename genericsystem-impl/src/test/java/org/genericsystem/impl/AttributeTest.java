@@ -17,7 +17,7 @@ public class AttributeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute("power");
 		assert vehiclePower.isStructural();
-		assert vehiclePower.getSupers().size() == 2 : vehiclePower.getSupers();
+		assert vehiclePower.getSupers().size() == 1 : vehiclePower.getSupers();
 		assert vehiclePower.inheritsFrom(cache.getEngine());
 	}
 
@@ -27,7 +27,7 @@ public class AttributeTest extends AbstractTest {
 		Attribute vehiclePower = vehicle.setProperty("power");
 
 		assert vehiclePower.isStructural();
-		assert vehiclePower.getSupers().size() == 2 : vehiclePower.getSupers();
+		assert vehiclePower.getSupers().size() == 1 : vehiclePower.getSupers();
 		assert vehiclePower.inheritsFrom(cache.getEngine());
 	}
 
@@ -35,8 +35,8 @@ public class AttributeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute("power");
-
-		assert cache.getEngine().getInheritings().contains(vehiclePower);
+		vehiclePower.log();
+		assert cache.getMetaAttribute().getInheritings().contains(vehiclePower);
 		assert cache.getEngine().getInheritings().contains(vehicle);
 		assert vehicle.getComposites().contains(vehiclePower) : cache.getEngine().getComposites();
 	}
@@ -46,7 +46,7 @@ public class AttributeTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty("power");
 
-		assert cache.getEngine().getInheritings().contains(vehiclePower);
+		assert cache.getMetaAttribute().getInheritings().contains(vehiclePower);
 		assert cache.getEngine().getInheritings().contains(vehicle);
 		assert vehicle.getComposites().contains(vehiclePower) : cache.getEngine().getComposites();
 	}

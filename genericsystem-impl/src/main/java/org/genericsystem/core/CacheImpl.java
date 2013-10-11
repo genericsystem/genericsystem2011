@@ -407,8 +407,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Primaries primarySet = new Primaries(homeTreeNode, supers);
-
-		// assert !homeTreeNode.getValue().equals(ConstraintsMapProvider.class) : specializationClass;
 		// if (homeTreeNode.getValue() != null) {
 		// HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
 		// if (phantomHomeNode != null) {
@@ -419,7 +417,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		// }
 		// }
 		final HomeTreeNode[] primaries = primarySet.toArray();
-		// log.info("ZZZZZZZ" + Arrays.toString(primaries));
 		assert primaries.length != 0;
 		Arrays.sort(supers);
 		// // KK supers[0] is not a real super...
@@ -440,12 +437,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (directSupers.length == 1) {
 			Generic result = directSupers[0];
 			if (((GenericImpl) result).equiv(homeTreeNode, primaries, components)) {
-				if (!homeTreeNode.equals(((GenericImpl) result).homeTreeNode))
-					rollback(new FunctionalConsistencyViolationException(result.info() + " " + Arrays.toString(directSupers)));
 				if (existsException)
 					rollback(new ExistsException(result + " already exists !"));
 				return (T) result;
 			}
+		} else {
+			for (Generic directSuper : directSupers)
+				if (Arrays.equals(primaries, (((GenericImpl) directSuper).primaries)) && Arrays.equals(components, (((GenericImpl) directSuper).components)))
+					// if (!homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
+					rollback(new FunctionalConsistencyViolationException(directSuper.info() + " " + Arrays.toString(directSupers)));
 		}
 
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();

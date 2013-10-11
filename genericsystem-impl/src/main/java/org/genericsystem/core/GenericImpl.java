@@ -67,7 +67,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	HomeTreeNode homeTreeNode;
 
-	public Generic[] supers;
+	Generic[] supers;
 
 	Generic[] components;
 
@@ -183,16 +183,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Generic> T getMeta() {
 		HomeTreeNode metaNode = homeTreeNode.metaNode;
 		GenericImpl generic = this;
-		while (!metaNode.equals(homeTreeNode.metaNode))
-			for (Generic superGeneric : generic.supers)
-				if (generic.homeTreeNode.inheritsFrom(((GenericImpl) superGeneric).homeTreeNode))
+		while (!generic.homeTreeNode.equals(metaNode)) {
+			for (Generic superGeneric : generic.supers) {
+				if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode)) {
 					generic = (GenericImpl) superGeneric;
+					break;
+				}
+			}
+		}
 		return (T) generic;
 	}
+
+	// @Override
+	// public <T extends Generic> T getImplicit() {
+	// return isPrimary() ? (T) this : supers[0].<T> getImplicit();
+	// }
 
 	@Override
 	public int getMetaLevel() {
 		return homeTreeNode.getMetaLevel();
+		// return isPrimary() ? supers[0].getMetaLevel() + 1 : getImplicit().getMetaLevel();
 	}
 
 	@Override
@@ -277,6 +287,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		assert value == null || getValues(attribute).contains(value) : "holder : " + holder.info() + " value : " + value + " => " + getValues(attribute);
 		return holder;
 	}
+
+	// public <T extends Generic> T bindPrimaryByValue(Class<?> specializationClass, Serializable value) {
+	// return getCurrentCache().bindPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, specializationClass);
+	// }
+	//
+	// public <T extends Generic> T findPrimaryByValue(Serializable value) {
+	// return getCurrentCache().findPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value);
+	// }
 
 	@Override
 	public <T extends Link> T setLink(Link relation, Serializable value, Generic... targets) {
@@ -473,6 +491,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int metaLevel, int basePos, boolean readPhantoms, Generic... targets) {
+		// log.info("XXXX");
 		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(metaLevel, attribute, basePos, readPhantoms), attribute, targets);
 	}
 
@@ -774,6 +793,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
 			@Override
 			public boolean isSelected() {
+				// log.info("XXXX" + next);
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
 			}
 		};
@@ -906,10 +926,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isSuperOf(primaries, components, ((GenericImpl) generic).primaries, ((GenericImpl) generic).components);
 	}
 
-	// static int i = 0;
+	static int i = 0;
 
 	public static boolean isSuperOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-
 		if (primaries.length == subPrimaries.length && components.length == subComponents.length) {
 			for (int i = 0; i < subPrimaries.length; i++) {
 				if (!subPrimaries[i].inheritsFrom(primaries[i]))
@@ -929,10 +948,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					if (!components[i].isEngine() && (!Arrays.equals(primaries, ((GenericImpl) components[i]).primaries) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
 						return false;
 			}
-			// log.info("BBBBBBB");
 			return true;
 		}
-		// log.info("YYY");
+
 		if (primaries.length < subPrimaries.length)
 			for (int i = 0; i < subPrimaries.length; i++)
 				if (isSuperOf(primaries, components, Statics.truncate(i, subPrimaries), subComponents))
@@ -941,7 +959,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (int i = 0; i < subComponents.length; i++)
 				if (isSuperOf(primaries, components, subPrimaries, Statics.truncate(i, subComponents)))
 					return true;
-		// log.info("ZZZ");
+
 		return false;
 	}
 
