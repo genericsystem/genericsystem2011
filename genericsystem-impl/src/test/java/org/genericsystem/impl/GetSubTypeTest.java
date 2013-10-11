@@ -27,10 +27,11 @@ public class GetSubTypeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
+		Generic myCar = car.newInstance("myCar");
 
-		assert cache.getEngine().getInstance("Car").equals(car);
-		assert cache.getEngine().getInstances().contains(car);
-		assert cache.getEngine().getAllInstances().contains(car) : cache.getEngine().getAllInstances();
+		assert car.getInstance("myCar").equals(myCar);
+		assert !vehicle.getInstances().contains(myCar) : vehicle.getInstances();
+		assert vehicle.getAllInstances().contains(myCar) : vehicle.getAllInstances();
 
 		assert cache.getEngine().getSubType("Car").equals(car) : cache.getEngine().getSubType("Car");
 		assert cache.getEngine().getSubTypes().contains(car) : cache.getEngine().getSubTypes();
