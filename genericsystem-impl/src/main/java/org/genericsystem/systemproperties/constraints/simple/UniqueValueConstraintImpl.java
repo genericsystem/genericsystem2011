@@ -1,6 +1,8 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
-import java.util.Iterator;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
@@ -31,17 +33,19 @@ public class UniqueValueConstraintImpl extends AbstractBooleanSimpleConstraintIm
 
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
-		if (modified.isStructural()) {
-			final Generic primary = modified.getImplicit();
-			Iterator<Generic> iterator = Statics.<Generic> valueFilter(((GenericImpl) primary).<Generic> directInheritingsIterator(), modified.getValue());
-			if (!iterator.hasNext())
-				return;
-			iterator.next();
-			if (iterator.hasNext() || !primary.isAutomatic())
-				throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
-		} else
-			for (Generic generic : ((Type) type).getAllInstances())
-				if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
-					throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
+		for (Generic generic : ((Type) type).getAllInstances())
+			if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
+				throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
+	}
+
+	@Override
+	public void checkConsistency(Generic base, Holder valueHolder, int axe) throws ConstraintViolationException {
+		Set<Serializable> values = new HashSet<>();
+		for (Generic attributeNode : ((Type) base).getAllInstances()) {
+			Serializable value = attributeNode.getValue();
+			if (value != null)
+				if (!values.add(value))
+					throw new UniqueValueConstraintViolationException("Duplicate value : " + value);
+		}
 	}
 }

@@ -24,6 +24,7 @@ public class Statics {
 
 	public static final Flag FLAG = new Flag();
 	public static final Generic[] EMPTY_GENERIC_ARRAY = new Generic[] {};
+	public static final String ROOT_NODE_VALUE = "Engine";
 
 	public static final int META = 0;
 	public static final int STRUCTURAL = 1;
@@ -72,6 +73,13 @@ public class Statics {
 		return result;
 	}
 
+	static HomeTreeNode[] insertFirst(HomeTreeNode first, HomeTreeNode... others) {
+		HomeTreeNode[] result = new HomeTreeNode[others.length + 1];
+		result[0] = first;
+		System.arraycopy(others, 0, result, 1, others.length);
+		return result;
+	}
+
 	public static Generic[] insertLastIntoArray(Generic last, Generic... others) {
 		Generic[] result = new Generic[others.length + 1];
 		result[result.length - 1] = last;
@@ -84,6 +92,21 @@ public class Statics {
 		System.arraycopy(generics, 0, result, 0, i);
 		System.arraycopy(generics, i + 1, result, i, generics.length - 1 - i);
 		return result;
+	}
+
+	static HomeTreeNode[] truncate(int i, HomeTreeNode[] nodes) {
+		HomeTreeNode[] result = new HomeTreeNode[nodes.length - 1];
+		System.arraycopy(nodes, 0, result, 0, i);
+		System.arraycopy(nodes, i + 1, result, i, nodes.length - 1 - i);
+		return result;
+	}
+
+	static HomeTreeNode[] truncate(HomeTreeNode[] nodes, HomeTreeNode node) {
+		for (int i = 0; i < nodes.length; i++) {
+			if (nodes[i].equals(node))
+				return truncate(i, nodes);
+		}
+		return nodes;
 	}
 
 	static Generic[] replace(int i, Generic[] generics, Generic generic) {
@@ -170,40 +193,38 @@ public class Statics {
 		return new SimpleDateFormat(Statics.PATTERN).format(new Date(ts / Statics.MILLI_TO_NANOSECONDS)) + "---" + ts;
 	}
 
-	public static class Primaries extends TreeSet<Generic> {
+	public static class Primaries extends TreeSet<HomeTreeNode> {
 		private static final long serialVersionUID = 7222889429002770779L;
 
-		public Primaries(Generic... generics) {
-			for (Generic generic : generics)
-				add(generic);
+		public Primaries(HomeTreeNode homeTreeNode, Generic... supers) {
+			add(homeTreeNode);
+			for (Generic superGeneric : supers)
+				for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
+					add(primary);
+		}
+
+		public Primaries(HomeTreeNode... primaries) {
+			for (HomeTreeNode primary : primaries)
+				add(primary);
 		}
 
 		@Override
-		public boolean add(Generic generic) {
-			if (((GenericImpl) generic).isPrimary())
-				restrictedAdd(generic);
-			else
-				for (Generic directSuper : ((GenericImpl) generic).supers)
-					add(directSuper);
-			return true;
-		}
-
-		private void restrictedAdd(Generic candidate) {
-			for (Generic generic : this)
-				if (generic.inheritsFrom(candidate))
-					return;
-			Iterator<Generic> it = this.iterator();
+		public boolean add(HomeTreeNode candidate) {
+			for (HomeTreeNode homeTreeNode : this)
+				if (homeTreeNode.inheritsFrom(candidate))
+					return false;
+			Iterator<HomeTreeNode> it = this.iterator();
 			while (it.hasNext()) {
-				Generic next = it.next();
+				HomeTreeNode next = it.next();
 				if (candidate.inheritsFrom(next))
 					it.remove();
 			}
-			super.add(candidate);
-		};
+			return super.add(candidate);
+		}
 
 		@Override
-		public Generic[] toArray() {
-			return toArray(new Generic[size()]);
+		public HomeTreeNode[] toArray() {
+			return toArray(new HomeTreeNode[size()]);
 		}
 	}
 

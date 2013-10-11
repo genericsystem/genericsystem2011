@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -104,12 +103,12 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	boolean isRelation();
 
-	/**
-	 * Returns true if this Generic has been automatically created.
-	 * 
-	 * @return True if this Generic has been automatically created.
-	 */
-	boolean isAutomatic();
+	// /**
+	// * Returns true if this Generic has been automatically created.
+	// *
+	// * @return True if this Generic has been automatically created.
+	// */
+	// boolean isAutomatic();
 
 	/**
 	 * Returns the value of this Generic.
@@ -338,6 +337,7 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * Returns the Holder of value.
+	 * 
 	 * @param metaLevel
 	 *            meta level.
 	 * @param attribute
@@ -353,6 +353,7 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * Returns the Holder of value.
+	 * 
 	 * @param metaLevel
 	 *            meta level.
 	 * @param attribute
@@ -465,12 +466,12 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	boolean isReferentialIntegrity(int componentPos);
 
-	/**
-	 * Returns the implicit.
-	 * 
-	 * @return The implicit.
-	 */
-	<T extends Generic> T getImplicit();
+	// /**
+	// * Returns the implicit.
+	// *
+	// * @return The implicit.
+	// */
+	// <T extends Generic> T getImplicit();
 
 	/**
 	 * Returns the supers of the Generic.
@@ -576,6 +577,13 @@ public interface Generic extends Comparable<Generic> {
 	boolean isMeta();
 
 	/**
+	 * Returns true if the Generic is Map Provider.
+	 * 
+	 * @return true if the Generic is Map Provider.
+	 */
+	boolean isMapProvider();
+
+	/**
 	 * Returns true if the Generic is tree.
 	 * 
 	 * @return True if the Generic is tree.
@@ -630,7 +638,7 @@ public interface Generic extends Comparable<Generic> {
 
 	Map<Serializable, Serializable> getPropertiesMap();
 
-	ExtendedMap<Serializable, Serializable> getContraintsMap();
+	ExtendedMap<Serializable, Serializable> getConstraintsMap();
 
 	ExtendedMap<Serializable, Serializable> getSystemPropertiesMap();
 
@@ -647,8 +655,6 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Generic> T removeSuper(int pos);
 
 	<T extends Generic> T updateValue(Serializable value);
-
-	Snapshot<Structural> getStructurals();
 
 	<T extends Generic> Snapshot<T> getOtherTargets(Holder holder);
 

@@ -32,12 +32,11 @@ public class AloneAutomaticsConstraintImpl extends AbstractBooleanSimpleConstrai
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(AloneAutomaticsConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
-		if (modified.isAlive() && modified.isAutomatic() && modified.getInheritings().isEmpty() && modified.getComposites().isEmpty())
+		if (modified.isAlive() /* && modified.isAutomatic() */&& modified.getInheritings().isEmpty() && modified.getComposites().isEmpty())
 			throw new AloneAutomaticsConstraintViolationException();
 
 	}

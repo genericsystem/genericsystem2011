@@ -52,7 +52,11 @@
 			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{genericBean.genericEditedValue}"
 			action="#{genericBean.setAttribute('new_attribute')}" mode="ajax"
 			execute="typestree" render="typestree,editTypesManager"
+<<<<<<< HEAD
 			icon="#{menuBean.getMenuTypeIcon('ATTRIBUTE')}" disabled="#{menuBean.genericEditedIsConcrete}" />
+=======
+			icon="#{menuBean.getMenuTypeIcon('ATTRIBUTE')}" disabled="#{menuBean.isConcrete()}" />
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{genericBean.genericEditedValue}"
 			action="#{genericBean.setProperty('new_property')}" mode="ajax"
@@ -70,5 +74,13 @@
 			execute="typestree" render="paneltitletypesmanager,typestree,editTypesManager"
 			icon="#{infos.imgGarb}" />
 	</rich:contextMenu>
+<<<<<<< HEAD
+=======
+
+<!-- 	<gs:popupPanel key="createproperty" -->
+<!-- 		title="#{msg.create} #{msg.a} #{msg.property}" -->
+<!-- 		action="#{genericBean.addProperty(popupKey, popupValue)}" -->
+<!-- 		render="typestree, editTypesManager" keyInput="true" /> -->
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 
 </ui:composition>

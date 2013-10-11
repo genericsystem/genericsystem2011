@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -28,10 +27,11 @@ public class GetSubTypeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
+		Generic myCar = car.newInstance("myCar");
 
-		assert cache.getEngine().getInstance("Car").equals(car.getImplicit());
-		assert cache.getEngine().getInstances().contains(car.getImplicit());
-		assert cache.getEngine().getAllInstances().contains(car.getImplicit()) : cache.getEngine().getAllInstances();
+		assert car.getInstance("myCar").equals(myCar);
+		assert !vehicle.getInstances().contains(myCar) : vehicle.getInstances();
+		assert vehicle.getAllInstances().contains(myCar) : vehicle.getAllInstances();
 
 		assert cache.getEngine().getSubType("Car").equals(car) : cache.getEngine().getSubType("Car");
 		assert cache.getEngine().getSubTypes().contains(car) : cache.getEngine().getSubTypes();
@@ -151,9 +151,9 @@ public class GetSubTypeTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		Type car = vehicle.newSubType("Car");
-		// ((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", color.newSubType("OutsideColor"));
-		// ((GenericImpl) car).setSubAttribute(vehicleColor, "CarPercent", cache.newType("Percent"));
-		((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.newType("Percent"));
+		try {
+			((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.newType("Percent"));
+		} catch (IllegalStateException ignore) {}
 	}
 
 	public void testGetSubTypeNonExistingRelation() {

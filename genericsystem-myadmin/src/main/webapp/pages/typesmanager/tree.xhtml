@@ -66,12 +66,21 @@
 		<rich:tree id="typestree" toggleType="ajax" var="item" status="status"
 			selectionType="ajax"
 			oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
+<<<<<<< HEAD
 			selectionChangeListener="#{treeBean.change}"
 			execute="typestree" render="paneltitletypesmanager,menutypesmanager,editTypesManager">
 			<rich:treeModelRecursiveAdaptor roots="#{treeBean.root}"
 				nodes="#{treeBean.getChildrens(item)}">
 				<rich:treeNode iconCollapsed="#{treeBean.getTypeIcon(item)}"
 					iconExpanded="#{treeBean.getTypeIcon(item)}"
+=======
+			selectionChangeListener="#{genericTreeBean.change}"
+			execute="typestree" render="paneltitletypesmanager,menutypesmanager,editTypesManager">
+			<rich:treeModelRecursiveAdaptor roots="#{genericTreeBean.root}"
+				nodes="#{genericTreeBean.getChildrens(item)}">
+				<rich:treeNode iconCollapsed="#{genericTreeBean.getTypeIcon(item)}"
+					iconExpanded="#{genericTreeBean.getTypeIcon(item)}"
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 					onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}"
 					title="#{treeBean.getTypeIconTitle(item)}">
 					<rich:dragSource type="generic" dragValue="#{item.generic}"/>

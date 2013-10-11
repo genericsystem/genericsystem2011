@@ -53,9 +53,13 @@ public class RequiredConstraintImpl extends AbstractBooleanAxedConstraintImpl im
 	}
 
 	@Override
-	public void checkConsistency(Generic base, Holder value, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-
+	public void checkConsistency(Generic base, Holder value, int axe)
+			throws ConstraintViolationException {
+		Type type = ((Attribute) base).getComponent(axe);
+		for (Generic instance : type.getAllInstances()) {
+			if (instance.getHolders((Attribute) base).isEmpty())
+				throw new RequiredConstraintViolationException(instance
+						+ " is required for " + base);
+		}
 	}
-
 }

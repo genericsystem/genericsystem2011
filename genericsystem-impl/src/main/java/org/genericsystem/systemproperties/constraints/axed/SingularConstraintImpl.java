@@ -13,6 +13,7 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
+import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
@@ -50,8 +51,10 @@ public class SingularConstraintImpl extends AbstractBooleanAxedConstraintImpl im
 
 	@Override
 	public void checkConsistency(Generic base, Holder value, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-
+		for (Generic link : ((Type) base).getInstances()) {
+			Generic instance = link.getComponents().get(axe);
+			if (instance != null && instance.getHolders((Relation) base).size() >= 2)
+				throw new SingularConstraintViolationException("Multiple links of attribute " + base + " on component " + instance + " (n° " + axe + ")");
+		}
 	}
-
 }

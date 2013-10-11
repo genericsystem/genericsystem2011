@@ -1,14 +1,11 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.NavigableSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import org.genericsystem.annotation.Components;
@@ -18,7 +15,6 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
-import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
@@ -89,23 +85,11 @@ public abstract class AbstractContext implements Serializable {
 		return getEngine().getMetaRelation();
 	}
 
-	public boolean isFlushable(Generic generic) {
-		if (!generic.isAutomatic())
-			return true;
-		for (Generic inheriting : generic.getInheritings())
-			if (isFlushable(inheriting))
-				return true;
-		for (Generic composite : generic.getComposites())
-			if (isFlushable((composite)))
-				return true;
-		return false;
-	}
-
 	public abstract boolean isScheduledToAdd(Generic generic);
 
 	public abstract boolean isScheduledToRemove(Generic generic);
 
-	Iterator<Generic> getDirectSupersIterator(final Generic[] interfaces, final Generic[] components) {
+	Iterator<Generic> getDirectSupersIterator(final HomeTreeNode[] primaries, final Generic[] components) {
 		return new AbstractSelectableLeafIterator(getEngine()) {
 
 			@Override
@@ -115,27 +99,28 @@ public abstract class AbstractContext implements Serializable {
 
 			@Override
 			public boolean isSelected(Generic candidate) {
-				return GenericImpl.isSuperOf(((GenericImpl) candidate).getPrimariesArray(), ((GenericImpl) candidate).components, interfaces, components);
+				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
+				// log.info("ISSELECTED : " + candidate + "(" + System.identityHashCode(((GenericImpl) candidate).homeTreeNode) + ") " + result);
+				// log.info("Primaries : " + Arrays.toString(((GenericImpl) candidate).primaries) + Arrays.toString(primaries));
+				return result;
+
 			}
 		};
 	}
 
-	// TODO clean
-	protected Generic[] getDirectSupers(final Generic[] interfaces, final Generic[] components) {
-		List<Generic> list = new ArrayList<Generic>();
-		final Iterator<Generic> iterator = getDirectSupersIterator(interfaces, components);
+	protected Generic[] getDirectSupers(final HomeTreeNode[] primaries, final Generic[] components) {
+		TreeSet<Generic> supers = new TreeSet<Generic>();
+		final Iterator<Generic> iterator = getDirectSupersIterator(primaries, components);
 		while (iterator.hasNext())
-			list.add(iterator.next());
-		return list.toArray(new Generic[list.size()]);
+			supers.add(iterator.next());
+		return supers.toArray(new Generic[supers.size()]);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isEngine() || generic.isAlive())
 			return (T) generic;
-		if (((GenericImpl) generic).isPrimary())
-			return findPrimaryByValue(reFind(((GenericImpl) generic).supers[0]), generic.getValue());
-		return fastFindByInterfaces(reFind(generic.getImplicit()), new Primaries(reFind(((GenericImpl) generic).getPrimariesArray())).toArray(), reFind(((GenericImpl) generic).components));
+		return fastFindBySuper(((GenericImpl) generic).homeTreeNode, ((GenericImpl) generic).primaries, reFind(((GenericImpl) generic).supers[0]), reFind(((GenericImpl) generic).components));
 	}
 
 	private Generic[] reFind(Generic[] generics) {
@@ -160,18 +145,10 @@ public abstract class AbstractContext implements Serializable {
 	// }
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T fastFindByInterfaces(Generic implicit, Generic[] interfaces, Generic[] components) {
-		// Statics.logTimeIfCurrentThreadDebugged("start" + implicit);
-		if (components.length == 0 && interfaces.length == 1) {
-			assert implicit.equals(interfaces[0]);
-			return (T) implicit;
-		}
-		for (Generic generic : components.length == 0 || components[0] == null ? implicit.getInheritings() : components[0].getComposites())
-			if (((GenericImpl) generic).equiv(interfaces, components)) {
-				// Statics.logTimeIfCurrentThreadDebugged("stop" + implicit);
+	<T extends Generic> T fastFindBySuper(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic superGeneric, Generic[] components) {
+		for (Generic generic : components.length == 0 || components[0] == null ? superGeneric.getInheritings() : components[0].getComposites())
+			if (((GenericImpl) generic).equiv(homeTreeNode, primaries, components))
 				return (T) generic;
-			}
-		// Statics.logTimeIfCurrentThreadDebugged("stop" + implicit);
 		return null;
 	}
 
@@ -230,9 +207,10 @@ public abstract class AbstractContext implements Serializable {
 		return this.<EngineImpl> getEngine().find(clazz);
 	}
 
-	<T extends Generic> T findMeta(Generic[] interfaces, Generic[] components) {
+	// TODO KK remove this !
+	<T extends Generic> T findMeta(HomeTreeNode[] primaries, Generic[] components) {
 		for (T composite : getEngine().<T> getComposites())
-			if (composite.isMeta() && Arrays.equals(interfaces, ((GenericImpl) composite).getPrimariesArray()) && Arrays.equals(components, ((GenericImpl) composite).components))
+			if (((GenericImpl) composite).equiv(this.<EngineImpl> getEngine().getHomeTreeNode(), primaries, components))
 				return composite;
 		return null;
 	}
@@ -288,16 +266,16 @@ public abstract class AbstractContext implements Serializable {
 		return clazz;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends Generic> T findPrimaryByValue(Generic meta, Serializable value) {
-		Iterator<Generic> it = directInheritingsIterator(meta);
-		while (it.hasNext()) {
-			Generic candidate = it.next();
-			if (((GenericImpl) candidate).isPrimary() && (Objects.hashCode(value) == Objects.hashCode(candidate.getValue())) && Objects.equals(value, candidate.getValue()))
-				return (T) candidate;
-		}
-		return null;
-	}
+	// @SuppressWarnings("unchecked")
+	// public <T extends Generic> T findPrimaryByValue(Generic meta, Serializable value) {
+	// Iterator<Generic> it = directInheritingsIterator(meta);
+	// while (it.hasNext()) {
+	// Generic candidate = it.next();
+	// if (((GenericImpl) candidate).isPrimary() && (Objects.hashCode(value) == Objects.hashCode(candidate.getValue())) && Objects.equals(value, candidate.getValue()))
+	// return (T) candidate;
+	// }
+	// return null;
+	// }
 
 	void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 		removeAll(removes);

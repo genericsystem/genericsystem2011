@@ -130,7 +130,7 @@ public class Archiver {
 		writeAncestors(generic.getSupers(), out);
 		writeAncestors(generic.getComponents(), out);
 		out.writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
-		out.writeBoolean(generic.isAutomatic());
+		// out.writeBoolean(generic.isAutomatic());
 	}
 
 	private static void writeTs(Generic generic, ObjectOutputStream out) throws IOException {
@@ -225,8 +225,7 @@ public class Archiver {
 				Engine engine = loadEngine();
 				for (;;)
 					loadGeneric(engine);
-			} catch (EOFException ignore) {
-			} catch (Exception e) {
+			} catch (EOFException ignore) {} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
@@ -246,7 +245,7 @@ public class Archiver {
 			Generic[] supers = loadAncestors(inputstream);
 			Generic[] components = loadAncestors(inputstream);
 			Generic generic = engine.getFactory().newGeneric((Class<?>) inputstream.readObject());
-			put(ts[0], ((GenericImpl) generic).restore(value, ts[0], ts[1], ts[2], ts[3], supers, components, inputstream.readBoolean()).plug());
+			put(ts[0], ((GenericImpl) generic).restore(((GenericImpl) supers[0]).bindInstanceNode(value), ts[0], ts[1], ts[2], ts[3], supers, components).plug());
 		}
 
 		private Generic[] loadAncestors(ObjectInputStream in) throws IOException {

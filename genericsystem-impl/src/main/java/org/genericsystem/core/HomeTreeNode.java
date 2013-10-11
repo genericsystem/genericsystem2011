@@ -2,35 +2,50 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
+import org.genericsystem.core.EngineImpl.RootTreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
-public class HomeTreeNode {
+public class HomeTreeNode implements Comparable<HomeTreeNode> {
 
-	private static final String ROOT_NODE_VALUE = "Engine";
+	protected static Logger log = LoggerFactory.getLogger(HomeTreeNode.class);
 
-	private HomeTreeNode metaNode;
-	private Serializable value;
+	HomeTreeNode metaNode;
+	Serializable value;
+	long ts;
 
-	// TODO WEAK or SOFT references ?
 	private ConcurrentHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentHashMap<>();
 
-	private HomeTreeNode(HomeTreeNode metaNode, Serializable value) {
-		this.metaNode = metaNode;
+	protected HomeTreeNode(HomeTreeNode metaNode, Serializable value) {
+		this.metaNode = metaNode == null ? this : metaNode;
 		this.value = value;
+		ts = getHomeTree().pickNewTs();
 	}
 
 	public HomeTreeNode findInstanceNode(Serializable value) {
+		if (value == null)
+			value = NULL_VALUE;
 		return instancesNodes.get(value);
 	}
 
+	private static final String NULL_VALUE = "NULL_VALUE";
+
 	public HomeTreeNode bindInstanceNode(Serializable value) {
-		return instancesNodes.putIfAbsent(value, new HomeTreeNode(this, value));
+		if (value == null)
+			value = NULL_VALUE;
+		HomeTreeNode result = findInstanceNode(value);
+		if (result != null)
+			return result;
+		HomeTreeNode newHomeTreeNode = new HomeTreeNode(this, value);
+		result = instancesNodes.putIfAbsent(value, newHomeTreeNode);
+		return result == null ? newHomeTreeNode : result;
 	}
 
-	public HomeTreeNode getHomeTree() {
+	public RootTreeNode getHomeTree() {
 		return metaNode.getHomeTree();
 	}
 
@@ -40,40 +55,33 @@ public class HomeTreeNode {
 
 	@SuppressWarnings("unchecked")
 	public <S extends Serializable> S getValue() {
-		return (S) value;
+		return value == NULL_VALUE ? null : (S) value;
 	}
 
 	public int getMetaLevel() {
-		return metaNode.getMetaLevel() + 1;
+		assert 1 + metaNode.getMetaLevel() >= 1;
+		return 1 + metaNode.getMetaLevel();
 	}
 
 	public boolean inheritsFrom(HomeTreeNode homeTreeNode) {
-		return equals(homeTreeNode) ? true : metaNode.inheritsFrom(homeTreeNode);
+		return this.equals(homeTreeNode) ? true : metaNode.inheritsFrom(homeTreeNode);
 	}
 
-	static class RootTreeNode extends HomeTreeNode {
-		RootTreeNode() {
-			super(null, ROOT_NODE_VALUE);
-		}
+	// public boolean inheritsAtLeastFromOne(HomeTreeNode... homeTreeNodes) {
+	// for (HomeTreeNode homeTreeNode : homeTreeNodes)
+	// if (inheritsFrom(homeTreeNode))
+	// return true;
+	// return false;
+	// }
 
-		@Override
-		public boolean isRoot() {
-			return true;
-		}
-
-		@Override
-		public HomeTreeNode getHomeTree() {
-			return this;
-		}
-
-		@Override
-		public int getMetaLevel() {
-			return Statics.META;
-		}
-
-		@Override
-		public boolean inheritsFrom(HomeTreeNode homeTreeNode) {
-			return equals(homeTreeNode);
-		}
+	@Override
+	public String toString() {
+		return metaNode.toString() + "|" + value;
 	}
+
+	@Override
+	public int compareTo(HomeTreeNode homeTreeNode) {
+		return Long.compare(ts, homeTreeNode.ts);
+	}
+
 }

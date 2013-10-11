@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.List;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -70,8 +69,8 @@ public class AnnotationTest extends AbstractTest {
 		Type vehicle = cache.find(Vehicle.class);
 		Type human = cache.find(Human.class);
 		Type myck = cache.find(Myck.class);
-		assert !human.isAutomatic();
-		assert !myck.isAutomatic();
+		// assert !human.isAutomatic();
+		// assert !myck.isAutomatic();
 		assert vehicle.isStructural();
 		assert human.isStructural();
 		assert myck.isConcrete();
@@ -85,16 +84,14 @@ public class AnnotationTest extends AbstractTest {
 
 		assert vehicle.isStructural();
 		assert car.isStructural();
-		assert !vehicle.isAutomatic();
-		assert !car.isAutomatic();
-		assert car.getImplicit().isAutomatic();
-		assert !myCar.isAutomatic();
+		// assert !vehicle.isAutomatic();
+		// assert !car.isAutomatic();
+		// assert car.getImplicit().isAutomatic();
+		// assert !myCar.isAutomatic();
 		assert vehicle.getDirectSubTypes().size() == 1;
 		assert vehicle.getDirectSubTypes().contains(car);
-		assert car.getSupers().size() == 2 : car.getSupers();
+		assert car.getSupers().size() == 1 : car.getSupers();
 		assert car.getSupers().contains(vehicle);
-		assert car.getSupers().contains(car.getImplicit());
-		assert !car.equals(car.getImplicit());
 	}
 
 	public void testAttribute() {
@@ -241,19 +238,16 @@ public class AnnotationTest extends AbstractTest {
 		assert transformerChildrenGames.inheritsFrom(childrenGames);
 		assert transformerChildrenGames.getSupers().contains(childrenGames) : transformerChildrenGames.info();
 		assert transformerChildrenGames.getSupers().contains(transformer);
-		assert transformerChildrenGames.getSupers().contains(transformerChildrenGames.getImplicit());
 		assert transformerChildrenGames.getInheritings().size() == 0;
 		assert transformerChildrenGames.getComposites().size() == 0;
 
 		assert childrenGames.getSupers().contains(games);
 		assert childrenGames.getSupers().contains(children);
-		assert childrenGames.getSupers().contains(childrenGames.getImplicit());
 		assert childrenGames.getInheritings().contains(transformerChildrenGames);
 		assert childrenGames.getComposites().size() == 0;
 
 		assert transformer.getSupers().contains(vehicle);
 		assert transformer.getSupers().contains(human);
-		assert transformer.getSupers().contains(transformer.getImplicit());
 		assert transformer.getInheritings().contains(transformerChildrenGames);
 		assert transformer.getComposites().size() == 0;
 	}
@@ -282,7 +276,6 @@ public class AnnotationTest extends AbstractTest {
 		assert !myTransformerChildrenGames.inheritsFrom(myChildrenGames);
 		assert !myTransformerChildrenGames.inheritsFrom(myTransformer);
 		assert myTransformerChildrenGames.getSupers().contains(transformerChildrenGames);
-		assert myTransformerChildrenGames.getSupers().contains(myTransformerChildrenGames.getImplicit());
 		assert myTransformerChildrenGames.getInheritings().size() == 0;
 		assert myTransformerChildrenGames.getComposites().size() == 0;
 
@@ -292,7 +285,6 @@ public class AnnotationTest extends AbstractTest {
 		assert !myChildrenGames.inheritsFrom(myGames);
 		assert !myChildrenGames.inheritsFrom(myChildren);
 		assert myChildrenGames.getSupers().contains(childrenGames);
-		assert myChildrenGames.getSupers().contains(myChildrenGames.getImplicit());
 		assert myChildrenGames.getInheritings().size() == 0;
 		assert myChildrenGames.getComposites().size() == 0;
 
@@ -302,7 +294,6 @@ public class AnnotationTest extends AbstractTest {
 		assert !myTransformer.inheritsFrom(myVehicle);
 		assert !myTransformer.inheritsFrom(myck);
 		assert myTransformer.getSupers().contains(transformer);
-		assert myTransformer.getSupers().contains(myTransformer.getImplicit());
 		assert myTransformer.getInheritings().size() == 0;
 		assert myTransformer.getComposites().size() == 0;
 
@@ -311,52 +302,42 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Games {
-	}
+	public static class Games {}
 
 	@SystemGeneric
 	@Extends(meta = Games.class)
-	public static class MyGames {
-	}
+	public static class MyGames {}
 
 	@SystemGeneric
-	public static class Children {
-	}
+	public static class Children {}
 
 	@SystemGeneric
 	@Extends(meta = Children.class)
-	public static class MyChildren {
-	}
+	public static class MyChildren {}
 
 	@SystemGeneric
 	@Extends({ Games.class, Children.class })
-	public static class ChildrenGames {
-	}
+	public static class ChildrenGames {}
 
 	@SystemGeneric
 	@Extends(meta = ChildrenGames.class)
-	public static class MyChildrenGames {
-	}
+	public static class MyChildrenGames {}
 
 	@SystemGeneric
 	@Extends({ Human.class, Vehicle.class })
-	public static class Transformer {
-	}
+	public static class Transformer {}
 
 	@SystemGeneric
 	@Extends(meta = Transformer.class)
-	public static class MyTransformer {
-	}
+	public static class MyTransformer {}
 
 	@SystemGeneric
 	@Extends({ Transformer.class, ChildrenGames.class })
-	public static class TransformerChildrenGames {
-	}
+	public static class TransformerChildrenGames {}
 
 	@SystemGeneric
 	@Extends(meta = TransformerChildrenGames.class)
-	public static class MyTransformerChildrenGames {
-	}
+	public static class MyTransformerChildrenGames {}
 
 	@SystemGeneric
 	public static class GraphicComponent {
@@ -405,8 +386,7 @@ public class AnnotationTest extends AbstractTest {
 
 	@SystemGeneric
 	@Extends(meta = Vehicle.class)
-	public static class MyVehicle {
-	}
+	public static class MyVehicle {}
 
 	@SystemGeneric
 	@Components(Vehicle.class)
@@ -429,8 +409,7 @@ public class AnnotationTest extends AbstractTest {
 
 	@SystemGeneric
 	@Extends(meta = Car.class)
-	public static class myCar {
-	}
+	public static class myCar {}
 
 	@SystemGeneric
 	@Components(Car.class)
@@ -445,40 +424,32 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Human {
-	}
+	public static class Human {}
 
 	@SystemGeneric
-	public static class Man extends Human {
-	}
+	public static class Man extends Human {}
 
 	@SystemGeneric
 	@Extends(meta = Human.class)
-	public static class Myck {
-	}
+	public static class Myck {}
 
 	@SystemGeneric
-	public static class Time {
-	}
+	public static class Time {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class })
-	public static class HumanPossessVehicle {
-	}
+	public static class HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Car.class })
-	public static class HumanPossessCar extends HumanPossessVehicle {
-	}
+	public static class HumanPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Man.class, Car.class })
-	public static class ManPossessCar extends HumanPossessVehicle {
-	}
+	public static class ManPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class, Time.class })
-	public static class HumanPossessVehicleTime {
-	}
+	public static class HumanPossessVehicleTime {}
 
 }

@@ -9,7 +9,6 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.exception.ConcreteInheritanceConstraintViolationException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
@@ -32,14 +31,13 @@ public class ConcreteInheritanceConstraintImpl extends AbstractBooleanSimpleCons
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(ConcreteInheritanceConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
-		if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
-			if (((GenericImpl) modified).getSupers().get(0).isConcrete())
-				throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());
+		// if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
+		// if (((GenericImpl) modified).getSupers().get(0).isConcrete())
+		// throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());
 	}
 
 }

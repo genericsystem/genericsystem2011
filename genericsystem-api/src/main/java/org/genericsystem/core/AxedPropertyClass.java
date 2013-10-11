@@ -41,6 +41,6 @@ public class AxedPropertyClass implements Serializable {
 
 	@Override
 	public String toString() {
-		return "class : " + clazz + ", axe : " + axe;
+		return "class : " + clazz.getSimpleName() + ", axe : " + axe;
 	}
 }

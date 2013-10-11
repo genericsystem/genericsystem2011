@@ -21,7 +21,8 @@ public class OverrideAnnotationTest extends AbstractTest {
 		assert car.inheritsFrom(vehicle);
 		assert !car.inheritsFrom(human) : car.info();
 		assert man.inheritsFrom(human);
-		assert outsideColor.getSupers().size() == 2 : outsideColor.getSupers();
+		assert outsideColor.getSupers().size() == 1 : outsideColor.getSupers();
+		assert outsideColor.getSupers().contains(cache.find(Color.class));
 		assert !outsideColor.getSupers().contains(cache.find(Engine.class));
 	}
 
@@ -37,12 +38,10 @@ public class OverrideAnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Human {
-	}
+	public static class Human {}
 
 	@SystemGeneric
-	public static class Man extends Human {
-	}
+	public static class Man extends Human {}
 
 	@SystemGeneric
 	public static class Color {

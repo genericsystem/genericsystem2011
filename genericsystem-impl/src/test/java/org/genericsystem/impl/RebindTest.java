@@ -44,8 +44,8 @@ public class RebindTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
-		Generic power = car.setAttribute("Power").getImplicit();
-		Attribute power2 = vehicle.setAttribute("Power").getImplicit();
+		Generic power = car.setAttribute("Power");
+		Attribute power2 = vehicle.setAttribute("Power");
 		assert power == power2;
 	}
 
