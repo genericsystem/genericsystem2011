@@ -1,7 +1,6 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 
@@ -61,17 +60,19 @@ public interface Type extends Generic {
 	 * @return Return the attribute.
 	 * @see Attribute
 	 */
-	<T extends Attribute> T addAttribute(Serializable value);
+	<T extends Attribute> T addAttribute(Serializable value, Generic... targets);
 
 	/**
 	 * Creates an attribute for the type or returns this attribute if already exists.
 	 * 
 	 * @param value
 	 *            The attribute value.
+	 * @param targets
+	 *            The targets
 	 * @return Return the attribute.
 	 * @see Attribute
 	 */
-	<T extends Attribute> T setAttribute(Serializable value);
+	<T extends Attribute> T setAttribute(Serializable value, Generic... targets);
 
 	/**
 	 * Find the property by value.
@@ -80,7 +81,7 @@ public interface Type extends Generic {
 	 *            The property value.
 	 * @return Return the property or null if no property find.
 	 */
-	<T extends Attribute> T getProperty(Serializable value);
+	<T extends Attribute> T getProperty(Serializable value, Generic... targets);
 
 	/**
 	 * Creates a property for the type or throws an exception if this property already exists.
@@ -92,7 +93,7 @@ public interface Type extends Generic {
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T addProperty(Serializable value, Type... targets);
+	<T extends Attribute> T addProperty(Serializable value, Generic... targets);
 
 	/**
 	 * Creates a property for the type or returns this property if already exists.
@@ -104,7 +105,7 @@ public interface Type extends Generic {
 	 * @return the attribute
 	 * @see Attribute
 	 */
-	<T extends Attribute> T setProperty(Serializable value, Type... targets);
+	<T extends Attribute> T setProperty(Serializable value, Generic... targets);
 
 	/**
 	 * Returns the relations of Generic.
@@ -133,7 +134,7 @@ public interface Type extends Generic {
 	 * @return Return the relation.
 	 * @see Relation
 	 */
-	<T extends Relation> T addRelation(Serializable value, Type... targets);
+	<T extends Relation> T addRelation(Serializable value, Generic... targets);
 
 	/**
 	 * Creates a relation or returns this relation if this relation already exists.
@@ -145,7 +146,7 @@ public interface Type extends Generic {
 	 * @return Return the relation.
 	 * @see Relation
 	 */
-	<T extends Relation> T setRelation(Serializable value, Type... targets);
+	<T extends Relation> T setRelation(Serializable value, Generic... targets);
 
 	/**
 	 * Returns the instances of Generic.
@@ -208,75 +209,6 @@ public interface Type extends Generic {
 	 */
 	<T extends Type> T newSubType(Serializable value, Generic... components);
 
-	/**
-	 * Enable singular constraint.
-	 * 
-	 * @return Return this.
-	 */
-	<T extends Type> T enableSingularConstraint();
-
-	/**
-	 * Disable singular constraint.
-	 * 
-	 * @return Return this
-	 */
-	<T extends Type> T disableSingularConstraint();
-
-	/**
-	 * Returns true if the singular constraint enabled
-	 * 
-	 * @return true if the singular constraint enabled
-	 */
-	boolean isSingularConstraintEnabled();
-
-	/**
-	 * Enable singular constraint for the base position
-	 * 
-	 * @param componentPos
-	 *            The component position implicated by the constraint.
-	 * @return this
-	 */
-	<T extends Type> T enableSingularConstraint(int componentPos);
-
-	/**
-	 * Disable singular constraint for the base position.
-	 * 
-	 * @param componentPos
-	 *            The component position implicated by the constraint.
-	 * @return Return this
-	 */
-	<T extends Type> T disableSingularConstraint(int componentPos);
-
-	/**
-	 * Returns true if the singular constraint enabled for the base position
-	 * 
-	 * @param componentPos
-	 *            The component position implicated by the constraint.
-	 * @return true if the singular constraint enabled for the base position
-	 */
-	boolean isSingularConstraintEnabled(int componentPos);
-
-	/**
-	 * Enable property constraint.
-	 * 
-	 * @return Return this
-	 */
-	<T extends Type> T enablePropertyConstraint();
-
-	/**
-	 * Disable property constraint.
-	 * 
-	 * @return Return this
-	 */
-	<T extends Type> T disablePropertyConstraint();
-
-	/**
-	 * Returns true if the property constraint enabled
-	 * 
-	 * @return true if the property constraint enabled
-	 */
-	boolean isPropertyConstraintEnabled();
-
 	// /**
 	// * Enable not null constraint.
 	// *
@@ -324,75 +256,6 @@ public interface Type extends Generic {
 	 * @return true if the singleton constraint enabled
 	 */
 	boolean isSingletonConstraintEnabled();
-
-	/**
-	 * Enable required constraint.
-	 * 
-	 * @return Return this.
-	 */
-	<T extends Type> T enableRequiredConstraint();
-
-	/**
-	 * Disable required constraint
-	 * 
-	 * @return this
-	 */
-	<T extends Type> T disableRequiredConstraint();
-
-	/**
-	 * Returns true if the required constraint enabled
-	 * 
-	 * @return true if the required constraint enabled
-	 */
-	boolean isRequiredConstraintEnabled();
-
-	/**
-	 * Enable required constraint for the base position.
-	 * 
-	 * @param componentPos
-	 *            The component position implicated by the constraint.
-	 * @return Return this.
-	 */
-	<T extends Type> T enableRequiredConstraint(int componentPos);
-
-	/**
-	 * Disable required constraint for the base position.
-	 * 
-	 * @param componentPos
-	 *            The component position implicated by the constraint.
-	 * @return Return this.
-	 */
-	<T extends Type> T disableRequiredConstraint(int componentPos);
-
-	/**
-	 * Returns true if the required constraint enabled for the base position
-	 * 
-	 * @param componentPos
-	 *            The component position implicated by the constraint.
-	 * @return true if the required constraint enabled for the base position
-	 */
-	boolean isRequiredConstraintEnabled(int componentPos);
-
-	/**
-	 * Enable unique value constraint.
-	 * 
-	 * @return Return this.
-	 */
-	<T extends Type> T enableUniqueValueConstraint();
-
-	/**
-	 * Disable unique value constraint.
-	 * 
-	 * @return Return this.
-	 */
-	<T extends Type> T disableUniqueValueConstraint();
-
-	/**
-	 * Returns true if the unique value constraint enabled.
-	 * 
-	 * @return true if the unique value constraint enabled.
-	 */
-	boolean isUniqueValueConstraintEnabled();
 
 	/**
 	 * Enable virtual constraint.

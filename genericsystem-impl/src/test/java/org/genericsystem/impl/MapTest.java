@@ -9,7 +9,6 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
-import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.testng.annotations.Test;
@@ -162,18 +161,4 @@ public class MapTest extends AbstractTest {
 		assert vehicle.getMap(MyMapProvider.class).get("power") == null;
 	}
 
-	public void testSingularMap() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
-		assert !vehicle.isSingularConstraintEnabled();
-		Relation vehicleColor = vehicle.setRelation("VehicleColor", color).<Relation> enableSingularConstraint(Statics.TARGET_POSITION);
-		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
-		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION);
-		assert !vehicle.isSingularConstraintEnabled();
-		vehicleColor.disableSingularConstraint(Statics.TARGET_POSITION);
-		assert !vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
-		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION);
-		assert !vehicle.isSingularConstraintEnabled();
-	}
 }

@@ -13,10 +13,11 @@ import org.genericsystem.example.Example.Vehicle;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
+import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.beans.GenericBean;
-import org.genericsystem.myadmin.beans.GenericTreeBean;
+import org.genericsystem.myadmin.beans.TreeBean;
 import org.testng.annotations.Test;
 
 @Test
@@ -26,7 +27,7 @@ public class TypesTest extends AbstractTest {
 	private Cache cache;
 
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private TreeBean genericTreeBean;
 
 	@Test
 	public void testExample() {
@@ -79,6 +80,7 @@ public class TypesTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty("power");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
+		myVehicle.getMap(MapProvider.class);
 		Holder myVehicle123 = myVehicle.setValue(vehiclePower, "123");
 		myVehicle.removeHolder(myVehicle123);
 		assert !myVehicle123.isAlive();
