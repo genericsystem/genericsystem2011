@@ -674,8 +674,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				log.info("999999999999999" + holder.info() + attribute.info() + "     " + value);
 				return holder.updateValue(value);
 			}
-			holder.remove();
 		}
+		holder.remove();
 		return this.<T> setHolder(specializationClass, attribute, value, metaLevel, basePos, existsException, targets);
 	}
 
