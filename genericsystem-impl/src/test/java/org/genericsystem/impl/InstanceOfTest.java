@@ -122,7 +122,7 @@ public class InstanceOfTest extends AbstractTest {
 		Type car1 = cache.newSubType("Car1", vehicle);
 		Type car2 = vehicle.newSubType("Car2");
 
-		assert !car1.getSupers().get(0).equals(car2.getSupers().get(0));
+		assert car1.getSupers().get(0).equals(car2.getSupers().get(0));
 	}
 
 	public void testNewSubTypeWithoutSuper() {

@@ -397,7 +397,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic meta = directSuper.getMetaLevel() != homeTreeNode.getMetaLevel() ? directSuper : directSuper.getMeta();
 		InstanceGenericClass instanceClass = meta.getClass().getAnnotation(InstanceGenericClass.class);
 		if (instanceClass != null)
-			if (specializationClass.isAssignableFrom(instanceClass.value())) {
+			if (specializationClass == null || specializationClass.isAssignableFrom(instanceClass.value())) {
 				specializationClass = instanceClass.value();
 			} else {
 				assert instanceClass.value().isAssignableFrom(specializationClass);
@@ -489,8 +489,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	static int i = 0;
 
 	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-		// checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-		// checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
+		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 	}

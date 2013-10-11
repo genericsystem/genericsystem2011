@@ -335,7 +335,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T cancel(Holder attribute, int basePos, boolean concrete, Generic... targets) {
-		return bind(((GenericImpl) attribute.getMeta()).bindInstanceNode(null), null, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		return bind(((GenericImpl) attribute).homeTreeNode.metaNode.bindInstanceNode(null), null, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override

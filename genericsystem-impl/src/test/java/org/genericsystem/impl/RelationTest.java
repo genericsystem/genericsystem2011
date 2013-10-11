@@ -1117,7 +1117,7 @@ public class RelationTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type human = cache.newType("Human");
 		Relation relationPilot = vehicle.setRelation("pilot", human);
-		assert cache.getEngine().getInheritings().containsAll(Arrays.asList(vehicle, human, relationPilot));
+		assert cache.getMetaRelation().getInheritings().containsAll(Arrays.asList(vehicle, human, relationPilot));
 	}
 
 	public void testIsRelation() {
