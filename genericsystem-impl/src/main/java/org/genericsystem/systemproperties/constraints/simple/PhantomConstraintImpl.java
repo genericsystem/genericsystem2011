@@ -31,8 +31,7 @@ public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl i
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(PhantomConstraintImpl.class)
-	@BooleanValue(false)
-	// TODO true
+	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override

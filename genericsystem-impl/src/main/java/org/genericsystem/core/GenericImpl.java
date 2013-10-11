@@ -673,27 +673,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
-		// assert attribute.getMetaLevel() >= metaLevel;
-		Generic meta = metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute;
+		assert attribute.getMetaLevel() - metaLevel <= 1;
+		// assert attribute.getMetaLevel() - metaLevel >= 0;
+		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
+
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
 		if (holder == null)
-			return value == null ? null : this.<T> bind(((GenericImpl) meta).bindInstanceNode(value), specializationClass, attribute, basePos, existsException, targets);
-		HomeTreeNode homeTreeNode = ((GenericImpl) meta).findInstanceNode(value);
+			return value == null ? null : this.<T> bind(metaNode.bindInstanceNode(value), specializationClass, attribute, basePos, existsException, targets);
 		if (!equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(holder, basePos, true);
-			if (homeTreeNode != null && !(((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+			HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
+			if (!(((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
 				cancel(holder, basePos, true);
-			return this.<T> bind(((GenericImpl) meta).bindInstanceNode(value), specializationClass, attribute, basePos, existsException, targets);
+			return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, existsException, targets);
 		}
-		if (homeTreeNode != null) {
-			if (((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
-				return holder;
-			if (value != null && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos))) {
-				log.info("999999999999999" + holder.info() + attribute.info() + "     " + value);
-				return holder.updateValue(value);
-			}
-		}
+		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
+		if (((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+			return holder;
+		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+			return holder.updateValue(value);
 		holder.remove();
 		return this.<T> setHolder(specializationClass, attribute, value, metaLevel, basePos, existsException, targets);
 	}
