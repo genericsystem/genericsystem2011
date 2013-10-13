@@ -81,6 +81,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return components.clone();
 	}
 
+	@Override
+	public boolean fastValueEquals(Generic generic) {
+		return homeTreeNode.equals(((GenericImpl) generic).homeTreeNode);
+	}
+
 	public HomeTreeNode bindInstanceNode(Serializable value) {
 		return homeTreeNode.bindInstanceNode(value);
 	}
@@ -92,10 +97,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public HomeTreeNode getHomeTreeNode() {
 		return homeTreeNode;
 	}
-
-	// final GenericImpl initializePrimary(HomeTreeNode homeTreeNode, Generic[] directSupers, Generic[] components) {
-	// return restore(homeTreeNode, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
-	// }
 
 	final GenericImpl initialize(HomeTreeNode homeTreeNode, Generic[] directSupers, Generic[] components) {
 		return restore(homeTreeNode, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
@@ -132,8 +133,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
 		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
 		for (Generic superGeneric : supers) {
-			assert !this.equals(superGeneric) || isEngine() : this;
-			assert !isConcrete() || !superGeneric.isMeta();
+			if (this.equals(superGeneric) && !isEngine())
+				throw new IllegalStateException();
+			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+				throw new IllegalStateException();
+			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+				throw new IllegalStateException();
 		}
 
 		return this;
@@ -882,9 +887,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return projections;
 	}
 
-	private boolean findPhantom(Generic[] components) {
+	boolean findPhantom(Generic[] components) {
 		HomeTreeNode phantom = homeTreeNode.metaNode.findInstanceNode(null);
-		return phantom != null && getCurrentCache().fastFindBySuper(phantom, new Primaries(phantom, supers).toArray(), supers[0], components) != null;
+		return phantom != null && getCurrentCache().fastFindBySuper(phantom, new Primaries(Statics.insertFirst(phantom, primaries)).toArray(), supers[0], components) != null;
 	}
 
 	@Override
@@ -1243,7 +1248,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> allInheritingsIterator() {
+	protected <T extends Generic> Iterator<T> allInheritingsIterator() {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 
 			private static final long serialVersionUID = 4540682035671625893L;

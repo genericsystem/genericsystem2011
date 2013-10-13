@@ -665,4 +665,6 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> Snapshot<T> getHolders(Holder attribute, int basePos, boolean readPhantoms, Generic... targets);
 
 	void removePhantoms(Attribute attribute);
+
+	boolean fastValueEquals(Generic generic);
 }
