@@ -85,12 +85,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<EngineImpl> getEngine().start(this);
 	}
 
-	// <T extends Generic> T bindPrimaryByValue(Generic meta, Serializable value, Class<?> specializeGeneric) {
-	// T implicit = findPrimaryByValue(meta, value);
-	// HomeTreeNode homeTreeNode = ((GenericImpl) meta).bindInstanceNode(value);
-	// return implicit != null ? implicit : this.<T> insert(((GenericImpl) getEngine().getFactory().newGeneric(specializeGeneric)).initialize(homeTreeNode, new Generic[] { meta }, Statics.EMPTY_GENERIC_ARRAY));
-	// }
-
 	@Override
 	TimestampedDependencies getDirectInheritingsDependencies(Generic directSuper) {
 		TimestampedDependencies dependencies = inheritingDependenciesMap.get(directSuper);
@@ -373,7 +367,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
-		return bind(homeTreeNode, userSupers, components, clazz, false);
+		// log.info("AAAAAAA meta=" + meta + " " + homeTreeNode + " " + Arrays.toString(userSupers) + " " + Arrays.toString(components));
+		return bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
 	}
 
 	private GenericImpl getMeta(Class<?> clazz) {
@@ -381,7 +376,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (null == extendsAnnotation)
 			return getEngine();
 		Class<?> meta = extendsAnnotation.meta();
-		return meta == Engine.class ? (GenericImpl) getEngine() : this.<GenericImpl> find(meta);
+		return this.<GenericImpl> find(meta);
 	}
 
 	// private boolean isAutomatic(Generic[] userSupers, Generic[] components) {
@@ -407,15 +402,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Primaries primarySet = new Primaries(homeTreeNode, supers);
-		// if (homeTreeNode.getValue() != null) {
-		// HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
-		// if (phantomHomeNode != null) {
-		// // KK supers[0] is not a real super...
-		// T phantom = fastFindBySuper(phantomHomeNode, primaries, supers[0], components);
-		// if (phantom != null)
-		// phantom.remove();
-		// }
-		// }
 		final HomeTreeNode[] primaries = primarySet.toArray();
 		assert primaries.length != 0;
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
@@ -423,6 +409,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
+
 		Generic[] directSupers = getDirectSupers(primaries, components);
 		if (directSupers.length == 1) {
 			Generic result = directSupers[0];
@@ -437,13 +424,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 					// if (!homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
 					rollback(new FunctionalConsistencyViolationException(directSuper.info() + " " + Arrays.toString(directSupers)));
 		}
+		if (homeTreeNode.getValue() != null) {
+			HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
+			if (phantomHomeNode != null) {
+				T phantom = fastFindBySuper(phantomHomeNode, new Primaries(Statics.insertFirst(phantomHomeNode, primaries)).toArray(), directSupers[0], components);
+				if (phantom != null)
+					phantom.remove();
+			}
+		}
 
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(directSuper, primaries, components);
 			while (removeIterator.hasNext()) {
 				Generic next = removeIterator.next();
-				// log.info("eeeeeeee" + next);
 				orderedDependencies.addAll(orderDependencies(next));
 			}
 		}

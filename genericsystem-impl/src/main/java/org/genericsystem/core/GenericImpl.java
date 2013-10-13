@@ -131,8 +131,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
 		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-		for (Generic superGeneric : supers)
+		for (Generic superGeneric : supers) {
 			assert !this.equals(superGeneric) || isEngine() : this;
+			assert !isConcrete() || !superGeneric.isMeta();
+		}
+
 		return this;
 	}
 
@@ -329,28 +332,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T cancel(Holder attribute, boolean concrete, Generic... targets) {
-		return cancel(attribute, getBasePos(attribute), concrete, targets);
+	public <T extends Generic> T cancel(Holder attribute, int metaLevel, Generic... targets) {
+		return cancel(attribute, getBasePos(attribute), metaLevel, targets);
 	}
 
 	@Override
-	public <T extends Generic> T cancel(Holder attribute, int basePos, boolean concrete, Generic... targets) {
-		return bind(((GenericImpl) attribute).homeTreeNode.metaNode.bindInstanceNode(null), null, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+	public <T extends Generic> T cancel(Holder attribute, int basePos, int metaLevel, Generic... targets) {
+		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
+
+		return bind(metaNode.bindInstanceNode(null), null, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override
-	public void cancelAll(Holder attribute, boolean concrete, Generic... targets) {
-		cancelAll(attribute, getBasePos(attribute), concrete, targets);
+	public void cancelAll(Holder attribute, int metaLevel, Generic... targets) {
+		cancelAll(attribute, getBasePos(attribute), metaLevel, targets);
 	}
 
 	@Override
-	public void cancelAll(Holder attribute, int basePos, boolean concrete, Generic... targets) {
-		for (Holder holder : concrete ? getHolders((Attribute) attribute, basePos, targets) : getAttributes((Attribute) attribute)) {
+	public void cancelAll(Holder attribute, int basePos, int metaLevel, Generic... targets) {
+		for (Holder holder : Statics.CONCRETE == metaLevel ? getHolders((Attribute) attribute, basePos, targets) : getAttributes((Attribute) attribute)) {
 			if (this.equals(holder.getComponent(basePos))) {
 				holder.remove();
-				cancelAll(attribute, basePos, concrete, targets);
+				cancelAll(attribute, basePos, metaLevel, targets);
 			} else
-				cancel(holder, basePos, concrete);
+				cancel(holder, basePos, metaLevel, targets);
 		}
 	}
 
@@ -388,7 +393,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (equals(holder.getBaseComponent()))
 			holder.remove();
 		else
-			cancel(holder, true);
+			cancel(holder, Statics.CONCRETE);
 	}
 
 	@Override
@@ -682,10 +687,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return value == null ? null : this.<T> bind(metaNode.bindInstanceNode(value), specializationClass, attribute, basePos, existsException, targets);
 		if (!equals(holder.getComponent(basePos))) {
 			if (value == null)
-				return cancel(holder, basePos, true);
+				return cancel(holder, basePos, metaLevel);
 			HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
 			if (!(((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
-				cancel(holder, basePos, true);
+				cancel(holder, basePos, metaLevel);
 			return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, existsException, targets);
 		}
 		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
@@ -1040,7 +1045,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
 		s += "toString    : " + this + "\n";
-		s += "meta        : " + getMeta() + "\n";
+		// s += "meta        : " + getMeta() + "\n";
 		s += "value       : " + getValue() + "\n";
 		s += "metaLevel   : " + getMetaLevel() + "\n";
 		s += "**********************************************************************\n";
@@ -1308,7 +1313,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getSystemPropertyValue(constraintClass, pos);
-		return null != value && !Boolean.FALSE.equals(value);
+		// log.info("ZZZ" + value);
+		return value != null && !Boolean.FALSE.equals(value);
 	}
 
 	public <T extends Generic> Serializable getConstraintValue(Class<T> constraintClass, int pos) {

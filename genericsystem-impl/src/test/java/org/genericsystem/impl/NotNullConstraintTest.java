@@ -43,7 +43,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		sportCar.clearAllConcrete(vehiclePower);
 		assert Objects.equals(90, sportCar.getValue(vehiclePower)) : sportCar.getHolders(vehiclePower);
 		sportCar.setValue(vehiclePower, 250);
-		sportCar.cancelAll(vehiclePower, true);
+		sportCar.cancelAll(vehiclePower, Statics.CONCRETE);
 		assert sportCar.getValue(vehiclePower) == null : sportCar.getValue(vehiclePower);
 	}
 

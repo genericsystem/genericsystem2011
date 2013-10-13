@@ -76,7 +76,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 
 	@Override
 	public String toString() {
-		return metaNode.toString() + "|" + value;
+		return metaNode.toString() + "|" + getValue();
 	}
 
 	@Override

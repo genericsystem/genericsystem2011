@@ -40,11 +40,12 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (!modified.isStructural())
 			return;
+
 		Iterator<Generic> iterator = Statics.<Generic> valueFilter(((GenericImpl) modified).<Generic> directInheritingsIterator(), modified.getValue());
 		if (!iterator.hasNext())
 			return;
 		iterator.next();
-		if (iterator.hasNext() /* || !primary.isAutomatic() */)
+		if (iterator.hasNext())
 			throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
 	}
 }
