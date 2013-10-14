@@ -451,11 +451,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
+
 		return new AbstractFilterIterator<T>(this.<T> directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
-				// log.info("###" + next);
-				// log.info("directSuper : " + directSuper + System.identityHashCode(directSuper) + " " + next + System.identityHashCode(next) + Arrays.toString(((GenericImpl) next).supers) + Arrays.toString(((GenericImpl) next).components));
+				// Statics.logTimeIfCurrentThreadDebugged("###" + next);
+				// Statics.logTimeIfCurrentThreadDebugged("directSuper : " + directSuper + System.identityHashCode(directSuper) + " " + next + System.identityHashCode(next)
+				// + GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components));
 				return GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
 			}
 		};
