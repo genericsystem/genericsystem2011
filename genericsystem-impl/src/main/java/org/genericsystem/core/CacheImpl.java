@@ -245,12 +245,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	Generic[] reBind(Generic[] generics) {
-		Generic[] reBind = new Generic[generics.length];
+		Generic[] reBounds = new Generic[generics.length];
 		for (int i = 0; i < generics.length; i++) {
 			Generic generic = generics[i];
-			reBind[i] = generic.isAlive() ? generic : updateValue(generic, generic.getValue());
+			reBounds[i] = generic == null ? null : generic.isAlive() ? generic : updateValue(generic, generic.getValue());
 		}
-		return reBind;
+		return reBounds;
 	}
 
 	@Override
@@ -367,7 +367,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
-		// log.info("AAAAAAA meta=" + meta + " " + homeTreeNode + " " + Arrays.toString(userSupers) + " " + Arrays.toString(components));
 		return bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
 	}
 
