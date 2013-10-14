@@ -1,6 +1,7 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
 import java.util.Iterator;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -36,6 +37,9 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (!modified.isStructural())
