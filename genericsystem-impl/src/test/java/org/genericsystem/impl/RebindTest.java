@@ -5,6 +5,7 @@ import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
@@ -36,7 +37,10 @@ public class RebindTest extends AbstractTest {
 		Holder vUnit = vPower.setValue(carPowerUnit, "HorsePower");
 		assert vPower.getHolders(carPowerUnit).contains(vUnit);
 		assert myCar.getHolders(carPower).contains(vPower);
+		Statics.debugCurrentThread();
 		Attribute vehiclePower = vehicle.setAttribute("Power");
+		assert false;
+		assert !carPower.isAlive();
 		assert ((CacheImpl) cache).reFind(carPower).inheritsFrom(vehiclePower);
 	}
 

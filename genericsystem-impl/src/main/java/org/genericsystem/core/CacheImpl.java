@@ -435,8 +435,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(directSuper, primaries, components);
+			// Statics.logTimeIfCurrentThreadDebugged("YYYYYYYYYYYYYYYYYYYY");
 			while (removeIterator.hasNext()) {
 				Generic next = removeIterator.next();
+				// Statics.logTimeIfCurrentThreadDebugged("ZZZZZZZZZZZZZZZ" + next);
 				orderedDependencies.addAll(orderDependencies(next));
 			}
 		}
@@ -448,6 +450,29 @@ public class CacheImpl extends AbstractContext implements Cache {
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
 	}
+
+	// @SuppressWarnings("unchecked")
+	// <T extends Generic> Iterator<T> concernedDependenciesIterator(final HomeTreeNode[] primaries, final Generic[] components) {
+	// return (Iterator<T>) new AbstractSelectableLeafIterator(getEngine()) {
+	//
+	// @Override
+	// protected boolean isSelectable() {
+	// boolean result = GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
+	// Statics.logTimeIfCurrentThreadDebugged("isSelectable : " + next + " " + result);
+	// // assert !result : next.info() + " " + Arrays.toString(primaries) + " " + Arrays.toString(components);
+	// return result;
+	// }
+	//
+	// @Override
+	// public boolean isSelected(Generic candidate) {
+	// boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components)
+	// || GenericImpl.isSuperOf(primaries, components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components);
+	// Statics.logTimeIfCurrentThreadDebugged("isSelected : " + candidate + " " + result);
+	//
+	// return result;
+	// }
+	// };
+	// }
 
 	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
 
