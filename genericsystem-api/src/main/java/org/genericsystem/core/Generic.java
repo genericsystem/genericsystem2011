@@ -626,13 +626,13 @@ public interface Generic extends Comparable<Generic> {
 
 	void clearAllConcrete(Holder attribute, int basePos, Generic... targets);
 
-	void cancelAll(Holder attribute, boolean concrete, Generic... targets);
+	void cancelAll(Holder attribute, int metaLevel, Generic... targets);
 
-	void cancelAll(Holder attribute, int basePos, boolean concrete, Generic... targets);
+	void cancelAll(Holder attribute, int basePos, int metaLevel, Generic... targets);
 
-	<T extends Generic> T cancel(Holder attribute, boolean concrete, Generic... targets);
+	<T extends Generic> T cancel(Holder attribute, int metaLevel, Generic... targets);
 
-	<T extends Generic> T cancel(Holder attribute, int basePos, boolean concrete, Generic... targets);
+	<T extends Generic> T cancel(Holder attribute, int basePos, int metaLevel, Generic... targets);
 
 	<T extends MapProvider> Map<Serializable, Serializable> getMap(Class<T> mapClass);
 
@@ -665,4 +665,6 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> Snapshot<T> getHolders(Holder attribute, int basePos, boolean readPhantoms, Generic... targets);
 
 	void removePhantoms(Attribute attribute);
+
+	boolean fastValueEquals(Generic generic);
 }

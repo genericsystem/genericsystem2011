@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -56,7 +55,11 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Holder getValueHolder(Serializable key) {
+				// log.info("AAAA" + key);
 				Holder keyHolder = getKeyHolder(key);
+				// log.info("BBBB" + (keyHolder != null ? keyHolder.info() + keyHolder.getBaseComponent().info() : null));
+
+				// getCurrentCache().find(DefaultValue.class).log();
 				return keyHolder != null ? keyHolder.getHolder(Statics.CONCRETE, getValueAttribute()) : null;
 			}
 

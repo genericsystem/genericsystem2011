@@ -31,8 +31,7 @@ public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl i
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(PhantomConstraintImpl.class)
-	@BooleanValue(false)
-	// TODO true
+	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
@@ -40,10 +39,10 @@ public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl i
 		Generic[] supers = ((GenericImpl) modified).getSupersArray();
 		if (modified.getValue() == null)
 			if (modified.getComponentsSize() != 0) {
-				if (supers.length != 2 || (modified.isStructural() ? supers[1].isConcrete() : supers[1].isStructural()))
+				if (supers.length != 1)
 					throw new PhantomConstraintViolationException(modified.info() + " " + supers[1].info());
 
-				Generic[] components = ((GenericImpl) supers[1]).getComponentsArray();
+				Generic[] components = ((GenericImpl) supers[0]).getComponentsArray();
 				Generic[] subComponents = ((GenericImpl) modified).getComponentsArray();
 				assert components.length >= subComponents.length;
 

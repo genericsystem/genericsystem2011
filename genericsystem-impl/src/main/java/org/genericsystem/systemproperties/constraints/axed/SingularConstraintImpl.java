@@ -11,6 +11,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -29,18 +30,17 @@ public class SingularConstraintImpl extends AbstractBooleanAxedConstraintImpl im
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(SingularConstraintImpl.class)
 	@BooleanValue(false)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
 	public void check(Generic base, Generic attribute, int axe) throws ConstraintViolationException {
-		Snapshot<Holder> holders = base.getHolders((Relation) attribute, axe);
+		Snapshot<Holder> holders = base.getHolders((Attribute) attribute, axe);
 		if (holders.size() > 1)
-			throw new SingularConstraintViolationException("Multiple links of attribute " + attribute + " on component " + base + " (n° " + axe + ") : " + holders);
+			throw new SingularConstraintViolationException("Multiple links of attribute " + attribute + " on component " + base + " (n° " + axe + ") : " + holders.get(0).info() + holders.get(1).info());
 		for (Generic generic : ((GenericImpl) base).getAllInheritings()) {
 			holders = generic.getHolders((Relation) attribute, axe);
 			if (holders.size() > 1)
-				throw new SingularConstraintViolationException("Multiple links of attribute " + attribute + " on component " + base + " (n° " + axe + ") : " + holders);
+				throw new SingularConstraintViolationException("Multiple links of attribute " + attribute + " on component " + generic + " (n° " + axe + ") : " + holders.get(0).info() + holders.get(1).info());
 		}
 	}
 
