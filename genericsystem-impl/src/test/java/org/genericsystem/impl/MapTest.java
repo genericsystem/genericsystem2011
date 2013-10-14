@@ -4,13 +4,15 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
+import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.map.SystemPropertiesMapProvider.SystemPropertyValue;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
+import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty.DefaultValue;
 import org.testng.annotations.Test;
 
 @Test
@@ -89,6 +91,8 @@ public class MapTest extends AbstractTest {
 
 	public void testOnInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		cache.find(DefaultValue.class).log();
+		cache.find(SystemPropertyValue.class).log();
 		assert !cache.getEngine().isReferentialIntegrity(0);
 		assert !cache.newType("Vehicle").isReferentialIntegrity(0);
 		assert !cache.find(NoInheritanceSystemType.class).isReferentialIntegrity(0);
@@ -161,4 +165,18 @@ public class MapTest extends AbstractTest {
 		assert vehicle.getMap(MyMapProvider.class).get("power") == null;
 	}
 
+	public void testSingularMap() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type color = cache.newType("Color");
+		assert !vehicle.isSingularConstraintEnabled();
+		Relation vehicleColor = vehicle.setRelation("VehicleColor", color).<Relation> enableSingularConstraint(Statics.TARGET_POSITION);
+		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION);
+		assert !vehicle.isSingularConstraintEnabled();
+		vehicleColor.disableSingularConstraint(Statics.TARGET_POSITION);
+		assert !vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		assert !vehicleColor.isSingularConstraintEnabled(Statics.BASE_POSITION);
+		assert !vehicle.isSingularConstraintEnabled();
+	}
 }

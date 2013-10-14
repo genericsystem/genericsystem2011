@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
@@ -82,7 +83,7 @@ public class RemoveTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		final Relation humanDriveVehicle = human.addRelation("drive", vehicle);
-		Relation manSubDriveCar = man.addSubRelation(humanDriveVehicle, "subDrive", car);
+		Relation manSubDriveCar = ((GenericImpl) man).addSubRelation(humanDriveVehicle, "subDrive", car);
 		cache.flush();
 		new RollbackCatcher() {
 			@Override
@@ -121,7 +122,8 @@ public class RemoveTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
 		try {
 			cache.find(Vehicle.class).remove();
-		} catch (NotRemovableException ignore) {}
+		} catch (NotRemovableException ignore) {
+		}
 	}
 
 }
