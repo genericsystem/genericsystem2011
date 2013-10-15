@@ -140,7 +140,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
 				throw new IllegalStateException();
 		}
-
+		// assert getValue() != null;
 		return this;
 	}
 
@@ -935,7 +935,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isSuperOf(primaries, components, ((GenericImpl) generic).primaries, ((GenericImpl) generic).components);
 	}
 
-	static int i = 0;
+	public static boolean isDependencyOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
+		if (isSuperOf(primaries, components, subPrimaries, subComponents))
+			return true;
+		for (Generic component : subComponents)
+			if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
+				if (isDependencyOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
+					return true;
+		return false;
+
+	}
 
 	public static boolean isSuperOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
 		if (primaries.length == subPrimaries.length && components.length == subComponents.length) {
@@ -1260,7 +1269,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> allInheritingsIteratorWithoutRoot() {
+	<T extends Generic> Iterator<T> allInheritingsIteratorWithoutRoot() {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 
 			{
