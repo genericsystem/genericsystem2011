@@ -1,7 +1,5 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
-import java.util.Iterator;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -11,7 +9,6 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Holder;
@@ -35,20 +32,21 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(UniqueStructuralValueConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {}
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
-		if (!modified.isStructural())
+		int modifiedComponentsSize = modified.getComponentsSize();
+		if (!modified.isStructural() || modifiedComponentsSize == 0)
 			return;
-		Iterator<Generic> iterator = Statics.<Generic> valueFilter(((GenericImpl) modified).<Generic> directInheritingsIterator(), modified.getValue());
-		if (!iterator.hasNext())
-			return;
-		iterator.next();
-		if (iterator.hasNext() /* || !primary.isAutomatic() */)
-			throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
+		for (Generic superComponent : modified.getSupers()) {
+			int superComponentsSize = superComponent.getComponentsSize();
+			if (superComponent.fastValueEquals(modified) && superComponentsSize != modifiedComponentsSize)
+				throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
+		}
 	}
 }

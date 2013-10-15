@@ -63,6 +63,7 @@ public class SingularConstraintTest extends AbstractTest {
 		Type car = vehicle.newSubType("Car");
 		Attribute vehiclePower = vehicle.setProperty("Power");
 		car.setValue(vehiclePower, 50);
+		assert vehicle.getValue(vehiclePower) == null;
 		vehicle.setValue(vehiclePower, 125);
 		assert car.getValue(vehiclePower).equals(50);
 	}

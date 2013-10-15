@@ -85,12 +85,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<EngineImpl> getEngine().start(this);
 	}
 
-	// <T extends Generic> T bindPrimaryByValue(Generic meta, Serializable value, Class<?> specializeGeneric) {
-	// T implicit = findPrimaryByValue(meta, value);
-	// HomeTreeNode homeTreeNode = ((GenericImpl) meta).bindInstanceNode(value);
-	// return implicit != null ? implicit : this.<T> insert(((GenericImpl) getEngine().getFactory().newGeneric(specializeGeneric)).initialize(homeTreeNode, new Generic[] { meta }, Statics.EMPTY_GENERIC_ARRAY));
-	// }
-
 	@Override
 	TimestampedDependencies getDirectInheritingsDependencies(Generic directSuper) {
 		TimestampedDependencies dependencies = inheritingDependenciesMap.get(directSuper);
@@ -251,12 +245,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	Generic[] reBind(Generic[] generics) {
-		Generic[] reBind = new Generic[generics.length];
+		Generic[] reBounds = new Generic[generics.length];
 		for (int i = 0; i < generics.length; i++) {
 			Generic generic = generics[i];
-			reBind[i] = generic.isAlive() ? generic : updateValue(generic, generic.getValue());
+			reBounds[i] = generic == null ? null : generic.isAlive() ? generic : updateValue(generic, generic.getValue());
 		}
-		return reBind;
+		return reBounds;
 	}
 
 	@Override
@@ -373,7 +367,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
-		return bind(homeTreeNode, userSupers, components, clazz, false);
+		return bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
 	}
 
 	private GenericImpl getMeta(Class<?> clazz) {
@@ -381,7 +375,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (null == extendsAnnotation)
 			return getEngine();
 		Class<?> meta = extendsAnnotation.meta();
-		return meta == Engine.class ? (GenericImpl) getEngine() : this.<GenericImpl> find(meta);
+		return this.<GenericImpl> find(meta);
 	}
 
 	// private boolean isAutomatic(Generic[] userSupers, Generic[] components) {
@@ -407,15 +401,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Primaries primarySet = new Primaries(homeTreeNode, supers);
-		// if (homeTreeNode.getValue() != null) {
-		// HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
-		// if (phantomHomeNode != null) {
-		// // KK supers[0] is not a real super...
-		// T phantom = fastFindBySuper(phantomHomeNode, primaries, supers[0], components);
-		// if (phantom != null)
-		// phantom.remove();
-		// }
-		// }
 		final HomeTreeNode[] primaries = primarySet.toArray();
 		assert primaries.length != 0;
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
@@ -423,6 +408,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
+
 		Generic[] directSupers = getDirectSupers(primaries, components);
 		if (directSupers.length == 1) {
 			Generic result = directSupers[0];
@@ -437,13 +423,22 @@ public class CacheImpl extends AbstractContext implements Cache {
 					// if (!homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
 					rollback(new FunctionalConsistencyViolationException(directSuper.info() + " " + Arrays.toString(directSupers)));
 		}
+		if (homeTreeNode.getValue() != null) {
+			HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
+			if (phantomHomeNode != null) {
+				T phantom = fastFindBySuper(phantomHomeNode, new Primaries(Statics.insertFirst(phantomHomeNode, primaries)).toArray(), directSupers[0], components);
+				if (phantom != null)
+					phantom.remove();
+			}
+		}
 
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic directSuper : directSupers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator(directSuper, primaries, components);
+			// Statics.logTimeIfCurrentThreadDebugged("YYYYYYYYYYYYYYYYYYYY");
 			while (removeIterator.hasNext()) {
 				Generic next = removeIterator.next();
-				// log.info("eeeeeeee" + next);
+				// Statics.logTimeIfCurrentThreadDebugged("ZZZZZZZZZZZZZZZ" + next);
 				orderedDependencies.addAll(orderDependencies(next));
 			}
 		}
@@ -456,12 +451,37 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return superGeneric;
 	}
 
+	// @SuppressWarnings("unchecked")
+	// <T extends Generic> Iterator<T> concernedDependenciesIterator(final HomeTreeNode[] primaries, final Generic[] components) {
+	// return (Iterator<T>) new AbstractSelectableLeafIterator(getEngine()) {
+	//
+	// @Override
+	// protected boolean isSelectable() {
+	// boolean result = GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
+	// Statics.logTimeIfCurrentThreadDebugged("isSelectable : " + next + " " + result);
+	// // assert !result : next.info() + " " + Arrays.toString(primaries) + " " + Arrays.toString(components);
+	// return result;
+	// }
+	//
+	// @Override
+	// public boolean isSelected(Generic candidate) {
+	// boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components)
+	// || GenericImpl.isSuperOf(primaries, components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components);
+	// Statics.logTimeIfCurrentThreadDebugged("isSelected : " + candidate + " " + result);
+	//
+	// return result;
+	// }
+	// };
+	// }
+
 	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
+
 		return new AbstractFilterIterator<T>(this.<T> directInheritingsIterator(directSuper)) {
 			@Override
 			public boolean isSelected() {
-				// log.info("###" + next);
-				// log.info("directSuper : " + directSuper + System.identityHashCode(directSuper) + " " + next + System.identityHashCode(next) + Arrays.toString(((GenericImpl) next).supers) + Arrays.toString(((GenericImpl) next).components));
+				// Statics.logTimeIfCurrentThreadDebugged("###" + next);
+				// Statics.logTimeIfCurrentThreadDebugged("directSuper : " + directSuper + System.identityHashCode(directSuper) + " " + next + System.identityHashCode(next)
+				// + GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components));
 				return GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
 			}
 		};

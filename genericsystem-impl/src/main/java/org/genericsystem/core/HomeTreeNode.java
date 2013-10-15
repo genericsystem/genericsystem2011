@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import java.util.concurrent.ConcurrentHashMap;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	Serializable value;
 	long ts;
 
-	private ConcurrentHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentHashMap<>();
+	private ConcurrentWeakValueHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentWeakValueHashMap<>();
 
 	protected HomeTreeNode(HomeTreeNode metaNode, Serializable value) {
 		this.metaNode = metaNode == null ? this : metaNode;
@@ -76,7 +75,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 
 	@Override
 	public String toString() {
-		return metaNode.toString() + "|" + value;
+		return metaNode.toString() + "|" + getValue();
 	}
 
 	@Override

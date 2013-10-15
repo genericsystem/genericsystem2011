@@ -100,8 +100,14 @@ public abstract class AbstractContext implements Serializable {
 			@Override
 			public boolean isSelected(Generic candidate) {
 				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
+				// if (SystemPropertyValue.class.equals(candidate.getClass())) {
 				// log.info("ISSELECTED : " + candidate + "(" + System.identityHashCode(((GenericImpl) candidate).homeTreeNode) + ") " + result);
-				// log.info("Primaries : " + Arrays.toString(((GenericImpl) candidate).primaries) + Arrays.toString(primaries));
+				// log.info("================> Primaries : " + Arrays.toString(((GenericImpl) candidate).primaries) + "===>" + Arrays.toString(primaries));
+				// log.info("================> Components : " + Arrays.toString(((GenericImpl) candidate).components) + "===>" + Arrays.toString(components));
+				// // assert primaries[0].inheritsFrom((((GenericImpl) candidate).primaries)[0]);
+				//
+				// // assert components[0].inheritsFrom((((GenericImpl) candidate).components)[0]);
+				// }
 				return result;
 
 			}
