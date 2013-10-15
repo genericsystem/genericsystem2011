@@ -7,39 +7,49 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<property>
+					<name>environment</name>
+					<value>development</value>
+				</property>
+			</activation>
+			<build>
+				<finalName>gsmyadmin</finalName>
+
+				<plugins>
+					<plugin>
+						<groupId>org.jboss.as.plugins</groupId>
+						<artifactId>jboss-as-maven-plugin</artifactId>
+						<version>7.4.Final</version>
+						<executions>
+							<execution>
+								<phase>install</phase>
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- <plugin> <groupId>org.codehaus.cargo</groupId> <artifactId>cargo-maven2-plugin</artifactId> 
+						<version>${cargo-maven2-plugin.version}</version> <executions> <execution> 
+						<id>verify-deploy</id> <phase>install</phase> <goals> <goal>deployer-deploy</goal> 
+						</goals> </execution> </executions> <configuration> <deployer> <deployables> 
+						<deployable> <groupId>${project.groupId}</groupId> <artifactId>${project.artifactId}</artifactId> 
+						</deployable> </deployables> </deployer> <container> <containerId>tomcat7x</containerId> 
+						<home>${user.home}/apache-tomcat</home> </container> <type>existing</type> 
+						<home>${user.home}/apache-tomcat</home> </configuration> </plugin> -->
+				</plugins>
+
+			</build>
+		</profile>
+	</profiles>
+
 	<artifactId>genericsystem-myadmin</artifactId>
 	<name>Generic System MyAdmin</name>
 	<packaging>war</packaging>
-
-	<build>
-		<finalName>gsmyadmin</finalName>
-
-		<plugins>
-			<plugin>
-				<groupId>org.jboss.as.plugins</groupId>
-				<artifactId>jboss-as-maven-plugin</artifactId>
-				<version>7.4.Final</version>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<goals>
-							<goal>deploy</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- <plugin> <groupId>org.codehaus.cargo</groupId> <artifactId>cargo-maven2-plugin</artifactId> 
-				<version>${cargo-maven2-plugin.version}</version> <executions> <execution> 
-				<id>verify-deploy</id> <phase>install</phase> <goals> <goal>deployer-deploy</goal> 
-				</goals> </execution> </executions> <configuration> <deployer> <deployables> 
-				<deployable> <groupId>${project.groupId}</groupId> <artifactId>${project.artifactId}</artifactId> 
-				</deployable> </deployables> </deployer> <container> <containerId>tomcat7x</containerId> 
-				<home>${user.home}/apache-tomcat</home> </container> <type>existing</type> 
-				<home>${user.home}/apache-tomcat</home> </configuration> </plugin> -->
-		</plugins>
-
-	</build>
-
 
 	<dependencies>
 		<dependency>
@@ -111,7 +121,7 @@
 			<artifactId>cdi-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.jboss.solder</groupId>
 			<artifactId>solder-api</artifactId>
@@ -144,23 +154,19 @@
 			<artifactId>joda-time</artifactId>
 			<scope>compile</scope>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>6.0.35</version>
-			<scope>provided</scope>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.apache.tomcat</groupId> <artifactId>servlet-api</artifactId> 
+			<version>6.0.35</version> <scope>provided</scope> </dependency> -->
 
 		<!-- tests -->
-		
+
 		<dependency>
 			<groupId>org.jboss.weld</groupId>
 			<artifactId>weld-core</artifactId>
