@@ -1,5 +1,6 @@
 package org.genericsystem.systemproperties.constraints.simple;
 
+import java.util.Iterator;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -9,6 +10,7 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Holder;
@@ -40,13 +42,17 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 	 */
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
-		int modifiedComponentsSize = modified.getComponentsSize();
-		if (!modified.isStructural() || modifiedComponentsSize == 0)
+		if (!modified.isStructural() && modified.getComponentsSize() == 0)
 			return;
-		for (Generic superComponent : modified.getSupers()) {
-			int superComponentsSize = superComponent.getComponentsSize();
-			if (superComponent.fastValueEquals(modified) && superComponentsSize != modifiedComponentsSize)
-				throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
-		}
+		Generic[] components = ((GenericImpl) modified).getComponentsArray();
+		for (int i = 0; i < modified.getComponentsSize(); i++)
+			for (Generic inherited : ((GenericImpl) components[i]).getAllInheritings()) {
+				Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL, modified.getValue() == null), modified.getValue());
+				if (iterator.hasNext()) {
+					iterator.next();
+					if (iterator.hasNext())
+						throw new UniqueStructuralValueConstraintViolationException(iterator.next().info());
+				}
+			}
 	}
 }
