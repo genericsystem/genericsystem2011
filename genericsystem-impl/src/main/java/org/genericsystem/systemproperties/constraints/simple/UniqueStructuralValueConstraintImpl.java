@@ -34,8 +34,12 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(UniqueStructuralValueConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {}
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (!modified.isStructural() && modified.getComponentsSize() == 0)
