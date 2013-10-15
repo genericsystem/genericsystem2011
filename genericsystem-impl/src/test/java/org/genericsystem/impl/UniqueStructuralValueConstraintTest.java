@@ -26,32 +26,18 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		assert Objects.equals(car, car2);
 	}
 
-	public void testAttributeWithSameNameAsTypeKO() {
+	public void testAttributeWithSameNameAsTypeOK2() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		cache.newType("Plane");
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				car.setAttribute("Plane");
-			}
-		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
+		car.setAttribute("Plane");
 	}
 
-	public void testRelationWithSameNameAsTypeKO() {
+	public void testRelationWithSameNameAsTypeOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		final Type plane = cache.newType("Plane");
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				car.setRelation("Plane", plane);
-			}
-		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
+		car.setRelation("Plane", plane);
 	}
 
 	// Attribute
@@ -100,8 +86,8 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		assert power.fastValueEquals(powerOnCar);
 		assert !powerOnCar.isAlive();
 		assert !powerOnPlane.isAlive();
-		assert powerOnCar.inheritsFrom(power);
-		assert powerOnPlane.inheritsFrom(power);
+		assert ((GenericImpl) powerOnCar).reFind().inheritsFrom(power);
+		assert ((GenericImpl) powerOnCar).reFind().inheritsFrom(power);
 
 		assert ((GenericImpl) powerOnCar).reFind() == car.getAttribute("Power");
 		assert ((GenericImpl) powerOnPlane).reFind() == plane.getAttribute("Power");
