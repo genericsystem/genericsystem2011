@@ -140,7 +140,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
 				throw new IllegalStateException();
 		}
-		// assert getValue() != null;
+		assert !homeTreeNode.toString().equals("Engine|class org.genericsystem.map.ConstraintsMapProvider$ConstraintKey|null");
 		return this;
 	}
 
@@ -694,9 +694,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (value == null)
 				return cancel(holder, basePos, metaLevel);
 			HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
-			if (!(((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+			if (!(((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos)))) {
 				cancel(holder, basePos, metaLevel);
-			return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, existsException, targets);
+				return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, existsException, targets);
+			}
+			return this.<T> bind(homeTreeNode, specializationClass, holder, basePos, existsException, targets);
 		}
 		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
 		if (((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
