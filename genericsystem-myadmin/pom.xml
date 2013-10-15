@@ -11,10 +11,7 @@
 		<profile>
 			<id>development</id>
 			<activation>
-				<property>
-					<name>environment</name>
-					<value>development</value>
-				</property>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
 				<finalName>gsmyadmin</finalName>
@@ -44,6 +41,17 @@
 				</plugins>
 
 			</build>
+		</profile>
+		
+		<profile>
+			<id>integration</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>environment</name>
+					<value>integration</value>
+				</property>
+			</activation>
 		</profile>
 	</profiles>
 
