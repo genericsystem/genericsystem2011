@@ -25,27 +25,11 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 		return true;
 	}
 
-	/**
-	 * Checks that inserted/modified node not violate the constraint.
-	 * 
-	 * @param modified
-	 * @param valueBaseComponent
-	 * 
-	 * @throws ConstraintViolationException
-	 */
-	public abstract void check(Generic modified, Holder valueBaseComponent) throws ConstraintViolationException;
-
-	/**
-	 * Checks if constraint can be put on current tree. This method verify that nodes already
-	 * present in tree not violate constraint that will be applyed.
-	 * 
-	 * @param base
-	 * @param value
-	 * @param axe
-	 * 
-	 * @throws ConstraintViolationException
-	 */
-	public abstract void checkConsistency(Generic base, Holder value, int axe) throws ConstraintViolationException;
+	public abstract void check(Generic modified, Holder valueConstraint,int axe) throws ConstraintViolationException;	
+	public abstract void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException;
+	
+		
+	
 
 	// @Override
 	// public int compareTo(AbstractConstraintImpl otherConstraint) {

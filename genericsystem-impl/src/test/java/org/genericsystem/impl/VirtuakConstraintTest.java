@@ -46,6 +46,12 @@ public class VirtuakConstraintTest extends AbstractTest {
 		final Type vehicle = cache.newType("Vehicle");
 		vehicle.newInstance("myVehicle");
 		cache.flush();
-		vehicle.enableVirtualConstraint();
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				vehicle.enableVirtualConstraint();
+			}
+		}.assertIsCausedBy(VirtualConstraintException.class);
+		
 	}
 }

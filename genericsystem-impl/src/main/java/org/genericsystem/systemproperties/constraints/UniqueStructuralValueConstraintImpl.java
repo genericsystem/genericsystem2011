@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints.simple;
+package org.genericsystem.systemproperties.constraints;
 
 import java.util.Iterator;
 import org.genericsystem.annotation.Components;
@@ -28,7 +28,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SingularConstraint
 @Dependencies(UniqueStructuralValueConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(UniqueStructuralValueConstraintImpl.class)
-public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
+public class UniqueStructuralValueConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
@@ -41,7 +41,7 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void check(Generic modified, Generic type) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type,int axe) throws ConstraintViolationException {
 		if (!modified.isStructural() && modified.getComponentsSize() == 0)
 			return;
 		Generic[] components = ((GenericImpl) modified).getComponentsArray();
@@ -55,4 +55,10 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanSimpleCo
 				}
 			}
 	}
+	@Override
+	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints.simple;
+package org.genericsystem.systemproperties.constraints;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -31,13 +31,13 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @SingularConstraint
 @AxedConstraintValue(UniqueValueConstraintImpl.class)
-public class UniqueValueConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
+public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void check(Generic modified, Generic type) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type,int axe) throws ConstraintViolationException {
 		if (!modified.isStructural()) {
 			for (Generic generic : ((Type) type).getAllInstances())
 				if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
