@@ -28,8 +28,8 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 	/**
 	 * Checks that inserted/modified node not violate the constraint.
 	 * 
-	 * @param modified
-	 * @param valueBaseComponent
+	 * @param modified - modified attribute.
+	 * @param valueBaseComponent - holder that hold this attribute.
 	 * 
 	 * @throws ConstraintViolationException
 	 */

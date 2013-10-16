@@ -39,10 +39,12 @@ public class UniqueValueConstraintImpl extends AbstractBooleanSimpleConstraintIm
 	@Override
 	public void check(Generic modified, Generic type) throws ConstraintViolationException {
 		if (!modified.isStructural()) {
+			/* Get all instances of type and checks that there is only one instance with the same value */
 			for (Generic generic : ((Type) type).getAllInstances())
 				if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
 					throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
 		} else {
+			/* Get all instances of modified structural and checks that there is only one instance */
 			Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) modified).<Generic> directInheritingsIterator(), modified.getValue());
 			if (iterator.hasNext()) {
 				iterator.next();
