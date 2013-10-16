@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,12 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		ts = getHomeTree().pickNewTs();
 	}
 
+	protected HomeTreeNode(long ts, HomeTreeNode metaNode, Serializable value) {
+		this.metaNode = metaNode == null ? this : metaNode;
+		this.value = value;
+		this.ts = ts;
+	}
+
 	public HomeTreeNode findInstanceNode(Serializable value) {
 		if (value == null)
 			value = NULL_VALUE;
@@ -40,6 +47,17 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		if (result != null)
 			return result;
 		HomeTreeNode newHomeTreeNode = new HomeTreeNode(this, value);
+		result = instancesNodes.putIfAbsent(value, newHomeTreeNode);
+		return result == null ? newHomeTreeNode : result;
+	}
+
+	public HomeTreeNode bindInstanceNode(long ts, Serializable value) {
+		if (value == null)
+			value = NULL_VALUE;
+		HomeTreeNode result = findInstanceNode(value);
+		if (result != null)
+			return result;
+		HomeTreeNode newHomeTreeNode = new HomeTreeNode(ts, this, value);
 		result = instancesNodes.putIfAbsent(value, newHomeTreeNode);
 		return result == null ? newHomeTreeNode : result;
 	}

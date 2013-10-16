@@ -10,6 +10,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -362,16 +363,22 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
+		// GenericImpl meta = getMeta(clazz);
+		// return bind(meta.bindInstanceNode(findImplictValue(clazz)), Statics.insertFirst(meta, findUserSupers(clazz)), findComponents(clazz), clazz, false);
+
 		Generic[] userSupers = findUserSupers(clazz);
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
-		// log.info("AAAAAAA meta=" + meta + " " + homeTreeNode + " " + Arrays.toString(userSupers) + " " + Arrays.toString(components));
+		// log.info("AAAAAAA meta= " + meta.info() + " " + homeTreeNode + " " + System.identityHashCode(homeTreeNode) + " " + Arrays.toString(userSupers) + " " + Arrays.toString(components));
 		return bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
 	}
 
 	private GenericImpl getMeta(Class<?> clazz) {
+		// Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
+		// return null == extendsAnnotation ? (GenericImpl) getEngine() : this.<GenericImpl> find(extendsAnnotation.meta());
+
 		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
 		if (null == extendsAnnotation)
 			return getEngine();

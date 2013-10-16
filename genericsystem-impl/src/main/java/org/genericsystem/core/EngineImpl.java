@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
 import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
@@ -13,6 +14,7 @@ import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.systemproperties.MetaAttribute;
 import org.genericsystem.systemproperties.MetaRelation;
+import org.genericsystem.systemproperties.NoInheritanceSystemType;
 
 /**
  * @author Nicolas Feybesse
@@ -22,7 +24,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	private SystemCache systemCache = new SystemCache();
 	private TsGenerator generator = new TsGenerator();
-	private HomeTreeNode homeTree = new RootTreeNode();
+	private HomeTreeNode homeTree;
 	private Factory factory;
 	private Archiver archiver;
 
@@ -34,10 +36,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	void restoreEngine() {
-		restoreEngine(pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE);
+		restoreEngine(0L, pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE);
 	}
 
-	final void restoreEngine(long designTs, long birthTs, long lastReadTs, long deathTs) {
+	final void restoreEngine(long homeTreeNodeTs, long designTs, long birthTs, long lastReadTs, long deathTs) {
+		homeTree = 0L == homeTreeNodeTs ? new RootTreeNode() : new RootTreeNode(homeTreeNodeTs);
 		restore(homeTree, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
 		assert components.length == 0;
 	}
@@ -130,6 +133,10 @@ public class EngineImpl extends GenericImpl implements Engine {
 			super(null, Statics.ROOT_NODE_VALUE);
 		}
 
+		RootTreeNode(long ts) {
+			super(ts, null, Statics.ROOT_NODE_VALUE);
+		}
+
 		public long pickNewTs() {
 			return EngineImpl.this.pickNewTs();
 		}
@@ -168,7 +175,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		SystemCache init(Class<?>... userClasses) {
 			put(Engine.class, EngineImpl.this);
-			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
+			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, NoInheritanceSystemType.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
 			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				get(clazz);

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -116,6 +117,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	// supers[index] = supers[0];
 	// supers[0] = tmp;
 	// }
+
+	GenericImpl restore(Long homeTreeNodeTs, Serializable homeTreeNodeValue, HomeTreeNode metaNode, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] supers, Generic[] components) {
+		return restore(metaNode.bindInstanceNode(homeTreeNodeTs, homeTreeNodeValue), designTs, birthTs, lastReadTs, deathTs, supers, components);
+	}
 
 	final GenericImpl restore(HomeTreeNode homeTreeNode, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] supers, Generic[] components) {
 		assert homeTreeNode != null;

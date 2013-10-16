@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 public class PersistenceTest2 {
 
 	public void testDefaultConfiguration() {
-		String path = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
+		String path = System.getenv("HOME") + "/test/snapshot_save";// + new Random().nextInt();
 		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path).start();
 		GenericImpl metaAttribute = cache.getMetaAttribute();
 		cache.getEngine().close();

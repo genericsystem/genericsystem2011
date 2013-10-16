@@ -56,7 +56,7 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanSimpleConst
 		if (iterator.hasNext()) {
 			iterator.next();
 			if (iterator.hasNext())
-				throw new UnduplicateBindingConstraintViolationException();
+				throw new UnduplicateBindingConstraintViolationException(iterator.next().info());
 		}
 	}
 
