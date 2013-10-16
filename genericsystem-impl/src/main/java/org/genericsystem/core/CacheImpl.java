@@ -222,7 +222,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies, boolean computeDirectSupers) {
 			for (Generic orderedDependency : orderedDependencies) {
-				log.info("REBUILD : " + orderedDependency.info());
+				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
 						adjust(((GenericImpl) orderedDependency).components));
@@ -446,10 +446,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 		// }
 		for (Generic generic : orderedDependencies.descendingSet()) {
-			log.info("Remove : " + generic.info());
+			// log.info("Remove : " + generic.info());
 			simpleRemove(generic);
 		}
-		log.info("===> dependency of " + homeTreeNode);
+		// log.info("===> dependency of " + homeTreeNode);
 		// assert orderedDependencies.isEmpty() : "" + orderedDependencies.first().info() + Arrays.toString(primaries) + Arrays.toString(components);
 		ConnectionMap connectionMap = new ConnectionMap();
 		T superGeneric = buildAndInsertComplex(homeTreeNode, specializationClass, directSupers, components);
