@@ -62,20 +62,11 @@ public class UniqueValueConstraintImpl extends AbstractBooleanSimpleConstraintIm
 	@Override
 	public void checkConsistency(Generic base, Holder valueHolder, int axe) throws ConstraintViolationException {
 		Set<Serializable> values = new HashSet<>();
-		if (!base.isStructural()) {
-			for (Generic attributeNode : ((Type) base).getAllInstances()) {
-				Serializable value = attributeNode.getValue();
-				if (value != null)
-					if (!values.add(value))
-						throw new UniqueValueConstraintViolationException("Duplicate value : " + value);
-			}
-		} else {
-			Iterator<Generic> iterator = (Iterator<Generic>) ((GenericImpl) base).getAllInheritings();
-			while (iterator.hasNext()) {
-				Serializable value = ((Iterator<Serializable>) values).next();
+		for (Generic attributeNode : ((Type) base).getAllInstances()) {
+			Serializable value = attributeNode.getValue();
+			if (value != null)
 				if (!values.add(value))
 					throw new UniqueValueConstraintViolationException("Duplicate value : " + value);
-			}
 		}
 	}
 }
