@@ -26,7 +26,6 @@ import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintI
 import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.SuperRuleConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UnduplicateBindingConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.UniqueStructuralValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
 import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
 
@@ -39,8 +38,8 @@ import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintIm
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
-		OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class,
-		UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
+	OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, /* UniqueStructuralValueConstraintImpl.class,*/
+	UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
 
 	@Override
