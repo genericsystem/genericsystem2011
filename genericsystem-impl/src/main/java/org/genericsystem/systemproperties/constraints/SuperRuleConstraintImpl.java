@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints.simple;
+package org.genericsystem.systemproperties.constraints;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -26,7 +26,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SingularConstraint
 @Dependencies(SuperRuleConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(SuperRuleConstraintImpl.class)
-public class SuperRuleConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
+public class SuperRuleConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
@@ -36,9 +36,15 @@ public class SuperRuleConstraintImpl extends AbstractBooleanSimpleConstraintImpl
 	}
 
 	@Override
-	public void check(Generic modified, Generic type) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type,int axe) throws ConstraintViolationException {
 		for (Generic directSuper : modified.getSupers())
 			if (!((GenericImpl) directSuper).isSuperOf(modified))
 				throw new SuperRuleConstraintViolationException(modified.info() + " should inherits from : " + directSuper.info());
+	}
+
+	@Override
+	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
+		// TODO Auto-generated method stub
+
 	}
 }

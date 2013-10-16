@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints.simple;
+package org.genericsystem.systemproperties.constraints;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -26,7 +26,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SingularConstraint
 @Dependencies(PhantomConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(PhantomConstraintImpl.class)
-public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
+public class PhantomConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
@@ -35,7 +35,7 @@ public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl i
 	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
-	public void check(Generic modified, Generic type) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type, int axe) throws ConstraintViolationException {
 		Generic[] supers = ((GenericImpl) modified).getSupersArray();
 		if (modified.getValue() == null)
 			if (modified.getComponentsSize() != 0) {
@@ -60,5 +60,11 @@ public class PhantomConstraintImpl extends AbstractBooleanSimpleConstraintImpl i
 				if (inheritancesCount != 1)
 					throw new PhantomConstraintViolationException(modified.info());
 			}
+	}
+
+	@Override
+	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
+		// TODO Auto-generated method stub
+
 	}
 }

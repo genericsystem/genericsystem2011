@@ -43,14 +43,14 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.InstanceClassConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
+import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.systemproperties.constraints.PropertyConstraintImpl;
+import org.genericsystem.systemproperties.constraints.RequiredConstraintImpl;
+import org.genericsystem.systemproperties.constraints.SingletonConstraintImpl;
+import org.genericsystem.systemproperties.constraints.SingularConstraintImpl;
+import org.genericsystem.systemproperties.constraints.SizeConstraintImpl;
+import org.genericsystem.systemproperties.constraints.UniqueValueConstraintImpl;
+import org.genericsystem.systemproperties.constraints.VirtualConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1418,11 +1418,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (T) this;
 	}
 
+//	@Override
+//	public <T extends Generic> T disableSizeConstraint(int basePos) {
+//		setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
+//		return (T) this;
+//	}
 	@Override
 	public <T extends Generic> T disableSizeConstraint(int basePos) {
-		setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
+		//TODO different des autres
+		getConstraintsMap().getValueHolder(new AxedPropertyClass(SizeConstraintImpl.class, basePos)).remove();
 		return (T) this;
 	}
+
 
 	@Override
 	public Integer getSizeConstraint(int basePos) {

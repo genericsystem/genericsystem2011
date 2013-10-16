@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints.axed;
+package org.genericsystem.systemproperties.constraints;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
@@ -25,7 +25,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @AxedConstraintValue(RequiredConstraintImpl.class)
 @SingularConstraint
-public class RequiredConstraintImpl extends AbstractBooleanAxedConstraintImpl implements Holder {
+public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
 	public void check(Generic base, Generic attribute, int axe) throws ConstraintViolationException {

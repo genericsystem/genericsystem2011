@@ -43,7 +43,7 @@ public class SizeTest extends AbstractTest {
 		assert vehicleColor.getSizeConstraint(Statics.BASE_POSITION) != 1 : vehicleColor.getSizeConstraint(Statics.BASE_POSITION);
 		assert vehicleColor.getSizeConstraint(Statics.BASE_POSITION) == 2 : vehicleColor.getSizeConstraint(Statics.BASE_POSITION);
 		vehicleColor.disableSizeConstraint(Statics.BASE_POSITION);
-		assert vehicleColor.getSizeConstraint(Statics.BASE_POSITION) == -1 : vehicleColor.getSizeConstraint(Statics.BASE_POSITION);
+		assert vehicleColor.getSizeConstraint(Statics.BASE_POSITION) == null : vehicleColor.getSizeConstraint(Statics.BASE_POSITION);
 	}
 
 	public void enableComplexSize() {
