@@ -37,7 +37,7 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void check(Generic modified, Generic type,int axe) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type, int axe) throws ConstraintViolationException {
 		if (!modified.isStructural()) {
 			for (Generic generic : ((Type) type).getAllInstances())
 				if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
@@ -51,15 +51,8 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 				}
 			}
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void checkConsistency(Generic base, Holder valueHolder, int axe) throws ConstraintViolationException {
 		Set<Serializable> values = new HashSet<>();
-		for (Generic attributeNode : ((Type) base).getAllInstances()) {
+		for (Generic attributeNode : ((Type) type).getAllInstances()) {
 			Serializable value = attributeNode.getValue();
 			if (value != null)
 				if (!values.add(value))

@@ -107,14 +107,4 @@ public class OptimisticLockConstraintImpl extends AbstractBooleanConstraintImpl 
 	public boolean isCheckedAt(Generic modified, CheckingType type) {
 		return type.equals(CheckingType.CHECK_ON_REMOVE_NODE);
 	}
-
-	@Override
-	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	
-
 }

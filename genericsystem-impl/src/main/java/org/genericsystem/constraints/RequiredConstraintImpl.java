@@ -6,8 +6,6 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot;
-import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.RequiredConstraintViolationException;
 import org.genericsystem.generic.Attribute;
@@ -32,14 +30,10 @@ public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implem
 		if (base.isConcrete()) {
 			if (base.getHolders((Holder) attribute).isEmpty())
 				throw new RequiredConstraintViolationException(attribute + " is required");
-		} else {
-			Snapshot<Generic> instances = ((Type) base).getAllInstances();
-			if (instances.isEmpty())
-				throw new RequiredConstraintViolationException(attribute + " is required");
-			for (Generic generic : instances)
-				if (null == generic.getHolder(Statics.CONCRETE, (Attribute) attribute, axe))
-					throw new RequiredConstraintViolationException(generic + " is required for " + attribute);
-		}
+		} else
+			for (Generic instance : ((Type) base).getAllInstances())
+				if (null == instance.getValue((Attribute) attribute))
+					throw new RequiredConstraintViolationException(attribute + " is required for " + instance);
 	}
 
 	@Override
@@ -50,16 +44,5 @@ public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implem
 	@Override
 	public boolean isImmediatelyCheckable() {
 		return false;
-	}
-
-	@Override
-	public void checkConsistency(Generic base, Holder value, int axe)
-			throws ConstraintViolationException {
-		Type type = ((Attribute) base).getComponent(axe);
-		for (Generic instance : type.getAllInstances()) {
-			if (instance.getHolders((Attribute) base).isEmpty())
-				throw new RequiredConstraintViolationException(instance
-						+ " is required for " + base);
-		}
 	}
 }

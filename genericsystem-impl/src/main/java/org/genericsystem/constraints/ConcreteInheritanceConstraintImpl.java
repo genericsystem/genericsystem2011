@@ -88,11 +88,4 @@ public class ConcreteInheritanceConstraintImpl extends AbstractBooleanConstraint
 //			if (((GenericImpl) base).getSupers().get(0).isConcrete())
 //				throw new ConcreteInheritanceConstraintViolationException(base.getMeta() + " " + base.info());
 //	}
-
-	@Override
-	public void checkConsistency(Generic baseConstraint,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-
-	}
-
 }

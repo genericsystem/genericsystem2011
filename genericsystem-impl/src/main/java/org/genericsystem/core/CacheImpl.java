@@ -536,30 +536,25 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
-	// TODO clean
-	// protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-	// for (Generic generic : generics)
-	// if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
-	// AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-	// keyHolder.checkConsistency((Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-	// }
-	// }
+	protected void checkConsistency(Iterable<Generic> generics) throws ConstraintViolationException {
+		for (Generic generic : generics)
+			if (isGenericOfConstraintActivate(generic)) {
+				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
+				keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+			}
+	}
 
 	static int i = 0;
 
 	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-		// checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-		// checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+		checkConsistency(adds);
+		checkConsistency(removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics) {
-			if (isGenericOfConstraintActivate(generic)) {
-				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-				keyHolder.checkConsistency(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-			}
 			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
 			for (Serializable key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
@@ -624,13 +619,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private void addGeneric(Generic generic) throws ConstraintViolationException {
 		simpleAdd(generic);
-		// checkConsistency(CheckingType.CHECK_ON_ADD_NODE, false, Arrays.asList(generic));
+		checkConsistency(Arrays.asList(generic));
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, Arrays.asList(generic));
 	}
 
 	private void removeGeneric(Generic generic) throws ConstraintViolationException {
 		simpleRemove(generic);
-		// checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
+		checkConsistency(Arrays.asList(generic));
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
 	}
 

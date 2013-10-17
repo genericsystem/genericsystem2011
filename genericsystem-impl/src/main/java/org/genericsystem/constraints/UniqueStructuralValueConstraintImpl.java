@@ -41,7 +41,7 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanConstrai
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void check(Generic modified, Generic type,int axe) throws ConstraintViolationException {
+	public void check(Generic modified, Generic type, int axe) throws ConstraintViolationException {
 		if (!modified.isStructural() && modified.getComponentsSize() == 0)
 			return;
 		Generic[] components = ((GenericImpl) modified).getComponentsArray();
@@ -55,10 +55,4 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanConstrai
 				}
 			}
 	}
-	@Override
-	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

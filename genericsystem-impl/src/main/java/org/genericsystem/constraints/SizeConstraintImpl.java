@@ -16,7 +16,6 @@ import org.genericsystem.exception.SizeConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
-import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
@@ -49,12 +48,5 @@ public class SizeConstraintImpl extends AbstractNoBooleanConstraintImpl implemen
 		if (value instanceof Integer)
 			if (holders.size() > (Integer) value)
 				throw new SizeConstraintViolationException("Multiple links of type " + baseConstraint + ", and the maximum size is " + value);
-	}
-
-	@Override
-	public void checkConsistency(Generic modified, Holder valueConstraint, int axe) throws ConstraintViolationException {
-		Generic baseConstraint = ((Holder) getBaseComponent()).getBaseComponent();
-		if (baseConstraint.getComponentsSize() > 0 && ((Type) baseConstraint).getInstances().size() > (Integer) valueConstraint.getValue())
-			throw new SizeConstraintViolationException("Multiple links of " + baseConstraint + ", and the maximum size is " + valueConstraint);
 	}
 }

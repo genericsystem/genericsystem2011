@@ -16,36 +16,32 @@ import org.testng.annotations.Test;
 public class RequiredConstraintTest extends AbstractTest {
 
 	public void requiredAddedAndRemoved() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Generic myFiat = vehicle.newInstance("myFiat");
 		final Attribute wheel = vehicle.setAttribute("wheel");
-		Holder wheelMyFiat = myFiat.setValue(wheel, "BigWheel");
+		Holder wheelMyFiat = myFiat.setValue(wheel, "4");
 		cache.flush();
 		wheelMyFiat.remove();
-		assert !wheelMyFiat.isAlive();
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				
 				wheel.enableRequiredConstraint();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
-		cache.flush();
 	}
 
 	public void requiredNeverAdded() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
-		vehicle.newInstance("myFiat");	
+		vehicle.newInstance("myFiat");
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
 				vehicle.setAttribute("wheel").enableRequiredConstraint();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
-		cache.flush();
 	}
 
 	public void addOneRequired() {
@@ -84,21 +80,14 @@ public class RequiredConstraintTest extends AbstractTest {
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
 
-	public void addRequiredOnRelationBaseSide() {
+	public void addRequiredOnRelationBaseSideEmpty() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
 		color.newInstance("red");
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				cache.flush();
-			}
-		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+		cache.flush();
 	}
 
 	public void addRequiredOnRelationTargetSide() {
