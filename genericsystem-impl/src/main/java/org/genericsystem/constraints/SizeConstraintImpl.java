@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 import java.io.Serializable;
 
@@ -15,8 +15,8 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SizeConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Type;
 import org.genericsystem.generic.Relation;
+import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
@@ -43,18 +43,18 @@ public class SizeConstraintImpl extends AbstractNoBooleanConstraintImpl implemen
 	@Override
 	public void check(Generic base, Generic valueConstraint, int pos) throws ConstraintViolationException {
 		// TODO KK because InstanceClassConstraint, see GenericImpl::setConstraintClass
-		Serializable value = ((Holder)valueConstraint).getValue();
+		Serializable value = ((Holder) valueConstraint).getValue();
 		Generic baseConstraint = ((Holder) valueConstraint).<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent();
 		Snapshot<Holder> holders = ((GenericImpl) base).getHolders((Relation) baseConstraint);
-		holders.log();
 		if (value instanceof Integer)
 			if (holders.size() > (Integer) value)
 				throw new SizeConstraintViolationException("Multiple links of type " + baseConstraint + ", and the maximum size is " + value);
 	}
-	 @Override
-	 public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-			Generic baseConstraint = ((Holder) getBaseComponent()).getBaseComponent();
-		 if ( baseConstraint.getComponentsSize() > 0 && ((Type) baseConstraint).getInstances().size() > (Integer) valueConstraint.getValue())
-	 throw new SizeConstraintViolationException("Multiple links of " + baseConstraint + ", and the maximum size is " + valueConstraint);
-	 }
+
+	@Override
+	public void checkConsistency(Generic modified, Holder valueConstraint, int axe) throws ConstraintViolationException {
+		Generic baseConstraint = ((Holder) getBaseComponent()).getBaseComponent();
+		if (baseConstraint.getComponentsSize() > 0 && ((Type) baseConstraint).getInstances().size() > (Integer) valueConstraint.getValue())
+			throw new SizeConstraintViolationException("Multiple links of " + baseConstraint + ", and the maximum size is " + valueConstraint);
+	}
 }

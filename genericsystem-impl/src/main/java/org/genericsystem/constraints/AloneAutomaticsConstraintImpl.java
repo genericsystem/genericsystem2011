@@ -9,6 +9,7 @@
 //import org.genericsystem.annotation.value.BooleanValue;
 //import org.genericsystem.core.Generic;
 //import org.genericsystem.core.GenericImpl;
+//import org.genericsystem.exception.AloneAutomaticsConstraintViolationException;
 //import org.genericsystem.exception.ConstraintViolationException;
 //import org.genericsystem.generic.Holder;
 //import org.genericsystem.map.ConstraintsMapProvider;
@@ -17,31 +18,36 @@
 //
 ///**
 // * @author Nicolas Feybesse
-// * 
+// * @author Michael Ory
 // */
 //@SystemGeneric
 //@Extends(meta = ConstraintKey.class)
 //@Components(MapInstance.class)
 //@SingularConstraint
-//@Dependencies(ConcreteInheritanceConstraintImpl.DefaultValue.class)
-//@AxedConstraintValue(ConcreteInheritanceConstraintImpl.class)
-//public class ConcreteInheritanceConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
+//@Dependencies(AloneAutomaticsConstraintImpl.DefaultValue.class)
+//@AxedConstraintValue(AloneAutomaticsConstraintImpl.class)
+//public class AloneAutomaticsConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 //
 //	@SystemGeneric
 //	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
-//	@Components(ConcreteInheritanceConstraintImpl.class)
+//	@Components(AloneAutomaticsConstraintImpl.class)
 //	@BooleanValue(true)
 //	public static class DefaultValue extends GenericImpl implements Holder {}
 //
 //	@Override
 //	public void check(Generic modified, Generic type) throws ConstraintViolationException {
-//		// if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
-//		// if (((GenericImpl) modified).getSupers().get(0).isConcrete())
-//		// throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());
+//		if (modified.isAlive() /* && modified.isAutomatic() */&& modified.getInheritings().isEmpty() && modified.getComposites().isEmpty())
+//			throw new AloneAutomaticsConstraintViolationException();
+//
+//	}
+//
+//	@Override
+//	public boolean isCheckedAt(Generic modified, CheckingType type) {
+//		return type.equals(CheckingType.CHECK_ON_REMOVE_NODE);
 //	}
 //
 //}
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -52,6 +58,7 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.exception.AloneAutomaticsConstraintViolationException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
@@ -60,34 +67,34 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
- * 
+ * @author Michael Ory
  */
 @SystemGeneric
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
 @SingularConstraint
-@Dependencies(ConcreteInheritanceConstraintImpl.DefaultValue.class)
-@AxedConstraintValue(ConcreteInheritanceConstraintImpl.class)
-public class ConcreteInheritanceConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+@Dependencies(AloneAutomaticsConstraintImpl.DefaultValue.class)
+@AxedConstraintValue(AloneAutomaticsConstraintImpl.class)
+public class AloneAutomaticsConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
-	@Components(ConcreteInheritanceConstraintImpl.class)
+	@Components(AloneAutomaticsConstraintImpl.class)
 	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}
 	@Override
-	public void check(Generic base, Generic baseConstraint, int axe) throws ConstraintViolationException {
-		// if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
-		// if (((GenericImpl) modified).getSupers().get(0).isConcrete())
-		// throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());
+	public void check(Generic base,Generic baseConstraint, int axe) throws ConstraintViolationException {
+		if (base.isAlive() /* && modified.isAutomatic() */&& base.getInheritings().isEmpty() && base.getComposites().isEmpty())
+			throw new AloneAutomaticsConstraintViolationException();
+
 	}
-//	@Override
-//	public void check(Generic base, Generic baseConstraint, int axe) throws ConstraintViolationException {
-//		if (base.isConcrete() && ((GenericImpl) base).isPrimary())
-//			if (((GenericImpl) base).getSupers().get(0).isConcrete())
-//				throw new ConcreteInheritanceConstraintViolationException(base.getMeta() + " " + base.info());
-//	}
+
+
+	@Override
+	public boolean isCheckedAt(Generic modified, CheckingType type) {
+		return type.equals(CheckingType.CHECK_ON_REMOVE_NODE);
+	}
 
 	@Override
 	public void checkConsistency(Generic baseConstraint,Holder valueConstraint, int axe) throws ConstraintViolationException {
@@ -96,3 +103,4 @@ public class ConcreteInheritanceConstraintImpl extends AbstractBooleanConstraint
 	}
 
 }
+

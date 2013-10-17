@@ -14,6 +14,8 @@ import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.constraints.AbstractConstraintImpl;
+import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.core.Generic.ExtendedMap;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
@@ -31,11 +33,10 @@ import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
+import org.genericsystem.iterator.AbstractSelectableLeafIterator2;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.tree.TreeImpl;
 
 /**
@@ -409,6 +410,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
 	}
 
+	static long time1 = 0;
+	static long time2 = 0;
+
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 
@@ -434,52 +438,68 @@ public class CacheImpl extends AbstractContext implements Cache {
 					phantom.remove();
 			}
 		}
-
-		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
-		// for (Generic directSuper : directSupers) {
-		Iterator<Generic> removeIterator = concernedDependenciesIterator(getEngine(), primaries, components);
-		// Statics.logTimeIfCurrentThreadDebugged("YYYYYYYYYYYYYYYYYYYY");
-		while (removeIterator.hasNext()) {
-			Generic next = removeIterator.next();
-			// Statics.logTimeIfCurrentThreadDebugged("ZZZZZZZZZZZZZZZ" + next);
-			orderedDependencies.add(next);
-		}
-		// }
-		for (Generic generic : orderedDependencies.descendingSet()) {
-			// log.info("Remove : " + generic.info());
+		long ts1 = System.currentTimeMillis();
+		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(primaries, components);
+		long ts2 = System.currentTimeMillis();
+		time1 += (ts2 - ts1);
+		long ts3 = System.currentTimeMillis();
+		NavigableSet<Generic> orderedDependencies2 = getConcernedDependencies2(directSupers, primaries, components);
+		long ts4 = System.currentTimeMillis();
+		time2 += (ts4 - ts3);
+		// log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
+		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
+		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
+		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
-		}
-		// log.info("===> dependency of " + homeTreeNode);
-		// assert orderedDependencies.isEmpty() : "" + orderedDependencies.first().info() + Arrays.toString(primaries) + Arrays.toString(components);
 		ConnectionMap connectionMap = new ConnectionMap();
 		T superGeneric = buildAndInsertComplex(homeTreeNode, specializationClass, directSupers, components);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
 	}
 
+	NavigableSet<Generic> getConcernedDependencies(HomeTreeNode[] primaries, Generic[] components) {
+		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
+		Iterator<Generic> removeIterator = concernedDependenciesIterator(getEngine(), primaries, components);
+		while (removeIterator.hasNext()) {
+			Generic next = removeIterator.next();
+			orderedDependencies.add(next);
+		}
+		return orderedDependencies;
+	}
+
+	NavigableSet<Generic> getConcernedDependencies2(Generic[] supers, HomeTreeNode[] primaries, Generic[] components) {
+		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
+		for (Generic superGeneric : supers) {
+			Iterator<Generic> removeIterator = concernedDependenciesIterator2(superGeneric, primaries, components);
+			while (removeIterator.hasNext()) {
+				Generic next = removeIterator.next();
+				orderedDependencies.addAll(orderDependencies((GenericImpl) next));
+			}
+		}
+		return orderedDependencies;
+	}
+
 	@SuppressWarnings("unchecked")
-	// @SuppressWarnings("unchecked")
-	// <T extends Generic> Iterator<T> concernedDependenciesIterator(final HomeTreeNode[] primaries, final Generic[] components) {
-	// return (Iterator<T>) new AbstractSelectableLeafIterator(getEngine()) {
-	//
-	// @Override
-	// protected boolean isSelectable() {
-	// boolean result = GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
-	// Statics.logTimeIfCurrentThreadDebugged("isSelectable : " + next + " " + result);
-	// // assert !result : next.info() + " " + Arrays.toString(primaries) + " " + Arrays.toString(components);
-	// return result;
-	// }
-	//
-	// @Override
-	// public boolean isSelected(Generic candidate) {
-	// boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components)
-	// || GenericImpl.isSuperOf(primaries, components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components);
-	// Statics.logTimeIfCurrentThreadDebugged("isSelected : " + candidate + " " + result);
-	//
-	// return result;
-	// }
-	// };
-	// }
+	<T extends Generic> Iterator<T> concernedDependenciesIterator2(Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
+		return (Iterator<T>) new AbstractSelectableLeafIterator2(directSuper) {
+
+			@Override
+			protected boolean isSelectable() {
+				boolean result = GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
+				// log.info("isSelectable ===> " + next + " " + Arrays.toString(primaries) + Arrays.toString(components) + " " + result);
+				return result;
+			}
+
+			@Override
+			public boolean isSelected(Generic father, Generic candidate) {
+				return !GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) father).primaries, ((GenericImpl) father).components);
+				// boolean result = GenericImpl.isDependencyOf(((GenericImpl) father).primaries, ((GenericImpl) father).components, primaries, components);
+				// return result;
+			}
+		};
+	}
+
+	@SuppressWarnings("unchecked")
 	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
 
 		return new AbstractFilterIterator<T>((Iterator<T>) new AbstractPreTreeIterator<Generic>(directSuper) {
@@ -515,20 +535,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Class<?> dependencyClass : dependenciesClass.value())
 				find(dependencyClass);
 	}
-	//TODO clean
-//	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-//		for (Generic generic : generics)
-//			if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
-//				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-//				keyHolder.checkConsistency((Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-//			}
-//	}
+
+	// TODO clean
+	// protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+	// for (Generic generic : generics)
+	// if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
+	// AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
+	// keyHolder.checkConsistency((Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+	// }
+	// }
 
 	static int i = 0;
 
 	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-//		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-//		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+		// checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
+		// checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 	}
@@ -537,14 +558,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : generics) {
 			if (isGenericOfConstraintActivate(generic)) {
 				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-				keyHolder.checkConsistency(((Holder)keyHolder . getBaseComponent()).getBaseComponent(),(Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+				keyHolder.checkConsistency(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
 			}
 			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
 			for (Serializable key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
 				if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
-					keyHolder.check(generic, valueHolder,((AxedPropertyClass) keyHolder.getValue()).getAxe());
+					keyHolder.check(generic, valueHolder, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
 			}
 		}
 	}
@@ -552,34 +573,35 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private boolean isGenericOfConstraintActivate(Generic generic) {
 		return null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class));
 	}
-//	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-//		for (Generic generic : generics)
-//			if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
-//				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-//				keyHolder.checkConsistency(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-//			}
-//	}
-//
-//	static int i = 0;
-//
-//	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-//		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-//		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
-//		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-//		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
-//	}
-//
-//	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-//		for (Generic generic : generics) {
-//			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
-//			for (Serializable key : constraintMap.keySet()) {
-//				Holder valueHolder = constraintMap.getValueHolder(key);
-//				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-//				if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
-//					keyHolder.check(generic, valueHolder);
-//			}
-//		}
-//	}
+
+	// protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+	// for (Generic generic : generics)
+	// if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
+	// AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
+	// keyHolder.checkConsistency(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+	// }
+	// }
+	//
+	// static int i = 0;
+	//
+	// protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
+	// checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
+	// checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+	// checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
+	// checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+	// }
+	//
+	// private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+	// for (Generic generic : generics) {
+	// ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
+	// for (Serializable key : constraintMap.keySet()) {
+	// Holder valueHolder = constraintMap.getValueHolder(key);
+	// AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
+	// if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
+	// keyHolder.check(generic, valueHolder);
+	// }
+	// }
+	// }
 
 	protected boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
 		return (isFlushTime || constraint.isImmediatelyCheckable()) && constraint.isCheckedAt(generic, checkingType);
@@ -602,13 +624,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private void addGeneric(Generic generic) throws ConstraintViolationException {
 		simpleAdd(generic);
-		//checkConsistency(CheckingType.CHECK_ON_ADD_NODE, false, Arrays.asList(generic));
+		// checkConsistency(CheckingType.CHECK_ON_ADD_NODE, false, Arrays.asList(generic));
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, Arrays.asList(generic));
 	}
 
 	private void removeGeneric(Generic generic) throws ConstraintViolationException {
 		simpleRemove(generic);
-	//	checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
+		// checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
 	}
 

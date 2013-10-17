@@ -53,7 +53,7 @@
 //	}
 //
 //}
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 
 import org.genericsystem.annotation.Components;

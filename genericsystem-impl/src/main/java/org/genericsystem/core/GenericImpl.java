@@ -10,12 +10,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.UniqueValueConstraint;
 import org.genericsystem.annotation.constraints.VirtualConstraint;
+import org.genericsystem.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.constraints.PropertyConstraintImpl;
+import org.genericsystem.constraints.RequiredConstraintImpl;
+import org.genericsystem.constraints.SingletonConstraintImpl;
+import org.genericsystem.constraints.SingularConstraintImpl;
+import org.genericsystem.constraints.SizeConstraintImpl;
+import org.genericsystem.constraints.UniqueValueConstraintImpl;
+import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
@@ -43,14 +52,6 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.systemproperties.constraints.PropertyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.RequiredConstraintImpl;
-import org.genericsystem.systemproperties.constraints.SingletonConstraintImpl;
-import org.genericsystem.systemproperties.constraints.SingularConstraintImpl;
-import org.genericsystem.systemproperties.constraints.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.UniqueValueConstraintImpl;
-import org.genericsystem.systemproperties.constraints.VirtualConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -716,7 +717,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Holder> T getSelectedHolder(Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
 		if (((Attribute) attribute).isSingularConstraintEnabled(basePos))
 			return getHolder(metaLevel, (Attribute) attribute, basePos);
-		if (value == null || ((Type) attribute).isPropertyConstraintEnabled())
+		if (value == null || ((Attribute) attribute).isPropertyConstraintEnabled())
 			return this.<T> getHolder(metaLevel, attribute, basePos, targets);
 		return this.<T> getHolderByValue(metaLevel, attribute, value, basePos, targets);
 	}
@@ -941,9 +942,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (isSuperOf(primaries, components, subPrimaries, subComponents))
 			return true;
 		for (Generic component : subComponents)
-			if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
-				if (isDependencyOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
-					return true;
+			if (component != null)
+				if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
+					if (isDependencyOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
+						return true;
 		return false;
 
 	}
@@ -1418,18 +1420,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (T) this;
 	}
 
-//	@Override
-//	public <T extends Generic> T disableSizeConstraint(int basePos) {
-//		setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
-//		return (T) this;
-//	}
+	// @Override
+	// public <T extends Generic> T disableSizeConstraint(int basePos) {
+	// setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
+	// return (T) this;
+	// }
 	@Override
 	public <T extends Generic> T disableSizeConstraint(int basePos) {
-		//TODO different des autres
+		// TODO different des autres
 		getConstraintsMap().getValueHolder(new AxedPropertyClass(SizeConstraintImpl.class, basePos)).remove();
 		return (T) this;
 	}
-
 
 	@Override
 	public Integer getSizeConstraint(int basePos) {

@@ -2,17 +2,17 @@ package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
 
-import javax.el.MethodExpression;
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.event.Observes;
-import javax.faces.context.FacesContext;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
+import org.genericsystem.core.Generic;
+import org.genericsystem.myadmin.beans.GenericBean.GenericEdited;
+import org.genericsystem.myadmin.beans.GenericBean.ModifyViewEvent;
+import org.genericsystem.myadmin.beans.GenericBean.View;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.richfaces.component.UIMenuGroup;
-import org.richfaces.component.UIMenuItem;
 
 @RequestScoped
 @Named
@@ -21,12 +21,21 @@ public class MenuBean implements Serializable {
 	private static final long serialVersionUID = 3205251309315588635L;
 
 	private UIMenuGroup menuGroup;
-
+	//
 	@Inject
 	private GsMessages messages;
-
+	//
+	// @Inject
+	// private TreeBean genericTreeBean;
+	//
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private Event<ModifyViewEvent> modifyViewEvent;
+
+	@GenericEdited
+	@Inject
+	public Generic genericEdited;
+
+	private View currentView;
 
 	public UIMenuGroup getMenuGroup() {
 		return menuGroup;
@@ -50,41 +59,48 @@ public class MenuBean implements Serializable {
 		throw new IllegalStateException();
 	}
 
-	public boolean isConcrete() {
-		return genericTreeBean.getSelectedTreeNodeGeneric().isConcrete();
+	public void changeView(View view) {
+		modifyViewEvent.fire(new ModifyViewEvent(view));
+		currentView = view;
+		messages.info("showchanged", view);
 	}
 
-	public void changeType(@Observes MenuEvent menuEvent) {
-		menuGroup.getChildren().clear();
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-		int i = 0;
-		for (GenericTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildrens(TreeType.ATTRIBUTES, menuEvent.isImplicitShow())) {
-			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
-			uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
-			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{genericTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
-			uiMenuItem.setActionExpression(methodExpression);
-			uiMenuItem.setRender("typestree, typestreetitle");
-			menuGroup.getChildren().add(uiMenuItem);
-			i++;
-		}
+	//
+	public boolean isViewSelected(View view) {
+		return view.equals(currentView);
 	}
-
-	public static class MenuEvent {
-		private final GenericTreeNode genericTreeNode;
-		private final boolean implicitShow;
-
-		public MenuEvent(GenericTreeNode genericTreeNode, boolean implicitShow) {
-			this.genericTreeNode = genericTreeNode;
-			this.implicitShow = implicitShow;
-		}
-
-		public GenericTreeNode getGenericTreeNode() {
-			return genericTreeNode;
-		}
-
-		public boolean isImplicitShow() {
-			return implicitShow;
-		}
-
-	}
+	//
+	// public void changeType(@Observes MenuEvent menuEvent) {
+	// menuGroup.getChildren().clear();
+	// FacesContext facesContext = FacesContext.getCurrentInstance();
+	// int i = 0;
+	// for (TreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildrens(TreeType.ATTRIBUTES, menuEvent.isImplicitShow())) {
+	// UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
+	// uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
+	// MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{genericTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
+	// uiMenuItem.setActionExpression(methodExpression);
+	// uiMenuItem.setRender("typestree, typestreetitle");
+	// menuGroup.getChildren().add(uiMenuItem);
+	// i++;
+	// }
+	// }
+	//
+	// public static class MenuEvent {
+	// private final TreeNode genericTreeNode;
+	// private final boolean implicitShow;
+	//
+	// public MenuEvent(TreeNode genericTreeNode, boolean implicitShow) {
+	// this.genericTreeNode = genericTreeNode;
+	// this.implicitShow = implicitShow;
+	// }
+	//
+	// public TreeNode getGenericTreeNode() {
+	// return genericTreeNode;
+	// }
+	//
+	// public boolean isImplicitShow() {
+	// return implicitShow;
+	// }
+	//
+	// }
 }
