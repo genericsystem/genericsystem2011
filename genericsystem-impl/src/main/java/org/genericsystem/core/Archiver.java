@@ -43,8 +43,6 @@ public class Archiver {
 	private File formalFile;
 	private File contentFile;
 
-	private Map<Long, HomeTreeNode> homeTreeMap;
-
 	public Archiver(Engine engine, String directoryPath) {
 		this.engine = engine;
 		prepareAndLockDirectory(directoryPath);
@@ -83,7 +81,7 @@ public class Archiver {
 			if (!snapshotsMap.isEmpty())
 				try {
 					ZipArchiver zipArchiver = new ZipArchiver();
-					zipArchiver.decompress(directory.getAbsolutePath(), Statics.getFilename(snapshotsMap.lastKey()));
+					zipArchiver.decompress(directory.getAbsolutePath() + File.separator + Statics.getFilename(snapshotsMap.lastKey()));
 					return zipArchiver;
 				} catch (IOException e) {
 					return null;
@@ -109,92 +107,28 @@ public class Archiver {
 		return snapshotsMap;
 	}
 
-	private void doSnapshot(Engine engine) {
-		long ts = engine.pickNewTs();
-		String fileName = Statics.getFilename(ts);
-		formalFile = new File(directory.getAbsolutePath() + File.separator + fileName + Statics.FORMAL_EXTENSION);
-		contentFile = new File(directory.getAbsolutePath() + File.separator + fileName + Statics.CONTENT_EXTENSION);
-		saveSnapshot(new Transaction(engine));
-		compressTemporarySnapshot(fileName);
-		formalFile.delete();
-		contentFile.delete();
-		confirmTemporarySnapshot(fileName);
-	}
-
-	private void saveSnapshot(AbstractContext context) {
-		try {
-			ObjectOutputStream formalObjectOutput = new ObjectOutputStream(buildNewTemporaryFormal(formalFile));
-			ObjectOutputStream contentObjectOutput = new ObjectOutputStream(buildNewTemporaryContent(contentFile));
-			NavigableSet<Generic> orderGenerics = context.orderDependencies(context.getEngine());
-			for (Generic orderGeneric : orderGenerics)
-				writeGeneric(((GenericImpl) orderGeneric), formalObjectOutput, contentObjectOutput);
-			contentObjectOutput.flush();
-			contentObjectOutput.close();
-			formalObjectOutput.flush();
-			formalObjectOutput.close();
-		} catch (IOException ioe) {
-			throw new IllegalStateException(ioe);
-		}
-	}
-
-	private void compressTemporarySnapshot(String fileName) {
-		new ZipArchiver().compress(directory.getAbsolutePath(), fileName, formalFile, contentFile);
-	}
-
-	private void confirmTemporarySnapshot(String fileName) {
-		new ZipArchiver().confirm(directory.getAbsolutePath(), fileName);
-		manageOldSnapshots();
-	}
-
-	// todo ici write
-
-	private OutputStream buildNewTemporaryFormal(File formalFile) {
-		try {
-			return new FileOutputStream(formalFile);
-		} catch (FileNotFoundException e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
-	private OutputStream buildNewTemporaryContent(File contentFile) {
-		try {
-			return new FileOutputStream(contentFile);
-		} catch (FileNotFoundException e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
-	private void manageOldSnapshots() {
-		NavigableMap<Long, File> snapshotsMap = snapshotsMap();
-		long lastTs = snapshotsMap.lastKey();
-		long firstTs = snapshotsMap.firstKey();
-		long ts = firstTs;
-		for (long snapshotTs : new TreeSet<Long>(snapshotsMap.keySet()))
-			if (snapshotTs != lastTs && snapshotTs != firstTs)
-				if ((snapshotTs - ts) < minInterval((lastTs - snapshotTs)))
-					removeSnapshot(snapshotsMap, snapshotTs);
-				else
-					ts = snapshotTs;
-	}
-
-	private static long minInterval(long periodNumber) {
-		return (long) Math.floor(periodNumber / Statics.ARCHIVER_COEFF);
-	}
-
-	private static void removeSnapshot(NavigableMap<Long, File> snapshotsMap, long ts) {
-		snapshotsMap.get(ts).delete();
-		snapshotsMap.remove(ts);
-	}
-
-	private static long getTimestamp(final String filename) throws ParseException {
+	private long getTimestamp(final String filename) throws ParseException {
 		return Long.parseLong(filename.substring(filename.lastIndexOf("---") + 3));
+	}
+
+	public void startScheduler() {
+		if (lockFile != null)
+			if (Statics.SNAPSHOTS_PERIOD > 0L) {
+				final SnapshotWriter snapshotWriter = new SnapshotWriter();
+				scheduler.scheduleAtFixedRate(new Runnable() {
+					@Override
+					public void run() {
+						snapshotWriter.doSnapshot(engine);
+					}
+				}, Statics.SESSION_TIMEOUT, Statics.SNAPSHOTS_PERIOD, TimeUnit.MILLISECONDS);
+			}
 	}
 
 	public void close() {
 		if (lockFile != null)
 			try {
 				scheduler.shutdown();
-				doSnapshot(engine);
+				new SnapshotWriter().doSnapshot(engine);
 				lockFile.close();
 				lockFile = null;
 			} catch (IOException e) {
@@ -202,51 +136,118 @@ public class Archiver {
 			}
 	}
 
-	public void startScheduler() {
-		homeTreeMap = new HashMap<>();
-		if (lockFile != null)
-			if (Statics.SNAPSHOTS_PERIOD > 0L) {
-				scheduler.scheduleAtFixedRate(new Runnable() {
-					@Override
-					public void run() {
-						doSnapshot(engine);
-					}
-				}, Statics.SESSION_TIMEOUT, Statics.SNAPSHOTS_PERIOD, TimeUnit.MILLISECONDS);
-			}
-	}
+	private class SnapshotWriter {
 
-	private void writeGeneric(GenericImpl generic, ObjectOutputStream formalObjectOutput, ObjectOutputStream contentObjectOutput) throws IOException {
-		writeTs(generic, formalObjectOutput);
-		contentObjectOutput.writeLong(generic.homeTreeNode.ts);
-		contentObjectOutput.writeObject(generic.homeTreeNode.value);
-		formalObjectOutput.writeInt(generic.getMetaLevel());
-		if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
-			contentObjectOutput.writeLong(generic.homeTreeNode.metaNode.ts);
-			homeTreeMap.put(generic.homeTreeNode.ts, generic.homeTreeNode);
+		private Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
+
+		public void doSnapshot(Engine engine) {
+			long ts = engine.pickNewTs();
+			String fileName = Statics.getFilename(ts);
+			formalFile = new File(directory.getAbsolutePath() + File.separator + fileName + Statics.FORMAL_EXTENSION);
+			contentFile = new File(directory.getAbsolutePath() + File.separator + fileName + Statics.CONTENT_EXTENSION);
+			saveSnapshot(new Transaction(engine));
+			compressTemporarySnapshot(fileName);
+			formalFile.delete();
+			contentFile.delete();
+			confirmTemporarySnapshot(fileName);
 		}
-		if (generic.isEngine())
-			return;
-		writeAncestors(generic.getSupers(), formalObjectOutput);
-		writeAncestors(generic.getComponents(), formalObjectOutput);
-		formalObjectOutput.writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
-	}
 
-	private static void writeTs(Generic generic, ObjectOutputStream formalObjectOutput) throws IOException {
-		formalObjectOutput.writeLong(((GenericImpl) generic).getDesignTs());
-		formalObjectOutput.writeLong(((GenericImpl) generic).getBirthTs());
-		formalObjectOutput.writeLong(((GenericImpl) generic).getLastReadTs());
-		formalObjectOutput.writeLong(((GenericImpl) generic).getDeathTs());
-	}
+		private void saveSnapshot(AbstractContext context) {
+			try {
+				ObjectOutputStream formalObjectOutput = new ObjectOutputStream(buildNewTemporaryFormal(formalFile));
+				ObjectOutputStream contentObjectOutput = new ObjectOutputStream(buildNewTemporaryContent(contentFile));
+				NavigableSet<Generic> orderGenerics = context.orderDependencies(context.getEngine());
+				for (Generic orderGeneric : orderGenerics)
+					writeGeneric(((GenericImpl) orderGeneric), formalObjectOutput, contentObjectOutput);
+				contentObjectOutput.flush();
+				contentObjectOutput.close();
+				formalObjectOutput.flush();
+				formalObjectOutput.close();
+			} catch (IOException ioe) {
+				throw new IllegalStateException(ioe);
+			}
+		}
 
-	private static void writeAncestors(Snapshot<Generic> dependencies, ObjectOutputStream formalObjectOutput) throws IOException {
-		formalObjectOutput.writeInt(dependencies.size());
-		for (Generic dependency : dependencies)
-			formalObjectOutput.writeLong(((GenericImpl) dependency).getDesignTs());
+		private OutputStream buildNewTemporaryFormal(File formalFile) {
+			try {
+				return new FileOutputStream(formalFile);
+			} catch (FileNotFoundException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
+		private OutputStream buildNewTemporaryContent(File contentFile) {
+			try {
+				return new FileOutputStream(contentFile);
+			} catch (FileNotFoundException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
+		private void writeGeneric(GenericImpl generic, ObjectOutputStream formalObjectOutput, ObjectOutputStream contentObjectOutput) throws IOException {
+			writeTs(generic, formalObjectOutput);
+			contentObjectOutput.writeLong(generic.homeTreeNode.ts);
+			if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
+				contentObjectOutput.writeLong(generic.homeTreeNode.metaNode.ts);
+				contentObjectOutput.writeObject(generic.homeTreeNode.value);
+				homeTreeMap.put(generic.homeTreeNode.ts, generic.homeTreeNode);
+			}
+			if (generic.isEngine())
+				return;
+			writeAncestors(generic.getSupers(), formalObjectOutput);
+			writeAncestors(generic.getComponents(), formalObjectOutput);
+			formalObjectOutput.writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
+		}
+
+		private void writeTs(Generic generic, ObjectOutputStream formalObjectOutput) throws IOException {
+			formalObjectOutput.writeLong(((GenericImpl) generic).getDesignTs());
+			formalObjectOutput.writeLong(((GenericImpl) generic).getBirthTs());
+			formalObjectOutput.writeLong(((GenericImpl) generic).getLastReadTs());
+			formalObjectOutput.writeLong(((GenericImpl) generic).getDeathTs());
+		}
+
+		private void writeAncestors(Snapshot<Generic> dependencies, ObjectOutputStream formalObjectOutput) throws IOException {
+			formalObjectOutput.writeInt(dependencies.size());
+			for (Generic dependency : dependencies)
+				formalObjectOutput.writeLong(((GenericImpl) dependency).getDesignTs());
+		}
+
+		private void compressTemporarySnapshot(String fileName) {
+			new ZipArchiver().compress(directory.getAbsolutePath(), fileName, formalFile, contentFile);
+		}
+
+		private void confirmTemporarySnapshot(String fileName) {
+			new ZipArchiver().confirm(directory.getAbsolutePath(), fileName);
+			manageOldSnapshots();
+		}
+
+		private void manageOldSnapshots() {
+			NavigableMap<Long, File> snapshotsMap = snapshotsMap();
+			long lastTs = snapshotsMap.lastKey();
+			long firstTs = snapshotsMap.firstKey();
+			long ts = firstTs;
+			for (long snapshotTs : new TreeSet<Long>(snapshotsMap.keySet()))
+				if (snapshotTs != lastTs && snapshotTs != firstTs)
+					if ((snapshotTs - ts) < minInterval((lastTs - snapshotTs)))
+						removeSnapshot(snapshotsMap, snapshotTs);
+					else
+						ts = snapshotTs;
+		}
+
+		private long minInterval(long periodNumber) {
+			return (long) Math.floor(periodNumber / Statics.ARCHIVER_COEFF);
+		}
+
+		private void removeSnapshot(NavigableMap<Long, File> snapshotsMap, long ts) {
+			snapshotsMap.get(ts).delete();
+			snapshotsMap.remove(ts);
+		}
 	}
 
 	private class SnapshotLoader extends HashMap<Long, Generic> {
 		private static final long serialVersionUID = 3139276947667714316L;
 
+		private Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 		private ObjectInputStream formalInputStream;
 		private ObjectInputStream contentInputStream;
 
@@ -257,7 +258,6 @@ public class Archiver {
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
 			}
-			homeTreeMap = new HashMap<>();
 		}
 
 		private void loadSnapshot() {
@@ -274,48 +274,29 @@ public class Archiver {
 		private Engine loadEngine() throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(formalInputStream);
 			long homeTreeNodeTs = contentInputStream.readLong();
-			Serializable value = (Serializable) contentInputStream.readObject();
-			int metaLevel = formalInputStream.readInt();
-			long metaNodeTS = contentInputStream.readLong();
+			contentInputStream.readLong();
+			contentInputStream.readObject();
 			((EngineImpl) engine).restoreEngine(homeTreeNodeTs, ts[0], ts[1], ts[2], ts[3]);
 			put(ts[0], engine);
 			homeTreeMap.put(homeTreeNodeTs, ((EngineImpl) engine).homeTreeNode);
-			assert engine.getValue().equals(value);
-			assert engine.getMetaLevel() == metaLevel;
 			return engine;
 		}
 
 		private void loadGeneric(Engine engine) throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(formalInputStream);
 			long homeTreeNodeTs = contentInputStream.readLong();
-			Serializable homeTreeNodeValue = (Serializable) contentInputStream.readObject();
-			int metaLevel = formalInputStream.readInt();
 			HomeTreeNode homeTreeNode = null;
-			// Serializable homeTreeNodeValue = null;
-			HomeTreeNode metaNode = null;
 			if (homeTreeMap.containsKey(homeTreeNodeTs))
 				homeTreeNode = homeTreeMap.get(homeTreeNodeTs);
-			else {
-				// homeTreeNodeValue = (Serializable) contentInputStream.readObject();
-				metaNode = homeTreeMap.get(contentInputStream.readLong());
-			}
+			else
+				homeTreeNode = homeTreeMap.get(contentInputStream.readLong()).bindInstanceNode(homeTreeNodeTs, (Serializable) contentInputStream.readObject());
 			Generic[] supers = loadAncestors(formalInputStream);
 			Generic[] components = loadAncestors(formalInputStream);
 			Generic generic = engine.getFactory().newGeneric((Class<?>) formalInputStream.readObject());
-			GenericImpl plug;
-			if (homeTreeMap.containsKey(homeTreeNodeTs))
-				plug = ((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components).plug();
-			else {
-				plug = ((GenericImpl) generic).restore(homeTreeNodeTs, homeTreeNodeValue, metaNode, ts[0], ts[1], ts[2], ts[3], supers, components).plug();
+			GenericImpl plug = ((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components).plug();
+			if (!homeTreeMap.containsKey(homeTreeNodeTs))
 				homeTreeMap.put(homeTreeNodeTs, plug.homeTreeNode);
-			}
-			if (plug.isMeta() && plug.getComponentsSize() == 1) {
-				plug.log();
-				assert ts[0] == plug.getDesignTs();
-			}
 			put(ts[0], plug);
-			assert homeTreeNodeValue.equals(plug.getValue()) : homeTreeNodeValue;
-			assert plug.getMetaLevel() == metaLevel;
 		}
 
 		private Generic[] loadAncestors(ObjectInputStream in) throws IOException {
@@ -336,63 +317,6 @@ public class Archiver {
 		}
 
 	}
-
-	// private static class SnapshotZipOutputStream extends OutputStream {
-	//
-	// private ZipOutputStream zipOutputStream;
-	//
-	// private SnapshotZipOutputStream(String directoryPath, String fileName) throws FileNotFoundException {
-	// zipOutputStream = new ZipOutputStream(new FileOutputStream(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));
-	// ZipEntry zipEntry = new ZipEntry(fileName + Statics.SNAPSHOT_EXTENSION);
-	// try {
-	// zipOutputStream.putNextEntry(zipEntry);
-	// // TODO second file
-	// zipOutputStream.putNextEntry(new ZipEntry(fileName + Statics.SNAPSHOT_EXTENSION + "2"));
-	// } catch (IOException e) {
-	// throw new IllegalStateException(e);
-	// }
-	// }
-	//
-	// @Override
-	// public void write(int b) throws IOException {
-	// zipOutputStream.write(b);
-	// }
-	//
-	// @Override
-	// public void flush() throws IOException {
-	// zipOutputStream.flush();
-	// }
-	//
-	// @Override
-	// public void close() throws IOException {
-	// zipOutputStream.close();
-	// }
-	//
-	// }
-
-	// private static class SnapshotZipInputStream extends InputStream {
-	//
-	// private ZipInputStream zipInputStream;
-	//
-	// private SnapshotZipInputStream(String directoryPath, String fileName) throws FileNotFoundException {
-	// zipInputStream = new ZipInputStream(new FileInputStream(new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION)));
-	// try {
-	// zipInputStream.getNextEntry();
-	// } catch (IOException e) {
-	// throw new IllegalStateException(e);
-	// }
-	// }
-	//
-	// @Override
-	// public int read() throws IOException {
-	// return zipInputStream.read();
-	// }
-	//
-	// @Override
-	// public void close() throws IOException {
-	// zipInputStream.close();
-	// }
-	// }
 
 	private class ZipArchiver {
 
@@ -425,10 +349,10 @@ public class Archiver {
 			new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION));
 		}
 
-		public void decompress(String directoryPath, String fileName) throws IOException {
-			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION)));
-			formalFile = write(inputStream, directoryPath + File.separator + fileName + Statics.FORMAL_EXTENSION);
-			contentFile = write(inputStream, directoryPath + File.separator + fileName + Statics.CONTENT_EXTENSION);
+		public void decompress(String filePath) throws IOException {
+			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(filePath + Statics.ZIP_EXTENSION)));
+			formalFile = write(inputStream, filePath + Statics.FORMAL_EXTENSION);
+			contentFile = write(inputStream, filePath + Statics.CONTENT_EXTENSION);
 			inputStream.close();
 		}
 

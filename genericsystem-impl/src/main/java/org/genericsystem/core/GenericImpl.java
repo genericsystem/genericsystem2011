@@ -17,6 +17,14 @@ import org.genericsystem.annotation.constraints.SingletonConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.UniqueValueConstraint;
 import org.genericsystem.annotation.constraints.VirtualConstraint;
+import org.genericsystem.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.constraints.PropertyConstraintImpl;
+import org.genericsystem.constraints.RequiredConstraintImpl;
+import org.genericsystem.constraints.SingletonConstraintImpl;
+import org.genericsystem.constraints.SingularConstraintImpl;
+import org.genericsystem.constraints.SizeConstraintImpl;
+import org.genericsystem.constraints.UniqueValueConstraintImpl;
+import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
@@ -44,14 +52,6 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
-import org.genericsystem.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.constraints.PropertyConstraintImpl;
-import org.genericsystem.constraints.RequiredConstraintImpl;
-import org.genericsystem.constraints.SingletonConstraintImpl;
-import org.genericsystem.constraints.SingularConstraintImpl;
-import org.genericsystem.constraints.SizeConstraintImpl;
-import org.genericsystem.constraints.UniqueValueConstraintImpl;
-import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,10 +117,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	// supers[index] = supers[0];
 	// supers[0] = tmp;
 	// }
-
-	GenericImpl restore(Long homeTreeNodeTs, Serializable homeTreeNodeValue, HomeTreeNode metaNode, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] supers, Generic[] components) {
-		return restore(metaNode.bindInstanceNode(homeTreeNodeTs, homeTreeNodeValue), designTs, birthTs, lastReadTs, deathTs, supers, components);
-	}
 
 	final GenericImpl restore(HomeTreeNode homeTreeNode, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] supers, Generic[] components) {
 		assert homeTreeNode != null;
@@ -1332,7 +1328,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		getSystemPropertiesMap().put(new AxedPropertyClass(constraintClass, pos), value);
 	}
 
-	public <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
+	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getSystemPropertyValue(constraintClass, pos);
 		// log.info("ZZZ" + value);
 		return value != null && !Boolean.FALSE.equals(value);
@@ -1423,18 +1419,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (T) this;
 	}
 
-//	@Override
-//	public <T extends Generic> T disableSizeConstraint(int basePos) {
-//		setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
-//		return (T) this;
-//	}
+	// @Override
+	// public <T extends Generic> T disableSizeConstraint(int basePos) {
+	// setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
+	// return (T) this;
+	// }
 	@Override
 	public <T extends Generic> T disableSizeConstraint(int basePos) {
-		//TODO different des autres
+		// TODO different des autres
 		getConstraintsMap().getValueHolder(new AxedPropertyClass(SizeConstraintImpl.class, basePos)).remove();
 		return (T) this;
 	}
-
 
 	@Override
 	public Integer getSizeConstraint(int basePos) {
