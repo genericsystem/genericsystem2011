@@ -11,16 +11,30 @@ import org.genericsystem.core.GenericSystem;
 import org.testng.annotations.Test;
 
 @Test
-public class PersistenceTest2 {
+public class PersistenceTest2 extends AbstractTest {
 
 	public void testDefaultConfiguration() {
-		String path = System.getenv("HOME") + "/test/snapshot_save";// + new Random().nextInt();
+		String path = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
 		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path).start();
 		GenericImpl metaAttribute = cache.getMetaAttribute();
 		cache.getEngine().close();
 		Cache cache2 = GenericSystem.newCacheOnANewPersistentEngine(path).start();
 		GenericImpl metaAttribute2 = cache2.getMetaAttribute();
+		assert cache.getEngine().getMetaAttribute() != cache2.getEngine().getMetaAttribute();
+		assert metaAttribute != metaAttribute2;
 		assert metaAttribute.getDesignTs() == metaAttribute2.getDesignTs() : metaAttribute.info() + metaAttribute2.info();
+	}
+
+	public void testDefaultConfiguration2() {
+		String path = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
+		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path).start();
+		EngineImpl engine = cache.getEngine();
+		cache.getEngine().close();
+		Cache cache2 = GenericSystem.newCacheOnANewPersistentEngine(path).start();
+		EngineImpl engine2 = cache2.getEngine();
+		assert engine != engine2;
+		assert engine.getMetaAttribute() != engine2.getMetaAttribute();
+		assert engine.getDesignTs() == engine2.getDesignTs() : engine.info() + engine2.info();
 	}
 
 	public void testType() {

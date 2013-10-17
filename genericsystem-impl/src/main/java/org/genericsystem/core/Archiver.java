@@ -25,16 +25,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author Nicolas Feybesse
- * 
+ * @author Michael Ory
  */
 public class Archiver {
 
-	private static final Logger log = LoggerFactory.getLogger(Archiver.class);
+	// private static final Logger log = LoggerFactory.getLogger(Archiver.class);
 
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -46,15 +43,17 @@ public class Archiver {
 	private File formalFile;
 	private File contentFile;
 
-	private Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
+	private Map<Long, HomeTreeNode> homeTreeMap;
 
 	public Archiver(Engine engine, String directoryPath) {
 		this.engine = engine;
 		prepareAndLockDirectory(directoryPath);
 		ZipArchiver zipArchiver = decompress();
-		if (zipArchiver != null)
+		if (zipArchiver != null) {
 			new SnapshotLoader(zipArchiver).loadSnapshot();
-		else
+			formalFile.delete();
+			contentFile.delete();
+		} else
 			((EngineImpl) engine).restoreEngine();
 	}
 
@@ -97,11 +96,8 @@ public class Archiver {
 		NavigableMap<Long, File> snapshotsMap = new TreeMap<Long, File>();
 		for (File file : directory.listFiles()) {
 			String filename = file.getName();
-			if (!file.isDirectory()) {
-				if (filename.endsWith(".content"))
-					filename = filename.substring(0, filename.length() - ".content".length());
-				if (filename.endsWith(".formal"))
-					filename = filename.substring(0, filename.length() - ".formal".length());
+			if (!file.isDirectory() && filename.endsWith(Statics.ZIP_EXTENSION)) {
+				filename = filename.substring(0, filename.length() - Statics.ZIP_EXTENSION.length());
 				if (filename.matches(Statics.MATCHING_REGEX))
 					try {
 						snapshotsMap.put(getTimestamp(filename), file);
@@ -114,20 +110,15 @@ public class Archiver {
 	}
 
 	private void doSnapshot(Engine engine) {
-		log.info("WRITE");
 		long ts = engine.pickNewTs();
 		String fileName = Statics.getFilename(ts);
 		formalFile = new File(directory.getAbsolutePath() + File.separator + fileName + Statics.FORMAL_EXTENSION);
 		contentFile = new File(directory.getAbsolutePath() + File.separator + fileName + Statics.CONTENT_EXTENSION);
 		saveSnapshot(new Transaction(engine));
-		// log.info("START COMPRESS");
-		// compressTemporarySnapshot(fileName);
-		// log.info("END COMPRESS");
-		// formalFile.delete();
-		// contentFile.delete();
-		// log.info("START CONFIRM");
-		// confirmTemporarySnapshot(fileName);
-		// log.info("END CONFIRM");
+		compressTemporarySnapshot(fileName);
+		formalFile.delete();
+		contentFile.delete();
+		confirmTemporarySnapshot(fileName);
 	}
 
 	private void saveSnapshot(AbstractContext context) {
@@ -147,11 +138,11 @@ public class Archiver {
 	}
 
 	private void compressTemporarySnapshot(String fileName) {
-		ZipArchiver.compress(directory.getAbsolutePath(), fileName, formalFile, contentFile);
+		new ZipArchiver().compress(directory.getAbsolutePath(), fileName, formalFile, contentFile);
 	}
 
 	private void confirmTemporarySnapshot(String fileName) {
-		ZipArchiver.confirm(directory.getAbsolutePath(), fileName);
+		new ZipArchiver().confirm(directory.getAbsolutePath(), fileName);
 		manageOldSnapshots();
 	}
 
@@ -212,6 +203,7 @@ public class Archiver {
 	}
 
 	public void startScheduler() {
+		homeTreeMap = new HashMap<>();
 		if (lockFile != null)
 			if (Statics.SNAPSHOTS_PERIOD > 0L) {
 				scheduler.scheduleAtFixedRate(new Runnable() {
@@ -241,7 +233,6 @@ public class Archiver {
 
 	private static void writeTs(Generic generic, ObjectOutputStream formalObjectOutput) throws IOException {
 		formalObjectOutput.writeLong(((GenericImpl) generic).getDesignTs());
-		log.info("write " + generic + " " + ((GenericImpl) generic).getDesignTs());
 		formalObjectOutput.writeLong(((GenericImpl) generic).getBirthTs());
 		formalObjectOutput.writeLong(((GenericImpl) generic).getLastReadTs());
 		formalObjectOutput.writeLong(((GenericImpl) generic).getDeathTs());
@@ -256,12 +247,10 @@ public class Archiver {
 	private class SnapshotLoader extends HashMap<Long, Generic> {
 		private static final long serialVersionUID = 3139276947667714316L;
 
-		private ZipArchiver zipArchiver;
 		private ObjectInputStream formalInputStream;
 		private ObjectInputStream contentInputStream;
 
 		private SnapshotLoader(ZipArchiver zipArchiver) {
-			this.zipArchiver = zipArchiver;
 			try {
 				this.formalInputStream = new ObjectInputStream(zipArchiver.getFormalInputStream());
 				this.contentInputStream = new ObjectInputStream(zipArchiver.getContentInputStream());
@@ -272,14 +261,11 @@ public class Archiver {
 		}
 
 		private void loadSnapshot() {
-			log.info("LOAD");
 			try {
 				Engine engine = loadEngine();
 				for (;;)
 					loadGeneric(engine);
 			} catch (EOFException ignore) {
-				// zipArchiver.formalFile.delete();
-				// zipArchiver.contentFile.delete();
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
@@ -323,8 +309,11 @@ public class Archiver {
 				plug = ((GenericImpl) generic).restore(homeTreeNodeTs, homeTreeNodeValue, metaNode, ts[0], ts[1], ts[2], ts[3], supers, components).plug();
 				homeTreeMap.put(homeTreeNodeTs, plug.homeTreeNode);
 			}
+			if (plug.isMeta() && plug.getComponentsSize() == 1) {
+				plug.log();
+				assert ts[0] == plug.getDesignTs();
+			}
 			put(ts[0], plug);
-			log.info("LOAD generic " + ts[0]);
 			assert homeTreeNodeValue.equals(plug.getValue()) : homeTreeNodeValue;
 			assert plug.getMetaLevel() == metaLevel;
 		}
@@ -405,24 +394,25 @@ public class Archiver {
 	// }
 	// }
 
-	private static class ZipArchiver {
+	private class ZipArchiver {
 
-		private File formalFile;
-		private File contentFile;
-
-		public static void compress(String directoryPath, String fileName, File formalFile, File contentFile) {
+		public void compress(String directoryPath, String fileName, File formalFile, File contentFile) {
 			try {
 				ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));
 				zos.putNextEntry(new ZipEntry(formalFile.getName()));
 
 				FileInputStream fileInputStream = new FileInputStream(formalFile);
-				try {
-					for (;;)
-						zos.write(fileInputStream.read());
-				} catch (EOFException ignore) {
-					fileInputStream.close();
-				}
+				byte[] buffer = new byte[1024];
+				int len;
+				while ((len = fileInputStream.read(buffer)) > 0)
+					zos.write(buffer, 0, len);
+				fileInputStream.close();
+
 				zos.putNextEntry(new ZipEntry(contentFile.getName()));
+				fileInputStream = new FileInputStream(contentFile);
+				while ((len = fileInputStream.read(buffer)) > 0)
+					zos.write(buffer, 0, len);
+				fileInputStream.close();
 
 				zos.flush();
 				zos.close();
@@ -431,21 +421,15 @@ public class Archiver {
 			}
 		}
 
-		public static void confirm(String directoryPath, String fileName) {
+		public void confirm(String directoryPath, String fileName) {
 			new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION));
 		}
 
 		public void decompress(String directoryPath, String fileName) throws IOException {
-			formalFile = new File(directoryPath + File.separator + fileName + Statics.FORMAL_EXTENSION);
-			contentFile = new File(directoryPath + File.separator + fileName + Statics.CONTENT_EXTENSION);
-
-			// log.info("DECOMPRESS " + directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION);
-			// File zipFile = new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION);
-			// ZipInputStream inputStream = new ZipInputStream(new FileInputStream(zipFile));
-			// formalFile = write(inputStream, directoryPath + File.separator + fileName + Statics.FORMAL_EXTENSION);
-			// log.info("A");
-			// contentFile = write(inputStream, directoryPath + File.separator + fileName + Statics.CONTENT_EXTENSION);
-			// inputStream.close();
+			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION)));
+			formalFile = write(inputStream, directoryPath + File.separator + fileName + Statics.FORMAL_EXTENSION);
+			contentFile = write(inputStream, directoryPath + File.separator + fileName + Statics.CONTENT_EXTENSION);
+			inputStream.close();
 		}
 
 		private File write(ZipInputStream inputStream, String path) throws IOException {

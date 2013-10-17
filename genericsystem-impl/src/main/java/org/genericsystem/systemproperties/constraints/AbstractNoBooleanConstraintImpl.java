@@ -1,19 +1,21 @@
 package org.genericsystem.systemproperties.constraints;
 
-import java.io.Serializable;
-
+import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 
 public abstract class AbstractNoBooleanConstraintImpl extends AbstractConstraintImpl {
 
 	@Override
-	public void check(Generic modified, Holder valueBaseComponent) throws ConstraintViolationException {
-		check(modified, valueBaseComponent.<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent(), valueBaseComponent.getValue());
+	public void check(Generic modified, Holder valueConstraint, int axe) throws ConstraintViolationException {
+		AxedPropertyClass key = getValue();
+		check(key.getAxe() == Statics.MULTIDIRECTIONAL ? modified : ((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), (Generic) valueConstraint, key.getAxe());
 	}
 
-	public abstract void check(Generic modified, Generic baseComponent, Serializable value) throws ConstraintViolationException;
+	// baseconstraint= valueConstraint.<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent()
+	public abstract void check(Generic base, Generic valueConstraint, int axe) throws ConstraintViolationException;
 
 }

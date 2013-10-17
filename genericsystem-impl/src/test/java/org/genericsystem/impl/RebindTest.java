@@ -36,7 +36,10 @@ public class RebindTest extends AbstractTest {
 		Holder vUnit = vPower.setValue(carPowerUnit, "HorsePower");
 		assert vPower.getHolders(carPowerUnit).contains(vUnit);
 		assert myCar.getHolders(carPower).contains(vPower);
+		// Statics.debugCurrentThread();
 		Attribute vehiclePower = vehicle.setAttribute("Power");
+		// assert false;
+		assert !carPower.isAlive();
 		assert ((CacheImpl) cache).reFind(carPower).inheritsFrom(vehiclePower);
 	}
 

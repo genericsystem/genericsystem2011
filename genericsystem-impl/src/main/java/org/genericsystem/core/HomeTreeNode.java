@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 
+import org.genericsystem.core.ConcurrentRefValueHashMap.ConcurrentWeakValueHashMap;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,13 +84,6 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	public boolean inheritsFrom(HomeTreeNode homeTreeNode) {
 		return this.equals(homeTreeNode) ? true : metaNode.inheritsFrom(homeTreeNode);
 	}
-
-	// public boolean inheritsAtLeastFromOne(HomeTreeNode... homeTreeNodes) {
-	// for (HomeTreeNode homeTreeNode : homeTreeNodes)
-	// if (inheritsFrom(homeTreeNode))
-	// return true;
-	// return false;
-	// }
 
 	@Override
 	public String toString() {

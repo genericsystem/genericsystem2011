@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints.simple;
+package org.genericsystem.systemproperties.constraints;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -33,7 +33,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SingularConstraint
 @Dependencies(UnduplicateBindingConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
-public class UnduplicateBindingConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
+public class UnduplicateBindingConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
@@ -43,7 +43,7 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanSimpleConst
 	}
 
 	@Override
-	public void check(final Generic modified, Generic type) throws ConstraintViolationException {
+	public void check(final Generic modified, Generic type,int axe) throws ConstraintViolationException {
 		final Generic[] supers = ((GenericImpl) modified).getSupersArray();
 		final Generic[] components = ((GenericImpl) modified).getComponentsArray();
 		Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((EngineImpl) modified.getEngine()).getCurrentCache().compositesIterator(components[0])
@@ -56,7 +56,7 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanSimpleConst
 		if (iterator.hasNext()) {
 			iterator.next();
 			if (iterator.hasNext())
-				throw new UnduplicateBindingConstraintViolationException(iterator.next().info());
+				throw new UnduplicateBindingConstraintViolationException();
 		}
 	}
 
@@ -64,5 +64,9 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanSimpleConst
 	public boolean isImmediatelyCheckable() {
 		return false;
 	}
-
+	@Override
+	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
+		// TODO Auto-generated method stub
+		
+	}
 }

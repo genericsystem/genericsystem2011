@@ -44,14 +44,14 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.InstanceClassConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.PropertyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.SingletonConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.UniqueValueConstraintImpl;
-import org.genericsystem.systemproperties.constraints.simple.VirtualConstraintImpl;
+import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.systemproperties.constraints.PropertyConstraintImpl;
+import org.genericsystem.systemproperties.constraints.RequiredConstraintImpl;
+import org.genericsystem.systemproperties.constraints.SingletonConstraintImpl;
+import org.genericsystem.systemproperties.constraints.SingularConstraintImpl;
+import org.genericsystem.systemproperties.constraints.SizeConstraintImpl;
+import org.genericsystem.systemproperties.constraints.UniqueValueConstraintImpl;
+import org.genericsystem.systemproperties.constraints.VirtualConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +145,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
 				throw new IllegalStateException();
 		}
-
+		assert !homeTreeNode.toString().equals("Engine|class org.genericsystem.map.ConstraintsMapProvider$ConstraintKey|null");
 		return this;
 	}
 
@@ -699,9 +699,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (value == null)
 				return cancel(holder, basePos, metaLevel);
 			HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
-			if (!(((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos))))
+			if (!(((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos)))) {
 				cancel(holder, basePos, metaLevel);
-			return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, existsException, targets);
+				return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, existsException, targets);
+			}
+			return this.<T> bind(homeTreeNode, specializationClass, holder, basePos, existsException, targets);
 		}
 		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
 		if (((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
@@ -940,7 +942,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isSuperOf(primaries, components, ((GenericImpl) generic).primaries, ((GenericImpl) generic).components);
 	}
 
-	static int i = 0;
+	public static boolean isDependencyOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
+		if (isSuperOf(primaries, components, subPrimaries, subComponents))
+			return true;
+		for (Generic component : subComponents)
+			if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
+				if (isDependencyOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
+					return true;
+		return false;
+
+	}
 
 	public static boolean isSuperOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
 		if (primaries.length == subPrimaries.length && components.length == subComponents.length) {
@@ -1265,7 +1276,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> allInheritingsIteratorWithoutRoot() {
+	<T extends Generic> Iterator<T> allInheritingsIteratorWithoutRoot() {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 
 			{
@@ -1412,11 +1423,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (T) this;
 	}
 
+//	@Override
+//	public <T extends Generic> T disableSizeConstraint(int basePos) {
+//		setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
+//		return (T) this;
+//	}
 	@Override
 	public <T extends Generic> T disableSizeConstraint(int basePos) {
-		setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
+		//TODO different des autres
+		getConstraintsMap().getValueHolder(new AxedPropertyClass(SizeConstraintImpl.class, basePos)).remove();
 		return (T) this;
 	}
+
 
 	@Override
 	public Integer getSizeConstraint(int basePos) {

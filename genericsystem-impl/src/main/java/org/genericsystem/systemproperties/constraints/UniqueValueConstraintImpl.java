@@ -1,7 +1,8 @@
-package org.genericsystem.systemproperties.constraints.simple;
+package org.genericsystem.systemproperties.constraints;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.genericsystem.annotation.Components;
@@ -21,23 +22,40 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
- * @author Nicolas Feybesse
  * 
+ * 
+ * @author Nicolas Feybesse
  */
 @SystemGeneric
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
 @SingularConstraint
 @AxedConstraintValue(UniqueValueConstraintImpl.class)
-public class UniqueValueConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
+public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void check(Generic modified, Generic type) throws ConstraintViolationException {
-		for (Generic generic : ((Type) type).getAllInstances())
-			if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
-				throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
+	public void check(Generic modified, Generic type,int axe) throws ConstraintViolationException {
+		if (!modified.isStructural()) {
+			for (Generic generic : ((Type) type).getAllInstances())
+				if (!generic.equals(modified) && generic.getValue().equals(modified.getValue()))
+					throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
+		} else {
+			Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) modified).<Generic> directInheritingsIterator(), modified.getValue());
+			if (iterator.hasNext()) {
+				iterator.next();
+				if (iterator.hasNext()) {
+					throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
+				}
+			}
+		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void checkConsistency(Generic base, Holder valueHolder, int axe) throws ConstraintViolationException {
 		Set<Serializable> values = new HashSet<>();
