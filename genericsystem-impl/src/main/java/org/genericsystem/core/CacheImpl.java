@@ -10,7 +10,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -447,8 +446,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		NavigableSet<Generic> orderedDependencies2 = getConcernedDependencies2(directSupers, primaries, components);
 		long ts4 = System.currentTimeMillis();
 		time2 += (ts4 - ts3);
-		log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
-		log.info("ZZZZZZZZ" + Arrays.toString(primaries));
+		// log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
+		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
 		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
