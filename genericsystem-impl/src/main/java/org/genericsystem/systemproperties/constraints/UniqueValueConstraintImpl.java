@@ -6,18 +6,20 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.genericsystem.annotation.Components;
+import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.exception.UniqueValueConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
@@ -30,8 +32,15 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
 @SingularConstraint
+@Dependencies(UniqueValueConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(UniqueValueConstraintImpl.class)
 public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+
+	@SystemGeneric
+	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
+	@Components(UniqueValueConstraintImpl.class)
+	@BooleanValue(true)
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	/**
 	 * {@inheritDoc}
@@ -44,13 +53,19 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 					throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
 		} else {
 			Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) modified).<Generic> directInheritingsIterator(), modified.getValue());
+		}
+
+		/*} else {
+			/* Get all instances of modified structural and checks that there is only one instance
+		Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) modified).<Generic> directInheritingsIterator(), modified.getValue());
+		if (iterator.hasNext()) {
+			iterator.next();
+>>>>>>> constraints:genericsystem-impl/src/main/java/org/genericsystem/systemproperties/constraints/simple/UniqueValueConstraintImpl.java
 			if (iterator.hasNext()) {
-				iterator.next();
-				if (iterator.hasNext()) {
-					throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
-				}
+				throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
 			}
 		}
+	}*/
 	}
 
 	/**
@@ -66,4 +81,5 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 					throw new UniqueValueConstraintViolationException("Duplicate value : " + value);
 		}
 	}
+
 }

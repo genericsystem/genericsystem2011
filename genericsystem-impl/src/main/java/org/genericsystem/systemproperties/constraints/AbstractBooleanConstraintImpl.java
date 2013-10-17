@@ -18,5 +18,14 @@ public abstract class AbstractBooleanConstraintImpl extends AbstractConstraintIm
 		}
 	}
 
+	/**
+	 * Checks that modififed generic is unique on base component.
+	 * 
+	 * @param modified - modified generic.
+	 * @param baseComponent - base component (type or another generic that contains modified).
+	 * @param axe - axe of constraint.
+	 * 
+	 * @throws ConstraintViolationException
+	 */
 	public abstract void check(Generic base, Generic baseConstraint, int axe) throws ConstraintViolationException;
 }

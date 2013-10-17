@@ -1,12 +1,13 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
+import org.genericsystem.exception.UniqueValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -105,7 +106,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 			public void intercept() {
 				plane.setRelation("ColorRelation", color);
 			}
-		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
+		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
 
 	// Instance
