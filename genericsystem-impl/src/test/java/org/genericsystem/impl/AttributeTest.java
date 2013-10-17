@@ -35,7 +35,6 @@ public class AttributeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute("power");
-		vehiclePower.log();
 		assert cache.getMetaAttribute().getInheritings().contains(vehiclePower);
 		assert cache.getEngine().getInheritings().contains(vehicle);
 		assert vehicle.getComposites().contains(vehiclePower) : cache.getEngine().getComposites();

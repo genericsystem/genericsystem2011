@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.util.GsMessages;
 
@@ -21,7 +20,7 @@ public class WrapperBean {
 	private GsMessages messages;
 
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private TreeBean genericTreeBean;
 
 	@Inject
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
@@ -49,31 +48,6 @@ public class WrapperBean {
 			if (!newValue.equals(generic.toString())) {
 				generic.updateValue(newValue);
 				messages.info("updateValue", generic, newValue);
-			}
-		}
-	}
-
-	public GenericTreeNodeWrapper getGenericTreeNodeWrapper(GenericTreeNode genericTreeNode) {
-		return new GenericTreeNodeWrapper(genericTreeNode);
-	}
-
-	public class GenericTreeNodeWrapper {
-		private GenericTreeNode genericTreeNode;
-
-		public GenericTreeNodeWrapper(GenericTreeNode genericTreeNode) {
-			this.genericTreeNode = genericTreeNode;
-		}
-
-		public String getValue() {
-			return genericTreeNode.getValue();
-		}
-
-		public void setValue(String newValue) {
-			Generic generic = genericTreeNode.getGeneric();
-			if (!newValue.equals(generic.toString())) {
-				genericTreeNode.setGeneric(generic.updateValue(newValue));
-				messages.info("updateGeneric", newValue, generic.getValue());
-				panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) genericTreeBean.getSelectedTreeNodeGeneric()).toCategoryString()));
 			}
 		}
 	}

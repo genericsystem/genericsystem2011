@@ -60,9 +60,9 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.InstanceClassConstraintViolationException;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
@@ -92,7 +92,6 @@ public class InstanceClassConstraintImpl extends AbstractNoBooleanConstraintImpl
 
 	@Override
 	public void checkConsistency(Generic baseConstraint, Holder valueConstraint, int axe) throws ConstraintViolationException {
-		log.info("valueConstraint   " + valueConstraint);
 		// la value est valueconstraint
 		assert baseConstraint.isStructural();
 		for (Generic instance : ((Type) baseConstraint).getInstances())

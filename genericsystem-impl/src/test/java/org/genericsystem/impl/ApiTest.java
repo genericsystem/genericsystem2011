@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
@@ -221,14 +222,13 @@ public class ApiTest extends AbstractTest {
 	public void testCyclicInherits() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type a = cache.newType("A");
-		a.newSubType("B").log();
+		a.newSubType("B");
 		final Type b = cache.newType("B");
-		b.log();
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				b.newSubType("A").log();
+				b.newSubType("A");
 			}
 		}.assertIsCausedBy(FunctionalConsistencyViolationException.class);
 	}

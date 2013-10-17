@@ -185,7 +185,7 @@ public class PhamtomTest extends AbstractTest {
 		assert phantom.isAlive();
 
 		vehiclePower.enableSingularConstraint();
-		assert ((Type) defaultPower).isSingularConstraintEnabled();
+		assert defaultPower.isSingularConstraintEnabled();
 		myVehicle.setValue(defaultPower, "235");
 		assert myVehicle.getValue(vehiclePower) == "235";
 	}
