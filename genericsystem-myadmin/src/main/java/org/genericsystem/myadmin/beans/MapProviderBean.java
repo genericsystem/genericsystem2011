@@ -24,9 +24,9 @@ import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
-import org.genericsystem.systemproperties.constraints.axed.RequiredConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.SingularConstraintImpl;
-import org.genericsystem.systemproperties.constraints.axed.SizeConstraintImpl;
+import org.genericsystem.constraints.RequiredConstraintImpl;
+import org.genericsystem.constraints.SingularConstraintImpl;
+import org.genericsystem.constraints.SizeConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

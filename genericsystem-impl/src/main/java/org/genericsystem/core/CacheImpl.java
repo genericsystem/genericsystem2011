@@ -35,8 +35,8 @@ import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl;
-import org.genericsystem.systemproperties.constraints.AbstractConstraintImpl.CheckingType;
+import org.genericsystem.constraints.AbstractConstraintImpl;
+import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.tree.TreeImpl;
 
 /**
@@ -366,22 +366,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
-		// GenericImpl meta = getMeta(clazz);
-		// return bind(meta.bindInstanceNode(findImplictValue(clazz)), Statics.insertFirst(meta, findUserSupers(clazz)), findComponents(clazz), clazz, false);
-
 		Generic[] userSupers = findUserSupers(clazz);
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
-		// log.info("AAAAAAA meta= " + meta.info() + " " + homeTreeNode + " " + System.identityHashCode(homeTreeNode) + " " + Arrays.toString(userSupers) + " " + Arrays.toString(components));
 		return bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
 	}
 
 	private GenericImpl getMeta(Class<?> clazz) {
-		// Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
-		// return null == extendsAnnotation ? (GenericImpl) getEngine() : this.<GenericImpl> find(extendsAnnotation.meta());
-
 		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
 		if (null == extendsAnnotation)
 			return getEngine();

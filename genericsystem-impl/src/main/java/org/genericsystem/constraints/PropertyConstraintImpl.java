@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 import java.util.Iterator;
 import java.util.Objects;
