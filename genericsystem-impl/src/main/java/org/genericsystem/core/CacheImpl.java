@@ -10,6 +10,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -225,7 +226,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-						adjust(((GenericImpl) orderedDependency).components));
+								adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -516,70 +517,117 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 	//TODO clean
-//	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-//		for (Generic generic : generics)
-//			if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
-//				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-//				keyHolder.checkConsistency((Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-//			}
-//	}
+	//	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+	//		for (Generic generic : generics)
+	//			if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
+	//				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
+	//				keyHolder.checkConsistency((Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+	//			}
+	//	}
 
 	static int i = 0;
 
 	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-//		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-//		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+		//		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
+		//		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+
+		/* Variables */
+		AbstractConstraintImpl constraint;			// constraint to check
+		Generic constrainedGeneric;					// generic concerned by constraint
+		Holder constraintValueHolder;				// holder of constraint's value
+		int axe;									// constraint's axe
+
 		for (Generic generic : generics) {
 			if (isGenericOfConstraintActivate(generic)) {
-				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-				keyHolder.checkConsistency(((Holder)keyHolder . getBaseComponent()).getBaseComponent(),(Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+				/* This generic is the holder of the constrant's value */
+				constraint = ((Holder) generic).getBaseComponent();
+				constrainedGeneric = ((Holder) constraint.getBaseComponent()).getBaseComponent();
+				constraintValueHolder = (Holder) generic;
+				axe = ((AxedPropertyClass) constraint.getValue()).getAxe();
+
+				/* Check consistency of this constraint */
+				constraint.checkConsistency(constrainedGeneric, constraintValueHolder, axe);
 			}
+
+
+			//				AbstractConstraintImpl constraint = ((Holder) generic).getBaseComponent();
+			//				constraint.checkConsistency(
+			//						((Holder)constraint.getBaseComponent()).getBaseComponent(),	// generic concerned by constraint
+			//						(Holder) generic,											// constraint value holder
+			//						((AxedPropertyClass) constraint.getValue()).getAxe()		// axe
+			//						);
+			//} else {
+			/* It's the simple generic */
 			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
 			for (Serializable key : constraintMap.keySet()) {
-				Holder valueHolder = constraintMap.getValueHolder(key);
-				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-				if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
-					keyHolder.check(generic, valueHolder,((AxedPropertyClass) keyHolder.getValue()).getAxe());
+				constrainedGeneric = generic;
+				constraintValueHolder = constraintMap.getValueHolder(key);
+				constraint = constraintValueHolder.getBaseComponent();
+				axe = ((AxedPropertyClass) constraint.getValue()).getAxe();
+
+				/* Check this cosntraint */
+				if (isCheckable(constraint, constrainedGeneric, checkingType, isFlushTime))
+					constraint.check(constrainedGeneric, constraintValueHolder, axe);
+
+				//					Holder valueHolder = constraintMap.getValueHolder(key);
+				//					AbstractConstraintImpl constraint = valueHolder.getBaseComponent();
+				//					if (isCheckable(constraint, generic, checkingType, isFlushTime))
+				//						constraint.check(
+				//								generic,												// generic concerned by constraint
+				//								valueHolder,											// constraint value holder
+				//								((AxedPropertyClass) constraint.getValue()).getAxe()	// axe
+				//								);
 			}
+			//}
+
 		}
 	}
 
+	/**
+	 * Returns true if generic in parameters is value of constraint, false if not.
+	 * 
+	 * @param generic - some generic.
+	 * 
+	 * @return true - generic in parameters is value of constraint, false - not.
+	 */
 	private boolean isGenericOfConstraintActivate(Generic generic) {
-		return null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class));
+		return generic.getValue() != null &&
+				generic.isAttribute() &&
+				generic.isInstanceOf(find(ConstraintValue.class));
 	}
-//	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-//		for (Generic generic : generics)
-//			if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
-//				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-//				keyHolder.checkConsistency(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-//			}
-//	}
-//
-//	static int i = 0;
-//
-//	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-//		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-//		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
-//		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-//		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
-//	}
-//
-//	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-//		for (Generic generic : generics) {
-//			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
-//			for (Serializable key : constraintMap.keySet()) {
-//				Holder valueHolder = constraintMap.getValueHolder(key);
-//				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-//				if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
-//					keyHolder.check(generic, valueHolder);
-//			}
-//		}
-//	}
+	//	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+	//		for (Generic generic : generics)
+	//			if (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) {
+	//				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
+	//				keyHolder.checkConsistency(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+	//			}
+	//	}
+	//
+	//	static int i = 0;
+	//
+	//	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
+	//		checkConsistency(CheckingType.CHECK_ON_ADD_NODE, true, adds);
+	//		checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+	//		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
+	//		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+	//	}
+	//
+	//	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+	//		for (Generic generic : generics) {
+	//			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
+	//			for (Serializable key : constraintMap.keySet()) {
+	//				Holder valueHolder = constraintMap.getValueHolder(key);
+	//				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
+	//				if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
+	//					keyHolder.check(generic, valueHolder);
+	//			}
+	//		}
+	//	}
 
 	protected boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
 		return (isFlushTime || constraint.isImmediatelyCheckable()) && constraint.isCheckedAt(generic, checkingType);
@@ -608,7 +656,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private void removeGeneric(Generic generic) throws ConstraintViolationException {
 		simpleRemove(generic);
-	//	checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
+		//	checkConsistency(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
 		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
 	}
 

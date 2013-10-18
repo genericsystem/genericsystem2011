@@ -31,14 +31,30 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		cache.newType("Plane");
-		car.setAttribute("Plane");
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				car.setAttribute("Plane");
+			}
+
+		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
 
 	public void testRelationWithSameNameAsTypeOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		final Type plane = cache.newType("Plane");
-		car.setRelation("Plane", plane);
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				car.setRelation("Plane", plane);
+			}
+
+		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
 
 	// Attribute
@@ -51,13 +67,20 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		assert Objects.equals(wheel, wheel2);
 	}
 
-	public void testRelationWithSameNameAsAttributeOK() {
+	public void testRelationWithSameNameAsAttributeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type plane = cache.newType("Plane");
+		final Type car = cache.newType("Car");
+		final Type plane = cache.newType("Plane");
 		Attribute wheelAttribute = car.setAttribute("Wheels");
-		Relation wheelRelation = car.setRelation("Wheels", plane);
-		assert !Objects.equals(wheelAttribute, wheelRelation);
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				car.setRelation("Wheels", plane);
+			}
+
+		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
 
 	// Relation
@@ -78,8 +101,8 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		Type car = cache.newType("Car");
 		final Type plane = cache.newType("Plane");
 		Attribute powerOnCar = car.setAttribute("Power");
+		log.info("@@@@@@@@@@@@@@@@@@@@@");
 		Attribute powerOnPlane = plane.setAttribute("Power");
-
 		assert powerOnCar == car.getAttribute("Power");
 		assert powerOnPlane == plane.getAttribute("Power");
 		Statics.debugCurrentThread();
@@ -89,9 +112,30 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		assert !powerOnPlane.isAlive();
 		assert ((GenericImpl) powerOnCar).reFind().inheritsFrom(power);
 		assert ((GenericImpl) powerOnCar).reFind().inheritsFrom(power);
-
 		assert ((GenericImpl) powerOnCar).reFind() == car.getAttribute("Power");
 		assert ((GenericImpl) powerOnPlane).reFind() == plane.getAttribute("Power");
+	}
+
+	public void testTypeAndItsSubtypeKO() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		final Type car = cache.newType("Car");
+		assert car.isUniqueValueConstraintEnabled();
+		assert car == car.newSubType("Car");
+	}
+
+	public void testOneTypeAndOneAttributeWithSameNameKO() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		final Type car = cache.newType("Car");
+		car.setAttribute("Power");
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				cache.newType("Power");
+			}
+
+		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
 
 	public void testTwoTypesWithSameRelationKO() {
