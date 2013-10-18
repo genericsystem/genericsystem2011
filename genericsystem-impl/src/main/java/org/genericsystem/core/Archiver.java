@@ -253,8 +253,8 @@ public class Archiver {
 
 		private SnapshotLoader(ZipArchiver zipArchiver) {
 			try {
-				this.formalInputStream = new ObjectInputStream(zipArchiver.getFormalInputStream());
-				this.contentInputStream = new ObjectInputStream(zipArchiver.getContentInputStream());
+				formalInputStream = new ObjectInputStream(zipArchiver.getFormalInputStream());
+				contentInputStream = new ObjectInputStream(zipArchiver.getContentInputStream());
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
 			}
@@ -265,8 +265,7 @@ public class Archiver {
 				Engine engine = loadEngine();
 				for (;;)
 					loadGeneric(engine);
-			} catch (EOFException ignore) {
-			} catch (Exception e) {
+			} catch (EOFException ignore) {} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}

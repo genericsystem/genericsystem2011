@@ -34,7 +34,6 @@ import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
-import org.genericsystem.iterator.AbstractSelectableLeafIterator2;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
@@ -413,7 +412,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	static long time1 = 0;
 	static long time2 = 0;
-	static long time3 = 0;
+
+	// static long time3 = 0;
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
@@ -448,14 +448,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		NavigableSet<Generic> orderedDependencies2 = getConcernedDependencies2(directSupers, primaries, components);
 		long ts4 = System.currentTimeMillis();
 		time2 += (ts4 - ts3);
-		long ts5 = System.currentTimeMillis();
-		NavigableSet<Generic> orderedDependencies3 = getConcernedDependencies3(directSupers, primaries, components);
-		long ts6 = System.currentTimeMillis();
-		time3 += (ts6 - ts5);
-		log.info("old vs new : " + time1 + " " + time2 + " " + time3 + "  =========> " + (time1 - time2) + " " + (time2 - time3));
-		log.info("ZZZZZZZZ" + Arrays.toString(primaries));
+		// log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
+		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
 		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
-		assert orderedDependencies.equals(orderedDependencies3) : orderedDependencies + " " + orderedDependencies3;
+		// assert orderedDependencies.equals(orderedDependencies3) : orderedDependencies + " " + orderedDependencies3;
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
 		ConnectionMap connectionMap = new ConnectionMap();
@@ -486,30 +482,18 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return orderedDependencies;
 	}
 
-	NavigableSet<Generic> getConcernedDependencies3(Generic[] supers, HomeTreeNode[] primaries, Generic[] components) {
-		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
-		for (Generic superGeneric : supers) {
-			Iterator<Generic> removeIterator = concernedDependenciesIterator3(superGeneric, primaries, components);
-			while (removeIterator.hasNext()) {
-				Generic next = removeIterator.next();
-				orderedDependencies.addAll(orderDependencies((GenericImpl) next));
-			}
-		}
-		return orderedDependencies;
-	}
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> Iterator<T> concernedDependenciesIterator2(Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
 		return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) directSuper) {
 
+			private static final long serialVersionUID = 3038922934693070661L;
+
 			@Override
 			public Iterator<T> children(T node) {
-
 				if (GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) node).primaries, ((GenericImpl) node).components))
 					return Collections.emptyIterator();
 				else
 					return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
-
 			}
 		}) {
 			@Override
@@ -519,32 +503,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		};
 	}
 
-	<T extends Generic> Iterator<T> concernedDependenciesIterator3(Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
-
-		return (Iterator<T>) new AbstractSelectableLeafIterator2(directSuper) {
-
-			@Override
-			protected boolean isSelectable() {
-				boolean result = GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
-				// log.info("isSelectable ===> " + next + " " + Arrays.toString(primaries) + Arrays.toString(components) + " " + result);
-				return result;
-			}
-
-			@Override
-			public boolean isSelected(Generic father) {
-				return !GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) father).primaries, ((GenericImpl) father).components);
-			}
-		};
-	}
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
 
 		return new AbstractFilterIterator<T>((Iterator<T>) new AbstractPreTreeIterator<Generic>(directSuper) {
-
-			{
-				next();
-			}
 
 			private static final long serialVersionUID = 4540682035671625893L;
 
@@ -555,9 +517,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}) {
 			@Override
 			public boolean isSelected() {
-				// Statics.logTimeIfCurrentThreadDebugged("###" + next);
-				// Statics.logTimeIfCurrentThreadDebugged("directSuper : " + directSuper + System.identityHashCode(directSuper) + " " + next + System.identityHashCode(next)
-				// + GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components));
 				return GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
 			}
 		};
