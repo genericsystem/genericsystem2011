@@ -159,4 +159,6 @@ public interface Cache {
 	Cache start();
 
 	Snapshot<Type> getAllTypes();
+
+
 }
