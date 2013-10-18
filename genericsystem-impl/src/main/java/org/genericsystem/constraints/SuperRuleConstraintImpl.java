@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -40,11 +40,5 @@ public class SuperRuleConstraintImpl extends AbstractBooleanConstraintImpl imple
 		for (Generic directSuper : modified.getSupers())
 			if (!((GenericImpl) directSuper).isSuperOf(modified))
 				throw new SuperRuleConstraintViolationException(modified.info() + " should inherits from : " + directSuper.info());
-	}
-
-	@Override
-	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-
 	}
 }

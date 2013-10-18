@@ -47,7 +47,7 @@
 //	}
 //
 //}
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -83,24 +83,15 @@ public class AloneAutomaticsConstraintImpl extends AbstractBooleanConstraintImpl
 	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}
+
 	@Override
-	public void check(Generic base,Generic baseConstraint, int axe) throws ConstraintViolationException {
+	public void check(Generic base, Generic baseConstraint, int axe) throws ConstraintViolationException {
 		if (base.isAlive() /* && modified.isAutomatic() */&& base.getInheritings().isEmpty() && base.getComposites().isEmpty())
 			throw new AloneAutomaticsConstraintViolationException();
-
 	}
-
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType type) {
 		return type.equals(CheckingType.CHECK_ON_REMOVE_NODE);
 	}
-
-	@Override
-	public void checkConsistency(Generic baseConstraint,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-
-	}
-
 }
-

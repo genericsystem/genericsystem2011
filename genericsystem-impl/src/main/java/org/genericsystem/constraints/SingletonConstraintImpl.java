@@ -34,7 +34,7 @@
 //	}
 //
 //}
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 
 import org.genericsystem.annotation.Components;
@@ -69,13 +69,4 @@ public class SingletonConstraintImpl extends AbstractBooleanConstraintImpl imple
 		if (instanceNumber > 1)
 			throw new SingletonConstraintViolationException("Singleton constraint violation : type " + baseConstraint + " has " + instanceNumber + " instances.");
 	}
-
-	@Override
-	public void checkConsistency(Generic baseConstraint,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		int instanceNumber = ((Type) baseConstraint).getAllInstances().size();
-		if (instanceNumber > 1)
-			throw new SingletonConstraintViolationException("Singleton constraint violation : type " + baseConstraint + " has " + instanceNumber + " instances.");
-	}
-
-
 }

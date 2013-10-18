@@ -13,22 +13,22 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
-import org.genericsystem.systemproperties.constraints.AliveConstraintImpl;
-import org.genericsystem.systemproperties.constraints.AloneAutomaticsConstraintImpl;
-import org.genericsystem.systemproperties.constraints.ConcreteInheritanceConstraintImpl;
-import org.genericsystem.systemproperties.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.systemproperties.constraints.OptimisticLockConstraintImpl;
-import org.genericsystem.systemproperties.constraints.PhantomConstraintImpl;
-import org.genericsystem.systemproperties.constraints.PropertyConstraintImpl;
-import org.genericsystem.systemproperties.constraints.RequiredConstraintImpl;
-import org.genericsystem.systemproperties.constraints.SingletonConstraintImpl;
-import org.genericsystem.systemproperties.constraints.SingularConstraintImpl;
-import org.genericsystem.systemproperties.constraints.SizeConstraintImpl;
-import org.genericsystem.systemproperties.constraints.SuperRuleConstraintImpl;
-import org.genericsystem.systemproperties.constraints.UnduplicateBindingConstraintImpl;
-import org.genericsystem.systemproperties.constraints.UniqueStructuralValueConstraintImpl;
-import org.genericsystem.systemproperties.constraints.UniqueValueConstraintImpl;
-import org.genericsystem.systemproperties.constraints.VirtualConstraintImpl;
+import org.genericsystem.constraints.AliveConstraintImpl;
+import org.genericsystem.constraints.AloneAutomaticsConstraintImpl;
+import org.genericsystem.constraints.ConcreteInheritanceConstraintImpl;
+import org.genericsystem.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.constraints.OptimisticLockConstraintImpl;
+import org.genericsystem.constraints.PhantomConstraintImpl;
+import org.genericsystem.constraints.PropertyConstraintImpl;
+import org.genericsystem.constraints.RequiredConstraintImpl;
+import org.genericsystem.constraints.SingletonConstraintImpl;
+import org.genericsystem.constraints.SingularConstraintImpl;
+import org.genericsystem.constraints.SizeConstraintImpl;
+import org.genericsystem.constraints.SuperRuleConstraintImpl;
+import org.genericsystem.constraints.UnduplicateBindingConstraintImpl;
+import org.genericsystem.constraints.UniqueStructuralValueConstraintImpl;
+import org.genericsystem.constraints.UniqueValueConstraintImpl;
+import org.genericsystem.constraints.VirtualConstraintImpl;
 
 /**
  * @author Nicolas Feybesse

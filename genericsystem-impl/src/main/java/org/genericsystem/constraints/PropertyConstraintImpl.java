@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -26,7 +26,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class PropertyConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
-	public void check(final Generic modified, final Generic type,int axe) throws ConstraintViolationException {
+	public void check(final Generic modified, final Generic type, int axe) throws ConstraintViolationException {
 		if (modified.isAttribute()) {
 			// TODO KK
 			for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {
@@ -61,10 +61,4 @@ public class PropertyConstraintImpl extends AbstractBooleanConstraintImpl implem
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
 		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
 	}
-	@Override
-	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

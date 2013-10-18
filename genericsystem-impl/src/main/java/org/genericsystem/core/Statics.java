@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,8 @@ public class Statics {
 
 	public static final long serialVersionUID = -4186936523588998107L;
 	public static final String SNAPSHOT_EXTENSION = ".snapshot";
+	public static final String FORMAL_EXTENSION = ".formal";
+	public static final String CONTENT_EXTENSION = ".content";
 	public static final String PART_EXTENSION = ".part";
 	public static final String PATTERN = "yyyy.MM.dd_HH-mm-ss.SSS";
 	public static final String MATCHING_REGEX = "[0-9]{4}.[0-9]{2}.[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}.[0-9]{3}---[0-9]+";
@@ -136,7 +139,8 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {}
+		private Flag() {
+		}
 
 		@Override
 		public String toString() {

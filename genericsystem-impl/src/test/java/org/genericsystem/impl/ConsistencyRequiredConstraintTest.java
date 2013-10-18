@@ -22,19 +22,17 @@ public class ConsistencyRequiredConstraintTest extends AbstractTest {
 	}
 
 	public void ConsistencyAttributeKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine()
-				.start();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.newInstance("myVehicle");
 		final Attribute power = vehicle.setAttribute("power");
-		
+
 		new RollbackCatcher() {
 			@Override
-			public void intercept() {		
+			public void intercept() {
 				power.enableRequiredConstraint();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
-		cache.flush();
 	}
 
 }

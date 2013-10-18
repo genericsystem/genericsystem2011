@@ -45,7 +45,7 @@
 //				throw new InstanceClassConstraintViolationException("Wrong type of instance");
 //	}
 //}
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 import java.io.Serializable;
 
@@ -60,9 +60,9 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.InstanceClassConstraintViolationException;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
@@ -83,21 +83,13 @@ public class InstanceClassConstraintImpl extends AbstractNoBooleanConstraintImpl
 		Generic baseConstraint = ((Holder) valueConstraint).<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent();
 		if (base.isConcrete() && ((GenericImpl) base.getMeta()).getValue(((EngineImpl) base.getEngine()).getCurrentCache().<Holder> find(InstanceClassConstraintImpl.class)) != null) {
 			Class<?> clazz = (Class<?>) value;
-			if (base.getValue() != null && !clazz.isAssignableFrom(base.getValue().getClass()))
-				throw new InstanceClassConstraintViolationException("Wrong value type for generic " + base + " : should be " + clazz.getSimpleName() + " but is " + base.getValue().getClass().getSimpleName() + " for type " + baseConstraint);
-
+			if (!valueConstraint.getValue().equals(AxedPropertyClass.class))
+				if (base.getValue() != null && !clazz.isAssignableFrom(base.getValue().getClass()))
+					throw new InstanceClassConstraintViolationException("clazz " + clazz + " / " + base.getValue().getClass() + " base " + base);
 		}
-
-	}
-
-	@Override
-	public void checkConsistency(Generic baseConstraint, Holder valueConstraint, int axe) throws ConstraintViolationException {
-		log.info("valueConstraint   " + valueConstraint);
-		// la value est valueconstraint
-		assert baseConstraint.isStructural();
 		for (Generic instance : ((Type) baseConstraint).getInstances())
 			if (!valueConstraint.getValue().equals(AxedPropertyClass.class) && !instance.getValue().getClass().equals(valueConstraint.getValue()))
 				throw new InstanceClassConstraintViolationException("Wrong type of instance");
-	}
 
+	}
 }

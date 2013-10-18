@@ -46,8 +46,7 @@
 //	}
 //
 //}
-package org.genericsystem.systemproperties.constraints;
-
+package org.genericsystem.constraints;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -93,12 +92,4 @@ public class AliveConstraintImpl extends AbstractBooleanConstraintImpl implement
 			if (!generic.isAlive())
 				throw new AliveConstraintViolationException("Super : " + generic + " of added node " + base + " should be alive.");
 	}
-
-	@Override
-	public void checkConsistency(Generic baseConstraint,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-	}
-
-
 }
-

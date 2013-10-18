@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 //TODO KK
 //package org.genericsystem.systemproperties.constraints.simple;
 //

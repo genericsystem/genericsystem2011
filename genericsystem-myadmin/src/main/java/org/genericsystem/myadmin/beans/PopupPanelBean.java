@@ -14,9 +14,9 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
-import org.genericsystem.systemproperties.constraints.RequiredConstraintImpl;
-import org.genericsystem.systemproperties.constraints.SingularConstraintImpl;
-import org.genericsystem.systemproperties.constraints.SizeConstraintImpl;
+import org.genericsystem.constraints.RequiredConstraintImpl;
+import org.genericsystem.constraints.SingularConstraintImpl;
+import org.genericsystem.constraints.SizeConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class PopupPanelBean implements Serializable {
 	private Attribute attribute;
 
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private TreeBean genericTreeBean;
 
 	public void addProperties() {
 		genericTreeBean.getSelectedTreeNode().getGeneric().getPropertiesMap().put(getPopupkey(), getPopupValue());

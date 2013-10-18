@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -43,7 +43,7 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanConstraintI
 	}
 
 	@Override
-	public void check(final Generic modified, Generic type,int axe) throws ConstraintViolationException {
+	public void check(final Generic modified, Generic type, int axe) throws ConstraintViolationException {
 		final Generic[] supers = ((GenericImpl) modified).getSupersArray();
 		final Generic[] components = ((GenericImpl) modified).getComponentsArray();
 		Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((EngineImpl) modified.getEngine()).getCurrentCache().compositesIterator(components[0])
@@ -63,10 +63,5 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanConstraintI
 	@Override
 	public boolean isImmediatelyCheckable() {
 		return false;
-	}
-	@Override
-	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-		
 	}
 }

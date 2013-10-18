@@ -18,7 +18,7 @@ import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.beans.GenericBean;
-import org.genericsystem.myadmin.beans.GenericTreeBean;
+import org.genericsystem.myadmin.beans.TreeBean;
 import org.testng.annotations.Test;
 
 @Test
@@ -28,7 +28,7 @@ public class TypesTest extends AbstractTest {
 	private Cache cache;
 
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private TreeBean genericTreeBean;
 
 	@Test
 	public void testExample() {

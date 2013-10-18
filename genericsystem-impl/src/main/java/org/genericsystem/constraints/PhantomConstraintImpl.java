@@ -1,4 +1,4 @@
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -62,9 +62,4 @@ public class PhantomConstraintImpl extends AbstractBooleanConstraintImpl impleme
 			}
 	}
 
-	@Override
-	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-
-	}
 }

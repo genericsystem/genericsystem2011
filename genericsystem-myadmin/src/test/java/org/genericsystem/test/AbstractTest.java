@@ -13,7 +13,7 @@ import org.genericsystem.cdi.UserClassesProvider;
 import org.genericsystem.example.Example.MyVehicle;
 import org.genericsystem.example.Example.Vehicle;
 import org.genericsystem.myadmin.beans.GenericBean;
-import org.genericsystem.myadmin.beans.GenericTreeBean;
+import org.genericsystem.myadmin.beans.TreeBean;
 import org.genericsystem.myadmin.beans.WrapperBean;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
@@ -37,7 +37,7 @@ public abstract class AbstractTest extends Arquillian {
 	@Deployment
 	public static JavaArchive createTestArchive() {
 		return new Archiver(GenericBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class,
-				MessageFactory.class, CdiFactory.class, GenericTreeBean.class, WrapperBean.class, MyVehicle.class, Vehicle.class).archive();
+				MessageFactory.class, CdiFactory.class, TreeBean.class, WrapperBean.class, MyVehicle.class, Vehicle.class).archive();
 	}
 
 	@Inject

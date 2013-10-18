@@ -58,7 +58,7 @@
 //		}
 //	}
 //}
-package org.genericsystem.systemproperties.constraints;
+package org.genericsystem.constraints;
 
 
 import org.genericsystem.annotation.Components;
@@ -102,6 +102,11 @@ public class SingularConstraintImpl extends AbstractBooleanConstraintImpl implem
 			if (holders.size() > 1)
 				throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + modified + " (n° " + axe + ") : " + holders);
 		}
+		for (Generic link : ((Type) baseConstraint).getInstances()) {
+			Generic instance = link.getComponents().get(axe);
+			if (instance != null && instance.getHolders((Relation) baseConstraint).size() >= 2)
+				throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + instance + " (n° " + axe + ")");
+		}
 	}
 
 
@@ -110,15 +115,4 @@ public class SingularConstraintImpl extends AbstractBooleanConstraintImpl implem
 		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
 	}
 
-
-	@Override
-	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		Generic baseConstraint = ((Holder) getBaseComponent()).getBaseComponent();
-		for (Generic link : ((Type) baseConstraint).getInstances()) {
-			Generic instance = link.getComponents().get(axe);
-			if (instance != null && instance.getHolders((Relation) baseConstraint).size() >= 2)
-				throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + instance + " (n° " + axe + ")");
-		}
-		
-	}
 }
