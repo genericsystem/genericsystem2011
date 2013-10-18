@@ -20,10 +20,10 @@ public abstract class AbstractPreTreeLeafIterator<T> extends AbstractAwareIterat
 		deque.push(new SingletonIterator<T>(rootNode));
 	}
 
-	@Override
-	public boolean hasNext() {
-		return (!deque.isEmpty() && deque.peek().hasNext());
-	}
+	// @Override
+	// public boolean hasNext() {
+	// return (!deque.isEmpty() && deque.peek().hasNext());
+	// }
 
 	@Override
 	protected void advance() {
@@ -38,11 +38,12 @@ public abstract class AbstractPreTreeLeafIterator<T> extends AbstractAwareIterat
 					return alreadyTraversed.add(next);
 				}
 			};
-			next = node;
-			if (children.hasNext())
+			if (children.hasNext()) {
 				deque.push(children);
-			else
+			} else {
+				next = node;
 				return;
+			}
 		}
 		next = null;
 

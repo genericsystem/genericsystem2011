@@ -19,12 +19,6 @@ public abstract class AbstractSelectableLeafIterator2 extends AbstractSelectable
 	@Override
 	protected Iterator<Generic> children(final Generic father) {
 		return isSelected(father) ? new ConcateIterator<Generic>(((GenericImpl) father).directInheritingsIterator(), ((GenericImpl) father).compositesIterator()) : Collections.<Generic> emptyIterator();
-		// return new AbstractFilterIterator<Generic>(new ConcateIterator<Generic>(((GenericImpl) father).directInheritingsIterator(), ((GenericImpl) father).compositesIterator())) {
-		// @Override
-		// public boolean isSelected() {
-		// return AbstractSelectableLeafIterator2.this.isSelected(father, next);
-		// }
-		// };
 	}
 
 	public abstract boolean isSelected(Generic father);

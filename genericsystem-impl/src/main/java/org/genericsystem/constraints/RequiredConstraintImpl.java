@@ -45,4 +45,5 @@ public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implem
 	public boolean isImmediatelyCheckable() {
 		return false;
 	}
+
 }
