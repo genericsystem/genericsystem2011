@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -536,36 +537,34 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
-	protected void checkConsistency(boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		for (Generic generic : generics)
-			if (isConsistencyToCheck(isFlushTime, generic)) {
-				AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-				keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-			}
+	protected void checkConsistency(boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+		if (isConsistencyToCheck(isFlushTime, generic)) {
+			AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
+			keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+		}
 	}
 
 	protected boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
 		return (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) ? isFlushTime || ((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()).isImmediatelyConsistencyCheckable() : false;
 	}
 
-	static int i = 0;
-
-	protected void checkConstraints(Iterable<Generic> adds, Iterable<Generic> removes) throws ConstraintViolationException {
-		checkConsistency(true, adds);
-		checkConsistency(true, removes);
-		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+	protected void check(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+		for (Generic generic : generics)
+			check(checkingType, isFlushTime, generic);
 	}
 
-	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		for (Generic generic : generics) {
-			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
-			for (Serializable key : constraintMap.keySet()) {
-				Holder valueHolder = constraintMap.getValueHolder(key);
-				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-				if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
-					keyHolder.check(generic, valueHolder, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-			}
+	protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+		checkConsistency(isFlushTime, generic);
+		checkConstraints(checkingType, isFlushTime, generic);
+	}
+
+	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
+		for (Serializable key : constraintMap.keySet()) {
+			Holder valueHolder = constraintMap.getValueHolder(key);
+			AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
+			if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
+				keyHolder.check(generic, valueHolder, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
 		}
 	}
 
@@ -590,18 +589,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private void addGeneric(Generic generic) throws ConstraintViolationException {
 		simpleAdd(generic);
-		checkConsistency(false, Arrays.asList(generic));
-		checkConstraints(CheckingType.CHECK_ON_ADD_NODE, false, Arrays.asList(generic));
+		check(CheckingType.CHECK_ON_ADD_NODE, false, generic);
 	}
 
 	private void removeGeneric(Generic generic) throws ConstraintViolationException {
 		simpleRemove(generic);
-		checkConsistency(false, Arrays.asList(generic));
-		checkConstraints(CheckingType.CHECK_ON_REMOVE_NODE, false, Arrays.asList(generic));
+		check(CheckingType.CHECK_ON_REMOVE_NODE, false, generic);
 	}
 
 	private void checkConstraints() throws ConstraintViolationException {
-		checkConstraints(adds, removes);
+		check(CheckingType.CHECK_ON_ADD_NODE, true, adds);
+		check(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
 	}
 
 	static class CacheDependencies implements TimestampedDependencies {
