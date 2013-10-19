@@ -348,8 +348,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(this.<EngineImpl> getEngine().bindInstanceNode(value), new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, false);// .<T>
-		// disableInheritance();
+		return this.<T> bind(this.<EngineImpl> getEngine().bindInstanceNode(value), new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, false);
 	}
 
 	@Override
@@ -379,16 +378,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (null == extendsAnnotation)
 			return getEngine();
 		Class<?> meta = extendsAnnotation.meta();
+		if (Engine.class.equals(meta))
+			meta = EngineImpl.class;
 		return this.<GenericImpl> find(meta);
 	}
-
-	// private boolean isAutomatic(Generic[] userSupers, Generic[] components) {
-	// if (components.length > 0)
-	// return true;
-	// if (userSupers.length == 1)
-	// return !userSupers[0].isEngine();
-	// return !(userSupers.length == 0);
-	// }
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic directSuper, boolean existsException, Generic... components) {
 		components = ((GenericImpl) directSuper).sortAndCheck(components);
@@ -451,7 +444,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		// log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
 		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
 		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
-		// assert orderedDependencies.equals(orderedDependencies3) : orderedDependencies + " " + orderedDependencies3;
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
 		ConnectionMap connectionMap = new ConnectionMap();

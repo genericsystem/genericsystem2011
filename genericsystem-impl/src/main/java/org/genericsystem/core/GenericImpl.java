@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -103,21 +102,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return restore(homeTreeNode, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
 	}
 
-	// private static void reorderImplicit(Generic implicit, Generic[] supers) {
-	// for (int index = 0; index < supers.length; index++)
-	// if (implicit.equals(supers[index].getImplicit()))
-	// if (index != 0) {
-	// switchFirst(index, supers);
-	// return;
-	// }
-	// }
-
-	// private static void switchFirst(int index, Generic[] supers) {
-	// Generic tmp = supers[index];
-	// supers[index] = supers[0];
-	// supers[0] = tmp;
-	// }
-
 	final GenericImpl restore(HomeTreeNode homeTreeNode, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] supers, Generic[] components) {
 		assert homeTreeNode != null;
 		this.homeTreeNode = homeTreeNode;
@@ -141,7 +125,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
 				throw new IllegalStateException();
 		}
-		assert !homeTreeNode.toString().equals("Engine|class org.genericsystem.map.ConstraintsMapProvider$ConstraintKey|null");
 		return this;
 	}
 
@@ -184,10 +167,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getMetaLevel() - generic.getMetaLevel() == 1 ? this.inheritsFrom(generic) : false;
 	}
 
-	// public boolean isPrimary() {
-	// return components.length == 0 && supers.length == 1;
-	// }
-
 	@Override
 	public <T extends Generic> T getMeta() {
 		HomeTreeNode metaNode = homeTreeNode.metaNode;
@@ -203,15 +182,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (T) generic;
 	}
 
-	// @Override
-	// public <T extends Generic> T getImplicit() {
-	// return isPrimary() ? (T) this : supers[0].<T> getImplicit();
-	// }
-
 	@Override
 	public int getMetaLevel() {
 		return homeTreeNode.getMetaLevel();
-		// return isPrimary() ? supers[0].getMetaLevel() + 1 : getImplicit().getMetaLevel();
 	}
 
 	@Override
@@ -296,14 +269,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		assert value == null || getValues(attribute).contains(value) : "holder : " + holder.info() + " value : " + value + " => " + getValues(attribute);
 		return holder;
 	}
-
-	// public <T extends Generic> T bindPrimaryByValue(Class<?> specializationClass, Serializable value) {
-	// return getCurrentCache().bindPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value, specializationClass);
-	// }
-	//
-	// public <T extends Generic> T findPrimaryByValue(Serializable value) {
-	// return getCurrentCache().findPrimaryByValue(isConcrete() ? this.<GenericImpl> getImplicit().supers[0] : getImplicit(), value);
-	// }
 
 	@Override
 	public <T extends Link> T setLink(Link relation, Serializable value, Generic... targets) {
@@ -502,7 +467,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int metaLevel, int basePos, boolean readPhantoms, Generic... targets) {
-		// log.info("XXXX");
 		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(metaLevel, attribute, basePos, readPhantoms), attribute, targets);
 	}
 
@@ -780,20 +744,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return result;
 	}
 
-	// Generic[] sortAndCheck(Generic... components) {
-	// if (getComponentsSize() != components.length)
-	// throw new IllegalStateException("Illegal components size : " + components.length);
-	// List<Integer> positions = getComponentsPositions(components);
-	// Generic[] orderedComponents = new Generic[components.length];
-	// for (int i = 0; i < components.length; i++) {
-	// int pos = positions.get(i);
-	// if (pos < 0 || pos >= components.length)
-	// throw new IllegalStateException("Unable to find a valid position for : " + components[i]);
-	// orderedComponents[pos] = components[i];
-	// }
-	// return orderedComponents;
-	// }
-
 	public <T extends Generic> Iterator<T> holdersIterator(final int level, Holder origin, int basePos, boolean readPhantom) {
 		if (Statics.STRUCTURAL == level)
 			basePos = Statics.MULTIDIRECTIONAL;
@@ -805,48 +755,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
 			@Override
 			public boolean isSelected() {
-				// log.info("XXXX" + next);
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
 			}
 		};
 	}
-
-	// private Iterator<Generic> allSupersIterator() {
-	// return new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
-	//
-	// private static final long serialVersionUID = -6254209580316166416L;
-	//
-	// @Override
-	// public Iterator<Generic> children(Generic node) {
-	// return new ArrayIterator<Generic>(((GenericImpl) node).supers);
-	// }
-	// };
-	// }
-	//
-	// private <T extends Generic> Iterator<T> mainIterator2(final Generic origin, final int level, final int pos, final boolean readPhantom) {
-	// return new AbstractFilterIterator<T>(new AbstractConcateIterator<Generic, T>(allSupersIterator()) {
-	// @Override
-	// protected Iterator<T> getIterator(Generic superGeneric) {
-	// return ((GenericImpl) superGeneric).noInheritanceIterator(pos, level, origin);
-	// }
-	// }) {
-	//
-	// private Set<T> alreadyComputed = new HashSet<>();
-	//
-	// @Override
-	// public boolean isSelected() {
-	// return isNewLeaf(next) && (readPhantom || next.getValue() != null); // test phantom after add
-	// }
-	//
-	// private boolean isNewLeaf(Generic candidate) {
-	// for (Generic generic : alreadyComputed)
-	// if (generic.inheritsFrom(candidate))
-	// return false;
-	// return true;
-	// }
-	//
-	// };
-	// }
 
 	public <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(origin) {
@@ -908,14 +820,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return inheritance;
 	}
 
-	private class InheritanceCalculator extends HashSet<Generic> {
-		private static final long serialVersionUID = -894665449193645526L;
+	private class InheritanceCalculator /* extends HashSet<Generic> */{
+		// private static final long serialVersionUID = -894665449193645526L;
 
 		public boolean isSuperOf(Generic subGeneric) {
 			if (GenericImpl.this.equals(subGeneric))
 				return true;
+			if (subGeneric.isEngine())
+				return isEngine();
 			for (Generic directSuper : ((GenericImpl) subGeneric).supers)
-				if (add(directSuper) && isSuperOf(directSuper))
+				if (/* add(directSuper) && */isSuperOf(directSuper))
 					return true;
 			return false;
 		}

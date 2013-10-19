@@ -1,20 +1,19 @@
 package org.genericsystem.impl;
 
 import java.io.Serializable;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.RequiredConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
-import org.genericsystem.core.Engine;
+import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.impl.MyMapProvider.MyValue;
 import org.genericsystem.map.AbstractMapProvider;
 
 @SystemGeneric
-@Components(Engine.class)
+@Components(EngineImpl.class)
 @Dependencies(MyValue.class)
 public class MyMapProvider extends AbstractMapProvider<Serializable, Serializable> {
 

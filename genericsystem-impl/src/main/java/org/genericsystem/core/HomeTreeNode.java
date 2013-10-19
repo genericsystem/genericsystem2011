@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-
 import org.genericsystem.core.ConcurrentRefValueHashMap.ConcurrentWeakValueHashMap;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.slf4j.Logger;
