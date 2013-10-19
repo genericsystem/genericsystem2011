@@ -28,7 +28,6 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	private SystemCache systemCache = new SystemCache();
 	private TsGenerator generator = new TsGenerator();
-	private HomeTreeNode homeTree;
 	private Factory factory;
 	private Archiver archiver;
 
@@ -39,14 +38,13 @@ public class EngineImpl extends GenericImpl implements Engine {
 		archiver.startScheduler();
 	}
 
-	// TODO KK why 0L => pass null
 	void restoreEngine() {
-		restoreEngine(null, pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE);
+		restore(new RootTreeNode(), pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
 	}
 
-	final void restoreEngine(Long homeTreeNodeTs, long designTs, long birthTs, long lastReadTs, long deathTs) {
-		homeTree = homeTreeNodeTs == null ? new RootTreeNode() : new RootTreeNode(homeTreeNodeTs);
-		restore(homeTree, designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
+	final void restoreEngine(long homeTreeNodeTs, long designTs, long birthTs, long lastReadTs, long deathTs) {
+		assert homeTreeNodeTs != 0;
+		restore(new RootTreeNode(homeTreeNodeTs), designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
 		assert components.length == 0;
 	}
 
@@ -209,13 +207,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 				return systemProperty;
 			if (!startupTime)
 				throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
-			return bind(clazz);
-		}
-
-		// @SuppressWarnings("unchecked")
-		private <T extends Generic> T bind(Class<?> clazz) {
 			CacheImpl cache = getCurrentCache();
-			T result = cache.<T> bind(clazz);
+			T result = getCurrentCache().<T> bind(clazz);
 			put(clazz, result);
 			((GenericImpl) result).mountConstraints(clazz);
 			cache.triggersDependencies(clazz);

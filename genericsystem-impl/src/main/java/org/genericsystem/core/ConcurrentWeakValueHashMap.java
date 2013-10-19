@@ -5,7 +5,7 @@ import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-abstract class ConcurrentRefValueHashMap<K, V> {
+class ConcurrentWeakValueHashMap<K, V> {
 
 	private final ConcurrentHashMap<K, MyReference<K, V>> myMap = new ConcurrentHashMap<K, MyReference<K, V>>();
 	protected final ReferenceQueue<V> myQueue = new ReferenceQueue<V>();
@@ -33,7 +33,9 @@ abstract class ConcurrentRefValueHashMap<K, V> {
 		return ref.get();
 	}
 
-	protected abstract MyReference<K, V> createRef(K key, V value);
+	protected MyReference<K, V> createRef(K key, V value) {
+		return new MyWeakReference<K, V>(key, value, myQueue);
+	}
 
 	public V putIfAbsent(K key, V value) {
 		MyReference<K, V> newRef = createRef(key, value);
@@ -82,13 +84,4 @@ abstract class ConcurrentRefValueHashMap<K, V> {
 			return key.hashCode();
 		}
 	}
-
-	public static final class ConcurrentWeakValueHashMap<K, V> extends ConcurrentRefValueHashMap<K, V> {
-
-		@Override
-		protected MyReference<K, V> createRef(K key, V value) {
-			return new MyWeakReference<K, V>(key, value, myQueue);
-		}
-	}
-
 }

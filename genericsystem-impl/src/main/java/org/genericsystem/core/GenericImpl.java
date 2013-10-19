@@ -1483,6 +1483,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.homeTreeNode.equals(homeTreeNode) && Arrays.equals(this.primaries, primaries) && Arrays.equals(this.components, nullToSelfComponent(components));
 	}
 
+	public boolean equiv(HomeTreeNode[] primaries, Generic[] components) {
+		return Arrays.equals(this.primaries, primaries) && Arrays.equals(this.components, nullToSelfComponent(components));
+	}
+
 	public <T extends Generic> T reBind() {
 		return getCurrentCache().reBind(this);
 	}

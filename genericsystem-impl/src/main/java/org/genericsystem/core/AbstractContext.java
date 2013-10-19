@@ -213,14 +213,6 @@ public abstract class AbstractContext implements Serializable {
 		return this.<EngineImpl> getEngine().find(clazz);
 	}
 
-	// TODO KK remove this !
-	<T extends Generic> T findMeta(HomeTreeNode[] primaries, Generic[] components) {
-		for (T composite : getEngine().<T> getComposites())
-			if (((GenericImpl) composite).equiv(this.<EngineImpl> getEngine().getHomeTreeNode(), primaries, components))
-				return composite;
-		return null;
-	}
-
 	Generic[] findUserSupers(Class<?> clazz) {
 		int i = 0;
 		LinkedHashSet<Class<?>> supersClasses = getSupersClasses(clazz);
@@ -314,6 +306,5 @@ public abstract class AbstractContext implements Serializable {
 
 		Iterator<Generic> iterator(long ts);
 	}
-
 
 }

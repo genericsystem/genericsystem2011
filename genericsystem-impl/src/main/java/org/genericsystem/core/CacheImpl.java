@@ -370,7 +370,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
-		return bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
+		T result = bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
+		return result;
 	}
 
 	private GenericImpl getMeta(Class<?> clazz) {
@@ -406,25 +407,19 @@ public class CacheImpl extends AbstractContext implements Cache {
 	static long time1 = 0;
 	static long time2 = 0;
 
-	// static long time3 = 0;
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
-
 		Generic[] directSupers = getDirectSupers(primaries, components);
-		if (directSupers.length == 1) {
-			Generic result = directSupers[0];
-			if (((GenericImpl) result).equiv(homeTreeNode, primaries, components)) {
-				if (existsException)
-					rollback(new ExistsException(result + " already exists !"));
-				return (T) result;
-			}
-		} else {
-			for (Generic directSuper : directSupers)
-				if (Arrays.equals(primaries, (((GenericImpl) directSuper).primaries)) && Arrays.equals(components, (((GenericImpl) directSuper).components)))
-					// if (!homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
+		for (Generic directSuper : directSupers)
+			if (((GenericImpl) directSuper).equiv(primaries, components))
+				if (directSupers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
+					if (existsException)
+						rollback(new ExistsException(directSuper + " already exists !"));
+					else
+						return (T) directSuper;
+				else
 					rollback(new FunctionalConsistencyViolationException(directSuper.info() + " " + Arrays.toString(directSupers)));
-		}
+
 		if (homeTreeNode.getValue() != null) {
 			HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
 			if (phantomHomeNode != null) {
@@ -442,6 +437,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		long ts4 = System.currentTimeMillis();
 		time2 += (ts4 - ts3);
 		// log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
+		log.info("ZZZZZZZZ" + Arrays.toString(primaries));
+		log.info("ZZZZZZZZ" + orderedDependencies);
+		if (!orderedDependencies.isEmpty())
+			log.info("UUUUUUUUUUU" + orderedDependencies.first().info());
 		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
 		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
 		for (Generic generic : orderedDependencies.descendingSet())
