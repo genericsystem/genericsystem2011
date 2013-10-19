@@ -421,12 +421,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 					rollback(new FunctionalConsistencyViolationException(directSuper.info() + " " + Arrays.toString(directSupers)));
 
 		if (homeTreeNode.getValue() != null) {
-			HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
-			if (phantomHomeNode != null) {
-				T phantom = fastFindBySuper(phantomHomeNode, new Primaries(Statics.insertFirst(phantomHomeNode, primaries)).toArray(), directSupers[0], components);
-				if (phantom != null)
-					phantom.remove();
-			}
+			T phantom = fastFindPhantom(homeTreeNode, primaries, components);
+			if (phantom != null)
+				phantom.remove();
 		}
 		long ts1 = System.currentTimeMillis();
 		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(primaries, components);

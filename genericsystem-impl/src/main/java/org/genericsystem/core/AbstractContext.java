@@ -15,6 +15,7 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
+import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
@@ -142,6 +143,20 @@ public abstract class AbstractContext implements Serializable {
 			if (((GenericImpl) generic).equiv(homeTreeNode, primaries, components))
 				return (T) generic;
 		return null;
+	}
+
+	<T extends Generic> T fastFindPhantom(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
+		HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
+		return phantomHomeNode != null ? this.<T> fastFindByComponents(phantomHomeNode, new Primaries(Statics.insertFirst(phantomHomeNode, primaries)).toArray(), components) : null;
+	}
+
+	@SuppressWarnings("unchecked")
+	<T extends Generic> T fastFindByComponents(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
+		for (Generic generic : components[components.length - 1].getComposites())
+			if (((GenericImpl) generic).equiv(homeTreeNode, primaries, components))
+				return (T) generic;
+		return null;
+
 	}
 
 	<T extends Generic> NavigableSet<T> orderDependencies(final Generic generic) {
