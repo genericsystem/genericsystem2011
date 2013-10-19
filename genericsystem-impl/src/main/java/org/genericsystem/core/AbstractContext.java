@@ -136,20 +136,6 @@ public abstract class AbstractContext implements Serializable {
 		return reBind;
 	}
 
-	// @SuppressWarnings("unchecked")
-	// <T extends Generic> T find(Generic[] supers, Generic[] components) {
-	// final Generic[] interfaces = new Primaries(supers).toArray();
-	// Generic[] directSupers = getDirectSupers(interfaces, components);
-	// if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
-	// return (T) directSupers[0];
-	// return null;
-	// }
-
-	// <T extends Generic> T fastFind(Generic implicit, Generic[] supers, Generic[] components) {
-	// assert supers[0].getImplicit().equals(implicit);
-	// return fastFindByInterfaces(implicit, new Primaries(supers).toArray(), components);
-	// }
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFindBySuper(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic superGeneric, Generic[] components) {
 		for (Generic generic : components.length == 0 || components[0] == null ? superGeneric.getInheritings() : components[0].getComposites())

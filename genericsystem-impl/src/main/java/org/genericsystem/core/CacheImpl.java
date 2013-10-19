@@ -437,8 +437,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		long ts4 = System.currentTimeMillis();
 		time2 += (ts4 - ts3);
 		// log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
-		log.info("ZZZZZZZZ" + Arrays.toString(primaries));
-		log.info("ZZZZZZZZ" + orderedDependencies);
+		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
+		// log.info("ZZZZZZZZ" + orderedDependencies);
 		if (!orderedDependencies.isEmpty())
 			log.info("UUUUUUUUUUU" + orderedDependencies.first().info());
 		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));

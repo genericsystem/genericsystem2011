@@ -783,7 +783,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = (Generic[]) cartesianIterator.next();
-			if (!findPhantom(components))
+			if (findPhantom(components) == null)
 				getCurrentCache().bind(getHomeTreeNode(), null, this, false, components);
 		}
 	}
@@ -802,9 +802,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return projections;
 	}
 
-	boolean findPhantom(Generic[] components) {
+	Generic findPhantom(Generic[] components) {
 		HomeTreeNode phantom = homeTreeNode.metaNode.findInstanceNode(null);
-		return phantom != null && getCurrentCache().fastFindBySuper(phantom, new Primaries(Statics.insertFirst(phantom, primaries)).toArray(), supers[0], components) != null;
+		return phantom != null ? getCurrentCache().fastFindBySuper(phantom, new Primaries(Statics.insertFirst(phantom, primaries)).toArray(), supers[0], components) : null;
 	}
 
 	@Override
