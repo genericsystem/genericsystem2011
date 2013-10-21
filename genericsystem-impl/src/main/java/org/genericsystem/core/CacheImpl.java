@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -545,7 +544,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	protected boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
-		return (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) ? isFlushTime || ((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()).isImmediatelyConsistencyCheckable() : false;
+		if (!((GenericImpl) generic).isPhantomGeneric() && isConstraintValueSetting(generic))
+			return isFlushTime || ((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()).isImmediatelyConsistencyCheckable();
+		return false;
+	}
+
+	public boolean isConstraintValueSetting(Generic generic) {
+		return generic.isInstanceOf(find(ConstraintValue.class));
 	}
 
 	protected void check(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
@@ -701,7 +706,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		@Override
 		protected boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
-			return (null != generic.getValue() && generic.isAttribute() && generic.isInstanceOf(find(ConstraintValue.class))) ? isFlushTime : false;
+			if (!((GenericImpl) generic).isPhantomGeneric() && isConstraintValueSetting(generic))
+				return isFlushTime;
+			return false;
 		}
 
 		@Override

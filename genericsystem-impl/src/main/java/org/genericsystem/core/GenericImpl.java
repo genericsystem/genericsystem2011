@@ -48,6 +48,7 @@ import org.genericsystem.map.AbstractMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
+import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
@@ -1733,6 +1734,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return components[next];
 			}
 		};
+	}
+	public boolean isPhantomGeneric() {
+		return this.getValue() == null;
 	}
 
 	public CacheImpl getCurrentCache() {
