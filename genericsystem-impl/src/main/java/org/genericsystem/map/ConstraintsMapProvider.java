@@ -13,22 +13,6 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
-import org.genericsystem.constraints.AliveConstraintImpl;
-import org.genericsystem.constraints.AloneAutomaticsConstraintImpl;
-import org.genericsystem.constraints.ConcreteInheritanceConstraintImpl;
-import org.genericsystem.constraints.InstanceClassConstraintImpl;
-import org.genericsystem.constraints.OptimisticLockConstraintImpl;
-import org.genericsystem.constraints.PhantomConstraintImpl;
-import org.genericsystem.constraints.PropertyConstraintImpl;
-import org.genericsystem.constraints.RequiredConstraintImpl;
-import org.genericsystem.constraints.SingletonConstraintImpl;
-import org.genericsystem.constraints.SingularConstraintImpl;
-import org.genericsystem.constraints.SizeConstraintImpl;
-import org.genericsystem.constraints.SuperRuleConstraintImpl;
-import org.genericsystem.constraints.UnduplicateBindingConstraintImpl;
-import org.genericsystem.constraints.UniqueStructuralValueConstraintImpl;
-import org.genericsystem.constraints.UniqueValueConstraintImpl;
-import org.genericsystem.constraints.VirtualConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -39,8 +23,8 @@ import org.genericsystem.constraints.VirtualConstraintImpl;
 @SystemGeneric
 @Components(Engine.class)
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
-		OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueStructuralValueConstraintImpl.class,
-		UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
+	OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, /* UniqueStructuralValueConstraintImpl.class,*/
+	UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
 
 	@Override

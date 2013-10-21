@@ -132,17 +132,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-		for (Generic superGeneric : supers) {
-			if (this.equals(superGeneric) && !isEngine())
-				throw new IllegalStateException();
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-				throw new IllegalStateException();
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-				throw new IllegalStateException();
-		}
-		assert !homeTreeNode.toString().equals("Engine|class org.genericsystem.map.ConstraintsMapProvider$ConstraintKey|null");
-		return this;
+					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+					for (Generic superGeneric : supers) {
+						if (this.equals(superGeneric) && !isEngine())
+							throw new IllegalStateException();
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+							throw new IllegalStateException();
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+							throw new IllegalStateException();
+					}
+					assert !homeTreeNode.toString().equals("Engine|class org.genericsystem.map.ConstraintsMapProvider$ConstraintKey|null");
+					return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -1208,11 +1208,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T getSubType(final Serializable value) {
-		return Statics.<T> unambigousFirst(Statics.<T> valueFilter(this.<T> allSubTypesIteratorWithoutRoot(), value));
-	}
-
-	@Override
 	public <T extends Generic> Snapshot<T> getDirectSubTypes() {
 		return new AbstractSnapshot<T>() {
 			@Override
@@ -1228,11 +1223,29 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> Snapshot<T> getSubTypes() {
+
 		return new AbstractSnapshot<T>() {
 
 			@Override
 			public Iterator<T> iterator() {
 				return allSubTypesIteratorWithoutRoot();
+			}
+		};
+	}
+
+
+	@Override
+	public <T extends Generic> T getSubType(final Serializable value) {
+		return Statics.<T> unambigousFirst(Statics.<T> valueFilter(this.<T> allSubTypesIteratorWithoutRoot(), value));
+	}
+
+	@Override
+	public <T extends Generic> Snapshot<T> getSubTypes(final String name) {
+		return new AbstractSnapshot<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				return Statics.valueFilter(GenericImpl.this.<T> allSubTypesIteratorWithoutRoot(), name);
 			}
 		};
 	}
