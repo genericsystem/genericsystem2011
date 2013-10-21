@@ -386,7 +386,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic directSuper, boolean existsException, Generic... components) {
 		components = ((GenericImpl) directSuper).sortAndCheck(components);
-		Generic meta = directSuper.getMetaLevel() != homeTreeNode.getMetaLevel() ? directSuper : directSuper.getMeta();
+		return bind(homeTreeNode, new Generic[] { directSuper }, components, specializationClass, existsException);
+	}
+
+	private Class<?> getMetaInstanceGenericClass(Class<?> specializationClass, HomeTreeNode homeTreeNode, Generic[] supers) {
+		Generic meta = getMeta(homeTreeNode, supers);
 		InstanceGenericClass instanceClass = meta.getClass().getAnnotation(InstanceGenericClass.class);
 		if (instanceClass != null)
 			if (specializationClass == null || specializationClass.isAssignableFrom(instanceClass.value())) {
@@ -394,20 +398,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 			} else {
 				assert instanceClass.value().isAssignableFrom(specializationClass);
 			}
-		return bind(homeTreeNode, new Generic[] { directSuper }, components, specializationClass, existsException);
+		return specializationClass;
 	}
 
-	public <T extends Generic> T getMeta(HomeTreeNode homeTreeNode, Generic[] supers) {
+	private <T extends Generic> T getMeta(HomeTreeNode homeTreeNode, Generic[] supers) {
 		HomeTreeNode metaNode = homeTreeNode.metaNode;
 		GenericImpl generic = null;
-		while (!generic.homeTreeNode.equals(metaNode)) {
+		do {
 			for (Generic superGeneric : generic == null ? supers : generic.supers) {
 				if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode)) {
 					generic = (GenericImpl) superGeneric;
 					break;
 				}
 			}
-		}
+		} while (!generic.homeTreeNode.equals(metaNode));
 		return (T) generic;
 	}
 
@@ -424,6 +428,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
+
 		for (Generic directSuper : directSupers)
 			if (((GenericImpl) directSuper).equiv(primaries, components))
 				if (directSupers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
@@ -453,6 +458,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		// if (!orderedDependencies.isEmpty())
 		// log.info("UUUUUUUUUUU" + orderedDependencies.first().info());
 		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
+		specializationClass = getMetaInstanceGenericClass(specializationClass, homeTreeNode, directSupers);
+
 		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
