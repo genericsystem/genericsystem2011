@@ -397,6 +397,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return bind(homeTreeNode, new Generic[] { directSuper }, components, specializationClass, existsException);
 	}
 
+	public <T extends Generic> T getMeta(HomeTreeNode homeTreeNode, Generic[] supers) {
+		HomeTreeNode metaNode = homeTreeNode.metaNode;
+		GenericImpl generic = null;
+		while (!generic.homeTreeNode.equals(metaNode)) {
+			for (Generic superGeneric : generic == null ? supers : generic.supers) {
+				if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode)) {
+					generic = (GenericImpl) superGeneric;
+					break;
+				}
+			}
+		}
+		return (T) generic;
+	}
+
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Primaries primarySet = new Primaries(homeTreeNode, supers);
 		final HomeTreeNode[] primaries = primarySet.toArray();
@@ -436,8 +450,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		// log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
 		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
 		// log.info("ZZZZZZZZ" + orderedDependencies);
-		if (!orderedDependencies.isEmpty())
-			log.info("UUUUUUUUUUU" + orderedDependencies.first().info());
+		// if (!orderedDependencies.isEmpty())
+		// log.info("UUUUUUUUUUU" + orderedDependencies.first().info());
 		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
 		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
 		for (Generic generic : orderedDependencies.descendingSet())

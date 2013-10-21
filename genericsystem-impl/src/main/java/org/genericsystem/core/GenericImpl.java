@@ -815,25 +815,36 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return false;
 		if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
 			return false;
-		boolean inheritance = ((GenericImpl) generic).new InheritanceCalculator().isSuperOf(this);
+		boolean inheritance = ((GenericImpl) generic).isSuperOf2(this);
+		// boolean inheritance2 = inheritsFrom2(generic);
+		// assert inheritance == inheritance2 : "" + this.info() + generic.info() + " : " + inheritance + " != " + inheritance2;
 		boolean superOf = ((GenericImpl) generic).isSuperOf(this);
 		assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
-		return inheritance;
+		return superOf;
 	}
 
-	private class InheritanceCalculator /* extends HashSet<Generic> */{
-		// private static final long serialVersionUID = -894665449193645526L;
-
-		public boolean isSuperOf(Generic subGeneric) {
-			if (GenericImpl.this.equals(subGeneric))
-				return true;
-			if (subGeneric.isEngine())
-				return isEngine();
-			for (Generic directSuper : ((GenericImpl) subGeneric).supers)
-				if (/* add(directSuper) && */isSuperOf(directSuper))
-					return true;
+	public boolean inheritsFrom2(Generic generic) {
+		if (equals(generic))
+			return true;
+		if (generic.isEngine())
+			return true;
+		if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
 			return false;
-		}
+		for (Generic directSuper : supers)
+			if (((GenericImpl) directSuper).inheritsFrom2(generic))
+				return true;
+		return false;
+	}
+
+	public boolean isSuperOf2(Generic subGeneric) {
+		if (GenericImpl.this.equals(subGeneric))
+			return true;
+		if (subGeneric.isEngine())
+			return isEngine();
+		for (Generic directSuper : ((GenericImpl) subGeneric).supers)
+			if (isSuperOf2(directSuper))
+				return true;
+		return false;
 	}
 
 	@Override
@@ -888,11 +899,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return true;
 		}
 
-		if (primaries.length < subPrimaries.length)
+		if (components.length <= subComponents.length && primaries.length < subPrimaries.length)
 			for (int i = 0; i < subPrimaries.length; i++)
 				if (isSuperOf(primaries, components, Statics.truncate(i, subPrimaries), subComponents))
 					return true;
-		if (components.length < subComponents.length)
+		if (components.length < subComponents.length && primaries.length <= subPrimaries.length)
 			for (int i = 0; i < subComponents.length; i++)
 				if (isSuperOf(primaries, components, subPrimaries, Statics.truncate(i, subComponents)))
 					return true;
