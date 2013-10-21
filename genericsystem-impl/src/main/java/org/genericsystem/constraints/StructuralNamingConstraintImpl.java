@@ -22,7 +22,7 @@ import org.genericsystem.systemproperties.constraints.simple.AbstractBooleanSimp
 
 /**
  * @author Nicolas Feybesse
- *
+ * 
  */
 @SystemGeneric
 @Extends(meta = ConstraintKey.class)
@@ -35,21 +35,27 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanSimpleConstra
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(StructuralNamingConstraintImpl.class)
-	@BooleanValue(false)
-	public static class DefaultValue extends GenericImpl implements Holder {}
+	@BooleanValue(true)
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void check(Generic modified, Generic type, int axe) throws ConstraintViolationException {
-		if (!modified.isStructural())
+		if (!modified.isStructural() && modified.getComponentsSize() == 0)
 			return;
-		Iterator<Generic> iterator = Statics.<Generic> valueFilter(((GenericImpl) modified).<Generic> directInheritingsIterator(), modified.getValue());
-		if (!iterator.hasNext())
-			return;
-		iterator.next();
-		if (iterator.hasNext() /* || !primary.isAutomatic() */)
-			throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
+		Generic[] components = ((GenericImpl) modified).getComponentsArray();
+		for (int i = 0; i < modified.getComponentsSize(); i++)
+			for (Generic inherited : ((GenericImpl) components[i]).getAllInheritings()) {
+				Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL, modified.getValue() == null), modified.getValue());
+				if (iterator.hasNext()) {
+					iterator.next();
+					if (iterator.hasNext())
+						throw new UniqueStructuralValueConstraintViolationException(iterator.next().info());
+				}
+			}
 	}
+
 }

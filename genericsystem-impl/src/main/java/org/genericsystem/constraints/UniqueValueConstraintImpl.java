@@ -1,6 +1,9 @@
 package org.genericsystem.constraints;
 
+import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
@@ -41,13 +44,19 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 	 */
 	@Override
 	public void check(Generic modified, Generic type, int axe) throws ConstraintViolationException {
-		if (!modified.isStructural())
-			for (Generic generic : (((Type) type).getAllInstances())) {
-				if (!generic.equals(modified) &&
-						generic.getValue().equals(modified.getValue()) &&
-						Arrays.equals(((GenericImpl) generic).getComponentsArray(), ((GenericImpl) modified).getComponentsArray()))
-					throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
-			}
+		for (Generic generic : (((Type) type).getAllInstances())) {
+			if (!generic.equals(modified) &&
+					generic.getValue().equals(modified.getValue()) &&
+					Arrays.equals(((GenericImpl) generic).getComponentsArray(), ((GenericImpl) modified).getComponentsArray()))
+				throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
+		}
+		Set<Serializable> values = new HashSet<>();
+		for (Generic attributeNode : ((Type) type).getAllInstances()) {
+			Serializable value = attributeNode.getValue();
+			if (value != null)
+				if (!values.add(value))
+					throw new UniqueValueConstraintViolationException("Duplicate value : " + value);
+		}
 	}
 
 }

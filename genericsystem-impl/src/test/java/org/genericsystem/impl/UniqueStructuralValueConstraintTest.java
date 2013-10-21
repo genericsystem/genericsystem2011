@@ -6,7 +6,7 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.exception.UniqueValueConstraintViolationException;
+import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -106,7 +106,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	public void testTypeAndItsSubtypeKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-		assert ((GenericImpl) car).isUniqueValueConstraintEnabled();
+		//assert ((GenericImpl) car).isStructuralNamingConstraintEnabled();
 		assert car == car.newSubType("Car");
 	}
 
@@ -118,14 +118,21 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		assert car.getAttribute("Power").getSupers().get(1) == power;
 	}
 
-	public void testTwoTypesWithSameRelationOK() {
+	// TODO: vhdjhvj
+	public void testTwoTypesWithSameRelationKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Type plane = cache.newType("Plane");
 		final Type color = cache.newType("Color");
 		Relation cr1 = car.setRelation("ColorRelation", color);
-		Relation cr2 = plane.setRelation("ColorRelation", color);
-		assert cr1 != cr2;
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				plane.setRelation("ColorRelation", color);
+			}
+		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
 	}
 
 	// Instance
@@ -138,16 +145,11 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		assert Objects.equals(myCar, myCar2);
 	}
 
-	public void testInstanceWithSameNameAsTypeKO() {
+	public void testInstanceWithSameNameAsTypeOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				car.newInstance("Car");
-			}
-		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
+		Generic iCar = car.newInstance("Car");
+		assert !Objects.equals(car, iCar);
 	}
 
 	// Holder
