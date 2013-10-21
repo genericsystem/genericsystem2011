@@ -1677,6 +1677,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 		};
 	}
+	public boolean isPhantomGeneric() {
+		return this.getValue() == null;
+	}
 
 	public CacheImpl getCurrentCache() {
 		return getEngine().getCurrentCache();

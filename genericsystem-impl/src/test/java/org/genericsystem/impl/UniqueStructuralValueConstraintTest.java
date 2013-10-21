@@ -197,4 +197,13 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		Link myVehicleRed = myCar.setLink(carColor, "Power", myColor);
 		assert !Objects.equals(myVehicleRed, power);
 	}
+
+	public void testTwoTypesWithSameNameHeritingFromDifferentSupertypes() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type plant = cache.newType("Plant");
+		Type collection = cache.newType("Collection");
+		Type tree1 = plant.newSubType("Tree");
+		Type tree2 = collection.newSubType("Tree");
+		assert Objects.equals(tree1, tree2);
+	}
 }
