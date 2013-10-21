@@ -227,7 +227,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-								adjust(((GenericImpl) orderedDependency).components));
+						adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -402,6 +402,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return specializationClass;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends Generic> T getMeta(HomeTreeNode homeTreeNode, Generic[] supers) {
 		HomeTreeNode metaNode = homeTreeNode.metaNode;
 		GenericImpl generic = null;
@@ -550,13 +551,27 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	protected boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
-		if (!((GenericImpl) generic).isPhantomGeneric() && isConstraintValueSetting(generic))
-			return isFlushTime || ((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()).isImmediatelyConsistencyCheckable();
+	private boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
+		if (isConstraintActivated(generic))
+			if (isFlushTime || isImmediatelyConsistencyCheckable((Holder) generic))
+				return true;
 		return false;
 	}
 
-	public boolean isConstraintValueSetting(Generic generic) {
+	protected boolean isConstraintActivated(Generic generic) {
+		if (!((GenericImpl) generic).isPhantomGeneric())
+			if (isConstraintValueSetting(generic))
+				if (!Boolean.FALSE.equals(generic.getValue()))
+					return true;
+		return false;
+
+	}
+
+	protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
+		return ((AbstractConstraintImpl) valueHolder.getBaseComponent()).isImmediatelyConsistencyCheckable();
+	}
+
+	protected boolean isConstraintValueSetting(Generic generic) {
 		return generic.isInstanceOf(find(ConstraintValue.class));
 	}
 
@@ -712,9 +727,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		@Override
-		protected boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
-			if (!((GenericImpl) generic).isPhantomGeneric() && isConstraintValueSetting(generic))
-				return isFlushTime;
+		protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
 			return false;
 		}
 
