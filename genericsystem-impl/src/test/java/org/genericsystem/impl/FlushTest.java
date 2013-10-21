@@ -10,6 +10,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
+import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
@@ -115,4 +116,18 @@ public class FlushTest {
 		((CacheImpl) cache2).pickNewTs();
 		assert cache2.getType("Vehicle").equals(vehicle);
 	}
+
+	public void testAutomaticsNotFlushed() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation("CarColor", color);
+
+		Generic red = color.newInstance("Red");
+		Generic grey = color.newInstance("Grey");
+		car.setLink(carColor, "DefaultCarColor", red);		// default color of car
+
+	}
+
 }
