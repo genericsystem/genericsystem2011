@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
-import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -23,7 +22,7 @@ public class OverrideAnnotationTest extends AbstractTest {
 		assert man.inheritsFrom(human);
 		assert outsideColor.getSupers().size() == 1 : outsideColor.getSupers();
 		assert outsideColor.getSupers().contains(cache.find(Color.class));
-		assert !outsideColor.getSupers().contains(cache.find(Engine.class));
+		assert !outsideColor.getSupers().contains(cache.getEngine());
 	}
 
 	@SystemGeneric

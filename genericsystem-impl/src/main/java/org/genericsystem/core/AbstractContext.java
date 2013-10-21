@@ -15,6 +15,7 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
+import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
@@ -136,26 +137,26 @@ public abstract class AbstractContext implements Serializable {
 		return reBind;
 	}
 
-	// @SuppressWarnings("unchecked")
-	// <T extends Generic> T find(Generic[] supers, Generic[] components) {
-	// final Generic[] interfaces = new Primaries(supers).toArray();
-	// Generic[] directSupers = getDirectSupers(interfaces, components);
-	// if (directSupers.length == 1 && ((GenericImpl) directSupers[0]).equiv(interfaces, components))
-	// return (T) directSupers[0];
-	// return null;
-	// }
-
-	// <T extends Generic> T fastFind(Generic implicit, Generic[] supers, Generic[] components) {
-	// assert supers[0].getImplicit().equals(implicit);
-	// return fastFindByInterfaces(implicit, new Primaries(supers).toArray(), components);
-	// }
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFindBySuper(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic superGeneric, Generic[] components) {
 		for (Generic generic : components.length == 0 || components[0] == null ? superGeneric.getInheritings() : components[0].getComposites())
 			if (((GenericImpl) generic).equiv(homeTreeNode, primaries, components))
 				return (T) generic;
 		return null;
+	}
+
+	<T extends Generic> T fastFindPhantom(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
+		HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
+		return phantomHomeNode != null ? this.<T> fastFindByComponents(phantomHomeNode, new Primaries(Statics.insertFirst(phantomHomeNode, primaries)).toArray(), components) : null;
+	}
+
+	@SuppressWarnings("unchecked")
+	<T extends Generic> T fastFindByComponents(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
+		for (Generic generic : components[components.length - 1].getComposites())
+			if (((GenericImpl) generic).equiv(homeTreeNode, primaries, components))
+				return (T) generic;
+		return null;
+
 	}
 
 	<T extends Generic> NavigableSet<T> orderDependencies(final Generic generic) {
@@ -211,14 +212,6 @@ public abstract class AbstractContext implements Serializable {
 
 	public <T extends Generic> T find(Class<?> clazz) {
 		return this.<EngineImpl> getEngine().find(clazz);
-	}
-
-	// TODO KK remove this !
-	<T extends Generic> T findMeta(HomeTreeNode[] primaries, Generic[] components) {
-		for (T composite : getEngine().<T> getComposites())
-			if (((GenericImpl) composite).equiv(this.<EngineImpl> getEngine().getHomeTreeNode(), primaries, components))
-				return composite;
-		return null;
 	}
 
 	Generic[] findUserSupers(Class<?> clazz) {
@@ -314,6 +307,5 @@ public abstract class AbstractContext implements Serializable {
 
 		Iterator<Generic> iterator(long ts);
 	}
-
 
 }

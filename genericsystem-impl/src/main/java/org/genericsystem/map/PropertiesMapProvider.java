@@ -1,14 +1,13 @@
 package org.genericsystem.map;
 
 import java.io.Serializable;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
-import org.genericsystem.core.Engine;
+import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -21,7 +20,7 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
  * 
  */
 @SystemGeneric
-@Components(Engine.class)
+@Components(EngineImpl.class)
 @Dependencies({ PropertyKey.class, PropertyValue.class })
 public class PropertiesMapProvider extends AbstractMapProvider<Serializable, Serializable> {
 
@@ -39,8 +38,7 @@ public class PropertiesMapProvider extends AbstractMapProvider<Serializable, Ser
 
 	@SystemGeneric
 	@Components(PropertiesMapProvider.class)
-	public static class PropertyKey extends GenericImpl implements Attribute {
-	}
+	public static class PropertyKey extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Components(PropertyKey.class)
@@ -48,14 +46,12 @@ public class PropertiesMapProvider extends AbstractMapProvider<Serializable, Ser
 	@Extends(NoInheritanceSystemType.class)
 	// @RequiredConstraint
 	// @InheritanceDisabled
-	public static class PropertyValue extends GenericImpl implements Attribute {
-	}
+	public static class PropertyValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(meta = PropertiesMapProvider.class)
-	@Components(Engine.class)
+	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
-	}
+	public static class MapInstance extends GenericImpl implements Holder {}
 
 }
