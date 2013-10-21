@@ -1,11 +1,11 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.core.Statics;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -19,25 +19,28 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 
 	// Type
 
-	public void testTypeWithSameNameAsTypeOK() {
+	public void testTwoTypesWithSameNameOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car  = cache.newType("Car");
 		Type car2 = cache.newType("Car");
 		assert Objects.equals(car, car2);
 	}
 
-	public void testAttributeWithSameNameAsTypeOK2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type car = cache.newType("Car");
-		cache.newType("Plane");
-		car.setAttribute("Plane");
+	public void testAttributeWithSameNameAsTypeOK() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car   = cache.newType("Car");
+		Type power = cache.newType("Power");
+		Attribute carPower = car.setAttribute("Power");
+		assert carPower.getSupers().contains(power);
 	}
 
 	public void testRelationWithSameNameAsTypeOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
 		final Type plane = cache.newType("Plane");
-		car.setRelation("Plane", plane);
+		Generic relation = car.setRelation("Plane", plane);
+		assert car.getAttribute("Plane") == relation;
+		assert cache.getEngine().getSubTypes("Plane").contains(plane);
 	}
 
 	// Attribute
@@ -50,18 +53,28 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		assert Objects.equals(wheel, wheel2);
 	}
 
-	public void testRelationWithSameNameAsAttributeOK() {
+	public void testRelationWithSameNameAsAttributeOnSameGenericOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type plane = cache.newType("Plane");
-		Attribute wheelAttribute = car.setAttribute("Wheels");
-		Relation wheelRelation = car.setRelation("Wheels", plane);
-		assert !Objects.equals(wheelAttribute, wheelRelation);
+		final Type car = cache.newType("Car");
+		final Type plane = cache.newType("Plane");
+		Attribute wheelA = car.setAttribute("Wheels");
+		Relation wheelR = car.setRelation("Wheels", plane);
+		assert !Objects.equals(wheelA, wheelR);
+	}
+
+	public void testRelationWithSameNameAsAttributeOnDifferentGenericsOK() {
+		Cache cache       = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car     = cache.newType("Car");
+		Type plane       = cache.newType("Plane");
+		Relation powerR  = car.setRelation("Power", plane);
+		Type color      = cache.newType("Color");
+		Attribute powerA = color.setAttribute("Power");
+		assert !Objects.equals(powerA, powerR);
 	}
 
 	// Relation
 
-	public void testRelationWithSameNameAsRelationOK() {
+	public void testTwoRelationsWithSameNameOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
@@ -78,27 +91,41 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		final Type plane = cache.newType("Plane");
 		Attribute powerOnCar = car.setAttribute("Power");
 		Attribute powerOnPlane = plane.setAttribute("Power");
-
 		assert powerOnCar == car.getAttribute("Power");
 		assert powerOnPlane == plane.getAttribute("Power");
-		Statics.debugCurrentThread();
 		Type power = cache.newType("Power");
 		assert power.fastValueEquals(powerOnCar);
 		assert !powerOnCar.isAlive();
 		assert !powerOnPlane.isAlive();
 		assert ((GenericImpl) powerOnCar).reFind().inheritsFrom(power);
 		assert ((GenericImpl) powerOnCar).reFind().inheritsFrom(power);
-
 		assert ((GenericImpl) powerOnCar).reFind() == car.getAttribute("Power");
 		assert ((GenericImpl) powerOnPlane).reFind() == plane.getAttribute("Power");
 	}
 
+	public void testTypeAndItsSubtypeKO() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		final Type car = cache.newType("Car");
+		//assert ((GenericImpl) car).isStructuralNamingConstraintEnabled();
+		assert car == car.newSubType("Car");
+	}
+
+	public void testOneTypeAndOneAttributeWithSameNameOK() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		final Type car = cache.newType("Car");
+		car.setAttribute("Power");
+		Generic power = cache.newType("Power");
+		assert car.getAttribute("Power").getSupers().get(1) == power;
+	}
+
+	// TODO: vhdjhvj
 	public void testTwoTypesWithSameRelationKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		final Type plane = cache.newType("Plane");
 		final Type color = cache.newType("Color");
-		car.setRelation("ColorRelation", color);
+		Relation cr1 = car.setRelation("ColorRelation", color);
+
 		new RollbackCatcher() {
 
 			@Override
@@ -110,7 +137,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 
 	// Instance
 
-	public void testInstanceWithSameNameAsInstanceOK() {
+	public void testTwoInstancesWithSameNameOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Generic myCar = car.newInstance("myCar");
@@ -121,23 +148,24 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	public void testInstanceWithSameNameAsTypeOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-		Generic myCar = car.newInstance("Car");
-		assert !Objects.equals(car, myCar);
+		Generic iCar = car.newInstance("Car");
+		assert !Objects.equals(car, iCar);
 	}
 
 	// Holder
 
-	public void testHolderWithSameValueAsHolderOK() {
+	public void testTwoHoldersWithSameValueOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute("Power");
 		Generic myCar = car.newInstance("myCar");
 		Holder myPower1 = myCar.setValue(power, 20000);
 		Holder myPower2 = myCar.setValue(power, 20000);
+		assert myPower1 == myPower2;
 		assert Objects.equals(myPower1, myPower2);
 	}
 
-	public void testHolderWithSameValueAsTypeNameKO() {
+	public void testHolderWithSameValueAsTypeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute("Power");
@@ -148,7 +176,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 
 	// Link
 
-	public void testLinkWithSameNameAsLinkOK() {
+	public void testTwoLinksWithSameNameOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
@@ -162,13 +190,22 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 
 	public void testLinkWithSameNameAsAttributeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
-		Attribute power = car.setAttribute("Power");
+		Type car          = cache.newType("Car");
+		Type color        = cache.newType("Color");
+		Attribute power   = car.setAttribute("Power");
 		Relation carColor = car.setRelation("CarColor", color);
-		Generic myCar = car.newInstance("myCar");
-		Generic myColor = color.newInstance("red");
+		Generic myCar     = car.newInstance("myCar");
+		Generic myColor   = color.newInstance("red");
 		Link myVehicleRed = myCar.setLink(carColor, "Power", myColor);
 		assert !Objects.equals(myVehicleRed, power);
+	}
+
+	public void testTwoTypesWithSameNameHeritingFromDifferentSupertypes() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type plant = cache.newType("Plant");
+		Type collection = cache.newType("Collection");
+		Type tree1 = plant.newSubType("Tree");
+		Type tree2 = collection.newSubType("Tree");
+		assert !Objects.equals(tree1, tree2);
 	}
 }

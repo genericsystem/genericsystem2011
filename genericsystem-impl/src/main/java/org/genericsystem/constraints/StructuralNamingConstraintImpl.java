@@ -1,6 +1,7 @@
 package org.genericsystem.constraints;
 
 import java.util.Iterator;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -17,6 +18,7 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
+import org.genericsystem.systemproperties.constraints.simple.AbstractBooleanSimpleConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -26,13 +28,13 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
 @SingularConstraint
-@Dependencies(UniqueStructuralValueConstraintImpl.DefaultValue.class)
-@AxedConstraintValue(UniqueStructuralValueConstraintImpl.class)
-public class UniqueStructuralValueConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+@Dependencies(StructuralNamingConstraintImpl.DefaultValue.class)
+@AxedConstraintValue(StructuralNamingConstraintImpl.class)
+public class StructuralNamingConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
-	@Components(UniqueStructuralValueConstraintImpl.class)
+	@Components(StructuralNamingConstraintImpl.class)
 	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}
@@ -55,4 +57,5 @@ public class UniqueStructuralValueConstraintImpl extends AbstractBooleanConstrai
 				}
 			}
 	}
+
 }

@@ -1,0 +1,17 @@
+﻿Generic System GS is an information engine developed by the company Middleware Factory.
+It is described as an innovative engine ,persistent,transactional,concurrential and highly personalized. 
+GS is easy to adjust and ensure a significant data management through its several powerful functionalities.
+Implemented in java,GS adopts the all object logic. 
+It has also been integrated into the ecosystem of NOSQL databases and does not lead to dependancy on a relational database.
+
+Persistent
+
+Generic System runs in memory and has its own persistence mechanism. At startup, the Generic System engine recovers the recent archived image  (in a directory provided for this purpose) and builds the information system. Periodically, GS creates system images that constitute what is called restore points.When the engine stops, it archives (records)the last system image accuretely at shutdown time.
+
+Transactional
+
+GS is a transactional information system. A GS transaction can be compared to a relational database transaction. In fact , all the writes operations are executed through a transaction, which ensures that they all run at the same time t. The internal design of Generic System guarantees that any reading of an object or set of objects, made ​​at time t, is reproducible. Therefore,this provision ensures the transaction isolation within the meaning of dirty reads, non- reproducible reads and phantom reads. To improve the system availability ,GS generally gives priority to read operations rather than to write operations.
+
+
+
+

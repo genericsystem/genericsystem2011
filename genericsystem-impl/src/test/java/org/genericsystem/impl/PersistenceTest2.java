@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 @Test
 public class PersistenceTest2 extends AbstractTest {
 
+	// @Test(invocationCount = 100, threadPoolSize = 1)
 	public void testDefaultConfiguration() {
 		String path = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
 		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path).start();
