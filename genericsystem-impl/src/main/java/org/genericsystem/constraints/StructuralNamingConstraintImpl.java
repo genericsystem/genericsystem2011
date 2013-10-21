@@ -1,6 +1,6 @@
 package org.genericsystem.constraints;
 
-import java.util.Arrays;
+import java.util.Iterator;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -11,33 +11,32 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.exception.UniqueValueConstraintViolationException;
+import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
+import org.genericsystem.systemproperties.constraints.simple.AbstractBooleanSimpleConstraintImpl;
 
 /**
- * 
- * 
  * @author Nicolas Feybesse
+ *
  */
 @SystemGeneric
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
 @SingularConstraint
-@Dependencies(UniqueValueConstraintImpl.DefaultValue.class)
-@AxedConstraintValue(UniqueValueConstraintImpl.class)
-public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+@Dependencies(StructuralNamingConstraintImpl.DefaultValue.class)
+@AxedConstraintValue(StructuralNamingConstraintImpl.class)
+public class StructuralNamingConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
-	@Components(UniqueValueConstraintImpl.class)
-	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	@Components(StructuralNamingConstraintImpl.class)
+	@BooleanValue(false)
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	/**
 	 * {@inheritDoc}
@@ -45,12 +44,12 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 	@Override
 	public void check(Generic modified, Generic type, int axe) throws ConstraintViolationException {
 		if (!modified.isStructural())
-			for (Generic generic : (((Type) type).getAllInstances())) {
-				if (!generic.equals(modified) &&
-						generic.getValue().equals(modified.getValue()) &&
-						Arrays.equals(((GenericImpl) generic).getComponentsArray(), ((GenericImpl) modified).getComponentsArray()))
-					throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
-			}
+			return;
+		Iterator<Generic> iterator = Statics.<Generic> valueFilter(((GenericImpl) modified).<Generic> directInheritingsIterator(), modified.getValue());
+		if (!iterator.hasNext())
+			return;
+		iterator.next();
+		if (iterator.hasNext() /* || !primary.isAutomatic() */)
+			throw new UniqueStructuralValueConstraintViolationException("modified : " + modified.info());
 	}
-
 }
