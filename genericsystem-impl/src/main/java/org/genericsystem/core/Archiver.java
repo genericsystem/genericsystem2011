@@ -40,18 +40,13 @@ public class Archiver {
 
 	private FileOutputStream lockFile;
 
-	private File formalFile;
-	private File contentFile;
-
 	public Archiver(Engine engine, String directoryPath) {
 		this.engine = engine;
 		prepareAndLockDirectory(directoryPath);
 		ZipArchiver zipArchiver = decompress();
-		if (zipArchiver != null) {
+		if (zipArchiver != null)
 			new SnapshotLoader(zipArchiver).loadSnapshot();
-			formalFile.delete();
-			contentFile.delete();
-		} else
+		else
 			((EngineImpl) engine).restoreEngine();
 	}
 
@@ -80,9 +75,7 @@ public class Archiver {
 			NavigableMap<Long, File> snapshotsMap = snapshotsMap();
 			if (!snapshotsMap.isEmpty())
 				try {
-					ZipArchiver zipArchiver = new ZipArchiver();
-					zipArchiver.decompress(directory.getAbsolutePath() + File.separator + Statics.getFilename(snapshotsMap.lastKey()));
-					return zipArchiver;
+					return ZipArchiver.decompress(directory.getAbsolutePath() + File.separator + Statics.getFilename(snapshotsMap.lastKey()));
 				} catch (IOException e) {
 					return null;
 				}
@@ -139,23 +132,22 @@ public class Archiver {
 	private class SnapshotWriter {
 
 		private Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
+		private ZipArchiver zipArchiver;
 
 		public void doSnapshot(Engine engine) {
 			long ts = engine.pickNewTs();
 			String fileName = directory.getAbsolutePath() + File.separator + Statics.getFilename(ts);
-			formalFile = new File(fileName + Statics.FORMAL_EXTENSION);
-			contentFile = new File(fileName + Statics.CONTENT_EXTENSION);
+			zipArchiver = new ZipArchiver(new File(fileName + Statics.FORMAL_EXTENSION), new File(fileName + Statics.CONTENT_EXTENSION));
 			saveSnapshot(new Transaction(engine));
 			compressTemporarySnapshot(fileName);
-			formalFile.delete();
-			contentFile.delete();
+			zipArchiver.deleteFiles();
 			confirmTemporarySnapshot(fileName);
 		}
 
 		private void saveSnapshot(AbstractContext context) {
 			try {
-				ObjectOutputStream formalObjectOutput = new ObjectOutputStream(buildNewTemporaryFormal(formalFile));
-				ObjectOutputStream contentObjectOutput = new ObjectOutputStream(buildNewTemporaryContent(contentFile));
+				ObjectOutputStream formalObjectOutput = new ObjectOutputStream(buildNewTemporaryFormal(zipArchiver.getFormalFile()));
+				ObjectOutputStream contentObjectOutput = new ObjectOutputStream(buildNewTemporaryContent(zipArchiver.getContentFile()));
 				NavigableSet<Generic> orderGenerics = context.orderDependencies(context.getEngine());
 				for (Generic orderGeneric : orderGenerics)
 					writeGeneric(((GenericImpl) orderGeneric), formalObjectOutput, contentObjectOutput);
@@ -213,11 +205,11 @@ public class Archiver {
 		}
 
 		private void compressTemporarySnapshot(String path) {
-			new ZipArchiver().compress(path);
+			zipArchiver.compress(path);
 		}
 
 		private void confirmTemporarySnapshot(String path) {
-			new ZipArchiver().confirm(path);
+			zipArchiver.confirm(path);
 			manageOldSnapshots();
 		}
 
@@ -248,13 +240,15 @@ public class Archiver {
 		private static final long serialVersionUID = 3139276947667714316L;
 
 		private Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
+		private ZipArchiver zipArchiver;
 		private ObjectInputStream formalInputStream;
 		private ObjectInputStream contentInputStream;
 
 		private SnapshotLoader(ZipArchiver zipArchiver) {
 			try {
-				formalInputStream = new ObjectInputStream(zipArchiver.getFormalInputStream());
-				contentInputStream = new ObjectInputStream(zipArchiver.getContentInputStream());
+				this.zipArchiver = zipArchiver;
+				formalInputStream = new ObjectInputStream(new FileInputStream(zipArchiver.getFormalFile()));
+				contentInputStream = new ObjectInputStream(new FileInputStream(zipArchiver.getContentFile()));
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
 			}
@@ -265,7 +259,10 @@ public class Archiver {
 				Engine engine = loadEngine();
 				for (;;)
 					loadGeneric(engine);
-			} catch (EOFException ignore) {} catch (Exception e) {
+			} catch (EOFException ignore) {
+				zipArchiver.getFormalFile().delete();
+				zipArchiver.getContentFile().delete();
+			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
@@ -317,7 +314,15 @@ public class Archiver {
 
 	}
 
-	private class ZipArchiver {
+	private static class ZipArchiver {
+
+		private File formalFile;
+		private File contentFile;
+
+		public ZipArchiver(File formalFile, File contentFile) {
+			this.formalFile = formalFile;
+			this.contentFile = contentFile;
+		}
 
 		public void compress(String path) {
 			try {
@@ -348,14 +353,20 @@ public class Archiver {
 			new File(path + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(path + Statics.ZIP_EXTENSION));
 		}
 
-		public void decompress(String path) throws IOException {
-			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(path + Statics.ZIP_EXTENSION)));
-			formalFile = write(inputStream, path + Statics.FORMAL_EXTENSION);
-			contentFile = write(inputStream, path + Statics.CONTENT_EXTENSION);
-			inputStream.close();
+		public void deleteFiles() {
+			formalFile.delete();
+			contentFile.delete();
 		}
 
-		private File write(ZipInputStream inputStream, String path) throws IOException {
+		public static ZipArchiver decompress(String path) throws IOException {
+			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(path + Statics.ZIP_EXTENSION)));
+			File formalFile = write(inputStream, path + Statics.FORMAL_EXTENSION);
+			File contentFile = write(inputStream, path + Statics.CONTENT_EXTENSION);
+			inputStream.close();
+			return new ZipArchiver(formalFile, contentFile);
+		}
+
+		private static File write(ZipInputStream inputStream, String path) throws IOException {
 			File file = new File(path);
 			file.createNewFile();
 			inputStream.getNextEntry();
@@ -369,20 +380,12 @@ public class Archiver {
 			return file;
 		}
 
-		public FileInputStream getFormalInputStream() {
-			try {
-				return new FileInputStream(formalFile);
-			} catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
+		public File getFormalFile() {
+			return formalFile;
 		}
 
-		public FileInputStream getContentInputStream() {
-			try {
-				return new FileInputStream(contentFile);
-			} catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
+		public File getContentFile() {
+			return contentFile;
 		}
 
 	}

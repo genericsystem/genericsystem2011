@@ -227,7 +227,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-								adjust(((GenericImpl) orderedDependency).components));
+						adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -402,6 +402,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return specializationClass;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends Generic> T getMeta(HomeTreeNode homeTreeNode, Generic[] supers) {
 		HomeTreeNode metaNode = homeTreeNode.metaNode;
 		GenericImpl generic = null;
