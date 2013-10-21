@@ -544,6 +544,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
+	protected void check(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+		for (Generic generic : generics)
+			check(checkingType, isFlushTime, generic);
+	}
+
+	protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+		checkConsistency(isFlushTime, generic);
+		checkConstraints(checkingType, isFlushTime, generic);
+	}
+
 	protected void checkConsistency(boolean isFlushTime, Generic generic) throws ConstraintViolationException {
 		if (isConsistencyToCheck(isFlushTime, generic)) {
 			AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
@@ -567,22 +577,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	}
 
-	protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
-		return ((AbstractConstraintImpl) valueHolder.getBaseComponent()).isImmediatelyConsistencyCheckable();
-	}
-
 	protected boolean isConstraintValueSetting(Generic generic) {
 		return generic.isInstanceOf(find(ConstraintValue.class));
 	}
 
-	protected void check(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
-		for (Generic generic : generics)
-			check(checkingType, isFlushTime, generic);
-	}
-
-	protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
-		checkConsistency(isFlushTime, generic);
-		checkConstraints(checkingType, isFlushTime, generic);
+	protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
+		return ((AbstractConstraintImpl) valueHolder.getBaseComponent()).isImmediatelyConsistencyCheckable();
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
@@ -595,8 +595,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	protected boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-		return (isFlushTime || constraint.isImmediatelyCheckable()) && constraint.isCheckedAt(generic, checkingType);
+	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
+		return (isFlushTime || isImmediatelyCheckable(constraint)) && constraint.isCheckedAt(generic, checkingType);
+	}
+
+	protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
+		return constraint.isImmediatelyCheckable();
 	}
 
 	@Override
@@ -722,8 +726,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		@Override
-		protected boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-			return isFlushTime && constraint.isCheckedAt(generic, checkingType);
+		protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
+			return false;
 		}
 
 		@Override
