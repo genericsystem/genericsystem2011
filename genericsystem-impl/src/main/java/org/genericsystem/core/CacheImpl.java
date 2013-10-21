@@ -544,23 +544,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 				find(dependencyClass);
 	}
 
-	protected void checkConsistency(boolean isFlushTime, Generic generic) throws ConstraintViolationException {
-		if (isConsistencyToCheck(isFlushTime, generic)) {
-			AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-			keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-		}
-	}
-
-	protected boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
-		if (!((GenericImpl) generic).isPhantomGeneric() && isConstraintValueSetting(generic))
-			return isFlushTime || ((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()).isImmediatelyConsistencyCheckable();
-		return false;
-	}
-
-	public boolean isConstraintValueSetting(Generic generic) {
-		return generic.isInstanceOf(find(ConstraintValue.class));
-	}
-
 	protected void check(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics)
 			check(checkingType, isFlushTime, generic);
@@ -569,6 +552,37 @@ public class CacheImpl extends AbstractContext implements Cache {
 	protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
 		checkConsistency(isFlushTime, generic);
 		checkConstraints(checkingType, isFlushTime, generic);
+	}
+
+	protected void checkConsistency(boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+		if (isConsistencyToCheck(isFlushTime, generic)) {
+			AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
+			keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+		}
+	}
+
+	private boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
+		if (isConstraintActivated(generic))
+			if (isFlushTime || isImmediatelyConsistencyCheckable((Holder) generic))
+				return true;
+		return false;
+	}
+
+	protected boolean isConstraintActivated(Generic generic) {
+		if (!((GenericImpl) generic).isPhantomGeneric())
+			if (isConstraintValueSetting(generic))
+				if (!Boolean.FALSE.equals(generic.getValue()))
+					return true;
+		return false;
+
+	}
+
+	protected boolean isConstraintValueSetting(Generic generic) {
+		return generic.isInstanceOf(find(ConstraintValue.class));
+	}
+
+	protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
+		return ((AbstractConstraintImpl) valueHolder.getBaseComponent()).isImmediatelyConsistencyCheckable();
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
@@ -581,8 +595,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	protected boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-		return (isFlushTime || constraint.isImmediatelyCheckable()) && constraint.isCheckedAt(generic, checkingType);
+	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
+		return (isFlushTime || isImmediatelyCheckable(constraint)) && constraint.isCheckedAt(generic, checkingType);
+	}
+
+	protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
+		return constraint.isImmediatelyCheckable();
 	}
 
 	@Override
@@ -708,14 +726,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		@Override
-		protected boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-			return isFlushTime && constraint.isCheckedAt(generic, checkingType);
+		protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
+			return false;
 		}
 
 		@Override
-		protected boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
-			if (!((GenericImpl) generic).isPhantomGeneric() && isConstraintValueSetting(generic))
-				return isFlushTime;
+		protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
 			return false;
 		}
 
