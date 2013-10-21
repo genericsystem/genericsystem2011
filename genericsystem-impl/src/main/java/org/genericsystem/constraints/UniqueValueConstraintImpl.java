@@ -1,9 +1,6 @@
 package org.genericsystem.constraints;
 
-import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -52,13 +49,6 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 					generic.getValue().equals(modified.getValue()) &&
 					Arrays.equals(((GenericImpl) generic).getComponentsArray(), ((GenericImpl) modified).getComponentsArray()))
 				throw new UniqueValueConstraintViolationException("Holder " + modified.getValue() + " is duplicate for type " + type + ".");
-		}
-		Set<Serializable> values = new HashSet<>();
-		for (Generic attributeNode : ((Type) type).getAllInstances()) {
-			Serializable value = attributeNode.getValue();
-			if (value != null)
-				if (!values.add(value))
-					throw new UniqueValueConstraintViolationException("Duplicate value : " + value);
 		}
 	}
 
