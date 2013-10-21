@@ -23,7 +23,7 @@ import org.genericsystem.constraints.UnduplicateBindingConstraintImpl;
 import org.genericsystem.constraints.UniqueValueConstraintImpl;
 import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.AxedPropertyClass;
-import org.genericsystem.core.Engine;
+import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -36,7 +36,7 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
  * 
  */
 @SystemGeneric
-@Components(Engine.class)
+@Components(EngineImpl.class)
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
 	OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, /* UniqueStructuralValueConstraintImpl.class,*/
 	UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
@@ -63,8 +63,7 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 	@SystemGeneric
 	@Components(ConstraintsMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class ConstraintKey extends GenericImpl implements Attribute {
-	}
+	public static class ConstraintKey extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(NoInheritanceSystemType.class)
@@ -72,13 +71,11 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 	@SingularConstraint
 	// @RequiredConstraint
 	// @InheritanceDisabled
-	public static class ConstraintValue extends GenericImpl implements Attribute {
-	}
+	public static class ConstraintValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.class)
-	@Components(Engine.class)
+	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
-	}
+	public static class MapInstance extends GenericImpl implements Holder {}
 }

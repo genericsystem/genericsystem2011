@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -34,7 +35,6 @@ import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
-import org.genericsystem.iterator.AbstractSelectableLeafIterator2;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
@@ -349,8 +349,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(this.<EngineImpl> getEngine().bindInstanceNode(value), new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, false);// .<T>
-		// disableInheritance();
+		return this.<T> bind(this.<EngineImpl> getEngine().bindInstanceNode(value), new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, false);
 	}
 
 	@Override
@@ -372,7 +371,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
-		return bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
+		T result = bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
+		return result;
 	}
 
 	private GenericImpl getMeta(Class<?> clazz) {
@@ -380,20 +380,18 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (null == extendsAnnotation)
 			return getEngine();
 		Class<?> meta = extendsAnnotation.meta();
+		if (Engine.class.equals(meta))
+			meta = EngineImpl.class;
 		return this.<GenericImpl> find(meta);
 	}
 
-	// private boolean isAutomatic(Generic[] userSupers, Generic[] components) {
-	// if (components.length > 0)
-	// return true;
-	// if (userSupers.length == 1)
-	// return !userSupers[0].isEngine();
-	// return !(userSupers.length == 0);
-	// }
-
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic directSuper, boolean existsException, Generic... components) {
 		components = ((GenericImpl) directSuper).sortAndCheck(components);
-		Generic meta = directSuper.getMetaLevel() != homeTreeNode.getMetaLevel() ? directSuper : directSuper.getMeta();
+		return bind(homeTreeNode, new Generic[] { directSuper }, components, specializationClass, existsException);
+	}
+
+	private Class<?> getMetaInstanceGenericClass(Class<?> specializationClass, HomeTreeNode homeTreeNode, Generic[] supers) {
+		Generic meta = getMeta(homeTreeNode, supers);
 		InstanceGenericClass instanceClass = meta.getClass().getAnnotation(InstanceGenericClass.class);
 		if (instanceClass != null)
 			if (specializationClass == null || specializationClass.isAssignableFrom(instanceClass.value())) {
@@ -401,7 +399,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 			} else {
 				assert instanceClass.value().isAssignableFrom(specializationClass);
 			}
-		return bind(homeTreeNode, new Generic[] { directSuper }, components, specializationClass, existsException);
+		return specializationClass;
+	}
+
+	private <T extends Generic> T getMeta(HomeTreeNode homeTreeNode, Generic[] supers) {
+		HomeTreeNode metaNode = homeTreeNode.metaNode;
+		GenericImpl generic = null;
+		do {
+			for (Generic superGeneric : generic == null ? supers : generic.supers) {
+				if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode)) {
+					generic = (GenericImpl) superGeneric;
+					break;
+				}
+			}
+		} while (!generic.homeTreeNode.equals(metaNode));
+		return (T) generic;
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
@@ -416,28 +428,22 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
-
 		Generic[] directSupers = getDirectSupers(primaries, components);
-		if (directSupers.length == 1) {
-			Generic result = directSupers[0];
-			if (((GenericImpl) result).equiv(homeTreeNode, primaries, components)) {
-				if (existsException)
-					rollback(new ExistsException(result + " already exists !"));
-				return (T) result;
-			}
-		} else {
-			for (Generic directSuper : directSupers)
-				if (Arrays.equals(primaries, (((GenericImpl) directSuper).primaries)) && Arrays.equals(components, (((GenericImpl) directSuper).components)))
-					// if (!homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
+
+		for (Generic directSuper : directSupers)
+			if (((GenericImpl) directSuper).equiv(primaries, components))
+				if (directSupers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
+					if (existsException)
+						rollback(new ExistsException(directSuper + " already exists !"));
+					else
+						return (T) directSuper;
+				else
 					rollback(new FunctionalConsistencyViolationException(directSuper.info() + " " + Arrays.toString(directSupers)));
-		}
+
 		if (homeTreeNode.getValue() != null) {
-			HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
-			if (phantomHomeNode != null) {
-				T phantom = fastFindBySuper(phantomHomeNode, new Primaries(Statics.insertFirst(phantomHomeNode, primaries)).toArray(), directSupers[0], components);
-				if (phantom != null)
-					phantom.remove();
-			}
+			T phantom = fastFindPhantom(homeTreeNode, primaries, components);
+			if (phantom != null)
+				phantom.remove();
 		}
 		long ts1 = System.currentTimeMillis();
 		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(primaries, components);
@@ -449,6 +455,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		time2 += (ts4 - ts3);
 		// log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
 		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
+		// log.info("ZZZZZZZZ" + orderedDependencies);
+		// if (!orderedDependencies.isEmpty())
+		// log.info("UUUUUUUUUUU" + orderedDependencies.first().info());
+		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
+		specializationClass = getMetaInstanceGenericClass(specializationClass, homeTreeNode, directSupers);
+
 		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
@@ -482,20 +494,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> Iterator<T> concernedDependenciesIterator2(Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
-		return (Iterator<T>) new AbstractSelectableLeafIterator2(directSuper) {
+		return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) directSuper) {
+
+			private static final long serialVersionUID = 3038922934693070661L;
 
 			@Override
-			protected boolean isSelectable() {
-				boolean result = GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
-				// log.info("isSelectable ===> " + next + " " + Arrays.toString(primaries) + Arrays.toString(components) + " " + result);
-				return result;
+			public Iterator<T> children(T node) {
+				if (GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) node).primaries, ((GenericImpl) node).components))
+					return Collections.emptyIterator();
+				else
+					return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
 			}
-
+		}) {
 			@Override
-			public boolean isSelected(Generic father, Generic candidate) {
-				return !GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) father).primaries, ((GenericImpl) father).components);
-				// boolean result = GenericImpl.isDependencyOf(((GenericImpl) father).primaries, ((GenericImpl) father).components, primaries, components);
-				// return result;
+			public boolean isSelected() {
+				return GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
 			}
 		};
 	}
@@ -504,10 +517,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
 
 		return new AbstractFilterIterator<T>((Iterator<T>) new AbstractPreTreeIterator<Generic>(directSuper) {
-
-			{
-				next();
-			}
 
 			private static final long serialVersionUID = 4540682035671625893L;
 
@@ -518,9 +527,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}) {
 			@Override
 			public boolean isSelected() {
-				// Statics.logTimeIfCurrentThreadDebugged("###" + next);
-				// Statics.logTimeIfCurrentThreadDebugged("directSuper : " + directSuper + System.identityHashCode(directSuper) + " " + next + System.identityHashCode(next)
-				// + GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components));
 				return GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
 			}
 		};
