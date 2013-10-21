@@ -8,7 +8,7 @@ import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.AxedPropertyClass;
-import org.genericsystem.core.Engine;
+import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -22,7 +22,7 @@ import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
  * 
  */
 @SystemGeneric
-@Components(Engine.class)
+@Components(EngineImpl.class)
 @Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class })
 public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
 
@@ -47,8 +47,7 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 	@SystemGeneric
 	@Components(SystemPropertiesMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class SystemPropertyKey extends GenericImpl implements Attribute {
-	}
+	public static class SystemPropertyKey extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Components(SystemPropertyKey.class)
@@ -56,13 +55,11 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 	@Extends(NoInheritanceSystemType.class)
 	// @RequiredConstraint
 	// @InheritanceDisabled
-	public static class SystemPropertyValue extends GenericImpl implements Attribute {
-	}
+	public static class SystemPropertyValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(meta = SystemPropertiesMapProvider.class)
-	@Components(Engine.class)
+	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
-	}
+	public static class MapInstance extends GenericImpl implements Holder {}
 }

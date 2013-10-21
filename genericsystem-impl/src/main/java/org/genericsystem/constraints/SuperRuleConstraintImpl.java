@@ -41,10 +41,4 @@ public class SuperRuleConstraintImpl extends AbstractBooleanConstraintImpl imple
 			if (!((GenericImpl) directSuper).isSuperOf(modified))
 				throw new SuperRuleConstraintViolationException(modified.info() + " should inherits from : " + directSuper.info());
 	}
-
-	@Override
-	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-
-	}
 }

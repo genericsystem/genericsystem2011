@@ -62,9 +62,4 @@ public class PhantomConstraintImpl extends AbstractBooleanConstraintImpl impleme
 			}
 	}
 
-	@Override
-	public void checkConsistency(Generic modified,Holder valueConstraint, int axe) throws ConstraintViolationException {
-		// TODO Auto-generated method stub
-
-	}
 }

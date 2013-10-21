@@ -1,6 +1,7 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 
@@ -197,6 +198,14 @@ public interface Type extends Generic {
 	 * @see Snapshot
 	 */
 	<T extends Generic> Snapshot<T> getSubTypes();
+
+	/**
+	 * Returns the sub types with the given name.
+	 * 
+	 * @param name - the name of sub types.
+	 * @return Snapshot
+	 */
+	<T extends Generic> Snapshot<T> getSubTypes(String name);
 
 	/**
 	 * Create a subtype.
