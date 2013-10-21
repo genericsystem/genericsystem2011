@@ -142,9 +142,9 @@ public class Archiver {
 
 		public void doSnapshot(Engine engine) {
 			long ts = engine.pickNewTs();
-			String fileName = Statics.getFilename(ts);
-			formalFile = new File(directory.getAbsolutePath() + File.separator + fileName + Statics.FORMAL_EXTENSION);
-			contentFile = new File(directory.getAbsolutePath() + File.separator + fileName + Statics.CONTENT_EXTENSION);
+			String fileName = directory.getAbsolutePath() + File.separator + Statics.getFilename(ts);
+			formalFile = new File(fileName + Statics.FORMAL_EXTENSION);
+			contentFile = new File(fileName + Statics.CONTENT_EXTENSION);
 			saveSnapshot(new Transaction(engine));
 			compressTemporarySnapshot(fileName);
 			formalFile.delete();
@@ -212,12 +212,12 @@ public class Archiver {
 				formalObjectOutput.writeLong(((GenericImpl) dependency).getDesignTs());
 		}
 
-		private void compressTemporarySnapshot(String fileName) {
-			new ZipArchiver().compress(directory.getAbsolutePath(), fileName, formalFile, contentFile);
+		private void compressTemporarySnapshot(String path) {
+			new ZipArchiver().compress(path);
 		}
 
-		private void confirmTemporarySnapshot(String fileName) {
-			new ZipArchiver().confirm(directory.getAbsolutePath(), fileName);
+		private void confirmTemporarySnapshot(String path) {
+			new ZipArchiver().confirm(path);
 			manageOldSnapshots();
 		}
 
@@ -253,8 +253,8 @@ public class Archiver {
 
 		private SnapshotLoader(ZipArchiver zipArchiver) {
 			try {
-				this.formalInputStream = new ObjectInputStream(zipArchiver.getFormalInputStream());
-				this.contentInputStream = new ObjectInputStream(zipArchiver.getContentInputStream());
+				formalInputStream = new ObjectInputStream(zipArchiver.getFormalInputStream());
+				contentInputStream = new ObjectInputStream(zipArchiver.getContentInputStream());
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
 			}
@@ -265,8 +265,7 @@ public class Archiver {
 				Engine engine = loadEngine();
 				for (;;)
 					loadGeneric(engine);
-			} catch (EOFException ignore) {
-			} catch (Exception e) {
+			} catch (EOFException ignore) {} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
@@ -320,11 +319,11 @@ public class Archiver {
 
 	private class ZipArchiver {
 
-		public void compress(String directoryPath, String fileName, File formalFile, File contentFile) {
+		public void compress(String path) {
 			try {
-				ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));
-				zos.putNextEntry(new ZipEntry(formalFile.getName()));
+				ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));
 
+				zos.putNextEntry(new ZipEntry(formalFile.getName()));
 				FileInputStream fileInputStream = new FileInputStream(formalFile);
 				byte[] buffer = new byte[1024];
 				int len;
@@ -345,14 +344,14 @@ public class Archiver {
 			}
 		}
 
-		public void confirm(String directoryPath, String fileName) {
-			new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(directoryPath + File.separator + fileName + Statics.ZIP_EXTENSION));
+		public void confirm(String path) {
+			new File(path + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(path + Statics.ZIP_EXTENSION));
 		}
 
-		public void decompress(String filePath) throws IOException {
-			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(filePath + Statics.ZIP_EXTENSION)));
-			formalFile = write(inputStream, filePath + Statics.FORMAL_EXTENSION);
-			contentFile = write(inputStream, filePath + Statics.CONTENT_EXTENSION);
+		public void decompress(String path) throws IOException {
+			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(path + Statics.ZIP_EXTENSION)));
+			formalFile = write(inputStream, path + Statics.FORMAL_EXTENSION);
+			contentFile = write(inputStream, path + Statics.CONTENT_EXTENSION);
 			inputStream.close();
 		}
 
