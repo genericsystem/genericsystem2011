@@ -18,6 +18,7 @@ import org.genericsystem.constraints.RequiredConstraintImpl;
 import org.genericsystem.constraints.SingletonConstraintImpl;
 import org.genericsystem.constraints.SingularConstraintImpl;
 import org.genericsystem.constraints.SizeConstraintImpl;
+import org.genericsystem.constraints.StructuralNamingConstraintImpl;
 import org.genericsystem.constraints.SuperRuleConstraintImpl;
 import org.genericsystem.constraints.UnduplicateBindingConstraintImpl;
 import org.genericsystem.constraints.UniqueValueConstraintImpl;
@@ -39,7 +40,7 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
 @Components(EngineImpl.class)
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
 	OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, /* UniqueStructuralValueConstraintImpl.class,*/
-	UniqueValueConstraintImpl.class, VirtualConstraintImpl.class })
+	UniqueValueConstraintImpl.class, VirtualConstraintImpl.class, StructuralNamingConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
 
 	@Override
