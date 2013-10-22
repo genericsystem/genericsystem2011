@@ -645,8 +645,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
-		assert attribute.getMetaLevel() - metaLevel <= 1;
-		// assert attribute.getMetaLevel() - metaLevel >= 0;
+		assert metaLevel - attribute.getMetaLevel() <= 1;
+		assert metaLevel - attribute.getMetaLevel() >= 0;
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
 
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);

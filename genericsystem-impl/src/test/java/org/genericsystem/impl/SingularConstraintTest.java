@@ -61,7 +61,7 @@ public class SingularConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
-		Attribute vehiclePower = vehicle.setProperty("Power");
+		Attribute vehiclePower = vehicle.setProperty("Power").enableSingularConstraint();
 		car.setValue(vehiclePower, 50);
 		assert vehicle.getValue(vehiclePower) == null;
 		vehicle.setValue(vehiclePower, 125);
