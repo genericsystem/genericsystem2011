@@ -2,13 +2,17 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
+import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -122,12 +126,13 @@ public class FlushTest extends AbstractTest {
 		assert cache2.getType("Vehicle").equals(vehicle);
 	}
 
-	public void testAutomaticsNotFlushed2() {
+	public void testAutomatics() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
+		carColor.enableSingularConstraint();
 
 		Generic red = color.newInstance("Red");
 		Generic grey = color.newInstance("Grey");
@@ -139,53 +144,78 @@ public class FlushTest extends AbstractTest {
 		assert red.getLinks(carColor).size() == 2;
 	}
 
-	// public void testAutomaticsNotFlushed() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-	//
-	// Type car = cache.newType("Car");
-	// Type color = cache.newType("Color");
-	// Relation carColor = car.setRelation("CarColor", color);
-	//
-	// Generic red = color.newInstance("Red");
-	// Generic grey = color.newInstance("Grey");
-	// car.setLink(carColor, "DefaultCarColor", red); // default color of car
-	//
-	// final Generic bmw = car.newInstance("Bmw");
-	// Generic mercedes = car.newInstance("Mercedes");
-	// mercedes.setLink(carColor, "ColorOfMercedes", grey);
-	// assert red.getLinks(carColor).size() == 1;
-	//
-	// log.info("@@@@@@@@≤≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥@@@@@@@@");
-	// log.info("" + cache.getType("Color").getInstance("Red").getLinks(carColor));
-	// for (Link link : cache.getType("Color").getInstance("Red").getLinks(carColor))
-	// link.log();
-	//
-	// Snapshot<Link> links = red.getLinks(carColor);
-	// @SuppressWarnings({ "unchecked", "rawtypes" })
-	// Link redToBMW = links.filter(new Filter() {
-	//
-	// @Override
-	// public boolean isSelected(Object element) {
-	// return ((Link) element).getComponents().contains(bmw);
-	// }
-	// }).get(0);
-	//
-	// /* Autopmatic link from red tyo BMW exists */
-	// assert redToBMW != null;
-	// /* Link from red to BMW is automatic */
-	// assert ((GenericImpl) redToBMW).isAutomatic();
-	//
-	// cache.flush();
-	// Cache cache2 = cache.getEngine().newCache().start();
-	//
-	// /* Cache 2 contains our types */
-	// assert cache2.getAllTypes().contains(color);
-	//
-	// log.info("@@@@@@@@≤≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥@@@@@@@@");
-	// log.info("" + cache2.getType("Color").getInstance("Red").getLinks(carColor).size());
-	// //cache2.getType("Color").getInstance("Red").
-	//
-	// /* Automatic link red to BMW is not in this cache */
-	// assert !cache2.getType("Color").getInstance("Red").getLinks(carColor).contains(redToBMW);
-	// }
+	public void testAutomaticsNotFlushed() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation("CarColor", color);
+		carColor.enableSingularConstraint();
+		Attribute intensity = carColor.setAttribute("Intensity");
+
+		Generic red = color.newInstance("Red");
+		Generic grey = color.newInstance("Grey");
+		Link defaultCarColor = car.setLink(carColor, "DefaultCarColor", red);	// default color of car
+
+		final Generic bmw = car.newInstance("Bmw");
+		Generic mercedes = car.newInstance("Mercedes");
+		final Generic lada = car.newInstance("Lada");
+		mercedes.setLink(carColor, "ColorOfMercedes", grey);
+
+		red.getLink(carColor, lada).setValue(intensity, "60%");
+
+		/* Link beetween Lada and color is not the same as link between Car and color */
+		assert !Objects.equals(lada.getLink(carColor, red), defaultCarColor);
+
+		/* Two links: Bmw <-> Red; Lada <-> Red */
+		assert red.getLinks(carColor).size() == 2;
+
+		Snapshot<Link> links = red.getLinks(carColor);
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		Link redToBMW = links.filter(new Filter() {
+
+			@Override
+			public boolean isSelected(Object element) {
+				return ((Link) element).getComponents().contains(bmw);
+			}
+		}).get(0);
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		Link redToLada = links.filter(new Filter() {
+
+			@Override
+			public boolean isSelected(Object element) {
+				return ((Link) element).getComponents().contains(lada);
+			}
+		}).get(0);
+
+		/* Automatic link from red tyo BMW exists */
+		assert redToBMW != null;
+
+		/* Link from red to BMW is automatic */
+		assert ((GenericImpl) redToBMW).isAutomatic();
+
+		/* Link from red to BMW is not flushable */
+		assert !((GenericImpl) redToBMW).isFlushable();
+
+		/* Automatic link from red to Lada exists */
+		assert redToLada != null;
+
+		/* Link from red to Lada is automatic */
+		assert ((GenericImpl) redToLada).isAutomatic();
+
+		/* Link from red to Lada is flushable */
+		assert ((GenericImpl) redToLada).isFlushable();
+
+		cache.flush();
+		Cache cache2 = cache.getEngine().newCache().start();
+
+		/* Cache 2 contains our types */
+		assert cache2.getAllTypes().contains(color);
+
+		Relation carColor2 = cache2.getType("Car").getRelation("CarColor");
+		Link defColor = carColor2.getInstance("DefaultCarColor");
+
+		/* Automatic link between BMW and red color was not restored from cache */
+		assert cache2.getType("Car").getInstance("Bmw").getLinks(carColor2).contains(defColor);
+	}
 }

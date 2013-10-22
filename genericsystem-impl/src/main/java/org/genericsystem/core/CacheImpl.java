@@ -268,10 +268,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (!isAutomatic(generic))
 			return true;
 		for (Generic inheriting : generic.getInheritings())
-			if (!isFlushable(inheriting))
+			if (isFlushable(inheriting))
 				return true;
 		for (Generic composite : generic.getComposites())
-			if (!isFlushable(composite))
+			if (isFlushable(composite))
 				return true;
 		return false;
 	};
