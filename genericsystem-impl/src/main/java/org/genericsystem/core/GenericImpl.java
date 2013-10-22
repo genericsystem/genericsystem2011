@@ -785,16 +785,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = (Generic[]) cartesianIterator.next();
 			if (phantomExists(components)) {
-				//TODO mark automatic!!!si vraiment bindé // methode fastFind
+				// TODO: optimize performancies
 				Generic generic = getCurrentCache().fastFindBySuper(this.getHomeTreeNode(), new Primaries(this.getHomeTreeNode(), this).toArray(), this, components);
-				if (generic == null) {
-					if (this.isAutomatic() && !this.isFlushableAutomatic())
-						this.markAsAutomatic();
-				}
-				getCurrentCache().bind(getHomeTreeNode(), null, this, false, components);
-				for (int i = 0; i < components.length; i++) {
-
-				}
+				if (generic == null)
+					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, components)).markAsAutomatic();
 			}
 		}
 	}
@@ -1695,8 +1689,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().isAutomatic(this);
 	}
 
-	public boolean isFlushableAutomatic() {
-		return getCurrentCache().isFlushableAutomatic(this);
+	public boolean isFlushable() {
+		return getCurrentCache().isFlushable(this);
 	}
 
 	public void markAsAutomatic() {

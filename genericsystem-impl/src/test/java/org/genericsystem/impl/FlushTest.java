@@ -15,8 +15,9 @@ import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
-public class FlushTest {
+public class FlushTest extends AbstractTest {
 
+	@Test
 	public void testFlush() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
@@ -28,6 +29,7 @@ public class FlushTest {
 		assert engine.getInheritings().contains(human);
 	}
 
+	@Test
 	public void testNoFlush() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
@@ -50,6 +52,7 @@ public class FlushTest {
 		}).isEmpty();
 	}
 
+	@Test
 	public void testPartialFlush() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
@@ -64,6 +67,7 @@ public class FlushTest {
 		assert !snapshot.contains(car) : snapshot;
 	}
 
+	@Test
 	public void testMultipleCache() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
@@ -83,6 +87,7 @@ public class FlushTest {
 		assert snapshot.containsAll(Arrays.asList(human, car)) : snapshot;
 	}
 
+	@Test
 	public void testMultipleCache2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
@@ -102,6 +107,7 @@ public class FlushTest {
 		engine.close();
 	}
 
+	@Test
 	public void testMultipleCache3() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
@@ -117,7 +123,7 @@ public class FlushTest {
 		assert cache2.getType("Vehicle").equals(vehicle);
 	}
 
-	public void testAutomaticsNotFlushed() {
+	public void testAutomaticsNotFlushed2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
@@ -128,6 +134,59 @@ public class FlushTest {
 		Generic grey = color.newInstance("Grey");
 		car.setLink(carColor, "DefaultCarColor", red);		// default color of car
 
+		final Generic bmw = car.newInstance("Bmw");
+		Generic mercedes = car.newInstance("Mercedes");
+		mercedes.setLink(carColor, "ColorOfMercedes", grey);
+		assert red.getLinks(carColor).size() == 1;
 	}
 
+	//	public void testAutomaticsNotFlushed() {
+	//		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+	//
+	//		Type car = cache.newType("Car");
+	//		Type color = cache.newType("Color");
+	//		Relation carColor = car.setRelation("CarColor", color);
+	//
+	//		Generic red = color.newInstance("Red");
+	//		Generic grey = color.newInstance("Grey");
+	//		car.setLink(carColor, "DefaultCarColor", red);		// default color of car
+	//
+	//		final Generic bmw = car.newInstance("Bmw");
+	//		Generic mercedes = car.newInstance("Mercedes");
+	//		mercedes.setLink(carColor, "ColorOfMercedes", grey);
+	//		assert red.getLinks(carColor).size() == 1;
+	//
+	//		log.info("@@@@@@@@≤≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥@@@@@@@@");
+	//		log.info("" + cache.getType("Color").getInstance("Red").getLinks(carColor));
+	//		for (Link link : cache.getType("Color").getInstance("Red").getLinks(carColor))
+	//			link.log();
+	//
+	//		Snapshot<Link> links = red.getLinks(carColor);
+	//		@SuppressWarnings({ "unchecked", "rawtypes" })
+	//		Link redToBMW = links.filter(new Filter() {
+	//
+	//			@Override
+	//			public boolean isSelected(Object element) {
+	//				return ((Link) element).getComponents().contains(bmw);
+	//			}
+	//		}).get(0);
+	//
+	//		/* Autopmatic link from red tyo BMW exists */
+	//		assert redToBMW != null;
+	//		/* Link from red to BMW is automatic */
+	//		assert ((GenericImpl) redToBMW).isAutomatic();
+	//
+	//		cache.flush();
+	//		Cache cache2 = cache.getEngine().newCache().start();
+	//
+	//		/* Cache 2 contains our types */
+	//		assert cache2.getAllTypes().contains(color);
+	//
+	//		log.info("@@@@@@@@≤≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥@@@@@@@@");
+	//		log.info("" + cache2.getType("Color").getInstance("Red").getLinks(carColor).size());
+	//		//cache2.getType("Color").getInstance("Red").
+	//
+	//		/* Automatic link red to BMW is not in this cache */
+	//		assert !cache2.getType("Color").getInstance("Red").getLinks(carColor).contains(redToBMW);
+	//	}
 }

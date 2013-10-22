@@ -265,12 +265,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return automatics.contains(generic);
 	};
 
-	public boolean isFlushableAutomatic(Generic generic) {
-
-
-
-		return isAutomatic(generic) &&
-				!generic.getInheritings().isEmpty();
+	public boolean isFlushable(Generic generic) {
+		if (!isAutomatic(generic))
+			return true;
+		for (Generic inheriting : generic.getInheritings())
+			if (!isFlushable(inheriting))
+				return true;
+		for (Generic composite : generic.getComposites())
+			if (!isFlushable(composite))
+				return true;
+		return false;
 	};
 
 	public void markAsAutomatic(Generic generic) {
@@ -284,8 +288,22 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (int attempt = 0; attempt < Statics.ATTEMPTS; attempt++)
 			try {
 				checkConstraints();
-				adds.removeAll(automatics);
-				getSubContext().apply(adds, removes);
+				//adds.removeAll(automatics);
+				getSubContext().apply(new Iterable<Generic>() {
+
+					@Override
+					public Iterator<Generic> iterator() {
+						return new AbstractFilterIterator<Generic>(adds.iterator()){
+
+							@Override
+							public boolean isSelected() {
+								return ((GenericImpl) next).isFlushable();
+							}
+
+						};
+					}
+
+				}, removes);
 
 				clear();
 				return;
