@@ -116,4 +116,9 @@ public class Transaction extends AbstractContext {
 				lifeManager.writeUnlock();
 		}
 	}
+
+	@Override
+	public boolean isAutomatic(Generic generic) {
+		return false;
+	}
 }

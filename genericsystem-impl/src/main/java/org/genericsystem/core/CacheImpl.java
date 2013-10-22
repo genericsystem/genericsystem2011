@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -131,16 +132,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return true;
 	}
 
-	void removeWithAutomatics(Generic generic) throws RollbackException {
-		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
-			throw new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated");
-		remove(generic);
-		// Generic automatic = findAutomaticAlone(generic);
-		// if (null != automatic)
-		// remove(automatic);
-	}
 
-	private void remove(Generic generic) throws RollbackException {
+	void remove(Generic generic) throws RollbackException {
+		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
+			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
 		try {
 			internalRemove(generic);
 		} catch (ConstraintViolationException e) {
@@ -148,18 +143,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	// private Generic findAutomaticAlone(Generic generic) {
-	// Generic automaticCandidate = generic.getImplicit();
-	// if (automaticCandidate.isAlive() && automaticCandidate.isAutomatic() && automaticCandidate.getInheritings().isEmpty() && automaticCandidate.getComposites().isEmpty())
-	// return automaticCandidate;
-	// return null;
-	// }
-
-	private void internalRemove(Generic node) throws ConstraintViolationException {
+	private void internalRemove(final Generic node) throws ConstraintViolationException {
 		if (!isAlive(node))
 			throw new AliveConstraintViolationException(node + " is not alive");
-		for (Generic generic : orderRemoves(node).descendingSet())
-			removeGeneric(generic);
+
+		new UnsafeCacheManager<Object>() {
+			@Override
+			Object internalWork(UnsafeCache unsafeCache) {
+				unsafeCache.internalRemove(node);
+				return null;
+			}
+		}.doWork();
 	}
 
 	private abstract class UnsafeCacheManager<T> {
@@ -229,7 +223,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-						adjust(((GenericImpl) orderedDependency).components));
+								adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -260,8 +254,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return reBounds;
 	}
 
+	@Override
 	public boolean isAutomatic(Generic generic) {
-		return automatics.contains(generic);
+		return automatics.contains(generic) || subContext.isAutomatic(generic);
 	};
 
 	public boolean isFlushable(Generic generic) {
@@ -640,7 +635,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		check(CheckingType.CHECK_ON_ADD_NODE, false, generic);
 	}
 
-	private void removeGeneric(Generic generic) throws ConstraintViolationException {
+	protected void removeGeneric(Generic generic) throws ConstraintViolationException {
 		simpleRemove(generic);
 		check(CheckingType.CHECK_ON_REMOVE_NODE, false, generic);
 	}
@@ -792,6 +787,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 					return bind(((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), true);
 				}
 			}.rebuildAll(old);
+		}
+
+		void internalRemove(Generic node) {
+			try {
+				for (Generic generic : orderRemoves(node).descendingSet())
+					removeGeneric(generic);
+			} catch (ConstraintViolationException e) {
+				rollback(e);
+			}
 		}
 
 		@Override
