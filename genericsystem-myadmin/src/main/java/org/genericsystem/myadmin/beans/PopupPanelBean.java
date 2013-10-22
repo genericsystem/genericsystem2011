@@ -44,7 +44,7 @@ public class PopupPanelBean implements Serializable {
 	private Attribute attribute;
 
 	@Inject
-	private TreeBean genericTreeBean;
+	private GenericTreeBean genericTreeBean;
 
 	public void addProperties() {
 		genericTreeBean.getSelectedTreeNode().getGeneric().getPropertiesMap().put(getPopupkey(), getPopupValue());

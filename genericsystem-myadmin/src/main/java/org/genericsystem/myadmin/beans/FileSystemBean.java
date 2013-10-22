@@ -15,7 +15,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType.File;
-import org.genericsystem.myadmin.beans.TreeBean.TreeSelectionEvent;
+import org.genericsystem.myadmin.beans.GenericTreeBean.TreeSelectionEvent;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
