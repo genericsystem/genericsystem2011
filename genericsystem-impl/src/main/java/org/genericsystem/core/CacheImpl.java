@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -54,6 +55,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private Set<Generic> adds;
 	private Set<Generic> removes;
+	private Set<Generic> automatics;
 
 	public CacheImpl(Cache cache) {
 		subContext = (CacheImpl) cache;
@@ -71,6 +73,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		inheritingDependenciesMap = new HashMap<>();
 		adds = new LinkedHashSet<>();
 		removes = new LinkedHashSet<>();
+		automatics = new HashSet<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -227,7 +230,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-						adjust(((GenericImpl) orderedDependency).components));
+								adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -258,6 +261,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return reBounds;
 	}
 
+	public boolean isAutomatic(Generic generic) {
+		return automatics.contains(generic);
+	};
+
+	public boolean isFlushable(Generic generic) {
+		if (!isAutomatic(generic))
+			return true;
+		for (Generic inheriting : generic.getInheritings())
+			if (isFlushable(inheriting))
+				return true;
+		for (Generic composite : generic.getComposites())
+			if (isFlushable(composite))
+				return true;
+		return false;
+	};
+
+	public void markAsAutomatic(Generic generic) {
+		automatics.add(generic);
+	}
+
 	@Override
 	public void flush() throws RollbackException {
 		assert equals(getEngine().getCurrentCache());
@@ -265,7 +288,22 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (int attempt = 0; attempt < Statics.ATTEMPTS; attempt++)
 			try {
 				checkConstraints();
-				getSubContext().apply(adds, removes);
+				//adds.removeAll(automatics);
+				getSubContext().apply(new Iterable<Generic>() {
+
+					@Override
+					public Iterator<Generic> iterator() {
+						return new AbstractFilterIterator<Generic>(adds.iterator()){
+
+							@Override
+							public boolean isSelected() {
+								return ((GenericImpl) next).isFlushable();
+							}
+
+						};
+					}
+
+				}, removes);
 
 				clear();
 				return;

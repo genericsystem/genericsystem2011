@@ -112,9 +112,12 @@ public class ApiTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 		car.newInstance("myAudi");
+		car.newInstance("myMercedes");
+		car.newInstance("myLada");
 		Generic red = color.newInstance("red");
 		Link carRed = car.setLink(carColor, "carRed", red);
-		assert !red.getLinks(carColor).contains(carRed) : red.getLinks(carColor);
+		assert red.getLinks(carColor).size()==3;
+		assert !red.getLinks(carColor).contains(carRed);
 	}
 
 	public void ternaryDeduct() {
