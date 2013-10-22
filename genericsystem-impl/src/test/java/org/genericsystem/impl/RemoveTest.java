@@ -8,6 +8,7 @@ import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.impl.ApiTest.Vehicle;
@@ -119,11 +120,47 @@ public class RemoveTest extends AbstractTest {
 	}
 
 	public void testRemoveSystemGeneric() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
-		try {
-			cache.find(Vehicle.class).remove();
-		} catch (NotRemovableException ignore) {
-		}
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				cache.find(Vehicle.class).remove();
+			}
+
+		}.assertIsCausedBy(NotRemovableException.class);
+	}
+
+	public void testRemoveLinkWithItsAutomaticsOK() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation("CarColor", color);
+		carColor.enableSingularConstraint();
+		Attribute intensity = carColor.setAttribute("Intensity");
+
+		Generic red = color.newInstance("Red");
+		Generic grey = color.newInstance("Grey");
+		Link defaultCarColor = car.setLink(carColor, "DefaultCarColor", red);	// default color of car
+
+		final Generic bmw = car.newInstance("Bmw");
+		Generic mercedes = car.newInstance("Mercedes");
+		final Generic lada = car.newInstance("Lada");
+		mercedes.setLink(carColor, "ColorOfMercedes", grey);
+
+		red.getLink(carColor, lada).setValue(intensity, "60%");
+
+		defaultCarColor.remove();
+
+		/* Links BMW <-> Red and Lada <-> Red disappear and Mercedes <-> Grey stay */
+		assert bmw.getLink(carColor, red) == null;
+		assert mercedes.getLink(carColor, grey) != null;
+		assert lada.getLink(carColor, red) == null;
+
+		/* No more lisnks from Red */
+		assert red.getLinks(carColor).size() == 0;
 	}
 
 }

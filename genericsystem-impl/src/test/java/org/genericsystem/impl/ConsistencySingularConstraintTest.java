@@ -110,7 +110,7 @@ public class ConsistencySingularConstraintTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				power.enableSingularConstraint(Statics.BASE_POSITION);
+			power.enableSingularConstraint(Statics.BASE_POSITION);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}

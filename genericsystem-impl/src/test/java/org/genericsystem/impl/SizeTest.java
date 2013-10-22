@@ -109,13 +109,14 @@ public class SizeTest extends AbstractTest {
 	}
 
 	public void checkConstraintWithAttributeWithInherits2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type vehicle = cache.newType("Vehicle");
-		final Type car = vehicle.newSubType("Car");
-		final Attribute vehiclePower = vehicle.setAttribute("power");
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
-		car.newInstance("myCar1").setValue(vehiclePower, 123);
-		vehicle.newInstance("myVehicle1").setValue(vehiclePower, 123);
+		vehicle.setValue(vehiclePower, 123);
+		car.setValue(vehiclePower, 123);
+
 	}
 
 	public void checkConstraintWithRelation() {

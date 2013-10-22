@@ -60,7 +60,6 @@
 //}
 package org.genericsystem.constraints;
 
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -74,7 +73,6 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
-import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
@@ -93,26 +91,21 @@ public class SingularConstraintImpl extends AbstractBooleanConstraintImpl implem
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}
 
+	@Override
 	public void check(Generic modified, Generic baseConstraint, int axe) throws ConstraintViolationException {
 		Snapshot<Holder> holders = modified.getHolders((Relation) baseConstraint, axe);
 		if (holders.size() > 1)
 			throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + modified + " (n° " + axe + ") : " + holders);
-		for (Generic generic : ((GenericImpl) modified).getAllInheritings()) {
+		for (Generic generic : ((GenericImpl) modified).getAllInstances()) {
 			holders = generic.getHolders((Relation) baseConstraint, axe);
 			if (holders.size() > 1)
 				throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + modified + " (n° " + axe + ") : " + holders);
 		}
-		for (Generic link : ((Type) baseConstraint).getInstances()) {
-			Generic instance = link.getComponents().get(axe);
-			if (instance != null && instance.getHolders((Relation) baseConstraint).size() >= 2)
-				throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + instance + " (n° " + axe + ")");
-		}
 	}
-
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
-		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (modified.getValue() == null && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
+		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (((GenericImpl) modified).isPhantomGeneric() && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
 	}
 
 }
