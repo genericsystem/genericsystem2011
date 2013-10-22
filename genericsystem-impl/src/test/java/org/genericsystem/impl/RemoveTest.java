@@ -120,11 +120,16 @@ public class RemoveTest extends AbstractTest {
 	}
 
 	public void testRemoveSystemGeneric() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
-		try {
-			cache.find(Vehicle.class).remove();
-		} catch (NotRemovableException ignore) {
-		}
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class).start();
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				cache.find(Vehicle.class).remove();
+			}
+
+		}.assertIsCausedBy(NotRemovableException.class);
 	}
 
 	public void testRemoveLinkWithItsAutomaticsOK() {
