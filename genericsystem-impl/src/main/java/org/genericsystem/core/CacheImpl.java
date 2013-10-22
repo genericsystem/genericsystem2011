@@ -489,7 +489,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		throw new IllegalStateException();
 	}
 
-	NavigableSet<Generic> getConcernedDependencies(HomeTreeNode[] primaries, Generic[] components) {
+	private NavigableSet<Generic> getConcernedDependencies(HomeTreeNode[] primaries, Generic[] components) {
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		Iterator<Generic> removeIterator = concernedDependenciesIterator(getEngine(), primaries, components);
 		while (removeIterator.hasNext()) {
@@ -499,7 +499,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return orderedDependencies;
 	}
 
-	NavigableSet<Generic> getConcernedDependencies2(Generic[] supers, HomeTreeNode[] primaries, Generic[] components) {
+	private NavigableSet<Generic> getConcernedDependencies2(Generic[] supers, HomeTreeNode[] primaries, Generic[] components) {
 		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
 		for (Generic superGeneric : supers) {
 			Iterator<Generic> removeIterator = concernedDependenciesIterator2(superGeneric, primaries, components);
@@ -521,8 +521,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			public Iterator<T> children(T node) {
 				if (GenericImpl.isDependencyOf(primaries, components, ((GenericImpl) node).primaries, ((GenericImpl) node).components))
 					return Collections.emptyIterator();
-				else
-					return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
+				return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
 			}
 		}) {
 			@Override
