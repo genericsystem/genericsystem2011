@@ -60,7 +60,6 @@
 //}
 package org.genericsystem.constraints;
 
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -74,7 +73,6 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
-import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
@@ -103,7 +101,6 @@ public class SingularConstraintImpl extends AbstractBooleanConstraintImpl implem
 				throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + modified + " (n° " + axe + ") : " + holders);
 		}
 	}
-
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
