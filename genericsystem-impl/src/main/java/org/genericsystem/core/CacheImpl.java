@@ -396,7 +396,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		NavigableSet<T> orderedGenerics = orderDependencies(old);
 		for (T generic : orderedGenerics.descendingSet())
 			if (generic.isAlive())
-				remove(generic);
+				simpleRemove(generic);
 		return orderedGenerics;
 	}
 
