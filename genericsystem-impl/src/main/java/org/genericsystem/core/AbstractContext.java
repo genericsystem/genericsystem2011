@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -89,6 +90,8 @@ public abstract class AbstractContext implements Serializable {
 	public abstract boolean isScheduledToAdd(Generic generic);
 
 	public abstract boolean isScheduledToRemove(Generic generic);
+
+	public abstract boolean isAutomatic(Generic generic);
 
 	Iterator<Generic> getDirectSupersIterator(final HomeTreeNode[] primaries, final Generic[] components) {
 		return new AbstractSelectableLeafIterator(getEngine()) {
@@ -189,14 +192,17 @@ public abstract class AbstractContext implements Serializable {
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
 					for (T inheritingDependency : generic.<T> getInheritings())
-						if (inheritingDependency.getValue() == null)
+						if (((GenericImpl) inheritingDependency).isPhantomGeneric() || ((GenericImpl) inheritingDependency).isAutomatic())
 							addDependencies(inheritingDependency);
 						else if (!contains(inheritingDependency))
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
 					for (T compositeDependency : generic.<T> getComposites())
 						if (!generic.equals(compositeDependency)) {
 							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components.length; componentPos++)
-								if (((GenericImpl) compositeDependency).components[componentPos].equals(generic) && !contains(compositeDependency) && compositeDependency.isReferentialIntegrity(componentPos))
+								if (!((GenericImpl) compositeDependency).isAutomatic() &&
+										((GenericImpl) compositeDependency).components[componentPos].equals(generic) &&
+										!contains(compositeDependency) &&
+										compositeDependency.isReferentialIntegrity(componentPos))
 									throw new ReferentialIntegrityConstraintViolationException(compositeDependency + " is Referential Integrity for ancestor " + generic + " by component position : " + componentPos);
 							addDependencies(compositeDependency);
 						}
@@ -245,7 +251,7 @@ public abstract class AbstractContext implements Serializable {
 		Generic[] components = new Generic[componentClasses.length];
 		for (int index = 0; index < componentClasses.length; index++)
 			components[index] = !clazz.equals(componentClasses[index]) ? find(componentClasses[index]) : null;
-		return components;
+			return components;
 	}
 
 	@SuppressWarnings("unchecked")
