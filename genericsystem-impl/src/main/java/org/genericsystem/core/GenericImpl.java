@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -117,16 +116,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-					for (Generic superGeneric : supers) {
-						if (this.equals(superGeneric) && !isEngine())
-							throw new IllegalStateException();
-						if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-							throw new IllegalStateException();
-						if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-							throw new IllegalStateException();
-					}
-					return this;
+		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+		for (Generic superGeneric : supers) {
+			if (this.equals(superGeneric) && !isEngine())
+				throw new IllegalStateException();
+			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+				throw new IllegalStateException();
+			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+				throw new IllegalStateException();
+		}
+		return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -171,16 +170,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Generic> T getMeta() {
 		HomeTreeNode metaNode = homeTreeNode.metaNode;
-		GenericImpl generic = this;
-		while (!generic.homeTreeNode.equals(metaNode)) {
-			for (Generic superGeneric : generic.supers) {
-				if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode)) {
-					generic = (GenericImpl) superGeneric;
-					break;
-				}
-			}
-		}
-		return (T) generic;
+		for (Generic superGeneric : supers)
+			if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
+				return (T) superGeneric;
+		for (Generic superGeneric : supers)
+			if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
+				return superGeneric.getMeta();
+		throw new IllegalStateException();
 	}
 
 	@Override
@@ -649,8 +645,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
-		assert attribute.getMetaLevel() - metaLevel <= 1;
-		// assert attribute.getMetaLevel() - metaLevel >= 0;
+		assert metaLevel - attribute.getMetaLevel() <= 1;
+		assert metaLevel - attribute.getMetaLevel() >= 0;
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
 
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
@@ -784,8 +780,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			Generic[] components = (Generic[]) cartesianIterator.next();
-			if (phantomExists(components))
-				getCurrentCache().bind(getHomeTreeNode(), null, this, false, components);
+			if (phantomExists(components)) {
+				// TODO: optimize performancies
+				Generic generic = getCurrentCache().fastFindBySuper(this.getHomeTreeNode(), new Primaries(this.getHomeTreeNode(), this).toArray(), this, components);
+				if (generic == null)
+					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, components)).markAsAutomatic();
+			}
 		}
 	}
 
@@ -1677,8 +1677,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 		};
 	}
+
 	public boolean isPhantomGeneric() {
 		return this.getValue() == null;
+	}
+
+	public boolean isAutomatic() {
+		return getCurrentCache().isAutomatic(this);
+	}
+
+	public boolean isFlushable() {
+		return getCurrentCache().isFlushable(this);
+	}
+
+	public void markAsAutomatic() {
+		getCurrentCache().markAsAutomatic(this);
 	}
 
 	public CacheImpl getCurrentCache() {
