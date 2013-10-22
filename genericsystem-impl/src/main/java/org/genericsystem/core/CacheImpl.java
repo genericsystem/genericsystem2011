@@ -229,7 +229,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-								adjust(((GenericImpl) orderedDependency).components));
+						adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -287,12 +287,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (int attempt = 0; attempt < Statics.ATTEMPTS; attempt++)
 			try {
 				checkConstraints();
-				//adds.removeAll(automatics);
+				// adds.removeAll(automatics);
 				getSubContext().apply(new Iterable<Generic>() {
 
 					@Override
 					public Iterator<Generic> iterator() {
-						return new AbstractFilterIterator<Generic>(adds.iterator()){
+						return new AbstractFilterIterator<Generic>(adds.iterator()) {
 
 							@Override
 							public boolean isSelected() {
@@ -458,9 +458,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
 	}
 
-	static long time1 = 0;
-	static long time2 = 0;
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
@@ -480,27 +477,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 			if (phantom != null)
 				phantom.remove();
 		}
-		long ts1 = System.currentTimeMillis();
-		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(primaries, components);
-		long ts2 = System.currentTimeMillis();
-		time1 += (ts2 - ts1);
-		long ts3 = System.currentTimeMillis();
-		NavigableSet<Generic> orderedDependencies2 = getConcernedDependencies2(directSupers, primaries, components);
-		long ts4 = System.currentTimeMillis();
-		time2 += (ts4 - ts3);
-		// log.info("old vs new : " + time1 + " " + time2 + "  =========> " + (time1 - time2));
-		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
-		// log.info("ZZZZZZZZ" + orderedDependencies);
-		// if (!orderedDependencies.isEmpty())
-		// log.info("UUUUUUUUUUU" + orderedDependencies.first().info());
-		// log.info("ZZZZZZZZ" + Arrays.toString(primaries));
-		specializationClass = specializeGenericClass(specializationClass, homeTreeNode, directSupers);
+		// NavigableSet<Generic> orderedDependencies = getConcernedDependencies(primaries, components);
+		NavigableSet<Generic> orderedDependencies = getConcernedDependencies2(directSupers, primaries, components);
+		// assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
 
-		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
 		ConnectionMap connectionMap = new ConnectionMap();
-		T superGeneric = buildAndInsertComplex(homeTreeNode, specializationClass, directSupers, components);
+		T superGeneric = buildAndInsertComplex(homeTreeNode, specializeGenericClass(specializationClass, homeTreeNode, directSupers), directSupers, components);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
 	}
