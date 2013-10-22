@@ -13,13 +13,14 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
+import org.genericsystem.systemproperties.NoInheritanceSystemType;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 @SystemGeneric
-@Extends(meta = ConstraintKey.class)
+@Extends(meta = ConstraintKey.class, value = NoInheritanceSystemType.class)
 @Components(MapInstance.class)
 @AxedConstraintValue(RequiredConstraintImpl.class)
 @SingularConstraint
@@ -31,7 +32,7 @@ public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implem
 			if (base.getHolders((Holder) attribute).isEmpty())
 				throw new RequiredConstraintViolationException(attribute + " is required");
 		} else
-			for (Generic instance : ((Type) base).getAllInstances())
+			for (Generic instance : ((Type) base).getInstances())
 				if (null == instance.getValue((Attribute) attribute))
 					throw new RequiredConstraintViolationException(attribute + " is required for " + instance);
 	}

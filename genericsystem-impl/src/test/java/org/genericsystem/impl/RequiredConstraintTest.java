@@ -53,6 +53,17 @@ public class RequiredConstraintTest extends AbstractTest {
 		cache.flush();
 	}
 
+	public void requiredHeritageTest() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("car");
+		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
+		Generic myFiat = vehicle.newInstance("myFiat");
+		car.newInstance("myCar");
+		myFiat.setValue(vehicleWheel, "myFiatWheel");
+		cache.flush();
+	}
+
 	// public void addSubOneRequired() {
 	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 	// Type vehicleType = cache.newType("Vehicle");
@@ -70,14 +81,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		vehicle.setAttribute("power").enableRequiredConstraint();
 		Type car = vehicle.newSubType("Car");
 		car.newInstance("myFiat");
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				cache.flush();
-			}
-		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+		cache.flush();
 	}
 
 	public void addRequiredOnRelationBaseSideEmpty() {
