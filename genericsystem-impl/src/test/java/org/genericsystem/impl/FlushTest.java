@@ -144,7 +144,7 @@ public class FlushTest extends AbstractTest {
 		assert red.getLinks(carColor).size() == 2;
 	}
 
-	public void testAutomaticsNotFlushed() {
+	public void testAutomaticsNotFlushedOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.newType("Car");
