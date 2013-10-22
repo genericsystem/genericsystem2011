@@ -141,7 +141,7 @@ public class FlushTest extends AbstractTest {
 		final Generic bmw = car.newInstance("Bmw");
 		Generic mercedes = car.newInstance("Mercedes");
 		mercedes.setLink(carColor, "ColorOfMercedes", grey);
-		assert red.getLinks(carColor).size() == 2;
+		assert red.getLinks(carColor).size() == 1;
 	}
 
 	public void testAutomaticsNotFlushedOK() {
