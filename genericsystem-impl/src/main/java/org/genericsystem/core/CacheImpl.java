@@ -160,11 +160,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 		private UnsafeCache unsafeCache = new UnsafeCache(CacheImpl.this);
 
 		T doWork() {
-			unsafeCache.start();
-			T result = internalWork(unsafeCache);
-			unsafeCache.flush();
-			start();
-			return result;
+			try {
+				unsafeCache.start();
+				T result = internalWork(unsafeCache);
+				unsafeCache.flush();
+				return result;
+			} finally {
+				start();
+			}
 		}
 
 		abstract T internalWork(UnsafeCache unsafeCache);
