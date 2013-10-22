@@ -94,18 +94,15 @@ public class SingularConstraintImpl extends AbstractBooleanConstraintImpl implem
 	}
 
 	public void check(Generic modified, Generic baseConstraint, int axe) throws ConstraintViolationException {
+		modified.log();
+		log.info("modified   "+modified+"baseConstraint   "+baseConstraint);
 		Snapshot<Holder> holders = modified.getHolders((Relation) baseConstraint, axe);
 		if (holders.size() > 1)
 			throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + modified + " (n° " + axe + ") : " + holders);
-		for (Generic generic : ((GenericImpl) modified).getAllInheritings()) {
+		for (Generic generic : ((GenericImpl) modified).getAllInstances()) {
 			holders = generic.getHolders((Relation) baseConstraint, axe);
 			if (holders.size() > 1)
 				throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + modified + " (n° " + axe + ") : " + holders);
-		}
-		for (Generic link : ((Type) baseConstraint).getInstances()) {
-			Generic instance = link.getComponents().get(axe);
-			if (instance != null && instance.getHolders((Relation) baseConstraint).size() >= 2)
-				throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + instance + " (n° " + axe + ")");
 		}
 	}
 
