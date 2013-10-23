@@ -54,7 +54,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		Type human = cache.newType("Human");
 
 		final Relation driving = car.setRelation("DrivingAlong", human, road);
-		driving.enableRequiredConstraint();
+		// driving.enableRequiredConstraint();
 
 		final Generic myCar = car.newInstance("myCar");
 		final Generic myHuman = human.newInstance("myHuman");
