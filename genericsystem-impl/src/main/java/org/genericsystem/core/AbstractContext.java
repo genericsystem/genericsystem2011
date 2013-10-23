@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -162,25 +161,6 @@ public abstract class AbstractContext implements Serializable {
 
 	}
 
-	<T extends Generic> NavigableSet<T> orderDependencies(final Generic generic) {
-		return new TreeSet<T>() {
-			private static final long serialVersionUID = 1053909994506452123L;
-			{
-				addDependencies(generic);
-			}
-
-			@SuppressWarnings("unchecked")
-			public void addDependencies(Generic g) {
-				if (super.add((T) g)) {// protect from loop
-					for (T inheritingDependency : g.<T> getInheritings())
-						addDependencies(inheritingDependency);
-					for (T compositeDependency : g.<T> getComposites())
-						addDependencies(compositeDependency);
-				}
-			}
-		};
-	}
-
 	<T extends Generic> NavigableSet<T> orderRemoves(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
 		return new TreeSet<T>() {
 			private static final long serialVersionUID = -6526972335865898198L;
@@ -199,16 +179,34 @@ public abstract class AbstractContext implements Serializable {
 					for (T compositeDependency : generic.<T> getComposites())
 						if (!generic.equals(compositeDependency)) {
 							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components.length; componentPos++)
-								if (!((GenericImpl) compositeDependency).isAutomatic() &&
-										((GenericImpl) compositeDependency).components[componentPos].equals(generic) &&
-										!contains(compositeDependency) &&
-										compositeDependency.isReferentialIntegrity(componentPos))
+								if (!((GenericImpl) compositeDependency).isAutomatic() && ((GenericImpl) compositeDependency).components[componentPos].equals(generic) && !contains(compositeDependency)
+										&& compositeDependency.isReferentialIntegrity(componentPos))
 									throw new ReferentialIntegrityConstraintViolationException(compositeDependency + " is Referential Integrity for ancestor " + generic + " by component position : " + componentPos);
 							addDependencies(compositeDependency);
 						}
 					for (int axe = 0; axe < ((GenericImpl) generic).components.length; axe++)
 						if (((GenericImpl) generic).isCascadeRemove(axe))
 							addDependencies(((GenericImpl) generic).components[axe]);
+				}
+			}
+		};
+	}
+
+	<T extends Generic> NavigableSet<T> orderDependencies(final Generic generic) {
+		return new TreeSet<T>() {
+			private static final long serialVersionUID = 1053909994506452123L;
+			{
+				if (generic.isAlive())
+					addDependencies(generic);
+			}
+
+			@SuppressWarnings("unchecked")
+			public void addDependencies(Generic g) {
+				if (super.add((T) g)) {// protect from loop
+					for (T inheritingDependency : g.<T> getInheritings())
+						addDependencies(inheritingDependency);
+					for (T compositeDependency : g.<T> getComposites())
+						addDependencies(compositeDependency);
 				}
 			}
 		};
@@ -251,7 +249,7 @@ public abstract class AbstractContext implements Serializable {
 		Generic[] components = new Generic[componentClasses.length];
 		for (int index = 0; index < componentClasses.length; index++)
 			components[index] = !clazz.equals(componentClasses[index]) ? find(componentClasses[index]) : null;
-			return components;
+		return components;
 	}
 
 	@SuppressWarnings("unchecked")
