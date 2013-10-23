@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -165,7 +164,7 @@ public class PhamtomTest extends AbstractTest {
 		Iterator<Generic> iterator = ((GenericImpl) car).holdersIterator(Statics.STRUCTURAL, vehiclePower, Statics.MULTIDIRECTIONAL, true);
 		Generic phantom = iterator.next();
 		// car.restore( vehiclePower);
-		car.clearAllStructural(vehiclePower);
+		car.clearAll(vehiclePower, Statics.STRUCTURAL);
 		assert !phantom.isAlive();
 	}
 
@@ -280,7 +279,7 @@ public class PhamtomTest extends AbstractTest {
 		assert convertible.getRelations().size() == 0;
 		assert !convertible.getRelations().contains(vehicleHuman);
 
-		car.clearAllStructural(vehicleHuman);
+		car.clearAll(vehicleHuman, Statics.STRUCTURAL);
 		assert vehicle.getRelations().contains(vehicleHuman);
 		assert car.getRelations().contains(vehicleHuman);
 		assert convertible.getRelations().contains(vehicleHuman);
@@ -307,7 +306,7 @@ public class PhamtomTest extends AbstractTest {
 		assert breakVehicle.getRelations().size() == 0;
 		assert convertible.getRelations().size() == 0;
 
-		car.clearAllStructural(vehicleColor);
+		car.clearAll(vehicleColor, Statics.STRUCTURAL);
 		assert vehicle.getRelations().size() == 1;
 		assert car.getRelations().get(0).equals(vehicleColor) : car.getRelations();
 		assert breakVehicle.getRelations().get(0).equals(vehicleColor);
@@ -482,7 +481,7 @@ public class PhamtomTest extends AbstractTest {
 		assert mycar.getValue(carPower) == null;
 		mycar.cancelAll(defaultPower, Statics.CONCRETE);
 		assert mycar.getValue(carPower) == null;
-		mycar.clearAllConcrete(defaultPower);
+		mycar.clearAll(defaultPower, Statics.CONCRETE);
 		assert mycar.getValue(carPower).equals("233");
 	}
 
@@ -498,9 +497,9 @@ public class PhamtomTest extends AbstractTest {
 		myCar.setValue(defaultPower, null);
 		assert myCar.getValue(carPower) == null;
 		// ((GenericImpl) myCar).getHolderByValue( defaultPower, null).remove();
-		myCar.clearAllConcrete(defaultPower);
+		myCar.clearAll(defaultPower, Statics.CONCRETE);
 		assert myCar.getValue(carPower).equals("233");
-		myCar.clearAllConcrete(defaultPower);
+		myCar.clearAll(defaultPower, Statics.CONCRETE);
 		assert myCar.getValue(carPower).equals("233");
 		myCar.cancelAll(defaultPower, Statics.CONCRETE);
 		assert myCar.getValue(carPower) == null;
@@ -514,11 +513,11 @@ public class PhamtomTest extends AbstractTest {
 		Generic mycar = car.newInstance("myCar");
 		assert mycar.getValue(carPower).equals("233");
 		mycar.cancelAll(defaultPower, Statics.CONCRETE);
-		mycar.clearAllConcrete(defaultPower);
-		mycar.clearAllStructural(defaultPower);
+		mycar.clearAll(defaultPower, Statics.CONCRETE);
+		mycar.clearAll(defaultPower, Statics.STRUCTURAL);
 		mycar.cancelAll(defaultPower, Statics.CONCRETE);
 		mycar.cancelAll(defaultPower, Statics.CONCRETE);
-		mycar.clearAllConcrete(defaultPower);
+		mycar.clearAll(defaultPower, Statics.CONCRETE);
 		assert mycar.getValue(carPower).equals("233");
 	}
 
@@ -535,7 +534,7 @@ public class PhamtomTest extends AbstractTest {
 		assert myCar.getTargets(carColor).isEmpty();
 		myCar.cancelAll(defaultCarColor, Statics.CONCRETE);
 		assert myCar.getTargets(carColor).isEmpty();
-		myCar.clearAllConcrete(defaultCarColor);
+		myCar.clearAll(defaultCarColor, Statics.CONCRETE);
 		assert myCar.getTargets(carColor).contains(red);
 	}
 
@@ -574,11 +573,11 @@ public class PhamtomTest extends AbstractTest {
 		Generic myCar = car.newInstance("myCar");
 		assert myCar.getTargets(carColor).contains(red);
 		myCar.cancelAll(defaultCarColor, Statics.CONCRETE);
-		myCar.clearAllConcrete(defaultCarColor);
-		myCar.clearAllStructural(defaultCarColor);
+		myCar.clearAll(defaultCarColor, Statics.CONCRETE);
+		myCar.clearAll(defaultCarColor, Statics.STRUCTURAL);
 		myCar.cancelAll(defaultCarColor, Statics.CONCRETE);
 		myCar.cancelAll(defaultCarColor, Statics.CONCRETE);
-		myCar.clearAllConcrete(defaultCarColor);
+		myCar.clearAll(defaultCarColor, Statics.CONCRETE);
 		assert myCar.getTargets(carColor).contains(red);
 	}
 
