@@ -5,7 +5,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Structural;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -17,7 +16,7 @@ import org.richfaces.event.DropEvent;
 public class DragAndDropBean {
 
 	@Inject
-	private TreeBean genericTreeBean;
+	private GenericTreeBean genericTreeBean;
 
 	@Inject
 	private GsMessages messages;
@@ -42,7 +41,7 @@ public class DragAndDropBean {
 	}
 
 	public void addTarget(DropEvent dropEvent) {
-		Generic target = ((TreeNode) dropEvent.getDragValue()).getGeneric();
+		Generic target = ((GenericTreeNode) dropEvent.getDragValue()).getGeneric();
 		Attribute attribute = ((Structural) dropEvent.getDropValue()).getAttribute();
 		if (target.isStructural()) {
 			attribute.addComponent(attribute.getComponentsSize(), target);

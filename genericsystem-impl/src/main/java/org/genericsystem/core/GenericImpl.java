@@ -117,16 +117,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-		for (Generic superGeneric : supers) {
-			if (this.equals(superGeneric) && !isEngine())
-				throw new IllegalStateException();
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-				throw new IllegalStateException();
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-				throw new IllegalStateException();
-		}
-		return this;
+					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+					for (Generic superGeneric : supers) {
+						if (this.equals(superGeneric) && !isEngine())
+							throw new IllegalStateException();
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+							throw new IllegalStateException();
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+							throw new IllegalStateException();
+					}
+					return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -646,8 +646,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, boolean existsException, Generic... targets) {
-		assert attribute.getMetaLevel() - metaLevel <= 1;
-		// assert attribute.getMetaLevel() - metaLevel >= 0;
+		assert metaLevel - attribute.getMetaLevel() <= 1;
+		assert metaLevel - attribute.getMetaLevel() >= 0;
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
 
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
@@ -915,7 +915,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void remove() {
-		getCurrentCache().removeWithAutomatics(this);
+		getCurrentCache().remove(this);
 	}
 
 	@Override

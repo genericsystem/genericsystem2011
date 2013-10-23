@@ -123,7 +123,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		cache.flush();
 	}
 
-	public void addRequiredOnRelationBaseSideOk2() {
+	public void testRemoveRequiredOnRelationBaseSideKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
@@ -131,12 +131,13 @@ public class RequiredConstraintTest extends AbstractTest {
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
 		Generic red = color.newInstance("red");
 		Generic myFiat = car.newInstance("myFiat");
-		Link myFiatRed = myFiat.setLink(carColor, "myFiatRed", red);
+		final Link myFiatRed = myFiat.setLink(carColor, "myFiatRed", red);
 		myFiatRed.remove();
+		cache.flush();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				cache.flush();
+				myFiatRed.remove();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}

@@ -9,6 +9,7 @@ import org.genericsystem.core.Snapshot;
 import org.genericsystem.generic.Type;
 
 public class GenericTreeNode {
+	// protected static Logger log = LoggerFactory.getLogger(GenericTreeNode.class);
 
 	private final GenericTreeNode parent;
 
@@ -16,7 +17,7 @@ public class GenericTreeNode {
 
 	private TreeType treeType;
 
-	//	private Attribute attribute;
+	// private Attribute attribute;
 
 	private List<GenericTreeNode> childrens = new ArrayList<>();
 
@@ -47,9 +48,10 @@ public class GenericTreeNode {
 	@SuppressWarnings("hiding")
 	public List<GenericTreeNode> getChildrens(TreeType treeType, boolean implicitShow) {
 		List<GenericTreeNode> list = new ArrayList<>();
-		for (Generic child : getSnapshot(treeType))
-			if (implicitShow || !isImplicitAutomatic(child))
-				list.add(getGenericTreeNode(child));
+		for (Generic child : getSnapshot(treeType)) {
+			// if (implicitShow || !isImplicitAutomatic(child))
+			list.add(getGenericTreeNode(child));
+		}
 		childrens = list;
 		return list;
 	}
@@ -69,8 +71,8 @@ public class GenericTreeNode {
 			return generic.getComposites();
 		case ATTRIBUTES:
 			return (Snapshot<T>) ((Type) generic).getAttributes();
-			//		case VALUES:
-			//			return (Snapshot<T>) generic.getHolders(attribute);
+			// case VALUES:
+			// return (Snapshot<T>) generic.getHolders(attribute);
 		default:
 			break;
 		}
@@ -117,12 +119,17 @@ public class GenericTreeNode {
 		this.treeType = treeType;
 	}
 
-	//	public Attribute getAttribute() {
-	//		return attribute;
-	//	}
+	@Override
+	public String toString() {
+		return generic.toString();
+	}
+
+	// public Attribute getAttribute() {
+	// return attribute;
+	// }
 	//
-	//	public void setAttribute(Attribute attribute) {
-	//		this.attribute = attribute;
-	//	}
+	// public void setAttribute(Attribute attribute) {
+	// this.attribute = attribute;
+	// }
 
 }

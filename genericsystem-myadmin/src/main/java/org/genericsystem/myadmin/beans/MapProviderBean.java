@@ -44,12 +44,9 @@ public class MapProviderBean implements Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(MapProviderBean.class);
 
-	@Inject
-	private TreeBean genericTreeBean; // generic tree bean
-	@Inject
-	private PopupPanelBean popupPanelBean; // Popup Panel bean
-	@Inject
-	private GsMessages messages; // messages bean
+	@Inject private GenericTreeBean genericTreeBean;	// generic tree bean
+	@Inject private PopupPanelBean popupPanelBean;		// Popup Panel bean
+	@Inject private GsMessages messages;				// messages bean
 
 	private String key;
 	private int pos;
@@ -58,21 +55,19 @@ public class MapProviderBean implements Serializable {
 	/**
 	 * Returns map of map provider.
 	 * 
-	 * @param mapProvider
-	 *            - map provider.
+	 * @param mapProvider - map provider.
 	 * 
 	 * @return map object.
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractMapProvider<?, ?>> Map<Serializable, Serializable> getMap(MapProvider mapProvider) {
-		return mapProvider.getMap((Class<T>) genericTreeBean.getSelectedTreeNodeGeneric().getClass());
+		return mapProvider.getMap((Class<T>)genericTreeBean.getSelectedTreeNodeGeneric().getClass());
 	}
 
 	/**
 	 * Returns set of etries of the map.
 	 * 
-	 * @param map
-	 *            - the map.
+	 * @param map - the map.
 	 * 
 	 * @return set of entries of the map.
 	 */
@@ -83,8 +78,7 @@ public class MapProviderBean implements Serializable {
 	/**
 	 * Adds a couple of key and value from the bean to the map.
 	 * 
-	 * @param map
-	 *            - the map.
+	 * @param map - the map.
 	 */
 	public void addKeyValueToMap(Map<Serializable, Serializable> map) {
 		addKeyValueToMap(map, key, pos, value);
@@ -93,10 +87,8 @@ public class MapProviderBean implements Serializable {
 	/**
 	 * Adds a couple of key and value to the map.
 	 * 
-	 * @param key
-	 *            - key.
-	 * @param value
-	 *            - value.
+	 * @param key - key.
+	 * @param value - value.
 	 */
 	public void addKeyValueToMap(Map<Serializable, Serializable> map, String key, int pos, boolean value) {
 		map.put(new AxedPropertyClass(getClassByName(key), pos), value);
@@ -105,10 +97,8 @@ public class MapProviderBean implements Serializable {
 	/**
 	 * Removes an entry from the map.
 	 * 
-	 * @param map
-	 *            - map object.
-	 * @param entry
-	 *            - couple of key and value.
+	 * @param map - map object.
+	 * @param entry - couple of key and value.
 	 */
 	public void removeEntryFromMap(Map<Serializable, Serializable> map, Entry<Serializable, Serializable> entry) {
 		try {
@@ -122,8 +112,7 @@ public class MapProviderBean implements Serializable {
 	/**
 	 * Return an class by it's name.
 	 * 
-	 * @param className
-	 *            - name of the class.
+	 * @param className - name of the class.
 	 * 
 	 * @return the class.
 	 */
@@ -138,10 +127,10 @@ public class MapProviderBean implements Serializable {
 	}
 
 	/**
-	 * Returns the list of possible classes for objects that figure in the key positions of the map.
+	 * Returns the list of possible classes for objects that figure in the key
+	 * positions of the map.
 	 * 
-	 * @param mapProviderClass
-	 *            - class of map provider.
+	 * @param mapProviderClass - class of map provider.
 	 * 
 	 * @return list of SelectItems for drop-down list in the popup.
 	 */

@@ -7,8 +7,6 @@ import javax.inject.Inject;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Structural;
-import org.genericsystem.core.StructuralImpl;
 import org.genericsystem.example.Example.MyVehicle;
 import org.genericsystem.example.Example.Vehicle;
 import org.genericsystem.generic.Attribute;
@@ -18,7 +16,9 @@ import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.beans.GenericBean;
-import org.genericsystem.myadmin.beans.TreeBean;
+import org.genericsystem.myadmin.beans.GenericTreeBean;
+import org.genericsystem.myadmin.beans.Structural;
+import org.genericsystem.myadmin.beans.StructuralImpl;
 import org.testng.annotations.Test;
 
 @Test
@@ -28,7 +28,7 @@ public class TypesTest extends AbstractTest {
 	private Cache cache;
 
 	@Inject
-	private TreeBean genericTreeBean;
+	private GenericTreeBean genericTreeBean;
 
 	@Test
 	public void testExample() {
@@ -91,10 +91,10 @@ public class TypesTest extends AbstractTest {
 		Holder myVehicle123 = myVehicle.setValue(vehiclePower, "123");
 		myVehicle.removeHolder(myVehicle123);
 		assert !myVehicle123.isAlive();
-		//assert !myVehicle123.getImplicit().isAlive();
+		// assert !myVehicle123.getImplicit().isAlive();
 		vehicle.removeHolder(vehiclePower);
 		assert !vehiclePower.isAlive();
-		//assert !vehiclePower.getImplicit().isAlive();
+		// assert !vehiclePower.getImplicit().isAlive();
 		GenericBean gb = new GenericBean();
 	}
 }

@@ -131,46 +131,35 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return true;
 	}
 
-	void removeWithAutomatics(Generic generic) throws RollbackException {
+	void remove(final Generic generic) throws RollbackException {
 		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
-			throw new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated");
-		remove(generic);
-		// Generic automatic = findAutomaticAlone(generic);
-		// if (null != automatic)
-		// remove(automatic);
-	}
+			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
+		new UnsafeCacheManager<Object>() {
+			@Override
+			Object internalWork(UnsafeCache unsafeCache) {
+				try {
+					unsafeCache.unsafeRemove(generic);
+				} catch (ConstraintViolationException e) {
+					rollback(e);
+				}
+				return null;
+			}
+		}.doWork();
 
-	private void remove(Generic generic) throws RollbackException {
-		try {
-			internalRemove(generic);
-		} catch (ConstraintViolationException e) {
-			rollback(e);
-		}
-	}
-
-	// private Generic findAutomaticAlone(Generic generic) {
-	// Generic automaticCandidate = generic.getImplicit();
-	// if (automaticCandidate.isAlive() && automaticCandidate.isAutomatic() && automaticCandidate.getInheritings().isEmpty() && automaticCandidate.getComposites().isEmpty())
-	// return automaticCandidate;
-	// return null;
-	// }
-
-	private void internalRemove(Generic node) throws ConstraintViolationException {
-		if (!isAlive(node))
-			throw new AliveConstraintViolationException(node + " is not alive");
-		for (Generic generic : orderRemoves(node).descendingSet())
-			removeGeneric(generic);
 	}
 
 	private abstract class UnsafeCacheManager<T> {
 		private UnsafeCache unsafeCache = new UnsafeCache(CacheImpl.this);
 
 		T doWork() {
-			unsafeCache.start();
-			T result = internalWork(unsafeCache);
-			unsafeCache.flush();
-			start();
-			return result;
+			try {
+				unsafeCache.start();
+				T result = internalWork(unsafeCache);
+				unsafeCache.flush();
+				return result;
+			} finally {
+				start();
+			}
 		}
 
 		abstract T internalWork(UnsafeCache unsafeCache);
@@ -260,8 +249,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return reBounds;
 	}
 
+	@Override
 	public boolean isAutomatic(Generic generic) {
-		return automatics.contains(generic);
+		return automatics.contains(generic) || subContext.isAutomatic(generic);
 	};
 
 	public boolean isFlushable(Generic generic) {
@@ -398,7 +388,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		NavigableSet<T> orderedGenerics = orderDependencies(old);
 		for (T generic : orderedGenerics.descendingSet())
 			if (generic.isAlive())
-				remove(generic);
+				simpleRemove(generic);
 		return orderedGenerics;
 	}
 
@@ -453,13 +443,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 			if (phantom != null)
 				phantom.remove();
 		}
-		// NavigableSet<Generic> orderedDependencies = getConcernedDependencies(primaries, components);
-		NavigableSet<Generic> orderedDependencies = getConcernedDependencies2(directSupers, primaries, components);
-		// assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
+		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(primaries, components);
+		NavigableSet<Generic> orderedDependencies2 = getConcernedDependencies2(directSupers, primaries, components);
+		assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " " + orderedDependencies2;
 
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
 		ConnectionMap connectionMap = new ConnectionMap();
+		log.info("zZZZZZZZZZZZ" + orderedDependencies + Arrays.toString(directSupers) + " " + Arrays.toString(components));
 		T superGeneric = buildAndInsertComplex(homeTreeNode, specializeGenericClass(specializationClass, homeTreeNode, directSupers), directSupers, components);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
@@ -640,7 +631,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		check(CheckingType.CHECK_ON_ADD_NODE, false, generic);
 	}
 
-	private void removeGeneric(Generic generic) throws ConstraintViolationException {
+	protected void removeGeneric(Generic generic) throws ConstraintViolationException {
 		simpleRemove(generic);
 		check(CheckingType.CHECK_ON_REMOVE_NODE, false, generic);
 	}
@@ -792,6 +783,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 					return bind(((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), true);
 				}
 			}.rebuildAll(old);
+		}
+
+		void unsafeRemove(Generic generic) throws ConstraintViolationException {
+			if (!isAlive(generic))
+				rollback(new AliveConstraintViolationException(generic + " is not alive"));
+			for (Generic dependency : orderRemoves(generic).descendingSet())
+				removeGeneric(dependency);
 		}
 
 		@Override
