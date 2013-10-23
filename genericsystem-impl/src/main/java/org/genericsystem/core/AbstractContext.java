@@ -161,7 +161,7 @@ public abstract class AbstractContext implements Serializable {
 
 	}
 
-	<T extends Generic> NavigableSet<T> orderRemoves(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
+	<T extends Generic> NavigableSet<T> orderDependenciesForRemove(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
 		return new TreeSet<T>() {
 			private static final long serialVersionUID = -6526972335865898198L;
 			{

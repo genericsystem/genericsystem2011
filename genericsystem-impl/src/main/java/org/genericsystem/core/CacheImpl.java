@@ -124,7 +124,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@Override
 	public boolean isRemovable(Generic generic) {
 		try {
-			orderRemoves(generic);
+			orderDependenciesForRemove(generic);
 		} catch (ReferentialIntegrityConstraintViolationException e) {
 			return false;
 		}
@@ -565,7 +565,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
 		if (isConstraintActivated(generic))
-			if (isFlushTime || isImmediatelyConsistencyCheckable((Holder) generic))
+			if (isFlushTime || isImmediatelyConsistencyCheckable((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()))
 				return true;
 		return false;
 	}
@@ -583,8 +583,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return generic.isInstanceOf(find(ConstraintValue.class));
 	}
 
-	protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
-		return ((AbstractConstraintImpl) valueHolder.getBaseComponent()).isImmediatelyConsistencyCheckable();
+	protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
+		return constraint.isImmediatelyConsistencyCheckable();
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
@@ -734,7 +734,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		@Override
-		protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
+		protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
 			return false;
 		}
 
@@ -801,7 +801,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		private <T extends Generic> NavigableSet<T> orderAndRemoveDependenciesForRemove(final T old) throws ConstraintViolationException {
-			NavigableSet<T> orderedGenerics = orderRemoves(old);
+			NavigableSet<T> orderedGenerics = orderDependenciesForRemove(old);
 			for (T generic : orderedGenerics.descendingSet())
 				removeGeneric(generic);
 			return orderedGenerics;
