@@ -12,7 +12,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -132,28 +131,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return true;
 	}
 
-
-	void remove(Generic generic) throws RollbackException {
+	void remove(final Generic generic) throws RollbackException {
 		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
 			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
-		try {
-			internalRemove(generic);
-		} catch (ConstraintViolationException e) {
-			rollback(e);
-		}
-	}
-
-	private void internalRemove(final Generic node) throws ConstraintViolationException {
-		if (!isAlive(node))
-			throw new AliveConstraintViolationException(node + " is not alive");
-
 		new UnsafeCacheManager<Object>() {
 			@Override
 			Object internalWork(UnsafeCache unsafeCache) {
-				unsafeCache.internalRemove(node);
+				try {
+					unsafeCache.unsafeRemove(generic);
+				} catch (ConstraintViolationException e) {
+					rollback(e);
+				}
 				return null;
 			}
 		}.doWork();
+
 	}
 
 	private abstract class UnsafeCacheManager<T> {
@@ -226,7 +218,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-								adjust(((GenericImpl) orderedDependency).components));
+						adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -793,13 +785,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(old);
 		}
 
-		void internalRemove(Generic node) {
-			try {
-				for (Generic generic : orderRemoves(node).descendingSet())
-					removeGeneric(generic);
-			} catch (ConstraintViolationException e) {
-				rollback(e);
-			}
+		void unsafeRemove(Generic generic) throws ConstraintViolationException {
+			if (!isAlive(generic))
+				rollback(new AliveConstraintViolationException(generic + " is not alive"));
+			for (Generic dependency : orderRemoves(generic).descendingSet())
+				removeGeneric(dependency);
 		}
 
 		@Override
