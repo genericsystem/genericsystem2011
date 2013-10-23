@@ -12,9 +12,9 @@ public abstract class AbstractBooleanConstraintImpl extends AbstractConstraintIm
 
 	@Override
 	public void check(Generic modified, Holder valueConstraint, int axe) throws ConstraintViolationException {
-		if (valueConstraint.getValue()) {
-			AxedPropertyClass key = getValue();
-			check(key.getAxe() == Statics.MULTIDIRECTIONAL ? modified : ((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), valueConstraint.<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent(), key.getAxe());
+		if (valueConstraint.getValue()!=null && !Boolean.FALSE.equals(valueConstraint.getValue())) {
+			//AxedPropertyClass key = getValue();
+			check(axe == Statics.MULTIDIRECTIONAL ? modified : ((GenericImpl) modified).<GenericImpl> getComponent(axe), valueConstraint.<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent(), axe);
 		}
 	}
 

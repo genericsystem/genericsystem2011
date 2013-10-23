@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -716,7 +717,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	private class TakenPositions extends ArrayList<Integer> {
 
 		private static final long serialVersionUID = 1777313486204962418L;
-		private int max;
+		private final int max;
 
 		public TakenPositions(int max) {
 			this.max = max;
@@ -1367,13 +1368,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Generic> T disableSizeConstraint(int basePos) {
 		// TODO different des autres
-		getConstraintsMap().getValueHolder(new AxedPropertyClass(SizeConstraintImpl.class, basePos)).remove();
+		setConstraintValue(SizeConstraintImpl.class, basePos, false);
+		// getConstraintsMap().getValueHolder(new AxedPropertyClass(SizeConstraintImpl.class, basePos)).remove();
 		return (T) this;
 	}
 
 	@Override
 	public Integer getSizeConstraint(int basePos) {
-		return (Integer) getConstraintValue(SizeConstraintImpl.class, basePos);
+		Serializable result = getConstraintValue(SizeConstraintImpl.class, basePos);
+		return result instanceof Integer ? (Integer) result : null;
 	}
 
 	@Override
