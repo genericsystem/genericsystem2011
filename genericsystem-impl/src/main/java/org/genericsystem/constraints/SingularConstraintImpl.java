@@ -68,6 +68,7 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Holder;
@@ -93,9 +94,14 @@ public class SingularConstraintImpl extends AbstractBooleanConstraintImpl implem
 
 	@Override
 	public void check(Generic modified, Generic baseConstraint, int axe) throws ConstraintViolationException {
-		for (Generic instance : ((Type) baseConstraint.getComponents().get(axe)).getAllInstances())
-			if ((instance.getHolders((Relation) baseConstraint, axe)).size() > 1)
-				throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + modified + " (n° " + axe + ")");
+		Snapshot<Holder> holders = modified.getHolders((Relation) baseConstraint, axe);
+		if (holders.size() > 1)
+			throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + modified + " (n° " + axe + ") : " + holders);
+		else {
+			for (Generic instance : ((Type) baseConstraint.getComponents().get(axe)).getAllInstances())
+				if ((instance.getHolders((Relation) baseConstraint, axe)).size() > 1)
+					throw new SingularConstraintViolationException("Multiple links of attribute " + baseConstraint + " on component " + modified + " (n° " + axe + ")");
+		}
 	}
 
 	@Override
