@@ -34,7 +34,7 @@
 
 		<!-- Grid with structurals -->
 		<h:panelGrid columns="2" styleClass="fullWidth">
-			<c:forEach items="#{genericBean.structurals}" var="wrapper"
+			<c:forEach items="#{genericBean.structuralWrappers}" var="wrapper"
 				varStatus="status">
 				<h:panelGroup>
 					<a4j:outputPanel>
@@ -45,7 +45,7 @@
 							render="holders#{status.index},typestree" />
 
 						<!-- Not map provider -->
-<!-- 						<c:if test="#{!wrapper.structural.attribute.isMapProvider()}"> -->
+						<c:if test="#{!wrapper.structural.attribute.isMapProvider()}">
 							<gs:structuralWrapper id="holders#{status.index}"
 								wrapper="#{wrapper}"
 								showAddAction="#{!genericBean.isSingular(wrapper.structural)}"
@@ -53,17 +53,17 @@
 								genBean="#{genericBean}"
 								wrapBean="#{wrapperBean}"
 								genTreeBean="#{genericTreeBean}" />
-<!-- 						</c:if> -->
-
-<!-- 						Map provider -->
-<!-- 						<c:if test="#{wrapper.structural.attribute.isMapProvider()}"> -->
-<!-- 							<gs:mapProvider id="holders#{status.index}" -->
-<!-- 								wrapper="#{wrapper}" -->
-<!-- 								showAddAction="true" -->
-<!-- 								showDeleteAction="true" -->
-<!-- 								genBean="#{genericBean}" -->
-<!-- 								wrapBean="#{wrapperBean}"/> -->
-<!-- 						</c:if> -->
+						</c:if>
+						
+						<!-- Map provider -->
+						<c:if test="#{wrapper.structural.attribute.isMapProvider()}">
+							<gs:mapProvider id="holders#{status.index}"
+								wrapper="#{wrapper}"
+								showAddAction="true"
+								showDeleteAction="true"
+								genBean="#{genericBean}"
+								wrapBean="#{wrapperBean}" />
+						</c:if>
 
 					</a4j:outputPanel>
 				</h:panelGroup>

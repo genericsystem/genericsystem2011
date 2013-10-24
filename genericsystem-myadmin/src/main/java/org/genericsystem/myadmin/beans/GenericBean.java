@@ -19,13 +19,15 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.util.GsMessages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
 public class GenericBean implements Serializable {
 
 	private static final long serialVersionUID = 2108715680116264876L;
-	// protected static Logger log = LoggerFactory.getLogger(GenericBean.class);
+	protected static Logger log = LoggerFactory.getLogger(GenericBean.class);
 	@Inject
 	private transient Cache cache;
 
@@ -113,15 +115,15 @@ public class GenericBean implements Serializable {
 		}
 	}
 
-	public List<StructuralWrapper> getStructurals() {
+	public List<StructuralWrapper> getStructuralWrappers() {
 		List<StructuralWrapper> list = new ArrayList<>();
 		for (Structural structural : listStructurals(genericTreeBean.<Attribute> getSelectedTreeNodeGeneric())) {
-			// log.info("structural " + structural);
-			if (!structural.getAttribute().isMapProvider())
-				list.add(getStructuralWrapper(structural));
+			//log.info("structural " + structural);
+			//if (!structural.getAttribute().isMapProvider())
+			list.add(getStructuralWrapper(structural));
 		}
 		structuralWrappers = list;
-		// log.info(">>>>>>>>>>>>>>>>>> " + list);
+		//log.info(">>>>>>>>>>>>>>>>>> " + list);
 		return list;
 	}
 

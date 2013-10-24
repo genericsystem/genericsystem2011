@@ -70,14 +70,14 @@ public class Archiver {
 
 	private String getSnapshotPath() {
 		if (lockFile != null) {
-			NavigableMap<Long, File> snapshotsMap = snapshotsMap();
+			NavigableMap<Long, File> snapshotsMap = snapshotsMap(directory);
 			if (!snapshotsMap.isEmpty())
 				return directory.getAbsolutePath() + File.separator + Statics.getFilename(snapshotsMap.lastKey());
 		}
 		return null;
 	}
 
-	private NavigableMap<Long, File> snapshotsMap() {
+	private static NavigableMap<Long, File> snapshotsMap(File directory) {
 		NavigableMap<Long, File> snapshotsMap = new TreeMap<Long, File>();
 		for (File file : directory.listFiles()) {
 			String filename = file.getName();
@@ -94,18 +94,17 @@ public class Archiver {
 		return snapshotsMap;
 	}
 
-	private long getTimestamp(final String filename) throws ParseException {
+	private static long getTimestamp(final String filename) throws ParseException {
 		return Long.parseLong(filename.substring(filename.lastIndexOf("---") + 3));
 	}
 
 	public void startScheduler() {
 		if (lockFile != null)
 			if (Statics.SNAPSHOTS_PERIOD > 0L) {
-				final SnapshotWriter snapshotWriter = new SnapshotWriter();
 				scheduler.scheduleAtFixedRate(new Runnable() {
 					@Override
 					public void run() {
-						snapshotWriter.doSnapshot(directory.getAbsolutePath() + File.separator, Statics.getFilename(engine.pickNewTs()));
+						SnapshotWriter.doSnapshot(directory, engine);
 					}
 				}, Statics.SESSION_TIMEOUT, Statics.SNAPSHOTS_PERIOD, TimeUnit.MILLISECONDS);
 			}
@@ -115,7 +114,7 @@ public class Archiver {
 		if (lockFile != null)
 			try {
 				scheduler.shutdown();
-				new SnapshotWriter().doSnapshot(directory.getAbsolutePath() + File.separator, Statics.getFilename(engine.pickNewTs()));
+				SnapshotWriter.doSnapshot(directory, engine);
 				lockFile.close();
 				lockFile = null;
 			} catch (IOException e) {
@@ -123,13 +122,15 @@ public class Archiver {
 			}
 	}
 
-	private class SnapshotWriter {
+	private static class SnapshotWriter {
 
-		public void doSnapshot(String path, String fileName) {
+		public static void doSnapshot(File directory, Engine engine) {
+			String path = directory.getAbsolutePath() + File.separator;
+			String fileName = Statics.getFilename(engine.pickNewTs());
 			try (ByteArrayOutputStream formalOutputStream = new ByteArrayOutputStream(); ZipOutputStream zipOutput = new ZipOutputStream(new FileOutputStream(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));) {
 
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.CONTENT_EXTENSION));
-				saveSnapshot(new ObjectOutputStream(formalOutputStream), new ObjectOutputStream(zipOutput));
+				saveSnapshot(engine, new ObjectOutputStream(formalOutputStream), new ObjectOutputStream(zipOutput));
 				zipOutput.closeEntry();
 
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.FORMAL_EXTENSION));
@@ -141,19 +142,19 @@ public class Archiver {
 				zipOutput.close();
 
 				new File(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(path + fileName + Statics.ZIP_EXTENSION));
-				manageOldSnapshots();
+				manageOldSnapshots(directory);
 			} catch (IOException ioe) {
 				throw new IllegalStateException(ioe);
 			}
 		}
 
-		private void saveSnapshot(ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent) throws IOException {
+		private static void saveSnapshot(Engine engine, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent) throws IOException {
 			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 			for (Generic orderGeneric : new Transaction(engine).orderDependencies(engine))
 				writeGeneric(((GenericImpl) orderGeneric), tmpFormal, tmpContent, homeTreeMap);
 		}
 
-		private void writeGeneric(GenericImpl generic, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
+		private static void writeGeneric(GenericImpl generic, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
 			writeTs(generic, tmpFormal);
 			tmpContent.writeLong(generic.homeTreeNode.ts);
 			if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
@@ -168,21 +169,21 @@ public class Archiver {
 			tmpFormal.writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
 		}
 
-		private void writeTs(Generic generic, ObjectOutputStream tmpFormal) throws IOException {
+		private static void writeTs(Generic generic, ObjectOutputStream tmpFormal) throws IOException {
 			tmpFormal.writeLong(((GenericImpl) generic).getDesignTs());
 			tmpFormal.writeLong(((GenericImpl) generic).getBirthTs());
 			tmpFormal.writeLong(((GenericImpl) generic).getLastReadTs());
 			tmpFormal.writeLong(((GenericImpl) generic).getDeathTs());
 		}
 
-		private void writeAncestors(Snapshot<Generic> dependencies, ObjectOutputStream formalObjectOutput) throws IOException {
+		private static void writeAncestors(Snapshot<Generic> dependencies, ObjectOutputStream formalObjectOutput) throws IOException {
 			formalObjectOutput.writeInt(dependencies.size());
 			for (Generic dependency : dependencies)
 				formalObjectOutput.writeLong(((GenericImpl) dependency).getDesignTs());
 		}
 
-		private void manageOldSnapshots() {
-			NavigableMap<Long, File> snapshotsMap = snapshotsMap();
+		private static void manageOldSnapshots(File directory) {
+			NavigableMap<Long, File> snapshotsMap = snapshotsMap(directory);
 			long lastTs = snapshotsMap.lastKey();
 			long firstTs = snapshotsMap.firstKey();
 			long ts = firstTs;
@@ -194,11 +195,11 @@ public class Archiver {
 						ts = snapshotTs;
 		}
 
-		private long minInterval(long periodNumber) {
+		private static long minInterval(long periodNumber) {
 			return (long) Math.floor(periodNumber / Statics.ARCHIVER_COEFF);
 		}
 
-		private void removeSnapshot(NavigableMap<Long, File> snapshotsMap, long ts) {
+		private static void removeSnapshot(NavigableMap<Long, File> snapshotsMap, long ts) {
 			snapshotsMap.get(ts).delete();
 			snapshotsMap.remove(ts);
 		}
