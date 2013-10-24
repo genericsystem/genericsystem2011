@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 
+import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -131,6 +132,13 @@ public interface Cache {
 	 * @return The new super Cache.
 	 */
 	Cache newSuperCache();
+
+	/**
+	 * Returns the level of this cache. Level 1 is equivalent to transaction.
+	 * 
+	 * @return the level of this cache.
+	 */
+	int getLevel();
 
 	/**
 	 * Returns the meta Attribute.

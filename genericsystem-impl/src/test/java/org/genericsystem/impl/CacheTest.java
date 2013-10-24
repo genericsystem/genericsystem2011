@@ -21,4 +21,14 @@ public class CacheTest extends AbstractTest {
 		assert cache.getEngine().getInheritings().contains(vehicle);
 	}
 
+	public void testCacheLevel() {
+		Cache mainCache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache superCache1 = mainCache.newSuperCache().start();
+		Cache superCache2 = superCache1.newSuperCache().start();
+
+		assert mainCache.getLevel() == 1;
+		assert superCache1.getLevel() == 2;
+		assert superCache2.getLevel() == 3;
+	}
+
 }

@@ -20,21 +20,26 @@
 			<f:facet name="label">
 				<h:outputText value="Session" />
 			</f:facet>
+			<!-- Invalidate session -->
 			<rich:menuItem label="#{msg.invalidateSession}"
 				action="#{sessionBean.invalidate}" icon="#{infos.lifebelt}" />
 		</rich:dropDownMenu>
+		
 		<!-- Cache -->
 		<rich:dropDownMenu>
 			<f:facet name="label">
-				<h:outputText value="Cache" />
+				<h:outputText value="Cache (Level #{cacheBean.cache.level})" />
 			</f:facet>
-			<rich:menuItem label="#{msg.addCache}" action="#{cacheBean.newCache}"
-				icon="#{infos.add}" />
-			<rich:menuItem label="#{msg.save_button}" action="#{cacheBean.save}"
-				icon="#{infos.data_next}" />
+			<!-- New super cache -->
+			<rich:menuItem label="#{msg.addCache}" action="#{cacheBean.newSuperCache}"
+				icon="#{infos.add}" immediate="true" />
+			<!-- Flush current cache -->
+			<rich:menuItem label="#{msg.save_button}" action="#{cacheBean.saveCache}"
+				icon="#{infos.data_next}" immediate="true" />
 			<rich:menuSeparator />
+			<!-- Discard current cache -->
 			<rich:menuItem label="#{msg.discard_button}"
-				action="#{cacheBean.discard}" icon="#{infos.data_previous}" />
+				action="#{cacheBean.discardCache}" icon="#{infos.data_previous}" immediate="true" />
 		</rich:dropDownMenu>
 	</rich:toolbar>
 </composite:implementation>
