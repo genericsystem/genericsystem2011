@@ -383,8 +383,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	public Cache newSuperCache() {
+	public Cache mountNewCache() {
 		return this.<EngineImpl> getEngine().getFactory().newCache(this);
+	}
+
+	@Override
+	public Cache flushAndUnmount() {
+		this.flush();
+		AbstractContext subContext = this.getSubContext();
+		if (subContext instanceof Cache)
+			return (Cache) subContext;
+		return null;
+	}
+
+	@Override
+	public Cache discardAndUnmount() {
+		this.clear();
+		AbstractContext subContext = this.getSubContext();
+		if (subContext instanceof Cache)
+			return (Cache) subContext;
+		return null;
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {

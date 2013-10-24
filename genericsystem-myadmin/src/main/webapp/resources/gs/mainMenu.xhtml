@@ -31,15 +31,15 @@
 				<h:outputText value="Cache (Level #{cacheBean.cache.level})" />
 			</f:facet>
 			<!-- New super cache -->
-			<rich:menuItem label="#{msg.addCache}" action="#{cacheBean.newSuperCache}"
+			<rich:menuItem label="#{msg.addCache}" action="#{cacheBean.mountNewCache}"
 				icon="#{infos.add}" immediate="true" />
 			<!-- Flush current cache -->
-			<rich:menuItem label="#{msg.save_button}" action="#{cacheBean.saveCache}"
+			<rich:menuItem label="#{msg.save_button}" action="#{cacheBean.flushCurrentCache}"
 				icon="#{infos.data_next}" immediate="true" />
 			<rich:menuSeparator />
 			<!-- Discard current cache -->
 			<rich:menuItem label="#{msg.discard_button}"
-				action="#{cacheBean.discardCache}" icon="#{infos.data_previous}" immediate="true" />
+				action="#{cacheBean.discardCurrentCache}" icon="#{infos.data_previous}" immediate="true" />
 		</rich:dropDownMenu>
 	</rich:toolbar>
 </composite:implementation>

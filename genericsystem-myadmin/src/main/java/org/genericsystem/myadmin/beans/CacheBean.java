@@ -29,8 +29,8 @@ public class CacheBean implements Serializable {
 	 * 
 	 * @return string "HOME".
 	 */
-	public String newSuperCache() {
-		cacheProvider.newSuperCache();
+	public String mountNewCache() {
+		cacheProvider.mountNewCache();
 
 		messages.info("addCache");
 
@@ -42,10 +42,10 @@ public class CacheBean implements Serializable {
 	 * 
 	 * @return string "HOME".
 	 */
-	public String saveCache() {
-		cacheProvider.saveCache();
+	public String flushCurrentCache() {
+		cacheProvider.flushCurrentCache();
 
-		messages.info("flushCache", cacheProvider.getCache().getLevel());
+		messages.info("flushCache", cacheProvider.getCurrentCache().getLevel());
 
 		return "HOME";
 	}
@@ -55,19 +55,19 @@ public class CacheBean implements Serializable {
 	 * 
 	 * @return string "HOME".
 	 */
-	public String discardCache() {
-		cacheProvider.discardCache();
+	public String discardCurrentCache() {
+		cacheProvider.discardCurrentCache();
 
-		messages.info("discardCache", cacheProvider.getCache().getLevel());
+		messages.info("discardCache", cacheProvider.getCurrentCache().getLevel());
 
 		return "HOME";
 	}
 
 	public Cache getCache() {
-		return cacheProvider.getCache();
+		return cacheProvider.getCurrentCache();
 	}
 
 	public void setCache(Cache cache) {
-		cacheProvider.setCache(cache);
+		cacheProvider.setCurrentCache(cache);
 	}
 }

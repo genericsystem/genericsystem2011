@@ -72,7 +72,7 @@ public class FileSystemTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				cache.newSuperCache().start();
+				cache.mountNewCache().start();
 				directory2.addDirectory("directory1"); // Exception
 			}
 		}.assertIsCausedBy(ExistsException.class);

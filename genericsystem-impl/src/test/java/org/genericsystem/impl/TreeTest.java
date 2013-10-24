@@ -64,7 +64,7 @@ public class TreeTest extends AbstractTest {
 			@Override
 			public void intercept() {
 				// mount a cache for try
-				cache.newSuperCache().start();
+				cache.mountNewCache().start();
 				root.remove();
 			}
 		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
