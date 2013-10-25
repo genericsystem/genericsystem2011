@@ -33,28 +33,20 @@ public class GenericTreeBean implements Serializable {
 
 	private static final long serialVersionUID = -1799171287514605774L;
 
+	/* Injected beans */
+	@Inject transient CacheProvider cacheProvider;
+	@Inject private GsMessages gsMessages;
+
 	private GuiTreeNode rootTreeNode;					// root node of the tree
 	private GuiTreeNode selectedTreeNode;				// selected tree node
-
-	@Inject transient CacheProvider cacheProvider;
-
 	private boolean implicitShow;
-
 	private boolean selectionLocked;
 
-	@Inject
-	private GsMessages messages;
-
-	@Inject
-	private Event<TreeSelectionEvent> launcher;
-
+	/* Events */
+	@Inject private Event<TreeSelectionEvent> treeSelectionEvent;
+	@Inject private Event<MenuEvent> menuEvent;
+	@Inject private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 	private TreeSelectionEvent event;
-
-	@Inject
-	private Event<MenuEvent> menuEvent;
-
-	@Inject
-	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
 	/**
 	 * Event of selection of node of the tree.
@@ -192,7 +184,7 @@ public class GenericTreeBean implements Serializable {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			selectedTreeNode = (GuiTreeNode) treeSelectionEvent.getObject();
 			internalChangeType();
-			messages.info("typeselectionchanged", getSelectedTreeNodeGeneric().toString());
+			gsMessages.info("typeselectionchanged", getSelectedTreeNodeGeneric().toString());
 		}
 	}
 
@@ -230,7 +222,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	public void fire(@Observes @InvokeApplication @After PhaseEvent e) {
 		if (event != null) {
-			launcher.fire(event);
+			treeSelectionEvent.fire(event);
 			event = null;
 		}
 	}
@@ -254,7 +246,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	public void changeTreeType(TreeType treeType) {
 		selectedTreeNode.setTreeType(treeType);
-		messages.info("showchanged", treeType);
+		gsMessages.info("showchanged", treeType);
 	}
 
 	/**
@@ -265,7 +257,7 @@ public class GenericTreeBean implements Serializable {
 	public void view(Generic generic) {
 		selectedTreeNode = changeView(rootTreeNode, generic);
 		internalChangeType();
-		messages.info("typeselectionchanged", selectedTreeNode.getGeneric());
+		gsMessages.info("typeselectionchanged", selectedTreeNode.getGeneric());
 	}
 
 	/**
@@ -337,25 +329,25 @@ public class GenericTreeBean implements Serializable {
 		Generic generic = genericTreeNode.getGeneric();
 		if (generic.isMeta()) {
 			if (generic.isType())
-				return messages.getInfos("bullet_square_red");
+				return gsMessages.getInfos("bullet_square_red");
 			if (generic.isReallyAttribute())
-				return messages.getInfos("bullet_triangle_red");
+				return gsMessages.getInfos("bullet_triangle_red");
 			if (generic.isRelation())
-				return messages.getInfos("bullet_ball_red");
+				return gsMessages.getInfos("bullet_ball_red");
 		} else if (generic.isStructural()) {
 			if (generic.isType())
-				return messages.getInfos("bullet_square_yellow");
+				return gsMessages.getInfos("bullet_square_yellow");
 			if (generic.isReallyAttribute())
-				return messages.getInfos("bullet_triangle_yellow");
+				return gsMessages.getInfos("bullet_triangle_yellow");
 			if (generic.isRelation())
-				return messages.getInfos("bullet_ball_yellow");
+				return gsMessages.getInfos("bullet_ball_yellow");
 		} else if (generic.isConcrete()) {
 			if (generic.isType())
-				return messages.getInfos("bullet_square_green");
+				return gsMessages.getInfos("bullet_square_green");
 			if (generic.isReallyAttribute())
-				return messages.getInfos("bullet_triangle_green");
+				return gsMessages.getInfos("bullet_triangle_green");
 			if (generic.isRelation())
-				return messages.getInfos("bullet_ball_green");
+				return gsMessages.getInfos("bullet_ball_green");
 		}
 		throw new IllegalStateException();
 	}
@@ -370,23 +362,23 @@ public class GenericTreeBean implements Serializable {
 	public String getTypeIconTitle(GuiTreeNode genericTreeNode) {
 		Generic generic = genericTreeNode.getGeneric();
 		if (generic.isMeta() && generic.isType())
-			return messages.getMessage("meta") + " " + messages.getMessage("type");
+			return gsMessages.getMessage("meta") + " " + gsMessages.getMessage("type");
 		else if (generic.isMeta() && generic.isReallyAttribute())
-			return messages.getMessage("meta") + " " + messages.getMessage("attribute");
+			return gsMessages.getMessage("meta") + " " + gsMessages.getMessage("attribute");
 		else if (generic.isMeta() && generic.isRelation())
-			return messages.getMessage("meta") + " " + messages.getMessage("relation");
+			return gsMessages.getMessage("meta") + " " + gsMessages.getMessage("relation");
 		else if (generic.isStructural() && generic.isType())
-			return messages.getMessage("type");
+			return gsMessages.getMessage("type");
 		else if (generic.isStructural() && generic.isReallyAttribute())
-			return messages.getMessage("attribute");
+			return gsMessages.getMessage("attribute");
 		else if (generic.isStructural() && generic.isRelation())
-			return messages.getMessage("relation");
+			return gsMessages.getMessage("relation");
 		else if (generic.isConcrete() && generic.isType())
-			return messages.getMessage("instance");
+			return gsMessages.getMessage("instance");
 		else if (generic.isConcrete() && generic.isReallyAttribute())
-			return messages.getMessage("value");
+			return gsMessages.getMessage("value");
 		else if (generic.isConcrete() && generic.isRelation())
-			return messages.getMessage("link");
+			return gsMessages.getMessage("link");
 		throw new IllegalStateException();
 	}
 
