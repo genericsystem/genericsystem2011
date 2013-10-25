@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -28,6 +29,7 @@ import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
@@ -145,7 +147,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private abstract class UnsafeCacheManager<T> {
-		private UnsafeCache unsafeCache = new UnsafeCache(CacheImpl.this);
+		private final UnsafeCache unsafeCache = new UnsafeCache(CacheImpl.this);
 
 		T doWork() {
 			try {
@@ -552,18 +554,33 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
-		checkConsistency(isFlushTime, generic);
+		checkConsistency(checkingType, isFlushTime, generic);
 		checkConstraints(checkingType, isFlushTime, generic);
 	}
 
-	protected void checkConsistency(boolean isFlushTime, Generic generic) throws ConstraintViolationException {
-		if (isConsistencyToCheck(isFlushTime, generic)) {
+	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+		if (isConsistencyToCheck(checkingType, isFlushTime, generic)) {
+
 			AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-			keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+			int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+			Generic constraintBase = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
+
+			if (axe == Statics.MULTIDIRECTIONAL) {
+				keyHolder.check(constraintBase, generic, checkingType, (Holder) generic);
+
+			} else {
+				log.info("4444generic   " + generic + "constraintBase " + constraintBase);
+				for (Generic instance : ((Type) ((Attribute) constraintBase).getComponents().get(axe)).getAllInstances()) {
+					keyHolder.check(instance, constraintBase, checkingType, (Holder) generic);
+				}
+			}
+
+			// keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+			// keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), generic, checkingType, (Holder) generic);
 		}
 	}
 
-	private boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
+	private boolean isConsistencyToCheck(CheckingType checkingType, boolean isFlushTime, Generic generic) {
 		if (isConstraintActivated(generic))
 			if (isFlushTime || isImmediatelyConsistencyCheckable((Holder) generic))
 				return true;
@@ -591,9 +608,22 @@ public class CacheImpl extends AbstractContext implements Cache {
 		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
 		for (Serializable key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
+
 			AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-			if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
-				keyHolder.check(generic, valueHolder, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+
+			if (isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
+				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
+				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+				if (axe == Statics.MULTIDIRECTIONAL) {
+					log.info("baseConstraint" + baseConstraint + "generic" + generic);
+					keyHolder.check(baseConstraint, generic, checkingType, valueHolder);
+
+				} else {
+					log.info("qdqd" + axe + ((Attribute) generic).getComponent(axe) + "  generic  " + generic + "  valueHolder" + valueHolder);
+					keyHolder.check(((Attribute) generic).getComponent(axe), baseConstraint, checkingType, valueHolder);
+				}
+
+			}
 		}
 	}
 
@@ -639,8 +669,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		private transient TimestampedDependencies underlyingDependencies;
 
-		private PseudoConcurrentSnapshot inserts = new PseudoConcurrentSnapshot();
-		private PseudoConcurrentSnapshot deletes = new PseudoConcurrentSnapshot();
+		private final PseudoConcurrentSnapshot inserts = new PseudoConcurrentSnapshot();
+		private final PseudoConcurrentSnapshot deletes = new PseudoConcurrentSnapshot();
 
 		public CacheDependencies(TimestampedDependencies underlyingDependencies) {
 			assert underlyingDependencies != null;
@@ -664,8 +694,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		private class InternalIterator extends AbstractAwareIterator<Generic> implements Iterator<Generic> {
-			private Iterator<Generic> underlyingIterator;
-			private Iterator<Generic> insertsIterator = inserts.iterator();
+			private final Iterator<Generic> underlyingIterator;
+			private final Iterator<Generic> insertsIterator = inserts.iterator();
 
 			private InternalIterator(Iterator<Generic> underlyingIterator) {
 				this.underlyingIterator = underlyingIterator;

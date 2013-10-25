@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.PropertyConstraintViolationException;
 import org.genericsystem.generic.Attribute;
@@ -19,6 +18,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.setAttribute("Equipment");
+		log.info("@@@@@@@@@@@");
 		equipment.enablePropertyConstraint();
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
@@ -32,6 +32,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Generic myVehicle = vehicle.newInstance("myVehicle");
 		Holder abs = myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
+		log.info("jjklkbjgggggggg" + ((Type) equipment).getInstances());
 		assert !abs.isAlive();
 	}
 
@@ -59,12 +60,14 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
+
 		vehicleColor.enablePropertyConstraint();
 		Generic myVehicle = vehicle.newInstance("MyVehicle");
 		Generic red = color.newInstance("red");
 		Generic blue = color.newInstance("blue");
-		myVehicle.setLink(vehicleColor, "myVehicleColor", red);
+		Link myVehicleColor = myVehicle.setLink(vehicleColor, "myVehicleColor", red);
 		myVehicle.setLink(vehicleColor, "myVehicleColor", blue);
+		log.info("@@@@@@@@@@@@@@@@" + myVehicleColor.getComponents());
 	}
 
 	public void testBinaryRelationSameTarget() {
@@ -205,19 +208,18 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Type vehicle = cache.newType("Vehicle");
 		final Attribute equipment = vehicle.setAttribute("Equipment");
 		equipment.enablePropertyConstraint();
+		assert equipment.isPropertyConstraintEnabled();
 		final Generic myVehicle = vehicle.newInstance("myVehicle");
-
 		final Generic result = myVehicle.setValue(equipment, "ABS");
-
 		assert vehicle.getAllInstances().contains(myVehicle);
-
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
 				vehicle.setValue(equipment, "GPS");
-				assert !result.isAlive();
-				assert ((GenericImpl) result).reFind() != null;
+				log.info("la value" + myVehicle.getHolders(equipment));
+				cache.flush();
+				// assert ((GenericImpl) result).reFind() != null;
 			}
 		}.assertIsCausedBy(PropertyConstraintViolationException.class);
 	}

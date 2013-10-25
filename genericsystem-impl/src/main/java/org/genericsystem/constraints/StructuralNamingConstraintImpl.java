@@ -43,13 +43,14 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanSimpleConstra
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void check(Generic modified, Generic type, int axe) throws ConstraintViolationException {
-		if (!modified.isStructural() && modified.getComponentsSize() == 0)
+	// Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe
+	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+		if (!constraintBase.isStructural() && constraintBase.getComponentsSize() == 0)
 			return;
-		Generic[] components = ((GenericImpl) modified).getComponentsArray();
-		for (int i = 0; i < modified.getComponentsSize(); i++)
+		Generic[] components = ((GenericImpl) constraintBase).getComponentsArray();
+		for (int i = 0; i < constraintBase.getComponentsSize(); i++)
 			for (Generic inherited : ((GenericImpl) components[i]).getAllInheritings()) {
-				Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL, modified.getValue() == null), modified.getValue());
+				Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL, constraintBase.getValue() == null), constraintBase.getValue());
 				if (iterator.hasNext()) {
 					iterator.next();
 					if (iterator.hasNext())

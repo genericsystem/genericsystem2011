@@ -24,10 +24,10 @@ public class RequiredConstraintTest extends AbstractTest {
 		cache.flush();
 		wheelMyFiat.remove();
 		new RollbackCatcher() {
-
 			@Override
 			public void intercept() {
 				wheel.enableRequiredConstraint();
+				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
@@ -108,6 +108,7 @@ public class RequiredConstraintTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
+				log.info("jrrrrrrrrrrrrr");
 				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
@@ -132,12 +133,11 @@ public class RequiredConstraintTest extends AbstractTest {
 		Generic red = color.newInstance("red");
 		Generic myFiat = car.newInstance("myFiat");
 		final Link myFiatRed = myFiat.setLink(carColor, "myFiatRed", red);
-		myFiatRed.remove();
-		cache.flush();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
 				myFiatRed.remove();
+				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}

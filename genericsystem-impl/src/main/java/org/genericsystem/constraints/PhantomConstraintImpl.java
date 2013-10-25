@@ -32,10 +32,12 @@ public class PhantomConstraintImpl extends AbstractBooleanConstraintImpl impleme
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(PhantomConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {}
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
 	@Override
-	public void check(Generic modified, Generic type, int axe) throws ConstraintViolationException {
+	// Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
 		Generic[] supers = ((GenericImpl) modified).getSupersArray();
 		if (modified.getValue() == null)
 			if (modified.getComponentsSize() != 0) {

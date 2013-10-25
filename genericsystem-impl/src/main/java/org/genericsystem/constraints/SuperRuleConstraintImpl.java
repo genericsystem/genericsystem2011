@@ -35,10 +35,11 @@ public class SuperRuleConstraintImpl extends AbstractBooleanConstraintImpl imple
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}
 
+	// Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe
 	@Override
-	public void check(Generic modified, Generic type,int axe) throws ConstraintViolationException {
-		for (Generic directSuper : modified.getSupers())
-			if (!((GenericImpl) directSuper).isSuperOf(modified))
-				throw new SuperRuleConstraintViolationException(modified.info() + " should inherits from : " + directSuper.info());
+	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+		for (Generic directSuper : constraintBase.getSupers())
+			if (!((GenericImpl) directSuper).isSuperOf(constraintBase))
+				throw new SuperRuleConstraintViolationException(constraintBase.info() + " should inherits from : " + directSuper.info());
 	}
 }

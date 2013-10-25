@@ -26,16 +26,17 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class PropertyConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
-	public void check(final Generic modified, final Generic type, int axe) throws ConstraintViolationException {
+	//
+	public void check(final Generic constraintBase, final Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+
 		if (modified.isAttribute()) {
-			// TODO KK
 			for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {
 				@SuppressWarnings({ "unchecked", "rawtypes" })
-				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders((Attribute) type).iterator()) {
+				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders((Attribute) constraintBase).iterator()) {
 					@Override
 					public boolean isSelected() {
 						for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
-							if (!Objects.equals(((Holder) next).getComponent(componentPos), ((Holder) type).getComponent(componentPos)))
+							if (!Objects.equals(((Holder) next).getComponent(componentPos), ((Holder) constraintBase).getComponent(componentPos)))
 								return false;
 						return true;
 					}
@@ -48,7 +49,7 @@ public class PropertyConstraintImpl extends AbstractBooleanConstraintImpl implem
 			}
 			return;
 		}
-		if (new AbstractFilterIterator<Generic>(((GenericImpl) type).getAllInstances().iterator()) {
+		if (new AbstractFilterIterator<Generic>(((GenericImpl) constraintBase).getAllInstances().iterator()) {
 			@Override
 			public boolean isSelected() {
 				return !next.equals(modified) && Objects.equals(next.getValue(), modified.getValue());

@@ -41,8 +41,9 @@ public class SingularConstraintTest extends AbstractTest {
 		assert metaRelation.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 		assert !metaRelation.isSingularConstraintEnabled();
 	}
-	public void testHeritageSingularOK(){
-		
+
+	public void testHeritageSingularOK() {
+
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute power = vehicle.setAttribute("power");
@@ -51,7 +52,7 @@ public class SingularConstraintTest extends AbstractTest {
 		vehicle.setHolder(power, 123);
 		Type car = vehicle.newSubType("Car");
 		assert car.getSupers().size() == 1;
-    	car.newInstance("myCar");
+		car.newInstance("myCar");
 	}
 
 	public void testConstraintCheckOK() {
@@ -307,10 +308,13 @@ public class SingularConstraintTest extends AbstractTest {
 		final Generic yellow = color.newInstance("yellow");
 		myBmw.setLink(carColor, "myBmwYellow", yellow);
 		assert carColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				myAudi.setLink(carColor, "myAudiYellow", yellow);
+				log.info("@@@@@@@@@@@@@@");
+				Link myAudiYellow = myAudi.setLink(carColor, "myAudiYellow", yellow);
+				log.info("yellow.getHolders(carColor).size()" + yellow.getHolders(carColor).size());
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}

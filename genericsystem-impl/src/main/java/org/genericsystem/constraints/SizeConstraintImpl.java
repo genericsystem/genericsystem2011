@@ -12,7 +12,6 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SizeConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
@@ -37,22 +36,10 @@ public class SizeConstraintImpl extends AbstractNoBooleanConstraintImpl implemen
 	}
 
 	@Override
-	public void check(Generic base, Generic valueConstraint, int axe) throws ConstraintViolationException {
-		if (valueConstraint.getValue() instanceof Integer) {
-			Holder baseConstraint = ((Holder) valueConstraint).<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent();
-			for (Generic instance : ((Type) baseConstraint.getBaseComponent()).getAllInstances()) {
-				if (instance.getHolders(baseConstraint).size() > (Integer) (valueConstraint).getValue())
-					throw new SizeConstraintViolationException("Multiple links of " + baseConstraint + ", and the maximum size is " + valueConstraint);
-			}
+	public void check(Generic instanceToCheck, Generic baseConstraint, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+		if (constraintValue.getValue() instanceof Integer) {
+			if ((instanceToCheck.getHolders((Attribute) baseConstraint, axe).size()) > (Integer) (constraintValue).getValue())
+				throw new SizeConstraintViolationException("Multiple links of " + baseConstraint + ", and the maximum size is " + constraintValue);
 		}
 	}
-	// Serializable value = ((Holder) valueConstraint).getValue();
-	// Generic baseConstraint = ((Holder) valueConstraint).<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent();
-	// baseConstraint.log();
-	// Snapshot<Holder> holders = ((GenericImpl) base).getHolders((Relation) baseConstraint);
-	// if (value instanceof Integer)
-	// if (holders.size() > (Integer) value)
-	// throw new SizeConstraintViolationException("Multiple links of type " + baseConstraint + ", and the maximum size is " + value);
-	// if (baseConstraint.getComponentsSize() > 0 && ((Type) baseConstraint).getInstances().size() > (Integer) valueConstraint.getValue())
-	// throw new SizeConstraintViolationException("Multiple links of " + baseConstraint + ", and the maximum size is " + valueConstraint);
 }

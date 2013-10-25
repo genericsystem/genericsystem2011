@@ -47,22 +47,17 @@
 //}
 package org.genericsystem.constraints;
 
-import java.io.Serializable;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.core.AxedPropertyClass;
-import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.InstanceClassConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
@@ -78,18 +73,9 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class InstanceClassConstraintImpl extends AbstractNoBooleanConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic base, Generic valueConstraint, int axe) throws ConstraintViolationException {
-		Serializable value = ((Holder) valueConstraint).getValue();
-		Generic baseConstraint = ((Holder) valueConstraint).<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent();
-		if (base.isConcrete() && ((GenericImpl) base.getMeta()).getValue(((EngineImpl) base.getEngine()).getCurrentCache().<Holder> find(InstanceClassConstraintImpl.class)) != null) {
-			Class<?> clazz = (Class<?>) value;
-			if (!valueConstraint.getValue().equals(AxedPropertyClass.class))
-				if (base.getValue() != null && !clazz.isAssignableFrom(base.getValue().getClass()))
-					throw new InstanceClassConstraintViolationException("clazz " + clazz + " / " + base.getValue().getClass() + " base " + base);
-		}
-		for (Generic instance : ((Type) baseConstraint).getInstances())
-			if (!valueConstraint.getValue().equals(AxedPropertyClass.class) && !instance.getValue().getClass().equals(valueConstraint.getValue()))
+	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+		for (Generic instance : ((Attribute) instanceToCheck).getInstances())
+			if (!constraintValue.getValue().equals(AxedPropertyClass.class) && !instance.getValue().getClass().equals(constraintValue.getValue()))
 				throw new InstanceClassConstraintViolationException("Wrong type of instance");
-
 	}
 }

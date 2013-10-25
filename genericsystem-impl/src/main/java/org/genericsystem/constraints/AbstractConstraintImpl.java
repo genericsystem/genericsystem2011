@@ -24,10 +24,10 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 	public boolean isImmediatelyCheckable() {
 		return true;
 	}
-	
+
 	public boolean isImmediatelyConsistencyCheckable() {
 		return true;
 	}
-	
-	public abstract void check(Generic modified, Holder valueConstraint, int axe) throws ConstraintViolationException;
+
+	public abstract void check(Generic constraintBase, Generic modified, CheckingType checkingType, Holder constraintValue) throws ConstraintViolationException;
 }
