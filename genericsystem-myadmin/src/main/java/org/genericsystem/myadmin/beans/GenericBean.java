@@ -10,7 +10,7 @@ import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.core.Cache;
+import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Projector;
@@ -28,8 +28,8 @@ public class GenericBean implements Serializable {
 
 	private static final long serialVersionUID = 2108715680116264876L;
 	protected static Logger log = LoggerFactory.getLogger(GenericBean.class);
-	@Inject
-	private transient Cache cache;
+
+	@Inject transient CacheProvider cacheProvider;
 
 	@Inject
 	private GsMessages messages;
@@ -40,7 +40,7 @@ public class GenericBean implements Serializable {
 	private List<StructuralWrapper> structuralWrappers = new ArrayList<>();
 
 	public void newType(String newValue) {
-		cache.newType(newValue);
+		cacheProvider.getCurrentCache().newType(newValue);
 		messages.info("createRootType", newValue);
 	}
 
