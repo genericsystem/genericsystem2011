@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.myadmin.gui.GuiTreeNode;
-import org.genericsystem.myadmin.gui.GuiTreeNode.TreeType;
+import org.genericsystem.myadmin.gui.GuiTreeNode.GuiTreeChildrenType;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.richfaces.component.UIMenuGroup;
 import org.richfaces.component.UIMenuItem;
@@ -59,7 +59,7 @@ public class MenuBean implements Serializable {
 		menuGroup.getChildren().clear();
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		int i = 0;
-		for (GuiTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildren(TreeType.ATTRIBUTES)) {
+		for (GuiTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildren(GuiTreeChildrenType.ATTRIBUTES)) {
 			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
 			uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
 			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{genericTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });

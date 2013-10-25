@@ -19,7 +19,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.gui.GuiTreeNode;
-import org.genericsystem.myadmin.gui.GuiTreeNode.TreeType;
+import org.genericsystem.myadmin.gui.GuiTreeNode.GuiTreeChildrenType;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.jboss.seam.faces.event.qualifier.After;
 import org.jboss.seam.faces.event.qualifier.InvokeApplication;
@@ -74,7 +74,7 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @param treeType - tree type.
 	 */
-	public void changeTreeType(TreeType treeType) {
+	public void changeTreeType(GuiTreeChildrenType treeType) {
 		selectedTreeNode.setTreeType(treeType);
 
 		gsMessages.info("showchanged", treeType);
@@ -121,7 +121,7 @@ public class GenericTreeBean implements Serializable {
 	 * @return true - if tree type of selected tree node is equal to type in parameters,
 	 * false - if not.
 	 */
-	public boolean isTreeTypeSelected(TreeType treeType) {
+	public boolean isTreeTypeSelected(GuiTreeChildrenType treeType) {
 		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
 	}
 

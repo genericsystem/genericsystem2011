@@ -4,29 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.generic.Type;
 
 public class GuiTreeNode {
 
-	// protected static Logger log = LoggerFactory.getLogger(GenericTreeNode.class);
+	public enum GuiTreeChildrenType {
+		SUPERS, INSTANCES, INHERITINGS, COMPONENTS, COMPOSITES, ATTRIBUTES, RELATIONS, VALUES;
+	}
 
-	public static final TreeType TreeType_DEFAULT = TreeType.INHERITINGS;
+	public static final GuiTreeChildrenType DEFAULT_CHILDREN_TYPE = GuiTreeChildrenType.INHERITINGS;
 
 	private final GuiTreeNode parent;
 	private Generic generic;
 	private List<GuiTreeNode> children = new ArrayList<>();
-	private TreeType treeType = TreeType_DEFAULT;
-	// private Attribute attribute;
+	private GuiTreeChildrenType childrenType = DEFAULT_CHILDREN_TYPE;
 
-	public enum TreeType {
-		SUPERS, INSTANCES, INHERITINGS, COMPONENTS, COMPOSITES, ATTRIBUTES, RELATIONS, VALUES;
-	}
-
-	public GuiTreeNode(GuiTreeNode parent, Generic generic, TreeType treeType) {
+	public GuiTreeNode(GuiTreeNode parent, Generic generic, GuiTreeChildrenType treeType) {
 		this.parent = parent;
 		this.generic = generic;
-		this.treeType = treeType;
+		this.childrenType = treeType;
 	}
 
 	public GuiTreeNode(GuiTreeNode parent, Generic generic) {
@@ -34,28 +30,25 @@ public class GuiTreeNode {
 		this.generic = generic;
 	}
 
-	private TreeType getTreeTypeByGeneric(Generic generic) {
-		for (GuiTreeNode child : children)
-			if (child.getGeneric().equals(generic))
-				return child.getTreeType();
-		return TreeType_DEFAULT;
-	}
-
 	public List<GuiTreeNode> getChildren() {
-		return getChildren(treeType);
+		return getChildren(childrenType);
 	}
 
-	public List<GuiTreeNode> getChildren(TreeType treeType) {
-		List<GuiTreeNode> list = new ArrayList<>();
-		for (Generic child : getSnapshot(treeType))
-			list.add(getChildTreeNode(child));
-		children = list;
-		return list;
+	public List<GuiTreeNode> getChildren(GuiTreeChildrenType childrenType) {
+		List<GuiTreeNode> children = new ArrayList<>();
+		//		for (Generic generic : getGenericsForSubTree(childrenType))
+		//			children.add(new GuiTreeNode(this, generic));
+		//		return children;
+
+		for (Generic child : getGenericsForSubTree(childrenType))
+			children.add(getChildTreeNode(child));
+		this.children = children;
+		return children;
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	private <T extends Generic> Snapshot<T> getSnapshot(TreeType treeType) {
-		switch (treeType) {
+	@SuppressWarnings("unchecked")
+	private <T extends Generic> List<T> getGenericsForSubTree(GuiTreeChildrenType childrenType) {
+		switch (childrenType) {
 		case SUPERS:
 			return generic.getSupers();
 		case INSTANCES:
@@ -67,13 +60,14 @@ public class GuiTreeNode {
 		case COMPOSITES:
 			return generic.getComposites();
 		case ATTRIBUTES:
-			return (Snapshot<T>) ((Type) generic).getAttributes();
+			return (List<T>) ((Type) generic).getAttributes();
 			// case VALUES:
 			// return (Snapshot<T>) generic.getHolders(attribute);
 		default:
 			break;
 		}
-		throw new IllegalStateException();
+		return new ArrayList<>();
+		//throw new IllegalStateException();
 	}
 
 	/**
@@ -87,7 +81,7 @@ public class GuiTreeNode {
 		for (GuiTreeNode childTreeNode : children)
 			if (childTreeNode.getGeneric().equals(child))
 				return childTreeNode;
-		return new GuiTreeNode(this, child, getTreeTypeByGeneric(child));
+		return new GuiTreeNode(this, child, DEFAULT_CHILDREN_TYPE);
 	}
 
 	public String getValue() {
@@ -106,25 +100,17 @@ public class GuiTreeNode {
 		this.generic = generic;
 	}
 
-	public TreeType getTreeType() {
-		return treeType;
+	public GuiTreeChildrenType getTreeType() {
+		return childrenType;
 	}
 
-	public void setTreeType(TreeType treeType) {
-		this.treeType = treeType;
+	public void setTreeType(GuiTreeChildrenType treeType) {
+		this.childrenType = treeType;
 	}
 
 	@Override
 	public String toString() {
 		return generic.toString();
 	}
-
-	// public Attribute getAttribute() {
-	// return attribute;
-	// }
-	//
-	// public void setAttribute(Attribute attribute) {
-	// this.attribute = attribute;
-	// }
 
 }
