@@ -23,7 +23,6 @@ import org.genericsystem.constraints.SuperRuleConstraintImpl;
 import org.genericsystem.constraints.UnduplicateBindingConstraintImpl;
 import org.genericsystem.constraints.UniqueValueConstraintImpl;
 import org.genericsystem.constraints.VirtualConstraintImpl;
-import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;

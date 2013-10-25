@@ -1,11 +1,11 @@
 package org.genericsystem.constraints;
 
-import org.genericsystem.core.AxedPropertyClass;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.map.AxedPropertyClass;
 
 public abstract class AbstractNoBooleanConstraintImpl extends AbstractConstraintImpl {
 
