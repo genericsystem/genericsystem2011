@@ -15,9 +15,9 @@
 		<!-- Cache -->
 		<rich:dropDownMenu>
 			<f:facet name="label">
-				<h:outputText value="#{msg.itmCache}" >
+				<h:outputFormat value="#{msg.itmCache}" >
 					<f:param value="#{cacheBean.cache.level}" />
-				</h:outputText>
+				</h:outputFormat>
 			</f:facet>
 			<!-- New super cache -->
 			<rich:menuItem label="#{msg.itmMountNewCache}"
@@ -37,10 +37,10 @@
 		<!-- Session -->
 		<rich:dropDownMenu>
 			<f:facet name="label">
-				<h:outputText value="Session" />
+				<h:outputText value="#{msg.itmSession}" />
 			</f:facet>
 			<!-- Invalidate session -->
-			<rich:menuItem label="#{msg.invalidateSession}"
+			<rich:menuItem label="#{msg.itmInvalidateSession}"
 				action="#{sessionBean.invalidate}" icon="#{infos.lifebelt}" />
 		</rich:dropDownMenu>
 	</rich:toolbar>
