@@ -37,6 +37,7 @@ import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
+import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
@@ -126,7 +127,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@Override
 	public boolean isRemovable(Generic generic) {
 		try {
-			orderRemoves(generic);
+			orderDependenciesForRemove(generic);
 		} catch (ReferentialIntegrityConstraintViolationException e) {
 			return false;
 		}
@@ -222,7 +223,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-						adjust(((GenericImpl) orderedDependency).components));
+								adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -384,8 +385,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	public Cache newSuperCache() {
+	public Cache mountNewCache() {
 		return this.<EngineImpl> getEngine().getFactory().newCache(this);
+	}
+
+	@Override
+	public Cache flushAndUnmount() {
+		this.flush();
+		AbstractContext subContext = this.getSubContext();
+		if (subContext instanceof Cache)
+			return (Cache) subContext;
+		return null;
+	}
+
+	@Override
+	public Cache discardAndUnmount() {
+		this.clear();
+		AbstractContext subContext = this.getSubContext();
+		if (subContext instanceof Cache)
+			return (Cache) subContext;
+		return null;
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
@@ -446,7 +465,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
 		ConnectionMap connectionMap = new ConnectionMap();
-		log.info("zZZZZZZZZZZZ" + orderedDependencies + Arrays.toString(directSupers) + " " + Arrays.toString(components));
+		// log.info("zZZZZZZZZZZZ" + orderedDependencies + Arrays.toString(directSupers) + " " + Arrays.toString(components));
 		T superGeneric = buildAndInsertComplex(homeTreeNode, specializeGenericClass(specializationClass, homeTreeNode, directSupers), directSupers, components);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
@@ -582,7 +601,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private boolean isConsistencyToCheck(CheckingType checkingType, boolean isFlushTime, Generic generic) {
 		if (isConstraintActivated(generic))
-			if (isFlushTime || isImmediatelyConsistencyCheckable((Holder) generic))
+			if (isFlushTime || isImmediatelyConsistencyCheckable((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()))
 				return true;
 		return false;
 	}
@@ -600,8 +619,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return generic.isInstanceOf(find(ConstraintValue.class));
 	}
 
-	protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
-		return ((AbstractConstraintImpl) valueHolder.getBaseComponent()).isImmediatelyConsistencyCheckable();
+	protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
+		return constraint.isImmediatelyConsistencyCheckable();
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
@@ -764,7 +783,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		@Override
-		protected boolean isImmediatelyConsistencyCheckable(Holder valueHolder) {
+		protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
 			return false;
 		}
 
@@ -831,7 +850,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		private <T extends Generic> NavigableSet<T> orderAndRemoveDependenciesForRemove(final T old) throws ConstraintViolationException {
-			NavigableSet<T> orderedGenerics = orderRemoves(old);
+			NavigableSet<T> orderedGenerics = orderDependenciesForRemove(old);
 			for (T generic : orderedGenerics.descendingSet())
 				removeGeneric(generic);
 			return orderedGenerics;
@@ -850,5 +869,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 			abstract Generic rebuild();
 		}
 
+	}
+
+	@Override
+	public int getLevel() {
+		if (subContext != null && subContext instanceof Cache)
+			return 1 + ((Cache) subContext).getLevel();
+		return 1;
 	}
 }

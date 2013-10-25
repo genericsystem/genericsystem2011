@@ -167,7 +167,7 @@ public class FlushTest extends AbstractTest {
 		/* Link beetween Lada and color is not the same as link between Car and color */
 		assert !Objects.equals(lada.getLink(carColor, red), defaultCarColor);
 
-		/* Two links: Bmw <-> Red; Lada <-> Red */
+		/* There are two links: Bmw <-> Red; Lada <-> Red */
 		assert red.getLinks(carColor).size() == 2;
 
 		Snapshot<Link> links = red.getLinks(carColor);
@@ -188,7 +188,7 @@ public class FlushTest extends AbstractTest {
 			}
 		}).get(0);
 
-		/* Automatic link from red tyo BMW exists */
+		/* Automatic link from red to BMW exists */
 		assert redToBMW != null;
 
 		/* Link from red to BMW is automatic */
@@ -215,7 +215,12 @@ public class FlushTest extends AbstractTest {
 		Relation carColor2 = cache2.getType("Car").getRelation("CarColor");
 		Link defColor = carColor2.getInstance("DefaultCarColor");
 
+		/* Automatic link betweeb Lada and red was restored from cache */
+		assert cache2.getType("Car").getInstance("Lada").getLinks(carColor2).size() == 1;
+		assert !cache2.getType("Car").getInstance("Lada").getLinks(carColor2).contains(defColor);
+
 		/* Automatic link between BMW and red color was not restored from cache */
+		assert cache2.getType("Car").getInstance("Bmw").getLinks(carColor2).size() == 1;
 		assert cache2.getType("Car").getInstance("Bmw").getLinks(carColor2).contains(defColor);
 	}
 }

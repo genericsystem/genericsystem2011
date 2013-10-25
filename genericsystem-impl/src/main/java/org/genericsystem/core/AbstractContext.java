@@ -23,6 +23,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
+import org.genericsystem.map.AxedPropertyClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +162,7 @@ public abstract class AbstractContext implements Serializable {
 
 	}
 
-	<T extends Generic> NavigableSet<T> orderRemoves(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
+	<T extends Generic> NavigableSet<T> orderDependenciesForRemove(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
 		return new TreeSet<T>() {
 			private static final long serialVersionUID = -6526972335865898198L;
 			{

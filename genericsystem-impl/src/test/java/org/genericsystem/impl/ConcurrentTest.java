@@ -18,7 +18,7 @@ public class ConcurrentTest extends AbstractTest {
 		Engine engine = GenericSystem.newInMemoryEngine();
 		Cache cache = engine.newCache().start();
 		Type car = cache.newType("Car");
-		cache.newSuperCache().start();
+		cache.mountNewCache().start();
 		assert engine.getInheritings().contains(car);
 		assert engine.getInheritings().contains(car);
 	}

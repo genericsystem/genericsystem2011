@@ -555,7 +555,7 @@ public class RelationTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				cache.newSuperCache().start();
+				cache.mountNewCache().start();
 				me.setLink(carOwner, "value2", myBmw);
 			}
 

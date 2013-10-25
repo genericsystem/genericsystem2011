@@ -12,11 +12,14 @@ import javax.faces.model.SelectItem;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.core.AxedPropertyClass;
+import org.genericsystem.constraints.RequiredConstraintImpl;
+import org.genericsystem.constraints.SingularConstraintImpl;
+import org.genericsystem.constraints.SizeConstraintImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.map.AbstractMapProvider;
+import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
@@ -24,9 +27,6 @@ import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
-import org.genericsystem.constraints.RequiredConstraintImpl;
-import org.genericsystem.constraints.SingularConstraintImpl;
-import org.genericsystem.constraints.SizeConstraintImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +59,9 @@ public class MapProviderBean implements Serializable {
 	 * 
 	 * @return map object.
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends AbstractMapProvider<?, ?>> Map<Serializable, Serializable> getMap(MapProvider mapProvider) {
-		return mapProvider.getMap((Class<T>)genericTreeBean.getSelectedTreeNodeGeneric().getClass());
+		//return mapProvider.getMap((Class<T>)genericTreeBean.getSelectedTreeNodeGeneric().getClass());
+		return mapProvider.getExtendedMap(genericTreeBean.getSelectedTreeNodeGeneric());
 	}
 
 	/**

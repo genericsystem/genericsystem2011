@@ -13,7 +13,7 @@ import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.core.Cache;
+import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Holder;
@@ -35,8 +35,7 @@ public class GenericTreeBean implements Serializable {
 	private GenericTreeNode rootTreeNode;					// root node of the tree
 	private GenericTreeNode selectedTreeNode;				// selected tree node
 
-	@Inject
-	private transient Cache cache;
+	@Inject transient CacheProvider cacheProvider;
 
 	private boolean implicitShow;
 
@@ -86,7 +85,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	@PostConstruct
 	public void init() {
-		rootTreeNode = new GenericTreeNode(null, cache.getEngine(), GenericTreeNode.TreeType_DEFAULT);
+		rootTreeNode = new GenericTreeNode(null, cacheProvider.getCurrentCache().getEngine(), GenericTreeNode.TreeType_DEFAULT);
 		selectedTreeNode = rootTreeNode;
 	}
 
