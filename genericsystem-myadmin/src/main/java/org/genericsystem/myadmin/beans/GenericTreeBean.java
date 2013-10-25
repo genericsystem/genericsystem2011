@@ -25,12 +25,41 @@ import org.jboss.seam.faces.event.qualifier.After;
 import org.jboss.seam.faces.event.qualifier.InvokeApplication;
 import org.richfaces.component.UITree;
 import org.richfaces.event.TreeSelectionChangeEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
 public class GenericTreeBean implements Serializable {
 
 	private static final long serialVersionUID = -1799171287514605774L;
+
+	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
+
+	/**
+	 * Event of selection of node of the tree.
+	 * 
+	 * @author middleware
+	 */
+	public static class TreeSelectionEvent {
+
+		private final String id;						// id of event
+		private final Object object;					// concerned object
+
+		public TreeSelectionEvent(String id, Object object) {
+			this.id = id;
+			this.object = object;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public Object getObject() {
+			return object;
+		}
+
+	}
 
 	/* Injected beans */
 	@Inject transient CacheProvider cacheProvider;
@@ -42,10 +71,12 @@ public class GenericTreeBean implements Serializable {
 	private boolean selectionLocked;
 
 	/* Events */
-	@Inject private Event<TreeSelectionEvent> treeSelectionEvent;
+
 	@Inject private Event<MenuEvent> menuEvent;
 	@Inject private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 	private TreeSelectionEvent event;
+
+	@Inject private Event<TreeSelectionEvent> launcher;
 
 	/**
 	 * Creates the root tree node and selects it.
@@ -124,7 +155,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	public void fireEvent(@Observes @InvokeApplication @After PhaseEvent phaseEvent) {
 		if (event != null) {
-			treeSelectionEvent.fire(event);
+			launcher.fire(event);
 			event = null;
 		}
 	}
@@ -164,9 +195,9 @@ public class GenericTreeBean implements Serializable {
 	private GuiTreeNode changeView(GuiTreeNode guiTreeNode, Generic generic) {
 		if (guiTreeNode.getGeneric().equals(generic))
 			return guiTreeNode;
-		for (GuiTreeNode child : getNodeChildren(guiTreeNode)) {
+		for (GuiTreeNode child : guiTreeNode.getChildren()) {
 			GuiTreeNode childTreeNode = changeView(child, generic);
-			if (child != null)
+			if (childTreeNode != null)
 				return childTreeNode;
 		}
 		return null;
@@ -323,31 +354,6 @@ public class GenericTreeBean implements Serializable {
 	 */
 	public void setSelectionLocked(boolean selectionLocked) {
 		this.selectionLocked = selectionLocked;
-	}
-
-	/**
-	 * Event of selection of node of the tree.
-	 * 
-	 * @author middleware
-	 */
-	public static class TreeSelectionEvent {
-
-		private final String id;						// id of event
-		private final Object object;					// concerned object
-
-		public TreeSelectionEvent(String id, Object object) {
-			this.id = id;
-			this.object = object;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public Object getObject() {
-			return object;
-		}
-
 	}
 
 }
