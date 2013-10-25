@@ -113,6 +113,7 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @return
 	 */
+	// TODO: move to GuiTreeNode
 	private GuiTreeNode changeView(GuiTreeNode guiTreeNode, Generic generic) {
 		if (guiTreeNode.getGeneric().equals(generic))
 			return guiTreeNode;
@@ -134,18 +135,6 @@ public class GenericTreeBean implements Serializable {
 	 */
 	public boolean isTreeTypeSelected(TreeType treeType) {
 		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
-	}
-
-	/**
-	 * Returns CSS style of generic tree node.
-	 * 
-	 * @param genericTreeNode - generic tree node.
-	 * 
-	 * @return name of CSS style.
-	 */
-	// TODO: remove
-	public String getStyle(GuiTreeNode genericTreeNode) {
-		return "";
 	}
 
 	/**

@@ -69,13 +69,12 @@
 					<rich:inplaceInput value="#{wrapperBean.getGenericTreeNodeWrapper(node).value}"
 						title="#{genericTreeBean.getTypeIconTitle(node)}" editEvent="dblclick"
 						rendered="#{!node.isReadOnly}" activeClass="blackcolor"
-						changedClass="blackcolor" styleClass="#{genericTreeBean.getStyle(node)}">
+						changedClass="blackcolor">
 						<a4j:ajax event="change" execute="typestree" render="typesmanager" />
 					</rich:inplaceInput>
 					<h:outputText value="#{node.getValue}"
 						title="#{genericTreeBean.getTypeIconTitle(node)}"
-						rendered="#{node.isReadOnly}"
-						styleClass="#{genericTreeBean.getStyle(node)}" />
+						rendered="#{node.isReadOnly}" />
 				</rich:treeNode>
 			</rich:treeModelRecursiveAdaptor>
 		</rich:tree>
