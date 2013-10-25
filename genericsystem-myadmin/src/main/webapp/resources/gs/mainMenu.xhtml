@@ -37,11 +37,11 @@
 		<!-- Session -->
 		<rich:dropDownMenu>
 			<f:facet name="label">
-				<h:outputText value="Session" />
+				<h:outputText value="#{msg.itmSession}" />
 			</f:facet>
 			<!-- Invalidate session -->
-			<rich:menuItem label="#{msg.invalidateSession}"
-				action="#{sessionBean.invalidate}" icon="#{infos.lifebelt}" />
+			<rich:menuItem label="#{msg.itmInvalidateSession}"
+				action="#{sessionBean.invalidateSession}" icon="#{infos.lifebelt}" immediate="true" />
 		</rich:dropDownMenu>
 	</rich:toolbar>
 </composite:implementation>

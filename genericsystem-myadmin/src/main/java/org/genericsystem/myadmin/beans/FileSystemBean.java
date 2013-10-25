@@ -10,7 +10,7 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.core.Cache;
+import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
@@ -26,8 +26,7 @@ public class FileSystemBean implements Serializable {
 
 	private static final long serialVersionUID = -646738653059697257L;
 
-	@Inject
-	private transient Cache cache;
+	@Inject transient CacheProvider cacheProvider;
 
 	@Inject
 	private GsMessages messages;
@@ -41,7 +40,7 @@ public class FileSystemBean implements Serializable {
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 
 	public List<Directory> getRootDirectories() {
-		return cache.<FileSystem> find(FileSystem.class).getRootDirectories();
+		return cacheProvider.getCurrentCache().<FileSystem> find(FileSystem.class).getRootDirectories();
 	}
 
 	public List<Directory> getDirectories(final Directory directory) {
@@ -61,7 +60,7 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public void addRootDirectory(String newValue) {
-		cache.<FileSystem> find(FileSystem.class).addRootDirectory(newValue);
+		cacheProvider.getCurrentCache().<FileSystem> find(FileSystem.class).addRootDirectory(newValue);
 		messages.info("createRootDirectory", newValue);
 	}
 

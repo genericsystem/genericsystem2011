@@ -11,6 +11,7 @@ import javax.inject.Named;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
+import org.genericsystem.myadmin.gui.GuiTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
 
 @Named
@@ -53,14 +54,14 @@ public class WrapperBean {
 		}
 	}
 
-	public GenericTreeNodeWrapper getGenericTreeNodeWrapper(GenericTreeNode genericTreeNode) {
+	public GenericTreeNodeWrapper getGenericTreeNodeWrapper(GuiTreeNode genericTreeNode) {
 		return new GenericTreeNodeWrapper(genericTreeNode);
 	}
 
 	public class GenericTreeNodeWrapper {
-		private GenericTreeNode genericTreeNode;
+		private GuiTreeNode genericTreeNode;
 
-		public GenericTreeNodeWrapper(GenericTreeNode genericTreeNode) {
+		public GenericTreeNodeWrapper(GuiTreeNode genericTreeNode) {
 			this.genericTreeNode = genericTreeNode;
 		}
 
@@ -73,7 +74,7 @@ public class WrapperBean {
 			if (!newValue.equals(generic.toString())) {
 				genericTreeNode.setGeneric(generic.updateValue(newValue));
 				messages.info("updateGeneric", newValue, generic.getValue());
-				panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) genericTreeBean.getSelectedTreeNodeGeneric()).toCategoryString()));
+				panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) genericTreeBean.getSelectedTreeNode().getGeneric()).toCategoryString()));
 			}
 		}
 	}
@@ -103,7 +104,7 @@ public class WrapperBean {
 
 		public void setValue(String newValue) {
 			if (!newValue.equals(entry.getValue())) {
-				genericTreeBean.getSelectedTreeNodeGeneric().getPropertiesMap().put(entry.getKey(), newValue);
+				genericTreeBean.getSelectedTreeNode().getGeneric().getPropertiesMap().put(entry.getKey(), newValue);
 				messages.info("updateValue", entry.getValue(), newValue);
 			}
 		}
@@ -122,7 +123,7 @@ public class WrapperBean {
 
 		public void setValue(Boolean newValue) {
 			if (!newValue.equals(entry.getValue())) {
-				genericTreeBean.getSelectedTreeNodeGeneric().getConstraintsMap().put(entry.getKey(), newValue);
+				genericTreeBean.getSelectedTreeNode().getGeneric().getConstraintsMap().put(entry.getKey(), newValue);
 				messages.info("updateValue", entry.getValue(), newValue);
 			}
 		}
@@ -141,7 +142,7 @@ public class WrapperBean {
 
 		public void setValue(Boolean newValue) {
 			if (!newValue.equals(entry.getValue())) {
-				genericTreeBean.getSelectedTreeNodeGeneric().getSystemPropertiesMap().put(entry.getKey(), newValue);
+				genericTreeBean.getSelectedTreeNode().getGeneric().getSystemPropertiesMap().put(entry.getKey(), newValue);
 				messages.info("updateValue", entry.getValue(), newValue);
 			}
 		}
