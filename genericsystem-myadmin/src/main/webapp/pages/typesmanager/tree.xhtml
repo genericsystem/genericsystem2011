@@ -35,22 +35,13 @@
 		styleClass="widthScroll280 fullHeight">
 		
 		<f:facet name="header">
-			<!-- Show implicite checkbox -->
-			<h:outputText value="#{msg.show} #{msg.implicits}"
-				styleClass="capitalize bold" />
-			<h:selectBooleanCheckbox value="#{genericTreeBean.implicitShow}"
-				title="#{msg.show} #{msg.implicits}" style="vertical-align: middle;">
-				<a4j:ajax event="change" execute="@this" render="typestree" />
-			
 			<!-- Lock selection checkbox -->
-			</h:selectBooleanCheckbox>
 			<h:outputText value="#{msg.lockSelection}"
 				styleClass="bold" />
 			<h:selectBooleanCheckbox value="#{genericTreeBean.selectionLocked}"
 				title="#{msg.lockSelection}" style="vertical-align: middle;">
 				<a4j:ajax event="change" execute="typestree" render="typestree" />
 			</h:selectBooleanCheckbox>
-			
 		</f:facet>
 
 		<script type="text/javascript">

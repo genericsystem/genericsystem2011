@@ -67,7 +67,6 @@ public class GenericTreeBean implements Serializable {
 
 	private GuiTreeNode rootTreeNode;					// root node of the tree
 	private GuiTreeNode selectedTreeNode;				// selected tree node
-	private boolean implicitShow;
 	private boolean selectionLocked;
 
 	/* Events */
@@ -318,24 +317,6 @@ public class GenericTreeBean implements Serializable {
 	 */
 	void setSelectedTreeNode(GuiTreeNode selectedTreeNode) {
 		this.selectedTreeNode = selectedTreeNode;
-	}
-
-	/**
-	 * Return value of flag implicit show.
-	 * 
-	 * @return value of flag implicit show.
-	 */
-	public boolean isImplicitShow() {
-		return implicitShow;
-	}
-
-	/**
-	 * Sets flag implicit show.
-	 * 
-	 * @param implicitShow - implicit show flag.
-	 */
-	public void setImplicitShow(boolean implicitShow) {
-		this.implicitShow = implicitShow;
 	}
 
 	/**
