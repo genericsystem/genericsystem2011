@@ -16,7 +16,6 @@ import javax.inject.Named;
 import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.generic.Holder;
 import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.gui.GuiTreeNode;
@@ -150,24 +149,26 @@ public class GenericTreeBean implements Serializable {
 	public void view(Generic generic) {
 		selectedTreeNode = changeView(rootTreeNode, generic);
 		internalChangeType();
+
 		gsMessages.info("typeselectionchanged", selectedTreeNode.getGeneric());
 	}
 
 	/**
-	 * Retourns tree node ???
+	 * Returns the GUI tree node of supplied generic. Method takes in consideration the implicit
+	 * show flag.
 	 * 
-	 * @param genericTreeNode - tree node.
+	 * @param guiTreeNode - node of GUI tree.
 	 * @param generic - generic.
 	 * 
 	 * @return
 	 */
-	private GuiTreeNode changeView(GuiTreeNode genericTreeNode, Generic generic) {
-		if (genericTreeNode.getGeneric().equals(generic))
-			return genericTreeNode;
-		for (GuiTreeNode tmp : getNodeChildren(genericTreeNode)) {
-			GuiTreeNode child = changeView(tmp, generic);
+	private GuiTreeNode changeView(GuiTreeNode guiTreeNode, Generic generic) {
+		if (guiTreeNode.getGeneric().equals(generic))
+			return guiTreeNode;
+		for (GuiTreeNode child : getNodeChildren(guiTreeNode)) {
+			GuiTreeNode childTreeNode = changeView(child, generic);
 			if (child != null)
-				return child;
+				return childTreeNode;
 		}
 		return null;
 	}
@@ -204,11 +205,7 @@ public class GenericTreeBean implements Serializable {
 	 * @return name of CSS style.
 	 */
 	public String getStyle(GuiTreeNode genericTreeNode) {
-		return genericTreeNode.isImplicitAutomatic(
-				genericTreeNode.getGeneric()) ||
-				(isValue(genericTreeNode.getGeneric()) &&
-						!((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(getSelectedTreeNode().getGeneric())
-						) ? "implicitColor" : "";
+		return "";
 	}
 
 	/**

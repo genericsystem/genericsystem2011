@@ -4,24 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.generic.Type;
 
 public class GuiTreeNode {
+
 	// protected static Logger log = LoggerFactory.getLogger(GenericTreeNode.class);
 
-	private final GuiTreeNode parent;
-
-	private Generic generic;
-
-	private TreeType treeType;
-
-	// private Attribute attribute;
-
-	private List<GuiTreeNode> children = new ArrayList<>();
-
 	public static final TreeType TreeType_DEFAULT = TreeType.INHERITINGS;
+
+	private final GuiTreeNode parent;
+	private Generic generic;
+	private List<GuiTreeNode> children = new ArrayList<>();
+	private TreeType treeType;
+	// private Attribute attribute;
 
 	public enum TreeType {
 		SUPERS, INSTANCES, INHERITINGS, COMPONENTS, COMPOSITES, ATTRIBUTES, RELATIONS, VALUES;
@@ -33,8 +29,8 @@ public class GuiTreeNode {
 		this.treeType = treeType;
 	}
 
-	@SuppressWarnings("hiding")
-	private TreeType getTreeType(Generic generic) {
+	@SuppressWarnings("unused")
+	private TreeType getTreeTypeByGeneric(Generic generic) {
 		for (GuiTreeNode child : children)
 			if (child.getGeneric().equals(generic))
 				return child.getTreeType();
@@ -45,18 +41,16 @@ public class GuiTreeNode {
 		return getChildren(treeType, implicitShow);
 	}
 
-	@SuppressWarnings("hiding")
 	public List<GuiTreeNode> getChildren(TreeType treeType, boolean implicitShow) {
 		List<GuiTreeNode> list = new ArrayList<>();
 		for (Generic child : getSnapshot(treeType)) {
-			// if (implicitShow || !isImplicitAutomatic(child))
-			list.add(getGenericTreeNode(child));
+			list.add(getChildTreeNode(child));
 		}
 		children = list;
 		return list;
 	}
 
-	@SuppressWarnings({ "unchecked", "hiding" })
+	@SuppressWarnings({ "unchecked" })
 	private <T extends Generic> Snapshot<T> getSnapshot(TreeType treeType) {
 		switch (treeType) {
 		case SUPERS:
@@ -79,16 +73,18 @@ public class GuiTreeNode {
 		throw new IllegalStateException();
 	}
 
-	private GuiTreeNode getGenericTreeNode(Generic child) {
-		for (GuiTreeNode old : children)
-			if (old.getGeneric().equals(child))
-				return old;
-		return new GuiTreeNode(this, child, getTreeType(child));
-	}
-
-	@SuppressWarnings("hiding")
-	public boolean isImplicitAutomatic(Generic generic) {
-		return ((GenericImpl) generic).getComponentsSize() == 0;
+	/**
+	 * Returns a GUI tree node of one of the child of this generic.
+	 * 
+	 * @param child - child generric.
+	 * 
+	 * @return GUITreeNode object.
+	 */
+	private GuiTreeNode getChildTreeNode(Generic child) {
+		for (GuiTreeNode childTreeNode : children)
+			if (childTreeNode.getGeneric().equals(child))
+				return childTreeNode;
+		return new GuiTreeNode(this, child, TreeType_DEFAULT);
 	}
 
 	public String getValue() {
