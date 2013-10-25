@@ -49,91 +49,14 @@ public class GenericTreeBean implements Serializable {
 	private TreeSelectionEvent event;
 
 	/**
-	 * Event of selection of node of the tree.
-	 * 
-	 * @author middleware
-	 */
-	public static class TreeSelectionEvent {
-
-		private final String id;						// id of event
-		private final Object object;					// concerned object
-
-		public TreeSelectionEvent(String id, Object object) {
-			this.id = id;
-			this.object = object;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public Object getObject() {
-			return object;
-		}
-
-	}
-
-	/**
 	 * Creates the root tree node and selects it.
 	 */
 	@PostConstruct
 	public void init() {
-		rootTreeNode = new GuiTreeNode(null, cacheProvider.getCurrentCache().getEngine(), GuiTreeNode.TreeType_DEFAULT);
+		rootTreeNode = new GuiTreeNode(null,
+				cacheProvider.getCurrentCache().getEngine(),
+				GuiTreeNode.TreeType_DEFAULT);
 		selectedTreeNode = rootTreeNode;
-	}
-
-	/**
-	 * Returns selected tree node.
-	 * 
-	 * @return selected tree node.
-	 */
-	public GuiTreeNode getSelectedTreeNode() {
-		return selectedTreeNode;
-	}
-
-	/**
-	 * Sets selected tree node.
-	 * 
-	 * @param selectedTreeNode - selected tree node.
-	 */
-	void setSelectedTreeNode(GuiTreeNode selectedTreeNode) {
-		this.selectedTreeNode = selectedTreeNode;
-	}
-
-	/**
-	 * Return value of flag implicit show.
-	 * 
-	 * @return value of flag implicit show.
-	 */
-	public boolean isImplicitShow() {
-		return implicitShow;
-	}
-
-	/**
-	 * Sets flag implicit show.
-	 * 
-	 * @param implicitShow - implicit show flag.
-	 */
-	public void setImplicitShow(boolean implicitShow) {
-		this.implicitShow = implicitShow;
-	}
-
-	/**
-	 * Returns value of flag selection locked.
-	 * 
-	 * @return value of flag selection locked.
-	 */
-	public boolean isSelectionLocked() {
-		return selectionLocked;
-	}
-
-	/**
-	 * Sets flag selection locked.
-	 * 
-	 * @param selectionLocked - flag selection locked.
-	 */
-	public void setSelectionLocked(boolean selectionLocked) {
-		this.selectionLocked = selectionLocked;
 	}
 
 	/**
@@ -197,16 +120,16 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
-	 * ???
+	 * Change the selected node in the tree of generics.
 	 * 
-	 * @param selectionChangeEvent
+	 * @param selectionChangeEvent - JSF event of selection change.
 	 */
-	public void change(TreeSelectionChangeEvent selectionChangeEvent) {
+	public void changeSelectedNode(TreeSelectionChangeEvent treeSelectionChangeEvent) {
 		if (!selectionLocked) {
-			List<Object> selection = new ArrayList<Object>(selectionChangeEvent.getNewSelection());
+			List<Object> selection = new ArrayList<Object>(treeSelectionChangeEvent.getNewSelection());
 			if (!selection.isEmpty()) {
 				Object currentSelectionKey = selection.get(0);
-				UITree tree = (UITree) selectionChangeEvent.getSource();
+				UITree tree = (UITree) treeSelectionChangeEvent.getSource();
 				Object storedKey = tree.getRowKey();
 				tree.setRowKey(currentSelectionKey);
 				event = new TreeSelectionEvent(tree.getId(), tree.getRowData());
@@ -216,11 +139,11 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
-	 * Fires event.
+	 * Fires event of tree selection after phase INVOKE_APPLICATION.
 	 * 
-	 * @param e - phase of event.
+	 * @param phaseEvent - event of phase changing.
 	 */
-	public void fire(@Observes @InvokeApplication @After PhaseEvent e) {
+	public void fireEvent(@Observes @InvokeApplication @After PhaseEvent phaseEvent) {
 		if (event != null) {
 			treeSelectionEvent.fire(event);
 			event = null;
@@ -380,6 +303,85 @@ public class GenericTreeBean implements Serializable {
 		else if (generic.isConcrete() && generic.isRelation())
 			return gsMessages.getMessage("link");
 		throw new IllegalStateException();
+	}
+
+	/**
+	 * Returns selected tree node.
+	 * 
+	 * @return selected tree node.
+	 */
+	public GuiTreeNode getSelectedTreeNode() {
+		return selectedTreeNode;
+	}
+
+	/**
+	 * Sets selected tree node.
+	 * 
+	 * @param selectedTreeNode - selected tree node.
+	 */
+	void setSelectedTreeNode(GuiTreeNode selectedTreeNode) {
+		this.selectedTreeNode = selectedTreeNode;
+	}
+
+	/**
+	 * Return value of flag implicit show.
+	 * 
+	 * @return value of flag implicit show.
+	 */
+	public boolean isImplicitShow() {
+		return implicitShow;
+	}
+
+	/**
+	 * Sets flag implicit show.
+	 * 
+	 * @param implicitShow - implicit show flag.
+	 */
+	public void setImplicitShow(boolean implicitShow) {
+		this.implicitShow = implicitShow;
+	}
+
+	/**
+	 * Returns value of flag selection locked.
+	 * 
+	 * @return value of flag selection locked.
+	 */
+	public boolean isSelectionLocked() {
+		return selectionLocked;
+	}
+
+	/**
+	 * Sets flag selection locked.
+	 * 
+	 * @param selectionLocked - flag selection locked.
+	 */
+	public void setSelectionLocked(boolean selectionLocked) {
+		this.selectionLocked = selectionLocked;
+	}
+
+	/**
+	 * Event of selection of node of the tree.
+	 * 
+	 * @author middleware
+	 */
+	public static class TreeSelectionEvent {
+
+		private final String id;						// id of event
+		private final Object object;					// concerned object
+
+		public TreeSelectionEvent(String id, Object object) {
+			this.id = id;
+			this.object = object;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public Object getObject() {
+			return object;
+		}
+
 	}
 
 }

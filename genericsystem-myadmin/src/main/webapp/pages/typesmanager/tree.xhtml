@@ -66,7 +66,7 @@
 		<rich:tree id="typestree" toggleType="ajax" var="node" status="status"
 			selectionType="ajax"
 			oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
-			selectionChangeListener="#{genericTreeBean.change}"
+			selectionChangeListener="#{genericTreeBean.changeSelectedNode}"
 			execute="typestree" render="paneltitletypesmanager,menutypesmanager,editTypesManager">
 			<rich:treeModelRecursiveAdaptor roots="#{genericTreeBean.roots}"
 				nodes="#{genericTreeBean.getNodeChildren(node)}">
