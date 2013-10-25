@@ -9,8 +9,8 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.myadmin.gui.GenericTreeNode;
-import org.genericsystem.myadmin.gui.GenericTreeNode.TreeType;
+import org.genericsystem.myadmin.gui.GuiTreeNode;
+import org.genericsystem.myadmin.gui.GuiTreeNode.TreeType;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.richfaces.component.UIMenuGroup;
 import org.richfaces.component.UIMenuItem;
@@ -59,7 +59,7 @@ public class MenuBean implements Serializable {
 		menuGroup.getChildren().clear();
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		int i = 0;
-		for (GenericTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildrens(TreeType.ATTRIBUTES, menuEvent.isImplicitShow())) {
+		for (GuiTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildrens(TreeType.ATTRIBUTES, menuEvent.isImplicitShow())) {
 			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
 			uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
 			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{genericTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
@@ -71,15 +71,15 @@ public class MenuBean implements Serializable {
 	}
 
 	public static class MenuEvent {
-		private final GenericTreeNode genericTreeNode;
+		private final GuiTreeNode genericTreeNode;
 		private final boolean implicitShow;
 
-		public MenuEvent(GenericTreeNode genericTreeNode, boolean implicitShow) {
+		public MenuEvent(GuiTreeNode genericTreeNode, boolean implicitShow) {
 			this.genericTreeNode = genericTreeNode;
 			this.implicitShow = implicitShow;
 		}
 
-		public GenericTreeNode getGenericTreeNode() {
+		public GuiTreeNode getGenericTreeNode() {
 			return genericTreeNode;
 		}
 

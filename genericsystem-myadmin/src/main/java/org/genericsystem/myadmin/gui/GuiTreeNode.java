@@ -8,10 +8,10 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.generic.Type;
 
-public class GenericTreeNode {
+public class GuiTreeNode {
 	// protected static Logger log = LoggerFactory.getLogger(GenericTreeNode.class);
 
-	private final GenericTreeNode parent;
+	private final GuiTreeNode parent;
 
 	private Generic generic;
 
@@ -19,7 +19,7 @@ public class GenericTreeNode {
 
 	// private Attribute attribute;
 
-	private List<GenericTreeNode> childrens = new ArrayList<>();
+	private List<GuiTreeNode> childrens = new ArrayList<>();
 
 	public static final TreeType TreeType_DEFAULT = TreeType.INHERITINGS;
 
@@ -27,7 +27,7 @@ public class GenericTreeNode {
 		SUPERS, INSTANCES, INHERITINGS, COMPONENTS, COMPOSITES, ATTRIBUTES, RELATIONS, VALUES;
 	}
 
-	public GenericTreeNode(GenericTreeNode parent, Generic generic, TreeType treeType) {
+	public GuiTreeNode(GuiTreeNode parent, Generic generic, TreeType treeType) {
 		this.parent = parent;
 		this.generic = generic;
 		this.treeType = treeType;
@@ -35,19 +35,19 @@ public class GenericTreeNode {
 
 	@SuppressWarnings("hiding")
 	private TreeType getTreeType(Generic generic) {
-		for (GenericTreeNode child : childrens)
+		for (GuiTreeNode child : childrens)
 			if (child.getGeneric().equals(generic))
 				return child.getTreeType();
 		return TreeType_DEFAULT;
 	}
 
-	public List<GenericTreeNode> getChildrens(boolean implicitShow) {
+	public List<GuiTreeNode> getChildrens(boolean implicitShow) {
 		return getChildrens(treeType, implicitShow);
 	}
 
 	@SuppressWarnings("hiding")
-	public List<GenericTreeNode> getChildrens(TreeType treeType, boolean implicitShow) {
-		List<GenericTreeNode> list = new ArrayList<>();
+	public List<GuiTreeNode> getChildrens(TreeType treeType, boolean implicitShow) {
+		List<GuiTreeNode> list = new ArrayList<>();
 		for (Generic child : getSnapshot(treeType)) {
 			// if (implicitShow || !isImplicitAutomatic(child))
 			list.add(getGenericTreeNode(child));
@@ -79,11 +79,11 @@ public class GenericTreeNode {
 		throw new IllegalStateException();
 	}
 
-	private GenericTreeNode getGenericTreeNode(Generic child) {
-		for (GenericTreeNode old : childrens)
+	private GuiTreeNode getGenericTreeNode(Generic child) {
+		for (GuiTreeNode old : childrens)
 			if (old.getGeneric().equals(child))
 				return old;
-		return new GenericTreeNode(this, child, getTreeType(child));
+		return new GuiTreeNode(this, child, getTreeType(child));
 	}
 
 	@SuppressWarnings("hiding")
@@ -99,7 +99,7 @@ public class GenericTreeNode {
 		return generic.isMeta();
 	}
 
-	public GenericTreeNode getParent() {
+	public GuiTreeNode getParent() {
 		return parent;
 	}
 
