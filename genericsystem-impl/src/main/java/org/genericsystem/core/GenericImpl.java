@@ -304,8 +304,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T cancel(Holder attribute, int basePos, int metaLevel, Generic... targets) {
-		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
-		return bind(metaNode.bindInstanceNode(null), null, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+		return addHolder(attribute, null, basePos, metaLevel, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override
@@ -645,41 +644,41 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Holder attribute, HomeTreeNode homeTreeNode, int basePos, boolean existsException, Generic... targets) {
-		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
+		T holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
 		if (holder == null) {
-			if (value == null)
+			if (homeTreeNode.getValue() == null)
 				return null;
-			return this.<T> addHolder(attribute, value, basePos, metaLevel, targets);
+			return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, existsException, targets);
 		}
 		if (!equals(holder.getComponent(basePos))) {
-			if (value == null)
-				return cancel(holder, basePos, metaLevel);
-			HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
+			if (homeTreeNode.getValue() == null)
+				return cancel(holder, basePos, homeTreeNode.getMetaLevel());
+			// return this.<T> bind(homeTreeNode, specializationClass, holder, basePos, existsException, targets);
 			if (!(((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos)))) {
-				cancel(holder, basePos, metaLevel);
+				cancel(holder, basePos, homeTreeNode.getMetaLevel());
+				// bind(homeTreeNode, null, holder, basePos, existsException, targets);
 				return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, existsException, targets);
 			}
 			return this.<T> bind(homeTreeNode, specializationClass, holder, basePos, existsException, targets);
 		}
-		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
 		if (((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 			return holder;
-		if (null != value && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
-			return holder.updateValue(value);
+		if (null != homeTreeNode.getValue() && Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+			return holder.updateValue(homeTreeNode.getValue());
 		holder.remove();
-		return this.<T> setHolder(specializationClass, attribute, value, metaLevel, basePos, existsException, targets);
+		return this.<T> internalSetHolder(specializationClass, attribute, homeTreeNode, basePos, existsException, targets);
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, basePos, false, targets);
 	}
 
-	public <T extends Holder> T getSelectedHolder(Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
+	public <T extends Holder> T getSelectedHolder(Holder attribute, HomeTreeNode homeTreeNode, int basePos, Generic... targets) {
 		if (((Attribute) attribute).isSingularConstraintEnabled(basePos))
-			return getHolder(metaLevel, (Attribute) attribute, basePos);
-		if (value == null || ((Attribute) attribute).isPropertyConstraintEnabled())
-			return this.<T> getHolder(metaLevel, attribute, basePos, targets);
-		return this.<T> getHolderByValue(metaLevel, attribute, value, basePos, targets);
+			return getHolder(homeTreeNode.getMetaLevel(), (Attribute) attribute, basePos);
+		if (homeTreeNode.getValue() == null || ((Attribute) attribute).isPropertyConstraintEnabled())
+			return this.<T> getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, targets);
+		return this.<T> getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, targets);
 	}
 
 	@Override
