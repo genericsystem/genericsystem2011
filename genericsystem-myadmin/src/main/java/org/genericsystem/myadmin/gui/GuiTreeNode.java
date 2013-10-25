@@ -34,7 +34,6 @@ public class GuiTreeNode {
 		this.generic = generic;
 	}
 
-	@SuppressWarnings("unused")
 	private TreeType getTreeTypeByGeneric(Generic generic) {
 		for (GuiTreeNode child : children)
 			if (child.getGeneric().equals(generic))
@@ -88,7 +87,7 @@ public class GuiTreeNode {
 		for (GuiTreeNode childTreeNode : children)
 			if (childTreeNode.getGeneric().equals(child))
 				return childTreeNode;
-		return new GuiTreeNode(this, child, TreeType_DEFAULT);
+		return new GuiTreeNode(this, child, getTreeTypeByGeneric(child));
 	}
 
 	public String getValue() {

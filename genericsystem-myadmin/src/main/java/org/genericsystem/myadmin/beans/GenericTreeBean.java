@@ -94,7 +94,7 @@ public class GenericTreeBean implements Serializable {
 	 * Changes the title of panel typesmanager.
 	 */
 	private void internalChangeType() {
-		menuEvent.fire(new MenuEvent(selectedTreeNode, implicitShow));
+		menuEvent.fire(new MenuEvent(selectedTreeNode));
 		panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNode().getGeneric()).toCategoryString()));
 	}
 
