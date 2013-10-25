@@ -70,18 +70,6 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
-	 * Returns the list of children of tree node.
-	 * 
-	 * @param genericTreeNode - tree node.
-	 * 
-	 * @return list of children.
-	 */
-	//TODO: remove
-	public List<GuiTreeNode> getNodeChildren(final GuiTreeNode genericTreeNode) {
-		return genericTreeNode.getChildren();
-	}
-
-	/**
 	 * Changes tree type.
 	 * 
 	 * @param treeType - tree type.

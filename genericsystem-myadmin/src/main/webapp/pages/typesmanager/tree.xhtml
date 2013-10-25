@@ -60,7 +60,7 @@
 			selectionChangeListener="#{genericTreeBean.changeSelectedNode}"
 			execute="typestree" render="paneltitletypesmanager,menutypesmanager,editTypesManager">
 			<rich:treeModelRecursiveAdaptor roots="#{genericTreeBean.roots}"
-				nodes="#{genericTreeBean.getNodeChildren(node)}">
+				nodes="#{node.getChildren()}">
 				<rich:treeNode iconCollapsed="#{genericTreeBean.getTypeIcon(node)}"
 					iconExpanded="#{genericTreeBean.getTypeIcon(node)}"
 					onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}"
