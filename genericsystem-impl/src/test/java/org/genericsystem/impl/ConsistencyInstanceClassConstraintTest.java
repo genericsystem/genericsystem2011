@@ -74,6 +74,7 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Generic red = color.newInstance("red");
 		final Relation vehicleColor = vehicle.addRelation("vehicleColor", color);
+		assert vehicleColor.isStructural();
 		myVehicle.setLink(vehicleColor, "link", red);
 		new RollbackCatcher() {
 			@Override
