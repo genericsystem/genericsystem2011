@@ -75,7 +75,7 @@ public class GenericTreeBean implements Serializable {
 	 * @return list of children.
 	 */
 	public List<GuiTreeNode> getNodeChildren(final GuiTreeNode genericTreeNode) {
-		return genericTreeNode.getChildren(implicitShow);
+		return genericTreeNode.getChildren();
 	}
 
 	/**

@@ -37,11 +37,11 @@ public class GuiTreeNode {
 		return TreeType_DEFAULT;
 	}
 
-	public List<GuiTreeNode> getChildren(boolean implicitShow) {
-		return getChildren(treeType, implicitShow);
+	public List<GuiTreeNode> getChildren() {
+		return getChildren(treeType);
 	}
 
-	public List<GuiTreeNode> getChildren(TreeType treeType, boolean implicitShow) {
+	public List<GuiTreeNode> getChildren(TreeType treeType) {
 		List<GuiTreeNode> list = new ArrayList<>();
 		for (Generic child : getSnapshot(treeType)) {
 			list.add(getChildTreeNode(child));

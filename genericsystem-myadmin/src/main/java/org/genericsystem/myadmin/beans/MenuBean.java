@@ -59,7 +59,7 @@ public class MenuBean implements Serializable {
 		menuGroup.getChildren().clear();
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		int i = 0;
-		for (GuiTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildren(TreeType.ATTRIBUTES, menuEvent.isImplicitShow())) {
+		for (GuiTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildren(TreeType.ATTRIBUTES)) {
 			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
 			uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
 			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{genericTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
