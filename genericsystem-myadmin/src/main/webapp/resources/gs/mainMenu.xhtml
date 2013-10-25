@@ -41,7 +41,7 @@
 			</f:facet>
 			<!-- Invalidate session -->
 			<rich:menuItem label="#{msg.itmInvalidateSession}"
-				action="#{sessionBean.invalidate}" icon="#{infos.lifebelt}" />
+				action="#{sessionBean.invalidateSession}" icon="#{infos.lifebelt}" immediate="true" />
 		</rich:dropDownMenu>
 	</rich:toolbar>
 </composite:implementation>
