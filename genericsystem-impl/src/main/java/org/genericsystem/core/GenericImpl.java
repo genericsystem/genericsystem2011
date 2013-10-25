@@ -649,14 +649,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (equals(holder.getComponent(basePos))) {
 				if (((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
 					return holder;
-				if (Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
-					return holder.updateValue(homeTreeNode.getValue());
-				// other targets
-				holder.remove();
+				if (!((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
+					if (Arrays.equals(((GenericImpl) holder).components, Statics.insertIntoArray(this, targets, basePos)))
+						return holder.updateValue(homeTreeNode.getValue());
+					holder.remove();
+				}
+
 			} else {
-				if ((((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos)))) {
+				if (((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
+
+					// if ((((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos)))) {
+					// assert (((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) : holder.info() + attribute.info() + homeTreeNode + "         "
+					// + Arrays.toString(new Primaries(homeTreeNode, attribute).toArray()) + "           " + Arrays.toString(Statics.insertIntoArray(this, targets, basePos));
 					return this.<T> bind(homeTreeNode, specializationClass, holder, basePos, false, targets);
 				}
+
 				cancel(holder, basePos, homeTreeNode.getMetaLevel());
 			}
 			holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
@@ -677,6 +684,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 		holder.remove();
 		return this.<T> internalCancelHolder(specializationClass, attribute, homeTreeNode, basePos, targets);
+	}
+
+	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, Generic... targets) {
+		return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, getBasePos(attribute), targets);
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
@@ -871,6 +882,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (((GenericImpl) generic).isEngine())
 			return isEngine();
 		return isSuperOf(primaries, components, ((GenericImpl) generic).primaries, ((GenericImpl) generic).components);
+	}
+
+	public boolean isSuperOf(HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
+		return subHomeTreeNode.inheritsFrom(homeTreeNode) && isSuperOf(primaries, components, subPrimaries, subComponents);
 	}
 
 	public static boolean isDependencyOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {

@@ -52,6 +52,6 @@ public class VirtuakConstraintTest extends AbstractTest {
 				vehicle.enableVirtualConstraint();
 			}
 		}.assertIsCausedBy(VirtualConstraintException.class);
-		
+
 	}
 }

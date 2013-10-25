@@ -44,6 +44,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	private static final String NULL_VALUE = "NULL_VALUE";
 
 	public HomeTreeNode bindInstanceNode(Serializable value) {
+		assert getMetaLevel() <= 1 : this + " " + value;
 		if (value == null)
 			value = NULL_VALUE;
 		HomeTreeNode result = findInstanceNode(value);
@@ -104,6 +105,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 
 		protected interface KeyValueRef<K, V> {
 			K getKey();
+
 			V get();
 		}
 

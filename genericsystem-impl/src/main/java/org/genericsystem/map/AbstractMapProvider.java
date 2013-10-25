@@ -74,8 +74,8 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				Value oldValue = get(key);
 				if (Objects.equals(oldValue, value))
 					return oldValue;
-				Holder attribute = getKeyAttribute();
-				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key, getBasePos(attribute));
+				Holder attribute = getAttribute(key);
+				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
 			}
@@ -110,6 +110,10 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 	protected <T extends GenericImpl> Class<T> getSpecializationClass(Key key) {
 		return null;
 	};
+
+	protected Holder getAttribute(Key key) {
+		return getKeyAttribute();
+	}
 
 	private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {
 		Holder map = generic.getHolder(Statics.CONCRETE, this);
