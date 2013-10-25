@@ -53,8 +53,7 @@ public class GenericTreeBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		rootTreeNode = new GuiTreeNode(null,
-				cacheProvider.getCurrentCache().getEngine(),
-				GuiTreeNode.TreeType_DEFAULT);
+				cacheProvider.getCurrentCache().getEngine());
 		selectedTreeNode = rootTreeNode;
 	}
 

@@ -16,7 +16,7 @@ public class GuiTreeNode {
 	private final GuiTreeNode parent;
 	private Generic generic;
 	private List<GuiTreeNode> children = new ArrayList<>();
-	private TreeType treeType;
+	private TreeType treeType = TreeType_DEFAULT;
 	// private Attribute attribute;
 
 	public enum TreeType {
@@ -27,6 +27,11 @@ public class GuiTreeNode {
 		this.parent = parent;
 		this.generic = generic;
 		this.treeType = treeType;
+	}
+
+	public GuiTreeNode(GuiTreeNode parent, Generic generic) {
+		this.parent = parent;
+		this.generic = generic;
 	}
 
 	@SuppressWarnings("unused")
@@ -43,9 +48,8 @@ public class GuiTreeNode {
 
 	public List<GuiTreeNode> getChildren(TreeType treeType) {
 		List<GuiTreeNode> list = new ArrayList<>();
-		for (Generic child : getSnapshot(treeType)) {
+		for (Generic child : getSnapshot(treeType))
 			list.add(getChildTreeNode(child));
-		}
 		children = list;
 		return list;
 	}
