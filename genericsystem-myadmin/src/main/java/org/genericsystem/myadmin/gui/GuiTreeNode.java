@@ -19,7 +19,7 @@ public class GuiTreeNode {
 
 	// private Attribute attribute;
 
-	private List<GuiTreeNode> childrens = new ArrayList<>();
+	private List<GuiTreeNode> children = new ArrayList<>();
 
 	public static final TreeType TreeType_DEFAULT = TreeType.INHERITINGS;
 
@@ -35,24 +35,24 @@ public class GuiTreeNode {
 
 	@SuppressWarnings("hiding")
 	private TreeType getTreeType(Generic generic) {
-		for (GuiTreeNode child : childrens)
+		for (GuiTreeNode child : children)
 			if (child.getGeneric().equals(generic))
 				return child.getTreeType();
 		return TreeType_DEFAULT;
 	}
 
-	public List<GuiTreeNode> getChildrens(boolean implicitShow) {
-		return getChildrens(treeType, implicitShow);
+	public List<GuiTreeNode> getChildren(boolean implicitShow) {
+		return getChildren(treeType, implicitShow);
 	}
 
 	@SuppressWarnings("hiding")
-	public List<GuiTreeNode> getChildrens(TreeType treeType, boolean implicitShow) {
+	public List<GuiTreeNode> getChildren(TreeType treeType, boolean implicitShow) {
 		List<GuiTreeNode> list = new ArrayList<>();
 		for (Generic child : getSnapshot(treeType)) {
 			// if (implicitShow || !isImplicitAutomatic(child))
 			list.add(getGenericTreeNode(child));
 		}
-		childrens = list;
+		children = list;
 		return list;
 	}
 
@@ -80,7 +80,7 @@ public class GuiTreeNode {
 	}
 
 	private GuiTreeNode getGenericTreeNode(Generic child) {
-		for (GuiTreeNode old : childrens)
+		for (GuiTreeNode old : children)
 			if (old.getGeneric().equals(child))
 				return old;
 		return new GuiTreeNode(this, child, getTreeType(child));

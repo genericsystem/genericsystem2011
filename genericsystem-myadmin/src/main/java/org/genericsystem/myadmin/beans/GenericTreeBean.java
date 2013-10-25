@@ -160,7 +160,7 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @return the list with only root of tree node.
 	 */
-	public List<GuiTreeNode> getRoot() {
+	public List<GuiTreeNode> getRoots() {
 		return Collections.singletonList(rootTreeNode);
 	}
 
@@ -171,8 +171,8 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @return list of children.
 	 */
-	public List<GuiTreeNode> getChildrens(final GuiTreeNode genericTreeNode) {
-		return genericTreeNode.getChildrens(implicitShow);
+	public List<GuiTreeNode> getNodeChildren(final GuiTreeNode genericTreeNode) {
+		return genericTreeNode.getChildren(implicitShow);
 	}
 
 	/**
@@ -271,7 +271,7 @@ public class GenericTreeBean implements Serializable {
 	private GuiTreeNode changeView(GuiTreeNode genericTreeNode, Generic generic) {
 		if (genericTreeNode.getGeneric().equals(generic))
 			return genericTreeNode;
-		for (GuiTreeNode tmp : getChildrens(genericTreeNode)) {
+		for (GuiTreeNode tmp : getNodeChildren(genericTreeNode)) {
 			GuiTreeNode child = changeView(tmp, generic);
 			if (child != null)
 				return child;
