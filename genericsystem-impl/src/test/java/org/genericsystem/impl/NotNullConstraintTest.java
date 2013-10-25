@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -70,7 +71,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert myCar.getLinks(driving).isEmpty();
 		test = myCar.setLink(driving, "test", myHuman, myRoad);
 		test2 = myCar.setLink(driving, "test2", myHuman, myRoad);
-		cache.newSuperCache().start();
+		cache.mountNewCache().start();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {

@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 
+import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -126,11 +127,32 @@ public interface Cache {
 	<T extends Tree> T newTree(Serializable value, int dim);
 
 	/**
-	 * Create a new Cache on the current Cache.
+	 * Create a new cache on the current cache.
 	 * 
-	 * @return The new super Cache.
+	 * @return the new super Cache.
 	 */
-	Cache newSuperCache();
+	Cache mountNewCache();
+
+	/**
+	 * Flush this cache in the sub cache and return the sub cache.
+	 * 
+	 * @return the sub cache.
+	 */
+	Cache flushAndUnmount();
+
+	/**
+	 * Discard changes in this cache and return the sub cache.
+	 * 
+	 * @return the sub cache.
+	 */
+	Cache discardAndUnmount();
+
+	/**
+	 * Returns the level of this cache. Level 1 is equivalent to transaction.
+	 * 
+	 * @return the level of this cache.
+	 */
+	int getLevel();
 
 	/**
 	 * Returns the meta Attribute.

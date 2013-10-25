@@ -15,19 +15,33 @@ public class CacheProvider implements Serializable {
 
 	private static final long serialVersionUID = 5201003234496546928L;
 
-	@Inject
-	private transient Engine engine;
-
-	private transient Cache cache;
+	@Inject private transient Engine engine;
+	private transient Cache currentCache;
 
 	@PostConstruct
 	public void init() {
-		cache = engine.newCache();
+		currentCache = engine.newCache();
+	}
+
+	public void mountNewCache() {
+		currentCache = currentCache.mountNewCache().start();
+	}
+
+	public void flushCurrentCache() {
+		currentCache = currentCache.flushAndUnmount();
+	}
+
+	public void discardCurrentCache() {
+		currentCache = currentCache.discardAndUnmount();
 	}
 
 	@Produces
-	public Cache getCache() {
-		return cache;
+	public Cache getCurrentCache() {
+		return currentCache;
+	}
+
+	public void setCurrentCache(Cache cache) {
+		this.currentCache = cache;
 	}
 
 }

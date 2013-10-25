@@ -23,6 +23,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
+import org.genericsystem.map.AxedPropertyClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

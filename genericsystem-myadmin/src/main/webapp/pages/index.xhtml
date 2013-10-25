@@ -13,7 +13,9 @@
 
 	<ui:define name="bodySection">
 		<gs:head />
-		<gs:toolbar />
+<!-- 		<gs:toolbar /> -->
+		<gs:mainMenu />
+
 		<c:catch var="exception">
 			<gs:panel key="typesmanager" managername="#{msg.type} #{msg.manager}"
 				includetree="/pages/typesmanager/tree.xhtml"

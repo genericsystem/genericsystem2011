@@ -44,6 +44,7 @@ import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.map.AbstractMapProvider;
+import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
@@ -279,7 +280,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Holder> T addHolder(Holder attribute, int basePos, Serializable value, Generic... targets) {
-		return bind(((GenericImpl) attribute).bindInstanceNode(value), null, attribute, basePos, true, targets);
+		return addHolder(attribute, value, basePos, Statics.CONCRETE, targets);
+	}
+
+	@Override
+	public <T extends Holder> T addHolder(Holder attribute, Serializable value, int basePos, int metaLevel, Generic... targets) {
+		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
+		return bind(metaNode.bindInstanceNode(value), null, attribute, basePos, true, targets);
 	}
 
 	public <T extends Holder> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
@@ -290,15 +297,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().fastFindBySuper(homeTreeNode, new Primaries(homeTreeNode, directSuper).toArray(), directSuper, Statics.insertIntoArray(this, targets, basePos));
 	}
 
-	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
-		return new AbstractFilterIterator<T>(concreteIterator) {
-			@Override
-			public boolean isSelected() {
-				return !GenericImpl.this.equals(next);
-			}
-		};
-	}
-
 	@Override
 	public <T extends Generic> T cancel(Holder attribute, int metaLevel, Generic... targets) {
 		return cancel(attribute, getBasePos(attribute), metaLevel, targets);
@@ -307,7 +305,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Generic> T cancel(Holder attribute, int basePos, int metaLevel, Generic... targets) {
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
-
 		return bind(metaNode.bindInstanceNode(null), null, attribute, basePos, false, Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
@@ -340,6 +337,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (this.equals(holder.getComponent(basePos)))
 				holder.remove();
 		}
+	}
+
+	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
+		return new AbstractFilterIterator<T>(concreteIterator) {
+			@Override
+			public boolean isSelected() {
+				return !GenericImpl.this.equals(next);
+			}
+		};
 	}
 
 	@Override
@@ -615,7 +621,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Attribute> T addAttribute(Serializable value, Generic... targets) {
-		return setHolder(null, getEngine(), value, Statics.STRUCTURAL, Statics.BASE_POSITION, true, targets);
+		return addHolder((Holder) getEngine(), value, Statics.BASE_POSITION, Statics.STRUCTURAL, targets);
 	}
 
 	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Generic... targets) {
@@ -625,7 +631,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Relation> T addSubAttribute(Attribute attribute, Serializable value, Generic... targets) {
-		T holder = setHolder(null, attribute, value, Statics.STRUCTURAL, getBasePos(attribute), true, targets);
+		T holder = addHolder(attribute, value, getBasePos(attribute), Statics.STRUCTURAL, targets);
 		assert holder.inheritsFrom(attribute) : holder.info();
 		return holder;
 	}
@@ -634,10 +640,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		assert metaLevel - attribute.getMetaLevel() <= 1;
 		assert metaLevel - attribute.getMetaLevel() >= 0;
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
+		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
+		return internalSetHolder(specializationClass, attribute, homeTreeNode, basePos, existsException, targets);
+	}
 
+	public <T extends Holder> T internalSetHolder(Class<?> specializationClass, Holder attribute, HomeTreeNode homeTreeNode, int basePos, boolean existsException, Generic... targets) {
 		T holder = getSelectedHolder(attribute, value, metaLevel, basePos, targets);
-		if (holder == null)
-			return value == null ? null : this.<T> bind(metaNode.bindInstanceNode(value), specializationClass, attribute, basePos, existsException, targets);
+		if (holder == null) {
+			if (value == null)
+				return null;
+			return this.<T> addHolder(attribute, value, basePos, metaLevel, targets);
+		}
 		if (!equals(holder.getComponent(basePos))) {
 			if (value == null)
 				return cancel(holder, basePos, metaLevel);

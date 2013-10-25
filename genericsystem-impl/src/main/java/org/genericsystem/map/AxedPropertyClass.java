@@ -1,6 +1,7 @@
-package org.genericsystem.core;
+package org.genericsystem.map;
 
 import java.io.Serializable;
+import org.genericsystem.core.Generic;
 
 /**
  * @author Nicolas Feybesse

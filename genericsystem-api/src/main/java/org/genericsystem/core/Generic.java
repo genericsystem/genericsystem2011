@@ -255,6 +255,21 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> T addHolder(Holder attribute, int basePos, Serializable value, Generic... targets);
 
 	/**
+	 * Creates an holder or throws an exception if this holder already exists. <br/>
+	 * 
+	 * @param attribute
+	 *            The Holder.
+	 * @param value
+	 *            The value Link.
+	 * @param basePos
+	 *            The base position. * @param metaLevel The meta level.
+	 * @param targets
+	 *            The optional targets.
+	 * @return The Holder.
+	 */
+	<T extends Holder> T addHolder(Holder attribute, Serializable value, int basePos, int metaLevel, Generic... targets);
+
+	/**
 	 * Creates an holder or returns this holder if already exists. <br/>
 	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
 	 * 

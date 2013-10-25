@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:rich="http://richfaces.org/rich">
+
+<composite:interface>
+</composite:interface>
+
+<composite:implementation>
+	<rich:toolbar height="26px">
+		<!-- Cache -->
+		<rich:dropDownMenu>
+			<f:facet name="label">
+				<h:outputFormat value="#{msg.itmCache}" >
+					<f:param value="#{cacheBean.cache.level}" />
+				</h:outputFormat>
+			</f:facet>
+			<!-- New super cache -->
+			<rich:menuItem label="#{msg.itmMountNewCache}"
+				action="#{cacheBean.mountNewCache}" icon="#{infos.add}"
+				immediate="true" />
+			<!-- Flush current cache -->
+			<rich:menuItem label="#{msg.itmFlushCurrentCache}"
+				action="#{cacheBean.flushCurrentCache}" icon="#{infos.data_next}"
+				immediate="true" />
+			<rich:menuSeparator />
+			<!-- Discard current cache -->
+			<rich:menuItem label="#{msg.itmDiscardCurrentCache}"
+				action="#{cacheBean.discardCurrentCache}"
+				icon="#{infos.data_previous}" immediate="true" />
+		</rich:dropDownMenu>
+
+		<!-- Session -->
+		<rich:dropDownMenu>
+			<f:facet name="label">
+				<h:outputText value="Session" />
+			</f:facet>
+			<!-- Invalidate session -->
+			<rich:menuItem label="#{msg.invalidateSession}"
+				action="#{sessionBean.invalidate}" icon="#{infos.lifebelt}" />
+		</rich:dropDownMenu>
+	</rich:toolbar>
+</composite:implementation>
+
+</html>

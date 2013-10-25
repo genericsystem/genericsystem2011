@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -35,6 +36,7 @@ import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
+import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
@@ -220,7 +222,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-						adjust(((GenericImpl) orderedDependency).components));
+								adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -382,8 +384,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	public Cache newSuperCache() {
+	public Cache mountNewCache() {
 		return this.<EngineImpl> getEngine().getFactory().newCache(this);
+	}
+
+	@Override
+	public Cache flushAndUnmount() {
+		this.flush();
+		AbstractContext subContext = this.getSubContext();
+		if (subContext instanceof Cache)
+			return (Cache) subContext;
+		return null;
+	}
+
+	@Override
+	public Cache discardAndUnmount() {
+		this.clear();
+		AbstractContext subContext = this.getSubContext();
+		if (subContext instanceof Cache)
+			return (Cache) subContext;
+		return null;
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
@@ -820,5 +840,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 			abstract Generic rebuild();
 		}
 
+	}
+
+	@Override
+	public int getLevel() {
+		if (subContext != null && subContext instanceof Cache)
+			return 1 + ((Cache) subContext).getLevel();
+		return 1;
 	}
 }
