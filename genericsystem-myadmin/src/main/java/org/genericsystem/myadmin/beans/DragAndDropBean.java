@@ -8,6 +8,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.myadmin.gui.GuiTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.richfaces.event.DropEvent;
 
@@ -23,7 +24,7 @@ public class DragAndDropBean {
 
 	public void addAttribute(DropEvent dropEvent) {
 		String dragValue = (String) dropEvent.getDragValue();
-		Type type = (Type) genericTreeBean.getSelectedTreeNodeGeneric();
+		Type type = (Type) genericTreeBean.getSelectedTreeNode().getGeneric();
 		Attribute attribute = type.setAttribute("new_attribute");
 		if (dragValue.equals("int"))
 			attribute.setConstraintClass(Integer.class);
@@ -41,14 +42,14 @@ public class DragAndDropBean {
 	}
 
 	public void addTarget(DropEvent dropEvent) {
-		Generic target = ((GenericTreeNode) dropEvent.getDragValue()).getGeneric();
+		Generic target = ((GuiTreeNode) dropEvent.getDragValue()).getGeneric();
 		Attribute attribute = ((Structural) dropEvent.getDropValue()).getAttribute();
 		if (target.isStructural()) {
 			attribute.addComponent(attribute.getComponentsSize(), target);
 			messages.info("targetRelation", target, attribute);
 		} else if (target.isConcrete()) {
 			if (attribute.isReallyRelation()) {
-				genericTreeBean.getSelectedTreeNodeGeneric().bind((Relation) attribute, target);
+				genericTreeBean.getSelectedTreeNode().getGeneric().bind((Relation) attribute, target);
 				messages.info("targetLink", target, attribute);
 			} else
 				messages.info("errorTargetLink");

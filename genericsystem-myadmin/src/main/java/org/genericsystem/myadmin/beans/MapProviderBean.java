@@ -60,8 +60,8 @@ public class MapProviderBean implements Serializable {
 	 * @return map object.
 	 */
 	public <T extends AbstractMapProvider<?, ?>> Map<Serializable, Serializable> getMap(MapProvider mapProvider) {
-		//return mapProvider.getMap((Class<T>)genericTreeBean.getSelectedTreeNodeGeneric().getClass());
-		return mapProvider.getExtendedMap(genericTreeBean.getSelectedTreeNodeGeneric());
+		//return mapProvider.getMap((Class<T>)genericTreeBean.getSelectedTreeNode().getGeneric().getClass());
+		return mapProvider.getExtendedMap(genericTreeBean.getSelectedTreeNode().getGeneric());
 	}
 
 	/**

@@ -35,22 +35,13 @@
 		styleClass="widthScroll280 fullHeight">
 		
 		<f:facet name="header">
-			<!-- Show implicite checkbox -->
-			<h:outputText value="#{msg.show} #{msg.implicits}"
-				styleClass="capitalize bold" />
-			<h:selectBooleanCheckbox value="#{genericTreeBean.implicitShow}"
-				title="#{msg.show} #{msg.implicits}" style="vertical-align: middle;">
-				<a4j:ajax event="change" execute="@this" render="typestree" />
-			
 			<!-- Lock selection checkbox -->
-			</h:selectBooleanCheckbox>
 			<h:outputText value="#{msg.lockSelection}"
 				styleClass="bold" />
 			<h:selectBooleanCheckbox value="#{genericTreeBean.selectionLocked}"
 				title="#{msg.lockSelection}" style="vertical-align: middle;">
 				<a4j:ajax event="change" execute="typestree" render="typestree" />
 			</h:selectBooleanCheckbox>
-			
 		</f:facet>
 
 		<script type="text/javascript">
@@ -63,28 +54,27 @@
 			}
 		</script>
 
-		<rich:tree id="typestree" toggleType="ajax" var="item" status="status"
+		<rich:tree id="typestree" toggleType="ajax" var="node" status="status"
 			selectionType="ajax"
 			oncomplete="#{rich:component('menutypesmanager')}.hide();if(rightClick==true){#{rich:component('menutypesmanager')}.show();menuTypes();}"
-			selectionChangeListener="#{genericTreeBean.change}"
+			selectionChangeListener="#{genericTreeBean.changeSelectedNode}"
 			execute="typestree" render="paneltitletypesmanager,menutypesmanager,editTypesManager">
-			<rich:treeModelRecursiveAdaptor roots="#{genericTreeBean.root}"
-				nodes="#{genericTreeBean.getChildrens(item)}">
-				<rich:treeNode iconCollapsed="#{genericTreeBean.getTypeIcon(item)}"
-					iconExpanded="#{genericTreeBean.getTypeIcon(item)}"
+			<rich:treeModelRecursiveAdaptor roots="#{genericTreeBean.roots}"
+				nodes="#{node.getChildren()}">
+				<rich:treeNode iconCollapsed="#{genericTreeBean.getTypeIcon(node)}"
+					iconExpanded="#{genericTreeBean.getTypeIcon(node)}"
 					onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}"
-					title="#{genericTreeBean.getTypeIconTitle(item)}">
-					<rich:dragSource type="genericTreeNode" dragValue="#{item}"/>
-					<rich:inplaceInput value="#{wrapperBean.getGenericTreeNodeWrapper(item).value}"
-						title="#{genericTreeBean.getTypeIconTitle(item)}" editEvent="dblclick"
-						rendered="#{!item.isReadOnly}" activeClass="blackcolor"
-						changedClass="blackcolor" styleClass="#{genericTreeBean.getStyle(item)}">
+					title="#{genericTreeBean.getTypeIconTitle(node)}">
+					<rich:dragSource type="genericTreeNode" dragValue="#{node}"/>
+					<rich:inplaceInput value="#{wrapperBean.getGenericTreeNodeWrapper(node).value}"
+						title="#{genericTreeBean.getTypeIconTitle(node)}" editEvent="dblclick"
+						rendered="#{!node.generic.meta}" activeClass="blackcolor"
+						changedClass="blackcolor">
 						<a4j:ajax event="change" execute="typestree" render="typesmanager" />
 					</rich:inplaceInput>
-					<h:outputText value="#{item.getValue}"
-						title="#{genericTreeBean.getTypeIconTitle(item)}"
-						rendered="#{item.isReadOnly}"
-						styleClass="#{genericTreeBean.getStyle(item)}" />
+					<h:outputText value="#{node.getValue}"
+						title="#{genericTreeBean.getTypeIconTitle(node)}"
+						rendered="#{node.generic.meta}" />
 				</rich:treeNode>
 			</rich:treeModelRecursiveAdaptor>
 		</rich:tree>
