@@ -9,7 +9,8 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
+import org.genericsystem.myadmin.gui.GenericTreeNode;
+import org.genericsystem.myadmin.gui.GenericTreeNode.TreeType;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.richfaces.component.UIMenuGroup;
 import org.richfaces.component.UIMenuItem;

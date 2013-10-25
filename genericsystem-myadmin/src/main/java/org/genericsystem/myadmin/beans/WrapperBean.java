@@ -11,6 +11,7 @@ import javax.inject.Named;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
+import org.genericsystem.myadmin.gui.GenericTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
 
 @Named

@@ -8,6 +8,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.myadmin.gui.GenericTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.richfaces.event.DropEvent;
 

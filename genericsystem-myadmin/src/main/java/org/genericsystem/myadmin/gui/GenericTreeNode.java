@@ -1,4 +1,4 @@
-package org.genericsystem.myadmin.beans;
+package org.genericsystem.myadmin.gui;
 
 import java.util.ArrayList;
 import java.util.List;
