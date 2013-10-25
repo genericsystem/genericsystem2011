@@ -131,18 +131,6 @@ public class GenericTreeBean implements Serializable {
 		}
 	}
 
-	//	/**
-	//	 * Changes attribute of selected tree node.
-	//	 *
-	//	 * @param attributeIndex - index of attribute.
-	//	 */
-	//	public void changeAttributeSelected(int attributeIndex) {
-	//		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
-	//		selectedTreeNode.setAttribute(attribute);
-	//		selectedTreeNode.setTreeType(TreeType.VALUES);
-	//		messages.info("showvalues", attribute);
-	//	}
-
 	/**
 	 * Changes tree type.
 	 * 
@@ -150,6 +138,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	public void changeTreeType(TreeType treeType) {
 		selectedTreeNode.setTreeType(treeType);
+
 		gsMessages.info("showchanged", treeType);
 	}
 
