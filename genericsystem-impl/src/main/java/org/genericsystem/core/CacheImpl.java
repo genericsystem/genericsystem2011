@@ -17,6 +17,7 @@ import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.constraints.AbstractAxedConstraint;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.core.Generic.ExtendedMap;
@@ -223,7 +224,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-								adjust(((GenericImpl) orderedDependency).components));
+						adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -588,14 +589,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 				keyHolder.check(constraintBase, generic, checkingType, (Holder) generic);
 
 			} else {
-				log.info("4444generic   " + generic + "constraintBase " + constraintBase);
+
 				for (Generic instance : ((Type) ((Attribute) constraintBase).getComponents().get(axe)).getAllInstances()) {
 					keyHolder.check(instance, constraintBase, checkingType, (Holder) generic);
 				}
 			}
 
-			// keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-			// keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), generic, checkingType, (Holder) generic);
 		}
 	}
 
@@ -624,25 +623,50 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+
+		for (Attribute attribute : ((Type) generic).getAttributes()) {
+			ExtendedMap<Serializable, Serializable> constraintMap = attribute.getConstraintsMap();
+			for (Serializable key : constraintMap.keySet()) {
+				Holder valueHolder = constraintMap.getValueHolder(key);
+				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
+				Class<?> constraintClass = ((AxedPropertyClass) keyHolder.getValue()).getClazz();
+				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+				if (AbstractAxedConstraint.class.isAssignableFrom(constraintClass))
+
+					if (generic.isInstanceOf(attribute.getComponent(axe))) {
+						log.info("leeeeeeeee generic est " + generic);
+						if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
+							((AbstractAxedConstraint) keyHolder).check(attribute, generic, checkingType, valueHolder);
+					}
+			}
+		}
+
 		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
 		for (Serializable key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
-
 			AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-
 			if (isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
 				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 				if (axe == Statics.MULTIDIRECTIONAL) {
-					log.info("baseConstraint" + baseConstraint + "generic" + generic);
 					keyHolder.check(baseConstraint, generic, checkingType, valueHolder);
-
-				} else {
-					log.info("qdqd" + axe + ((Attribute) generic).getComponent(axe) + "  generic  " + generic + "  valueHolder" + valueHolder);
-					keyHolder.check(((Attribute) generic).getComponent(axe), baseConstraint, checkingType, valueHolder);
 				}
+				// } else {
+				//
+				// // if (CheckingType.CHECK_ON_REMOVE_NODE.equals(checkingType))
+				// keyHolder.check(((Attribute) generic).getComponent(axe), baseConstraint, checkingType, valueHolder);
+				//
+				// // for (Attribute attribute : ((Attribute) generic).getAttributes())
+				// // if (attribute.isRequiredConstraintEnabled(axe) && attribute.getComponent(axe).equals(generic))
+				// //
+				// // keyHolder.check(generic, baseConstraint, checkingType, valueHolder);
+				// // else
+				// // keyHolder.check(((Attribute) generic).getComponent(axe), baseConstraint, checkingType, valueHolder);
+				// // keyHolder.check(((Attribute) generic).getComponent(axe), baseConstraint, checkingType, valueHolder);
+				// }
 
 			}
+
 		}
 	}
 

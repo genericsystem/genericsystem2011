@@ -22,23 +22,38 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @AxedConstraintValue(RequiredConstraintImpl.class)
 @SingularConstraint
-public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+public class RequiredConstraintImpl extends AbstractAxedConstraint implements Holder {
 
-	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
-		if (instanceToCheck.getHolders((Attribute) constraintBase, axe).isEmpty())
-			throw new RequiredConstraintViolationException(instanceToCheck + " is required for " + constraintBase);
-	}
+	// @Override
+	// public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	//
+	// if (CheckingType.CHECK_ON_REMOVE_NODE.equals(checkingType)) {
+	// if (instanceToCheck.getHolders((Attribute) constraintBase, axe).isEmpty())
+	// throw new RequiredConstraintViolationException(instanceToCheck + " is required for " + constraintBase);
+	// }
+
+	//
+	// for (Generic instance : ((Type) instanceToCheck).getAllInstances())
+	// if (instance.getHolders((Attribute) constraintBase, axe).isEmpty() && CheckingType.CHECK_ON_ADD_NODE.equals(checkingType))
+	// throw new RequiredConstraintViolationException(constraintBase + " is required for " + instance);
+	//
+	// }
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
-		// return CheckingType.CHECK_ON_REMOVE_NODE.equals(checkingType) || CheckingType.CHECK_ON_ADD_NODE.equals(checkingType);
-		return CheckingType.CHECK_ON_REMOVE_NODE.equals(checkingType);
+		return CheckingType.CHECK_ON_REMOVE_NODE.equals(checkingType) || CheckingType.CHECK_ON_ADD_NODE.equals(checkingType);
 	}
 
 	@Override
 	public boolean isImmediatelyCheckable() {
 		return false;
+	}
+
+	@Override
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException {
+		log.info("@@@@@@@@@@ modified  " + modified + "" + constraintBase);
+		if (modified.getHolders((Attribute) constraintBase).isEmpty())
+			throw new RequiredConstraintViolationException("" + modified + " is required for " + constraintValue);
 	}
 
 }

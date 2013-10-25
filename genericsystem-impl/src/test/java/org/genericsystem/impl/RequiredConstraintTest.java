@@ -35,11 +35,15 @@ public class RequiredConstraintTest extends AbstractTest {
 	public void requiredNeverAdded() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
+		Attribute wheel = vehicle.setAttribute("wheel");
+		wheel.enableRequiredConstraint();
+		cache.flush();
 		vehicle.newInstance("myFiat");
+
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				vehicle.setAttribute("wheel").enableRequiredConstraint();
+				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
@@ -50,6 +54,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
 		Generic myFiat = vehicle.newInstance("myFiat");
 		myFiat.setValue(vehicleWheel, "myFiatWheel");
+
 		cache.flush();
 	}
 
@@ -92,7 +97,13 @@ public class RequiredConstraintTest extends AbstractTest {
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
 		color.newInstance("red");
-		cache.flush();
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				cache.flush();
+			}
+		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
 
 	public void addRequiredOnRelationTargetSide() {
@@ -103,12 +114,10 @@ public class RequiredConstraintTest extends AbstractTest {
 		carColor.enableRequiredConstraint(Statics.TARGET_POSITION);
 		assert carColor.isRequiredConstraintEnabled(Statics.TARGET_POSITION);
 		color.newInstance("red");
-
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				log.info("jrrrrrrrrrrrrr");
 				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
@@ -117,6 +126,7 @@ public class RequiredConstraintTest extends AbstractTest {
 	public void addRequiredOnRelationBaseSideOk() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
+		car.newInstance("bmw");
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
