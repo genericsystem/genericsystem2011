@@ -60,16 +60,6 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
-	 * Returns generic of selected tree node.
-	 * 
-	 * @return generic of selected tree node.
-	 */
-	@SuppressWarnings("unchecked")
-	public <T extends Generic> T getSelectedTreeNodeGeneric() {
-		return (T) selectedTreeNode.getGeneric();
-	}
-
-	/**
 	 * Returns the value of selected tree node.
 	 * 
 	 * @return the value of selected tree node.
@@ -107,7 +97,7 @@ public class GenericTreeBean implements Serializable {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			selectedTreeNode = (GuiTreeNode) treeSelectionEvent.getObject();
 			internalChangeType();
-			gsMessages.info("typeselectionchanged", getSelectedTreeNodeGeneric().toString());
+			gsMessages.info("typeselectionchanged", getSelectedTreeNode().getGeneric().toString());
 		}
 	}
 
@@ -116,7 +106,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	private void internalChangeType() {
 		menuEvent.fire(new MenuEvent(selectedTreeNode, implicitShow));
-		panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNodeGeneric()).toCategoryString()));
+		panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNode().getGeneric()).toCategoryString()));
 	}
 
 	/**
@@ -237,7 +227,7 @@ public class GenericTreeBean implements Serializable {
 		return genericTreeNode.isImplicitAutomatic(
 				genericTreeNode.getGeneric()) ||
 				(isValue(genericTreeNode.getGeneric()) &&
-						!((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(getSelectedTreeNodeGeneric())
+						!((Holder) genericTreeNode.getGeneric()).getBaseComponent().equals(getSelectedTreeNode().getGeneric())
 						) ? "implicitColor" : "";
 	}
 

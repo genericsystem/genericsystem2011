@@ -52,7 +52,7 @@ public class MenuBean implements Serializable {
 	}
 
 	public boolean isConcrete() {
-		return genericTreeBean.getSelectedTreeNodeGeneric().isConcrete();
+		return genericTreeBean.getSelectedTreeNode().getGeneric().isConcrete();
 	}
 
 	public void changeType(@Observes MenuEvent menuEvent) {

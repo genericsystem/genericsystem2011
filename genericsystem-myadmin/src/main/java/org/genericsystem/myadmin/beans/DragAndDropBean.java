@@ -24,7 +24,7 @@ public class DragAndDropBean {
 
 	public void addAttribute(DropEvent dropEvent) {
 		String dragValue = (String) dropEvent.getDragValue();
-		Type type = (Type) genericTreeBean.getSelectedTreeNodeGeneric();
+		Type type = (Type) genericTreeBean.getSelectedTreeNode().getGeneric();
 		Attribute attribute = type.setAttribute("new_attribute");
 		if (dragValue.equals("int"))
 			attribute.setConstraintClass(Integer.class);
@@ -49,7 +49,7 @@ public class DragAndDropBean {
 			messages.info("targetRelation", target, attribute);
 		} else if (target.isConcrete()) {
 			if (attribute.isReallyRelation()) {
-				genericTreeBean.getSelectedTreeNodeGeneric().bind((Relation) attribute, target);
+				genericTreeBean.getSelectedTreeNode().getGeneric().bind((Relation) attribute, target);
 				messages.info("targetLink", target, attribute);
 			} else
 				messages.info("errorTargetLink");
