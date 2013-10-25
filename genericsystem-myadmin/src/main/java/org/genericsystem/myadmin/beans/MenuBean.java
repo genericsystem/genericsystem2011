@@ -72,20 +72,13 @@ public class MenuBean implements Serializable {
 
 	public static class MenuEvent {
 		private final GuiTreeNode genericTreeNode;
-		private final boolean implicitShow;
 
 		public MenuEvent(GuiTreeNode genericTreeNode, boolean implicitShow) {
 			this.genericTreeNode = genericTreeNode;
-			this.implicitShow = implicitShow;
 		}
 
 		public GuiTreeNode getGenericTreeNode() {
 			return genericTreeNode;
 		}
-
-		public boolean isImplicitShow() {
-			return implicitShow;
-		}
-
 	}
 }
