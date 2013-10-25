@@ -94,10 +94,6 @@ public class GuiTreeNode {
 		return generic.toString();
 	}
 
-	public boolean isReadOnly() {
-		return generic.isMeta();
-	}
-
 	public GuiTreeNode getParent() {
 		return parent;
 	}
