@@ -24,7 +24,7 @@
 				<a4j:ajax event="change" execute="inpInstanceName"
 					render="typesmanager" />
 			</rich:inplaceInput>
-			<h:outputText value="#{genericTreeBean.selectedTreeNodeValue}"
+			<h:outputText value="#{genericTreeBean.selectedTreeNode.value}"
 				rendered="#{genericBean.isMeta()}" />
 		</f:facet>
 

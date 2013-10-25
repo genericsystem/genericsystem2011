@@ -60,15 +60,6 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
-	 * Returns the value of selected tree node.
-	 * 
-	 * @return the value of selected tree node.
-	 */
-	public String getSelectedTreeNodeValue() {
-		return selectedTreeNode.getValue();
-	}
-
-	/**
 	 * Returns the list with only root of tree node.
 	 * 
 	 * @return the list with only root of tree node.
