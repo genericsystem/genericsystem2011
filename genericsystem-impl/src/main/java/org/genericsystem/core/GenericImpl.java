@@ -644,6 +644,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Holder> T internalSetHolder(Class<?> specializationClass, Holder attribute, HomeTreeNode homeTreeNode, int basePos, Generic... targets) {
+
 		T holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
 		while (holder != null) {
 			if (equals(holder.getComponent(basePos))) {
@@ -656,14 +657,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				}
 
 			} else {
-				if (((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
+				// if (((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
 
-					// if ((((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos)))) {
-					// assert (((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) : holder.info() + attribute.info() + homeTreeNode + "         "
-					// + Arrays.toString(new Primaries(homeTreeNode, attribute).toArray()) + "           " + Arrays.toString(Statics.insertIntoArray(this, targets, basePos));
+				if ((((GenericImpl) holder).equiv(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), Statics.insertIntoArray(holder.getComponent(basePos), targets, basePos)))) {
+					assert (((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) : holder.info() + attribute.info() + homeTreeNode + "         "
+							+ Arrays.toString(new Primaries(homeTreeNode, attribute).toArray()) + "           " + Arrays.toString(Statics.insertIntoArray(this, targets, basePos));
 					return this.<T> bind(homeTreeNode, specializationClass, holder, basePos, false, targets);
 				}
-
 				cancel(holder, basePos, homeTreeNode.getMetaLevel());
 			}
 			holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);

@@ -67,10 +67,14 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 
 	@SystemGeneric
 	@Extends(NoInheritanceSystemType.class)
+	@Components(ConstraintsMapProvider.class)
+	@InstanceValueClassConstraint(AxedPropertyClass.class)
+	public static class NoInheritanceConstraintKey extends ConstraintKey implements Attribute {}
+
+	@SystemGeneric
+	@Extends(NoInheritanceSystemType.class)
 	@Components(ConstraintKey.class)
 	@SingularConstraint
-	// @RequiredConstraint
-	// @InheritanceDisabled
 	public static class ConstraintValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
@@ -78,9 +82,4 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
 	public static class MapInstance extends GenericImpl implements Holder {}
-
-	@Override
-	protected Holder getAttribute(AxedPropertyClass key) {
-		return getCurrentCache().find(key.getClazz());
-	}
 }

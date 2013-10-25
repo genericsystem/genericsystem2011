@@ -10,16 +10,15 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.VirtualConstraintException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
-import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
+import org.genericsystem.map.ConstraintsMapProvider.NoInheritanceConstraintKey;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 @SystemGeneric
-@Extends(meta = ConstraintKey.class, value = NoInheritanceSystemType.class)
+@Extends(meta = NoInheritanceConstraintKey.class)
 @Components(MapInstance.class)
 @SingularConstraint
 @AxedConstraintValue(VirtualConstraintImpl.class)
