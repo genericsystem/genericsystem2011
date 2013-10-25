@@ -191,11 +191,6 @@ public class GenericBean implements Serializable {
 		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNode().getGeneric().getSystemPropertiesMap().entrySet();
 	}
 
-	// TODO in GS CORE
-	// public boolean isValue(Generic generic) {
-	// return generic.isConcrete() && generic.isAttribute();
-	// }
-
 	public boolean isSingular(Structural structural) {
 		return structural.getAttribute().isSingularConstraintEnabled();
 	}

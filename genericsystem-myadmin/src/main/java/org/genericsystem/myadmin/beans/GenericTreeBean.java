@@ -36,31 +36,6 @@ public class GenericTreeBean implements Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
 
-	/**
-	 * Event of selection of node of the tree.
-	 * 
-	 * @author middleware
-	 */
-	public static class TreeSelectionEvent {
-
-		private final String id;						// id of event
-		private final Object object;					// concerned object
-
-		public TreeSelectionEvent(String id, Object object) {
-			this.id = id;
-			this.object = object;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public Object getObject() {
-			return object;
-		}
-
-	}
-
 	/* Injected beans */
 	@Inject transient CacheProvider cacheProvider;
 	@Inject private GsMessages gsMessages;
@@ -70,11 +45,9 @@ public class GenericTreeBean implements Serializable {
 	private boolean selectionLocked;
 
 	/* Events */
-
 	@Inject private Event<MenuEvent> menuEvent;
 	@Inject private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 	private TreeSelectionEvent event;
-
 	@Inject private Event<TreeSelectionEvent> launcher;
 
 	/**
@@ -103,60 +76,9 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @return list of children.
 	 */
+	//TODO: remove
 	public List<GuiTreeNode> getNodeChildren(final GuiTreeNode genericTreeNode) {
 		return genericTreeNode.getChildren();
-	}
-
-	/**
-	 * Changes the type of something. ???
-	 * 
-	 * @param treeSelectionEvent
-	 */
-	public void changeType(@Observes TreeSelectionEvent treeSelectionEvent) {
-		if (treeSelectionEvent.getId().equals("typestree")) {
-			selectedTreeNode = (GuiTreeNode) treeSelectionEvent.getObject();
-			internalChangeType();
-			gsMessages.info("typeselectionchanged", getSelectedTreeNode().getGeneric().toString());
-		}
-	}
-
-	/**
-	 * Changes the title of panel typesmanager.
-	 */
-	private void internalChangeType() {
-		menuEvent.fire(new MenuEvent(selectedTreeNode));
-		panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNode().getGeneric()).toCategoryString()));
-	}
-
-	/**
-	 * Change the selected node in the tree of generics.
-	 * 
-	 * @param selectionChangeEvent - JSF event of selection change.
-	 */
-	public void changeSelectedNode(TreeSelectionChangeEvent treeSelectionChangeEvent) {
-		if (!selectionLocked) {
-			List<Object> selection = new ArrayList<Object>(treeSelectionChangeEvent.getNewSelection());
-			if (!selection.isEmpty()) {
-				Object currentSelectionKey = selection.get(0);
-				UITree tree = (UITree) treeSelectionChangeEvent.getSource();
-				Object storedKey = tree.getRowKey();
-				tree.setRowKey(currentSelectionKey);
-				event = new TreeSelectionEvent(tree.getId(), tree.getRowData());
-				tree.setRowKey(storedKey);
-			}
-		}
-	}
-
-	/**
-	 * Fires event of tree selection after phase INVOKE_APPLICATION.
-	 * 
-	 * @param phaseEvent - event of phase changing.
-	 */
-	public void fireEvent(@Observes @InvokeApplication @After PhaseEvent phaseEvent) {
-		if (event != null) {
-			launcher.fire(event);
-			event = null;
-		}
 	}
 
 	/**
@@ -215,24 +137,13 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
-	 * Returns true if generic is value. False if not.
-	 * 
-	 * @param generic - generic.
-	 * 
-	 * @return true - if generic is value, false - if not.
-	 */
-	// TODO in GS CORE
-	public boolean isValue(Generic generic) {
-		return generic.isConcrete() && generic.isAttribute();
-	}
-
-	/**
 	 * Returns CSS style of generic tree node.
 	 * 
 	 * @param genericTreeNode - generic tree node.
 	 * 
 	 * @return name of CSS style.
 	 */
+	// TODO: remove
 	public String getStyle(GuiTreeNode genericTreeNode) {
 		return "";
 	}
@@ -302,6 +213,58 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
+	 * Change the selected node in the tree of generics.
+	 * 
+	 * @param selectionChangeEvent - JSF event of selection change.
+	 */
+	public void changeSelectedNode(TreeSelectionChangeEvent treeSelectionChangeEvent) {
+		if (!selectionLocked) {
+			List<Object> selection = new ArrayList<Object>(treeSelectionChangeEvent.getNewSelection());
+			if (!selection.isEmpty()) {
+				Object currentSelectionKey = selection.get(0);
+				UITree tree = (UITree) treeSelectionChangeEvent.getSource();
+				Object storedKey = tree.getRowKey();
+				tree.setRowKey(currentSelectionKey);
+				event = new TreeSelectionEvent(tree.getId(), tree.getRowData());
+				tree.setRowKey(storedKey);
+			}
+		}
+	}
+
+	/**
+	 * Changes the type of something. ???
+	 * 
+	 * @param treeSelectionEvent
+	 */
+	public void changeType(@Observes TreeSelectionEvent treeSelectionEvent) {
+		if (treeSelectionEvent.getId().equals("typestree")) {
+			selectedTreeNode = (GuiTreeNode) treeSelectionEvent.getObject();
+			internalChangeType();
+			gsMessages.info("typeselectionchanged", getSelectedTreeNode().getGeneric().toString());
+		}
+	}
+
+	/**
+	 * Changes the title of panel typesmanager.
+	 */
+	private void internalChangeType() {
+		menuEvent.fire(new MenuEvent(selectedTreeNode));
+		panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) getSelectedTreeNode().getGeneric()).toCategoryString()));
+	}
+
+	/**
+	 * Fires event of tree selection after phase INVOKE_APPLICATION.
+	 * 
+	 * @param phaseEvent - event of phase changing.
+	 */
+	public void fireEvent(@Observes @InvokeApplication @After PhaseEvent phaseEvent) {
+		if (event != null) {
+			launcher.fire(event);
+			event = null;
+		}
+	}
+
+	/**
 	 * Returns selected tree node.
 	 * 
 	 * @return selected tree node.
@@ -335,6 +298,31 @@ public class GenericTreeBean implements Serializable {
 	 */
 	public void setSelectionLocked(boolean selectionLocked) {
 		this.selectionLocked = selectionLocked;
+	}
+
+	/**
+	 * Event of selection of node of the tree.
+	 * 
+	 * @author middleware
+	 */
+	public static class TreeSelectionEvent {
+
+		private final String id;						// id of event
+		private final Object object;					// concerned object
+
+		public TreeSelectionEvent(String id, Object object) {
+			this.id = id;
+			this.object = object;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public Object getObject() {
+			return object;
+		}
+
 	}
 
 }
