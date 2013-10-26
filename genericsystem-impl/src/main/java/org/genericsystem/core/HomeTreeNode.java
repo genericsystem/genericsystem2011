@@ -74,6 +74,10 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		return false;
 	}
 
+	public boolean isPhantom() {
+		return value == null;
+	}
+
 	@SuppressWarnings("unchecked")
 	public <S extends Serializable> S getValue() {
 		return value == NULL_VALUE ? null : (S) value;

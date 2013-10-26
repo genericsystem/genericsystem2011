@@ -428,16 +428,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
 	}
 
-	private GenericImpl getMeta(Class<?> clazz) {
-		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
-		if (null == extendsAnnotation)
-			return getEngine();
-		Class<?> meta = extendsAnnotation.meta();
-		if (Engine.class.equals(meta))
-			meta = EngineImpl.class;
-		return this.<GenericImpl> find(meta);
-	}
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
@@ -480,6 +470,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 				assert instanceClass.value().isAssignableFrom(specializationClass);
 			}
 		return specializationClass;
+	}
+
+	private GenericImpl getMeta(Class<?> clazz) {
+		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
+		if (null == extendsAnnotation)
+			return getEngine();
+		Class<?> meta = extendsAnnotation.meta();
+		if (Engine.class.equals(meta))
+			meta = EngineImpl.class;
+		return this.<GenericImpl> find(meta);
 	}
 
 	@SuppressWarnings("unchecked")
