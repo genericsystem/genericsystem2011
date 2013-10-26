@@ -75,12 +75,12 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	}
 
 	public boolean isPhantom() {
-		return value == null;
+		return NULL_VALUE.equals(value);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <S extends Serializable> S getValue() {
-		return value == NULL_VALUE ? null : (S) value;
+		return isPhantom() ? null : (S) value;
 	}
 
 	public int getMetaLevel() {

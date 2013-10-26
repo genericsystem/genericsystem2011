@@ -298,13 +298,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T cancel(Holder attribute, int metaLevel, Generic... targets) {
-		return cancel(attribute, getBasePos(attribute), metaLevel, targets);
+	public <T extends Generic> T cancel(Holder attribute, Generic... targets) {
+		return cancel(attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
-	public <T extends Generic> T cancel(Holder attribute, int basePos, int metaLevel, Generic... targets) {
-		return addHolder(attribute, null, basePos, metaLevel, Statics.truncate(basePos, ((GenericImpl) attribute).components));
+	public <T extends Generic> T cancel(Holder attribute, int basePos, Generic... targets) {
+		return addHolder(attribute, null, basePos, attribute.getMetaLevel(), Statics.truncate(basePos, ((GenericImpl) attribute).components));
 	}
 
 	@Override
@@ -319,7 +319,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				holder.remove();
 				cancelAll(attribute, basePos, metaLevel, targets);
 			} else
-				cancel(holder, basePos, metaLevel, targets);
+				cancel(holder, basePos, targets);
 		}
 	}
 
@@ -352,7 +352,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (equals(holder.getBaseComponent()))
 			holder.remove();
 		else
-			cancel(holder, Statics.CONCRETE);
+			cancel(holder);
 	}
 
 	@Override
@@ -625,7 +625,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Relation> T setSubAttribute(Attribute attribute, Serializable value, Generic... targets) {
 		T holder = setHolder(null, attribute, value, Statics.STRUCTURAL, getBasePos(attribute), targets);
-		assert holder.inheritsFrom(attribute) : holder.info() + attribute.info();
+		assert holder == null || holder.inheritsFrom(attribute) : holder.info() + attribute.info();
 		return holder;
 	}
 
@@ -640,35 +640,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		assert metaLevel - attribute.getMetaLevel() >= 0;
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
 		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
-		return value != null ? this.<T> internalSetHolder(specializationClass, attribute, homeTreeNode, basePos, targets) : this.<T> internalCancelHolder(specializationClass, attribute, homeTreeNode, basePos, targets);
+		clearExtraHolders(attribute, homeTreeNode, basePos, targets);
+		return !homeTreeNode.isPhantom() ? this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, false, targets) : null;
 	}
 
-	private <T extends Holder> T internalSetHolder(Class<?> specializationClass, Holder attribute, HomeTreeNode homeTreeNode, int basePos, Generic... targets) {
-		Generic[] components = Statics.insertIntoArray(this, targets, basePos);
-		HomeTreeNode[] primaries = new Primaries(homeTreeNode, attribute).toArray();
-		T holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
-		while (holder != null && !((GenericImpl) holder).isSuperOf(homeTreeNode, primaries, components)) {
-			if (equals(holder.getComponent(basePos)))
-				holder.remove();
-			else
-				cancel(holder, basePos, homeTreeNode.getMetaLevel());
+	private void clearExtraHolders(Holder attribute, HomeTreeNode homeTreeNode, int basePos, Generic... targets) {
+		Holder holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
+		while (holder != null && !((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
+			clear(holder, basePos, homeTreeNode.getMetaLevel());
 			holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
 		}
-		return !homeTreeNode.isPhantom() ? this.getCurrentCache().<T> bind(homeTreeNode, specializationClass, attribute, false, components) : null;
 	}
 
-	private <T extends Holder> T internalCancelHolder(Class<?> specializationClass, Holder attribute, HomeTreeNode homeTreeNode, int basePos, Generic... targets) {
-		Generic[] components = Statics.insertIntoArray(this, targets, basePos);
-		HomeTreeNode[] primaries = new Primaries(homeTreeNode, attribute).toArray();
-		T holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
-		while (holder != null && !((GenericImpl) holder).isSuperOf(homeTreeNode, primaries, components)) {
-			if (equals(holder.getComponent(basePos)))
-				holder.remove();
-			else
-				return cancel(holder, basePos, homeTreeNode.getMetaLevel());
-			holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
+	private void clear(Holder holder, int basePos, int metaLevel) {
+		if (equals(holder.getComponent(basePos)))
+			holder.remove();
+		else {
+			assert holder.getMetaLevel() == metaLevel;
+			cancel(holder, basePos);
 		}
-		return null;
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, Generic... targets) {
