@@ -1,14 +1,23 @@
 package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import javax.enterprise.event.Observes;
 import javax.faces.bean.RequestScoped;
+import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.CacheImpl;
+import org.genericsystem.core.Statics;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.myadmin.util.GsMessages;
+import org.jboss.seam.faces.event.qualifier.After;
+import org.jboss.seam.faces.event.qualifier.InvokeApplication;
 
 /**
  * Bean for management of cache via GUI of MyAdmin.
@@ -63,6 +72,15 @@ public class CacheBean implements Serializable {
 		return "HOME";
 	}
 
+	/**
+	 * Returns the formated timestamp of current cache (transaction).
+	 * 
+	 * @return the formated timestamp of current cache.
+	 */
+	public String getCurrentCacheTs() {
+		return new SimpleDateFormat(Statics.INT_TS_PATTERN).format(new Date(((CacheImpl) cacheProvider.getCurrentCache()).getTs() / Statics.MILLI_TO_NANOSECONDS)).toString();
+	}
+
 	public Cache getCache() {
 		return cacheProvider.getCurrentCache();
 	}
@@ -70,4 +88,15 @@ public class CacheBean implements Serializable {
 	public void setCache(Cache cache) {
 		cacheProvider.setCurrentCache(cache);
 	}
+
+	/**
+	 * Reset the timestamp of current transaction before the phase of RENDER_RESPONSE.
+	 * 
+	 * @param phaseEvent - event of JSF phase.
+	 * @throws ConstraintViolationException
+	 */
+	public void resetTransactionTs(@Observes @After @InvokeApplication PhaseEvent phaseEvent) throws ConstraintViolationException {
+		((CacheImpl) cacheProvider.getCurrentCache()).refresh();
+	}
+
 }
