@@ -55,8 +55,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	@PostConstruct
 	public void init() {
-		rootTreeNode = new GuiTreeNode(null,
-				cacheProvider.getCurrentCache().getEngine());
+		rootTreeNode = new GuiTreeNode(null, cacheProvider.getCurrentCache().getEngine());
 		selectedTreeNode = rootTreeNode;
 	}
 
@@ -70,47 +69,26 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
-	 * Changes tree type.
+	 * Changes the type of subtree elements of selected node.
 	 * 
-	 * @param treeType - tree type.
+	 * @param childrenType - the type of subtree elements.
 	 */
-	public void changeTreeType(GuiTreeChildrenType treeType) {
-		selectedTreeNode.setTreeType(treeType);
+	public void changeChildrenType(GuiTreeChildrenType childrenType) {
+		selectedTreeNode.setChildrenType(childrenType);
 
-		gsMessages.info("showchanged", treeType);
+		gsMessages.info("showchanged", childrenType);
 	}
 
 	/**
+	 * Selects the node of generic supplied in parameters.
 	 * 
-	 * 
-	 * @param generic
+	 * @param generic - the generic to look for.
 	 */
-	public void view(Generic generic) {
-		selectedTreeNode = changeView(rootTreeNode, generic);
+	public void selectNodeOfGeneric(Generic generic) {
+		selectedTreeNode = rootTreeNode.findSubTreeNodeByGeneric(generic);
 		internalChangeType();
 
 		gsMessages.info("typeselectionchanged", selectedTreeNode.getGeneric());
-	}
-
-	/**
-	 * Returns the GUI tree node of supplied generic. Method takes in consideration the implicit
-	 * show flag.
-	 * 
-	 * @param guiTreeNode - node of GUI tree.
-	 * @param generic - generic.
-	 * 
-	 * @return
-	 */
-	// TODO: move to GuiTreeNode
-	private GuiTreeNode changeView(GuiTreeNode guiTreeNode, Generic generic) {
-		if (guiTreeNode.getGeneric().equals(generic))
-			return guiTreeNode;
-		for (GuiTreeNode child : guiTreeNode.getChildren()) {
-			GuiTreeNode childTreeNode = changeView(child, generic);
-			if (childTreeNode != null)
-				return childTreeNode;
-		}
-		return null;
 	}
 
 	/**
@@ -122,7 +100,7 @@ public class GenericTreeBean implements Serializable {
 	 * false - if not.
 	 */
 	public boolean isTreeTypeSelected(GuiTreeChildrenType treeType) {
-		return selectedTreeNode != null && selectedTreeNode.getTreeType() == treeType;
+		return selectedTreeNode != null && selectedTreeNode.getChildrenType() == treeType;
 	}
 
 	/**
@@ -217,6 +195,7 @@ public class GenericTreeBean implements Serializable {
 		if (treeSelectionEvent.getId().equals("typestree")) {
 			selectedTreeNode = (GuiTreeNode) treeSelectionEvent.getObject();
 			internalChangeType();
+
 			gsMessages.info("typeselectionchanged", getSelectedTreeNode().getGeneric().toString());
 		}
 	}

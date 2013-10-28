@@ -10,7 +10,6 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.RequiredConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
@@ -23,27 +22,22 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @AxedConstraintValue(RequiredConstraintImpl.class)
 @SingularConstraint
-public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
-
-	@Override
-	public void check(Generic base, Generic attribute, int axe) throws ConstraintViolationException {
-		if (base.isConcrete()) {
-			if (base.getHolders((Holder) attribute).isEmpty())
-				throw new RequiredConstraintViolationException(attribute + " is required");
-		} else
-			for (Generic instance : ((Type) base).getAllInstances())
-				if (null == instance.getValue((Attribute) attribute))
-					throw new RequiredConstraintViolationException(attribute + " is required for " + instance);
-	}
+public class RequiredConstraintImpl extends AbstractAxedConstraint implements Holder {
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
-		return checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE) || checkingType.equals(CheckingType.CHECK_ON_ADD_NODE);
+		return CheckingType.CHECK_ON_REMOVE_NODE.equals(checkingType) || CheckingType.CHECK_ON_ADD_NODE.equals(checkingType);
 	}
 
 	@Override
 	public boolean isImmediatelyCheckable() {
 		return false;
+	}
+
+	@Override
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
+		if (modified.getHolders((Attribute) constraintBase).isEmpty())
+			throw new RequiredConstraintViolationException(modified + " is required for " + constraintBase);
 	}
 
 }
