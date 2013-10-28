@@ -49,7 +49,7 @@
 					value="#{structural.attribute} (#{structural.position})" />
 
 				<!-- View link -->
-				<a4j:commandLink action="#{genTreeBean.view(structural.attribute)}"
+				<a4j:commandLink action="#{genTreeBean.selectNodeOfGeneric(structural.attribute)}"
 					execute="structWrapper" render="typesmanager">
 					<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
 				</a4j:commandLink>
@@ -103,7 +103,7 @@
 					<h:outputText value="#{holder}"
 						rendered="#{genBean.isPhantom(holder)}"
 						styleClass="#{genBean.getHolderStyle(holder)}" />
-					<a4j:commandLink action="#{genTreeBean.view(holder)}"
+					<a4j:commandLink action="#{genTreeBean.selectNodeOfGeneric(holder)}"
 						execute="structWrapper" render="typesmanager"
 						style="padding-left : 5%;">
 						<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
@@ -127,7 +127,7 @@
 					</rich:inplaceInput>
 				</rich:column>
 				<rich:column>
-					<a4j:commandLink action="#{genTreeBean.view(target)}"
+					<a4j:commandLink action="#{genTreeBean.selectNodeOfGeneric(target)}"
 						execute="structWrapper" render="typesmanager">
 						<h:graphicImage value="#{infos.imgNavigate}" title="#{msg.view}" />
 					</a4j:commandLink>
