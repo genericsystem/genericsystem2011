@@ -16,6 +16,7 @@ import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.constraints.AbstractAxedConstraint;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.core.Generic.ExtendedMap;
@@ -28,6 +29,7 @@ import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.exception.RollbackException;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
@@ -146,7 +148,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private abstract class UnsafeCacheManager<T> {
-		private UnsafeCache unsafeCache = new UnsafeCache(CacheImpl.this);
+		private final UnsafeCache unsafeCache = new UnsafeCache(CacheImpl.this);
 
 		T doWork() {
 			try {
@@ -417,11 +419,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic directSuper, boolean existsException, Generic... components) {
+		log.info("YYYYYYYYYYYYYY" + Arrays.toString(components));
 		components = ((GenericImpl) directSuper).sortAndCheck(components);
+		log.info("UUUUUUUUUUUUUU" + Arrays.toString(components));
+
 		return bind(homeTreeNode, new Generic[] { directSuper }, components, specializationClass, existsException);
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
+		log.info("SSSSSSSSSSSSSSS" + Arrays.toString(components));
 		Primaries primarySet = new Primaries(homeTreeNode, supers);
 		final HomeTreeNode[] primaries = primarySet.toArray();
 		assert primaries.length != 0;
@@ -572,18 +578,24 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
-		checkConsistency(isFlushTime, generic);
+		checkConsistency(checkingType, isFlushTime, generic);
 		checkConstraints(checkingType, isFlushTime, generic);
 	}
 
-	protected void checkConsistency(boolean isFlushTime, Generic generic) throws ConstraintViolationException {
-		if (isConsistencyToCheck(isFlushTime, generic)) {
+	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+		if (isConsistencyToCheck(checkingType, isFlushTime, generic)) {
 			AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-			keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), (Holder) generic, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+			int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+			Generic constraintBase = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
+			if (axe == Statics.MULTIDIRECTIONAL)
+				keyHolder.check(constraintBase, generic, checkingType, (Holder) generic);
+			else
+				for (Generic instance : ((Type) ((Attribute) constraintBase).getComponent(axe)).getAllInstances())
+					keyHolder.check(constraintBase, instance, checkingType, (Holder) generic);
 		}
 	}
 
-	private boolean isConsistencyToCheck(boolean isFlushTime, Generic generic) {
+	private boolean isConsistencyToCheck(CheckingType checkingType, boolean isFlushTime, Generic generic) {
 		if (isConstraintActivated(generic))
 			if (isFlushTime || isImmediatelyConsistencyCheckable((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()))
 				return true;
@@ -608,12 +620,33 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+		// check des contraintes axées des attributs du modified
+		for (Attribute attribute : ((Type) generic).getAttributes()) {
+			ExtendedMap<Serializable, Serializable> constraintMap = attribute.getConstraintsMap();
+			for (Serializable key : constraintMap.keySet()) {
+				Holder valueHolder = constraintMap.getValueHolder(key);
+				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
+				Class<?> constraintClass = ((AxedPropertyClass) keyHolder.getValue()).getClazz();
+				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+				if (AbstractAxedConstraint.class.isAssignableFrom(constraintClass))
+					if (null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
+						if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
+							((AbstractAxedConstraint) keyHolder).check(attribute, generic, checkingType, valueHolder);
+
+			}
+		}
+
+		// check des contraintes du modified
 		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
 		for (Serializable key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
 			AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-			if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
-				keyHolder.check(generic, valueHolder, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
+			if (isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
+				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
+				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
+					keyHolder.check(baseConstraint, Statics.MULTIDIRECTIONAL == axe ? generic : ((Attribute) generic).getComponent(axe), checkingType, valueHolder);
+			}
 		}
 	}
 
@@ -659,8 +692,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		private transient TimestampedDependencies underlyingDependencies;
 
-		private PseudoConcurrentSnapshot inserts = new PseudoConcurrentSnapshot();
-		private PseudoConcurrentSnapshot deletes = new PseudoConcurrentSnapshot();
+		private final PseudoConcurrentSnapshot inserts = new PseudoConcurrentSnapshot();
+		private final PseudoConcurrentSnapshot deletes = new PseudoConcurrentSnapshot();
 
 		public CacheDependencies(TimestampedDependencies underlyingDependencies) {
 			assert underlyingDependencies != null;
@@ -684,8 +717,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		private class InternalIterator extends AbstractAwareIterator<Generic> implements Iterator<Generic> {
-			private Iterator<Generic> underlyingIterator;
-			private Iterator<Generic> insertsIterator = inserts.iterator();
+			private final Iterator<Generic> underlyingIterator;
+			private final Iterator<Generic> insertsIterator = inserts.iterator();
 
 			private InternalIterator(Iterator<Generic> underlyingIterator) {
 				this.underlyingIterator = underlyingIterator;
