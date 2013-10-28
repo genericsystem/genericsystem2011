@@ -419,15 +419,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic directSuper, boolean existsException, Generic... components) {
-		log.info("YYYYYYYYYYYYYY" + Arrays.toString(components));
+		// log.info("YYYYYYYYYYYYYY" + Arrays.toString(components));
 		components = ((GenericImpl) directSuper).sortAndCheck(components);
-		log.info("UUUUUUUUUUUUUU" + Arrays.toString(components));
+		// log.info("UUUUUUUUUUUUUU" + Arrays.toString(components));
 
 		return bind(homeTreeNode, new Generic[] { directSuper }, components, specializationClass, existsException);
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
-		log.info("SSSSSSSSSSSSSSS" + Arrays.toString(components));
+		// log.info("SSSSSSSSSSSSSSS" + Arrays.toString(components));
 		Primaries primarySet = new Primaries(homeTreeNode, supers);
 		final HomeTreeNode[] primaries = primarySet.toArray();
 		assert primaries.length != 0;
