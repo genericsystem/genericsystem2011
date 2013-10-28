@@ -13,23 +13,23 @@
 	<rich:contextMenu id="menutypesmanager" mode="ajax" attached="false">
 		<rich:menuGroup label="#{msg.show} ...">
 			<rich:menuItem label="#{msg.show} #{msg.super}s"
-				action="#{genericTreeBean.changeTreeType('SUPERS')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('SUPERS')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.up_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('SUPERS')}" />
 			<rich:menuItem label="#{msg.show} #{msg.inheriting}s"
-				action="#{genericTreeBean.changeTreeType('INHERITINGS')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('INHERITINGS')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.down_right_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('INHERITINGS')}" />
 			<rich:menuItem label="#{msg.show} #{msg.component}s"
-				action="#{genericTreeBean.changeTreeType('COMPONENTS')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('COMPONENTS')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.left_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('COMPONENTS')}" />
 			<rich:menuItem label="#{msg.show} #{msg.composite}s"
-				action="#{genericTreeBean.changeTreeType('COMPOSITES')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('COMPOSITES')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.right_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('COMPOSITES')}" />
 			<rich:menuItem label="#{msg.show} #{msg.attribute}s"
-				action="#{genericTreeBean.changeTreeType('ATTRIBUTES')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('ATTRIBUTES')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.up_right_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('ATTRIBUTES')}" />
 		</rich:menuGroup>

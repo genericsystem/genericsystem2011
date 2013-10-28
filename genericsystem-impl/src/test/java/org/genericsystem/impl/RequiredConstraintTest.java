@@ -20,14 +20,13 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Generic myFiat = vehicle.newInstance("myFiat");
 		final Attribute wheel = vehicle.setAttribute("wheel");
-		Holder wheelMyFiat = myFiat.setValue(wheel, "4");
-		cache.flush();
-		wheelMyFiat.remove();
+		final Holder wheelMyFiat = myFiat.setValue(wheel, "4");
+		wheel.enableRequiredConstraint();
 		new RollbackCatcher() {
-
 			@Override
 			public void intercept() {
-				wheel.enableRequiredConstraint();
+				wheelMyFiat.remove();
+				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
@@ -35,11 +34,16 @@ public class RequiredConstraintTest extends AbstractTest {
 	public void requiredNeverAdded() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
+		Attribute wheel = vehicle.setAttribute("wheel");
+		wheel.enableRequiredConstraint();
+		cache.flush();
+
 		vehicle.newInstance("myFiat");
+
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				vehicle.setAttribute("wheel").enableRequiredConstraint();
+				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
@@ -48,8 +52,37 @@ public class RequiredConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
+		cache.flush();
+
 		Generic myFiat = vehicle.newInstance("myFiat");
+
 		myFiat.setValue(vehicleWheel, "myFiatWheel");
+		cache.flush();
+	}
+
+	public void addOneRequiredKO() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
+		cache.flush();
+		vehicle.newInstance("myFiat");
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				cache.flush();
+			}
+		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+	}
+
+	public void requiredHeritageTest() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("car");
+		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
+		Generic myFiat = vehicle.newInstance("myFiat");
+		Generic myCar = car.newInstance("myCar");
+		myFiat.setValue(vehicleWheel, "myFiatWheel");
+		myCar.setValue(vehicleWheel, "myFiatWheel");
 		cache.flush();
 	}
 
@@ -67,17 +100,10 @@ public class RequiredConstraintTest extends AbstractTest {
 	public void addRequiredOnSubType() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		vehicle.setAttribute("power").enableRequiredConstraint();
+		Attribute power = vehicle.setAttribute("power").enableRequiredConstraint();
 		Type car = vehicle.newSubType("Car");
-		car.newInstance("myFiat");
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				cache.flush();
-			}
-		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+		car.newInstance("myFiat").setValue(power, 123);
+		cache.flush();
 	}
 
 	public void addRequiredOnRelationBaseSideEmpty() {
@@ -86,8 +112,14 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
-		color.newInstance("red");
-		cache.flush();
+		car.newInstance("myCar");
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				cache.flush();
+			}
+		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
 
 	public void addRequiredOnRelationTargetSide() {
@@ -98,7 +130,6 @@ public class RequiredConstraintTest extends AbstractTest {
 		carColor.enableRequiredConstraint(Statics.TARGET_POSITION);
 		assert carColor.isRequiredConstraintEnabled(Statics.TARGET_POSITION);
 		color.newInstance("red");
-
 		new RollbackCatcher() {
 
 			@Override
@@ -124,15 +155,14 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type color = cache.newType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
-		Generic myFiat = car.newInstance("myFiat");
 		Generic red = color.newInstance("red");
+		Generic myFiat = car.newInstance("myFiat");
 		final Link myFiatRed = myFiat.setLink(carColor, "myFiatRed", red);
-		cache.flush();
 		new RollbackCatcher() {
-
 			@Override
 			public void intercept() {
 				myFiatRed.remove();
+				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}

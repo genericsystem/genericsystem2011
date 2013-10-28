@@ -25,10 +25,8 @@ import org.genericsystem.map.ConstraintsMapProvider.NoInheritanceConstraintKey;
 public class VirtualConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic modified, Generic type, int axe) throws ConstraintViolationException {
-		if (((Type) modified.getMeta()).equals(type) && ((Type) modified.getMeta()).isVirtualConstraintEnabled())
-			throw new VirtualConstraintException(modified.getMeta() + " Problem should not be instanciated");
-		if (!((Type) modified).getInstances().isEmpty())
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+		if (!((Type) constraintBase).getInstances().isEmpty())
 			throw new VirtualConstraintException(modified + "  should not be instanciated");
 	}
 

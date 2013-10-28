@@ -55,7 +55,6 @@
 //}
 package org.genericsystem.constraints;
 
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -97,10 +96,10 @@ public class OptimisticLockConstraintImpl extends AbstractBooleanConstraintImpl 
 	}
 
 	@Override
-	public void check(Generic base, Generic baseConstraint, int axe) throws ConstraintViolationException {
-		Cache cache = ((EngineImpl) base.getEngine()).getCurrentCache();
-		if (cache instanceof CacheImpl && ((CacheImpl) cache).isScheduledToRemove(base) && (!((CacheImpl) cache).getSubContext().isAlive(base) || ((GenericImpl) base).getLifeManager().willDie()))
-			throw new OptimisticLockConstraintViolationException("Generic : " + base + " has already been removed by another thread");
+	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+		Cache cache = ((EngineImpl) constraintBase.getEngine()).getCurrentCache();
+		if (cache instanceof CacheImpl && ((CacheImpl) cache).isScheduledToRemove(constraintBase) && (!((CacheImpl) cache).getSubContext().isAlive(constraintBase) || ((GenericImpl) constraintBase).getLifeManager().willDie()))
+			throw new OptimisticLockConstraintViolationException("Generic : " + constraintBase + " has already been removed by another thread");
 	}
 
 	@Override

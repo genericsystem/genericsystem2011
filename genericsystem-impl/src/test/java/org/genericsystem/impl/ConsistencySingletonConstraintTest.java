@@ -11,6 +11,7 @@ public class ConsistencySingletonConstraintTest extends AbstractTest {
 
 	public void consistencyTypeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		log.info("zegfkugeukgekuf");
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.newInstance("myVehicle");
 		vehicle.enableSingletonConstraint();

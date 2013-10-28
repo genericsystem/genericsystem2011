@@ -27,69 +27,98 @@ import org.slf4j.LoggerFactory;
 public class GenericBean implements Serializable {
 
 	private static final long serialVersionUID = 2108715680116264876L;
+
 	protected static Logger log = LoggerFactory.getLogger(GenericBean.class);
 
+	/* Injected beans */
 	@Inject transient CacheProvider cacheProvider;
-
-	@Inject
-	private GsMessages messages;
-
-	@Inject
-	private GenericTreeBean genericTreeBean;
+	@Inject private GsMessages messages;
+	@Inject private GenericTreeBean genericTreeBean;
 
 	private List<StructuralWrapper> structuralWrappers = new ArrayList<>();
 
-	public void newType(String newValue) {
-		cacheProvider.getCurrentCache().newType(newValue);
-		messages.info("createRootType", newValue);
+	/**
+	 * Creates a new type in current cache.
+	 * 
+	 * @param typeName - the name of new type.
+	 */
+	public void newType(String typeName) {
+		cacheProvider.getCurrentCache().newType(typeName);
+
+		messages.info("createRootType", typeName);
 	}
 
-	public void newSubType(String newValue) {
-		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newSubType(newValue);
-		messages.info("createSubType", newValue, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
+	/**
+	 * Creates a new sub type of currently selected type generic.
+	 * 
+	 * @param subTypeName - the name of new sub type.
+	 */
+	public void newSubType(String subTypeName) {
+		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newSubType(subTypeName);
+
+		messages.info("createSubType", subTypeName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
 	}
 
-	public void setAttribute(String newValue) {
-		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).setAttribute(newValue);
-		messages.info("createRootAttribute", newValue, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
+	/**
+	 * Creates a new attribute on currently selected type generic.
+	 * 
+	 * @param attributeName - the name of attribute.
+	 */
+	public void setAttribute(String attributeName) {
+		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).setAttribute(attributeName);
+
+		messages.info("createRootAttribute", attributeName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
 	}
 
+	/**
+	 * Creates a new property on currently selected type generic.
+	 * 
+	 * @param key - key of property.
+	 * @param value - value of property.
+	 */
 	public void addProperty(String key, String value) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getPropertiesMap().put(key, value);
+
 		messages.info("createRootProperty", key, value);
 	}
 
 	public void addContraint(String key, String value) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getConstraintsMap().put(key, value);
+
 		messages.info("createRootProperty", key, value);
 	}
 
 	public void addSystemProperty(String key, String value) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getSystemPropertiesMap().put(key, value);
+
 		messages.info("createRootProperty", key, value);
 	}
 
-	public void newInstance(String newValue) {
-		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newInstance(newValue);
-		messages.info("createRootInstance", newValue, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
+	public void newInstance(String instanceName) {
+		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newInstance(instanceName);
+
+		messages.info("createRootInstance", instanceName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
 	}
 
-	public void addValue(Attribute attribute, String newValue) {
+	public void addValue(Attribute attribute, String value) {
 		Generic currentInstance = genericTreeBean.getSelectedTreeNode().getGeneric();
-		currentInstance.setValue(attribute, newValue);
-		messages.info("addValue", newValue, attribute, currentInstance);
+		currentInstance.setValue(attribute, value);
+
+		messages.info("addValue", value, attribute, currentInstance);
 	}
 
 	public void remove(Holder holder) {
 		genericTreeBean.getSelectedTreeNode().getGeneric().removeHolder(holder);
+
 		messages.info("remove", holder);
 	}
 
 	public String delete() {
 		Generic generic = genericTreeBean.getSelectedTreeNode().getGeneric();
-		generic.remove();
-		messages.info("remove", generic);
 		genericTreeBean.setSelectedTreeNode(genericTreeBean.getSelectedTreeNode().getParent());
+		generic.remove();
+
+		messages.info("remove", generic);
 		return "";
 	}
 
@@ -115,15 +144,16 @@ public class GenericBean implements Serializable {
 		}
 	}
 
+	public Generic getGeneric() {
+		return genericTreeBean.getSelectedTreeNode().getGeneric();
+	}
+
 	public List<StructuralWrapper> getStructuralWrappers() {
 		List<StructuralWrapper> list = new ArrayList<>();
 		for (Structural structural : listStructurals((Attribute) genericTreeBean.getSelectedTreeNode().getGeneric())) {
-			//log.info("structural " + structural);
-			//if (!structural.getAttribute().isMapProvider())
 			list.add(getStructuralWrapper(structural));
 		}
 		structuralWrappers = list;
-		//log.info(">>>>>>>>>>>>>>>>>> " + list);
 		return list;
 	}
 
@@ -205,10 +235,6 @@ public class GenericBean implements Serializable {
 
 	public boolean isPhantom(Holder holder) {
 		return holder.getValue() == null;
-	}
-
-	public boolean isMeta() {
-		return genericTreeBean.getSelectedTreeNode().getGeneric().isMeta();
 	}
 
 }

@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -620,29 +621,24 @@ public class RelationTest extends AbstractTest {
 
 	public void testOneToManyInheritance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-
 		Type car = cache.newType("Car");
 		Type tyre = cache.newType("Tyre");
 		Relation carTyres = car.setRelation("CarTyres", tyre);
-
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
-
 		Generic myBmw = car.newInstance("myBmw");
 		Generic frontLeft = tyre.newInstance("frontLeft");
 		Generic frontRight = tyre.newInstance("frontRight");
 		Generic rearLeft = tyre.newInstance("rearLeft");
 		Generic rearRight = tyre.newInstance("rearRight");
 		Generic center = tyre.newInstance("center");
-
 		car.setLink(carTyres, "defaultTyre", center);
+		assert center.getHolders(carTyres, 1).size() == 1;
 		assert myBmw.getLink(carTyres).getBaseComponent().equals(myBmw);
-
 		myBmw.bind(carTyres, frontLeft);
 		myBmw.bind(carTyres, frontRight);
 		myBmw.bind(carTyres, rearLeft);
 		myBmw.bind(carTyres, rearRight);
-
 		assert myBmw.getLinks(carTyres).size() == 5 : myBmw.getLinks(carTyres);
 	}
 

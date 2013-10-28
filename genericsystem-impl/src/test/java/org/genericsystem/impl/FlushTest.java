@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
@@ -140,7 +139,9 @@ public class FlushTest extends AbstractTest {
 
 		final Generic bmw = car.newInstance("Bmw");
 		Generic mercedes = car.newInstance("Mercedes");
-		mercedes.setLink(carColor, "ColorOfMercedes", grey);
+		mercedes.setLink(carColor, "ColorOfMercedes", grey).log();
+		red.getLinks(carColor).get(0).log();
+		// red.getLinks(carColor).get(1).log();
 		assert red.getLinks(carColor).size() == 1;
 	}
 
@@ -155,7 +156,7 @@ public class FlushTest extends AbstractTest {
 
 		Generic red = color.newInstance("Red");
 		Generic grey = color.newInstance("Grey");
-		Link defaultCarColor = car.setLink(carColor, "DefaultCarColor", red);	// default color of car
+		Link defaultCarColor = car.setLink(carColor, "DefaultCarColor", red); // default color of car
 
 		final Generic bmw = car.newInstance("Bmw");
 		Generic mercedes = car.newInstance("Mercedes");

@@ -76,16 +76,17 @@ public class ConcreteInheritanceConstraintImpl extends AbstractBooleanConstraint
 	@BooleanValue(true)
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}
+
 	@Override
-	public void check(Generic base, Generic baseConstraint, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
 		// if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
 		// if (((GenericImpl) modified).getSupers().get(0).isConcrete())
 		// throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());
 	}
-//	@Override
-//	public void check(Generic base, Generic baseConstraint, int axe) throws ConstraintViolationException {
-//		if (base.isConcrete() && ((GenericImpl) base).isPrimary())
-//			if (((GenericImpl) base).getSupers().get(0).isConcrete())
-//				throw new ConcreteInheritanceConstraintViolationException(base.getMeta() + " " + base.info());
-//	}
+	// @Override
+	// public void check(Generic base, Generic baseConstraint, int axe) throws ConstraintViolationException {
+	// if (base.isConcrete() && ((GenericImpl) base).isPrimary())
+	// if (((GenericImpl) base).getSupers().get(0).isConcrete())
+	// throw new ConcreteInheritanceConstraintViolationException(base.getMeta() + " " + base.info());
+	// }
 }

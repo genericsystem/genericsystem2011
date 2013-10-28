@@ -67,7 +67,6 @@ public class SizeTest extends AbstractTest {
 		final Generic myVehicle = vehicle.newInstance("myVehicle");
 		vehiclePower.newInstance(123, myVehicle);
 		new RollbackCatcher() {
-
 			@Override
 			public void intercept() {
 				vehiclePower.newInstance(126, myVehicle);

@@ -79,14 +79,13 @@ public class ConsistencySizeConstraintTest extends AbstractTest {
 
 	public void consistencyRelationTargetKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		final Type vehicle = cache.newType("Vehicle");
+		final Type color = cache.newType("Color");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic red = color.newInstance("red");
-		Generic green = color.newInstance("green");
+		final Generic red = color.newInstance("red");
 		final Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
 		vehicleColor.newInstance("myVehicleRed", myVehicle, red);
-		vehicleColor.newInstance("myVehicleGreen", myVehicle, green);
+		vehicleColor.newInstance("myVehicleGreen", myVehicle, red);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {

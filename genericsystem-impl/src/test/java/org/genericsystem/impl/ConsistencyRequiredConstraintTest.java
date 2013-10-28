@@ -26,13 +26,12 @@ public class ConsistencyRequiredConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		vehicle.newInstance("myVehicle");
 		final Attribute power = vehicle.setAttribute("power");
-
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
 				power.enableRequiredConstraint();
+				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
 	}
-
 }

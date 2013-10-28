@@ -51,6 +51,7 @@ public class Statics {
 	public static final String CONTENT_EXTENSION = ".content";
 	public static final String PART_EXTENSION = ".part";
 	public static final String PATTERN = "yyyy.MM.dd_HH-mm-ss.SSS";
+	public static final String INT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss.SSSS";
 	public static final String MATCHING_REGEX = "[0-9]{4}.[0-9]{2}.[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}.[0-9]{3}---[0-9]+";
 	public static final String LOCK_FILE_NAME = ".lock";
 	public static final String ZIP_EXTENSION = GS_EXTENSION + ".zip";
@@ -191,6 +192,11 @@ public class Statics {
 						return nanoTs;
 			}
 		}
+
+		static String tsToString(long ts) {
+			return new SimpleDateFormat(Statics.PATTERN).format(new Date(ts / Statics.MILLI_TO_NANOSECONDS)).toString();
+		}
+
 	}
 
 	static String getFilename(final long ts) {
