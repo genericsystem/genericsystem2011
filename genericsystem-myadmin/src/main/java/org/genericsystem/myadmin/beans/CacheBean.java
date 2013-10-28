@@ -16,8 +16,8 @@ import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.myadmin.util.GsMessages;
-import org.jboss.seam.faces.event.qualifier.Before;
-import org.jboss.seam.faces.event.qualifier.RenderResponse;
+import org.jboss.seam.faces.event.qualifier.After;
+import org.jboss.seam.faces.event.qualifier.InvokeApplication;
 
 /**
  * Bean for management of cache via GUI of MyAdmin.
@@ -95,7 +95,7 @@ public class CacheBean implements Serializable {
 	 * @param phaseEvent - event of JSF phase.
 	 * @throws ConstraintViolationException
 	 */
-	public void resetTransactionTs(@Observes @Before @RenderResponse PhaseEvent phaseEvent) throws ConstraintViolationException {
+	public void resetTransactionTs(@Observes @After @InvokeApplication PhaseEvent phaseEvent) throws ConstraintViolationException {
 		((CacheImpl) cacheProvider.getCurrentCache()).refresh();
 	}
 
