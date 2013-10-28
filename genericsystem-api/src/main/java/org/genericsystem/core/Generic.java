@@ -641,9 +641,9 @@ public interface Generic extends Comparable<Generic> {
 
 	void cancelAll(Holder attribute, int basePos, int metaLevel, Generic... targets);
 
-	<T extends Generic> T cancel(Holder attribute, int metaLevel, Generic... targets);
+	<T extends Generic> T cancel(Holder attribute, Generic... targets);
 
-	<T extends Generic> T cancel(Holder attribute, int basePos, int metaLevel, Generic... targets);
+	<T extends Generic> T cancel(Holder attribute, int basePos, Generic... targets);
 
 	<T extends MapProvider> Map<Serializable, Serializable> getMap(Class<T> mapClass);
 

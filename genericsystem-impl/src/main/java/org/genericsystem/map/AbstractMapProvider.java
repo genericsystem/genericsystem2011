@@ -55,11 +55,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Holder getValueHolder(Serializable key) {
-				// log.info("AAAA" + key);
 				Holder keyHolder = getKeyHolder(key);
-				// log.info("BBBB" + (keyHolder != null ? keyHolder.info() + keyHolder.getBaseComponent().info() : null));
-
-				// getCurrentCache().find(DefaultValue.class).log();
 				return keyHolder != null ? keyHolder.getHolder(Statics.CONCRETE, getValueAttribute()) : null;
 			}
 
@@ -75,7 +71,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				if (Objects.equals(oldValue, value))
 					return oldValue;
 				Holder attribute = getKeyAttribute();
-				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key, getBasePos(attribute));
+				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
 			}

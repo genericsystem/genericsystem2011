@@ -9,7 +9,8 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.myadmin.beans.GenericTreeNode.TreeType;
+import org.genericsystem.myadmin.gui.GuiTreeNode;
+import org.genericsystem.myadmin.gui.GuiTreeNode.GuiTreeChildrenType;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.richfaces.component.UIMenuGroup;
 import org.richfaces.component.UIMenuItem;
@@ -51,14 +52,14 @@ public class MenuBean implements Serializable {
 	}
 
 	public boolean isConcrete() {
-		return genericTreeBean.getSelectedTreeNodeGeneric().isConcrete();
+		return genericTreeBean.getSelectedTreeNode().getGeneric().isConcrete();
 	}
 
 	public void changeType(@Observes MenuEvent menuEvent) {
 		menuGroup.getChildren().clear();
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		int i = 0;
-		for (GenericTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildrens(TreeType.ATTRIBUTES, menuEvent.isImplicitShow())) {
+		for (GuiTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildren(GuiTreeChildrenType.ATTRIBUTES)) {
 			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
 			uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
 			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{genericTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
@@ -70,21 +71,14 @@ public class MenuBean implements Serializable {
 	}
 
 	public static class MenuEvent {
-		private final GenericTreeNode genericTreeNode;
-		private final boolean implicitShow;
+		private final GuiTreeNode genericTreeNode;
 
-		public MenuEvent(GenericTreeNode genericTreeNode, boolean implicitShow) {
+		public MenuEvent(GuiTreeNode genericTreeNode) {
 			this.genericTreeNode = genericTreeNode;
-			this.implicitShow = implicitShow;
 		}
 
-		public GenericTreeNode getGenericTreeNode() {
+		public GuiTreeNode getGenericTreeNode() {
 			return genericTreeNode;
 		}
-
-		public boolean isImplicitShow() {
-			return implicitShow;
-		}
-
 	}
 }

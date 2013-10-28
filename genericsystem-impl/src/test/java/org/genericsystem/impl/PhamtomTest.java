@@ -176,11 +176,13 @@ public class PhamtomTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 
 		assert myVehicle.getValue(vehiclePower) == "123";
-		Generic phantom = myVehicle.setValue(defaultPower, null);
+		myVehicle.setValue(defaultPower, null);
+		Generic phantom = ((GenericImpl) myVehicle).getHolderByValue(Statics.CONCRETE, defaultPower, null);
 		myVehicle.setValue(defaultPower, "123");
 		assert !phantom.isAlive();
 
-		phantom = myVehicle.setValue(defaultPower, null);
+		myVehicle.setValue(defaultPower, null);
+		phantom = ((GenericImpl) myVehicle).getHolderByValue(Statics.CONCRETE, defaultPower, null);
 		myVehicle.setValue(defaultPower, "555");
 		assert phantom.isAlive();
 
@@ -403,12 +405,13 @@ public class PhamtomTest extends AbstractTest {
 		Generic myCar = car.newInstance("myCar");
 		assert myCar.getHolder(Statics.CONCRETE, carPower).equals(defaultPower);
 
-		Generic cancel = myCar.setValue(carPower, null);
-		assert ((GenericImpl) myCar).getHolderByValue(Statics.CONCRETE, defaultPower, null) == cancel;
+		myCar.setValue(carPower, null);
+		Generic phantom = ((GenericImpl) myCar).getHolderByValue(Statics.CONCRETE, defaultPower, null);
+		assert ((GenericImpl) myCar).getHolderByValue(Statics.CONCRETE, defaultPower, null).getValue() == null;
 		assert myCar.getHolder(Statics.CONCRETE, carPower) == null : myCar.getHolder(Statics.CONCRETE, carPower);
 
 		myCar.setValue(carPower, "233");
-		assert !cancel.isAlive();
+		assert !phantom.isAlive();
 		assert myCar.getValue(carPower).equals("233");
 		assert ((GenericImpl) myCar).getHolderByValue(Statics.CONCRETE, defaultPower, null) == null;
 	}

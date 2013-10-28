@@ -61,4 +61,9 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
 	public static class MapInstance extends GenericImpl implements Holder {}
+
+	// @Override
+	// protected Holder getAttribute(AxedPropertyClass key) {
+	// return getCurrentCache().find(key.getClazz());
+	// }
 }

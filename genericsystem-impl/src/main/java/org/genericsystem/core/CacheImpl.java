@@ -12,7 +12,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -414,6 +413,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		GenericImpl meta = getMeta(clazz);
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
+		assert homeTreeNode.getMetaLevel() <= 2;
 		T result = bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
 		return result;
 	}
@@ -428,16 +428,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		final HomeTreeNode[] primaries = primarySet.toArray();
 		assert primaries.length != 0;
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
-	}
-
-	private GenericImpl getMeta(Class<?> clazz) {
-		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
-		if (null == extendsAnnotation)
-			return getEngine();
-		Class<?> meta = extendsAnnotation.meta();
-		if (Engine.class.equals(meta))
-			meta = EngineImpl.class;
-		return this.<GenericImpl> find(meta);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -482,6 +472,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 				assert instanceClass.value().isAssignableFrom(specializationClass);
 			}
 		return specializationClass;
+	}
+
+	private GenericImpl getMeta(Class<?> clazz) {
+		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
+		if (null == extendsAnnotation)
+			return getEngine();
+		Class<?> meta = extendsAnnotation.meta();
+		if (Engine.class.equals(meta))
+			meta = EngineImpl.class;
+		return this.<GenericImpl> find(meta);
 	}
 
 	@SuppressWarnings("unchecked")

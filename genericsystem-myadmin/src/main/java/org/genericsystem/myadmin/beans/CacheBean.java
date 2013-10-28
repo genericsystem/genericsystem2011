@@ -11,7 +11,7 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.myadmin.util.GsMessages;
 
 /**
- * Bean for managedement of cache via GUI of MyAdmin.
+ * Bean for management of cache via GUI of MyAdmin.
  * 
  * @author Alexei KLENIN - aklenin@middlewarefactory.com
  */

@@ -38,8 +38,8 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
 @SystemGeneric
 @Components(EngineImpl.class)
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
-	OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, /* UniqueStructuralValueConstraintImpl.class,*/
-	UniqueValueConstraintImpl.class, VirtualConstraintImpl.class, StructuralNamingConstraintImpl.class })
+		OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, /* UniqueStructuralValueConstraintImpl.class, */
+		UniqueValueConstraintImpl.class, VirtualConstraintImpl.class, StructuralNamingConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
 
 	@Override
@@ -67,10 +67,14 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 
 	@SystemGeneric
 	@Extends(NoInheritanceSystemType.class)
+	@Components(ConstraintsMapProvider.class)
+	@InstanceValueClassConstraint(AxedPropertyClass.class)
+	public static class NoInheritanceConstraintKey extends ConstraintKey implements Attribute {}
+
+	@SystemGeneric
+	@Extends(NoInheritanceSystemType.class)
 	@Components(ConstraintKey.class)
 	@SingularConstraint
-	// @RequiredConstraint
-	// @InheritanceDisabled
 	public static class ConstraintValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric

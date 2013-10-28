@@ -13,23 +13,23 @@
 	<rich:contextMenu id="menutypesmanager" mode="ajax" attached="false">
 		<rich:menuGroup label="#{msg.show} ...">
 			<rich:menuItem label="#{msg.show} #{msg.super}s"
-				action="#{genericTreeBean.changeTreeType('SUPERS')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('SUPERS')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.up_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('SUPERS')}" />
 			<rich:menuItem label="#{msg.show} #{msg.inheriting}s"
-				action="#{genericTreeBean.changeTreeType('INHERITINGS')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('INHERITINGS')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.down_right_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('INHERITINGS')}" />
 			<rich:menuItem label="#{msg.show} #{msg.component}s"
-				action="#{genericTreeBean.changeTreeType('COMPONENTS')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('COMPONENTS')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.left_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('COMPONENTS')}" />
 			<rich:menuItem label="#{msg.show} #{msg.composite}s"
-				action="#{genericTreeBean.changeTreeType('COMPOSITES')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('COMPOSITES')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.right_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('COMPOSITES')}" />
 			<rich:menuItem label="#{msg.show} #{msg.attribute}s"
-				action="#{genericTreeBean.changeTreeType('ATTRIBUTES')}" mode="ajax"
+				action="#{genericTreeBean.changeChildrenType('ATTRIBUTES')}" mode="ajax"
 				execute="typestree" render="typestree"
 				icon="#{infos.up_right_green_arrow}" disabled="#{genericTreeBean.isTreeTypeSelected('ATTRIBUTES')}" />
 		</rich:menuGroup>
@@ -44,26 +44,26 @@
 			execute="typestree" render="typestree"
 			icon="#{menuBean.getMenuTypeIcon('TYPE')}" disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
+			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{genericTreeBean.selectedTreeNode.value}"
 			action="#{genericBean.newSubType('new_subType')}" mode="ajax"
 			execute="typestree" render="typestree"
 			icon="#{menuBean.getMenuTypeIcon('TYPE')}" disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
+			label="#{msg.create} #{msg.a} #{msg.attribute} #{msg.for} #{genericTreeBean.selectedTreeNode.value}"
 			action="#{genericBean.setAttribute('new_attribute')}" mode="ajax"
 			execute="typestree" render="typestree,editTypesManager"
 			icon="#{menuBean.getMenuTypeIcon('ATTRIBUTE')}" disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
+			label="#{msg.create} #{msg.a} #{msg.property} #{msg.for} #{genericTreeBean.selectedTreeNode.value}"
 			oncomplete="#{rich:component('createproperty')}.show()" mode="ajax"
 			icon="#{menuBean.getMenuTypeIcon('ATTRIBUTE')}" disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.create} #{msg.a} #{msg.instance} #{msg.for} #{genericTreeBean.selectedTreeNodeValue}"
+			label="#{msg.create} #{msg.a} #{msg.instance} #{msg.for} #{genericTreeBean.selectedTreeNode.value}"
 			action="#{genericBean.newInstance('new_instance')}" mode="ajax"
 			execute="typestree" render="typestree"
 			icon="#{menuBean.getMenuTypeIcon('INSTANCE')}" disabled="#{menuBean.isConcrete()}" />
 		<rich:menuItem
-			label="#{msg.delete} #{genericTreeBean.selectedTreeNodeValue}"
+			label="#{msg.delete} #{genericTreeBean.selectedTreeNode.value}"
 			action="#{genericBean.delete}" mode="ajax"
 			onclick="if (! window.confirm('#{msg.popupRemove}') ) {return false;}"
 			execute="typestree" render="paneltitletypesmanager,typestree,editTypesManager"
