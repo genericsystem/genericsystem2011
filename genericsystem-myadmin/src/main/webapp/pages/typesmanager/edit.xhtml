@@ -10,6 +10,8 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
+	<ui:param name="generic" value="#{genericBean.generic}" />
+
 	<rich:panel id="editTypesManager" layout="block"
 		styleClass="fullWidth fullHeight" bodyClass="fullHeight"
 		headerClass="height24">
@@ -20,12 +22,12 @@
 				style="white-space:nowrap; padding-top:5px; margin-right:5px;" />
 			<rich:inplaceInput id="inpInstanceName"
 				value="#{wrapperBean.getGenericTreeNodeWrapper(genericTreeBean.selectedTreeNode).value}"
-				rendered="#{!genericBean.isMeta()}" editEvent="dblclick">
+				rendered="#{!generic.isMeta()}" editEvent="dblclick">
 				<a4j:ajax event="change" execute="inpInstanceName"
 					render="typesmanager" />
 			</rich:inplaceInput>
 			<h:outputText value="#{genericTreeBean.selectedTreeNode.value}"
-				rendered="#{genericBean.isMeta()}" />
+				rendered="#{generic.isMeta()}" />
 		</f:facet>
 
 		<rich:dropTarget acceptedTypes="primitive"
