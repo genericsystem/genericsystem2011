@@ -11,7 +11,6 @@ public abstract class AbstractBooleanConstraintImpl extends AbstractConstraintIm
 	public void check(Generic constraintBase, Generic modified, CheckingType checkingType, Holder constraintValue) throws ConstraintViolationException {
 		if (constraintValue.getValue() != null && !Boolean.FALSE.equals(constraintValue.getValue())) {
 			AxedPropertyClass key = getValue();
-			// Generic constraintBase = constraintValue.<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent();
 			check(constraintBase, modified, constraintValue, checkingType, key.getAxe());
 		}
 	}

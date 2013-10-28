@@ -36,7 +36,6 @@ public class PhantomConstraintImpl extends AbstractBooleanConstraintImpl impleme
 	}
 
 	@Override
-	// Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe
 	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
 		Generic[] supers = ((GenericImpl) modified).getSupersArray();
 		if (modified.getValue() == null)

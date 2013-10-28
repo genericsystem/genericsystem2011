@@ -39,11 +39,7 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanSimpleConstra
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	// Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe
 	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
 		if (!constraintBase.isStructural() && constraintBase.getComponentsSize() == 0)
 			return;

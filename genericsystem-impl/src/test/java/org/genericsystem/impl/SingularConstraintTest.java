@@ -301,20 +301,15 @@ public class SingularConstraintTest extends AbstractTest {
 		Type color = cache.newType("color");
 		final Relation carColor = car.setRelation("carColor", color);
 		carColor.enableSingularConstraint(Statics.TARGET_POSITION);
-
 		Generic myBmw = car.newInstance("myBmw");
 		final Generic myAudi = car.newInstance("myAudi");
-
 		final Generic yellow = color.newInstance("yellow");
 		myBmw.setLink(carColor, "myBmwYellow", yellow);
 		assert carColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
-
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				log.info("@@@@@@@@@@@@@@");
-				Link myAudiYellow = myAudi.setLink(carColor, "myAudiYellow", yellow);
-				log.info("yellow.getHolders(carColor).size()" + yellow.getHolders(carColor).size());
+				myAudi.setLink(carColor, "myAudiYellow", yellow);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}

@@ -35,7 +35,6 @@ public class SuperRuleConstraintImpl extends AbstractBooleanConstraintImpl imple
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}
 
-	// Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe
 	@Override
 	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
 		for (Generic directSuper : constraintBase.getSupers())

@@ -10,8 +10,6 @@ public abstract class AbstractNoBooleanConstraintImpl extends AbstractConstraint
 	@Override
 	public void check(Generic constraintBase, Generic modified, CheckingType checkingType, Holder constraintValue) throws ConstraintViolationException {
 		AxedPropertyClass key = getValue();
-		// check(key.getAxe() == Statics.MULTIDIRECTIONAL ? modified : ((GenericImpl) modified).<GenericImpl> getComponent(key.getAxe()), constraintValue, checkingType, key.getAxe());
-		// Generic constraintBase = constraintValue.<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent();
 		check(constraintBase, modified, constraintValue, checkingType, key.getAxe());
 	}
 

@@ -8,13 +8,9 @@ import org.genericsystem.map.AxedPropertyClass;
 public abstract class AbstractAxedConstraint extends AbstractConstraintImpl {
 	@Override
 	public void check(Generic constraintBase, Generic modified, CheckingType checkingType, Holder constraintValue) throws ConstraintViolationException {
-		//
-		if (constraintValue.getValue() != null && !Boolean.FALSE.equals(constraintValue.getValue())) {
-			AxedPropertyClass key = getValue();
-			// Generic constraintBase = constraintValue.<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent();
-			check(constraintBase, modified, constraintValue);
-		}
+		if (constraintValue.getValue() != null && !Boolean.FALSE.equals(constraintValue.getValue()))
+			check(constraintBase, modified, constraintValue, this.<AxedPropertyClass> getValue().getAxe());
 	}
 
-	public abstract void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException;;
+	public abstract void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException;;
 }

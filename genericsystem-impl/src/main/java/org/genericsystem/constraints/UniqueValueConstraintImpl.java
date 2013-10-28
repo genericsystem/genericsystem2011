@@ -37,9 +37,6 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 	// public static class DefaultValue extends GenericImpl implements Holder {
 	// }
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
 		Set<Serializable> values = new HashSet<>();
