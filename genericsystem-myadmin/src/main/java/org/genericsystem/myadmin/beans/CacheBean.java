@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.enterprise.event.Observes;
 import javax.faces.bean.RequestScoped;
+import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -13,6 +15,8 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Statics;
 import org.genericsystem.myadmin.util.GsMessages;
+import org.jboss.seam.faces.event.qualifier.Before;
+import org.jboss.seam.faces.event.qualifier.RenderResponse;
 
 /**
  * Bean for management of cache via GUI of MyAdmin.
@@ -83,4 +87,14 @@ public class CacheBean implements Serializable {
 	public void setCache(Cache cache) {
 		cacheProvider.setCurrentCache(cache);
 	}
+
+	/**
+	 * Reset the timestamp of current transaction before the phase of RENDER_RESPONSE.
+	 * 
+	 * @param phaseEvent - event of JSF phase.
+	 */
+	public void resetTransactionTs(@Observes @Before @RenderResponse PhaseEvent phaseEvent) {
+		((CacheImpl) cacheProvider.getCurrentCache()).pickNewTs();
+	}
+
 }
