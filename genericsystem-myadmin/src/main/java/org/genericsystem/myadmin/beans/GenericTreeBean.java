@@ -55,8 +55,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	@PostConstruct
 	public void init() {
-		rootTreeNode = new GuiTreeNode(null,
-				cacheProvider.getCurrentCache().getEngine());
+		rootTreeNode = new GuiTreeNode(null, cacheProvider.getCurrentCache().getEngine());
 		selectedTreeNode = rootTreeNode;
 	}
 
@@ -70,22 +69,22 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
-	 * Changes tree type.
+	 * Changes the type of subtree elements of selected node.
 	 * 
-	 * @param treeType - tree type.
+	 * @param childrenType - the type of subtree elements.
 	 */
-	public void changeTreeType(GuiTreeChildrenType treeType) {
-		selectedTreeNode.setChildrenType(treeType);
+	public void changeChildrenType(GuiTreeChildrenType childrenType) {
+		selectedTreeNode.setChildrenType(childrenType);
 
-		gsMessages.info("showchanged", treeType);
+		gsMessages.info("showchanged", childrenType);
 	}
 
 	/**
+	 * Selects the node of generic supplied in parameters.
 	 * 
-	 * 
-	 * @param generic
+	 * @param generic - the generic to look for.
 	 */
-	public void view(Generic generic) {
+	public void selectNodeOfGeneric(Generic generic) {
 		selectedTreeNode = rootTreeNode.findSubTreeNodeByGeneric(generic);
 		internalChangeType();
 
