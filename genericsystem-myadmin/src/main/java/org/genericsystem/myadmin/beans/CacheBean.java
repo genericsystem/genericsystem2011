@@ -1,6 +1,8 @@
 package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.faces.bean.RequestScoped;
 import javax.inject.Inject;
@@ -8,6 +10,8 @@ import javax.inject.Named;
 
 import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.CacheImpl;
+import org.genericsystem.core.Statics;
 import org.genericsystem.myadmin.util.GsMessages;
 
 /**
@@ -61,6 +65,15 @@ public class CacheBean implements Serializable {
 		messages.info("discardCache", cacheProvider.getCurrentCache().getLevel());
 
 		return "HOME";
+	}
+
+	/**
+	 * Returns the formated timestamp of current cache (transaction).
+	 * 
+	 * @return the formated timestamp of current cache.
+	 */
+	public String getCurrentCacheTs() {
+		return new SimpleDateFormat(Statics.INT_TS_PATTERN).format(new Date(((CacheImpl) cacheProvider.getCurrentCache()).getTs() / Statics.MILLI_TO_NANOSECONDS)).toString();
 	}
 
 	public Cache getCache() {
