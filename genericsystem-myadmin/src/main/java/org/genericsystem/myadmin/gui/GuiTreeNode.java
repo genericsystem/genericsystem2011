@@ -6,6 +6,11 @@ import java.util.List;
 import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Type;
 
+/**
+ * Node for the tree of generics in GUI of MyAdmin.
+ * 
+ * @author Alexei KLENIN - aklenin@middlewarefactory.com
+ */
 public class GuiTreeNode {
 
 	public enum GuiTreeChildrenType {
@@ -16,7 +21,7 @@ public class GuiTreeNode {
 
 	private final GuiTreeNode parent;
 	private Generic generic;
-	private List<GuiTreeNode> children;// = new ArrayList<>();
+	private List<GuiTreeNode> children;
 	private GuiTreeChildrenType childrenType = DEFAULT_CHILDREN_TYPE;
 
 	public GuiTreeNode(GuiTreeNode parent, Generic generic, GuiTreeChildrenType treeType) {
@@ -102,14 +107,14 @@ public class GuiTreeNode {
 		this.generic = generic;
 	}
 
-	public GuiTreeChildrenType getTreeChildrenType() {
+	public GuiTreeChildrenType getChildrenType() {
 		return childrenType;
 	}
 
-	public void setTreeChildrenType(GuiTreeChildrenType treeChildrenType) {
-		if (this.childrenType != treeChildrenType)
-			children = null;					// abandon precedent children
-		this.childrenType = treeChildrenType;
+	public void setChildrenType(GuiTreeChildrenType childrenType) {
+		if (this.childrenType != childrenType)
+			children = null;						// abandon precedent children
+		this.childrenType = childrenType;
 	}
 
 	@Override

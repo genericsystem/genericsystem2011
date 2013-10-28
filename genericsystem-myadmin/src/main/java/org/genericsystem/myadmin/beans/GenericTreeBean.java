@@ -75,7 +75,7 @@ public class GenericTreeBean implements Serializable {
 	 * @param treeType - tree type.
 	 */
 	public void changeTreeType(GuiTreeChildrenType treeType) {
-		selectedTreeNode.setTreeChildrenType(treeType);
+		selectedTreeNode.setChildrenType(treeType);
 
 		gsMessages.info("showchanged", treeType);
 	}
@@ -101,7 +101,7 @@ public class GenericTreeBean implements Serializable {
 	 * false - if not.
 	 */
 	public boolean isTreeTypeSelected(GuiTreeChildrenType treeType) {
-		return selectedTreeNode != null && selectedTreeNode.getTreeChildrenType() == treeType;
+		return selectedTreeNode != null && selectedTreeNode.getChildrenType() == treeType;
 	}
 
 	/**
