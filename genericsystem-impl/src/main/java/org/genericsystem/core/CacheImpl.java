@@ -124,6 +124,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
+	public void refresh() throws ConstraintViolationException {
+		pickNewTs();
+		try {
+			checkConstraints();
+		} catch (ConstraintViolationException e) {
+			rollback(e);
+			throw e;				// re-throw the same exception
+		}
+	}
+
 	@Override
 	public boolean isRemovable(Generic generic) {
 		try {

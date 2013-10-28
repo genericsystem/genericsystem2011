@@ -23,9 +23,14 @@
 	<rich:panel id="#{cc.attrs.key}" styleClass="fullWidth"
 		style="border-width:0;padding:0;">
 		<f:facet name="header">
-			<h:panelGrid id="paneltitle#{cc.attrs.key}" columns="2"
-				columnClasses="fullWidth,">
+			<h:panelGrid id="paneltitle#{cc.attrs.key}" columns="3"
+				styleClass="fullWidth" columnClasses="leftAligned,centerAligned,rightAligned">
 				<h:outputText styleClass="uppercase" value="#{cc.attrs.managername}" />
+				<a4j:outputPanel ajaxRendered="true">
+					<h:outputFormat value="#{msg.lblTransactionTimestamp}">
+						<f:param value="#{cacheBean.currentCacheTs}" />
+					</h:outputFormat>
+				</a4j:outputPanel>
 				<h:outputText style="white-space: nowrap;"
 					value="#{panelBean.getSelectedValue(cc.attrs.key)}" />
 			</h:panelGrid>
