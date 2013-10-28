@@ -14,6 +14,7 @@ import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Statics;
+import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.jboss.seam.faces.event.qualifier.Before;
 import org.jboss.seam.faces.event.qualifier.RenderResponse;
@@ -92,9 +93,10 @@ public class CacheBean implements Serializable {
 	 * Reset the timestamp of current transaction before the phase of RENDER_RESPONSE.
 	 * 
 	 * @param phaseEvent - event of JSF phase.
+	 * @throws ConstraintViolationException
 	 */
-	public void resetTransactionTs(@Observes @Before @RenderResponse PhaseEvent phaseEvent) {
-		((CacheImpl) cacheProvider.getCurrentCache()).pickNewTs();
+	public void resetTransactionTs(@Observes @Before @RenderResponse PhaseEvent phaseEvent) throws ConstraintViolationException {
+		((CacheImpl) cacheProvider.getCurrentCache()).refresh();
 	}
 
 }
