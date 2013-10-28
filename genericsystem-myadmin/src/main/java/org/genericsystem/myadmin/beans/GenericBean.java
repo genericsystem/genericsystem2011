@@ -144,6 +144,10 @@ public class GenericBean implements Serializable {
 		}
 	}
 
+	public Generic getGeneric() {
+		return genericTreeBean.getSelectedTreeNode().getGeneric();
+	}
+
 	public List<StructuralWrapper> getStructuralWrappers() {
 		List<StructuralWrapper> list = new ArrayList<>();
 		for (Structural structural : listStructurals((Attribute) genericTreeBean.getSelectedTreeNode().getGeneric())) {
@@ -231,10 +235,6 @@ public class GenericBean implements Serializable {
 
 	public boolean isPhantom(Holder holder) {
 		return holder.getValue() == null;
-	}
-
-	public boolean isMeta() {
-		return genericTreeBean.getSelectedTreeNode().getGeneric().isMeta();
 	}
 
 }
