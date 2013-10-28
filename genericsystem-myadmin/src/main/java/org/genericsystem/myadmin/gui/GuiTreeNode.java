@@ -16,7 +16,7 @@ public class GuiTreeNode {
 
 	private final GuiTreeNode parent;
 	private Generic generic;
-	private List<GuiTreeNode> children = new ArrayList<>();
+	private List<GuiTreeNode> children;// = new ArrayList<>();
 	private GuiTreeChildrenType childrenType = DEFAULT_CHILDREN_TYPE;
 
 	public GuiTreeNode(GuiTreeNode parent, Generic generic, GuiTreeChildrenType treeType) {
@@ -35,11 +35,31 @@ public class GuiTreeNode {
 	}
 
 	public List<GuiTreeNode> getChildren(GuiTreeChildrenType childrenType) {
-		List<GuiTreeNode> children = new ArrayList<>();
+		if (children != null && this.childrenType == childrenType)
+			return children;
+		children = new ArrayList<>();
 		for (Generic child : getGenericsForSubTree(childrenType))
-			children.add(getChildTreeNode(child));
-		this.children = children;
+			children.add(new GuiTreeNode(this, child));
 		return children;
+	}
+
+	/**
+	 * Returns the GUI tree node of generic in the sub tree of current node. Can return null if node
+	 * with generic is not found.
+	 * 
+	 * @param generic - generic to look for.
+	 * 
+	 * @return the GUI tree node of generic.
+	 */
+	public GuiTreeNode findSubTreeNodeByGeneric(Generic generic) {
+		if (this.generic == generic)
+			return this;
+		for (GuiTreeNode child : getChildren()) {
+			GuiTreeNode found = child.findSubTreeNodeByGeneric(generic);
+			if (found != null)
+				return found;
+		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -66,39 +86,6 @@ public class GuiTreeNode {
 		//throw new IllegalStateException();
 	}
 
-	/**
-	 * Returns a GUI tree node of one of the child of this generic.
-	 * 
-	 * @param child - child generric.
-	 * 
-	 * @return GUITreeNode object.
-	 */
-	private GuiTreeNode getChildTreeNode(Generic child) {
-		for (GuiTreeNode childTreeNode : children)
-			if (childTreeNode.getGeneric().equals(child))
-				return childTreeNode;
-		return new GuiTreeNode(this, child, DEFAULT_CHILDREN_TYPE);
-	}
-
-	/**
-	 * Returns the GUI tree node of generic in the sub tree of current node. Can return null if node
-	 * with generic is not found.
-	 * 
-	 * @param generic - generic to look for.
-	 * 
-	 * @return the GUI tree node of generic.
-	 */
-	public GuiTreeNode findSubTreeNodeByGeneric(Generic generic) {
-		if (this.generic == generic)
-			return this;
-		for (GuiTreeNode child : getChildren()) {
-			GuiTreeNode found = child.findSubTreeNodeByGeneric(generic);
-			if (found != null)
-				return found;
-		}
-		return null;
-	}
-
 	public String getValue() {
 		return generic.toString();
 	}
@@ -115,12 +102,14 @@ public class GuiTreeNode {
 		this.generic = generic;
 	}
 
-	public GuiTreeChildrenType getTreeType() {
+	public GuiTreeChildrenType getTreeChildrenType() {
 		return childrenType;
 	}
 
-	public void setTreeType(GuiTreeChildrenType treeType) {
-		this.childrenType = treeType;
+	public void setTreeChildrenType(GuiTreeChildrenType treeChildrenType) {
+		if (this.childrenType != treeChildrenType)
+			children = null;					// abandon precedent children
+		this.childrenType = treeChildrenType;
 	}
 
 	@Override
