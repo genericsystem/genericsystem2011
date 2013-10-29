@@ -154,7 +154,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 				return null;
 			}
 		}.doWork();
-
 	}
 
 	private abstract class UnsafeCacheManager<T> {
@@ -405,7 +404,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		AbstractContext subContext = this.getSubContext();
 		if (subContext instanceof Cache)
 			return (Cache) subContext;
-		return null;
+		return this;						// cache level 1
 	}
 
 	@Override
