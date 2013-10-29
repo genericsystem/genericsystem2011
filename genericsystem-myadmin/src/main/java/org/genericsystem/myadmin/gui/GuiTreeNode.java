@@ -45,9 +45,6 @@ public class GuiTreeNode {
 	}
 
 	public List<GuiTreeNode> getChildren(GuiTreeChildrenType childrenType) {
-		log.info("@@@@@@@@@@@@@≥≥≥≥≥≥≥≥≥≥≥≥≥@]@@@@@@@@@@@@@@ ::: " + generic.toString() + " : " + childrenType.toString());
-
-
 		if (children != null && this.childrenType == childrenType)
 			return children;
 		children = new ArrayList<>();
@@ -90,7 +87,6 @@ public class GuiTreeNode {
 		case INSTANCES:
 			return ((Type) generic).getInstances();
 		case INHERITINGS:
-			log.info(">>>>>> SUPERLALA: " + generic.toString());
 			return generic.getInheritings();
 		case COMPONENTS:
 			return generic.getComponents();

@@ -9,6 +9,8 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.genericsystem.core.Generic;
+import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.gui.GuiTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.richfaces.component.UIMenuGroup;
@@ -22,11 +24,9 @@ public class MenuBean implements Serializable {
 
 	private UIMenuGroup menuGroup;
 
-	@Inject
-	private GsMessages messages;
+	@Inject private GsMessages messages;
 
-	@Inject
-	private GenericTreeBean genericTreeBean;
+	@Inject private GenericTreeBean genericTreeBean;
 
 	public UIMenuGroup getMenuGroup() {
 		return menuGroup;
@@ -58,9 +58,9 @@ public class MenuBean implements Serializable {
 		menuGroup.getChildren().clear();
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		int i = 0;
-		for (GuiTreeNode genericTreeNode : menuEvent.getGenericTreeNode().getChildren(/*GuiTreeChildrenType.ATTRIBUTES*/)) {
+		for (Generic generic : ((Type) menuEvent.getGenericTreeNode().getGeneric()).getAttributes()) {
 			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
-			uiMenuItem.setLabel("show values of " + genericTreeNode.getGeneric());
+			uiMenuItem.setLabel("show values of " + generic);
 			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{genericTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
 			uiMenuItem.setActionExpression(methodExpression);
 			uiMenuItem.setRender("typestree, typestreetitle");
