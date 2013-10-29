@@ -73,7 +73,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class InstanceClassConstraintImpl extends AbstractNoBooleanConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, int axe) throws ConstraintViolationException {
 		for (Generic instance : ((Attribute) instanceToCheck).getInstances())
 			if (!constraintValue.getValue().equals(AxedPropertyClass.class) && !instance.getValue().getClass().equals(constraintValue.getValue()))
 				throw new InstanceClassConstraintViolationException("Wrong type of instance");

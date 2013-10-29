@@ -40,7 +40,7 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanSimpleConstra
 	}
 
 	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, int axe) throws ConstraintViolationException {
 		if (!constraintBase.isStructural() && constraintBase.getComponentsSize() == 0)
 			return;
 		Generic[] components = ((GenericImpl) constraintBase).getComponentsArray();

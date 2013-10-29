@@ -26,7 +26,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @Dependencies(SizeConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(SizeConstraintImpl.class)
-public class SizeConstraintImpl extends AbstractAxedConstraint implements Holder {
+public class SizeConstraintImpl extends AbstractNoBooleanConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
@@ -37,8 +37,9 @@ public class SizeConstraintImpl extends AbstractAxedConstraint implements Holder
 
 	@Override
 	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
-		if ((modified.getHolders((Attribute) constraintBase, axe).size()) > (Integer) (constraintValue).getValue())
-			throw new SizeConstraintViolationException("Multiple links of " + constraintBase + ", and the maximum size is " + constraintValue);
+		if (constraintValue.getValue() instanceof Integer)
+			if ((modified.getHolders((Attribute) constraintBase, axe).size()) > (Integer) (constraintValue).getValue())
+				throw new SizeConstraintViolationException("Multiple links of " + constraintBase + ", and the maximum size is " + constraintValue);
 	}
 
 }

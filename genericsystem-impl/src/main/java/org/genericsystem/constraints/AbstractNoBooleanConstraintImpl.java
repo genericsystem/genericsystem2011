@@ -8,11 +8,10 @@ import org.genericsystem.map.AxedPropertyClass;
 public abstract class AbstractNoBooleanConstraintImpl extends AbstractConstraintImpl {
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, CheckingType checkingType, Holder constraintValue) throws ConstraintViolationException {
-		AxedPropertyClass key = getValue();
-		check(constraintBase, modified, constraintValue, checkingType, key.getAxe());
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException {
+		check(constraintBase, modified, constraintValue, this.<AxedPropertyClass> getValue().getAxe());
 	}
 
-	public abstract void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException;
+	public abstract void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException;
 
 }

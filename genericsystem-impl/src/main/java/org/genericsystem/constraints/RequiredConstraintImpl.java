@@ -22,7 +22,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @AxedConstraintValue(RequiredConstraintImpl.class)
 @SingularConstraint
-public class RequiredConstraintImpl extends AbstractAxedConstraint implements Holder {
+public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {

@@ -29,5 +29,5 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 		return true;
 	}
 
-	public abstract void check(Generic constraintBase, Generic modified, CheckingType checkingType, Holder constraintValue) throws ConstraintViolationException;
+	public abstract void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException;
 }

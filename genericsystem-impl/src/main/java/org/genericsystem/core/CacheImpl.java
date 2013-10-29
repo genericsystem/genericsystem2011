@@ -17,7 +17,6 @@ import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.constraints.AbstractAxedConstraint;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.core.Generic.ExtendedMap;
@@ -131,7 +130,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			checkConstraints();
 		} catch (ConstraintViolationException e) {
 			rollback(e);
-			throw e;				// re-throw the same exception
+			throw e; // re-throw the same exception
 		}
 	}
 
@@ -155,6 +154,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				return null;
 			}
 		}.doWork();
+
 	}
 
 	private abstract class UnsafeCacheManager<T> {
@@ -230,7 +230,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies, boolean computeDirectSupers) {
 			for (Generic orderedDependency : orderedDependencies) {
-				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
 						adjust(((GenericImpl) orderedDependency).components));
@@ -318,8 +317,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 					throw new IllegalStateException(ex);
 				}
 				if (attempt > Statics.ATTEMPTS / 2)
-					log.info("MvccException : " + e + " attempt : " + attempt);
-				cause = e;
+					// log.info("MvccException : " + e + " attempt : " + attempt);
+					cause = e;
 				pickNewTs();
 				continue;
 			} catch (Exception e) {
@@ -405,7 +404,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		AbstractContext subContext = this.getSubContext();
 		if (subContext instanceof Cache)
 			return (Cache) subContext;
-		return this;						// cache level 1
+		return null;
 	}
 
 	@Override
@@ -429,10 +428,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic directSuper, boolean existsException, Generic... components) {
-		return bind(homeTreeNode, new Generic[] { directSuper }, ((GenericImpl) directSuper).sortAndCheck(components), specializationClass, existsException);
+		// log.info("YYYYYYYYYYYYYY" + Arrays.toString(components));
+		components = ((GenericImpl) directSuper).sortAndCheck(components);
+		// log.info("UUUUUUUUUUUUUU" + Arrays.toString(components));
+
+		return bind(homeTreeNode, new Generic[] { directSuper }, components, specializationClass, existsException);
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
+		// log.info("SSSSSSSSSSSSSSS" + Arrays.toString(components));
 		Primaries primarySet = new Primaries(homeTreeNode, supers);
 		final HomeTreeNode[] primaries = primarySet.toArray();
 		assert primaries.length != 0;
@@ -465,6 +469,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
 		ConnectionMap connectionMap = new ConnectionMap();
+		// log.info("zZZZZZZZZZZZ" + orderedDependencies + Arrays.toString(directSupers) + " " + Arrays.toString(components));
 		T superGeneric = buildAndInsertComplex(homeTreeNode, specializeGenericClass(specializationClass, homeTreeNode, directSupers), directSupers, components);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
@@ -548,6 +553,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
+
 		return new AbstractFilterIterator<T>((Iterator<T>) new AbstractPreTreeIterator<Generic>(directSuper) {
 
 			private static final long serialVersionUID = 4540682035671625893L;
@@ -591,10 +597,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 			int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 			Generic constraintBase = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
 			if (axe == Statics.MULTIDIRECTIONAL)
-				keyHolder.check(constraintBase, generic, checkingType, (Holder) generic);
+				keyHolder.check(constraintBase, generic, (Holder) generic);
 			else
 				for (Generic instance : ((Type) ((Attribute) constraintBase).getComponent(axe)).getAllInstances())
-					keyHolder.check(constraintBase, instance, checkingType, (Holder) generic);
+					keyHolder.check(constraintBase, instance, (Holder) generic);
 		}
 	}
 
@@ -622,39 +628,41 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return constraint.isImmediatelyConsistencyCheckable();
 	}
 
-	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
-		// check des contraintes axées des attributs du modified
-		for (Attribute attribute : ((Type) generic).getAttributes()) {
-			ExtendedMap<Serializable, Serializable> constraintMap = attribute.getConstraintsMap();
-			for (Serializable key : constraintMap.keySet()) {
-				Holder valueHolder = constraintMap.getValueHolder(key);
-				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-				Class<?> constraintClass = ((AxedPropertyClass) keyHolder.getValue()).getClazz();
-				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-				if (AbstractAxedConstraint.class.isAssignableFrom(constraintClass))
+	private void checkConstraints(final CheckingType checkingType, final boolean isFlushTime, final Generic generic) throws ConstraintViolationException {
+		for (final Attribute attribute : ((Type) generic).getAttributes())
+			new Check() {
+				@Override
+				public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException {
+					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 					if (null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
-						if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
-							((AbstractAxedConstraint) keyHolder).check(attribute, generic, checkingType, valueHolder);
+						keyHolder.check(attribute, generic, valueHolder);
+				}
+			}.check(checkingType, isFlushTime, attribute);
 
-			}
-		}
-
-		// check des contraintes du modified
-		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
-		for (Serializable key : constraintMap.keySet()) {
-			Holder valueHolder = constraintMap.getValueHolder(key);
-			AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-			// TODO clean
-			// log.info("generic " + generic);
-			if (isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
+		new Check() {
+			@Override
+			public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
-				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1) {
-					// log.info("baseConstraint " + baseConstraint + " axe " + axe + " " + ((Attribute) generic).getComponent(axe));
-					keyHolder.check(baseConstraint, Statics.MULTIDIRECTIONAL == axe ? generic : ((Attribute) generic).getComponent(axe), checkingType, valueHolder);
+					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+					keyHolder.check(baseConstraint, Statics.MULTIDIRECTIONAL == axe ? generic : ((Attribute) generic).getComponent(axe), valueHolder);
 				}
 			}
+		}.check(checkingType, isFlushTime, generic);
+	}
+
+	private abstract class Check {
+		void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
+			for (Serializable key : constraintMap.keySet()) {
+				Holder valueHolder = constraintMap.getValueHolder(key);
+				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
+				if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime))
+					internalCheck(keyHolder, valueHolder);
+			}
 		}
+
+		abstract void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException;
 	}
 
 	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {

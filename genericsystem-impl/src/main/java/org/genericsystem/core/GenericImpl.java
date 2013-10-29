@@ -118,16 +118,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-					for (Generic superGeneric : supers) {
-						if (this.equals(superGeneric) && !isEngine())
-							throw new IllegalStateException();
-						if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-							throw new IllegalStateException();
-						if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-							throw new IllegalStateException();
-					}
-					return this;
+		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+		for (Generic superGeneric : supers) {
+			if (this.equals(superGeneric) && !isEngine())
+				throw new IllegalStateException();
+			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+				throw new IllegalStateException();
+			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+				throw new IllegalStateException();
+		}
+		return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -666,7 +666,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (int i = 0; i < additionals.length; i++)
 			if (!targets[i].inheritsFrom(additionals[i]))
 				result.add(additionals[i]);
-		log.info("ZZZZZZZZZZZZ" + result.toString());
+		// log.info("ZZZZZZZZZZZZ" + result.toString());
 		return result.toArray(new Generic[result.size()]);
 	}
 
@@ -794,7 +794,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				});
 
 				if (projection == null) {
-					log.info("Search not found : " + this.getHomeTreeNode() + " " + Arrays.toString(new Primaries(this.getHomeTreeNode(), this).toArray()) + " " + Arrays.toString(components));
+					// log.info("Search not found : " + this.getHomeTreeNode() + " " + Arrays.toString(new Primaries(this.getHomeTreeNode(), this).toArray()) + " " + Arrays.toString(components));
 					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, components)).markAsAutomatic();
 				}
 			}

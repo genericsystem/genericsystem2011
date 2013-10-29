@@ -25,7 +25,6 @@ public class UniqueValueConstraintTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				log.info("dsef@@@@@@@@@");
 				yourCar.setValue(registration, "315DT75");
 			}
 		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
