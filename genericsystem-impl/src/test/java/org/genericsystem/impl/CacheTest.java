@@ -8,7 +8,14 @@ import org.testng.annotations.Test;
 @Test
 public class CacheTest extends AbstractTest {
 
-	public void testCacheOnCacheWithFlush() {
+	public void testFlushCache1OK() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		cache.flush();
+	}
+
+	public void testFlushCacheOnCacheOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Cache cache2 = cache.mountNewCache().start();
 		Type vehicle = cache2.newType("Vehicle");
@@ -21,7 +28,7 @@ public class CacheTest extends AbstractTest {
 		assert cache.getEngine().getInheritings().contains(vehicle);
 	}
 
-	public void testCacheLevel() {
+	public void testCacheLevelOK() {
 		Cache mainCache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Cache superCache1 = mainCache.mountNewCache().start();
 		Cache superCache2 = superCache1.mountNewCache().start();

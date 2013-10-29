@@ -67,6 +67,13 @@ public class GuiTreeNode {
 		return null;
 	}
 
+	/**
+	 * Abandon current children to force the rebuild of the subtree.
+	 */
+	public void abandonChildren() {
+		children = null;
+	}
+
 	@SuppressWarnings("unchecked")
 	private <T extends Generic> List<T> getGenericsForSubTree(GuiTreeChildrenType childrenType) {
 		switch (childrenType) {

@@ -110,6 +110,18 @@ body {
 	width: 280px;
 }
 
+.rightAligned {
+	text-align: right;
+}
+
+.leftAligned {
+	text-align: left;
+}
+
+.centerAligned {
+	text-align: center;
+}
+
 td {
 	vertical-align: middle;
 	text-align: left;
