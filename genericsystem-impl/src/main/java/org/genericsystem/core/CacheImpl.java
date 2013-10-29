@@ -642,9 +642,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 			@Override
 			public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
-				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1) {
+				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
 					keyHolder.check(baseConstraint, Statics.MULTIDIRECTIONAL == axe ? generic : ((Attribute) generic).getComponent(axe), valueHolder);
-				}
 			}
 		}.check(checkingType, isFlushTime, generic);
 	}
@@ -655,9 +654,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Serializable key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 				if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime))
-					internalCheck(keyHolder, valueHolder, axe);
+					internalCheck(keyHolder, valueHolder, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
 			}
 		}
 

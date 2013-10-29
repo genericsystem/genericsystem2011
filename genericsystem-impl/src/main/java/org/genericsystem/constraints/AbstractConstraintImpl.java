@@ -30,4 +30,15 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 	}
 
 	public abstract void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException;
+
+	public abstract static class AbstractBooleanConstraintImpl extends AbstractConstraintImpl {
+		@Override
+		public void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException {
+			if (Boolean.TRUE.equals(constraintValue.getValue()))
+				check(constraintBase, modified);
+		}
+
+		public abstract void check(Generic constraintBase, Generic modified) throws ConstraintViolationException;
+	}
+
 }
