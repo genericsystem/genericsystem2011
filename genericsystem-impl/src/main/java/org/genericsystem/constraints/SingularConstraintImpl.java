@@ -6,6 +6,7 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -21,7 +22,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @Dependencies(SingularConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(SingularConstraintImpl.class)
-public class SingularConstraintImpl extends AbstractAxedConstraint implements Holder {
+public class SingularConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
@@ -31,9 +32,9 @@ public class SingularConstraintImpl extends AbstractAxedConstraint implements Ho
 	}
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
-		if ((modified.getHolders((Attribute) constraintBase)).size() > 1)
-			throw new SingularConstraintViolationException("Multiple links of attribute " + modified + " on component " + constraintValue);
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
+		if (modified.getHolders((Attribute) constraintBase).size() > 1)
+			throw new SingularConstraintViolationException("Multiple links of attribute " + constraintBase + " on component " + modified);
 
 	}
 

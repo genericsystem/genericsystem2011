@@ -26,7 +26,9 @@
 	<rich:popupPanel id="popupPanel" domElementAttachment="form"
 		modal="true" resizeable="false" moveable="false" autosized="true">
 		<f:facet name="header">
-			<h:outputText styleClass="uppercase" value="blabla" />
+			<h:outputText styleClass="uppercase"
+				value="#{msg.add} #{msg.value} #{msg.for}" />
+			<h:outputText value=" #{mapProvider}" />
 		</f:facet>
 		<f:facet name="controls">
 			<h:outputLink value="#"
@@ -40,15 +42,13 @@
 				<h:outputText styleClass="uppercase" value="Class" />
 				<h:selectOneMenu id="inputPopupPanelKey" style="min-width:150"
 					value="#{mapProviderBean.key}">
-					<f:selectItems value="#{mapProviderBean.getKeyClasses(mapProvider.value)}" />
+					<f:selectItems
+						value="#{mapProviderBean.getKeyClasses(mapProvider.value)}" />
 				</h:selectOneMenu>
-				<h:outputText styleClass="uppercase" value="#{msg.position}"
-					rendered="#{keyInput}" />
-				<h:inputText id="inputPopupPanelPos"
-					value="#{mapProviderBean.pos}" rendered="#{keyInput}"
+				<h:outputText styleClass="uppercase" value="#{msg.position}" />
+				<h:inputText id="inputPopupPanelPos" value="#{mapProviderBean.pos}"
 					style="width:20px" />
 				<h:outputText styleClass="uppercase" value="#{msg.value}" />
-				<h:outputText rendered="#{keyInput}" />
 				<h:selectBooleanCheckbox id="inputPopupPanel"
 					value="#{mapProviderBean.value}"
 					style="margin-top:100;vertical-align:bottom;" />

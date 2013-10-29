@@ -9,6 +9,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -18,7 +19,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
-import org.genericsystem.systemproperties.constraints.simple.AbstractBooleanSimpleConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -30,7 +30,7 @@ import org.genericsystem.systemproperties.constraints.simple.AbstractBooleanSimp
 @SingularConstraint
 @Dependencies(StructuralNamingConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(StructuralNamingConstraintImpl.class)
-public class StructuralNamingConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
+public class StructuralNamingConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
@@ -40,7 +40,7 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanSimpleConstra
 	}
 
 	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
 		if (!constraintBase.isStructural() && constraintBase.getComponentsSize() == 0)
 			return;
 		Generic[] components = ((GenericImpl) constraintBase).getComponentsArray();

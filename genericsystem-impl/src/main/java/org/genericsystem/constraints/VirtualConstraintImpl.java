@@ -5,29 +5,31 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.VirtualConstraintException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
-import org.genericsystem.map.ConstraintsMapProvider.NoInheritanceConstraintKey;
+import org.genericsystem.systemproperties.NoInheritanceSystemType;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 @SystemGeneric
-@Extends(meta = NoInheritanceConstraintKey.class)
+@Extends(meta = ConstraintKey.class, value = NoInheritanceSystemType.class)
 @Components(MapInstance.class)
 @SingularConstraint
 @AxedConstraintValue(VirtualConstraintImpl.class)
 public class VirtualConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
 		if (!((Type) constraintBase).getInstances().isEmpty())
-			throw new VirtualConstraintException(modified + "  should not be instanciated");
+			throw new VirtualConstraintException(constraintBase + "  should not be instanciated");
 	}
 
 	@Override

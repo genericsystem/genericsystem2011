@@ -9,6 +9,7 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UniqueValueConstraintViolationException;
@@ -26,6 +27,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
 @SingularConstraint
+// TODO clean
 // @Dependencies(UniqueValueConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(UniqueValueConstraintImpl.class)
 public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
@@ -38,7 +40,7 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 	// }
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
 		Set<Serializable> values = new HashSet<>();
 		for (Generic attributeNode : ((Type) constraintBase).getAllInstances()) {
 			if (attributeNode.getValue() != null && !values.add(attributeNode.getValue()))

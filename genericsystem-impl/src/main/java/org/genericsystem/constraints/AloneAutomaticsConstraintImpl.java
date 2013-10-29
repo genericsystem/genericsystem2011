@@ -56,6 +56,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.AloneAutomaticsConstraintViolationException;
@@ -85,8 +86,8 @@ public class AloneAutomaticsConstraintImpl extends AbstractBooleanConstraintImpl
 	}
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
-		if (constraintBase.isAlive() /* && modified.isAutomatic() */&& constraintBase.getInheritings().isEmpty() && constraintBase.getComposites().isEmpty())
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
+		if (constraintBase.isAlive() && constraintBase.getInheritings().isEmpty() && constraintBase.getComposites().isEmpty())
 			throw new AloneAutomaticsConstraintViolationException();
 	}
 

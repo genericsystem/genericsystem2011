@@ -19,7 +19,6 @@ import org.testng.annotations.Test;
 public class MapTest extends AbstractTest {
 
 	public void testPropertyMap() {
-		Statics.debugCurrentThread();
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");

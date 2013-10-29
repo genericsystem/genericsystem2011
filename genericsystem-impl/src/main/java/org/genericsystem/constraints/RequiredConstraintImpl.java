@@ -5,6 +5,7 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.RequiredConstraintViolationException;
@@ -22,7 +23,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @AxedConstraintValue(RequiredConstraintImpl.class)
 @SingularConstraint
-public class RequiredConstraintImpl extends AbstractAxedConstraint implements Holder {
+public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
@@ -35,7 +36,7 @@ public class RequiredConstraintImpl extends AbstractAxedConstraint implements Ho
 	}
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
 		if (modified.getHolders((Attribute) constraintBase).isEmpty())
 			throw new RequiredConstraintViolationException(modified + " is required for " + constraintBase);
 	}

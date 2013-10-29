@@ -80,6 +80,13 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
+	 * Rebuild all the tree.
+	 */
+	public void rebuildTree() {
+		rootTreeNode.abandonChildren();
+	}
+
+	/**
 	 * Selects the node of generic supplied in parameters.
 	 * 
 	 * @param generic - the generic to look for.

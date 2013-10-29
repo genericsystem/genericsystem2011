@@ -42,6 +42,7 @@ import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingletonConstraintViolationException;
@@ -63,7 +64,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class SingletonConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
 		if (((Type) instanceToCheck).getAllInstances().size() > 1)
 			throw new SingletonConstraintViolationException("Singleton constraint violation : type " + constraintBase + " has " + ((Type) constraintBase).getAllInstances().size() + " instances.");
 	}

@@ -8,6 +8,7 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -26,8 +27,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class PropertyConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
-	//
-	public void check(final Generic constraintBase, final Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(final Generic constraintBase, final Generic modified) throws ConstraintViolationException {
 
 		if (modified.isAttribute()) {
 			for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {

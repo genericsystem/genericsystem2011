@@ -50,6 +50,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -77,8 +78,9 @@ public class ConcreteInheritanceConstraintImpl extends AbstractBooleanConstraint
 	public static class DefaultValue extends GenericImpl implements Holder {
 	}
 
+	// TODO impl ?
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
 		// if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
 		// if (((GenericImpl) modified).getSupers().get(0).isConcrete())
 		// throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());

@@ -12,7 +12,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -232,7 +231,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Generic orderedDependency : orderedDependencies) {
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-								adjust(((GenericImpl) orderedDependency).components));
+						adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -307,9 +306,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 				} catch (InterruptedException ex) {
 					throw new IllegalStateException(ex);
 				}
-				//if (attempt > Statics.ATTEMPTS / 2)
+
+				// if (attempt > Statics.ATTEMPTS / 2)
 				// log.info("MvccException : " + e + " attempt : " + attempt);
-				cause = e;
+
 				pickNewTs();
 				continue;
 			} catch (Exception e) {

@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -60,6 +59,7 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
+@SuppressWarnings("unchecked")
 public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute {
 
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
@@ -665,7 +665,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (int i = 0; i < additionals.length; i++)
 			if (!components[i].inheritsFrom(additionals[i]))
 				result.add(additionals[i]);
-		//log.info("ZZZZZZZZZZZZ" + result.toString());
 		return result.toArray(new Generic[result.size()]);
 	}
 
@@ -791,7 +790,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					}
 				});
 				if (projection == null) {
-					log.info("Search not found : " + this.getHomeTreeNode() + " " + new Primaries(this.getHomeTreeNode(), this).toArray() + " " + Arrays.toString(newComponents));
 					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, components)).markAsAutomatic();
 				}
 			}
