@@ -44,6 +44,7 @@ public class GenericBean implements Serializable {
 	 */
 	public void newType(String typeName) {
 		cacheProvider.getCurrentCache().newType(typeName);
+		genericTreeBean.rebuildTree();
 
 		messages.info("createRootType", typeName);
 	}
@@ -55,6 +56,7 @@ public class GenericBean implements Serializable {
 	 */
 	public void newSubType(String subTypeName) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newSubType(subTypeName);
+		genericTreeBean.rebuildTree();
 
 		messages.info("createSubType", subTypeName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
 	}
