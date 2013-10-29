@@ -91,11 +91,20 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @param generic - the generic to look for.
 	 */
-	public void selectNodeOfGeneric(Generic generic) {
-		selectedTreeNode = rootTreeNode.findSubTreeNodeByGeneric(generic);
-		internalChangeType();
+	//	public void selectNodeOfGeneric(Generic generic) {
+	//		selectedTreeNode = rootTreeNode.findSubTreeNodeByGeneric(generic);
+	//		internalChangeType();
+	//
+	//		gsMessages.info("typeselectionchanged", selectedTreeNode.getGeneric());
+	//	}
 
-		gsMessages.info("typeselectionchanged", selectedTreeNode.getGeneric());
+	/**
+	 * Selects one node already available in the tree.
+	 * 
+	 * @param node - node of the tree.
+	 */
+	public void selectNode(GuiTreeNode node) {
+		selectedTreeNode = node;
 	}
 
 	/**
@@ -203,7 +212,7 @@ public class GenericTreeBean implements Serializable {
 			selectedTreeNode = (GuiTreeNode) treeSelectionEvent.getObject();
 			internalChangeType();
 
-			gsMessages.info("typeselectionchanged", getSelectedTreeNode().getGeneric().toString());
+			gsMessages.info("msgNodeSelection", getSelectedTreeNode().getGeneric().toString());
 		}
 	}
 

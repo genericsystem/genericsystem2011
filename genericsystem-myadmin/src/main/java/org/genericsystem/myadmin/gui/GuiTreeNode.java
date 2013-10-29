@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Node for the tree of generics in GUI of MyAdmin.
@@ -12,6 +15,8 @@ import org.genericsystem.generic.Type;
  * @author Alexei KLENIN - aklenin@middlewarefactory.com
  */
 public class GuiTreeNode {
+
+	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
 
 	public enum GuiTreeChildrenType {
 		SUPERS, INSTANCES, INHERITINGS, COMPONENTS, COMPOSITES, ATTRIBUTES, RELATIONS, VALUES;
@@ -40,6 +45,9 @@ public class GuiTreeNode {
 	}
 
 	public List<GuiTreeNode> getChildren(GuiTreeChildrenType childrenType) {
+		log.info("@@@@@@@@@@@@@≥≥≥≥≥≥≥≥≥≥≥≥≥@]@@@@@@@@@@@@@@ ::: " + generic.toString() + " : " + childrenType.toString());
+
+
 		if (children != null && this.childrenType == childrenType)
 			return children;
 		children = new ArrayList<>();
@@ -82,6 +90,7 @@ public class GuiTreeNode {
 		case INSTANCES:
 			return ((Type) generic).getInstances();
 		case INHERITINGS:
+			log.info(">>>>>> SUPERLALA: " + generic.toString());
 			return generic.getInheritings();
 		case COMPONENTS:
 			return generic.getComponents();
