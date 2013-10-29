@@ -12,7 +12,6 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -254,15 +253,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return updateValue(generic, generic.getValue());
 	}
 
-	Generic[] reBind(Generic[] generics) {
-		Generic[] reBounds = new Generic[generics.length];
-		for (int i = 0; i < generics.length; i++) {
-			Generic generic = generics[i];
-			reBounds[i] = generic == null ? null : generic.isAlive() ? generic : updateValue(generic, generic.getValue());
-		}
-		return reBounds;
-	}
-
 	@Override
 	public boolean isAutomatic(Generic generic) {
 		return automatics.contains(generic) || subContext.isAutomatic(generic);
@@ -316,9 +306,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 				} catch (InterruptedException ex) {
 					throw new IllegalStateException(ex);
 				}
-				if (attempt > Statics.ATTEMPTS / 2)
-					// log.info("MvccException : " + e + " attempt : " + attempt);
-					cause = e;
+
+				// if (attempt > Statics.ATTEMPTS / 2)
+				// log.info("MvccException : " + e + " attempt : " + attempt);
+
 				pickNewTs();
 				continue;
 			} catch (Exception e) {
@@ -808,8 +799,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 				@Override
 				Generic rebuild() {
 					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
-					return internalBind(newHomeTreeNode, new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()))).toArray(),
-							reBind(((GenericImpl) old).selfToNullComponents()), old.getClass(), false);
+					return internalBind(newHomeTreeNode, new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()))).toArray(), ((GenericImpl) old).selfToNullComponents(),
+							old.getClass(), false);
 				}
 			}.rebuildAll(old);
 		}
