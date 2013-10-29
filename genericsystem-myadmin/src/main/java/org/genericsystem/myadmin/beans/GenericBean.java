@@ -111,6 +111,7 @@ public class GenericBean implements Serializable {
 
 	public void remove(Holder holder) {
 		genericTreeBean.getSelectedTreeNode().getGeneric().removeHolder(holder);
+		genericTreeBean.rebuildTree();
 
 		messages.info("remove", holder);
 	}
@@ -119,6 +120,7 @@ public class GenericBean implements Serializable {
 		Generic generic = genericTreeBean.getSelectedTreeNode().getGeneric();
 		genericTreeBean.setSelectedTreeNode(genericTreeBean.getSelectedTreeNode().getParent());
 		generic.remove();
+		genericTreeBean.rebuildTree();
 
 		messages.info("remove", generic);
 		return "";
