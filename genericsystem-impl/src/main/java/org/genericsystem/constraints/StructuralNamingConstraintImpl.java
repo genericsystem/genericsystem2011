@@ -18,7 +18,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
-import org.genericsystem.systemproperties.constraints.simple.AbstractBooleanSimpleConstraintImpl;
 
 /**
  * @author Nicolas Feybesse
@@ -30,7 +29,7 @@ import org.genericsystem.systemproperties.constraints.simple.AbstractBooleanSimp
 @SingularConstraint
 @Dependencies(StructuralNamingConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(StructuralNamingConstraintImpl.class)
-public class StructuralNamingConstraintImpl extends AbstractBooleanSimpleConstraintImpl implements Holder {
+public class StructuralNamingConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
