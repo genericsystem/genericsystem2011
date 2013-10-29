@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -55,7 +56,6 @@ import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("unchecked")
 /**
  * @author Nicolas Feybesse
  * @author Michael Ory
@@ -660,12 +660,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return !homeTreeNode.isPhantom() ? this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, false, targets) : null;
 	}
 
-	private Generic[] enrich(Generic[] targets, Generic[] additionals) {
-		List<Generic> result = new ArrayList<>(Arrays.asList(targets));
+	private Generic[] enrich(Generic[] components, Generic[] additionals) {
+		List<Generic> result = new ArrayList<>(Arrays.asList(components));
 		for (int i = 0; i < additionals.length; i++)
-			if (!targets[i].inheritsFrom(additionals[i]))
+			if (!components[i].inheritsFrom(additionals[i]))
 				result.add(additionals[i]);
-		log.info("ZZZZZZZZZZZZ" + result.toString());
+		//log.info("ZZZZZZZZZZZZ" + result.toString());
 		return result.toArray(new Generic[result.size()]);
 	}
 
@@ -782,18 +782,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final Generic[] components = (Generic[]) cartesianIterator.next();
-			if (phantomExists(components)) {
-				// Generic generic = getCurrentCache().fastFindBySuper(this.getHomeTreeNode(), new Primaries(this.getHomeTreeNode(), this).toArray(), this, components);
+			final Generic[] newComponents = enrich(components, GenericImpl.this.components);
+			if (!phantomExists(components)) {
 				Generic projection = Statics.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
-
 					@Override
 					public boolean isSelected() {
-						return isSuperOf(new Primaries(getHomeTreeNode(), GenericImpl.this).toArray(), components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
+						return isSuperOf(new Primaries(getHomeTreeNode(), GenericImpl.this).toArray(), newComponents, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
 					}
 				});
-
 				if (projection == null) {
-					log.info("Search not found : " + this.getHomeTreeNode() + " " + Arrays.toString(new Primaries(this.getHomeTreeNode(), this).toArray()) + " " + Arrays.toString(components));
+					log.info("Search not found : " + this.getHomeTreeNode() + " " + new Primaries(this.getHomeTreeNode(), this).toArray() + " " + Arrays.toString(newComponents));
 					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, components)).markAsAutomatic();
 				}
 			}
@@ -815,7 +813,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	boolean phantomExists(Generic[] components) {
-		return getCurrentCache().fastFindPhantom(homeTreeNode, primaries, components) == null;
+		return getCurrentCache().fastFindPhantom(homeTreeNode, primaries, components) != null;
 		// HomeTreeNode phantom = homeTreeNode.metaNode.findInstanceNode(null);
 		// return phantom != null ? getCurrentCache().fastFindBySuper(phantom, new Primaries(Statics.insertFirst(phantom, primaries)).toArray(), this, components) : null;
 	}
