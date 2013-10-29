@@ -37,14 +37,14 @@
 			icon="#{infos.imgGarb}" rendered="#{fileSystemBean.directorySelected || fileSystemBean.fileSelected}" />
 	</rich:contextMenu>
 
-	<gs:popupPanel key="createfile"
+	<gs:popupPanelProperties key="createfile"
 		title="#{msg.create} #{msg.a} #{msg.file}"
 		action="#{fileSystemBean.addFile(popupValue)}" render="directorytree" />
-	<gs:popupPanel key="createsubdirectory"
+	<gs:popupPanelProperties key="createsubdirectory"
 		title="#{msg.create} #{msg.a} #{msg.sub} #{msg.directory}"
 		action="#{fileSystemBean.addSubDirectory(popupValue)}"
 		render="directorytree" />
-	<gs:popupPanel key="newrootdirectory"
+	<gs:popupPanelProperties key="newrootdirectory"
 		title="#{msg.add} #{msg.a} #{msg.root} #{msg.directory}"
 		action="#{fileSystemBean.addRootDirectory(popupValue)}"
 		render="directorytree" />
