@@ -19,6 +19,37 @@
 			<rich:toolbar id="toolbar" itemStyle="padding: 0 4px;"
 				style="background-color: inherit; background-image: inherit; border: medium none;">
 
+				<rich:toolbarGroup>
+					<rich:dropDownMenu>
+						<f:facet name="label">
+							<h:outputFormat value="#{msg.itmCache}">
+								<f:param value="#{cacheBean.cache.level}" />
+							</h:outputFormat>
+						</f:facet>
+						<!-- New super cache -->
+						<rich:menuItem label="#{msg.itmMountNewCache}"
+							action="#{cacheBean.mountNewCache}" icon="#{infos.add}"
+							immediate="true" />
+						<!-- Flush current cache -->
+						<rich:menuItem label="#{msg.itmFlushCurrentCache}"
+							action="#{cacheBean.flushCurrentCache}" icon="#{infos.data_next}"
+							immediate="true" />
+						<rich:menuSeparator />
+						<!-- Discard current cache -->
+						<rich:menuItem label="#{msg.itmDiscardCurrentCache}"
+							action="#{cacheBean.discardCurrentCache}"
+							icon="#{infos.data_previous}" immediate="true" />
+					</rich:dropDownMenu>
+				</rich:toolbarGroup>
+
+				<rich:toolbarGroup>
+					<a4j:outputPanel ajaxRendered="true">
+						<h:outputFormat value="#{msg.lblTransactionTimestamp}">
+							<f:param value="#{cacheBean.currentCacheTs}" />
+						</h:outputFormat>
+					</a4j:outputPanel>
+				</rich:toolbarGroup>
+
 				<rich:toolbarGroup location="right">
 					<a4j:status name="status">
 						<f:facet name="start">
@@ -41,19 +72,6 @@
 						onclick="if (! window.confirm('#{msg.invalidateSessionConfirm}') ) {return false}">
 						<h:graphicImage value="#{infos.lifebelt}"
 							title="#{msg.invalidateSession}" />
-					</h:commandLink>
-
-					<a4j:commandLink action="#{cacheBean.newCache}">
-						<h:graphicImage value="#{infos.add}"
-							title="#{msg.addCache}" />
-					</a4j:commandLink>
-					<a4j:commandLink action="#{cacheBean.save}">
-						<h:graphicImage value="#{infos.data_next}"
-							title="#{msg.save_button}" />
-					</a4j:commandLink>
-					<h:commandLink action="#{cacheBean.discard}" immediate="true">
-						<h:graphicImage value="#{infos.data_previous}"
-							title="#{msg.discard_button}" />
 					</h:commandLink>
 				</rich:toolbarGroup>
 			</rich:toolbar>
