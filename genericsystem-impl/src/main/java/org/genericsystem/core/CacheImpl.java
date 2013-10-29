@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -619,35 +620,43 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return constraint.isImmediatelyConsistencyCheckable();
 	}
 
-	private void checkConstraints(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
-		// check des contraintes axées des attributs du modified
-		for (Attribute attribute : ((Type) generic).getAttributes()) {
-			ExtendedMap<Serializable, Serializable> constraintMap = attribute.getConstraintsMap();
+	private void checkConstraints(final CheckingType checkingType, final boolean isFlushTime, final Generic generic) throws ConstraintViolationException {
+		for (final Attribute attribute : ((Type) generic).getAttributes())
+			new Check() {
+				@Override
+				public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException {
+					if (AbstractAxedConstraint.class.isAssignableFrom(((AxedPropertyClass) keyHolder.getValue()).getClazz())) {
+						int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+						if (null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
+							((AbstractAxedConstraint) keyHolder).check(attribute, generic, checkingType, valueHolder);
+					}
+				}
+			}.check(checkingType, isFlushTime, attribute);
+
+		new Check() {
+			@Override
+			public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException {
+				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
+				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1) {
+					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+					keyHolder.check(baseConstraint, Statics.MULTIDIRECTIONAL == axe ? generic : ((Attribute) generic).getComponent(axe), checkingType, valueHolder);
+				}
+			}
+		}.check(checkingType, isFlushTime, generic);
+	}
+
+	private abstract class Check {
+		void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+			ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
 			for (Serializable key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
-				AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-				Class<?> constraintClass = ((AxedPropertyClass) keyHolder.getValue()).getClazz();
-				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-				if (AbstractAxedConstraint.class.isAssignableFrom(constraintClass))
-					if (null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
-						if (isCheckable(keyHolder, generic, checkingType, isFlushTime))
-							((AbstractAxedConstraint) keyHolder).check(attribute, generic, checkingType, valueHolder);
-
+				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
+				if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime))
+					internalCheck(keyHolder, valueHolder);
 			}
 		}
 
-		// check des contraintes du modified
-		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
-		for (Serializable key : constraintMap.keySet()) {
-			Holder valueHolder = constraintMap.getValueHolder(key);
-			AbstractConstraintImpl keyHolder = valueHolder.getBaseComponent();
-			if (isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
-				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
-				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
-					keyHolder.check(baseConstraint, Statics.MULTIDIRECTIONAL == axe ? generic : ((Attribute) generic).getComponent(axe), checkingType, valueHolder);
-			}
-		}
+		abstract void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException;
 	}
 
 	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
