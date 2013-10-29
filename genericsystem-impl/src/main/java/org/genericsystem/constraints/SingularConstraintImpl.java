@@ -32,7 +32,9 @@ public class SingularConstraintImpl extends AbstractAxedConstraint implements Ho
 
 	@Override
 	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
-		if ((modified.getHolders((Attribute) constraintBase)).size() > 1)
+		// TODO clean
+		// log.info("modified " + modified + " constraintBase " + constraintBase + " " + modified.getHolders((Attribute) constraintBase));
+		if (modified.getHolders((Attribute) constraintBase).size() > 1)
 			throw new SingularConstraintViolationException("Multiple links of attribute " + modified + " on component " + constraintValue);
 
 	}
