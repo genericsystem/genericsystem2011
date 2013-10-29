@@ -632,8 +632,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (final Attribute attribute : ((Type) generic).getAttributes())
 			new Check() {
 				@Override
-				public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException {
-					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+				public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException {
 					if (null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
 						keyHolder.check(attribute, generic, valueHolder);
 				}
@@ -641,10 +640,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		new Check() {
 			@Override
-			public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException {
+			public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
 				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1) {
-					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 					keyHolder.check(baseConstraint, Statics.MULTIDIRECTIONAL == axe ? generic : ((Attribute) generic).getComponent(axe), valueHolder);
 				}
 			}
@@ -657,12 +655,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Serializable key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
+				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 				if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime))
-					internalCheck(keyHolder, valueHolder);
+					internalCheck(keyHolder, valueHolder, axe);
 			}
 		}
 
-		abstract void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException;
+		abstract void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException;
 	}
 
 	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
