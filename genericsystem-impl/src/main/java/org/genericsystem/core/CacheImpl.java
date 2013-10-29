@@ -17,7 +17,6 @@ import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.constraints.AbstractAxedConstraint;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.core.Generic.ExtendedMap;
@@ -125,6 +124,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
+	public void refresh() throws ConstraintViolationException {
+		pickNewTs();
+		try {
+			checkConstraints();
+		} catch (ConstraintViolationException e) {
+			rollback(e);
+			throw e; // re-throw the same exception
+		}
+	}
+
 	@Override
 	public boolean isRemovable(Generic generic) {
 		try {
@@ -221,7 +230,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies, boolean computeDirectSupers) {
 			for (Generic orderedDependency : orderedDependencies) {
-				// log.info("REBUILD : " + orderedDependency.info());
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
 						adjust(((GenericImpl) orderedDependency).components));
@@ -309,8 +317,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 					throw new IllegalStateException(ex);
 				}
 				if (attempt > Statics.ATTEMPTS / 2)
-					log.info("MvccException : " + e + " attempt : " + attempt);
-				cause = e;
+					// log.info("MvccException : " + e + " attempt : " + attempt);
+					cause = e;
 				pickNewTs();
 				continue;
 			} catch (Exception e) {
@@ -589,10 +597,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 			int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 			Generic constraintBase = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
 			if (axe == Statics.MULTIDIRECTIONAL)
-				keyHolder.check(constraintBase, generic, checkingType, (Holder) generic);
+				keyHolder.check(constraintBase, generic, (Holder) generic);
 			else
 				for (Generic instance : ((Type) ((Attribute) constraintBase).getComponent(axe)).getAllInstances())
-					keyHolder.check(constraintBase, instance, checkingType, (Holder) generic);
+					keyHolder.check(constraintBase, instance, (Holder) generic);
 		}
 	}
 
@@ -625,11 +633,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 			new Check() {
 				@Override
 				public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder) throws ConstraintViolationException {
-					if (AbstractAxedConstraint.class.isAssignableFrom(((AxedPropertyClass) keyHolder.getValue()).getClazz())) {
-						int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-						if (null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
-							((AbstractAxedConstraint) keyHolder).check(attribute, generic, checkingType, valueHolder);
-					}
+					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+					if (null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
+						keyHolder.check(attribute, generic, valueHolder);
 				}
 			}.check(checkingType, isFlushTime, attribute);
 
@@ -639,7 +645,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
 				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1) {
 					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-					keyHolder.check(baseConstraint, Statics.MULTIDIRECTIONAL == axe ? generic : ((Attribute) generic).getComponent(axe), checkingType, valueHolder);
+					keyHolder.check(baseConstraint, Statics.MULTIDIRECTIONAL == axe ? generic : ((Attribute) generic).getComponent(axe), valueHolder);
 				}
 			}
 		}.check(checkingType, isFlushTime, generic);

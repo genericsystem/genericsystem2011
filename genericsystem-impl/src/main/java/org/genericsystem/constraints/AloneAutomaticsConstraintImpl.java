@@ -85,7 +85,7 @@ public class AloneAutomaticsConstraintImpl extends AbstractBooleanConstraintImpl
 	}
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
 		if (constraintBase.isAlive() /* && modified.isAutomatic() */&& constraintBase.getInheritings().isEmpty() && constraintBase.getComposites().isEmpty())
 			throw new AloneAutomaticsConstraintViolationException();
 	}

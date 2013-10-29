@@ -38,7 +38,7 @@ public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl imp
 	// }
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
 		Set<Serializable> values = new HashSet<>();
 		for (Generic attributeNode : ((Type) constraintBase).getAllInstances()) {
 			if (attributeNode.getValue() != null && !values.add(attributeNode.getValue()))

@@ -26,7 +26,7 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
 public class VirtualConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
 		if (!((Type) constraintBase).getInstances().isEmpty())
 			throw new VirtualConstraintException(modified + "  should not be instanciated");
 	}

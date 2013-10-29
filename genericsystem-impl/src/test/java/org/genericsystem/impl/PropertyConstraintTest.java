@@ -18,7 +18,6 @@ public class PropertyConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Attribute equipment = vehicle.setAttribute("Equipment");
-		log.info("@@@@@@@@@@@");
 		equipment.enablePropertyConstraint();
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
@@ -32,7 +31,6 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Generic myVehicle = vehicle.newInstance("myVehicle");
 		Holder abs = myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
-		log.info("jjklkbjgggggggg" + ((Type) equipment).getInstances());
 		assert !abs.isAlive();
 	}
 
@@ -67,7 +65,6 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic blue = color.newInstance("blue");
 		Link myVehicleColor = myVehicle.setLink(vehicleColor, "myVehicleColor", red);
 		myVehicle.setLink(vehicleColor, "myVehicleColor", blue);
-		log.info("@@@@@@@@@@@@@@@@" + myVehicleColor.getComponents());
 	}
 
 	public void testBinaryRelationSameTarget() {
@@ -217,7 +214,6 @@ public class PropertyConstraintTest extends AbstractTest {
 			@Override
 			public void intercept() {
 				vehicle.setValue(equipment, "GPS");
-				log.info("la value" + myVehicle.getHolders(equipment));
 				cache.flush();
 				// assert ((GenericImpl) result).reFind() != null;
 			}

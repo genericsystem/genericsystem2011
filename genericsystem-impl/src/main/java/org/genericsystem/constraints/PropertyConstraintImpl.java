@@ -26,8 +26,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 public class PropertyConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
-	//
-	public void check(final Generic constraintBase, final Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(final Generic constraintBase, final Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
 
 		if (modified.isAttribute()) {
 			for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {

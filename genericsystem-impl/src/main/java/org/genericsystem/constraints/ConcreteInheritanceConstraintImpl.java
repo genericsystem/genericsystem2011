@@ -78,7 +78,7 @@ public class ConcreteInheritanceConstraintImpl extends AbstractBooleanConstraint
 	}
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, CheckingType checkingType, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
 		// if (modified.isConcrete() && ((GenericImpl) modified).isPrimary())
 		// if (((GenericImpl) modified).getSupers().get(0).isConcrete())
 		// throw new ConcreteInheritanceConstraintViolationException(modified.getMeta() + " " + modified.info());
