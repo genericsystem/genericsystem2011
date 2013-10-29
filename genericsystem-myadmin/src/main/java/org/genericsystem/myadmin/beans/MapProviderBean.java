@@ -104,6 +104,7 @@ public class MapProviderBean implements Serializable {
 	 *            - value.
 	 */
 	public void addKeyValueToMap(Map<Serializable, Serializable> map, String key, int pos, boolean value) {
+		log.info("key " + key + " getClassByName(key) " + getClassByName(key) + " pos " + pos + " value " + value);
 		map.put(new AxedPropertyClass(getClassByName(key), pos), value);
 	}
 
