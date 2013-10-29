@@ -12,7 +12,6 @@ public class VirtuakConstraintTest extends AbstractTest {
 	public void testVirtual() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		log.info("@@@@@@@@@@");
 		vehicle.enableVirtualConstraint();
 		Type car = vehicle.newSubType("Car");
 		car.newInstance("myCar");

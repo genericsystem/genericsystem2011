@@ -5,6 +5,7 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.VirtualConstraintException;
@@ -26,9 +27,9 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
 public class VirtualConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
 		if (!((Type) constraintBase).getInstances().isEmpty())
-			throw new VirtualConstraintException(modified + "  should not be instanciated");
+			throw new VirtualConstraintException(constraintBase + "  should not be instanciated");
 	}
 
 	@Override

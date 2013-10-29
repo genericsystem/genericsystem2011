@@ -11,6 +11,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
 import org.genericsystem.core.AbstractContext;
 import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.Generic;
@@ -43,7 +44,7 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanConstraintI
 	}
 
 	@Override
-	public void check(Generic instanceToCheck, final Generic baseConstraint, Holder constraintValue, int axe) throws ConstraintViolationException {
+	public void check(Generic instanceToCheck, final Generic baseConstraint) throws ConstraintViolationException {
 		final Generic[] supers = ((GenericImpl) baseConstraint).getSupersArray();
 		final Generic[] components = ((GenericImpl) baseConstraint).getComponentsArray();
 		Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((EngineImpl) baseConstraint.getEngine()).getCurrentCache().compositesIterator(components[0])
