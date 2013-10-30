@@ -54,6 +54,7 @@ public class MapProviderBean implements Serializable {
 	private String key;
 	private int pos;
 	private boolean value;
+	private String valueStr;
 
 	/**
 	 * Returns map of map provider.
@@ -66,6 +67,10 @@ public class MapProviderBean implements Serializable {
 	public <T extends AbstractMapProvider<?, ?>> Map<Serializable, Serializable> getMap(MapProvider mapProvider) {
 		// return mapProvider.getMap((Class<T>)genericTreeBean.getSelectedTreeNode().getGeneric().getClass());
 		return mapProvider.getExtendedMap(genericTreeBean.getSelectedTreeNode().getGeneric());
+	}
+
+	public boolean isPropertiesMapProvider(MapProvider mapProvider) {
+		return PropertiesMapProvider.class.isAssignableFrom((Class<?>) mapProvider.getValue());
 	}
 
 	/**
@@ -99,7 +104,16 @@ public class MapProviderBean implements Serializable {
 	 *            - value.
 	 */
 	public void addKeyValueToMap(Map<Serializable, Serializable> map, String key, int pos, boolean value) {
+		log.info("key " + key + " getClassByName(key) " + getClassByName(key) + " pos " + pos + " value " + value);
 		map.put(new AxedPropertyClass(getClassByName(key), pos), value);
+	}
+
+	public void addKeyValueToPropertiesMap(Map<Serializable, Serializable> map) {
+		addKeyValueToPropertiesMap(map, key, valueStr);
+	}
+
+	public void addKeyValueToPropertiesMap(Map<Serializable, Serializable> map, String key, String value) {
+		map.put(key, value);
 	}
 
 	/**
@@ -189,6 +203,14 @@ public class MapProviderBean implements Serializable {
 
 	public void setValue(boolean value) {
 		this.value = value;
+	}
+
+	public String getValueStr() {
+		return valueStr;
+	}
+
+	public void setValueStr(String valueStr) {
+		this.valueStr = valueStr;
 	}
 
 }

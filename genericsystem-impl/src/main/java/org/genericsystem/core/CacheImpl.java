@@ -254,15 +254,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return updateValue(generic, generic.getValue());
 	}
 
-	Generic[] reBind(Generic[] generics) {
-		Generic[] reBounds = new Generic[generics.length];
-		for (int i = 0; i < generics.length; i++) {
-			Generic generic = generics[i];
-			reBounds[i] = generic == null ? null : generic.isAlive() ? generic : updateValue(generic, generic.getValue());
-		}
-		return reBounds;
-	}
-
 	@Override
 	public boolean isAutomatic(Generic generic) {
 		return automatics.contains(generic) || subContext.isAutomatic(generic);
@@ -316,9 +307,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 				} catch (InterruptedException ex) {
 					throw new IllegalStateException(ex);
 				}
-				if (attempt > Statics.ATTEMPTS / 2)
-					// log.info("MvccException : " + e + " attempt : " + attempt);
-					cause = e;
+
+				// if (attempt > Statics.ATTEMPTS / 2)
+				// log.info("MvccException : " + e + " attempt : " + attempt);
+
 				pickNewTs();
 				continue;
 			} catch (Exception e) {
@@ -594,13 +586,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
 		if (isConsistencyToCheck(checkingType, isFlushTime, generic)) {
 			AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-			int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-			Generic constraintBase = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
+			int axe = keyHolder.<AxedPropertyClass> getValue().getAxe();
+			Attribute constraintBase = keyHolder.<Holder> getBaseComponent().getBaseComponent();
 			if (axe == Statics.MULTIDIRECTIONAL)
 				keyHolder.check(constraintBase, generic, (Holder) generic);
-			else
-				for (Generic instance : ((Type) ((Attribute) constraintBase).getComponent(axe)).getAllInstances())
-					keyHolder.check(constraintBase, instance, (Holder) generic);
+			else {
+				Type component = constraintBase.getComponent(axe);
+				if (null != component)
+					for (Generic instance : component.getAllInstances())
+						keyHolder.check(constraintBase, instance, (Holder) generic);
+			}
 		}
 	}
 
@@ -808,8 +803,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 				@Override
 				Generic rebuild() {
 					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
-					return internalBind(newHomeTreeNode, new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()))).toArray(),
-							reBind(((GenericImpl) old).selfToNullComponents()), old.getClass(), false);
+					return internalBind(newHomeTreeNode, new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()))).toArray(), ((GenericImpl) old).selfToNullComponents(),
+							old.getClass(), false);
 				}
 			}.rebuildAll(old);
 		}
