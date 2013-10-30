@@ -53,8 +53,14 @@
 		</rich:menuGroup>
 
 		<rich:menuGroup label="#{msg.itmMenuShowValues}"
-			binding="#{genericBean.menuGroup}" 
+			binding="#{genericBean.menuGroup}"
 			rendered="#{guiGenericsTreeBean.selectedTreeNode.generic.isConcrete()}" />
+
+		<rich:menuSeparator />
+
+		<rich:menuItem label="#{msg.itmRefreshSubTree}"
+			action="#{guiGenericsTreeBean.updateSelectedSubTree}" mode="ajax"
+			execute="typestree" render="typestree" />
 
 		<rich:menuSeparator />
 
@@ -63,7 +69,7 @@
 			execute="typestree" render="typestree"
 			icon="#{menuBean.getMenuTypeIcon('TYPE')}"
 			disabled="#{guiGenericsTreeBean.selectedTreeNode.generic.isConcrete()}" />
-			
+
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{guiGenericsTreeBean.selectedTreeNode.value}"
 			action="#{genericBean.newSubType('new_subType')}" mode="ajax"

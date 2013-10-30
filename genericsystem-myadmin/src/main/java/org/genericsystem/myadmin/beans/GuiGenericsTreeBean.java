@@ -92,6 +92,11 @@ public class GuiGenericsTreeBean implements Serializable {
 		rootTreeNode.updateSubTree();
 	}
 
+	public String updateSelectedSubTree() {
+		selectedTreeNode.updateSubTree();
+		return "";
+	}
+
 	/**
 	 * Selects the node of generic supplied in parameters.
 	 * 

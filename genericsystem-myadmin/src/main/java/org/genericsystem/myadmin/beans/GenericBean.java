@@ -134,8 +134,12 @@ public class GenericBean implements Serializable {
 	public String delete() {
 		Generic generic = genericTreeBean.getSelectedTreeNode().getGeneric();
 		genericTreeBean.setSelectedTreeNode(genericTreeBean.getSelectedTreeNode().getParent());
-		generic.remove();
-		genericTreeBean.updateTree();
+
+		try {
+			generic.remove();
+		} finally {
+			genericTreeBean.updateTree();
+		}
 
 		messages.info("remove", generic);
 		return "";
