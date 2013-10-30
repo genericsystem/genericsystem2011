@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Alexei KLENIN - aklenin@middlewarefactory.com
  */
-public class GuiTreeNode {
+public class GuiGenericsTreeNode {
 
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
 
@@ -25,32 +25,32 @@ public class GuiTreeNode {
 
 	public static final GuiTreeChildrenType DEFAULT_CHILDREN_TYPE = GuiTreeChildrenType.INHERITINGS;
 
-	private final GuiTreeNode parent;
+	private final GuiGenericsTreeNode parent;
 	private Generic generic;
-	private List<GuiTreeNode> children;
+	private List<GuiGenericsTreeNode> children;
 	private GuiTreeChildrenType childrenType = DEFAULT_CHILDREN_TYPE;
 
-	public GuiTreeNode(GuiTreeNode parent, Generic generic, GuiTreeChildrenType treeType) {
+	public GuiGenericsTreeNode(GuiGenericsTreeNode parent, Generic generic, GuiTreeChildrenType treeType) {
 		this.parent = parent;
 		this.generic = generic;
 		this.childrenType = treeType;
 	}
 
-	public GuiTreeNode(GuiTreeNode parent, Generic generic) {
+	public GuiGenericsTreeNode(GuiGenericsTreeNode parent, Generic generic) {
 		this.parent = parent;
 		this.generic = generic;
 	}
 
-	public List<GuiTreeNode> getChildren() {
+	public List<GuiGenericsTreeNode> getChildren() {
 		return getChildren(childrenType);
 	}
 
-	public List<GuiTreeNode> getChildren(GuiTreeChildrenType childrenType) {
+	public List<GuiGenericsTreeNode> getChildren(GuiTreeChildrenType childrenType) {
 		if (children != null && this.childrenType == childrenType)
 			return children;
 		children = new ArrayList<>();
 		for (Generic child : getGenericsForSubTree(childrenType))
-			children.add(new GuiTreeNode(this, child));
+			children.add(new GuiGenericsTreeNode(this, child));
 		return children;
 	}
 
@@ -62,11 +62,11 @@ public class GuiTreeNode {
 	 * 
 	 * @return the GUI tree node of generic.
 	 */
-	public GuiTreeNode findSubTreeNodeByGeneric(Generic generic) {
+	public GuiGenericsTreeNode findSubTreeNodeByGeneric(Generic generic) {
 		if (this.generic == generic)
 			return this;
-		for (GuiTreeNode child : getChildren()) {
-			GuiTreeNode found = child.findSubTreeNodeByGeneric(generic);
+		for (GuiGenericsTreeNode child : getChildren()) {
+			GuiGenericsTreeNode found = child.findSubTreeNodeByGeneric(generic);
 			if (found != null)
 				return found;
 		}
@@ -108,7 +108,7 @@ public class GuiTreeNode {
 		return generic.toString();
 	}
 
-	public GuiTreeNode getParent() {
+	public GuiGenericsTreeNode getParent() {
 		return parent;
 	}
 

@@ -18,8 +18,8 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
-import org.genericsystem.myadmin.gui.GuiTreeNode;
-import org.genericsystem.myadmin.gui.GuiTreeNode.GuiTreeChildrenType;
+import org.genericsystem.myadmin.gui.GuiGenericsTreeNode;
+import org.genericsystem.myadmin.gui.GuiGenericsTreeNode.GuiTreeChildrenType;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.jboss.seam.faces.event.qualifier.After;
 import org.jboss.seam.faces.event.qualifier.InvokeApplication;
@@ -40,8 +40,8 @@ public class GenericTreeBean implements Serializable {
 	@Inject transient CacheProvider cacheProvider;
 	@Inject private GsMessages gsMessages;
 
-	private GuiTreeNode rootTreeNode;					// root node of the tree
-	private GuiTreeNode selectedTreeNode;				// selected tree node
+	private GuiGenericsTreeNode rootTreeNode;					// root node of the tree
+	private GuiGenericsTreeNode selectedTreeNode;				// selected tree node
 	private boolean selectionLocked;
 
 	/* Events */
@@ -55,7 +55,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	@PostConstruct
 	public void init() {
-		rootTreeNode = new GuiTreeNode(null, cacheProvider.getCurrentCache().getEngine());
+		rootTreeNode = new GuiGenericsTreeNode(null, cacheProvider.getCurrentCache().getEngine());
 		selectedTreeNode = rootTreeNode;
 	}
 
@@ -64,7 +64,7 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @return the list with only root of tree node.
 	 */
-	public List<GuiTreeNode> getRoots() {
+	public List<GuiGenericsTreeNode> getRoots() {
 		return Collections.singletonList(rootTreeNode);
 	}
 
@@ -103,7 +103,7 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @param node - node of the tree.
 	 */
-	public void selectNode(GuiTreeNode node) {
+	public void selectNode(GuiGenericsTreeNode node) {
 		selectedTreeNode = node;
 	}
 
@@ -143,7 +143,7 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @return name of icon.
 	 */
-	public String getTypeIcon(GuiTreeNode genericTreeNode) {
+	public String getTypeIcon(GuiGenericsTreeNode genericTreeNode) {
 		Generic generic = genericTreeNode.getGeneric();
 		if (generic.isMeta()) {
 			if (generic.isType())
@@ -177,7 +177,7 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @return title of icon.
 	 */
-	public String getTypeIconTitle(GuiTreeNode genericTreeNode) {
+	public String getTypeIconTitle(GuiGenericsTreeNode genericTreeNode) {
 		Generic generic = genericTreeNode.getGeneric();
 		if (generic.isMeta() && generic.isType())
 			return gsMessages.getMessage("meta") + " " + gsMessages.getMessage("type");
@@ -226,7 +226,7 @@ public class GenericTreeBean implements Serializable {
 	 */
 	public void changeType(@Observes TreeSelectionEvent treeSelectionEvent) {
 		if (treeSelectionEvent.getId().equals("typestree")) {
-			selectedTreeNode = (GuiTreeNode) treeSelectionEvent.getObject();
+			selectedTreeNode = (GuiGenericsTreeNode) treeSelectionEvent.getObject();
 			internalChangeType();
 
 			gsMessages.info("msgNodeSelection", getSelectedTreeNode().getGeneric().toString());
@@ -258,7 +258,7 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @return selected tree node.
 	 */
-	public GuiTreeNode getSelectedTreeNode() {
+	public GuiGenericsTreeNode getSelectedTreeNode() {
 		return selectedTreeNode;
 	}
 
@@ -267,7 +267,7 @@ public class GenericTreeBean implements Serializable {
 	 * 
 	 * @param selectedTreeNode - selected tree node.
 	 */
-	void setSelectedTreeNode(GuiTreeNode selectedTreeNode) {
+	void setSelectedTreeNode(GuiGenericsTreeNode selectedTreeNode) {
 		this.selectedTreeNode = selectedTreeNode;
 	}
 

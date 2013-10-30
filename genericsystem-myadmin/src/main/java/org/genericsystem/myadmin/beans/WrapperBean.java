@@ -11,7 +11,7 @@ import javax.inject.Named;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
-import org.genericsystem.myadmin.gui.GuiTreeNode;
+import org.genericsystem.myadmin.gui.GuiGenericsTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
 
 @Named
@@ -54,14 +54,14 @@ public class WrapperBean {
 		}
 	}
 
-	public GenericTreeNodeWrapper getGenericTreeNodeWrapper(GuiTreeNode genericTreeNode) {
+	public GenericTreeNodeWrapper getGenericTreeNodeWrapper(GuiGenericsTreeNode genericTreeNode) {
 		return new GenericTreeNodeWrapper(genericTreeNode);
 	}
 
 	public class GenericTreeNodeWrapper {
-		private GuiTreeNode genericTreeNode;
+		private GuiGenericsTreeNode genericTreeNode;
 
-		public GenericTreeNodeWrapper(GuiTreeNode genericTreeNode) {
+		public GenericTreeNodeWrapper(GuiGenericsTreeNode genericTreeNode) {
 			this.genericTreeNode = genericTreeNode;
 		}
 

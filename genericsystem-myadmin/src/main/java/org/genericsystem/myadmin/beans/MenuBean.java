@@ -6,7 +6,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.myadmin.gui.GuiTreeNode;
+import org.genericsystem.myadmin.gui.GuiGenericsTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
 
 @RequestScoped
@@ -71,13 +71,13 @@ public class MenuBean implements Serializable {
 	//	}
 
 	public static class MenuEvent {
-		private final GuiTreeNode genericTreeNode;
+		private final GuiGenericsTreeNode genericTreeNode;
 
-		public MenuEvent(GuiTreeNode genericTreeNode) {
+		public MenuEvent(GuiGenericsTreeNode genericTreeNode) {
 			this.genericTreeNode = genericTreeNode;
 		}
 
-		public GuiTreeNode getGenericTreeNode() {
+		public GuiGenericsTreeNode getGenericTreeNode() {
 			return genericTreeNode;
 		}
 	}
