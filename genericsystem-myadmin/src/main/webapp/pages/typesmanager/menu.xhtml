@@ -62,7 +62,8 @@
 			action="#{genericBean.newType('new_type')}" mode="ajax"
 			execute="typestree" render="typestree"
 			icon="#{menuBean.getMenuTypeIcon('TYPE')}"
-			disabled="#{menuBean.isConcrete()}" />
+			disabled="#{guiGenericsTreeBean.selectedTreeNode.generic.isConcrete()}" />
+			
 		<rich:menuItem
 			label="#{msg.create} #{msg.a} #{msg.sub} #{msg.type} #{msg.for} #{guiGenericsTreeBean.selectedTreeNode.value}"
 			action="#{genericBean.newSubType('new_subType')}" mode="ajax"

@@ -106,6 +106,8 @@ public class GuiGenericsTreeBean implements Serializable {
 	 */
 	public void selectNode(GuiGenericsTreeNode node) {
 		selectedTreeNode = node;
+		if (selectedTreeNode.getParent() != null)
+			selectedTreeNode.getParent().expand();
 	}
 
 	/**
