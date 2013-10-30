@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,8 +95,8 @@ public class GuiTreeNode {
 			return generic.getComposites();
 		case ATTRIBUTES:
 			return (List<T>) ((Type) generic).getAttributes();
-			// case VALUES:
-			// return (Snapshot<T>) generic.getHolders(attribute);
+		case VALUES:
+			return (List<T>) generic.getComponents().get(0). getHolders((Attribute) generic);
 		default:
 			break;
 		}

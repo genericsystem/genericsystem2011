@@ -108,6 +108,23 @@ public class GenericTreeBean implements Serializable {
 	}
 
 	/**
+	 * Select one attribute of generic in the tree.
+	 * 
+	 * @param index - index of attribute.
+	 */
+	public void changeAttributeSelected(int index) {
+		selectedTreeNode = selectedTreeNode.getChildren(GuiTreeChildrenType.ATTRIBUTES).get(index);
+		selectedTreeNode.setChildrenType(GuiTreeChildrenType.VALUES);
+
+
+
+		//		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
+		//		selectedTreeNode.setAttribute(attribute);
+		//		selectedTreeNode.setTreeType(TreeType.VALUES);
+		gsMessages.info("showvalues", selectedTreeNode.getGeneric());
+	}
+
+	/**
 	 * Returns true if tree type of selected tree node is equal to type in parameters. False if not.
 	 * 
 	 * @param treeType - tree type.

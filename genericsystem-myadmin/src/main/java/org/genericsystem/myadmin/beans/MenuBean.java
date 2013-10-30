@@ -2,19 +2,12 @@ package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
 
-import javax.el.MethodExpression;
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.event.Observes;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.core.Generic;
-import org.genericsystem.generic.Type;
 import org.genericsystem.myadmin.gui.GuiTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
-import org.richfaces.component.UIMenuGroup;
-import org.richfaces.component.UIMenuItem;
 
 @RequestScoped
 @Named
@@ -22,19 +15,19 @@ public class MenuBean implements Serializable {
 
 	private static final long serialVersionUID = 3205251309315588635L;
 
-	private UIMenuGroup menuGroup;
-
+	//	private UIMenuGroup menuGroup;
+	//
 	@Inject private GsMessages messages;
-
+	//
 	@Inject private GenericTreeBean genericTreeBean;
-
-	public UIMenuGroup getMenuGroup() {
-		return menuGroup;
-	}
-
-	public void setMenuGroup(UIMenuGroup menuGroup) {
-		this.menuGroup = menuGroup;
-	}
+	//
+	//	public UIMenuGroup getMenuGroup() {
+	//		return menuGroup;
+	//	}
+	//
+	//	public void setMenuGroup(UIMenuGroup menuGroup) {
+	//		this.menuGroup = menuGroup;
+	//	}
 
 	public String getMenuTypeIcon(String genericType) {
 		switch (genericType) {
@@ -54,20 +47,28 @@ public class MenuBean implements Serializable {
 		return genericTreeBean.getSelectedTreeNode().getGeneric().isConcrete();
 	}
 
-	public void changeType(@Observes MenuEvent menuEvent) {
-		menuGroup.getChildren().clear();
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-		int i = 0;
-		for (Generic generic : ((Type) menuEvent.getGenericTreeNode().getGeneric()).getAttributes()) {
-			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
-			uiMenuItem.setLabel("show values of " + generic);
-			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(facesContext.getELContext(), "#{genericTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
-			uiMenuItem.setActionExpression(methodExpression);
-			uiMenuItem.setRender("typestree, typestreetitle");
-			menuGroup.getChildren().add(uiMenuItem);
-			i++;
-		}
-	}
+	//	public void changeType(@Observes MenuEvent menuEvent) {
+	//		menuGroup.getChildren().clear();
+	//		FacesContext facesContext = FacesContext.getCurrentInstance();
+	//		int i = 0;
+	//		for (Generic generic : ((Type) menuEvent.getGenericTreeNode().getGeneric()).getAttributes()) {
+	//			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
+	//			uiMenuItem.setLabel("show values of " + generic);
+	//			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(
+	//					facesContext.getELContext(),
+	//					"#{genericTreeBean.changeAttributeSelected(" + i + ")}",
+	//					void.class,
+	//					new Class<?>[] { Integer.class });
+	//			uiMenuItem.setActionExpression(methodExpression);
+	//			uiMenuItem.setRender("typestree, typestreetitle");
+	//			menuGroup.getChildren().add(uiMenuItem);
+	//			i++;
+	//		}
+	//	}
+	//
+	//	public UIMenuGroup getAttributesMenuGroup() {
+	//		return null;
+	//	}
 
 	public static class MenuEvent {
 		private final GuiTreeNode genericTreeNode;
