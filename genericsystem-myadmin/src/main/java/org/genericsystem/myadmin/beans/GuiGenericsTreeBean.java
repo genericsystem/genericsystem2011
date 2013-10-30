@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
-public class GenericTreeBean implements Serializable {
+public class GuiGenericsTreeBean implements Serializable {
 
 	private static final long serialVersionUID = -1799171287514605774L;
 

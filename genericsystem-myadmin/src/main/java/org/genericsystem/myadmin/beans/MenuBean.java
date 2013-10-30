@@ -19,7 +19,7 @@ public class MenuBean implements Serializable {
 	//
 	@Inject private GsMessages messages;
 	//
-	@Inject private GenericTreeBean genericTreeBean;
+	@Inject private GuiGenericsTreeBean genericTreeBean;
 	//
 	//	public UIMenuGroup getMenuGroup() {
 	//		return menuGroup;

@@ -43,7 +43,7 @@ public class GenericBean implements Serializable {
 	/* Injected beans */
 	@Inject transient CacheProvider cacheProvider;
 	@Inject private GsMessages messages;
-	@Inject private GenericTreeBean genericTreeBean;
+	@Inject private GuiGenericsTreeBean genericTreeBean;
 	@Inject MessageFactory factory;
 
 	private List<StructuralWrapper> structuralWrappers = new ArrayList<>();

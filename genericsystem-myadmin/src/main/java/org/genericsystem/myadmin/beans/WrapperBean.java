@@ -22,7 +22,7 @@ public class WrapperBean {
 	private GsMessages messages;
 
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private GuiGenericsTreeBean genericTreeBean;
 
 	@Inject
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;

@@ -17,7 +17,7 @@ import org.richfaces.event.DropEvent;
 public class DragAndDropBean {
 
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private GuiGenericsTreeBean genericTreeBean;
 
 	@Inject
 	private GsMessages messages;
