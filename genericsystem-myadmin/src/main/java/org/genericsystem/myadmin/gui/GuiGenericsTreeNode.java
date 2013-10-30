@@ -94,6 +94,7 @@ public class GuiGenericsTreeNode {
 	/**
 	 * Abandon current children to force the rebuild of the subtree.
 	 */
+	@Deprecated
 	public void abandonChildren() {
 		children = null;
 	}
@@ -116,6 +117,16 @@ public class GuiGenericsTreeNode {
 					iterator.remove();
 			}
 		}
+	}
+
+	/**
+	 * Update it's own children and children of it's children. Recursive method.
+	 */
+	public void updateSubTree() {
+		updateChildren();
+		if (children != null)
+			for (GuiGenericsTreeNode child : children)
+				child.updateSubTree();
 	}
 
 	private <T extends Generic> List<T> getChildrenGenerics() {

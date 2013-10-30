@@ -83,8 +83,13 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Rebuild all the tree.
 	 */
+	@Deprecated
 	public void rebuildTree() {
 		rootTreeNode.abandonChildren();
+	}
+
+	public void updateTree() {
+		rootTreeNode.updateSubTree();
 	}
 
 	/**
