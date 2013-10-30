@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:gs="http://java.sun.com/jsf/composite/gs"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<composite:interface>
+	<composite:attribute name="key" required="true" />
+	<composite:attribute name="title" required="true" />
+	<composite:attribute name="name" required="true" />
+	<composite:attribute name="render" required="true" />
+	<composite:attribute name="action" method-signature="void action()"
+		required="true" />
+</composite:interface>
+<composite:implementation>
+	<rich:popupPanel id="#{cc.attrs.key}" domElementAttachment="form"
+		modal="true" resizeable="false" moveable="false" autosized="true">
+		<f:facet name="header">
+			<h:outputText styleClass="uppercase" value="#{cc.attrs.title}" />
+		</f:facet>
+		<f:facet name="controls">
+			<h:outputLink value="#"
+				onclick="#{rich:component(cc.attrs.key)}.hide(); return false;">
+				<h:graphicImage value="#{infos.delete}" title="#{msg.close}" />
+			</h:outputLink>
+		</f:facet>
+
+		<h:panelGrid styleClass="fullWidth" style="min-width: 600"
+			rowClasses="fullWidth" columnClasses="fullWidth">
+			<h:panelGroup>
+				<h:outputText styleClass="uppercase" value="#{cc.attrs.name}"/>
+				<h:inputText id="inputPopupPanelFile"
+					value="#{fileSystemBean.name}" />
+				
+
+				<a4j:commandButton id="applyName" action="#{cc.attrs.action}"
+					image="#{infos.floppy_disk}" execute="#{cc.attrs.key}"
+					render="#{cc.attrs.render}" style="vertical-align: bottom;"
+					onbeforedomupdate="#{rich:component(cc.attrs.key)}.hide();"
+					oncomplete="#{rich:element('inputPopupPanelFile')}.value=''; return false;" />
+			</h:panelGroup>
+		</h:panelGrid>
+	</rich:popupPanel>
+</composite:implementation>
+
+</html>

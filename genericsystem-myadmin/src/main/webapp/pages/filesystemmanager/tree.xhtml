@@ -27,7 +27,7 @@
 			selectionType="ajax"
 			onbeforeselectionchange="if(typeof editor!='undefined') {editor.save();}return true;"
 			oncomplete="#{rich:component('menufilesystemmanager')}.hide();if(rightClick==true){#{rich:component('menufilesystemmanager')}.show();menuFS();}"
-			selectionChangeListener="#{genericTreeBean.change}"
+			selectionChangeListener="#{genericTreeBean.changeSelectedNode}"
 			execute="code" render="paneltitlefilesystemmanager,menufilesystemmanager,editfilesystemmanager">
 			<rich:treeModelRecursiveAdaptor
 				roots="#{fileSystemBean.rootDirectories}"
