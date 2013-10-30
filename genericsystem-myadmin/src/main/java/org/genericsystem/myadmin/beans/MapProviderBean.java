@@ -44,12 +44,9 @@ public class MapProviderBean implements Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(MapProviderBean.class);
 
-	@Inject
-	private GenericTreeBean genericTreeBean; // generic tree bean
-	@Inject
-	private PopupPanelBean popupPanelBean; // Popup Panel bean
-	@Inject
-	private GsMessages messages; // messages bean
+	@Inject private GuiGenericsTreeBean genericTreeBean;	// generic tree bean
+	@Inject private PopupPanelBean popupPanelBean;		// Popup Panel bean
+	@Inject private GsMessages messages;				// messages bean
 
 	private String key;
 	private int pos;
