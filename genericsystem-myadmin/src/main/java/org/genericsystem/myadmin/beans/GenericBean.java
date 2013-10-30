@@ -69,8 +69,9 @@ public class GenericBean implements Serializable {
 	public void newSubType(String subTypeName) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newSubType(subTypeName);
 		genericTreeBean.updateTree();
+		genericTreeBean.getSelectedTreeNode().expand();
 
-		messages.info("createSubType", subTypeName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
+		messages.info("msgSubTypeCreates", subTypeName, ((Class<?>) genericTreeBean.getSelectedTreeNode().getGeneric().getValue()).getSimpleName());
 	}
 
 	/**
@@ -110,6 +111,7 @@ public class GenericBean implements Serializable {
 
 	public void newInstance(String instanceName) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newInstance(instanceName);
+		genericTreeBean.getSelectedTreeNode().expand();
 		genericTreeBean.updateTree();
 
 		messages.info("createRootInstance", instanceName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
