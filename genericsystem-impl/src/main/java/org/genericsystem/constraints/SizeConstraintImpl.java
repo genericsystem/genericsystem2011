@@ -15,8 +15,8 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SizeConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.generic.Type;
 import org.genericsystem.generic.Relation;
+import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
@@ -45,7 +45,7 @@ public class SizeConstraintImpl extends AbstractNoBooleanConstraintImpl implemen
 		// TODO KK because InstanceClassConstraint, see GenericImpl::setConstraintClass
 		Serializable value = ((Holder) valueConstraint).getValue();
 		Generic baseConstraint = ((Holder) valueConstraint).<Attribute> getBaseComponent().<Attribute> getBaseComponent().getBaseComponent();
-		baseConstraint.log();
+		//baseConstraint.log();
 		Snapshot<Holder> holders = ((GenericImpl) base).getHolders((Relation) baseConstraint);
 		if (value instanceof Integer)
 			if (holders.size() > (Integer) value)
