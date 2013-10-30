@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -585,13 +586,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
 		if (isConsistencyToCheck(checkingType, isFlushTime, generic)) {
 			AbstractConstraintImpl keyHolder = ((Holder) generic).getBaseComponent();
-			int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-			Generic constraintBase = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
+			int axe = keyHolder.<AxedPropertyClass> getValue().getAxe();
+			Attribute constraintBase = keyHolder.<Holder> getBaseComponent().getBaseComponent();
 			if (axe == Statics.MULTIDIRECTIONAL)
 				keyHolder.check(constraintBase, generic, (Holder) generic);
-			else
-				for (Generic instance : ((Type) ((Attribute) constraintBase).getComponent(axe)).getAllInstances())
-					keyHolder.check(constraintBase, instance, (Holder) generic);
+			else {
+				Type component = constraintBase.getComponent(axe);
+				if (null != component)
+					for (Generic instance : component.getAllInstances())
+						keyHolder.check(constraintBase, instance, (Holder) generic);
+			}
 		}
 	}
 
