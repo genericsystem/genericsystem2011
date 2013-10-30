@@ -57,6 +57,7 @@ public class GuiGenericsTreeBean implements Serializable {
 	public void init() {
 		rootTreeNode = new GuiGenericsTreeNode(null, cacheProvider.getCurrentCache().getEngine());
 		selectedTreeNode = rootTreeNode;
+		selectedTreeNode.expand();
 	}
 
 	/**
@@ -115,6 +116,7 @@ public class GuiGenericsTreeBean implements Serializable {
 	public void changeAttributeSelected(int index) {
 		selectedTreeNode = selectedTreeNode.getChildren(GuiTreeChildrenType.ATTRIBUTES).get(index);
 		selectedTreeNode.setChildrenType(GuiTreeChildrenType.VALUES);
+		selectedTreeNode.expand();
 
 
 
@@ -122,6 +124,10 @@ public class GuiGenericsTreeBean implements Serializable {
 		//		selectedTreeNode.setAttribute(attribute);
 		//		selectedTreeNode.setTreeType(TreeType.VALUES);
 		gsMessages.info("showvalues", selectedTreeNode.getGeneric());
+	}
+
+	public Boolean adviseNodeOpened(UITree tree) {
+		return true;
 	}
 
 	/**

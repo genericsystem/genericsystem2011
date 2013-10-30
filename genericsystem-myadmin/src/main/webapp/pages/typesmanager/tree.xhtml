@@ -61,7 +61,7 @@
 			execute="typestree" render="paneltitletypesmanager,menutypesmanager,editTypesManager">
 			<rich:treeModelRecursiveAdaptor roots="#{guiGenericsTreeBean.roots}"
 				nodes="#{node.getChildren()}">
-				<rich:treeNode iconCollapsed="#{guiGenericsTreeBean.getTypeIcon(node)}"
+				<rich:treeNode expanded="#{node.expanded}" iconCollapsed="#{guiGenericsTreeBean.getTypeIcon(node)}"
 					iconExpanded="#{guiGenericsTreeBean.getTypeIcon(node)}"
 					onmousedown="if(event.button==2){rightClick = true;posSouris(event);}else{rightClick = false;}"
 					title="#{guiGenericsTreeBean.getTypeIconTitle(node)}">

@@ -29,6 +29,7 @@ public class GuiGenericsTreeNode {
 	private Generic generic;
 	private List<GuiGenericsTreeNode> children;
 	private GuiTreeChildrenType childrenType = DEFAULT_CHILDREN_TYPE;
+	private boolean expanded = false;
 
 	public GuiGenericsTreeNode(GuiGenericsTreeNode parent, Generic generic, GuiTreeChildrenType treeType) {
 		this.parent = parent;
@@ -96,12 +97,22 @@ public class GuiGenericsTreeNode {
 		case ATTRIBUTES:
 			return (List<T>) ((Type) generic).getAttributes();
 		case VALUES:
-			return (List<T>) generic.getComponents().get(0). getHolders((Attribute) generic);
+			return (List<T>) generic.getComponents().get(0).getHolders((Attribute) generic);
 		default:
 			break;
 		}
 		return new ArrayList<>();
 		//throw new IllegalStateException();
+	}
+
+	public void expand() {
+		expanded = true;
+		if (parent != null)
+			parent.expand();
+	}
+
+	public void reduce() {
+		expanded = false;
 	}
 
 	public String getValue() {
@@ -133,6 +144,14 @@ public class GuiGenericsTreeNode {
 	@Override
 	public String toString() {
 		return generic.toString();
+	}
+
+	public boolean isExpanded() {
+		return expanded;
+	}
+
+	public void setExpanded(boolean expanded) {
+		this.expanded = expanded;
 	}
 
 }

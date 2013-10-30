@@ -172,7 +172,7 @@ public class GenericBean implements Serializable {
 			uiMenuItem.setLabel(factory.info(new BundleKey(MESSAGES_BUNDLE_NAME, "itmShowValuesOf"), generic.toString()).build().getText());
 			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(
 					facesContext.getELContext(),
-					"#{genericTreeBean.changeAttributeSelected(" + i + ")}",
+					"#{guiGenericsTreeBean.changeAttributeSelected(" + i + ")}",
 					void.class,
 					new Class<?>[] { Integer.class });
 			uiMenuItem.setActionExpression(methodExpression);

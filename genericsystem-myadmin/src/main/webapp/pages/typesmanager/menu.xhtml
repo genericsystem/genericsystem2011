@@ -11,11 +11,12 @@
 	xmlns:gs="http://java.sun.com/jsf/composite/gs">
 
 	<rich:contextMenu id="menutypesmanager" mode="ajax" attached="false">
+
 		<rich:menuGroup label="#{msg.itmMenuShow}">
 
 			<rich:menuItem label="#{msg.itmShowSupers}"
-				action="#{guiGenericsTreeBean.changeChildrenType('SUPERS')}" mode="ajax"
-				execute="typestree" render="typestree"
+				action="#{guiGenericsTreeBean.changeChildrenType('SUPERS')}"
+				mode="ajax" execute="typestree" render="typestree"
 				icon="#{infos.up_green_arrow}"
 				disabled="#{guiGenericsTreeBean.isTreeTypeSelected('SUPERS')}" />
 
@@ -42,7 +43,7 @@
 				mode="ajax" execute="typestree" render="typestree"
 				icon="#{infos.up_right_green_arrow}"
 				disabled="#{guiGenericsTreeBean.isTreeTypeSelected('ATTRIBUTES')}" />
-				
+
 			<rich:menuItem label="#{msg.itmShowValues}"
 				action="#{guiGenericsTreeBean.changeChildrenType('VALUES')}"
 				mode="ajax" execute="typestree" render="typestree"
@@ -52,7 +53,8 @@
 		</rich:menuGroup>
 
 		<rich:menuGroup label="#{msg.itmMenuShowValues}"
-			binding="#{genericBean.menuGroup}" />
+			binding="#{genericBean.menuGroup}" 
+			rendered="#{guiGenericsTreeBean.selectedTreeNode.generic.isConcrete()}" />
 
 		<rich:menuSeparator />
 
