@@ -8,7 +8,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.myadmin.gui.GuiTreeNode;
+import org.genericsystem.myadmin.gui.GuiGenericsTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.richfaces.event.DropEvent;
 
@@ -17,7 +17,7 @@ import org.richfaces.event.DropEvent;
 public class DragAndDropBean {
 
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private GuiGenericsTreeBean genericTreeBean;
 
 	@Inject
 	private GsMessages messages;
@@ -42,7 +42,7 @@ public class DragAndDropBean {
 	}
 
 	public void addTarget(DropEvent dropEvent) {
-		Generic target = ((GuiTreeNode) dropEvent.getDragValue()).getGeneric();
+		Generic target = ((GuiGenericsTreeNode) dropEvent.getDragValue()).getGeneric();
 		Attribute attribute = ((Structural) dropEvent.getDropValue()).getAttribute();
 		if (target.isStructural()) {
 			attribute.addComponent(attribute.getComponentsSize(), target);

@@ -15,7 +15,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.Directory;
 import org.genericsystem.file.FileSystem.FileType.File;
-import org.genericsystem.myadmin.beans.GenericTreeBean.TreeSelectionEvent;
+import org.genericsystem.myadmin.beans.GuiGenericsTreeBean.TreeSelectionEvent;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.myadmin.util.GsRedirect;
@@ -26,7 +26,8 @@ public class FileSystemBean implements Serializable {
 
 	private static final long serialVersionUID = -646738653059697257L;
 
-	@Inject transient CacheProvider cacheProvider;
+	@Inject
+	transient CacheProvider cacheProvider;
 
 	@Inject
 	private GsMessages messages;
@@ -38,6 +39,8 @@ public class FileSystemBean implements Serializable {
 
 	@Inject
 	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
+
+	private String name;
 
 	public List<Directory> getRootDirectories() {
 		return cacheProvider.getCurrentCache().<FileSystem> find(FileSystem.class).getRootDirectories();
@@ -59,19 +62,19 @@ public class FileSystemBean implements Serializable {
 		}
 	}
 
-	public void addRootDirectory(String newValue) {
-		cacheProvider.getCurrentCache().<FileSystem> find(FileSystem.class).addRootDirectory(newValue);
-		messages.info("createRootDirectory", newValue);
+	public void addRootDirectory() {
+		cacheProvider.getCurrentCache().<FileSystem> find(FileSystem.class).addRootDirectory(name);
+		messages.info("createRootDirectory", name);
 	}
 
-	public void addSubDirectory(String newValue) {
-		((Directory) selectedFile).addDirectory(newValue);
-		messages.info("createSubDirectory", newValue, selectedFile.getValue());
+	public void addSubDirectory() {
+		((Directory) selectedFile).addDirectory(name);
+		messages.info("createSubDirectory", name, selectedFile.getValue());
 	}
 
-	public void addFile(String newValue) {
-		((Directory) selectedFile).addFile(newValue);
-		messages.info("createFile", newValue);
+	public void addFile() {
+		((Directory) selectedFile).addFile(name);
+		messages.info("createFile", name);
 	}
 
 	public Wrapper getWrapper(Generic generic) {
@@ -83,7 +86,7 @@ public class FileSystemBean implements Serializable {
 	}
 
 	public class Wrapper {
-		private Generic generic;
+		private final Generic generic;
 
 		public Wrapper(Generic generic) {
 			this.generic = generic;
@@ -136,4 +139,13 @@ public class FileSystemBean implements Serializable {
 		((File) selectedFile).setContent(content.getBytes());
 		messages.info("setContent", selectedFile.getValue());
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 }

@@ -39,25 +39,60 @@
 		<h:panelGrid styleClass="fullWidth" style="min-width:600"
 			rowClasses="fullWidth" columnClasses="fullWidth">
 			<h:panelGroup>
-				<h:outputText styleClass="uppercase" value="Class" />
-				<h:selectOneMenu id="inputPopupPanelKey" style="min-width:150"
+				<!-- not propertiesMapProvider -->
+				<h:outputText
+					rendered="#{!mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					styleClass="uppercase" value="Class" />
+				<h:selectOneMenu
+					rendered="#{!mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					id="inputPopupPanelKey" style="min-width:150"
 					value="#{mapProviderBean.key}">
 					<f:selectItems
 						value="#{mapProviderBean.getKeyClasses(mapProvider.value)}" />
 				</h:selectOneMenu>
-				<h:outputText styleClass="uppercase" value="#{msg.position}" />
-				<h:inputText id="inputPopupPanelPos" value="#{mapProviderBean.pos}"
+				<h:outputText
+					rendered="#{!mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					styleClass="uppercase" value="#{msg.position}" />
+				<h:inputText
+					rendered="#{!mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					id="inputPopupPanelPos" value="#{mapProviderBean.pos}"
 					style="width:20px" />
-				<h:outputText styleClass="uppercase" value="#{msg.value}" />
-				<h:selectBooleanCheckbox id="inputPopupPanel"
-					value="#{mapProviderBean.value}"
+				<h:outputText
+					rendered="#{!mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					styleClass="uppercase" value="#{msg.value}" />
+				<h:selectBooleanCheckbox
+					rendered="#{!mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					id="inputPopupPanel" value="#{mapProviderBean.value}"
 					style="margin-top:100;vertical-align:bottom;" />
-				<a4j:commandButton id="apply"
+				<a4j:commandButton
+					rendered="#{!mapProviderBean.isPropertiesMapProvider(mapProvider)}"
 					action="#{mapProviderBean.addKeyValueToMap(map)}"
 					execute="popupPanel" image="#{infos.floppy_disk}"
 					render="#{mapProviderId}" style="vertical-align: bottom;"
 					onbeforedomupdate="#{rich:component('popup:popupPanel')}.hide();"
 					oncomplete="#{rich:element('inputPopupPanelKey')}.value=''; #{rich:element('inputPopupPanel')}.value='';#{rich:element('inputPopupPanelPos')}.value=''; return false;" />
+				<!-- propertiesMapProvider -->
+				<h:outputText
+					rendered="#{mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					styleClass="uppercase" value="#{msg.key}" />
+				<h:inputText
+					rendered="#{mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					id="inputPopupPanelKey2" value="#{mapProviderBean.key}"
+					style="width:100px" />
+				<h:outputText
+					rendered="#{mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					styleClass="uppercase" value="#{msg.value}" />
+				<h:inputText
+					rendered="#{mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					id="inputPopupPanelValue" value="#{mapProviderBean.valueStr}"
+					style="width:100px" />
+				<a4j:commandButton
+					rendered="#{mapProviderBean.isPropertiesMapProvider(mapProvider)}"
+					action="#{mapProviderBean.addKeyValueToPropertiesMap(map)}"
+					execute="popupPanel" image="#{infos.floppy_disk}"
+					render="#{mapProviderId}" style="vertical-align: bottom;"
+					onbeforedomupdate="#{rich:component('popup:popupPanel')}.hide();"
+					oncomplete="#{rich:element('inputPopupPanelKey2')}.value=''; #{rich:element('inputPopupPanelValue')}.value=''; return false;" />
 			</h:panelGroup>
 		</h:panelGrid>
 	</rich:popupPanel>

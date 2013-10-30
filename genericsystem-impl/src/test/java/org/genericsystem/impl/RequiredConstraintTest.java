@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.RequiredConstraintViolationException;
@@ -14,6 +15,11 @@ import org.testng.annotations.Test;
 
 @Test
 public class RequiredConstraintTest extends AbstractTest {
+
+	public void testContraint() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		((GenericImpl) cache.getEngine()).enableRequiredConstraint(0);
+	}
 
 	public void requiredAddedAndRemoved() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();

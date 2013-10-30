@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.example.Example.MyVehicle;
 import org.genericsystem.example.Example.Vehicle;
 import org.genericsystem.generic.Attribute;
@@ -16,7 +17,7 @@ import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.myadmin.beans.GenericBean;
-import org.genericsystem.myadmin.beans.GenericTreeBean;
+import org.genericsystem.myadmin.beans.GuiGenericsTreeBean;
 import org.genericsystem.myadmin.beans.Structural;
 import org.genericsystem.myadmin.beans.StructuralImpl;
 import org.testng.annotations.Test;
@@ -28,9 +29,8 @@ public class TypesTest extends AbstractTest {
 	private Cache cache;
 
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private GuiGenericsTreeBean genericTreeBean;
 
-	@Test
 	public void testExample() {
 		Generic vehicle = cache.find(Vehicle.class);
 		Generic myVehicle = cache.find(MyVehicle.class);
@@ -38,7 +38,6 @@ public class TypesTest extends AbstractTest {
 		assert vehicle.getInheritings().contains(myVehicle);
 	}
 
-	@Test
 	public void testGetAttributes() {
 		Type human = cache.newType("Human");
 		Generic michael = human.newInstance("Michael");
@@ -62,7 +61,6 @@ public class TypesTest extends AbstractTest {
 		assert structurals2.contains(new StructuralImpl(isBrotherOf, 0));
 	}
 
-	@Test
 	public void testGetOtherTargets() {
 		Type human = cache.newType("Human");
 		Generic michael = human.newInstance("Michael");
@@ -82,7 +80,6 @@ public class TypesTest extends AbstractTest {
 		assert !targetsFromMichael.contains(michael);
 	}
 
-	@Test
 	public void testContraint() {
 		Type vehicle = cache.newType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty("power");
@@ -96,5 +93,10 @@ public class TypesTest extends AbstractTest {
 		assert !vehiclePower.isAlive();
 		// assert !vehiclePower.getImplicit().isAlive();
 		GenericBean gb = new GenericBean();
+	}
+
+	public void testContraint2() {
+		// cache.getEngine().getConstraintsMap().put(new AxedPropertyClass(RequiredConstraintImpl.class, 0), true);
+		((GenericImpl) cache.getEngine()).enableRequiredConstraint(0);
 	}
 }
