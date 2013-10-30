@@ -8,7 +8,7 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
-import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -24,7 +24,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @SingularConstraint
 @AxedConstraintValue(PropertyConstraintImpl.class)
-public class PropertyConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+public class PropertyConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@Override
 	public void check(final Generic constraintBase, final Generic modified) throws ConstraintViolationException {

@@ -7,7 +7,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
-import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -27,7 +27,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SingularConstraint
 @Dependencies(SuperRuleConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(SuperRuleConstraintImpl.class)
-public class SuperRuleConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+public class SuperRuleConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)

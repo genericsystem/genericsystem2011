@@ -29,12 +29,31 @@ public abstract class AbstractConstraintImpl extends GenericImpl {
 		return true;
 	}
 
-	public abstract void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException;
+	public abstract void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException;
 
-	public abstract static class AbstractBooleanConstraintImpl extends AbstractConstraintImpl {
+	public abstract static class AbstractAxedConstraintImpl extends AbstractConstraintImpl {
+		@Override
+		public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
+			check(constraintBase, modified, constraintValue);
+		}
+
+		public abstract void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException;
+	}
+
+	public abstract static class AbstractBooleanAxedConstraintImpl extends AbstractAxedConstraintImpl {
 		@Override
 		public void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException {
-			if (Boolean.TRUE.equals(constraintValue.getValue()))
+			if (!Boolean.FALSE.equals(constraintValue.getValue()))
+				check(constraintBase, modified);
+		}
+
+		public abstract void check(Generic constraintBase, Generic modified) throws ConstraintViolationException;
+	}
+
+	public abstract static class AbstractBooleanNoAxedConstraintImpl extends AbstractConstraintImpl {
+		@Override
+		public void check(Generic constraintBase, Generic modified, Holder constraintValue, int axe) throws ConstraintViolationException {
+			if (!Boolean.FALSE.equals(constraintValue.getValue()))
 				check(constraintBase, modified);
 		}
 

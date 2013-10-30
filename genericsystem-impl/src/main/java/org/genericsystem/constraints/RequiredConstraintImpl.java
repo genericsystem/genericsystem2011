@@ -5,7 +5,7 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
-import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.RequiredConstraintViolationException;
@@ -23,7 +23,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @AxedConstraintValue(RequiredConstraintImpl.class)
 @SingularConstraint
-public class RequiredConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+public class RequiredConstraintImpl extends AbstractBooleanAxedConstraintImpl implements Holder {
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
