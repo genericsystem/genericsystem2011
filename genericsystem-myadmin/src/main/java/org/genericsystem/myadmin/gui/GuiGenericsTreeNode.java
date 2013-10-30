@@ -1,6 +1,7 @@
 package org.genericsystem.myadmin.gui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.genericsystem.core.Generic;
@@ -50,14 +51,30 @@ public class GuiGenericsTreeNode {
 		if (children != null && this.childrenType == childrenType)
 			return children;
 		children = new ArrayList<>();
-		for (Generic child : getGenericsForSubTree(childrenType))
+		for (Generic child : getChildrenGenerics(childrenType))
 			children.add(new GuiGenericsTreeNode(this, child));
 		return children;
 	}
 
 	/**
+	 * Returns the GUI tree node of generic from children of current node. Can return null if node
+	 * with generic was not found.
+	 * 
+	 * @param generic - generic to look for.
+	 * 
+	 * @return the GUI tree node of generic.
+	 */
+	public GuiGenericsTreeNode findChildNodeByGeneric(Generic generic) {
+		if (children != null)
+			for (GuiGenericsTreeNode childNode : children)
+				if (childNode.generic == generic)
+					return childNode;
+		return null;
+	}
+
+	/**
 	 * Returns the GUI tree node of generic in the sub tree of current node. Can return null if node
-	 * with generic is not found.
+	 * with generic was not found.
 	 * 
 	 * @param generic - generic to look for.
 	 * 
@@ -81,8 +98,32 @@ public class GuiGenericsTreeNode {
 		children = null;
 	}
 
+	/**
+	 * Update current list of children. If node of child is already present in the list of children
+	 * it's state is not changes. If the new child of generic found it's node will be added in the
+	 * list. If child not more exists it's node will be removed from the list.
+	 */
+	public void updateChildren() {
+		if (children != null) {
+			for (Generic child : getChildrenGenerics()) {
+				if (findChildNodeByGeneric(child) == null)
+					children.add(new GuiGenericsTreeNode(this, child));
+			}
+			Iterator<GuiGenericsTreeNode> iterator = children.iterator();
+			while (iterator.hasNext()) {
+				GuiGenericsTreeNode childNode = iterator.next();
+				if (!getChildrenGenerics().contains(childNode.generic))
+					iterator.remove();
+			}
+		}
+	}
+
+	private <T extends Generic> List<T> getChildrenGenerics() {
+		return getChildrenGenerics(childrenType);
+	}
+
 	@SuppressWarnings("unchecked")
-	private <T extends Generic> List<T> getGenericsForSubTree(GuiTreeChildrenType childrenType) {
+	private <T extends Generic> List<T> getChildrenGenerics(GuiTreeChildrenType childrenType) {
 		switch (childrenType) {
 		case SUPERS:
 			return generic.getSupers();
@@ -111,7 +152,7 @@ public class GuiGenericsTreeNode {
 			parent.expand();
 	}
 
-	public void reduce() {
+	public void collapse() {
 		expanded = false;
 	}
 

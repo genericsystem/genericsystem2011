@@ -55,7 +55,8 @@ public class GenericBean implements Serializable {
 	 */
 	public void newType(String typeName) {
 		cacheProvider.getCurrentCache().newType(typeName);
-		genericTreeBean.rebuildTree();
+		//genericTreeBean.rebuildTree();
+		genericTreeBean.getSelectedTreeNode().updateChildren();
 
 		messages.info("createRootType", typeName);
 	}
@@ -67,10 +68,11 @@ public class GenericBean implements Serializable {
 	 */
 	public void newSubType(String subTypeName) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newSubType(subTypeName);
-		genericTreeBean.getSelectedTreeNode().abandonChildren();
+		//genericTreeBean.getSelectedTreeNode().abandonChildren();
 		//genericTreeBean.rebuildTree();
+		genericTreeBean.getSelectedTreeNode().updateChildren();
 
-		//messages.info("createSubType", subTypeName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
+		messages.info("createSubType", subTypeName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
 	}
 
 	/**
@@ -123,7 +125,8 @@ public class GenericBean implements Serializable {
 
 	public void remove(Holder holder) {
 		genericTreeBean.getSelectedTreeNode().getGeneric().removeHolder(holder);
-		genericTreeBean.rebuildTree();
+		//genericTreeBean.rebuildTree();
+		genericTreeBean.getSelectedTreeNode().getParent().updateChildren();
 
 		messages.info("remove", holder);
 	}
@@ -132,7 +135,8 @@ public class GenericBean implements Serializable {
 		Generic generic = genericTreeBean.getSelectedTreeNode().getGeneric();
 		genericTreeBean.setSelectedTreeNode(genericTreeBean.getSelectedTreeNode().getParent());
 		generic.remove();
-		genericTreeBean.rebuildTree();
+		//genericTreeBean.rebuildTree();
+		genericTreeBean.getSelectedTreeNode().getParent().updateChildren();
 
 		messages.info("remove", generic);
 		return "";
