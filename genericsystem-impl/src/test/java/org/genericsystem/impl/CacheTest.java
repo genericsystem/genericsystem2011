@@ -1,5 +1,7 @@
 package org.genericsystem.impl;
 
+import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Type;
@@ -36,6 +38,28 @@ public class CacheTest extends AbstractTest {
 		assert mainCache.getLevel() == 1;
 		assert superCache1.getLevel() == 2;
 		assert superCache2.getLevel() == 3;
+	}
+
+	public void testFlushAndUnmountFirstCacheOk() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		assert Objects.equals(cache.flushAndUnmount(), cache);
+	}
+
+	public void testFlushAndUnmountSuperCacheOk() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache2 = cache.mountNewCache().start();
+		assert Objects.equals(cache2.flushAndUnmount(), cache);
+	}
+
+	public void testDiscardAndUnmountFirstCacheOk() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		assert Objects.equals(cache.discardAndUnmount(), cache);
+	}
+
+	public void testDiscardAndUnmountSuperCacheOk() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache2 = cache.mountNewCache().start();
+		assert Objects.equals(cache2.discardAndUnmount(), cache);
 	}
 
 }

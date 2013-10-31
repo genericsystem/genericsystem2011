@@ -21,12 +21,12 @@
 			<h:outputText value="#{msg.edit} " styleClass="capitalize"
 				style="white-space:nowrap; padding-top:5px; margin-right:5px;" />
 			<rich:inplaceInput id="inpInstanceName"
-				value="#{wrapperBean.getGenericTreeNodeWrapper(genericTreeBean.selectedTreeNode).value}"
+				value="#{wrapperBean.getGenericTreeNodeWrapper(guiGenericsTreeBean.selectedTreeNode).value}"
 				rendered="#{!generic.isMeta()}" editEvent="dblclick">
 				<a4j:ajax event="change" execute="inpInstanceName"
 					render="typesmanager" />
 			</rich:inplaceInput>
-			<h:outputText value="#{genericTreeBean.selectedTreeNode.value}"
+			<h:outputText value="#{guiGenericsTreeBean.selectedTreeNode.value}"
 				rendered="#{generic.isMeta()}" />
 		</f:facet>
 
@@ -54,7 +54,7 @@
 								showDeleteAction="#{!genericBean.hasValues(wrapper.structural.attribute)}"
 								genBean="#{genericBean}"
 								wrapBean="#{wrapperBean}"
-								genTreeBean="#{genericTreeBean}" />
+								genTreeBean="#{guiGenericsTreeBean}" />
 						</c:if>
 						
 						<!-- Map provider -->
