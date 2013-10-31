@@ -232,7 +232,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Generic orderedDependency : orderedDependencies) {
 				Generic generic = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(),
 						computeDirectSupers ? getDirectSupers(((GenericImpl) orderedDependency).primaries, adjust(((GenericImpl) orderedDependency).components)) : adjust(((GenericImpl) orderedDependency).supers),
-						adjust(((GenericImpl) orderedDependency).components));
+								adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, generic);
 			}
 			return this;
@@ -396,7 +396,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		AbstractContext subContext = this.getSubContext();
 		if (subContext instanceof Cache)
 			return (Cache) subContext;
-		return null;
+		return this;
 	}
 
 	@Override
@@ -405,7 +405,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		AbstractContext subContext = this.getSubContext();
 		if (subContext instanceof Cache)
 			return (Cache) subContext;
-		return null;
+		return this;
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
@@ -626,12 +626,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private void checkConstraints(final CheckingType checkingType, final boolean isFlushTime, final Generic generic) throws ConstraintViolationException {
 		for (final Attribute attribute : ((Type) generic).getAttributes())
 			new Check() {
-				@Override
-				public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException {
-					if (null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
-						keyHolder.check(attribute, generic, valueHolder);
-				}
-			}.check(checkingType, isFlushTime, attribute);
+			@Override
+			public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException {
+				if (null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
+					keyHolder.check(attribute, generic, valueHolder);
+			}
+		}.check(checkingType, isFlushTime, attribute);
 
 		new Check() {
 			@Override
