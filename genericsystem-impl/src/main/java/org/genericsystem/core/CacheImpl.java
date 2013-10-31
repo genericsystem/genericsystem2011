@@ -397,7 +397,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		AbstractContext subContext = this.getSubContext();
 		if (subContext instanceof Cache)
 			return (Cache) subContext;
-		return null;
+		return this;
 	}
 
 	@Override
@@ -406,7 +406,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		AbstractContext subContext = this.getSubContext();
 		if (subContext instanceof Cache)
 			return (Cache) subContext;
-		return null;
+		return this;
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
