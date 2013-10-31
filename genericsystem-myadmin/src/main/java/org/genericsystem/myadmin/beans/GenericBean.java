@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.el.MethodExpression;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Observes;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -18,7 +21,12 @@ import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
 import org.genericsystem.myadmin.util.GsMessages;
+import org.jboss.seam.international.status.MessageFactory;
+import org.jboss.seam.international.status.builder.BundleKey;
+import org.richfaces.component.UIMenuGroup;
+import org.richfaces.component.UIMenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +35,16 @@ import org.slf4j.LoggerFactory;
 public class GenericBean implements Serializable {
 
 	private static final long serialVersionUID = 2108715680116264876L;
+	private static final String MESSAGES_BUNDLE_NAME = "/bundles/messages";
 
 	protected static Logger log = LoggerFactory.getLogger(GenericBean.class);
+	private UIMenuGroup menuGroup;
 
 	/* Injected beans */
 	@Inject transient CacheProvider cacheProvider;
 	@Inject private GsMessages messages;
-	@Inject private GenericTreeBean genericTreeBean;
+	@Inject private GuiGenericsTreeBean genericTreeBean;
+	@Inject MessageFactory factory;
 
 	private List<StructuralWrapper> structuralWrappers = new ArrayList<>();
 
@@ -44,7 +55,8 @@ public class GenericBean implements Serializable {
 	 */
 	public void newType(String typeName) {
 		cacheProvider.getCurrentCache().newType(typeName);
-		genericTreeBean.rebuildTree();
+		//genericTreeBean.rebuildTree();
+		genericTreeBean.getSelectedTreeNode().updateChildren();
 
 		messages.info("createRootType", typeName);
 	}
@@ -56,9 +68,10 @@ public class GenericBean implements Serializable {
 	 */
 	public void newSubType(String subTypeName) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newSubType(subTypeName);
-		genericTreeBean.rebuildTree();
+		genericTreeBean.updateTree();
+		genericTreeBean.getSelectedTreeNode().expand();
 
-		messages.info("createSubType", subTypeName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
+		messages.info("msgSubTypeCreates", subTypeName, ((Class<?>) genericTreeBean.getSelectedTreeNode().getGeneric().getValue()).getSimpleName());
 	}
 
 	/**
@@ -98,6 +111,8 @@ public class GenericBean implements Serializable {
 
 	public void newInstance(String instanceName) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newInstance(instanceName);
+		genericTreeBean.getSelectedTreeNode().expand();
+		genericTreeBean.updateTree();
 
 		messages.info("createRootInstance", instanceName, genericTreeBean.getSelectedTreeNode().getGeneric().getValue());
 	}
@@ -111,7 +126,7 @@ public class GenericBean implements Serializable {
 
 	public void remove(Holder holder) {
 		genericTreeBean.getSelectedTreeNode().getGeneric().removeHolder(holder);
-		genericTreeBean.rebuildTree();
+		genericTreeBean.updateTree();
 
 		messages.info("remove", holder);
 	}
@@ -119,8 +134,12 @@ public class GenericBean implements Serializable {
 	public String delete() {
 		Generic generic = genericTreeBean.getSelectedTreeNode().getGeneric();
 		genericTreeBean.setSelectedTreeNode(genericTreeBean.getSelectedTreeNode().getParent());
-		generic.remove();
-		genericTreeBean.rebuildTree();
+
+		try {
+			generic.remove();
+		} finally {
+			genericTreeBean.updateTree();
+		}
 
 		messages.info("remove", generic);
 		return "";
@@ -150,6 +169,25 @@ public class GenericBean implements Serializable {
 
 	public Generic getGeneric() {
 		return genericTreeBean.getSelectedTreeNode().getGeneric();
+	}
+
+	public void initMenuGroup(@Observes MenuEvent menuEvent) {
+		menuGroup.getChildren().clear();
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		int i = 0;
+		for (Generic generic : ((Type) getGeneric()).getAttributes()) {
+			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
+			uiMenuItem.setLabel(factory.info(new BundleKey(MESSAGES_BUNDLE_NAME, "itmShowValuesOf"), generic.toString()).build().getText());
+			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(
+					facesContext.getELContext(),
+					"#{guiGenericsTreeBean.changeAttributeSelected(" + i + ")}",
+					void.class,
+					new Class<?>[] { Integer.class });
+			uiMenuItem.setActionExpression(methodExpression);
+			uiMenuItem.setRender("typestree, typestreetitle, editTypesManager");
+			menuGroup.getChildren().add(uiMenuItem);
+			i++;
+		}
 	}
 
 	public List<StructuralWrapper> getStructuralWrappers() {
@@ -239,6 +277,14 @@ public class GenericBean implements Serializable {
 
 	public boolean isPhantom(Holder holder) {
 		return holder.getValue() == null;
+	}
+
+	public UIMenuGroup getMenuGroup() {
+		return menuGroup;
+	}
+
+	public void setMenuGroup(UIMenuGroup menuGroup) {
+		this.menuGroup = menuGroup;
 	}
 
 }
