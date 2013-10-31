@@ -17,7 +17,7 @@ import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.myadmin.beans.GenericBean;
-import org.genericsystem.myadmin.beans.GenericTreeBean;
+import org.genericsystem.myadmin.beans.GuiGenericsTreeBean;
 import org.genericsystem.myadmin.beans.Structural;
 import org.genericsystem.myadmin.beans.StructuralImpl;
 import org.testng.annotations.Test;
@@ -29,7 +29,7 @@ public class TypesTest extends AbstractTest {
 	private Cache cache;
 
 	@Inject
-	private GenericTreeBean genericTreeBean;
+	private GuiGenericsTreeBean genericTreeBean;
 
 	public void testExample() {
 		Generic vehicle = cache.find(Vehicle.class);
