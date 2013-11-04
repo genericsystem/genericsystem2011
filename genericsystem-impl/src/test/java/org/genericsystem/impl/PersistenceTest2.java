@@ -43,8 +43,8 @@ public class PersistenceTest2 extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path, Vehicle.class).start();
 		GenericImpl vehicle = ((EngineImpl) cache.getEngine()).find(Vehicle.class);
 		cache.getEngine().close();
-		GenericSystem.newCacheOnANewPersistentEngine(path);
-		GenericImpl vehicle2 = ((EngineImpl) cache.getEngine()).find(Vehicle.class);
+		Cache cache2 = GenericSystem.newCacheOnANewPersistentEngine(path, Vehicle.class).start();
+		GenericImpl vehicle2 = ((EngineImpl) cache2.getEngine()).find(Vehicle.class);
 		assert vehicle.getDesignTs() == vehicle2.getDesignTs() : vehicle.info() + vehicle2.info();
 	}
 
@@ -53,8 +53,8 @@ public class PersistenceTest2 extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path, Car.class).start();
 		GenericImpl car = ((EngineImpl) cache.getEngine()).find(Car.class);
 		cache.getEngine().close();
-		GenericSystem.newCacheOnANewPersistentEngine(path);
-		GenericImpl car2 = ((EngineImpl) cache.getEngine()).find(Car.class);
+		Cache cache2 = GenericSystem.newCacheOnANewPersistentEngine(path, Car.class).start();
+		GenericImpl car2 = ((EngineImpl) cache2.getEngine()).find(Car.class);
 		assert car.getDesignTs() == car2.getDesignTs() : car.info() + car2.info();
 	}
 

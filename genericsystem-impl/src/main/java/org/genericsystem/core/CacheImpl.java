@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -447,10 +448,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
-		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, directSupers);
-		boolean[] singularAxes = getSingularAxes(meta);
-		boolean isProperty = false;// meta.isPropertyConstraintEnabled();
-		directSupers = getDirectSupers2(meta, isProperty, singularAxes, primaries, components);
+		// GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, directSupers);
+		// boolean[] singularAxes = getSingularAxes(meta);
+		// boolean isProperty = false;// meta.isPropertyConstraintEnabled();
+		// directSupers = getDirectSupers2(meta, isProperty, singularAxes, primaries, components);
 
 		for (Generic directSuper : directSupers)
 			if (((GenericImpl) directSuper).equiv(primaries, components))
@@ -467,8 +468,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 			if (phantom != null)
 				phantom.remove();
 		}
-		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(meta, isProperty, singularAxes, primaries, components);
-		// NavigableSet<Generic> orderedDependencies2 = getConcernedDependencies2(directSupers, primaries, components);
+		// NavigableSet<Generic> orderedDependencies = getConcernedDependencies(meta, isProperty, singularAxes, primaries, components);
+		NavigableSet<Generic> orderedDependencies = getConcernedDependencies2(directSupers, primaries, components);
 		// assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies.first().info() + " " + orderedDependencies2 + " for primaries : " + Arrays.toString(primaries) + " components : " + Arrays.toString(components);
 		for (Generic directSuper : directSupers)
 			assert directSuper.isAlive() : directSuper.info();
@@ -477,7 +478,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic directSuper : directSupers)
 			assert directSuper.isAlive() : directSuper.info() + Arrays.toString(components);
 		ConnectionMap connectionMap = new ConnectionMap();
-		log.info("zZZZZZZZZZZZ" + orderedDependencies + Arrays.toString(directSupers) + " " + Arrays.toString(components));
+		// log.info("zZZZZZZZZZZZ" + orderedDependencies + Arrays.toString(directSupers) + " " + Arrays.toString(components));
 		T superGeneric = buildAndInsertComplex(homeTreeNode, specializeGenericClass(specializationClass, homeTreeNode, directSupers), directSupers, components);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
