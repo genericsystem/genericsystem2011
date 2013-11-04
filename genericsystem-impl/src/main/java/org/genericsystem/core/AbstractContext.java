@@ -104,23 +104,47 @@ public abstract class AbstractContext implements Serializable {
 			@Override
 			public boolean isSelected(Generic candidate) {
 				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
-				// if (SystemPropertyValue.class.equals(candidate.getClass())) {
-				// log.info("ISSELECTED : " + candidate + "(" + System.identityHashCode(((GenericImpl) candidate).homeTreeNode) + ") " + result);
-				// log.info("================> Primaries : " + Arrays.toString(((GenericImpl) candidate).primaries) + "===>" + Arrays.toString(primaries));
-				// log.info("================> Components : " + Arrays.toString(((GenericImpl) candidate).components) + "===>" + Arrays.toString(components));
-				// // assert primaries[0].inheritsFrom((((GenericImpl) candidate).primaries)[0]);
-				//
-				// // assert components[0].inheritsFrom((((GenericImpl) candidate).components)[0]);
-				// }
 				return result;
 
 			}
 		};
 	}
 
-	protected Generic[] getDirectSupers(final HomeTreeNode[] primaries, final Generic[] components) {
+	Iterator<Generic> getDirectSupersIterator2(final Generic meta, final boolean isProperty, final boolean[] singularAxes, final HomeTreeNode[] primaries, final Generic[] components) {
+		return new AbstractSelectableLeafIterator(getEngine()) {
+
+			@Override
+			protected boolean isSelectable() {
+				return true;
+			}
+
+			@Override
+			public boolean isSelected(Generic candidate) {
+				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
+				if (!next.equals(meta) && GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
+					for (int axe = 0; axe < singularAxes.length; axe++)
+						if (isProperty || singularAxes[axe])
+							if (((GenericImpl) next).components.length == singularAxes.length)
+								if (((GenericImpl) next).components[axe].inheritsFrom(components[axe]))
+									return true;
+
+				return result;
+
+			}
+		};
+	}
+
+	protected Generic[] getDirectSupers(HomeTreeNode[] primaries, Generic[] components) {
 		TreeSet<Generic> supers = new TreeSet<Generic>();
 		final Iterator<Generic> iterator = getDirectSupersIterator(primaries, components);
+		while (iterator.hasNext())
+			supers.add(iterator.next());
+		return supers.toArray(new Generic[supers.size()]);
+	}
+
+	protected Generic[] getDirectSupers2(Generic meta, boolean isProperty, boolean[] singularAxes, HomeTreeNode[] primaries, Generic[] components) {
+		TreeSet<Generic> supers = new TreeSet<Generic>();
+		final Iterator<Generic> iterator = getDirectSupersIterator2(meta, isProperty, singularAxes, primaries, components);
 		while (iterator.hasNext())
 			supers.add(iterator.next());
 		return supers.toArray(new Generic[supers.size()]);
