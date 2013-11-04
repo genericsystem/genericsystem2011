@@ -849,6 +849,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		<T extends Generic> T unsafeUpdateValue(final Generic old, final Serializable value) throws ConstraintViolationException {
+			assert value != null;
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
@@ -856,6 +857,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 					return internalBind(newHomeTreeNode, new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()))).toArray(), ((GenericImpl) old).selfToNullComponents(),
 							old.getClass(), false);
 				}
+
 			}.rebuildAll(old);
 		}
 
