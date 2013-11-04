@@ -782,6 +782,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		while (cartesianIterator.hasNext()) {
 			final Generic[] components = (Generic[]) cartesianIterator.next();
 			final Generic[] newComponents = enrich(components, GenericImpl.this.components);
+			for (Generic component : newComponents)
+				assert component.isAlive();
 			if (!phantomExists(components)) {
 				Generic projection = Statics.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 					@Override
@@ -790,7 +792,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					}
 				});
 				if (projection == null) {
-					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, components)).markAsAutomatic();
+					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, newComponents)).markAsAutomatic();
 				}
 			}
 		}
@@ -876,13 +878,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return subHomeTreeNode.inheritsFrom(homeTreeNode) && isSuperOf(primaries, components, subPrimaries, subComponents);
 	}
 
-	public static boolean isDependencyOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
+	public static boolean isAncestorOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
 		if (isSuperOf(primaries, components, subPrimaries, subComponents))
 			return true;
 		for (Generic component : subComponents)
 			if (component != null)
 				if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
-					if (isDependencyOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
+					if (isAncestorOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
 						return true;
 		return false;
 
