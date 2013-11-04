@@ -6,7 +6,7 @@ import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
-import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingletonConstraintViolationException;
@@ -25,7 +25,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SingularConstraint
 @AxedConstraintValue(SingletonConstraintImpl.class)
 @Priority(10)
-public class SingletonConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+public class SingletonConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@Override
 	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {

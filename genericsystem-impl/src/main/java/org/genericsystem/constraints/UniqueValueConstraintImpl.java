@@ -9,7 +9,7 @@ import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
-import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanConstraintImpl;
+import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UniqueValueConstraintViolationException;
@@ -30,7 +30,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 // TODO clean
 // @Dependencies(UniqueValueConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(UniqueValueConstraintImpl.class)
-public class UniqueValueConstraintImpl extends AbstractBooleanConstraintImpl implements Holder {
+public class UniqueValueConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	// @SystemGeneric
 	// @Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
