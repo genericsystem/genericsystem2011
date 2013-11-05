@@ -116,8 +116,8 @@ public class NotNullConstraintTest extends AbstractTest {
 		final Attribute registration = car.setProperty("Registration");
 		final Generic myBmw = car.newInstance("myBmw");
 		Holder holder = car.setValue(registration, 235);
-		myBmw.setValue(holder, null);
-		assert myBmw.getHolder(Statics.CONCRETE, registration) == null;
+		myBmw.setValue(holder, null).log();
+		assert myBmw.getHolder(Statics.CONCRETE, registration) == null : myBmw.getHolder(Statics.CONCRETE, registration);
 		assert myBmw.getValues(registration).isEmpty();
 		myBmw.setValue(registration, null);// No exception
 		assert myBmw.getHolder(Statics.CONCRETE, registration) == null;

@@ -295,7 +295,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
-		return getCurrentCache().bind(homeTreeNode, specializationClass, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
+		return getCurrentCache().bind(homeTreeNode, specializationClass, directSuper, existsException, basePos, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Holder> T find(HomeTreeNode homeTreeNode, Holder directSuper, int basePos, Generic... targets) {
@@ -646,31 +646,31 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
 		// Generic meta = metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute;
 		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
-
-		boolean isSingular = ((Attribute) attribute).isSingularConstraintEnabled(basePos);
-		boolean isProperty = ((Attribute) attribute).isPropertyConstraintEnabled();
-
-		if (isSingular || isProperty || value == null) {
-			Holder holder = isSingular ? getHolder(homeTreeNode.getMetaLevel(), (Attribute) attribute, basePos) : getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, targets);
-			if (holder != null) {
-				if (((GenericImpl) holder).equiv(new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
-					return (T) holder;
-				if (equals(holder.getComponent(basePos))) {
-					if (value != null && Arrays.equals(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components)) {
-						return holder.updateValue(value);
-					} else {
-						holder.remove();
-						return setHolder(specializationClass, attribute, value, metaLevel, basePos, targets);
-					}
-				} else
-					return getCurrentCache().<T> bind(homeTreeNode, new Generic[] { holder }, enrich(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components), specializationClass, false);
-			}
-		} else {
-			Holder holder = this.<T> getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, targets);
-			if (holder != null)
-				return getCurrentCache().<T> bind(homeTreeNode, new Generic[] { holder }, enrich(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components), specializationClass, false);
-		}
-		return !homeTreeNode.isPhantom() ? this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, false, targets) : null;
+		//
+		// boolean isSingular = ((Attribute) attribute).isSingularConstraintEnabled(basePos);
+		// boolean isProperty = ((Attribute) attribute).isPropertyConstraintEnabled();
+		//
+		// if (isSingular || isProperty || value == null) {
+		// Holder holder = isSingular ? getHolder(homeTreeNode.getMetaLevel(), (Attribute) attribute, basePos) : getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, targets);
+		// if (holder != null) {
+		// if (((GenericImpl) holder).equiv(new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
+		// return (T) holder;
+		// if (equals(holder.getComponent(basePos))) {
+		// if (value != null && Arrays.equals(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components)) {
+		// return holder.updateValue(value);
+		// } else {
+		// holder.remove();
+		// return setHolder(specializationClass, attribute, value, metaLevel, basePos, targets);
+		// }
+		// } else
+		// return getCurrentCache().<T> bind(homeTreeNode, new Generic[] { holder }, enrich(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components), specializationClass, false, basePos);
+		// }
+		// } else {
+		// Holder holder = this.<T> getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, targets);
+		// if (holder != null)
+		// return getCurrentCache().<T> bind(homeTreeNode, new Generic[] { holder }, enrich(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components), specializationClass, false, basePos);
+		// }
+		return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, false, targets);
 
 		// Holder holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
 		// while (holder != null && !((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
@@ -700,10 +700,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.<T> getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, targets);
 	}
 
-	private Generic[] enrich(Generic[] components, Generic[] additionals) {
+	public static Generic[] enrich(Generic[] components, Generic[] additionals) {
 		List<Generic> result = new ArrayList<>(Arrays.asList(components));
 		for (int i = 0; i < additionals.length; i++)
-			if (!components[i].inheritsFrom(additionals[i]))
+			if (i >= components.length || !components[i].inheritsFrom(additionals[i]))
 				result.add(additionals[i]);
 		return result.toArray(new Generic[result.size()]);
 	}
@@ -733,12 +733,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Serializable value, Generic... components) {
-		return getCurrentCache().bind(bindInstanceNode(value), null, this, false, components);
+		return getCurrentCache().bind(bindInstanceNode(value), null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
-		return getCurrentCache().bind(getEngine().bindInstanceNode(value), null, this, false, components);
+		return getCurrentCache().bind(getEngine().bindInstanceNode(value), null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
@@ -824,7 +824,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					}
 				});
 				if (projection == null) {
-					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, newComponents)).markAsAutomatic();
+					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, Statics.MULTIDIRECTIONAL, newComponents)).markAsAutomatic();
 				}
 			}
 		}

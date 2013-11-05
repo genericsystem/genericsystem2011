@@ -9,6 +9,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
+import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Node.Visitor;
 import org.genericsystem.generic.Relation;
@@ -160,8 +161,8 @@ public class TreeTest extends AbstractTest {
 		assert graphicComponentColor.isPropertyConstraintEnabled();
 
 		webPage.bind(graphicComponentColor, red);
-		header.bind(graphicComponentColor, blue);
-		header.bind(graphicComponentColor, blue);
+		Link bind = header.bind(graphicComponentColor, blue);
+		assert bind == header.bind(graphicComponentColor, blue);
 		footer.bind(graphicComponentColor, yellow);
 
 		assert red.equals(body.getLink(graphicComponentColor).getTargetComponent()) : body.getLinks(graphicComponentColor);
