@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -80,6 +81,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public Generic[] getComponentsArray() {
 		return components.clone();
+	}
+
+	public HomeTreeNode[] getPrimariesArray() {
+		return primaries.clone();
 	}
 
 	@Override
@@ -290,7 +295,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
-		return getCurrentCache().bind(homeTreeNode, specializationClass, directSuper, existsException, Statics.insertIntoArray(this, targets, basePos));
+		return getCurrentCache().bind(homeTreeNode, specializationClass, directSuper, existsException, basePos, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Holder> T find(HomeTreeNode homeTreeNode, Holder directSuper, int basePos, Generic... targets) {
@@ -636,34 +641,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
-		assert metaLevel - attribute.getMetaLevel() <= 1;
-		assert metaLevel - attribute.getMetaLevel() >= 0;
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
-		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
-		Holder holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
-		while (holder != null && !((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
-			if (equals(holder.getComponent(basePos))) {
-				if (value != null && Arrays.equals(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components))
-					return holder.updateValue(value);
-				else
-					holder.remove();
-
-			} else {
-				// assert holder.getMetaLevel() == metaLevel;
-				// cancel(holder, basePos);
-				Generic[] components = Statics.insertIntoArray(this, targets, basePos);
-				Generic[] holdersComponent = ((GenericImpl) holder).components;
-				return getCurrentCache().<T> bind(homeTreeNode, new Generic[] { holder }, enrich(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components), specializationClass, false);
-			}
-			holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
-		}
-		return !homeTreeNode.isPhantom() ? this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, false, targets) : null;
+		return this.<T> bind(metaNode.bindInstanceNode(value), specializationClass, attribute, basePos, false, targets);
 	}
 
-	private Generic[] enrich(Generic[] components, Generic[] additionals) {
+	public static Generic[] enrich(Generic[] components, Generic[] additionals) {
 		List<Generic> result = new ArrayList<>(Arrays.asList(components));
 		for (int i = 0; i < additionals.length; i++)
-			if (!components[i].inheritsFrom(additionals[i]))
+			if (i >= components.length || !components[i].inheritsFrom(additionals[i]))
 				result.add(additionals[i]);
 		return result.toArray(new Generic[result.size()]);
 	}
@@ -674,14 +659,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, basePos, targets);
-	}
-
-	public <T extends Holder> T getSelectedHolder(Holder attribute, HomeTreeNode homeTreeNode, int basePos, Generic... targets) {
-		if (((Attribute) attribute).isSingularConstraintEnabled(basePos))
-			return getHolder(homeTreeNode.getMetaLevel(), (Attribute) attribute, basePos);
-		if (homeTreeNode.getValue() == null || ((Attribute) attribute).isPropertyConstraintEnabled())
-			return this.<T> getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, targets);
-		return this.<T> getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, targets);
 	}
 
 	@Override
@@ -701,12 +678,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Serializable value, Generic... components) {
-		return getCurrentCache().bind(bindInstanceNode(value), null, this, false, components);
+		return getCurrentCache().bind(bindInstanceNode(value), null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
-		return getCurrentCache().bind(getEngine().bindInstanceNode(value), null, this, false, components);
+		return getCurrentCache().bind(getEngine().bindInstanceNode(value), null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
@@ -792,7 +769,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					}
 				});
 				if (projection == null) {
-					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, newComponents)).markAsAutomatic();
+					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, Statics.MULTIDIRECTIONAL, newComponents)).markAsAutomatic();
 				}
 			}
 		}
@@ -1283,7 +1260,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getSystemPropertyValue(constraintClass, pos);
-		// log.info("ZZZ" + value);
 		return value != null && !Boolean.FALSE.equals(value);
 	}
 

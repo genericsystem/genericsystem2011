@@ -159,7 +159,7 @@ public class Archiver {
 			tmpContent.writeLong(generic.homeTreeNode.ts);
 			if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
 				tmpContent.writeLong(generic.homeTreeNode.metaNode.ts);
-				tmpContent.writeObject(generic.homeTreeNode.value);
+				tmpContent.writeObject(generic.homeTreeNode.getValue());
 				homeTreeMap.put(generic.homeTreeNode.ts, generic.homeTreeNode);
 			}
 			if (generic.isEngine())

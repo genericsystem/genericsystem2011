@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -870,7 +871,7 @@ public class RelationTest extends AbstractTest {
 		Link myBmwRearRight1 = rearRight.setLink(carTyres, "value1", myBmw);
 		assert myBmw.getLinks(carTyres).contains(myBmwRearRight1);
 		Link myBmwRearRight2 = rearRight.setLink(carTyres, "value1", myBmw);
-		assert myBmwRearRight1 == myBmwRearRight2;
+		assert myBmwRearRight1 == myBmwRearRight2 : myBmwRearRight1.isAlive();
 
 		assert myBmw.getLinks(carTyres).size() == 4 : myBmw.getLinks(carTyres);
 		assert myBmw.getLinks(carTyres).contains(myBmwRearRight1);
