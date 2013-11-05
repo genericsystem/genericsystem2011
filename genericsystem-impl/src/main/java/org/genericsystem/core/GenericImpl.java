@@ -641,63 +641,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
-		assert metaLevel - attribute.getMetaLevel() <= 1;
-		assert metaLevel - attribute.getMetaLevel() >= 0;
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
-		// Generic meta = metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute;
-		HomeTreeNode homeTreeNode = metaNode.bindInstanceNode(value);
-		//
-		// boolean isSingular = ((Attribute) attribute).isSingularConstraintEnabled(basePos);
-		// boolean isProperty = ((Attribute) attribute).isPropertyConstraintEnabled();
-		//
-		// if (isSingular || isProperty || value == null) {
-		// Holder holder = isSingular ? getHolder(homeTreeNode.getMetaLevel(), (Attribute) attribute, basePos) : getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, targets);
-		// if (holder != null) {
-		// if (((GenericImpl) holder).equiv(new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos)))
-		// return (T) holder;
-		// if (equals(holder.getComponent(basePos))) {
-		// if (value != null && Arrays.equals(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components)) {
-		// return holder.updateValue(value);
-		// } else {
-		// holder.remove();
-		// return setHolder(specializationClass, attribute, value, metaLevel, basePos, targets);
-		// }
-		// } else
-		// return getCurrentCache().<T> bind(homeTreeNode, new Generic[] { holder }, enrich(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components), specializationClass, false, basePos);
-		// }
-		// } else {
-		// Holder holder = this.<T> getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, targets);
-		// if (holder != null)
-		// return getCurrentCache().<T> bind(homeTreeNode, new Generic[] { holder }, enrich(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components), specializationClass, false, basePos);
-		// }
-		return this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, false, targets);
-
-		// Holder holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
-		// while (holder != null && !((GenericImpl) holder).isSuperOf(homeTreeNode, new Primaries(homeTreeNode, attribute).toArray(), Statics.insertIntoArray(this, targets, basePos))) {
-		// if (equals(holder.getComponent(basePos))) {
-		// if (value != null && Arrays.equals(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components))
-		// return holder.updateValue(value);
-		// else
-		// holder.remove();
-		//
-		// } else {
-		// // assert holder.getMetaLevel() == metaLevel;
-		// // cancel(holder, basePos);
-		// Generic[] components = Statics.insertIntoArray(this, targets, basePos);
-		// Generic[] holdersComponent = ((GenericImpl) holder).components;
-		// return getCurrentCache().<T> bind(homeTreeNode, new Generic[] { holder }, enrich(Statics.insertIntoArray(this, targets, basePos), ((GenericImpl) holder).components), specializationClass, false);
-		// }
-		// holder = getSelectedHolder(attribute, homeTreeNode, basePos, targets);
-		// }
-		// return !homeTreeNode.isPhantom() ? this.<T> bind(homeTreeNode, specializationClass, attribute, basePos, false, targets) : null;
-	}
-
-	public <T extends Holder> T getSelectedHolder(Holder attribute, HomeTreeNode homeTreeNode, int basePos, Generic... targets) {
-		if (((Attribute) attribute).isSingularConstraintEnabled(basePos))
-			return getHolder(homeTreeNode.getMetaLevel(), (Attribute) attribute, basePos);
-		if (homeTreeNode.getValue() == null || ((Attribute) attribute).isPropertyConstraintEnabled())
-			return this.<T> getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, targets);
-		return this.<T> getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, targets);
+		return this.<T> bind(metaNode.bindInstanceNode(value), specializationClass, attribute, basePos, false, targets);
 	}
 
 	public static Generic[] enrich(Generic[] components, Generic[] additionals) {

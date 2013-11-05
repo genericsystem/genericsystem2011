@@ -425,38 +425,36 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
-		Primaries primarySet = new Primaries(homeTreeNode, supers);
-		final HomeTreeNode[] primaries = primarySet.toArray();
-		assert primaries.length != 0;
-
 		if (Statics.MULTIDIRECTIONAL != basePos) {
 			Attribute attribute = (Attribute) supers[0];
 			boolean isSingular = attribute.isSingularConstraintEnabled(basePos);
 			boolean isProperty = attribute.isPropertyConstraintEnabled();
+			Holder holder;
 			if (isSingular || isProperty || homeTreeNode.isPhantom()) {
-				Holder holder = isSingular ? components[basePos].getHolder(homeTreeNode.getMetaLevel(), attribute, basePos) : components[basePos].getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, Statics.truncate(basePos, components));
-				if (holder != null) {
+				while ((holder = isSingular ? components[basePos].getHolder(homeTreeNode.getMetaLevel(), attribute, basePos) : components[basePos].getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, Statics.truncate(basePos, components))) != null) {
 					if (((GenericImpl) holder).equiv(new Primaries(homeTreeNode, attribute).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components)))
 						return (T) holder;
-					if (components[basePos].equals(holder.getComponent(basePos))) {
-						if (homeTreeNode.getValue() != null && Arrays.equals(components, ((GenericImpl) holder).components)) {
+					if (!components[basePos].equals(holder.getComponent(basePos)))
+						return this.<T> internalBind(homeTreeNode, new Generic[] { holder }, GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException);
+					else {
+						if (!homeTreeNode.isPhantom() && Arrays.equals(components, ((GenericImpl) holder).components))
 							return holder.updateValue(homeTreeNode.getValue());
-						} else {
+						else
 							holder.remove();
-							return bind(homeTreeNode, supers, components, specializationClass, existsException, basePos);
-						}
-					} else
-						return this.<T> bind(homeTreeNode, new Generic[] { holder }, GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, false, Statics.MULTIDIRECTIONAL);
-				} else if (homeTreeNode.isPhantom())
+					}
+				}
+				if (homeTreeNode.isPhantom())
 					return null;
-			} else {
-				Holder holder = ((GenericImpl) components[basePos]).getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, Statics.truncate(basePos, components));
-				if (holder != null)
-					return this.<T> bind(homeTreeNode, new Generic[] { holder }, GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, false, Statics.MULTIDIRECTIONAL);
-			}
+			} else if ((holder = ((GenericImpl) components[basePos]).getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, Statics.truncate(basePos, components))) != null)
+				return this.<T> internalBind(homeTreeNode, new Generic[] { holder }, GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException);
 		}
+		return internalBind(homeTreeNode, supers, components, specializationClass, existsException);
+	}
 
-		// return (T) (!homeTreeNode.isPhantom() ? internalBind(homeTreeNode, primaries, components, specializationClass, existsException) : null);
+	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
+		Primaries primarySet = new Primaries(homeTreeNode, supers);
+		final HomeTreeNode[] primaries = primarySet.toArray();
+		assert primaries.length != 0;
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
 	}
 
@@ -478,7 +476,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				else
 					rollback(new FunctionalConsistencyViolationException(directSuper.info() + " " + Arrays.toString(directSupers)));
 
-		if (homeTreeNode.getValue() != null) {
+		if (!homeTreeNode.isPhantom()) {
 			T phantom = fastFindPhantom(homeTreeNode, primaries, components);
 			if (phantom != null)
 				phantom.remove();
