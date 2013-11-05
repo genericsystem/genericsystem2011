@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -370,7 +371,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] userSupers, Generic... components) {
-		T result = bind(this.<EngineImpl> getEngine().bindInstanceNode(value), userSupers, components, null, false);
+		T result = bind(this.<EngineImpl> getEngine().bindInstanceNode(value), userSupers, components, null, false, Statics.MULTIDIRECTIONAL);
 		assert Objects.equals(value, result.getValue());
 		return result;
 	}
@@ -382,7 +383,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(this.<EngineImpl> getEngine().bindInstanceNode(value), new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, false);
+		return this.<T> bind(this.<EngineImpl> getEngine().bindInstanceNode(value), new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, false, Statics.MULTIDIRECTIONAL);
 	}
 
 	@Override
@@ -415,42 +416,55 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Serializable value = findImplictValue(clazz);
 		HomeTreeNode homeTreeNode = meta.bindInstanceNode(value);
 		assert homeTreeNode.getMetaLevel() <= 2;
-		T result = bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false);
-		return result;
+		return this.<T> bind(homeTreeNode, Statics.insertFirst(meta, userSupers), components, clazz, false, Statics.MULTIDIRECTIONAL);
 	}
 
-	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic directSuper, boolean existsException, Generic... components) {
-		// log.info("YYYYYYYYYYYYYY" + Arrays.toString(components));
-		components = ((GenericImpl) directSuper).sortAndCheck(components);
-		// log.info("UUUUUUUUUUUUUU" + Arrays.toString(components));
-
-		return bind(homeTreeNode, new Generic[] { directSuper }, components, specializationClass, existsException);
+	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Generic directSuper, boolean existsException, int axe, Generic... components) {
+		return bind(homeTreeNode, new Generic[] { directSuper }, ((GenericImpl) directSuper).sortAndCheck(components), specializationClass, existsException, axe);
 	}
 
-	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
-		// log.info("SSSSSSSSSSSSSSS" + Arrays.toString(components));
+	@SuppressWarnings("unchecked")
+	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
+		if (Statics.MULTIDIRECTIONAL != basePos) {
+			Attribute attribute = (Attribute) supers[0];
+			boolean isSingular = attribute.isSingularConstraintEnabled(basePos);
+			boolean isProperty = attribute.isPropertyConstraintEnabled();
+			Holder holder;
+			if (isSingular || isProperty || homeTreeNode.isPhantom()) {
+				while ((holder = isSingular ? components[basePos].getHolder(homeTreeNode.getMetaLevel(), attribute, basePos) : components[basePos].getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, Statics.truncate(basePos, components))) != null) {
+					if (((GenericImpl) holder).equiv(new Primaries(homeTreeNode, attribute).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components)))
+						return (T) holder;
+					if (!components[basePos].equals(holder.getComponent(basePos)))
+						return this.<T> internalBind(homeTreeNode, new Generic[] { holder }, GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException);
+					else {
+						if (!homeTreeNode.isPhantom() && Arrays.equals(components, ((GenericImpl) holder).components))
+							return holder.updateValue(homeTreeNode.getValue());
+						else
+							holder.remove();
+					}
+				}
+				if (homeTreeNode.isPhantom())
+					return null;
+			} else if ((holder = ((GenericImpl) components[basePos]).getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, Statics.truncate(basePos, components))) != null)
+				return this.<T> internalBind(homeTreeNode, new Generic[] { holder }, GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException);
+		}
+		return internalBind(homeTreeNode, supers, components, specializationClass, existsException);
+	}
+
+	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Primaries primarySet = new Primaries(homeTreeNode, supers);
 		final HomeTreeNode[] primaries = primarySet.toArray();
 		assert primaries.length != 0;
 		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException);
 	}
 
-	private boolean[] getSingularAxes(GenericImpl meta) {
-		boolean[] singularAxes = new boolean[meta.getComponentsSize()];
-		for (int i = 0; i < meta.components.length; i++) {
-			// log.info("meta " + meta + " ((Holder) meta.components[i]) " + (meta.components[i]));
-			singularAxes[i] = !meta.isMeta() && ((Holder) meta).isSingularConstraintEnabled(i);
-		}
-		return singularAxes;
-	}
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
-		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, directSupers);
-		boolean[] singularAxes = getSingularAxes(meta);
-		boolean isProperty = false;// meta.isPropertyConstraintEnabled();
-		directSupers = getDirectSupers2(meta, isProperty, singularAxes, primaries, components);
+		// GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, directSupers);
+		// boolean[] singularAxes = getSingularAxes(meta);
+		// boolean isProperty = false;// meta.isPropertyConstraintEnabled();
+		// directSupers = getDirectSupers2(meta, isProperty, singularAxes, primaries, components);
 
 		for (Generic directSuper : directSupers)
 			if (((GenericImpl) directSuper).equiv(primaries, components))
@@ -462,13 +476,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 				else
 					rollback(new FunctionalConsistencyViolationException(directSuper.info() + " " + Arrays.toString(directSupers)));
 
-		if (homeTreeNode.getValue() != null) {
+		if (!homeTreeNode.isPhantom()) {
 			T phantom = fastFindPhantom(homeTreeNode, primaries, components);
 			if (phantom != null)
 				phantom.remove();
 		}
-		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(meta, isProperty, singularAxes, primaries, components);
-		// NavigableSet<Generic> orderedDependencies2 = getConcernedDependencies2(directSupers, primaries, components);
+		// NavigableSet<Generic> orderedDependencies = getConcernedDependencies(meta, isProperty, singularAxes, primaries, components);
+		NavigableSet<Generic> orderedDependencies = getConcernedDependencies2(directSupers, primaries, components);
 		// assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies.first().info() + " " + orderedDependencies2 + " for primaries : " + Arrays.toString(primaries) + " components : " + Arrays.toString(components);
 		for (Generic directSuper : directSupers)
 			assert directSuper.isAlive() : directSuper.info();
@@ -477,11 +491,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic directSuper : directSupers)
 			assert directSuper.isAlive() : directSuper.info() + Arrays.toString(components);
 		ConnectionMap connectionMap = new ConnectionMap();
-		log.info("zZZZZZZZZZZZ" + orderedDependencies + Arrays.toString(directSupers) + " " + Arrays.toString(components));
+		// log.info("zZZZZZZZZZZZ" + orderedDependencies + Arrays.toString(directSupers) + " " + Arrays.toString(components));
 		T superGeneric = buildAndInsertComplex(homeTreeNode, specializeGenericClass(specializationClass, homeTreeNode, directSupers), directSupers, components);
 		connectionMap.reBind(orderedDependencies, true);
 		return superGeneric;
 	}
+
+	// private boolean[] getSingularAxes(GenericImpl meta) {
+	// boolean[] singularAxes = new boolean[meta.getComponentsSize()];
+	// for (int i = 0; i < meta.components.length; i++) {
+	// // log.info("meta " + meta + " ((Holder) meta.components[i]) " + (meta.components[i]));
+	// singularAxes[i] = !meta.isMeta() && ((Holder) meta).isSingularConstraintEnabled(i);
+	// }
+	// return singularAxes;
+	// }
 
 	private Class<?> specializeGenericClass(Class<?> specializationClass, HomeTreeNode homeTreeNode, Generic[] supers) {
 		Generic meta = getMeta(homeTreeNode, supers);
@@ -848,13 +871,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		<T extends Generic> T unsafeUpdateValue(final Generic old, final Serializable value) throws ConstraintViolationException {
+			assert value != null;
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
 					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
+					// TODO call internalBind is forbidden, you must call bind
 					return internalBind(newHomeTreeNode, new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()))).toArray(), ((GenericImpl) old).selfToNullComponents(),
 							old.getClass(), false);
 				}
+
 			}.rebuildAll(old);
 		}
 
@@ -862,7 +888,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
-					return bind(((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.getClass(), false);
+					return bind(((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.getClass(), false, Statics.MULTIDIRECTIONAL);
 				}
 			}.rebuildAll(old);
 		}
@@ -871,7 +897,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
-					return bind(((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.getClass(), false);
+					return bind(((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.getClass(), false, Statics.MULTIDIRECTIONAL);
 				}
 			}.rebuildAll(old);
 		}
@@ -880,7 +906,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
-					return bind(((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), true);
+					return bind(((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), true, Statics.MULTIDIRECTIONAL);
 				}
 			}.rebuildAll(old);
 		}
@@ -897,7 +923,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {
-					return bind(((GenericImpl) old).getHomeTreeNode(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), true);
+					return bind(((GenericImpl) old).getHomeTreeNode(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), true, Statics.MULTIDIRECTIONAL);
 				}
 			}.rebuildAll(old);
 		}
