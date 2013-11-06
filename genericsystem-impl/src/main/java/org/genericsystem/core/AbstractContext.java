@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -103,9 +104,7 @@ public abstract class AbstractContext implements Serializable {
 
 			@Override
 			public boolean isSelected(Generic candidate) {
-				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
-				return result;
-
+				return GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
 			}
 		};
 	}
@@ -197,7 +196,7 @@ public abstract class AbstractContext implements Serializable {
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
 					for (T inheritingDependency : generic.<T> getInheritings())
-						if (((GenericImpl) inheritingDependency).isPhantomGeneric() || ((GenericImpl) inheritingDependency).isAutomatic())
+						if (((GenericImpl) inheritingDependency).isPhantom() || ((GenericImpl) inheritingDependency).isAutomatic())
 							addDependencies(inheritingDependency);
 						else if (!contains(inheritingDependency))
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);

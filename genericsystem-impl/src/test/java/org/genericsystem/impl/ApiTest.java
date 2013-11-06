@@ -116,7 +116,7 @@ public class ApiTest extends AbstractTest {
 		car.newInstance("myLada");
 		Generic red = color.newInstance("red");
 		Link carRed = car.setLink(carColor, "carRed", red);
-		assert red.getLinks(carColor).size()==3;
+		assert red.getLinks(carColor).size() == 3;
 		assert !red.getLinks(carColor).contains(carRed);
 	}
 
