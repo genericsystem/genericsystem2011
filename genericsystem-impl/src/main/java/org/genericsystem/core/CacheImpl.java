@@ -238,11 +238,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 						continue;
 					if (((GenericImpl) orderedDependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos])) {
 						newHomeTreeNode = ((GenericImpl) orderedDependency).getHomeTreeNode();
-						primaries = new Primaries(newHomeTreeNode, homeTreeNode).toArray();
+						primaries = Statics.insertFirst(homeTreeNode, ((GenericImpl) orderedDependency).primaries);
 					} else {
 						newHomeTreeNode = homeTreeNode;
-						primaries = new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) orderedDependency).primaries, ((GenericImpl) orderedDependency).getHomeTreeNode()))).toArray();
+						primaries = Statics.replace(((GenericImpl) orderedDependency).primaries, ((GenericImpl) orderedDependency).getHomeTreeNode(), homeTreeNode);
 					}
+					Arrays.sort(primaries);
 					newComponents = GenericImpl.enrich(adjust(((GenericImpl) orderedDependency).selfToNullComponents()), ((GenericImpl) bind).components);
 				} else {
 					newHomeTreeNode = ((GenericImpl) orderedDependency).getHomeTreeNode();
