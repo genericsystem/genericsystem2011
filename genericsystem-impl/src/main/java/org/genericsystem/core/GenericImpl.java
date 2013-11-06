@@ -279,6 +279,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
+	public <T extends Link> T setLink(Link relation, Serializable value, int basePos, Generic... targets) {
+		return setHolder(relation, value, basePos, targets);
+	}
+
+	@Override
 	public <T extends Holder> T setHolder(Holder attribute, Serializable value, Generic... targets) {
 		return setHolder(attribute, value, getBasePos(attribute), targets);
 	}
@@ -1669,8 +1674,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	public boolean isPhantomGeneric() {
-		return this.getValue() == null;
+	public boolean isPhantom() {
+		return homeTreeNode.isPhantom();
 	}
 
 	public boolean isAutomatic() {

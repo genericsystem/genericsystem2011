@@ -78,7 +78,6 @@ public class SingularConstraintTest extends AbstractTest {
 		car.setValue(vehiclePower, 50);
 		assert vehicle.getValue(vehiclePower) == null;
 		assert vehiclePower.isSingularConstraintEnabled();
-		vehicle.setValue(vehiclePower, 125);
 		assert car.getValue(vehiclePower).equals(50);
 	}
 
@@ -90,7 +89,7 @@ public class SingularConstraintTest extends AbstractTest {
 		vehicle.setValue(vehiclePower, 125);
 		car.setValue(vehiclePower, 50);
 		vehicle.setValue(vehiclePower, 250);
-		assert car.getValue(vehiclePower).equals(50);
+		assert car.getValue(vehiclePower).equals(50) : car.getValue(vehiclePower);
 	}
 
 	public void testConstraintCheckKO() {

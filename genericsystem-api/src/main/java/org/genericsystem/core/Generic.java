@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
+
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -222,6 +223,22 @@ public interface Generic extends Comparable<Generic> {
 	 * @return The Link.
 	 */
 	<T extends Link> T setLink(Link relation, Serializable value, Generic... targets);
+
+	/**
+	 * Creates a link or returns the link if already exists <br/>
+	 * If the Singular constraint is enabled on the property, then one link will be created on the targets.<br/>
+	 * 
+	 * @param relation
+	 *            The relation.
+	 * @param value
+	 *            The value Link.
+	 * @param basePos
+	 *            The base position.
+	 * @param targets
+	 *            The optional targets.
+	 * @return The Link.
+	 */
+	<T extends Link> T setLink(Link relation, Serializable value, int basePos, Generic... targets);
 
 	/**
 	 * Creates an holder or throws an exception if this holder already exists. <br/>
