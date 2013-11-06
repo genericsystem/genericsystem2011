@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Statics;
 import org.genericsystem.exception.PropertyConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -63,8 +64,9 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance("MyVehicle");
 		Generic red = color.newInstance("red");
 		Generic blue = color.newInstance("blue");
-		Link myVehicleColor = myVehicle.setLink(vehicleColor, "myVehicleColor", red);
-		myVehicle.setLink(vehicleColor, "myVehicleColor", blue);
+		Link myVehicleRed = myVehicle.setLink(vehicleColor, "myVehicleRed", red);
+		myVehicle.setLink(vehicleColor, "myVehicleBlue", blue);
+		assert myVehicleRed.isAlive();
 	}
 
 	public void testBinaryRelationSameTarget() {
@@ -221,14 +223,39 @@ public class PropertyConstraintTest extends AbstractTest {
 	}
 
 	public void testOK() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
 		Relation carOutsideColor = car.setRelation("outside", color);
 		Generic myBmw = car.newInstance("myBmw");
 		Generic red = color.newInstance("red");
 		carOutsideColor.enablePropertyConstraint();
-		// carOutsideColor.enableSingularConstraint( Statics.BASE_POSITION);
+		myBmw.setLink(carOutsideColor, "20%", red);
+		myBmw.setLink(carOutsideColor, "40%", red);
+		myBmw.getLink(carOutsideColor, red);
+	}
+
+	public void testOK2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carOutsideColor = car.setRelation("outside", color);
+		Generic myBmw = car.newInstance("myBmw");
+		Generic red = color.newInstance("red");
+		carOutsideColor.enableSingularConstraint(Statics.BASE_POSITION);
+		myBmw.setLink(carOutsideColor, "20%", red);
+		myBmw.setLink(carOutsideColor, "40%", red);
+		myBmw.getLink(carOutsideColor, red);
+	}
+
+	public void testOK3() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carOutsideColor = car.setRelation("outside", color);
+		Generic myBmw = car.newInstance("myBmw");
+		Generic red = color.newInstance("red");
+		carOutsideColor.enableSingularConstraint(Statics.TARGET_POSITION);
 		myBmw.setLink(carOutsideColor, "20%", red);
 		myBmw.setLink(carOutsideColor, "40%", red);
 		myBmw.getLink(carOutsideColor, red);

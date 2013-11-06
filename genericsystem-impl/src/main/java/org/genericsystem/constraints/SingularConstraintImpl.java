@@ -41,7 +41,7 @@ public class SingularConstraintImpl extends AbstractBooleanAxedConstraintImpl im
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
-		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (((GenericImpl) modified).isPhantomGeneric() && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
+		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (((GenericImpl) modified).isPhantom() && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
 	}
 
 }
