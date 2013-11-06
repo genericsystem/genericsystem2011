@@ -460,22 +460,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 					if (((GenericImpl) holder).equiv(new Primaries(homeTreeNode, attribute).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components)))
 						return (T) holder;
 					if (!components[basePos].equals(holder.getComponent(basePos)))
-						return this.<T> internalBind(homeTreeNode, new Generic[] { holder }, GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException, basePos);
+						return this.<T> internalBind(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException, basePos);
 					break;
 				}
 				if (homeTreeNode.isPhantom())
 					return null;
 			} else if ((holder = ((GenericImpl) components[basePos]).getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, Statics.truncate(basePos, components))) != null)
-				return this.<T> internalBind(homeTreeNode, new Generic[] { holder }, GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException, basePos);
+				return this.<T> internalBind(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException, basePos);
 		}
-		return internalBind(homeTreeNode, supers, components, specializationClass, existsException, basePos);
-	}
-
-	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
-		Primaries primarySet = new Primaries(homeTreeNode, supers);
-		final HomeTreeNode[] primaries = primarySet.toArray();
-		assert primaries.length != 0;
-		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException, basePos);
+		return internalBind(homeTreeNode, new Primaries(homeTreeNode, supers).toArray(), components, specializationClass, existsException, basePos);
 	}
 
 	@SuppressWarnings("unchecked")
