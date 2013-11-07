@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -26,8 +25,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	static final String MAP_VALUE = "map";
 
-	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {
-	}
+	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -72,7 +70,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				Value oldValue = get(key);
 				if (Objects.equals(oldValue, value))
 					return oldValue;
-				Holder attribute = getKeyAttribute();
+				Holder attribute = getKeyAttribute(Key key);
 				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
@@ -87,7 +85,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 						if (map == null)
 							return Collections.emptyIterator();
 						Attribute key = getKeyAttribute();
-						return new AbstractProjectorAndFilterIterator<Holder, Key>(((GenericImpl) map).<Holder> holdersIterator(key, Statics.CONCRETE, getBasePos(key), false)) {
+						return new AbstractProjectorAndFilterIterator<Holder, Key>(((GenericImpl) map).<Holder> holdersIterator(key, Statics.CONCRETE, getBasePos(key))) {
 
 							@Override
 							public boolean isSelected() {
@@ -114,7 +112,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		if (map == null)
 			return Collections.emptyIterator();
 		Attribute key = getKeyAttribute();
-		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Key, Value>>(((GenericImpl) map).<Holder> holdersIterator(key, Statics.CONCRETE, getBasePos(key), false)) {
+		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Key, Value>>(((GenericImpl) map).<Holder> holdersIterator(key, Statics.CONCRETE, getBasePos(key))) {
 
 			private Holder valueHolder;
 
@@ -130,11 +128,11 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				Holder map = next.getBaseComponent();
 				if (generic.equals(map.getBaseComponent()))
 					next.remove();
-				else {
-					map = generic.setHolder(AbstractMapProvider.this, MAP_VALUE);
-					if (!((GenericImpl) next.getBaseComponent()).equals(map))
-						map.setHolder(next, null);
-				}
+				// else {
+				// map = generic.setHolder(AbstractMapProvider.this, MAP_VALUE);
+				// if (!((GenericImpl) next.getBaseComponent()).equals(map))
+				// map.setHolder(next, null);
+				// }
 			}
 
 			@Override

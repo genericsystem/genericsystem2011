@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
+import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.Generic.ExtendedMap;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
@@ -238,11 +240,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 						continue;
 					if (((GenericImpl) orderedDependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos])) {
 						newHomeTreeNode = ((GenericImpl) orderedDependency).getHomeTreeNode();
-						primaries = new Primaries(newHomeTreeNode, homeTreeNode).toArray();
+						primaries = Statics.insertFirst(homeTreeNode, ((GenericImpl) orderedDependency).primaries);
 					} else {
 						newHomeTreeNode = homeTreeNode;
-						primaries = new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) orderedDependency).primaries, ((GenericImpl) orderedDependency).getHomeTreeNode()))).toArray();
+						primaries = Statics.replace(((GenericImpl) orderedDependency).primaries, ((GenericImpl) orderedDependency).getHomeTreeNode(), homeTreeNode);
 					}
+					Arrays.sort(primaries);
 					newComponents = GenericImpl.enrich(adjust(((GenericImpl) orderedDependency).selfToNullComponents()), ((GenericImpl) bind).components);
 				} else {
 					newHomeTreeNode = ((GenericImpl) orderedDependency).getHomeTreeNode();
@@ -448,33 +451,32 @@ public class CacheImpl extends AbstractContext implements Cache {
 		throw new IllegalStateException();
 	}
 
-	@SuppressWarnings("unchecked")
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
+		boolean isSingular = false;
+		boolean isProperty = false;
 		if (Statics.MULTIDIRECTIONAL != basePos) {
+			Holder holder = null;
 			Attribute attribute = (Attribute) supers[0];
-			boolean isSingular = attribute.isSingularConstraintEnabled(basePos);
-			boolean isProperty = attribute.isPropertyConstraintEnabled();
-			Holder holder;
-			if (isSingular || isProperty || homeTreeNode.isPhantom()) {
-				while ((holder = isSingular ? components[basePos].getHolder(homeTreeNode.getMetaLevel(), attribute, basePos) : components[basePos].getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, Statics.truncate(basePos, components))) != null) {
-					if (((GenericImpl) holder).equiv(new Primaries(homeTreeNode, attribute).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components)))
-						return (T) holder;
-					if (!components[basePos].equals(holder.getComponent(basePos)))
-						return this.<T> internalBind(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException, basePos);
-					break;
+			GenericImpl baseComponent = (GenericImpl) components[basePos];
+			isSingular = attribute.isSingularConstraintEnabled(basePos);
+			isProperty = attribute.isPropertyConstraintEnabled();
+			if (isSingular)
+				holder = baseComponent.getHolder(homeTreeNode.getMetaLevel(), attribute, basePos);
+			else if (isProperty)
+				holder = baseComponent.getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, Statics.truncate(basePos, components));
+
+			if (holder != null)
+				if (!components[basePos].equals(holder.getComponent(basePos)) || ((GenericImpl) holder).equiv(new Primaries(homeTreeNode, holder).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components))) {
+					supers = new Generic[] { holder };
+					components = GenericImpl.enrich(components, ((GenericImpl) holder).components);
 				}
-				if (homeTreeNode.isPhantom())
-					return null;
-			} else if ((holder = ((GenericImpl) components[basePos]).getHolderByValue(homeTreeNode.getMetaLevel(), attribute, homeTreeNode.getValue(), basePos, Statics.truncate(basePos, components))) != null)
-				return this.<T> internalBind(homeTreeNode, new Primaries(homeTreeNode, holder).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components), specializationClass, existsException, basePos);
 		}
-		return internalBind(homeTreeNode, new Primaries(homeTreeNode, supers).toArray(), components, specializationClass, existsException, basePos);
+		return internalBind(homeTreeNode, new Primaries(homeTreeNode, supers).toArray(), components, specializationClass, existsException, isSingular, isProperty, basePos);
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
+	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException, boolean isSingular, boolean isProperty, int basePos) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
-
 		for (Generic directSuper : directSupers)
 			if (((GenericImpl) directSuper).equiv(primaries, components))
 				if (directSupers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
@@ -492,11 +494,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, directSupers);
-		boolean isProperty = !meta.isMeta() && meta.isPropertyConstraintEnabled();
-		boolean isSingular = !meta.isMeta() && ((Holder) meta).isSingularConstraintEnabled(basePos);
-		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(meta, isProperty, isSingular, primaries, components, basePos);
-		// NavigableSet<Generic> orderedDependencies2 = getConcernedDependencies2(directSupers, primaries, components);
-		// assert orderedDependencies.equals(orderedDependencies2) : orderedDependencies + " / " + orderedDependencies2;
+		// NavigableSet<Generic> orderedDependencies = getConcernedDependencies(meta, isProperty, isSingular, primaries, components, basePos);
+		NavigableSet<Generic> orderedDependencies = getConcernedDependencies2(new Generic[] { meta }, primaries, components, isProperty, isSingular, basePos);
+		// assert orderedDependencies.equals(concernedDependencies2) : orderedDependencies + " / " + concernedDependencies2 + " " + orderedDependencies.first().info();
 		for (Generic generic : orderedDependencies.descendingSet())
 			simpleRemove(generic);
 		ConnectionMap connectionMap = new ConnectionMap();
@@ -549,42 +549,82 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	// TODO clean
-	// private NavigableSet<Generic> getConcernedDependencies2(Generic[] supers, HomeTreeNode[] primaries, Generic[] components) {
-	// NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
-	// for (Generic superGeneric : supers) {
-	// Iterator<Generic> removeIterator = concernedDependenciesIterator2(superGeneric, primaries, components);
-	// while (removeIterator.hasNext()) {
-	// Generic next = removeIterator.next();
-	// orderedDependencies.addAll(orderDependencies((GenericImpl) next));
-	// }
-	// }
-	// return orderedDependencies;
-	// }
+	private NavigableSet<Generic> getConcernedDependencies2(Generic[] supers, HomeTreeNode[] primaries, Generic[] components, boolean isProperty, boolean isSingular, int basePos) {
+		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
+		for (Generic superGeneric : supers) {
+			Iterator<Generic> removeIterator = concernedDependenciesIterator2(superGeneric, primaries, components, isProperty, isSingular, basePos);
+			while (removeIterator.hasNext()) {
+				Generic next = removeIterator.next();
+				orderedDependencies.addAll(orderDependencies((GenericImpl) next));
+			}
+		}
+		return orderedDependencies;
+	}
 
-	// @SuppressWarnings("unchecked")
-	// <T extends Generic> Iterator<T> concernedDependenciesIterator2(Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components) {
-	// return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) directSuper) {
-	//
-	// private static final long serialVersionUID = 3038922934693070661L;
-	//
-	// @Override
-	// public Iterator<T> children(T node) {
-	// if (GenericImpl.isAncestorOf(primaries, components, ((GenericImpl) node).primaries, ((GenericImpl) node).components))
-	// return Collections.emptyIterator();
-	// return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
-	// }
-	// }) {
-	// @Override
-	// public boolean isSelected() {
-	// return GenericImpl.isAncestorOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
-	// }
-	// };
-	// }
+	@SuppressWarnings("unchecked")
+	<T extends Generic> Iterator<T> concernedDependenciesIterator2(final Generic meta, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
+		return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) meta) {
+
+			private static final long serialVersionUID = 3038922934693070661L;
+
+			{
+				next();
+			}
+
+			@Override
+			public Iterator<T> children(T node) {
+				if (isAncestorOf(primaries, components, ((GenericImpl) node).primaries, ((GenericImpl) node).components))
+					return Collections.emptyIterator();
+
+				if (meta.getMetaLevel() != node.getMetaLevel()) {
+					if (((GenericImpl) node).components.length != components.length)
+						return Collections.emptyIterator();
+					if (isSingular && ((GenericImpl) node).components[basePos].inheritsFrom(components[basePos]))
+						return Collections.emptyIterator();
+					if (isProperty && Arrays.equals(((GenericImpl) node).components, components))
+						return Collections.emptyIterator();
+				}
+
+				return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
+			}
+		}) {
+			@Override
+			public boolean isSelected() {
+				if (isAncestorOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
+					return true;
+
+				if (meta.getMetaLevel() != next.getMetaLevel()) {
+					if (((GenericImpl) next).components.length != components.length)
+						return false;
+					if (isSingular && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
+						return true;
+					if (isProperty && Arrays.equals(((GenericImpl) next).components, components))
+						return true;
+				}
+
+				return false;
+			}
+		};
+	}
+
+	public static boolean isAncestorOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
+		if (GenericImpl.isSuperOf(primaries, components, subPrimaries, subComponents))
+			return true;
+		for (Generic component : subComponents)
+			if (component != null)
+				if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
+					if (isAncestorOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
+						return true;
+		return false;
+	}
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components, final int basePos) {
 		return new AbstractFilterIterator<T>((Iterator<T>) new AbstractPreTreeIterator<Generic>(meta) {
 			private static final long serialVersionUID = 4540682035671625893L;
+			{
+				next();
+			}
 
 			@Override
 			public Iterator<Generic> children(Generic node) {
@@ -593,23 +633,24 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}) {
 			@Override
 			public boolean isSelected() {
-				if (GenericImpl.isAncestorOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
+				if (isAncestorOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
 					return true;
-				if (!next.equals(meta) && !GenericImpl.isSuperOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components)) {
-					if (((GenericImpl) next).components.length != components.length)
-						return false;
-					if (isSingular && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
-						return true;
-					else if (isProperty)
-						return Arrays.equals(((GenericImpl) next).components, components);
-				}
+				if (((GenericImpl) next).components.length != components.length)
+					return false;
+				if (isSingular && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
+					return true;
+				if (isProperty)
+					return Arrays.equals(((GenericImpl) next).components, components);
 				return false;
 			}
 		};
 	}
 
 	<T extends Generic> T buildAndInsertComplex(HomeTreeNode homeTreeNode, Class<?> clazz, Generic[] supers, Generic[] components) {
-		return insert(this.<EngineImpl> getEngine().buildComplex(homeTreeNode, clazz, supers, components));
+		T bind = insert(this.<EngineImpl> getEngine().buildComplex(homeTreeNode, clazz, supers, components));
+		if (bind.inheritsFrom(find(VirtualConstraintImpl.class)))
+			assert bind.inheritsFrom(find(NoInheritanceSystemType.class));
+		return bind;
 	}
 
 	protected void triggersDependencies(Class<?> clazz) {
@@ -874,7 +915,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
 					// TODO call internalBind is forbidden, you must call bind
 					return internalBind(newHomeTreeNode, new Primaries(Statics.insertFirst(newHomeTreeNode, Statics.truncate(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode()))).toArray(), ((GenericImpl) old).selfToNullComponents(),
-							old.getClass(), false, Statics.MULTIDIRECTIONAL);
+							old.getClass(), false, false, false, Statics.MULTIDIRECTIONAL);
 				}
 
 			}.rebuildAll(old);

@@ -42,6 +42,9 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
 		UniqueValueConstraintImpl.class, VirtualConstraintImpl.class, StructuralNamingConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
 
+	
+	getKe
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends Attribute> Class<T> getKeyAttributeClass() {
