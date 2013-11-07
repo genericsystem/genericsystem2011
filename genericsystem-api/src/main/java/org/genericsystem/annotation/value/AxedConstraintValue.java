@@ -17,6 +17,6 @@ public @interface AxedConstraintValue {
 
 	Class<?> value();
 
-	int axe() default -1;
+	 int axe() default -1;
 
 }
