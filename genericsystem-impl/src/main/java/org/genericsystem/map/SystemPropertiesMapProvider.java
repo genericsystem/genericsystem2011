@@ -46,7 +46,8 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 	@SystemGeneric
 	@Components(SystemPropertiesMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class SystemPropertyKey extends GenericImpl implements Attribute {}
+	public static class SystemPropertyKey extends GenericImpl implements Attribute {
+	}
 
 	@SystemGeneric
 	@Components(SystemPropertyKey.class)
@@ -54,16 +55,14 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 	@Extends(NoInheritanceSystemType.class)
 	// @RequiredConstraint
 	// @InheritanceDisabled
-	public static class SystemPropertyValue extends GenericImpl implements Attribute {}
+	public static class SystemPropertyValue extends GenericImpl implements Attribute {
+	}
 
 	@SystemGeneric
 	@Extends(meta = SystemPropertiesMapProvider.class)
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {}
+	public static class MapInstance extends GenericImpl implements Holder {
+	}
 
-	// @Override
-	// protected Holder getAttribute(AxedPropertyClass key) {
-	// return getCurrentCache().find(key.getClazz());
-	// }
 }

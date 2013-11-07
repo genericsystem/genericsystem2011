@@ -113,12 +113,12 @@ public class Statics {
 		return nodes;
 	}
 
-	static HomeTreeNode[] replace(HomeTreeNode[] homeTreeNodes, HomeTreeNode search) {
+	static HomeTreeNode[] replace(HomeTreeNode[] homeTreeNodes, HomeTreeNode old, HomeTreeNode newNode) {
 		HomeTreeNode[] copy = homeTreeNodes.clone();
 		for (int i = 0; i < copy.length; i++)
-			if (Objects.equals(copy[i].getValue(), search.getValue())) {
-				copy[i] = search;
-				break;
+			if (copy[i].equals(old)) {
+				copy[i] = newNode;
+				return copy;
 			}
 		return copy;
 	}

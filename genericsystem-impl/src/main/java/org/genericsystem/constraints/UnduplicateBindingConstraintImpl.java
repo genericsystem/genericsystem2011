@@ -6,7 +6,6 @@ import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
@@ -28,7 +27,6 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SystemGeneric
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@SingularConstraint
 @Dependencies(UnduplicateBindingConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
 public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {

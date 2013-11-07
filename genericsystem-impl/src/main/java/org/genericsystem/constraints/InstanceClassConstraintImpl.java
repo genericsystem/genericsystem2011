@@ -3,7 +3,6 @@ package org.genericsystem.constraints;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -21,7 +20,6 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SystemGeneric
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@SingularConstraint
 @AxedConstraintValue(InstanceClassConstraintImpl.class)
 public class InstanceClassConstraintImpl extends AbstractConstraintImpl implements Holder {
 

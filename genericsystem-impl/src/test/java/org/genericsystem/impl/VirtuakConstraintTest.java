@@ -38,6 +38,7 @@ public class VirtuakConstraintTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(VirtualConstraintException.class);
 		vehicle.disableVirtualConstraint();
+		assert !vehicle.isVirtualConstraintEnabled();
 		vehicle.newInstance("myVehicle");
 	}
 

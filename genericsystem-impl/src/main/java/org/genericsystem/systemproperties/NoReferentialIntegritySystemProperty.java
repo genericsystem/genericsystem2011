@@ -27,6 +27,7 @@ public class NoReferentialIntegritySystemProperty extends GenericImpl {
 	@Extends(meta = SystemPropertyValue.class)
 	@Components(NoReferentialIntegritySystemProperty.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {}
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
 }
