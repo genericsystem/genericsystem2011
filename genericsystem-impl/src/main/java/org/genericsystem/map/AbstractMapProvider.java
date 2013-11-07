@@ -72,7 +72,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				Value oldValue = get(key);
 				if (Objects.equals(oldValue, value))
 					return oldValue;
-				Holder attribute = getKeyAttribute();
+				Holder attribute = getRealKeyAttribute(key);
 				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
@@ -150,6 +150,16 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	private Attribute getKeyAttribute() {
 		return getCurrentCache().<Attribute> find(getKeyAttributeClass());
+	}
+
+	private Attribute getRealKeyAttribute(Key key) {
+		if (key instanceof AxedPropertyClass) {
+			Attribute attribute = getCurrentCache().find(((AxedPropertyClass) key).getClazz());
+			// TODO kk ?
+			if (attribute.<AxedPropertyClass> getValue().getAxe() == ((AxedPropertyClass) key).getAxe())
+				return attribute;
+		}
+		return getKeyAttribute();
 	}
 
 	private Attribute getValueAttribute() {

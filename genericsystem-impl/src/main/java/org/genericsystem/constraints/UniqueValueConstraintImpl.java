@@ -7,7 +7,6 @@ import java.util.Set;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
@@ -26,18 +25,8 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SystemGeneric
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@SingularConstraint
-// TODO clean
-// @Dependencies(UniqueValueConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(UniqueValueConstraintImpl.class)
 public class UniqueValueConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
-
-	// @SystemGeneric
-	// @Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
-	// @Components(UniqueValueConstraintImpl.class)
-	// @BooleanValue(true)
-	// public static class DefaultValue extends GenericImpl implements Holder {
-	// }
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {

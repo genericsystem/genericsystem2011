@@ -860,18 +860,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return subHomeTreeNode.inheritsFrom(homeTreeNode) && isSuperOf(primaries, components, subPrimaries, subComponents);
 	}
 
-	public static boolean isAncestorOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-		if (isSuperOf(primaries, components, subPrimaries, subComponents))
-			return true;
-		for (Generic component : subComponents)
-			if (component != null)
-				if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
-					if (isAncestorOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
-						return true;
-		return false;
-
-	}
-
 	public static boolean isSuperOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
 		if (primaries.length == subPrimaries.length && components.length == subComponents.length) {
 			for (int i = 0; i < subPrimaries.length; i++) {
