@@ -20,6 +20,13 @@ import org.testng.annotations.Test;
 @Test
 public class TreeTest extends AbstractTest {
 
+	public void test() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Tree tree = cache.newTree("Tree");
+		tree.enableReferentialIntegrity(Statics.BASE_POSITION);
+		tree.disableReferentialIntegrity(Statics.BASE_POSITION);
+	}
+
 	public void testTree() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.newTree("Tree");

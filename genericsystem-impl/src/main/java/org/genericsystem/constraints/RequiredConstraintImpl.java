@@ -3,7 +3,6 @@ package org.genericsystem.constraints;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanAxedConstraintImpl;
 import org.genericsystem.core.Generic;
@@ -22,7 +21,6 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
 @AxedConstraintValue(RequiredConstraintImpl.class)
-@SingularConstraint
 public class RequiredConstraintImpl extends AbstractBooleanAxedConstraintImpl implements Holder {
 
 	@Override
