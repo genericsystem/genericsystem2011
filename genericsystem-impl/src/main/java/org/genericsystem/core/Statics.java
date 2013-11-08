@@ -301,16 +301,16 @@ public class Statics {
 		};
 	}
 
-	public static <T> T unambigousFirst(Iterator<T> iterator) {
-		if (!iterator.hasNext())
-			return null;
-		T result = iterator.next();
-		if (iterator.hasNext()) {
-			String message = "" + ((Generic) result).info();
-			while (iterator.hasNext())
-				message += " / " + ((Generic) iterator.next()).info();
-			throw new IllegalStateException("Ambigous selection : " + message);
-		}
-		return result;
-	}
+	//	public static <T> T unambigousFirst(Iterator<T> iterator) {
+	//		if (!iterator.hasNext())
+	//			return null;
+	//		T result = iterator.next();
+	//		if (iterator.hasNext()) {
+	//			String message = "" + ((Generic) result).info();
+	//			while (iterator.hasNext())
+	//				message += " / " + ((Generic) iterator.next()).info();
+	//			throw new IllegalStateException("Ambigous selection : " + message);
+	//		}
+	//		return result;
+	//	}
 }
