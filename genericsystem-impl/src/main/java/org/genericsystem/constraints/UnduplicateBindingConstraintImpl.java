@@ -1,21 +1,17 @@
 package org.genericsystem.constraints;
 
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Objects;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
-import org.genericsystem.core.AbstractContext;
-import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.core.HomeTreeNode;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UnduplicateBindingConstraintViolationException;
 import org.genericsystem.generic.Holder;
@@ -31,7 +27,6 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SystemGeneric
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@SingularConstraint
 @Dependencies(UnduplicateBindingConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
 public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
@@ -47,22 +42,38 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	public void check(Generic instanceToCheck, final Generic baseConstraint) throws ConstraintViolationException {
 		final Generic[] supers = ((GenericImpl) baseConstraint).getSupersArray();
 		final Generic[] components = ((GenericImpl) baseConstraint).getComponentsArray();
-		Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((EngineImpl) baseConstraint.getEngine()).getCurrentCache().compositesIterator(components[0])
-				: ((AbstractContext) ((EngineImpl) baseConstraint.getEngine()).getCurrentCache()).directInheritingsIterator(supers[0])) {
+
+		final HomeTreeNode homeTreeNode = ((GenericImpl) baseConstraint).getHomeTreeNode();
+		final HomeTreeNode[] primaries = ((GenericImpl) baseConstraint).getPrimariesArray();
+
+		Iterator<Generic> iterator = components.length == 0 || components[0] == null ? supers[0].getInheritings().iterator() : components[0].getComposites().iterator();
+		iterator = new AbstractFilterIterator<Generic>(iterator) {
+
 			@Override
 			public boolean isSelected() {
-				return Arrays.equals(((GenericImpl) next).getSupersArray(), supers) && Arrays.equals(((GenericImpl) next).getComponentsArray(), components) && Objects.equals(baseConstraint.getValue(), next.getValue());
+				return !next.equals(baseConstraint) && ((GenericImpl) next).equiv(homeTreeNode, primaries, components);
 			}
 		};
-		if (iterator.hasNext()) {
-			iterator.next();
-			if (iterator.hasNext())
-				throw new UnduplicateBindingConstraintViolationException();
-		}
+
+		if (iterator.hasNext())
+			throw new UnduplicateBindingConstraintViolationException();
+
+		// Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(components.length > 0 && components[0] != null ? ((EngineImpl) baseConstraint.getEngine()).getCurrentCache().compositesIterator(components[0])
+		// : ((AbstractContext) ((EngineImpl) baseConstraint.getEngine()).getCurrentCache()).directInheritingsIterator(supers[0])) {
+		// @Override
+		// public boolean isSelected() {
+		// return Arrays.equals(((GenericImpl) next).getSupersArray(), supers) && Arrays.equals(((GenericImpl) next).getComponentsArray(), components) && Objects.equals(baseConstraint.getValue(), next.getValue());
+		// }
+		// };
+		// if (iterator.hasNext()) {
+		// iterator.next();
+		// if (iterator.hasNext())
+		// throw new UnduplicateBindingConstraintViolationException();
+		// }
 	}
 
 	@Override
 	public boolean isImmediatelyCheckable() {
-		return false;
+		return true;
 	}
 }

@@ -6,7 +6,6 @@ import java.util.Objects;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
@@ -22,7 +21,6 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @SystemGeneric
 @Extends(meta = ConstraintKey.class)
 @Components(MapInstance.class)
-@SingularConstraint
 @AxedConstraintValue(PropertyConstraintImpl.class)
 public class PropertyConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 

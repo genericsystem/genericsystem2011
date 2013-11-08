@@ -78,7 +78,6 @@ public class SingularConstraintTest extends AbstractTest {
 		car.setValue(vehiclePower, 50);
 		assert vehicle.getValue(vehiclePower) == null;
 		assert vehiclePower.isSingularConstraintEnabled();
-		vehicle.setValue(vehiclePower, 125);
 		assert car.getValue(vehiclePower).equals(50);
 	}
 
@@ -90,7 +89,7 @@ public class SingularConstraintTest extends AbstractTest {
 		vehicle.setValue(vehiclePower, 125);
 		car.setValue(vehiclePower, 50);
 		vehicle.setValue(vehiclePower, 250);
-		assert car.getValue(vehiclePower).equals(50);
+		assert car.getValue(vehiclePower).equals(50) : car.getValue(vehiclePower);
 	}
 
 	public void testConstraintCheckKO() {
@@ -127,7 +126,7 @@ public class SingularConstraintTest extends AbstractTest {
 	public void testRelationOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
-		Type dog = cache.newType("Dog");
+		Type dog = cache.newType("Color");
 		final Relation runsOver = vehicle.setRelation("RunsOver", dog);
 		final Generic myBMW = vehicle.newInstance("myBMW");
 		final Generic yourDog = dog.newInstance("yourDog");
@@ -136,7 +135,7 @@ public class SingularConstraintTest extends AbstractTest {
 		Link runsOverLink1 = myBMW.setLink(runsOver, "myBMWRunsOverYourDog", yourDog);
 		assert myBMW.getLink(runsOver, yourDog).equals(runsOverLink1) : myBMW.getLink(runsOver, yourDog);
 		Link runsOverLink2 = myBMW.setLink(runsOver, "myBMWRunsOverAndOverOverYourDog", yourDog);
-		assert !runsOverLink1.isAlive();
+		assert !runsOverLink1.isAlive() : runsOverLink1.info() + " / " + runsOverLink2.info();
 		assert myBMW.getLink(runsOver, yourDog).equals(runsOverLink2) : myBMW.getLink(runsOver, yourDog);
 	}
 

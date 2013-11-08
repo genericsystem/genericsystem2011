@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -25,7 +26,8 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	static final String MAP_VALUE = "map";
 
-	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {}
+	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -70,7 +72,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				Value oldValue = get(key);
 				if (Objects.equals(oldValue, value))
 					return oldValue;
-				Holder attribute = getKeyAttribute();
+				Holder attribute = getRealKeyAttribute(key);
 				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
@@ -148,6 +150,16 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	private Attribute getKeyAttribute() {
 		return getCurrentCache().<Attribute> find(getKeyAttributeClass());
+	}
+
+	private Attribute getRealKeyAttribute(Key key) {
+		if (key instanceof AxedPropertyClass) {
+			Attribute attribute = getCurrentCache().find(((AxedPropertyClass) key).getClazz());
+			// TODO kk ?
+			if (attribute.<AxedPropertyClass> getValue().getAxe() == ((AxedPropertyClass) key).getAxe())
+				return attribute;
+		}
+		return getKeyAttribute();
 	}
 
 	private Attribute getValueAttribute() {

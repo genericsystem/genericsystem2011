@@ -5,6 +5,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	protected static Logger log = LoggerFactory.getLogger(HomeTreeNode.class);
 
 	HomeTreeNode metaNode;
-	Serializable value;
+	private Serializable value;
 	long ts;
 
 	private ConcurrentWeakValueHashMap<Serializable, HomeTreeNode> instancesNodes = new ConcurrentWeakValueHashMap<>();
