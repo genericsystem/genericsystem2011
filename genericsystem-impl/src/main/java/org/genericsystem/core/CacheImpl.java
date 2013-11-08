@@ -3,16 +3,18 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -452,17 +454,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
+		Generic[] oldSupers = supers;
+		Generic[] oldComponents = components;
 		boolean isSingular = false;
 		boolean isProperty = false;
 		if (Statics.MULTIDIRECTIONAL != basePos) {
-			Holder holder = null;
 			Attribute attribute = (Attribute) supers[0];
 			GenericImpl baseComponent = (GenericImpl) components[basePos];
 			isSingular = attribute.isSingularConstraintEnabled(basePos);
 			isProperty = attribute.isPropertyConstraintEnabled();
-			if (isSingular)
+			Holder holder = null;
+			if (isSingular) {
 				holder = baseComponent.getHolder(homeTreeNode.getMetaLevel(), attribute, basePos);
-			else if (isProperty)
+				log.info("EEE" + holder);
+			} else if (isProperty)
 				holder = baseComponent.getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, Statics.truncate(basePos, components));
 
 			if (holder != null)
@@ -471,12 +476,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 					components = GenericImpl.enrich(components, ((GenericImpl) holder).components);
 				}
 		}
-		return internalBind(homeTreeNode, new Primaries(homeTreeNode, supers).toArray(), components, specializationClass, existsException, isSingular, isProperty, basePos);
+		HomeTreeNode[] oldPrimaries = new Primaries(homeTreeNode, oldSupers).toArray();
+		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, getDirectSupers(oldPrimaries, oldComponents));
+		Generic[] extendedDirectSupers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, oldPrimaries, oldComponents);
+
+		HomeTreeNode[] primaries = new Primaries(homeTreeNode, supers).toArray();
+		Generic[] directSupers = getDirectSupers(primaries, components);
+		assert Arrays.equals(directSupers, extendedDirectSupers) : directSupers[0].info() + "   " + extendedDirectSupers[0].info();
+
+		// assert Arrays.equals(directSupers, extendedDirectSupers) : Arrays.toString(directSupers) + "   " + Arrays.toString(extendedDirectSupers);
+
+		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException, isSingular, isProperty, basePos);
 	}
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException, boolean isSingular, boolean isProperty, int basePos) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
+		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, directSupers);
+		// Generic[] extendedDirectSupers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, primaries, components);
+		// assert Arrays.equals(directSupers, extendedDirectSupers);
+
 		for (Generic directSuper : directSupers)
 			if (((GenericImpl) directSuper).equiv(primaries, components))
 				if (directSupers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
@@ -492,8 +511,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			if (phantom != null)
 				phantom.remove();
 		}
-
-		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, directSupers);
 		// NavigableSet<Generic> orderedDependencies = getConcernedDependencies(meta, isProperty, isSingular, primaries, components, basePos);
 		NavigableSet<Generic> orderedDependencies = getConcernedDependencies2(new Generic[] { meta }, primaries, components, isProperty, isSingular, basePos);
 		// assert orderedDependencies.equals(concernedDependencies2) : orderedDependencies + " / " + concernedDependencies2 + " " + orderedDependencies.first().info();
@@ -594,12 +611,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 					return true;
 
 				if (meta.getMetaLevel() != next.getMetaLevel()) {
-					if (((GenericImpl) next).components.length != components.length)
-						return false;
-					if (isSingular && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
-						return true;
-					if (isProperty && Arrays.equals(((GenericImpl) next).components, components))
-						return true;
+					if (((GenericImpl) next).components.length == components.length) {
+						if (isSingular && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
+							return true;
+						if (isProperty && Arrays.equals(((GenericImpl) next).components, components))
+							return true;
+					}
 				}
 
 				return false;
@@ -711,45 +728,65 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(final CheckingType checkingType, final boolean isFlushTime, final Generic generic) throws ConstraintViolationException {
+		class ConstraintComparator implements Comparator<AbstractConstraintImpl> {
+			@Override
+			public int compare(AbstractConstraintImpl o1, AbstractConstraintImpl o2) {
+				if (o1.getPriority() < o2.getPriority())
+					return -1;
+				else if (o1.getPriority() > o2.getPriority())
+					return 1;
+				else
+					return o1.getClass().getSimpleName().compareTo(o2.getClass().getSimpleName());
+			}
+		}
+
 		for (final Attribute attribute : ((Type) generic).getAttributes()) {
 			ExtendedMap<Serializable, Serializable> constraintMap = attribute.getConstraintsMap();
+			TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
+
 			for (Serializable key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-				if (CacheImpl.this.isCheckable(keyHolder, attribute, checkingType, isFlushTime)) {
-					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-					if (AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()) && null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
-						keyHolder.check(attribute, generic, valueHolder, axe);
+
+				constraints.put(keyHolder, valueHolder);
+			}
+
+			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
+				if (CacheImpl.this.isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
+					int axe = ((AxedPropertyClass) entry.getKey().getValue()).getAxe();
+					if (AbstractAxedConstraintImpl.class.isAssignableFrom(entry.getKey().getClass())
+							&& attribute.getComponent(axe) != null
+							&& (generic.isInstanceOf(attribute.getComponent(axe)))) {
+						entry.getKey().check(attribute, generic, entry.getValue(), axe);
+					}
 				}
 			}
+
 		}
+
 		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
+		TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
 		for (Serializable key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
+
+
+			constraints.put(keyHolder, valueHolder);
+		}
+
+		for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
+			Holder valueHolder = entry.getValue();
+			AbstractConstraintImpl keyHolder = entry.getKey();
+
+
 			if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
 				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
 					keyHolder.check(baseConstraint, AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()) ? ((Attribute) generic).getComponent(axe) : generic, valueHolder, axe);
 			}
-		}
-		// new Check() {
-		// @Override
-		// public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException {
-		// if (AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()) && null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
-		// keyHolder.check(attribute, generic, valueHolder, axe);
-		// }
-		// }.check(checkingType, isFlushTime, attribute);
 
-		// new Check() {
-		// @Override
-		// public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException {
-		// Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
-		// if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
-		// keyHolder.check(baseConstraint, AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()) ? ((Attribute) generic).getComponent(axe) : generic, valueHolder, axe);
-		// }
-		// }.check(checkingType, isFlushTime, generic);
+		}
 	}
 
 	// private abstract class Check {

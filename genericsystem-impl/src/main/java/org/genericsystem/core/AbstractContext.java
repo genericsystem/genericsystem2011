@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -25,6 +24,7 @@ import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.map.AxedPropertyClass;
+import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +109,7 @@ public abstract class AbstractContext implements Serializable {
 		};
 	}
 
-	Iterator<Generic> getDirectSupersIterator2(final Generic meta, final boolean isProperty, final boolean[] singularAxes, final HomeTreeNode[] primaries, final Generic[] components) {
+	Iterator<Generic> getExtendedDirectSupersIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
 		return new AbstractSelectableLeafIterator(getEngine()) {
 
 			@Override
@@ -120,15 +120,29 @@ public abstract class AbstractContext implements Serializable {
 			@Override
 			public boolean isSelected(Generic candidate) {
 				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
-				if (!next.equals(meta) && GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
-					for (int axe = 0; axe < singularAxes.length; axe++)
-						if (isProperty || singularAxes[axe])
-							if (((GenericImpl) next).components.length == singularAxes.length)
-								if (((GenericImpl) next).components[axe].inheritsFrom(components[axe]))
-									return true;
-
-				return result;
-
+				if (result)
+					return true;
+				if (basePos != Statics.MULTIDIRECTIONAL)
+					if (GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components)) {
+						// log.info("candidate : " + candidate);
+						if (meta.getMetaLevel() != candidate.getMetaLevel()) {
+							if (((GenericImpl) candidate).components.length == components.length) {
+								if (!components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
+									if (isSingular && components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos])) {
+										// log.info("candidate2 : " + candidate);
+										if (!candidate.inheritsFrom(find(NoInheritanceSystemType.class)))
+											return true;
+									}
+									if (isProperty) {
+										// log.info("candidate2 : " + candidate);
+										if (Arrays.equals(((GenericImpl) candidate).components, components))
+											return true;
+									}
+								}
+							}
+						}
+					}
+				return false;
 			}
 		};
 	}
@@ -141,9 +155,9 @@ public abstract class AbstractContext implements Serializable {
 		return supers.toArray(new Generic[supers.size()]);
 	}
 
-	protected Generic[] getDirectSupers2(Generic meta, boolean isProperty, boolean[] singularAxes, HomeTreeNode[] primaries, Generic[] components) {
+	protected Generic[] getExtendedDirectSupers(Generic meta, boolean isProperty, boolean isSingular, int basePos, HomeTreeNode[] primaries, Generic[] components) {
 		TreeSet<Generic> supers = new TreeSet<Generic>();
-		final Iterator<Generic> iterator = getDirectSupersIterator2(meta, isProperty, singularAxes, primaries, components);
+		final Iterator<Generic> iterator = getExtendedDirectSupersIterator(meta, isProperty, isSingular, basePos, primaries, components);
 		while (iterator.hasNext())
 			supers.add(iterator.next());
 		return supers.toArray(new Generic[supers.size()]);

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,8 +149,7 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {
-		}
+		private Flag() {}
 
 		@Override
 		public String toString() {
@@ -218,6 +216,13 @@ public class Statics {
 
 		public Primaries(HomeTreeNode homeTreeNode, Generic... supers) {
 			add(homeTreeNode);
+			for (Generic superGeneric : supers)
+				for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
+					add(primary);
+		}
+
+		public Primaries(Generic... supers) {
+			// add(homeTreeNode);
 			for (Generic superGeneric : supers)
 				for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
 					add(primary);
@@ -301,16 +306,16 @@ public class Statics {
 		};
 	}
 
-	public static <T> T unambigousFirst(Iterator<T> iterator) {
-		if (!iterator.hasNext())
-			return null;
-		T result = iterator.next();
-		if (iterator.hasNext()) {
-			String message = "" + ((Generic) result).info();
-			while (iterator.hasNext())
-				message += " / " + ((Generic) iterator.next()).info();
-			throw new IllegalStateException("Ambigous selection : " + message);
-		}
-		return result;
-	}
+	//	public static <T> T unambigousFirst(Iterator<T> iterator) {
+	//		if (!iterator.hasNext())
+	//			return null;
+	//		T result = iterator.next();
+	//		if (iterator.hasNext()) {
+	//			String message = "" + ((Generic) result).info();
+	//			while (iterator.hasNext())
+	//				message += " / " + ((Generic) iterator.next()).info();
+	//			throw new IllegalStateException("Ambigous selection : " + message);
+	//		}
+	//		return result;
+	//	}
 }
