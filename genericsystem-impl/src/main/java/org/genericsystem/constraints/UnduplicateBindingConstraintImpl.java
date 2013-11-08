@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
@@ -29,6 +30,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(MapInstance.class)
 @Dependencies(UnduplicateBindingConstraintImpl.DefaultValue.class)
 @AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
+@Priority(-1)
 public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
