@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.genericsystem.annotation.Dependencies;
@@ -21,7 +23,6 @@ import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.constraints.VirtualConstraintImpl;
-import org.genericsystem.core.Generic.ExtendedMap;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
@@ -711,10 +712,30 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(final CheckingType checkingType, final boolean isFlushTime, final Generic generic) throws ConstraintViolationException {
+		TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new Comparator<AbstractConstraintImpl>() {
+			@Override
+			public int compare(AbstractConstraintImpl o1, AbstractConstraintImpl o2) {
+				if (o1.getPriority() < o2.getPriority())
+					return -1;
+				else if (o1.getPriority() > o2.getPriority())
+					return 1;
+				else
+					return 0;
+			}
+		});
+
 		for (final Attribute attribute : ((Type) generic).getAttributes()) {
-			ExtendedMap<Serializable, Serializable> constraintMap = attribute.getConstraintsMap();
-			for (Serializable key : constraintMap.keySet()) {
-				Holder valueHolder = constraintMap.getValueHolder(key);
+
+			//			ExtendedMap<Serializable, Serializable> constraintMap = attribute.getConstraintsMap();
+			//			for (Entry<Serializable, Serializable> entry : constraintMap.entrySet())
+			//				if (((Holder) entry.getValue()).getValue())
+			//					constraints.add((AbstractConstraintImpl) ((Holder) entry.getValue()).getBaseComponent());
+
+			constraints.putAll((Map<? extends AbstractConstraintImpl, ? extends Holder>) attribute.getConstraintsMap());
+
+			/* Check constraints from the set */
+			for (AbstractConstraintImpl key : constraints.keySet()) {
+				Holder valueHolder = constraints.get(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
 				if (CacheImpl.this.isCheckable(keyHolder, attribute, checkingType, isFlushTime)) {
 					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
@@ -722,10 +743,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 						keyHolder.check(attribute, generic, valueHolder, axe);
 				}
 			}
+
 		}
-		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
-		for (Serializable key : constraintMap.keySet()) {
-			Holder valueHolder = constraintMap.getValueHolder(key);
+
+		constraints.clear();
+		constraints.putAll((Map<? extends AbstractConstraintImpl, ? extends Holder>) generic.getConstraintsMap());
+
+		for (AbstractConstraintImpl key : constraints.keySet()) {
+			Holder valueHolder = constraints.get(key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
 			if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
