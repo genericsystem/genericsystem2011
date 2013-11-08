@@ -477,12 +477,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 				}
 		}
 		HomeTreeNode[] oldPrimaries = new Primaries(homeTreeNode, oldSupers).toArray();
-		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, getDirectSupers(oldPrimaries, oldComponents));
-		Generic[] extendedDirectSupers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, oldPrimaries, oldComponents);
+		// GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, getDirectSupers(oldPrimaries, oldComponents));
+		// Generic[] extendedDirectSupers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, oldPrimaries, oldComponents);
 
 		HomeTreeNode[] primaries = new Primaries(homeTreeNode, supers).toArray();
-		Generic[] directSupers = getDirectSupers(primaries, components);
-		assert Arrays.equals(directSupers, extendedDirectSupers) : directSupers[0].info() + "   " + extendedDirectSupers[0].info();
+		// Generic[] directSupers = getDirectSupers(primaries, components);
+		// assert Arrays.equals(directSupers, extendedDirectSupers) : directSupers[0].info() + "   " + extendedDirectSupers[0].info();
 
 		// assert Arrays.equals(directSupers, extendedDirectSupers) : Arrays.toString(directSupers) + "   " + Arrays.toString(extendedDirectSupers);
 
@@ -754,9 +754,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
 				if (CacheImpl.this.isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
 					int axe = ((AxedPropertyClass) entry.getKey().getValue()).getAxe();
-					if (AbstractAxedConstraintImpl.class.isAssignableFrom(entry.getKey().getClass())
-							&& attribute.getComponent(axe) != null
-							&& (generic.isInstanceOf(attribute.getComponent(axe)))) {
+					if (AbstractAxedConstraintImpl.class.isAssignableFrom(entry.getKey().getClass()) && attribute.getComponent(axe) != null && (generic.isInstanceOf(attribute.getComponent(axe)))) {
 						entry.getKey().check(attribute, generic, entry.getValue(), axe);
 					}
 				}
@@ -770,14 +768,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Holder valueHolder = constraintMap.getValueHolder(key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
 
-
 			constraints.put(keyHolder, valueHolder);
 		}
 
 		for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
 			Holder valueHolder = entry.getValue();
 			AbstractConstraintImpl keyHolder = entry.getKey();
-
 
 			if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
