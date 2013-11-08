@@ -714,9 +714,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(final CheckingType checkingType, final boolean isFlushTime, final Generic generic) throws ConstraintViolationException {
-
-		//LinkedHashMap<AbstractConstraintImpl, Holder> constraints = new LinkedHashMap<>();
-		TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new Comparator<AbstractConstraintImpl>() {
+		class ConstraintComparator implements Comparator<AbstractConstraintImpl> {
 			@Override
 			public int compare(AbstractConstraintImpl o1, AbstractConstraintImpl o2) {
 				if (o1.getPriority() < o2.getPriority())
@@ -726,25 +724,18 @@ public class CacheImpl extends AbstractContext implements Cache {
 				else
 					return o1.getClass().getSimpleName().compareTo(o2.getClass().getSimpleName());
 			}
-		});
-
+		}
 
 		for (final Attribute attribute : ((Type) generic).getAttributes()) {
 			ExtendedMap<Serializable, Serializable> constraintMap = attribute.getConstraintsMap();
-			constraints.clear();
+			TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
+
 			for (Serializable key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
 
 				constraints.put(keyHolder, valueHolder);
-
-				//				if (CacheImpl.this.isCheckable(keyHolder, attribute, checkingType, isFlushTime)) {
-				//					int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-				//					if (AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()) && null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
-				//						keyHolder.check(attribute, generic, valueHolder, axe);
-				//				}
 			}
-
 
 			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
 				if (CacheImpl.this.isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
@@ -760,7 +751,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
-		constraints.clear();
+		TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
 		for (Serializable key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
@@ -770,7 +761,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
-
 			Holder valueHolder = entry.getValue();
 			AbstractConstraintImpl keyHolder = entry.getKey();
 
@@ -783,40 +773,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}
 
 		}
-
-
-		//		for (Serializable key : constraintMap.keySet()) {
-		//
-		//			Holder valueHolder = constraintMap.getValueHolder(key);
-		//			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-		//
-		//			if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
-		//				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
-		//				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-		//				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
-		//					keyHolder.check(baseConstraint, AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()) ? ((Attribute) generic).getComponent(axe) : generic, valueHolder, axe);
-		//			}
-		//		}
-
-
-
-
-		// new Check() {
-		// @Override
-		// public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException {
-		// if (AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()) && null != attribute.getComponent(axe) && (generic.isInstanceOf(attribute.getComponent(axe))))
-		// keyHolder.check(attribute, generic, valueHolder, axe);
-		// }
-		// }.check(checkingType, isFlushTime, attribute);
-
-		// new Check() {
-		// @Override
-		// public void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException {
-		// Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
-		// if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
-		// keyHolder.check(baseConstraint, AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()) ? ((Attribute) generic).getComponent(axe) : generic, valueHolder, axe);
-		// }
-		// }.check(checkingType, isFlushTime, generic);
 	}
 
 	// private abstract class Check {
