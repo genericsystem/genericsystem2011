@@ -1389,11 +1389,14 @@ public class RelationTest extends AbstractTest {
 		final Type teacher = person.newSubType("Teacher");
 		teacher.setValue(age, "20");
 
-		try {
-			cache.newSubType("doctoral", student, teacher).getValue(age);
-		} catch (IllegalStateException ignore) {
+		new RollbackCatcher() {
 
-		}
+			@Override
+			public void intercept() {
+				cache.newSubType("doctoral", student, teacher).getValue(age);
+
+			}
+		}.assertIsCausedBy(IllegalStateException.class);
 	}
 
 	public void testDiamantOK() {

@@ -2,6 +2,7 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -38,7 +39,7 @@ public class TreeImpl extends GenericImpl implements Tree {
 	// TODO KK
 	@Override
 	public <T extends Node> T getRootByValue(Serializable value) {
-		return Statics.unambigousFirst(Statics.<T> rootFilter(Statics.<T> valueFilter(TreeImpl.this.<T> instancesIterator(), value)));
+		return this.unambigousFirst(Statics.<T> rootFilter(Statics.<T> valueFilter(TreeImpl.this.<T> instancesIterator(), value)));
 	}
 
 	@Override

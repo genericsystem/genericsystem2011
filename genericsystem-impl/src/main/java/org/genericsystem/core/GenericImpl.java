@@ -122,16 +122,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-		for (Generic superGeneric : supers) {
-			if (this.equals(superGeneric) && !isEngine())
-				throw new IllegalStateException();
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-				throw new IllegalStateException();
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-				throw new IllegalStateException();
-		}
-		return this;
+					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+					for (Generic superGeneric : supers) {
+						if (this.equals(superGeneric) && !isEngine())
+							throw new IllegalStateException();
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+							throw new IllegalStateException();
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+							throw new IllegalStateException();
+					}
+					return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -475,7 +475,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Holder> T getHolder(int metaLevel, Holder attribute, int basePos, Generic... targets) {
-		return Statics.unambigousFirst(this.<T> holdersIterator(attribute, metaLevel, basePos, false, targets));
+		return this.unambigousFirst(this.<T> holdersIterator(attribute, metaLevel, basePos, false, targets));
 	}
 
 	public <T extends Holder> T getHolderByValue(int metaLevel, Holder attribute, Serializable value, final Generic... targets) {
@@ -483,17 +483,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T getHolderByValue(int metaLevel, Holder attribute, Serializable value, int basePos, final Generic... targets) {
-		return Statics.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(attribute, metaLevel, basePos, value == null, targets), value));
+		return this.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(attribute, metaLevel, basePos, value == null, targets), value));
 	}
 
 	@Override
 	public <T extends Link> T getLink(Link relation, int basePos, Generic... targets) {
-		return Statics.unambigousFirst(this.<T> linksIterator(relation, basePos, targets));
+		return this.unambigousFirst(this.<T> linksIterator(relation, basePos, targets));
 	}
 
 	@Override
 	public <T extends Link> T getLink(Link relation, Generic... targets) {
-		return Statics.unambigousFirst(this.<T> linksIterator(relation, getBasePos(relation), targets));
+		return this.unambigousFirst(this.<T> linksIterator(relation, getBasePos(relation), targets));
 	}
 
 	public <T extends Generic> Iterator<T> directInheritingsIterator() {
@@ -564,7 +564,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Attribute> T getAttribute(Attribute attribute, final Serializable value, Generic... targets) {
-		return Statics.unambigousFirst(this.targetsFilter(Statics.valueFilter(this.<T> holdersIterator(Statics.STRUCTURAL, attribute, Statics.MULTIDIRECTIONAL, value == null), value), attribute, targets));
+		return this.unambigousFirst(this.targetsFilter(Statics.valueFilter(this.<T> holdersIterator(Statics.STRUCTURAL, attribute, Statics.MULTIDIRECTIONAL, value == null), value), attribute, targets));
 	}
 
 	private <T extends Relation> Iterator<T> relationsIterator(boolean readPhantom) {
@@ -593,7 +593,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Relation> T getRelation(final Serializable value) {
-		return Statics.unambigousFirst(Statics.valueFilter(this.<T> relationsIterator(value == null), value));
+		return this.unambigousFirst(Statics.valueFilter(this.<T> relationsIterator(value == null), value));
 	}
 
 	@Override
@@ -767,7 +767,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic component : newComponents)
 				assert component.isAlive();
 			if (!phantomExists(components)) {
-				Generic projection = Statics.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
+				Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 					@Override
 					public boolean isSelected() {
 						return isSuperOf(new Primaries(getHomeTreeNode(), GenericImpl.this).toArray(), newComponents, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
@@ -1083,7 +1083,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getInstance(final Serializable value) {
-		return Statics.unambigousFirst(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(), value));
+		return this.unambigousFirst(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(), value));
 	}
 
 	@Override
@@ -1145,7 +1145,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getSubType(final Serializable value) {
-		return Statics.<T> unambigousFirst(Statics.<T> valueFilter(this.<T> allSubTypesIteratorWithoutRoot(), value));
+		return this.unambigousFirst(Statics.<T> valueFilter(this.<T> allSubTypesIteratorWithoutRoot(), value));
 	}
 
 	@Override
@@ -1685,6 +1685,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isMapProvider() {
 		return this.getValue() instanceof Class && AbstractMapProvider.class.isAssignableFrom((Class<?>) this.getValue());
+	}
+
+	public <T> T unambigousFirst(Iterator<T> iterator) {
+		if (!iterator.hasNext())
+			return null;
+		T result = iterator.next();
+		if (iterator.hasNext()) {
+			String message = "" + ((Generic) result).info();
+			while (iterator.hasNext())
+				message += " / " + ((Generic) iterator.next()).info();
+			this.getCurrentCache().rollback(new IllegalStateException("Ambigous selection : " + message));
+		}
+		return result;
 	}
 
 }

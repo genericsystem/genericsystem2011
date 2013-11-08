@@ -16,7 +16,7 @@ public class NodeImpl extends GenericImpl implements Node {
 	@Override
 	public <T extends Node> T getChild(Serializable value) {
 		Tree attribute = getMeta();
-		return Statics.unambigousFirst(Statics.<T> valueFilter(this.<T> thisFilter(this.<T> holdersIterator(attribute, Statics.CONCRETE, getBasePos(attribute), value == null)), value));
+		return this.unambigousFirst(Statics.<T> valueFilter(this.<T> thisFilter(this.<T> holdersIterator(attribute, Statics.CONCRETE, getBasePos(attribute), value == null)), value));
 	}
 
 	@Override
