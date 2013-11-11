@@ -126,22 +126,25 @@ public abstract class AbstractContext implements Serializable {
 					if (GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components)) {
 						// log.info("candidate : " + candidate);
 						if (meta.getMetaLevel() != candidate.getMetaLevel()) {
-							if (((GenericImpl) candidate).components.length == components.length) {
-								if (!components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
-									if (isSingular && components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos])) {
-										// log.info("candidate2 : " + candidate);
-										if (!candidate.inheritsFrom(find(NoInheritanceSystemType.class)))
+							// if (((GenericImpl) candidate).components.length == components.length) {
+							if (!components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
+								if (components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos])) {
+									if (!candidate.inheritsFrom(find(NoInheritanceSystemType.class)))
+										if (isSingular) {
+											// log.info("candidate2 : " + candidate);
 											return true;
-									}
+										}
 									if (isProperty) {
 										// log.info("candidate2 : " + candidate);
-										if (Arrays.equals(((GenericImpl) candidate).components, components))
+										if (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components)))
 											return true;
 									}
 								}
-							}
+							} else
+								;
 						}
 					}
+				// }
 				return false;
 			}
 		};

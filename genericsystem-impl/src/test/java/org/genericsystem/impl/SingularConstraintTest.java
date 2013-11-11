@@ -97,8 +97,8 @@ public class SingularConstraintTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		final Attribute vehiclePower = vehicle.setAttribute("Power");
 		final Generic myVehicle = vehicle.newInstance("myVehicle");
-		vehiclePower.enableSingularConstraint(0);
-		assert vehiclePower.isSingularConstraintEnabled(0);
+		vehiclePower.enableSingularConstraint();
+		assert vehiclePower.isSingularConstraintEnabled();
 		Holder myVehiclePowerValue1 = myVehicle.setValue(vehiclePower, "5");
 		assert myVehicle.getHolders(vehiclePower).size() == 1;
 		assert myVehicle.getHolders(vehiclePower).get(0).equals(myVehiclePowerValue1);

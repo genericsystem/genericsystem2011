@@ -1,7 +1,6 @@
 package org.genericsystem.constraints;
 
 import java.util.Iterator;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -34,8 +33,7 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(StructuralNamingConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
 	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
@@ -44,7 +42,7 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 		Generic[] components = ((GenericImpl) constraintBase).getComponentsArray();
 		for (int i = 0; i < constraintBase.getComponentsSize(); i++)
 			for (Generic inherited : ((GenericImpl) components[i]).getAllInheritings()) {
-				Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL, constraintBase.getValue() == null), constraintBase.getValue());
+				Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL), constraintBase.getValue());
 				if (iterator.hasNext()) {
 					iterator.next();
 					if (iterator.hasNext())

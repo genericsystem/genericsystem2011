@@ -466,22 +466,28 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Holder holder = null;
 			if (isSingular) {
 				holder = baseComponent.getHolder(homeTreeNode.getMetaLevel(), attribute, basePos);
-				log.info("EEE" + holder);
 			} else if (isProperty)
 				holder = baseComponent.getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, Statics.truncate(basePos, components));
 
-			if (holder != null)
+			if (holder != null) {
+				log.info("EEE" + holder.info());
 				if (!components[basePos].equals(holder.getComponent(basePos)) || ((GenericImpl) holder).equiv(new Primaries(homeTreeNode, holder).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components))) {
 					supers = new Generic[] { holder };
 					components = GenericImpl.enrich(components, ((GenericImpl) holder).components);
 				}
+			}
 		}
 		HomeTreeNode[] oldPrimaries = new Primaries(homeTreeNode, oldSupers).toArray();
-		// GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, getDirectSupers(oldPrimaries, oldComponents));
-		// Generic[] extendedDirectSupers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, oldPrimaries, oldComponents);
+		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, getDirectSupers(oldPrimaries, oldComponents));
+		Generic[] extendedDirectSupers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, oldPrimaries, oldComponents);
+		// supers = new Generic[] { extendedDirectSupers[0] };
+		// components = GenericImpl.enrich(components, ((GenericImpl) extendedDirectSupers[0]).components);
 
 		HomeTreeNode[] primaries = new Primaries(homeTreeNode, supers).toArray();
-		// Generic[] directSupers = getDirectSupers(primaries, components);
+		Generic[] directSupers = getDirectSupers(primaries, components);
+
+		// assert Arrays.equals(directSupers, extendedDirectSupers) : Arrays.toString(primaries) + "   " + Arrays.toString(components);
+
 		// assert Arrays.equals(directSupers, extendedDirectSupers) : directSupers[0].info() + "   " + extendedDirectSupers[0].info();
 
 		// assert Arrays.equals(directSupers, extendedDirectSupers) : Arrays.toString(directSupers) + "   " + Arrays.toString(extendedDirectSupers);
