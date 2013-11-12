@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -140,8 +141,13 @@ public abstract class AbstractContext implements Serializable {
 											return true;
 									}
 								}
-							} else
-								;
+							} else {
+								// log.info("candidate " + candidate.info() + " primaries " + Arrays.toString(primaries) + " components " + Arrays.toString(components));
+								if (((GenericImpl) candidate).equiv(new Primaries(candidate, primaries).toArray(), GenericImpl.enrich(components, ((GenericImpl) candidate).components))) {
+									// log.info("YOUPI");
+									return true;
+								}
+							}
 						}
 					}
 				// }
