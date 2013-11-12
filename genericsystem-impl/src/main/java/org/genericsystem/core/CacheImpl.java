@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -605,15 +604,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 		throw new IllegalStateException();
 	}
 
-	private NavigableSet<Generic> getConcernedDependencies(Generic meta, boolean isProperty, boolean isSingular, HomeTreeNode[] primaries, Generic[] components, final int basePos) {
-		NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
-		Iterator<Generic> removeIterator = concernedDependenciesIterator(meta, isProperty, isSingular, getEngine(), primaries, components, basePos);
-		while (removeIterator.hasNext()) {
-			Generic next = removeIterator.next();
-			orderedDependencies.add(next);
-		}
-		return orderedDependencies;
-	}
+	// private NavigableSet<Generic> getConcernedDependencies(Generic meta, boolean isProperty, boolean isSingular, HomeTreeNode[] primaries, Generic[] components, final int basePos) {
+	// NavigableSet<Generic> orderedDependencies = new TreeSet<Generic>();
+	// Iterator<Generic> removeIterator = concernedDependenciesIterator(meta, isProperty, isSingular, getEngine(), primaries, components, basePos);
+	// while (removeIterator.hasNext()) {
+	// Generic next = removeIterator.next();
+	// orderedDependencies.add(next);
+	// }
+	// return orderedDependencies;
+	// }
 
 	// TODO clean
 	private NavigableSet<Generic> getConcernedDependencies2(Generic[] supers, HomeTreeNode[] primaries, Generic[] components, boolean isProperty, boolean isSingular, int basePos) {
@@ -681,33 +680,33 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components, final int basePos) {
-		return new AbstractFilterIterator<T>((Iterator<T>) new AbstractPreTreeIterator<Generic>(meta) {
-			private static final long serialVersionUID = 4540682035671625893L;
-			{
-				next();
-			}
-
-			@Override
-			public Iterator<Generic> children(Generic node) {
-				return new ConcateIterator<Generic>(((GenericImpl) node).directInheritingsIterator(), ((GenericImpl) node).compositesIterator());
-			}
-		}) {
-			@Override
-			public boolean isSelected() {
-				if (isAncestorOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
-					return true;
-				if (((GenericImpl) next).components.length != components.length)
-					return false;
-				if (isSingular && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
-					return true;
-				if (isProperty)
-					return Arrays.equals(((GenericImpl) next).components, components);
-				return false;
-			}
-		};
-	}
+	// @SuppressWarnings("unchecked")
+	// <T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final Generic directSuper, final HomeTreeNode[] primaries, final Generic[] components, final int basePos) {
+	// return new AbstractFilterIterator<T>((Iterator<T>) new AbstractPreTreeIterator<Generic>(meta) {
+	// private static final long serialVersionUID = 4540682035671625893L;
+	// {
+	// next();
+	// }
+	//
+	// @Override
+	// public Iterator<Generic> children(Generic node) {
+	// return new ConcateIterator<Generic>(((GenericImpl) node).directInheritingsIterator(), ((GenericImpl) node).compositesIterator());
+	// }
+	// }) {
+	// @Override
+	// public boolean isSelected() {
+	// if (isAncestorOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
+	// return true;
+	// if (((GenericImpl) next).components.length != components.length)
+	// return false;
+	// if (isSingular && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
+	// return true;
+	// if (isProperty)
+	// return Arrays.equals(((GenericImpl) next).components, components);
+	// return false;
+	// }
+	// };
+	// }
 
 	<T extends Generic> T buildAndInsertComplex(HomeTreeNode homeTreeNode, Class<?> clazz, Generic[] supers, Generic[] components) {
 		T bind = insert(this.<EngineImpl> getEngine().buildComplex(homeTreeNode, clazz, supers, components));
@@ -789,14 +788,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (final Attribute attribute : ((Type) generic).getAttributes()) {
 			ExtendedMap<Serializable, Serializable> constraintMap = attribute.getConstraintsMap();
 			TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
-
 			for (Serializable key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-
 				constraints.put(keyHolder, valueHolder);
 			}
-
 			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
 				if (CacheImpl.this.isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
 					int axe = ((AxedPropertyClass) entry.getKey().getValue()).getAxe();
@@ -805,7 +801,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 					}
 				}
 			}
-
 		}
 
 		ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
@@ -830,20 +825,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		}
 	}
-
-	// private abstract class Check {
-	// void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
-	// ExtendedMap<Serializable, Serializable> constraintMap = generic.getConstraintsMap();
-	// for (Serializable key : constraintMap.keySet()) {
-	// Holder valueHolder = constraintMap.getValueHolder(key);
-	// AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-	// if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime))
-	// internalCheck(keyHolder, valueHolder, ((AxedPropertyClass) keyHolder.getValue()).getAxe());
-	// }
-	// }
-	//
-	// abstract void internalCheck(AbstractConstraintImpl keyHolder, Holder valueHolder, int axe) throws ConstraintViolationException;
-	// }
 
 	public boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
 		return (isFlushTime || isImmediatelyCheckable(constraint)) && constraint.isCheckedAt(generic, checkingType);
@@ -946,24 +927,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public Snapshot<Type> getAllTypes() {
 		return getEngine().getAllInstances();
 	}
-
-	// public <T extends Generic> Iterator<T> queryIterator(Context context, final int levelFilter, Generic[] supers, final Generic... components) {
-	// final Primaries primaries = new Primaries(supers);
-	// final Generic[] interfaces = primaries.toArray();
-	// // Generic[] directSupers = getDirectSupers(interfaces, components);
-	// // assert directSupers.length >= 2;
-	// return new AbstractConcateIterator<Generic, T>(getDirectSupersIterator(interfaces, components)) {
-	// @Override
-	// protected Iterator<T> getIterator(Generic directSuper) {
-	// return new AbstractFilterIterator<T>(CacheImpl.this.<T> concernedDependenciesIterator(directSuper, interfaces, components)) {
-	// @Override
-	// public boolean isSelected() {
-	// return levelFilter == next.getMetaLevel();
-	// }
-	// };
-	// }
-	// };
-	// }
 
 	static class UnsafeCache extends CacheImpl {
 		private static final long serialVersionUID = 4843334203915625618L;
