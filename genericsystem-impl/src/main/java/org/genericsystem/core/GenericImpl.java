@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -27,6 +28,7 @@ import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
+import org.genericsystem.exception.AmbiguousSelectionException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -652,7 +654,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public static Generic[] enrich(Generic[] components, Generic[] additionals) {
 		List<Generic> result = new ArrayList<>(Arrays.asList(components));
 		for (int i = 0; i < additionals.length; i++)
-			if (i >= components.length || !components[i].inheritsFrom(additionals[i]))
+			if (i >= components.length || (components[i] != null && !components[i].inheritsFrom(additionals[i])))
 				result.add(additionals[i]);
 		return result.toArray(new Generic[result.size()]);
 	}
@@ -1693,7 +1695,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			String message = "" + ((Generic) result).info();
 			while (iterator.hasNext())
 				message += " / " + ((Generic) iterator.next()).info();
-			this.getCurrentCache().rollback(new IllegalStateException("Ambigous selection : " + message));
+			this.getCurrentCache().rollback(new AmbiguousSelectionException("Ambigous selection : " + message));
 		}
 		return result;
 	}
