@@ -11,6 +11,7 @@ import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics;
+import org.genericsystem.exception.AmbiguousSelectionException;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Link;
@@ -1396,7 +1397,7 @@ public class RelationTest extends AbstractTest {
 				cache.newSubType("doctoral", student, teacher).getValue(age);
 
 			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}.assertIsCausedBy(AmbiguousSelectionException.class);
 	}
 
 	public void testDiamantOK() {

@@ -28,6 +28,7 @@ import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
+import org.genericsystem.exception.AmbiguousSelectionException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -1695,7 +1696,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			String message = "" + ((Generic) result).info();
 			while (iterator.hasNext())
 				message += " / " + ((Generic) iterator.next()).info();
-			this.getCurrentCache().rollback(new IllegalStateException("Ambigous selection : " + message));
+			this.getCurrentCache().rollback(new AmbiguousSelectionException("Ambigous selection : " + message));
 		}
 		return result;
 	}
