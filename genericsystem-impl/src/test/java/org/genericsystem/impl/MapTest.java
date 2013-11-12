@@ -60,7 +60,7 @@ public class MapTest extends AbstractTest {
 		assert myBmw.getPropertiesMap().get("power").equals(123) : myBmw.getPropertiesMap();
 		assert myBmw.getPropertiesMap().get("wheel").equals(4);
 		myBmw.getPropertiesMap().remove("power");
-		assert vehicle.getPropertiesMap().get("power").equals(123);
+		assert vehicle.getPropertiesMap().get("power").equals(123) : vehicle.getPropertiesMap().get("power");
 		assert myBmw.getPropertiesMap().get("power") == null : myBmw.getPropertiesMap().get("power");
 		assert myBmw.getPropertiesMap().get("wheel").equals(4);
 	}
@@ -124,13 +124,24 @@ public class MapTest extends AbstractTest {
 		vehicle.getPropertiesMap().put("power", 123);
 		assert car.getPropertiesMap().get("power").equals(123);
 		car.getPropertiesMap().remove("power");
-		car.getPropertiesMap().remove("power");
+		// car.getPropertiesMap().remove("power");
 		assert car.getPropertiesMap().get("power") == null : car.getPropertiesMap();
 		car.getPropertiesMap().put("power", 123);
 		assert car.getPropertiesMap().get("power").equals(123);
 		// vehicle.getProperties().put("power", null);
 		// assert vehicle.getProperties().get("power") == null;
 		// assert car.getProperties().get("power") == null;
+	}
+
+	public void testRemoveNotNull() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		vehicle.getPropertiesMap().put("power", 123);
+		assert car.getPropertiesMap().get("power").equals(123);
+		car.getPropertiesMap().put("power", null);
+		// assert car.getPropertiesMap().get("power").equals(254) : car.getPropertiesMap();
+		car.getPropertiesMap().put("power", 255);
 	}
 
 	public void testRemove2() {
@@ -141,7 +152,7 @@ public class MapTest extends AbstractTest {
 		assert car.getPropertiesMap().get("power").equals(123);
 		car.getPropertiesMap().remove("power");
 		car.getPropertiesMap().remove("power");
-		assert car.getPropertiesMap().get("power") == null;
+		assert car.getPropertiesMap().get("power") == null : car.getPropertiesMap().get("power");
 		car.getPropertiesMap().put("power", 124);
 		assert car.getPropertiesMap().get("power").equals(124);
 		// vehicle.getProperties().put("power", null);

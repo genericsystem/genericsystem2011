@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -25,7 +26,8 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	static final String MAP_VALUE = "map";
 
-	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {}
+	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -66,7 +68,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Value put(Key key, Value value) {
-				assert null != value;
+				// assert null != value;
 				Value oldValue = get(key);
 				if (Objects.equals(oldValue, value))
 					return oldValue;

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -652,7 +653,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public static Generic[] enrich(Generic[] components, Generic[] additionals) {
 		List<Generic> result = new ArrayList<>(Arrays.asList(components));
 		for (int i = 0; i < additionals.length; i++)
-			if (i >= components.length || !components[i].inheritsFrom(additionals[i]))
+			if (i >= components.length || (components[i] != null && !components[i].inheritsFrom(additionals[i])))
 				result.add(additionals[i]);
 		return result.toArray(new Generic[result.size()]);
 	}

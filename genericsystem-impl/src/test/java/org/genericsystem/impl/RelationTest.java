@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -12,6 +13,7 @@ import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -1357,6 +1359,17 @@ public class RelationTest extends AbstractTest {
 		assert red.getTargets(carColor, 1, 0).containsAll(Arrays.asList(new Generic[] { myBmw, myAudi, myMercedes }));
 	}
 
+	public void mytest() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.newType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		Generic myCar = car.newInstance("myCar");
+		Attribute vehiclePower = vehicle.addProperty("power");
+		Holder car255 = car.setValue(vehiclePower, 255);
+		assert myCar.setValue(vehiclePower, 300).inheritsFrom(car255);
+		assert myCar.setValue(vehiclePower, 310).inheritsFrom(car255);
+	}
+
 	public void testDefaultReverseLinks() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
@@ -1370,7 +1383,7 @@ public class RelationTest extends AbstractTest {
 		Link carRed = car.bind(carColor, red);
 		myBmw.bind(carColor, red);
 		// myAudi.setLink(carRed, null, red);
-		Link myAudiRed = myAudi.bind(carRed, red);
+		Link myAudiRed = myAudi.bind(carRed, red);// myAudi.bind(carColor, red);
 
 		Link myAudiBlue = myAudi.bind(carColor, blue);
 		assert myAudiBlue.inheritsFrom(carRed);
