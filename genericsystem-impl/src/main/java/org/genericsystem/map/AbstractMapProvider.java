@@ -5,10 +5,8 @@ import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -26,8 +24,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	static final String MAP_VALUE = "map";
 
-	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {
-	}
+	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -68,7 +65,6 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Value put(Key key, Value value) {
-				// assert null != value;
 				Value oldValue = get(key);
 				if (Objects.equals(oldValue, value))
 					return oldValue;
@@ -102,47 +98,47 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 					}
 				};
 			}
+
+			private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {
+				Holder map = generic.getHolder(Statics.CONCRETE, AbstractMapProvider.this);
+				if (map == null)
+					return Collections.emptyIterator();
+				Attribute key = getKeyAttribute();
+				return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Key, Value>>(((GenericImpl) map).<Holder> holdersIterator(key, Statics.CONCRETE, getBasePos(key))) {
+
+					private Holder valueHolder;
+
+					@Override
+					public boolean isSelected() {
+						valueHolder = next.getHolder(Statics.CONCRETE, getValueAttribute());
+						return valueHolder != null;
+					}
+
+					@Override
+					public void remove() {
+						assert next.isAlive();
+						Holder map = next.getBaseComponent();
+						if (generic.equals(map.getBaseComponent()))
+							next.remove();
+						else {
+							put(next.<Key> getValue(), null);
+						}
+					}
+
+					@Override
+					protected Map.Entry<Key, Value> project() {
+						return new AbstractMap.SimpleImmutableEntry<Key, Value>(next.<Key> getValue(), valueHolder.<Value> getValue());
+					}
+				};
+			}
+
 		};
+
 	}
 
 	protected <T extends GenericImpl> Class<T> getSpecializationClass(Key key) {
 		return null;
 	};
-
-	private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {
-		Holder map = generic.getHolder(Statics.CONCRETE, this);
-		if (map == null)
-			return Collections.emptyIterator();
-		Attribute key = getKeyAttribute();
-		return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Key, Value>>(((GenericImpl) map).<Holder> holdersIterator(key, Statics.CONCRETE, getBasePos(key))) {
-
-			private Holder valueHolder;
-
-			@Override
-			public boolean isSelected() {
-				valueHolder = next.getHolder(Statics.CONCRETE, getValueAttribute());
-				return valueHolder != null;
-			}
-
-			@Override
-			public void remove() {
-				assert next.isAlive();
-				Holder map = next.getBaseComponent();
-				if (generic.equals(map.getBaseComponent()))
-					next.remove();
-				else {
-					map = generic.setHolder(AbstractMapProvider.this, MAP_VALUE);
-					if (!((GenericImpl) next.getBaseComponent()).equals(map))
-						map.setHolder(next, null);
-				}
-			}
-
-			@Override
-			protected Map.Entry<Key, Value> project() {
-				return new AbstractMap.SimpleImmutableEntry<Key, Value>(next.<Key> getValue(), valueHolder.<Value> getValue());
-			}
-		};
-	}
 
 	public abstract <T extends Attribute> Class<T> getKeyAttributeClass();
 

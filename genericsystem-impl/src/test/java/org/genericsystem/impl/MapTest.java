@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -124,8 +123,9 @@ public class MapTest extends AbstractTest {
 		vehicle.getPropertiesMap().put("power", 123);
 		assert car.getPropertiesMap().get("power").equals(123);
 		car.getPropertiesMap().remove("power");
-		// car.getPropertiesMap().remove("power");
-		assert car.getPropertiesMap().get("power") == null : car.getPropertiesMap();
+		// car.getPropertiesMap().put("power", null);
+		car.getPropertiesMap().remove("power");
+		assert car.getPropertiesMap().get("power").equals(123) : car.getPropertiesMap();
 		car.getPropertiesMap().put("power", 123);
 		assert car.getPropertiesMap().get("power").equals(123);
 		// vehicle.getProperties().put("power", null);
@@ -151,13 +151,9 @@ public class MapTest extends AbstractTest {
 		vehicle.getPropertiesMap().put("power", 123);
 		assert car.getPropertiesMap().get("power").equals(123);
 		car.getPropertiesMap().remove("power");
-		car.getPropertiesMap().remove("power");
 		assert car.getPropertiesMap().get("power") == null : car.getPropertiesMap().get("power");
 		car.getPropertiesMap().put("power", 124);
 		assert car.getPropertiesMap().get("power").equals(124);
-		// vehicle.getProperties().put("power", null);
-		// assert vehicle.getProperties().get("power") == null;
-		// assert car.getProperties().get("power").equals(124);
 	}
 
 	public void testOtherMap() {
