@@ -5,6 +5,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.PropertyConstraintViolationException;
+import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -252,13 +253,20 @@ public class PropertyConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");
 		Type color = cache.newType("Color");
-		Relation carOutsideColor = car.setRelation("outside", color);
-		Generic myBmw = car.newInstance("myBmw");
-		Generic red = color.newInstance("red");
+		final Relation carOutsideColor = car.setRelation("outside", color);
+		final Generic myBmw = car.newInstance("myBmw");
+		final Generic red = color.newInstance("red");
 		carOutsideColor.enableSingularConstraint(Statics.TARGET_POSITION);
 		myBmw.setLink(carOutsideColor, "20%", red);
-		myBmw.setLink(carOutsideColor, "40%", red);
-		myBmw.getLink(carOutsideColor, red);
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				myBmw.setLink(carOutsideColor, "40%", red);
+
+			}
+		}.assertIsCausedBy(SingularConstraintViolationException.class);
+
+		// myBmw.getLink(carOutsideColor, red);
 	}
 
 }

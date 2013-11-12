@@ -2,7 +2,6 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
@@ -16,7 +15,7 @@ public class NodeImpl extends GenericImpl implements Node {
 	@Override
 	public <T extends Node> T getChild(Serializable value) {
 		Tree attribute = getMeta();
-		return this.unambigousFirst(Statics.<T> valueFilter(this.<T> thisFilter(this.<T> holdersIterator(attribute, Statics.CONCRETE, getBasePos(attribute), value == null)), value));
+		return this.unambigousFirst(Statics.<T> valueFilter(this.<T> thisFilter(this.<T> holdersIterator(attribute, Statics.CONCRETE, getBasePos(attribute))), value));
 	}
 
 	@Override
@@ -40,7 +39,7 @@ public class NodeImpl extends GenericImpl implements Node {
 	}
 
 	<T extends Generic> Iterator<T> childrenIterator(int basePos) {
-		return thisFilter(this.<T> holdersIterator(Statics.CONCRETE, this.<Tree> getMeta(), basePos, false));
+		return thisFilter(this.<T> holdersIterator(Statics.CONCRETE, this.<Tree> getMeta(), basePos));
 	}
 
 	@Override

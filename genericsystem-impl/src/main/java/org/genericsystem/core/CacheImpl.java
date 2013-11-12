@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -455,31 +454,54 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
+		Generic[] oldSupers = supers;
+		Generic[] oldComponents = components;
 		boolean isSingular = false;
 		boolean isProperty = false;
 		if (Statics.MULTIDIRECTIONAL != basePos) {
-			Holder holder = null;
 			Attribute attribute = (Attribute) supers[0];
 			GenericImpl baseComponent = (GenericImpl) components[basePos];
 			isSingular = attribute.isSingularConstraintEnabled(basePos);
 			isProperty = attribute.isPropertyConstraintEnabled();
-			if (isSingular)
+			Holder holder = null;
+			if (isSingular) {
 				holder = baseComponent.getHolder(homeTreeNode.getMetaLevel(), attribute, basePos);
-			else if (isProperty)
+			} else if (isProperty)
 				holder = baseComponent.getHolder(homeTreeNode.getMetaLevel(), attribute, basePos, Statics.truncate(basePos, components));
 
-			if (holder != null)
+			if (holder != null) {
+				log.info("EEE" + holder.info());
 				if (!components[basePos].equals(holder.getComponent(basePos)) || ((GenericImpl) holder).equiv(new Primaries(homeTreeNode, holder).toArray(), GenericImpl.enrich(components, ((GenericImpl) holder).components))) {
 					supers = new Generic[] { holder };
 					components = GenericImpl.enrich(components, ((GenericImpl) holder).components);
 				}
+			}
 		}
-		return internalBind(homeTreeNode, new Primaries(homeTreeNode, supers).toArray(), components, specializationClass, existsException, isSingular, isProperty, basePos);
+		HomeTreeNode[] oldPrimaries = new Primaries(homeTreeNode, oldSupers).toArray();
+		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, getDirectSupers(oldPrimaries, oldComponents));
+		Generic[] extendedDirectSupers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, oldPrimaries, oldComponents);
+		// supers = new Generic[] { extendedDirectSupers[0] };
+		// components = GenericImpl.enrich(components, ((GenericImpl) extendedDirectSupers[0]).components);
+
+		HomeTreeNode[] primaries = new Primaries(homeTreeNode, supers).toArray();
+		Generic[] directSupers = getDirectSupers(primaries, components);
+
+		// assert Arrays.equals(directSupers, extendedDirectSupers) : Arrays.toString(primaries) + "   " + Arrays.toString(components);
+
+		// assert Arrays.equals(directSupers, extendedDirectSupers) : directSupers[0].info() + "   " + extendedDirectSupers[0].info();
+
+		// assert Arrays.equals(directSupers, extendedDirectSupers) : Arrays.toString(directSupers) + "   " + Arrays.toString(extendedDirectSupers);
+
+		return internalBind(homeTreeNode, primaries, components, specializationClass, existsException, isSingular, isProperty, basePos);
 	}
 
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException, boolean isSingular, boolean isProperty, int basePos) {
 		Generic[] directSupers = getDirectSupers(primaries, components);
+		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, directSupers);
+		// Generic[] extendedDirectSupers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, primaries, components);
+		// assert Arrays.equals(directSupers, extendedDirectSupers);
+
 		for (Generic directSuper : directSupers)
 			if (((GenericImpl) directSuper).equiv(primaries, components))
 				if (directSupers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
@@ -495,8 +517,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			if (phantom != null)
 				phantom.remove();
 		}
-
-		GenericImpl meta = this.<GenericImpl> getMeta(homeTreeNode, directSupers);
 		// NavigableSet<Generic> orderedDependencies = getConcernedDependencies(meta, isProperty, isSingular, primaries, components, basePos);
 		NavigableSet<Generic> orderedDependencies = getConcernedDependencies2(new Generic[] { meta }, primaries, components, isProperty, isSingular, basePos);
 		// assert orderedDependencies.equals(concernedDependencies2) : orderedDependencies + " / " + concernedDependencies2 + " " + orderedDependencies.first().info();
@@ -597,12 +617,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 					return true;
 
 				if (meta.getMetaLevel() != next.getMetaLevel()) {
-					if (((GenericImpl) next).components.length != components.length)
-						return false;
-					if (isSingular && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
-						return true;
-					if (isProperty && Arrays.equals(((GenericImpl) next).components, components))
-						return true;
+					if (((GenericImpl) next).components.length == components.length) {
+						if (isSingular && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
+							return true;
+						if (isProperty && Arrays.equals(((GenericImpl) next).components, components))
+							return true;
+					}
 				}
 
 				return false;
@@ -740,9 +760,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
 				if (CacheImpl.this.isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
 					int axe = ((AxedPropertyClass) entry.getKey().getValue()).getAxe();
-					if (AbstractAxedConstraintImpl.class.isAssignableFrom(entry.getKey().getClass())
-							&& attribute.getComponent(axe) != null
-							&& (generic.isInstanceOf(attribute.getComponent(axe)))) {
+					if (AbstractAxedConstraintImpl.class.isAssignableFrom(entry.getKey().getClass()) && attribute.getComponent(axe) != null && (generic.isInstanceOf(attribute.getComponent(axe)))) {
 						entry.getKey().check(attribute, generic, entry.getValue(), axe);
 					}
 				}
@@ -756,14 +774,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Holder valueHolder = constraintMap.getValueHolder(key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
 
-
 			constraints.put(keyHolder, valueHolder);
 		}
 
 		for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
 			Holder valueHolder = entry.getValue();
 			AbstractConstraintImpl keyHolder = entry.getKey();
-
 
 			if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();

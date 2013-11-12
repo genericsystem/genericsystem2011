@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -63,7 +62,7 @@ public class NotNullConstraintTest extends AbstractTest {
 
 		assert myCar.getLinks(driving).isEmpty();
 		myCar.setLink(driving, null, myHuman, myRoad);
-		assert myCar.getLinks(driving).isEmpty();
+		assert myCar.getLink(driving).getValue() == null;
 		Link test = myCar.setLink(driving, "test", myHuman, myRoad);
 		Link test2 = myCar.setLink(driving, "test2", myHuman, myRoad);
 		assert myCar.getLinks(driving).containsAll(Arrays.asList(test, test2));
@@ -80,8 +79,8 @@ public class NotNullConstraintTest extends AbstractTest {
 		};
 		test2.remove();
 		driving.enableSingularConstraint();
-		myCar.setLink(driving, null, myHuman, myRoad);// remove test
-		assert myCar.getLinks(driving).isEmpty();
+		myCar.setLink(driving, null, myHuman, myRoad);
+		assert myCar.getLink(driving).getValue() == null;
 	}
 
 	public void testEnabledConstraintOnASimpleTypeThenCreateASubtype() {
@@ -116,12 +115,11 @@ public class NotNullConstraintTest extends AbstractTest {
 		final Attribute registration = car.setProperty("Registration");
 		final Generic myBmw = car.newInstance("myBmw");
 		Holder holder = car.setValue(registration, 235);
-		myBmw.setValue(holder, null).log();
-		assert myBmw.getHolder(Statics.CONCRETE, registration) == null : myBmw.getHolder(Statics.CONCRETE, registration);
-		assert myBmw.getValues(registration).isEmpty();
+		myBmw.setValue(holder, null);
+		assert myBmw.getValue(registration) == null : myBmw.getHolder(Statics.CONCRETE, registration);
+		assert !myBmw.getValues(registration).isEmpty();
 		myBmw.setValue(registration, null);// No exception
-		assert myBmw.getHolder(Statics.CONCRETE, registration) == null;
-		assert myBmw.getValues(registration).isEmpty();
+		assert myBmw.getValue(registration) == null : myBmw.getHolder(Statics.CONCRETE, registration);
 	}
 
 	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {
@@ -149,6 +147,6 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert myBmw.getHolders(vehicleRegistration).contains(value);
 		myBmw.setValue(carRegistration, null);
 		assert !value.isAlive();
-		assert myBmw.getHolders(vehicleRegistration).isEmpty();
+		assert myBmw.getValue(vehicleRegistration) == null;
 	}
 }

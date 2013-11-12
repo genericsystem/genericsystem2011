@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -1371,8 +1370,13 @@ public class RelationTest extends AbstractTest {
 		Relation carColor = car.setRelation("carColor", color).enableSingularConstraint();
 		Link carRed = car.bind(carColor, red);
 		myBmw.bind(carColor, red);
-		myAudi.setLink(carRed, null, red);
-		myAudi.bind(carColor, blue);
+		// myAudi.setLink(carRed, null, red);
+		Link myAudiRed = myAudi.bind(carRed, red);
+
+		Link myAudiBlue = myAudi.bind(carColor, blue);
+		assert myAudiBlue.inheritsFrom(carRed);
+
+		assert !myAudiRed.isAlive();
 
 		assert red.getLinks(carColor, 1).size() == 2 : red.getLinks(carColor);
 		assert red.getTargets(carColor, 1, 0).containsAll(Arrays.asList(new Generic[] { myMercedes, myBmw }));
