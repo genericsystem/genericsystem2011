@@ -95,21 +95,6 @@ public abstract class AbstractContext implements Serializable {
 
 	public abstract boolean isAutomatic(Generic generic);
 
-	Iterator<Generic> getDirectSupersIterator(final HomeTreeNode[] primaries, final Generic[] components) {
-		return new AbstractSelectableLeafIterator(getEngine()) {
-
-			@Override
-			protected boolean isSelectable() {
-				return true;
-			}
-
-			@Override
-			public boolean isSelected(Generic candidate) {
-				return GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
-			}
-		};
-	}
-
 	Iterator<Generic> getExtendedDirectSupersIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
 		return new AbstractSelectableLeafIterator(getEngine()) {
 
@@ -125,43 +110,25 @@ public abstract class AbstractContext implements Serializable {
 					return true;
 				if (basePos != Statics.MULTIDIRECTIONAL)
 					if (GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components)) {
-						// log.info("candidate : " + candidate);
 						if (meta.getMetaLevel() != candidate.getMetaLevel()) {
-							// if (((GenericImpl) candidate).components.length == components.length) {
-							if (!components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
+							if (basePos < ((GenericImpl) candidate).components.length && !components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
 								if (components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos])) {
 									if (!candidate.inheritsFrom(find(NoInheritanceSystemType.class)))
-										if (isSingular) {
-											// log.info("candidate2 : " + candidate);
+										if (isSingular)
 											return true;
-										}
-									if (isProperty) {
-										// log.info("candidate2 : " + candidate);
+									if (isProperty)
 										if (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components)))
 											return true;
-									}
 								}
 							} else {
-								// log.info("candidate " + candidate.info() + " primaries " + Arrays.toString(primaries) + " components " + Arrays.toString(components));
-								if (((GenericImpl) candidate).equiv(new Primaries(candidate, primaries).toArray(), GenericImpl.enrich(components, ((GenericImpl) candidate).components))) {
-									// log.info("YOUPI");
+								if (((GenericImpl) candidate).equiv(new Primaries(candidate, primaries).toArray(), GenericImpl.enrich(components, ((GenericImpl) candidate).components)))
 									return true;
-								}
 							}
 						}
 					}
-				// }
 				return false;
 			}
 		};
-	}
-
-	protected Generic[] getDirectSupers(HomeTreeNode[] primaries, Generic[] components) {
-		TreeSet<Generic> supers = new TreeSet<Generic>();
-		final Iterator<Generic> iterator = getDirectSupersIterator(primaries, components);
-		while (iterator.hasNext())
-			supers.add(iterator.next());
-		return supers.toArray(new Generic[supers.size()]);
 	}
 
 	protected Generic[] getExtendedDirectSupers(Generic meta, boolean isProperty, boolean isSingular, int basePos, HomeTreeNode[] primaries, Generic[] components) {
