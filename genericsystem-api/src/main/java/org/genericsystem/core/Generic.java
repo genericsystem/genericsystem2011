@@ -682,7 +682,7 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Generic> T removeSuper(int pos);
 
-	<T extends Generic> T updateValue(Serializable value);
+	<T extends Generic> T setValue(Serializable value);
 
 	<T extends Generic> Snapshot<T> getOtherTargets(Holder holder);
 

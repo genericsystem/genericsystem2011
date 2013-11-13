@@ -48,7 +48,7 @@ public class WrapperBean {
 
 		public void setValue(String newValue) {
 			if (!newValue.equals(generic.toString())) {
-				generic.updateValue(newValue);
+				generic.setValue(newValue);
 				messages.info("updateValue", generic, newValue);
 			}
 		}
@@ -72,7 +72,7 @@ public class WrapperBean {
 		public void setValue(String newValue) {
 			Generic generic = genericTreeNode.getGeneric();
 			if (!newValue.equals(generic.toString())) {
-				genericTreeNode.setGeneric(generic.updateValue(newValue));
+				genericTreeNode.setGeneric(generic.setValue(newValue));
 				messages.info("updateGeneric", newValue, generic.getValue());
 				panelTitleChangeEvent.fire(new PanelTitleChangeEvent("typesmanager", ((GenericImpl) genericTreeBean.getSelectedTreeNode().getGeneric()).toCategoryString()));
 			}

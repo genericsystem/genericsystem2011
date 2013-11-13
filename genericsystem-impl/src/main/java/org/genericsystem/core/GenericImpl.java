@@ -297,11 +297,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Holder> T addHolder(Holder attribute, Serializable value, int basePos, int metaLevel, Generic... targets) {
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
-		return bind(metaNode.bindInstanceNode(value), null, attribute, basePos, true, targets);
+		Generic meta = metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute;
+		return bind(metaNode.bindInstanceNode(value), meta, null, attribute, basePos, true, targets);
 	}
 
-	public <T extends Holder> T bind(HomeTreeNode homeTreeNode, Class<?> specializationClass, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
-		return getCurrentCache().bind(homeTreeNode, specializationClass, directSuper, existsException, basePos, Statics.insertIntoArray(this, targets, basePos));
+	public <T extends Holder> T bind(HomeTreeNode homeTreeNode, Generic meta, Class<?> specializationClass, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
+		return getCurrentCache().bind(homeTreeNode, meta, specializationClass, directSuper, existsException, basePos, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	public <T extends Holder> T find(HomeTreeNode homeTreeNode, Holder directSuper, int basePos, Generic... targets) {
@@ -648,7 +649,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
 		HomeTreeNode metaNode = metaLevel == attribute.getMetaLevel() ? ((GenericImpl) attribute).homeTreeNode.metaNode : ((GenericImpl) attribute).homeTreeNode;
-		return this.<T> bind(metaNode.bindInstanceNode(value), specializationClass, attribute, basePos, false, targets);
+		Generic meta = metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute;
+		return this.<T> bind(metaNode.bindInstanceNode(value), meta, specializationClass, attribute, basePos, false, targets);
 	}
 
 	public static Generic[] enrich(Generic[] components, Generic[] additionals) {
@@ -684,12 +686,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T newInstance(Serializable value, Generic... components) {
-		return getCurrentCache().bind(bindInstanceNode(value), null, this, false, Statics.MULTIDIRECTIONAL, components);
+		return getCurrentCache().bind(bindInstanceNode(value), this, null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
-		return getCurrentCache().bind(getEngine().bindInstanceNode(value), null, this, false, Statics.MULTIDIRECTIONAL, components);
+		return getCurrentCache().bind(((GenericImpl) getMeta()).bindInstanceNode(value), getMeta(), null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
@@ -774,7 +776,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					}
 				});
 				if (projection == null) {
-					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), null, this, false, Statics.MULTIDIRECTIONAL, newComponents)).markAsAutomatic();
+					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), getMeta(), null, this, false, Statics.MULTIDIRECTIONAL, newComponents)).markAsAutomatic();
 				}
 			}
 		}
@@ -1589,8 +1591,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T updateValue(Serializable value) {
-		return getCurrentCache().updateValue(this, value);
+	public <T extends Generic> T setValue(Serializable value) {
+		return getCurrentCache().setValue(this, value);
 	}
 
 	public List<Integer> getComponentsPositions(Generic... components) {

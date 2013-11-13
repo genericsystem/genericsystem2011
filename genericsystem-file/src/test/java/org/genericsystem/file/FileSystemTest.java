@@ -21,7 +21,7 @@ public class FileSystemTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(FileSystem.class).start();
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
-		assert rootDirectory.updateValue("rootDirectory2").getValue().equals("rootDirectory2");
+		assert rootDirectory.setValue("rootDirectory2").getValue().equals("rootDirectory2");
 		assert !rootDirectory.isAlive();
 	}
 
@@ -30,7 +30,7 @@ public class FileSystemTest extends AbstractTest {
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
 		rootDirectory.addFile("file");
-		assert rootDirectory.updateValue("rootDirectory2").getValue().equals("rootDirectory2");
+		assert rootDirectory.setValue("rootDirectory2").getValue().equals("rootDirectory2");
 		assert !rootDirectory.isAlive();
 	}
 
@@ -39,7 +39,7 @@ public class FileSystemTest extends AbstractTest {
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
 		Directory directory = rootDirectory.addDirectory("directory");
-		assert directory.updateValue("directory2").getValue().equals("directory2");
+		assert directory.setValue("directory2").getValue().equals("directory2");
 		assert !directory.isAlive();
 	}
 
@@ -49,7 +49,7 @@ public class FileSystemTest extends AbstractTest {
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
 		Directory directory = rootDirectory.addDirectory("directory");
 		directory.addFile("file");
-		assert directory.updateValue("directory2").getValue().equals("directory2");
+		assert directory.setValue("directory2").getValue().equals("directory2");
 		assert !directory.isAlive();
 	}
 
@@ -58,7 +58,7 @@ public class FileSystemTest extends AbstractTest {
 		FileSystem fileSystem = cache.find(FileSystem.class);
 		Directory rootDirectory = fileSystem.addRootDirectory("rootDirectory");
 		File file = rootDirectory.addFile("file");
-		assert file.updateValue("file2").getValue().equals("file2");
+		assert file.setValue("file2").getValue().equals("file2");
 		assert !file.isAlive();
 	}
 
