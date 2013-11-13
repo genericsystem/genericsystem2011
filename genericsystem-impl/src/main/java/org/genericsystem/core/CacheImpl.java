@@ -235,30 +235,36 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private class ConnectionMap extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 8257917150315417734L;
 
-		private ConnectionMap reBind(HomeTreeNode homeTreeNode, Generic bind, Set<Generic> orderedDependencies, boolean isProperty, boolean isSingular, int basePos, boolean rebuildSupers) {
+		private ConnectionMap reBind(HomeTreeNode homeTreeNode, Generic bind, Set<Generic> orderedDependencies, boolean isProperty, boolean isSingular, int basePos) {
 			for (Generic orderedDependency : orderedDependencies) {
-				HomeTreeNode newHomeTreeNode = null;
-				HomeTreeNode[] primaries = null;
-				Generic[] newComponents = null;
+				HomeTreeNode newHomeTreeNode = ((GenericImpl) orderedDependency).getHomeTreeNode();
+				HomeTreeNode[] newPrimaries = ((GenericImpl) orderedDependency).primaries;
+				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).selfToNullComponents());
+
 				if (isSingular || isProperty) {
 					if (((GenericImpl) bind).getComponent(basePos).equals(((Holder) orderedDependency).getComponent(basePos)))
 						continue;
-					if (((GenericImpl) orderedDependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos])) {
-						newHomeTreeNode = ((GenericImpl) orderedDependency).getHomeTreeNode();
-						primaries = Statics.insertFirst(homeTreeNode, ((GenericImpl) orderedDependency).primaries);
-					} else {
+					if (((GenericImpl) orderedDependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos]))
+						newPrimaries = Statics.insertFirst(homeTreeNode, ((GenericImpl) orderedDependency).primaries);
+					else {
 						newHomeTreeNode = homeTreeNode;
-						primaries = Statics.replace(((GenericImpl) orderedDependency).primaries, ((GenericImpl) orderedDependency).getHomeTreeNode(), homeTreeNode);
+						newPrimaries = Statics.replace(((GenericImpl) orderedDependency).primaries, ((GenericImpl) orderedDependency).getHomeTreeNode(), newHomeTreeNode);
 					}
-					Arrays.sort(primaries);
-					newComponents = GenericImpl.enrich(adjust(((GenericImpl) orderedDependency).selfToNullComponents()), ((GenericImpl) bind).components);
-				} else {
-					newHomeTreeNode = ((GenericImpl) orderedDependency).getHomeTreeNode();
-					primaries = ((GenericImpl) orderedDependency).primaries;
-					newComponents = adjust(((GenericImpl) orderedDependency).components);
 				}
-				Generic build = buildAndInsertComplex(newHomeTreeNode, orderedDependency.getClass(), rebuildSupers ? getExtendedDirectSupers(orderedDependency.getMeta(), false, false, Statics.MULTIDIRECTIONAL, primaries, newComponents)
-						: adjust(((GenericImpl) orderedDependency).supers), newComponents);
+
+				Generic[] directSupers = getExtendedDirectSupers(orderedDependency.getMeta(), isProperty, isSingular, basePos, newPrimaries, newComponents);
+				for (Generic directSuper : directSupers) {
+					newPrimaries = new Primaries(directSuper, newPrimaries).toArray();
+					newComponents = GenericImpl.enrich(newComponents, ((GenericImpl) directSuper).components);
+				}
+				put(orderedDependency, buildAndInsertComplex(newHomeTreeNode, orderedDependency.getClass(), directSupers, newComponents));
+			}
+			return this;
+		}
+
+		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
+			for (Generic orderedDependency : orderedDependencies) {
+				Generic build = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(), adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, build);
 			}
 			return this;
@@ -474,6 +480,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic directSuper : directSupers) {
 			primaries = new Primaries(directSuper, primaries).toArray();
 			components = GenericImpl.enrich(components, ((GenericImpl) directSuper).components);
+		}
+
+		for (Generic directSuper : directSupers) {
 			if (((GenericImpl) directSuper).equiv(primaries, components))
 				if (directSupers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
 					if (existsException)
@@ -489,7 +498,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			simpleRemove(generic);
 		ConnectionMap connectionMap = new ConnectionMap();
 		T bind = buildAndInsertComplex(homeTreeNode, specializeGenericClass(specializationClass, homeTreeNode, directSupers), directSupers, components);
-		connectionMap.reBind(homeTreeNode, bind, orderedDependencies, isProperty, isSingular, basePos, true);
+		connectionMap.reBind(homeTreeNode, bind, orderedDependencies, isProperty, isSingular, basePos);
 		return bind;
 	}
 
@@ -914,9 +923,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old);
 				dependencies.remove(old);
 				ConnectionMap map = new ConnectionMap();
-				GenericImpl rebuild = (GenericImpl) rebuild();
-				map.put(old, rebuild);
-				return (T) map.reBind(rebuild.getHomeTreeNode(), rebuild, dependencies, false, false, Statics.MULTIDIRECTIONAL, false).get(old);
+				map.put(old, rebuild());
+				return (T) map.reBind(dependencies).get(old);
 			}
 
 			abstract Generic rebuild();
