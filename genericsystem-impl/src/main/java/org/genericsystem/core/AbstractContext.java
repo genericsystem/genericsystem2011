@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -95,48 +94,51 @@ public abstract class AbstractContext implements Serializable {
 
 	public abstract boolean isAutomatic(Generic generic);
 
-	Iterator<Generic> getExtendedDirectSupersIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
-		return new AbstractSelectableLeafIterator(getEngine()) {
-
-			@Override
-			protected boolean isSelectable() {
-				return true;
+	protected NavigableSet<Generic> getExtendedDirectSupers(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
+		return new TreeSet<Generic>() {
+			private static final long serialVersionUID = 8568383988023387246L;
+			{
+				Iterator<Generic> iterator = getExtendedDirectSupersIterator(meta, isProperty, isSingular, basePos, primaries, components);
+				while (iterator.hasNext())
+					add(iterator.next());
 			}
 
-			@Override
-			public boolean isSelected(Generic candidate) {
-				boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
-				if (result)
-					return true;
-				if (basePos != Statics.MULTIDIRECTIONAL)
-					if (GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components)) {
-						if (meta.getMetaLevel() != candidate.getMetaLevel()) {
-							if (basePos < ((GenericImpl) candidate).components.length && !components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
-								if (components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos])) {
-									if (!candidate.inheritsFrom(find(NoInheritanceSystemType.class)))
-										if (isSingular)
-											return true;
-									if (isProperty)
-										if (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components)))
-											return true;
-								}
-							} else {
-								if (((GenericImpl) candidate).equiv(new Primaries(candidate, primaries).toArray(), GenericImpl.enrich(components, ((GenericImpl) candidate).components)))
-									return true;
-							}
-						}
+			Iterator<Generic> getExtendedDirectSupersIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
+				return new AbstractSelectableLeafIterator(getEngine()) {
+
+					@Override
+					protected boolean isSelectable() {
+						return true;
 					}
-				return false;
+
+					@Override
+					public boolean isSelected(Generic candidate) {
+						boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
+						if (result)
+							return true;
+						if (basePos != Statics.MULTIDIRECTIONAL)
+							if (GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components)) {
+								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
+									if (basePos < ((GenericImpl) candidate).components.length && !components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
+										if (components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos])) {
+											if (!candidate.inheritsFrom(find(NoInheritanceSystemType.class)))
+												if (isSingular)
+													return true;
+											if (isProperty)
+												if (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components)))
+													return true;
+										}
+									} else {
+										if (((GenericImpl) candidate).equiv(new Primaries(candidate, primaries).toArray(), GenericImpl.enrich(components, ((GenericImpl) candidate).components)))
+											return true;
+									}
+								}
+							}
+						return false;
+					}
+				};
 			}
 		};
-	}
-
-	protected Generic[] getExtendedDirectSupers(Generic meta, boolean isProperty, boolean isSingular, int basePos, HomeTreeNode[] primaries, Generic[] components) {
-		TreeSet<Generic> supers = new TreeSet<Generic>();
-		final Iterator<Generic> iterator = getExtendedDirectSupersIterator(meta, isProperty, isSingular, basePos, primaries, components);
-		while (iterator.hasNext())
-			supers.add(iterator.next());
-		return supers.toArray(new Generic[supers.size()]);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -146,7 +148,7 @@ public abstract class AbstractContext implements Serializable {
 		return fastFindBySuper(((GenericImpl) generic).homeTreeNode, ((GenericImpl) generic).primaries, reFind(((GenericImpl) generic).supers[0]), reFind(((GenericImpl) generic).components));
 	}
 
-	private Generic[] reFind(Generic[] generics) {
+	private Generic[] reFind(Generic... generics) {
 		Generic[] reBind = new Generic[generics.length];
 		for (int i = 0; i < generics.length; i++)
 			reBind[i] = reFind(generics[i]);
@@ -161,19 +163,19 @@ public abstract class AbstractContext implements Serializable {
 		return null;
 	}
 
-	<T extends Generic> T fastFindPhantom(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
-		HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
-		return phantomHomeNode != null ? this.<T> fastFindByComponents(phantomHomeNode, new Primaries(Statics.insertFirst(phantomHomeNode, primaries)).toArray(), components) : null;
-	}
+	// <T extends Generic> T fastFindPhantom(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
+	// HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
+	// return phantomHomeNode != null ? this.<T> fastFindByComponents(phantomHomeNode, new Primaries(Statics.insertFirst(phantomHomeNode, primaries)).toArray(), components) : null;
+	// }
 
-	@SuppressWarnings("unchecked")
-	<T extends Generic> T fastFindByComponents(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
-		for (Generic generic : components[components.length - 1].getComposites())
-			if (((GenericImpl) generic).equiv(homeTreeNode, primaries, components))
-				return (T) generic;
-		return null;
-
-	}
+	// @SuppressWarnings("unchecked")
+	// <T extends Generic> T fastFindByComponents(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
+	// for (Generic generic : components[components.length - 1].getComposites())
+	// if (((GenericImpl) generic).equiv(homeTreeNode, primaries, components))
+	// return (T) generic;
+	// return null;
+	//
+	// }
 
 	<T extends Generic> NavigableSet<T> orderDependenciesForRemove(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
 		return new TreeSet<T>() {
@@ -186,7 +188,7 @@ public abstract class AbstractContext implements Serializable {
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
 					for (T inheritingDependency : generic.<T> getInheritings())
-						if (((GenericImpl) inheritingDependency).isPhantom() || ((GenericImpl) inheritingDependency).isAutomatic())
+						if (/* ((GenericImpl) inheritingDependency).isPhantom() || */((GenericImpl) inheritingDependency).isAutomatic())
 							addDependencies(inheritingDependency);
 						else if (!contains(inheritingDependency))
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
@@ -316,6 +318,8 @@ public abstract class AbstractContext implements Serializable {
 	void simpleRemove(Generic generic) {
 		unplug(generic);
 	}
+
+	abstract int getLevel();
 
 	interface TimestampedDependencies {
 

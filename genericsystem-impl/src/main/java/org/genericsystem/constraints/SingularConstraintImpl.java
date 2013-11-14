@@ -6,7 +6,6 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanAxedConstraintImpl;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
@@ -30,7 +29,7 @@ public class SingularConstraintImpl extends AbstractBooleanAxedConstraintImpl im
 
 	@Override
 	public boolean isCheckedAt(Generic modified, CheckingType checkingType) {
-		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (((GenericImpl) modified).isPhantom() && checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
+		return checkingType.equals(CheckingType.CHECK_ON_ADD_NODE) || (/* ((GenericImpl) modified).isPhantom() && */checkingType.equals(CheckingType.CHECK_ON_REMOVE_NODE));
 	}
 
 }

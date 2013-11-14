@@ -24,11 +24,13 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	static final String MAP_VALUE = "map";
 
-	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> implements ExtendedMap<K, V> {}
+	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> {
+		abstract public Holder getValueHolder(Serializable key);
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public ExtendedMap<Key, Value> getExtendedMap(final Generic generic) {
+	public AbstractExtendedMap<Key, Value> getExtendedMap(final Generic generic) {
 		return new AbstractExtendedMap<Key, Value>() {
 
 			@Override

@@ -8,9 +8,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
+import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -46,6 +45,7 @@ import org.genericsystem.iterator.CartesianIterator;
 import org.genericsystem.iterator.CountIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.genericsystem.map.AbstractMapProvider;
+import org.genericsystem.map.AbstractMapProvider.AbstractExtendedMap;
 import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
@@ -764,17 +764,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			final Generic[] newComponents = enrich(components, GenericImpl.this.components);
 			for (Generic component : newComponents)
 				assert component.isAlive();
-			if (!phantomExists(components)) {
-				Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
-					@Override
-					public boolean isSelected() {
-						return isSuperOf(new Primaries(getHomeTreeNode(), GenericImpl.this).toArray(), newComponents, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
-					}
-				});
-				if (projection == null) {
-					((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), getMeta(), new Generic[] { this }, newComponents, null, false, Statics.MULTIDIRECTIONAL)).markAsAutomatic();
+			// if (!phantomExists(components)) {
+			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
+				@Override
+				public boolean isSelected() {
+					return isSuperOf(new Primaries(getHomeTreeNode(), GenericImpl.this).toArray(), newComponents, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
 				}
+			});
+			if (projection == null) {
+				((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), getMeta(), new Generic[] { this }, newComponents, null, false, Statics.MULTIDIRECTIONAL)).markAsAutomatic();
 			}
+			// }
 		}
 	}
 
@@ -792,11 +792,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return projections;
 	}
 
-	boolean phantomExists(Generic[] components) {
-		return getCurrentCache().fastFindPhantom(homeTreeNode, primaries, components) != null;
-		// HomeTreeNode phantom = homeTreeNode.metaNode.findInstanceNode(null);
-		// return phantom != null ? getCurrentCache().fastFindBySuper(phantom, new Primaries(Statics.insertFirst(phantom, primaries)).toArray(), this, components) : null;
-	}
+	// boolean phantomExists(Generic[] components) {
+	// return getCurrentCache().fastFindPhantom(homeTreeNode, primaries, components) != null;
+	// // HomeTreeNode phantom = homeTreeNode.metaNode.findInstanceNode(null);
+	// // return phantom != null ? getCurrentCache().fastFindBySuper(phantom, new Primaries(Statics.insertFirst(phantom, primaries)).toArray(), this, components) : null;
+	// }
 
 	@Override
 	// TODO KK
@@ -1533,26 +1533,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends MapProvider> ExtendedMap<Serializable, Serializable> getMap(Class<T> mapClass) {
-		return getMap(getCurrentCache().<MapProvider> find(mapClass));
+	public <Key extends Serializable, Value extends Serializable> AbstractExtendedMap<Key, Value> getMap(Class<? extends MapProvider> mapClass) {
+		return this.<Key, Value> getMap(getCurrentCache().<MapProvider> find(mapClass));
 	}
 
-	public <T extends MapProvider> ExtendedMap<Serializable, Serializable> getMap(MapProvider mapProvider) {
-		return mapProvider.getExtendedMap(this);
+	public <Key extends Serializable, Value extends Serializable> AbstractExtendedMap<Key, Value> getMap(MapProvider mapProvider) {
+		return (AbstractExtendedMap<Key, Value>) mapProvider.<Key, Value> getExtendedMap(this);
 	}
 
 	@Override
-	public Map<Serializable, Serializable> getPropertiesMap() {
+	public <Key extends Serializable, Value extends Serializable> AbstractExtendedMap<Key, Value> getPropertiesMap() {
 		return getMap(PropertiesMapProvider.class);
 	}
 
-	@Override
-	public ExtendedMap<Serializable, Serializable> getConstraintsMap() {
+	public AbstractExtendedMap<AxedPropertyClass, Serializable> getConstraintsMap() {
 		return getMap(ConstraintsMapProvider.class);
 	}
 
-	@Override
-	public ExtendedMap<Serializable, Serializable> getSystemPropertiesMap() {
+	public AbstractExtendedMap<AxedPropertyClass, Serializable> getSystemPropertiesMap() {
 		return getMap(SystemPropertiesMapProvider.class);
 	}
 
@@ -1660,9 +1658,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	public boolean isPhantom() {
-		return homeTreeNode.isPhantom();
-	}
+	// public boolean isPhantom() {
+	// return homeTreeNode.isPhantom();
+	// }
 
 	public boolean isAutomatic() {
 		return getCurrentCache().isAutomatic(this);
@@ -1696,6 +1694,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			this.getCurrentCache().rollback(new AmbiguousSelectionException("Ambigous selection : " + message));
 		}
 		return result;
+	}
+
+	Class<?> specializeInstanceClass(Class<?> specializationClass) {
+		InstanceGenericClass instanceClass = getClass().getAnnotation(InstanceGenericClass.class);
+		if (instanceClass != null)
+			if (specializationClass == null || specializationClass.isAssignableFrom(instanceClass.value()))
+				specializationClass = instanceClass.value();
+			else
+				assert instanceClass.value().isAssignableFrom(specializationClass);
+		return specializationClass;
 	}
 
 }

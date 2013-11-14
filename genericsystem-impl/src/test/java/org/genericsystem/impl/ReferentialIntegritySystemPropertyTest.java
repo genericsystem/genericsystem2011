@@ -18,7 +18,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	public void testAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Attribute metaAttribute = cache.getMetaAttribute();
-		assert !metaAttribute.isReferentialIntegrity(Statics.BASE_POSITION) : metaAttribute.getSystemPropertiesMap();
+		assert !metaAttribute.isReferentialIntegrity(Statics.BASE_POSITION);
 
 		assert !cache.getMetaRelation().isReferentialIntegrity(Statics.BASE_POSITION);
 		assert cache.getMetaRelation().isReferentialIntegrity(Statics.TARGET_POSITION);
