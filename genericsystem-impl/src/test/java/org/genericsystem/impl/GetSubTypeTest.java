@@ -146,14 +146,17 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeDoubleHierarchyRelationWithOtherTargetType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type color = cache.newType("Color");
-		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
-		Type car = vehicle.newSubType("Car");
-		try {
-			((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.newType("Percent"));
-		} catch (IllegalStateException ignore) {}
+		final Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
+		final Type car = vehicle.newSubType("Car");
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.newType("Percent"));
+			}
+		}.assertIsCausedBy(IllegalStateException.class);
 	}
 
 	public void testGetSubTypeNonExistingRelation() {

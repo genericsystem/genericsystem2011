@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.util.HashSet;
-
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -120,5 +119,10 @@ public class Transaction extends AbstractContext {
 	@Override
 	public boolean isAutomatic(Generic generic) {
 		return false;
+	}
+
+	@Override
+	int getLevel() {
+		return 0;
 	}
 }

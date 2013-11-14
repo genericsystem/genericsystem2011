@@ -22,7 +22,7 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
 @SystemGeneric
 @Components(EngineImpl.class)
 @Dependencies({ PropertyKey.class, PropertyValue.class })
-public class PropertiesMapProvider extends AbstractMapProvider<Serializable, Serializable> {
+public class PropertiesMapProvider extends AbstractMapProvider<AxedPropertyClass, Serializable> {
 
 	@Override
 	@SuppressWarnings("unchecked")

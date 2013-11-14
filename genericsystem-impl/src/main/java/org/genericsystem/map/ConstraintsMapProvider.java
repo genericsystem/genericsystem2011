@@ -1,5 +1,6 @@
 package org.genericsystem.map;
 
+import java.io.Serializable;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -40,7 +41,7 @@ import org.genericsystem.systemproperties.NoInheritanceSystemType;
 @Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, ConcreteInheritanceConstraintImpl.class, InstanceClassConstraintImpl.class,
 		OptimisticLockConstraintImpl.class, PhantomConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, /* UniqueStructuralValueConstraintImpl.class, */
 		UniqueValueConstraintImpl.class, VirtualConstraintImpl.class, StructuralNamingConstraintImpl.class })
-public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
+public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Serializable> {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -63,20 +64,17 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 	@SystemGeneric
 	@Components(ConstraintsMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class ConstraintKey extends GenericImpl implements Attribute {
-	}
+	public static class ConstraintKey extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(NoInheritanceSystemType.class)
 	@Components(ConstraintKey.class)
 	@SingularConstraint
-	public static class ConstraintValue extends GenericImpl implements Attribute {
-	}
+	public static class ConstraintValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.class)
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
-	}
+	public static class MapInstance extends GenericImpl implements Holder {}
 }
