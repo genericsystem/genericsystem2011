@@ -5,7 +5,6 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,13 +74,9 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		return false;
 	}
 
-	public boolean isPhantom() {
-		return NULL_VALUE.equals(value);
-	}
-
 	@SuppressWarnings("unchecked")
 	public <S extends Serializable> S getValue() {
-		return isPhantom() ? null : (S) value;
+		return NULL_VALUE.equals(value) ? null : (S) value;
 	}
 
 	public int getMetaLevel() {
