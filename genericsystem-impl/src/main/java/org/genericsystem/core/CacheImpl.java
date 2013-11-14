@@ -503,18 +503,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<GenericImpl> find(meta);
 	}
 
-	// @SuppressWarnings("unchecked")
-	// private <T extends Generic> T getMeta(HomeTreeNode homeTreeNode, Generic[] supers) {
-	// HomeTreeNode metaNode = homeTreeNode.metaNode;
-	// for (Generic superGeneric : supers)
-	// if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
-	// return (T) superGeneric;
-	// for (Generic superGeneric : supers)
-	// if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
-	// return superGeneric.getMeta();
-	// throw new IllegalStateException();
-	// }
-
 	private NavigableSet<Generic> getConcernedDependencies(final Generic[] supers, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
 		return new TreeSet<Generic>() {
 			private static final long serialVersionUID = -38728500742395848L;

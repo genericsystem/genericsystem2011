@@ -70,7 +70,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert myCar.getLinks(driving).isEmpty();
 		test = myCar.setLink(driving, "test", myHuman, myRoad);
 		test2 = myCar.setLink(driving, "test2", myHuman, myRoad);
-		cache.mountNewCache().start();
+		cache.mountNewCache();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {

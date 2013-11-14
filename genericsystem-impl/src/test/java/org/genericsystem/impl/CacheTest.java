@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Type;
@@ -19,7 +18,7 @@ public class CacheTest extends AbstractTest {
 
 	public void testFlushCacheOnCacheOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Cache cache2 = cache.mountNewCache().start();
+		Cache cache2 = cache.mountNewCache();
 		Type vehicle = cache2.newType("Vehicle");
 		assert cache2.getEngine().getInheritings().contains(vehicle);
 		cache.start();
@@ -32,8 +31,8 @@ public class CacheTest extends AbstractTest {
 
 	public void testCacheLevelOK() {
 		Cache mainCache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Cache superCache1 = mainCache.mountNewCache().start();
-		Cache superCache2 = superCache1.mountNewCache().start();
+		Cache superCache1 = mainCache.mountNewCache();
+		Cache superCache2 = superCache1.mountNewCache();
 
 		assert mainCache.getLevel() == 1;
 		assert superCache1.getLevel() == 2;
@@ -47,7 +46,7 @@ public class CacheTest extends AbstractTest {
 
 	public void testFlushAndUnmountSuperCacheOk() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Cache cache2 = cache.mountNewCache().start();
+		Cache cache2 = cache.mountNewCache();
 		assert Objects.equals(cache2.flushAndUnmount(), cache);
 	}
 
@@ -58,7 +57,7 @@ public class CacheTest extends AbstractTest {
 
 	public void testDiscardAndUnmountSuperCacheOk() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Cache cache2 = cache.mountNewCache().start();
+		Cache cache2 = cache.mountNewCache();
 		assert Objects.equals(cache2.discardAndUnmount(), cache);
 	}
 
