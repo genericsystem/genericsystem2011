@@ -14,6 +14,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -516,6 +517,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				}
 			}
 
+			@SuppressWarnings("unchecked")
 			<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic meta, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
 				return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) meta) {
 
