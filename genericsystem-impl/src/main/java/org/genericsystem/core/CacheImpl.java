@@ -913,19 +913,19 @@ public class CacheImpl extends AbstractContext implements Cache {
 			switch (removeStrategy) {
 			case NORMAl:
 				orderAndRemoveDependenciesForRemove(generic);
-			break;
+				break;
 			case CONSERVE:
 				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
 				dependencies.remove(generic);
 				for (Generic dependency : dependencies)
 					bind(((GenericImpl) dependency).getHomeTreeNode(), dependency.getMeta(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), true, Statics.MULTIDIRECTIONAL);
-			break;
+				break;
 			case FORCE:
 				orderAndRemoveDependencies(generic);
-			break;
+				break;
 			case PROJECT:
-			// TODO impl
-			break;
+				// TODO impl
+				break;
 			}
 		}
 
