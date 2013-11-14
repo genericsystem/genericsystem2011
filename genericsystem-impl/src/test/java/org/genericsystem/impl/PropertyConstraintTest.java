@@ -213,7 +213,6 @@ public class PropertyConstraintTest extends AbstractTest {
 		assert !myVehicle235.isAlive();
 		assert myVehicle.getHolder(power).inheritsFrom(vehicle233);
 		assert myVehicle.getValue(power).equals(235);
-
 	}
 
 	public void testOK() {

@@ -559,13 +559,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 			{
 				for (Generic superGeneric : supers) {
 					Iterator<Generic> removeIterator = concernedDependenciesIterator(superGeneric, primaries, components, isProperty, isSingular, basePos);
-					while (removeIterator.hasNext()) {
-						Generic next = removeIterator.next();
-						addAll(orderDependencies((GenericImpl) next));
-					}
+					while (removeIterator.hasNext())
+						addAll(orderDependencies((GenericImpl) removeIterator.next()));
 				}
 			}
 
+			@SuppressWarnings("unchecked")
 			<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic meta, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
 				return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) meta) {
 
@@ -583,7 +582,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 						if (Statics.MULTIDIRECTIONAL != basePos) {
 							if (meta.getMetaLevel() != node.getMetaLevel())
 								if (basePos < ((GenericImpl) node).components.length && ((GenericImpl) node).components[basePos].inheritsFrom(components[basePos]))
-									if (isSingular || isProperty && (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) node).components), Statics.truncate(basePos, components))))
+									if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, ((GenericImpl) node).components), Statics.truncate(basePos, components))))
 										return Collections.emptyIterator();
 						}
 						return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
@@ -597,7 +596,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 						if (Statics.MULTIDIRECTIONAL != basePos) {
 							if (meta.getMetaLevel() != next.getMetaLevel())
 								if (basePos < ((GenericImpl) next).components.length && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos])) {
-									if (isSingular || (isProperty && (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) next).components), Statics.truncate(basePos, components)))))
+									if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, ((GenericImpl) next).components), Statics.truncate(basePos, components))))
 										return true;
 								}
 						}
