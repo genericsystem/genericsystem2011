@@ -2,7 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
-import org.genericsystem.generic.Attribute;
+
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.MapProvider;
@@ -102,13 +102,6 @@ public interface Generic extends Comparable<Generic> {
 	 * @return True if the Generic is an Relation.
 	 */
 	boolean isRelation();
-
-	// /**
-	// * Returns true if this Generic has been automatically created.
-	// *
-	// * @return True if this Generic has been automatically created.
-	// */
-	// boolean isAutomatic();
 
 	/**
 	 * Returns the value of this Generic.
@@ -497,13 +490,6 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	boolean isReferentialIntegrity(int componentPos);
 
-	// /**
-	// * Returns the implicit.
-	// *
-	// * @return The implicit.
-	// */
-	// <T extends Generic> T getImplicit();
-
 	/**
 	 * Returns the supers of the Generic.
 	 * 
@@ -649,25 +635,31 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	String info();
 
-	void clearAll(Holder attribute, int metaLevel, Generic... targets);
+	/**
+	 * remove or override value.
+	 * 
+	 * @param holder
+	 */
+	void cancel(Holder holder);
 
-	void clearAll(Holder attribute, int metaLevel, int basePos, Generic... targets);
+	void cancelAll(Holder attribute, Generic... targets);
 
-	void cancelAll(Holder attribute, int metaLevel, Generic... targets);
+	void cancelAll(Holder attribute, int basePos, Generic... targets);
 
-	void cancelAll(Holder attribute, int basePos, int metaLevel, Generic... targets);
+	/**
+	 * remove value
+	 * 
+	 * @param holder
+	 */
+	void clear(Holder holder);
 
-	<T extends Generic> T cancel(Holder attribute, Generic... targets);
+	void clearAll(Holder attribute, Generic... targets);
 
-	<T extends Generic> T cancel(Holder attribute, int basePos, Generic... targets);
+	void clearAll(Holder attribute, int basePos, Generic... targets);
 
 	<Key extends Serializable, Value extends Serializable> Map<Key, Value> getMap(Class<? extends MapProvider> mapClass);
 
 	<Key extends Serializable, Value extends Serializable> Map<Key, Value> getPropertiesMap();
-
-	// <Key extends Serializable> Map<Key, Serializable> getConstraintsMap();
-	//
-	// <Key extends Serializable> Map<Key, Serializable> getSystemPropertiesMap();
 
 	<T extends Generic> T addComponent(int pos, Generic newComponent);
 
@@ -681,13 +673,9 @@ public interface Generic extends Comparable<Generic> {
 
 	<T extends Generic> Snapshot<T> getOtherTargets(Holder holder);
 
-	void removeHolder(Holder holder);
-
 	<T extends Holder> Snapshot<T> getHolders(Holder attribute, boolean readPhantoms, Generic... targets);
 
 	<T extends Holder> Snapshot<T> getHolders(Holder attribute, int basePos, boolean readPhantoms, Generic... targets);
-
-	void removePhantoms(Attribute attribute);
 
 	boolean fastValueEquals(Generic generic);
 }

@@ -10,6 +10,8 @@ import javax.inject.Named;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.map.ConstraintsMapProvider;
+import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.gui.GuiGenericsTreeNode;
 import org.genericsystem.myadmin.util.GsMessages;
@@ -123,7 +125,7 @@ public class WrapperBean {
 
 		public void setValue(Boolean newValue) {
 			if (!newValue.equals(entry.getValue())) {
-				genericTreeBean.getSelectedTreeNode().getGeneric().getConstraintsMap().put(entry.getKey(), newValue);
+				genericTreeBean.getSelectedTreeNode().getGeneric().getMap(ConstraintsMapProvider.class).put(entry.getKey(), newValue);
 				messages.info("updateValue", entry.getValue(), newValue);
 			}
 		}
@@ -142,7 +144,7 @@ public class WrapperBean {
 
 		public void setValue(Boolean newValue) {
 			if (!newValue.equals(entry.getValue())) {
-				genericTreeBean.getSelectedTreeNode().getGeneric().getSystemPropertiesMap().put(entry.getKey(), newValue);
+				genericTreeBean.getSelectedTreeNode().getGeneric().getMap(SystemPropertiesMapProvider.class).put(entry.getKey(), newValue);
 				messages.info("updateValue", entry.getValue(), newValue);
 			}
 		}
