@@ -452,6 +452,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return -1;// Unreachable
 	}
 
+	private GenericImpl getMeta(Class<?> clazz, Generic[] components) {
+		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
+		Class<?> meta = extendsAnnotation == null || Engine.class.equals(extendsAnnotation.meta()) ? EngineImpl.class : extendsAnnotation.meta();
+		if (EngineImpl.class.equals(meta)) {
+			if (components.length == 0 || MetaAttribute.class.equals(clazz))
+				return getEngine();
+			else if (components.length == 1 || MetaRelation.class.equals(clazz))
+				meta = MetaAttribute.class;
+			else
+				meta = MetaRelation.class;
+		}
+		return this.<GenericImpl> find(meta);
+	}
+
 	<T extends Generic> T bind(Generic meta, Serializable value, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
 		return bind(((GenericImpl) meta).bindInstanceNode(value), meta, supers, components, specializationClass, existsException, basePos);
 	}
@@ -544,20 +558,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		T bind = buildAndInsertComplex(homeTreeNode, ((GenericImpl) meta).specializeInstanceClass(specializationClass), directSupers.toArray(new Generic[directSupers.size()]), components);
 		connectionMap.reBind(homeTreeNode, bind, orderedDependencies, isProperty, isSingular, basePos);
 		return bind;
-	}
-
-	private GenericImpl getMeta(Class<?> clazz, Generic[] components) {
-		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
-		Class<?> meta = extendsAnnotation == null || Engine.class.equals(extendsAnnotation.meta()) ? EngineImpl.class : extendsAnnotation.meta();
-		if (EngineImpl.class.equals(meta)) {
-			if (components.length == 0 || MetaAttribute.class.equals(clazz))
-				return getEngine();
-			else if (components.length == 1 || MetaRelation.class.equals(clazz))
-				meta = MetaAttribute.class;
-			else
-				meta = MetaRelation.class;
-		}
-		return this.<GenericImpl> find(meta);
 	}
 
 	private NavigableSet<Generic> getConcernedDependencies(final Generic[] supers, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
@@ -913,19 +913,19 @@ public class CacheImpl extends AbstractContext implements Cache {
 			switch (removeStrategy) {
 			case NORMAl:
 				orderAndRemoveDependenciesForRemove(generic);
-				break;
+			break;
 			case CONSERVE:
 				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
 				dependencies.remove(generic);
 				for (Generic dependency : dependencies)
 					bind(((GenericImpl) dependency).getHomeTreeNode(), dependency.getMeta(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), true, Statics.MULTIDIRECTIONAL);
-				break;
+			break;
 			case FORCE:
 				orderAndRemoveDependencies(generic);
-				break;
+			break;
 			case PROJECT:
-				// TODO impl
-				break;
+			// TODO impl
+			break;
 			}
 		}
 
