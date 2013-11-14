@@ -11,7 +11,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -165,7 +164,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private abstract class UnsafeCacheManager<T> {
 		private final UnsafeCache unsafeCache = new UnsafeCache(CacheImpl.this);
 
-		T doWork() {
+		T doWork() throws RollbackException {
 			try {
 				unsafeCache.start();
 				T result = internalWork(unsafeCache);
@@ -400,9 +399,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] userSupers, Generic... components) {
-		T result = bind(getEngine(), value, userSupers, components, null, false, Statics.MULTIDIRECTIONAL);
-		assert Objects.equals(value, result.getValue());
-		return result;
+		return bind(getEngine(), value, userSupers, components, null, false, Statics.MULTIDIRECTIONAL);
 	}
 
 	@Override
@@ -415,30 +412,24 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<T> bind(getEngine(), value, new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, false, Statics.MULTIDIRECTIONAL);
 	}
 
-	// TODO start new Cache ???
+	// TODO newCache not started ?
 	@Override
 	public Cache mountNewCache() {
 		return new CacheImpl(this);
 	}
 
-	// TODO start subContext ???
+	// TODO subContext not started ?
 	@Override
 	public Cache flushAndUnmount() {
-		this.flush();
-		AbstractContext subContext = this.getSubContext();
-		if (subContext instanceof Cache)
-			return (Cache) subContext;
-		return this;
+		flush();
+		return subContext instanceof Cache ? (Cache) subContext : this;
 	}
 
-	// TODO start subContext ???
+	// TODO subContext not started ?
 	@Override
 	public Cache discardAndUnmount() {
-		this.clear();
-		AbstractContext subContext = this.getSubContext();
-		if (subContext instanceof Cache)
-			return (Cache) subContext;
-		return this;
+		clear();
+		return subContext instanceof Cache ? (Cache) subContext : this;
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
@@ -454,13 +445,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return bind(meta, value, new Generic[] { directSuper }, sortAndCheck, specializationClass, existsException, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe);
 	}
 
-	int findAxe(Generic[] sorts, Generic baseComponent) {
-		for (int i = 0; i < sorts.length; i++) {
-			Generic sort = sorts[i];
-			if (baseComponent.equals(sort))
+	int findAxe(Generic[] sorts, Generic baseComponent) throws RollbackException {
+		for (int i = 0; i < sorts.length; i++)
+			if (baseComponent.equals(sorts[i]))
 				return i;
-		}
-		throw new IllegalStateException();
+		rollback(new IllegalStateException());
+		return -1;// Unreachable
 	}
 
 	<T extends Generic> T bind(Generic meta, Serializable value, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
@@ -472,7 +462,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, Generic meta, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
+	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, Generic meta, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) throws RollbackException {
 		assert homeTreeNode.getMetaLevel() <= 2;
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
@@ -883,7 +873,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		<T extends Generic> T unsafeRemoveSuper(final Generic old, final int pos) throws ConstraintViolationException {
 			if (pos == 0 && ((GenericImpl) old).supers.length == 1)
-				rollback(new UnsupportedOperationException());
+				rollback(new UnsupportedOperationException());// kk ?
 			return new Restructurator() {
 				@Override
 				Generic rebuild() {

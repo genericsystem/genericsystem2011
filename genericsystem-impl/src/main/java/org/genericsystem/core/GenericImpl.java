@@ -28,6 +28,7 @@ import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AmbiguousSelectionException;
+import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -126,11 +127,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
 		for (Generic superGeneric : supers) {
 			if (this.equals(superGeneric) && !isEngine())
-				throw new IllegalStateException();
+				getCurrentCache().rollback(new IllegalStateException());
 			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-				throw new IllegalStateException();
+				getCurrentCache().rollback(new IllegalStateException());
 			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-				throw new IllegalStateException();
+				getCurrentCache().rollback(new IllegalStateException());
 		}
 		return this;
 	}
@@ -175,7 +176,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T getMeta() {
+	public <T extends Generic> T getMeta() throws RollbackException {
 		HomeTreeNode metaNode = homeTreeNode.metaNode;
 		for (Generic superGeneric : supers)
 			if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
@@ -183,7 +184,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic superGeneric : supers)
 			if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
 				return superGeneric.getMeta();
-		throw new IllegalStateException();
+		getCurrentCache().rollback(new IllegalStateException("Unable to find a meta for : " + this.info()));
+		return null;// Unreachable
 	}
 
 	@Override
@@ -704,12 +706,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			this.max = max;
 		}
 
-		public int getFreePosition(Generic component) {
+		public int getFreePosition(Generic component) throws RollbackException {
 			int freePosition = 0;
 			while (contains(freePosition) || (freePosition < components.length && !component.inheritsFrom(components[freePosition])))
 				freePosition++;
 			if (freePosition >= max)
-				throw new IllegalStateException("Unable to find a valid position for : " + component + " " + Arrays.toString(components) + " " + max);
+				getCurrentCache().rollback(new IllegalStateException("Unable to find a valid position for : " + component + " " + Arrays.toString(components) + " " + max));
 			add(freePosition);
 			return freePosition;
 		}
@@ -1008,7 +1010,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return "(" + getCategoryString() + ") " + toString();
 	}
 
-	public String getCategoryString() {
+	public String getCategoryString() throws RollbackException {
 		int metaLevel = getMetaLevel();
 		int dim = getComponentsSize();
 		switch (metaLevel) {
@@ -1046,7 +1048,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return "NLink";
 			}
 		default:
-			throw new IllegalStateException();
+			getCurrentCache().rollback(new IllegalStateException());
+			return null;// Uneachable
 		}
 	}
 
@@ -1683,7 +1686,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.getValue() instanceof Class && AbstractMapProvider.class.isAssignableFrom((Class<?>) this.getValue());
 	}
 
-	public <T> T unambigousFirst(Iterator<T> iterator) {
+	public <T> T unambigousFirst(Iterator<T> iterator) throws RollbackException {
 		if (!iterator.hasNext())
 			return null;
 		T result = iterator.next();
