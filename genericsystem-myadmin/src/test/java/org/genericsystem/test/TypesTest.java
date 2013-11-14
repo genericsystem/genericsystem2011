@@ -86,10 +86,10 @@ public class TypesTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		myVehicle.getMap(ConstraintsMapProvider.class);
 		Holder myVehicle123 = myVehicle.setValue(vehiclePower, "123");
-		myVehicle.removeHolder(myVehicle123);
+		myVehicle.cancel(myVehicle123);
 		assert !myVehicle123.isAlive();
 		// assert !myVehicle123.getImplicit().isAlive();
-		vehicle.removeHolder(vehiclePower);
+		vehicle.cancel(vehiclePower);
 		assert !vehiclePower.isAlive();
 		// assert !vehiclePower.getImplicit().isAlive();
 		GenericBean gb = new GenericBean();

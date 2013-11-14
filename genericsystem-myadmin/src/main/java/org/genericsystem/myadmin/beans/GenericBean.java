@@ -41,21 +41,26 @@ public class GenericBean implements Serializable {
 	private UIMenuGroup menuGroup;
 
 	/* Injected beans */
-	@Inject transient CacheProvider cacheProvider;
-	@Inject private GsMessages messages;
-	@Inject private GuiGenericsTreeBean genericTreeBean;
-	@Inject MessageFactory factory;
+	@Inject
+	transient CacheProvider cacheProvider;
+	@Inject
+	private GsMessages messages;
+	@Inject
+	private GuiGenericsTreeBean genericTreeBean;
+	@Inject
+	MessageFactory factory;
 
 	private List<StructuralWrapper> structuralWrappers = new ArrayList<>();
 
 	/**
 	 * Creates a new type in current cache.
 	 * 
-	 * @param typeName - the name of new type.
+	 * @param typeName
+	 *            - the name of new type.
 	 */
 	public void newType(String typeName) {
 		cacheProvider.getCurrentCache().newType(typeName);
-		//genericTreeBean.rebuildTree();
+		// genericTreeBean.rebuildTree();
 		genericTreeBean.getSelectedTreeNode().updateChildren();
 
 		messages.info("createRootType", typeName);
@@ -64,7 +69,8 @@ public class GenericBean implements Serializable {
 	/**
 	 * Creates a new sub type of currently selected type generic.
 	 * 
-	 * @param subTypeName - the name of new sub type.
+	 * @param subTypeName
+	 *            - the name of new sub type.
 	 */
 	public void newSubType(String subTypeName) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).newSubType(subTypeName);
@@ -77,7 +83,8 @@ public class GenericBean implements Serializable {
 	/**
 	 * Creates a new attribute on currently selected type generic.
 	 * 
-	 * @param attributeName - the name of attribute.
+	 * @param attributeName
+	 *            - the name of attribute.
 	 */
 	public void setAttribute(String attributeName) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).setAttribute(attributeName);
@@ -88,8 +95,10 @@ public class GenericBean implements Serializable {
 	/**
 	 * Creates a new property on currently selected type generic.
 	 * 
-	 * @param key - key of property.
-	 * @param value - value of property.
+	 * @param key
+	 *            - key of property.
+	 * @param value
+	 *            - value of property.
 	 */
 	public void addProperty(String key, String value) {
 		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getPropertiesMap().put(key, value);
@@ -125,7 +134,7 @@ public class GenericBean implements Serializable {
 	}
 
 	public void remove(Holder holder) {
-		genericTreeBean.getSelectedTreeNode().getGeneric().removeHolder(holder);
+		genericTreeBean.getSelectedTreeNode().getGeneric().cancel(holder);
 		genericTreeBean.updateTree();
 
 		messages.info("remove", holder);
@@ -178,11 +187,8 @@ public class GenericBean implements Serializable {
 		for (Generic generic : ((Type) getGeneric()).getAttributes()) {
 			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
 			uiMenuItem.setLabel(factory.info(new BundleKey(MESSAGES_BUNDLE_NAME, "itmShowValuesOf"), generic.toString()).build().getText());
-			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory().createMethodExpression(
-					facesContext.getELContext(),
-					"#{guiGenericsTreeBean.changeAttributeSelected(" + i + ")}",
-					void.class,
-					new Class<?>[] { Integer.class });
+			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory()
+					.createMethodExpression(facesContext.getELContext(), "#{guiGenericsTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
 			uiMenuItem.setActionExpression(methodExpression);
 			uiMenuItem.setRender("typestree, typestreetitle, editTypesManager");
 			menuGroup.getChildren().add(uiMenuItem);

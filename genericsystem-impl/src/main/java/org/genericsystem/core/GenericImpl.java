@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -310,44 +311,41 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T cancel(Holder attribute, Generic... targets) {
-		return cancel(attribute, getBasePos(attribute), targets);
+	public void cancelAll(Holder attribute, Generic... targets) {
+		cancelAll(attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
-	public <T extends Generic> T cancel(Holder attribute, int basePos, Generic... targets) {
-		return addHolder(attribute, null, basePos, attribute.getMetaLevel(), Statics.truncate(basePos, ((GenericImpl) attribute).components));
+	public void cancelAll(Holder attribute, int basePos, Generic... targets) {
+		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, attribute.getMetaLevel() + 1, basePos, targets);
+		while (holders.hasNext())
+			cancel(holders.next());
 	}
 
 	@Override
-	public void cancelAll(Holder attribute, int metaLevel, Generic... targets) {
-		cancelAll(attribute, getBasePos(attribute), metaLevel, targets);
+	public void cancel(Holder holder) {
+		if (equals(holder.getBaseComponent()))
+			holder.remove();
+		else
+			addHolder(holder, null, getBasePos(holder), holder.getMetaLevel(), Statics.truncate(getBasePos(holder), ((GenericImpl) holder).components));
 	}
 
 	@Override
-	public void cancelAll(Holder attribute, int basePos, int metaLevel, Generic... targets) {
-		for (Holder holder : Statics.CONCRETE == metaLevel ? getHolders((Attribute) attribute, basePos, targets) : getAttributes((Attribute) attribute)) {
-			if (this.equals(holder.getComponent(basePos))) {
-				holder.remove();
-				cancelAll(attribute, basePos, metaLevel, targets);
-			} else
-				cancel(holder, basePos, targets);
-		}
+	public void clearAll(Holder attribute, Generic... targets) {
+		clearAll(attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
-	public void clearAll(Holder attribute, int metaLevel, Generic... targets) {
-		clearAll(attribute, metaLevel, getBasePos(attribute), targets);
+	public void clearAll(Holder attribute, int basePos, Generic... targets) {
+		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, attribute.getMetaLevel() + 1, basePos, targets);
+		while (holders.hasNext())
+			clear(holders.next());
 	}
 
 	@Override
-	public void clearAll(Holder attribute, int metaLevel, int basePos, Generic... targets) {
-		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, metaLevel, basePos, targets);
-		while (holders.hasNext()) {
-			Holder holder = holders.next();
-			if (this.equals(holder.getComponent(basePos)))
-				holder.remove();
-		}
+	public void clear(Holder holder) {
+		if (equals(holder.getBaseComponent()))
+			holder.remove();
 	}
 
 	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
@@ -357,14 +355,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return !GenericImpl.this.equals(next);
 			}
 		};
-	}
-
-	@Override
-	public void removeHolder(Holder holder) {
-		if (equals(holder.getBaseComponent()))
-			holder.remove();
-		else
-			cancel(holder);
 	}
 
 	@Override
@@ -403,16 +393,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	@Override
-	public void removePhantoms(Attribute attribute) {
-		Snapshot<Holder> holders = getHolders(attribute, true);
-		Iterator<Holder> iterator = holders.iterator();
-		while (iterator.hasNext()) {
-			Holder holder = iterator.next();
-			if (holder.getValue() == null)
-				holder.remove();
-		}
-	}
+	// TODO clean
+	// @Override
+	// public void removePhantoms(Attribute attribute) {
+	// Snapshot<Holder> holders = getHolders(attribute, true);
+	// Iterator<Holder> iterator = holders.iterator();
+	// while (iterator.hasNext()) {
+	// Holder holder = iterator.next();
+	// if (holder.getValue() == null)
+	// holder.remove();
+	// }
+	// }
 
 	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Relation relation, final Generic... targets) {
