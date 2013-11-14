@@ -149,13 +149,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return true;
 	}
 
-	void remove(final Generic generic) throws RollbackException {
+	void remove(final Generic generic, final RemoveStrategy removeStrategy) throws RollbackException {
 		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
 			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
 		new UnsafeCacheManager<Object>() {
 			@Override
 			Object internalWork(UnsafeCache unsafeCache) throws ConstraintViolationException {
-				unsafeCache.unsafeRemove(generic);
+				unsafeCache.unsafeRemove(generic, removeStrategy);
 				return null;
 			}
 		}.doWork();
@@ -262,6 +262,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
 			for (Generic orderedDependency : orderedDependencies) {
+				orderedDependency.log();
 				Generic build = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(), adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components));
 				put(orderedDependency, build);
 			}
@@ -819,6 +820,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
 					HomeTreeNode[] primaries = Statics.replace(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode(), newHomeTreeNode);
 					Arrays.sort(primaries);
+					// TODO call internalBind whitout rebind dependencies
 					return internalBind(newHomeTreeNode, old.getMeta(), primaries, ((GenericImpl) old).selfToNullComponents(), old.getClass(), false, Statics.MULTIDIRECTIONAL);
 				}
 
@@ -852,10 +854,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(old);
 		}
 
-		void unsafeRemove(Generic generic) throws ConstraintViolationException {
+		void unsafeRemove(Generic generic, RemoveStrategy removeStrategy) throws ConstraintViolationException {
 			if (!isAlive(generic))
 				throw new AliveConstraintViolationException(generic + " is not alive");
-			orderAndRemoveDependenciesForRemove(generic);
+			switch (removeStrategy) {
+			case NORMAl:
+				orderAndRemoveDependenciesForRemove(generic);
+				break;
+			case CONSERVE:
+				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
+				dependencies.remove(generic);
+				for (Generic dependency : dependencies)
+					bind(((GenericImpl) dependency).getHomeTreeNode(), dependency.getMeta(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), true, Statics.MULTIDIRECTIONAL);
+				break;
+			case FORCE:
+				orderAndRemoveDependencies(generic);
+				break;
+			case PROJECT:
+				// TODO impl
+				break;
+			}
 		}
 
 		<T extends Generic> T unsafeRemoveSuper(final Generic old, final int pos) throws ConstraintViolationException {

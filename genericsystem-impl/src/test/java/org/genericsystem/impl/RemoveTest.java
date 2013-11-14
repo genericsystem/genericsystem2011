@@ -4,6 +4,7 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.RemoveStrategy;
 import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.generic.Attribute;
@@ -143,7 +144,7 @@ public class RemoveTest extends AbstractTest {
 
 		Generic red = color.newInstance("Red");
 		Generic grey = color.newInstance("Grey");
-		Link defaultCarColor = car.setLink(carColor, "DefaultCarColor", red);	// default color of car
+		Link defaultCarColor = car.setLink(carColor, "DefaultCarColor", red); // default color of car
 
 		final Generic bmw = car.newInstance("Bmw");
 		Generic mercedes = car.newInstance("Mercedes");
@@ -152,11 +153,11 @@ public class RemoveTest extends AbstractTest {
 
 		red.getLink(carColor, lada).setValue(intensity, "60%");
 
-		defaultCarColor.remove();
+		defaultCarColor.remove(RemoveStrategy.FORCE);
 
 		/* Links BMW <-> Red and Lada <-> Red disappear and Mercedes <-> Grey stay */
 		assert bmw.getLink(carColor, red) == null;
-		assert mercedes.getLink(carColor, grey) != null;
+		assert mercedes.getLink(carColor, grey) == null;
 		assert lada.getLink(carColor, red) == null;
 
 		/* No more lisnks from Red */

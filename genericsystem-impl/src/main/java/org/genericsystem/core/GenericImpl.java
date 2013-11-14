@@ -888,7 +888,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void remove() {
-		getCurrentCache().remove(this);
+		remove(RemoveStrategy.NORMAl);
+	}
+
+	@Override
+	public void remove(RemoveStrategy removeStrategy) {
+		getCurrentCache().remove(this, removeStrategy);
 	}
 
 	@Override

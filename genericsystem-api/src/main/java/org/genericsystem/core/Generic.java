@@ -454,6 +454,15 @@ public interface Generic extends Comparable<Generic> {
 	void remove();
 
 	/**
+	 * Remove the Generic.
+	 * 
+	 * @param removeStrategy
+	 *            strategy of remove
+	 * @see RemoveStrategy
+	 */
+	void remove(RemoveStrategy removeStrategy);
+
+	/**
 	 * Returns true if the Generic is alive
 	 * 
 	 * @return True if the Generic is alive.
