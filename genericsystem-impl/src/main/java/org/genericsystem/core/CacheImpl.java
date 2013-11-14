@@ -412,24 +412,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<T> bind(getEngine(), value, new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, false, Statics.MULTIDIRECTIONAL);
 	}
 
-	// TODO newCache not started ?
 	@Override
 	public Cache mountNewCache() {
-		return new CacheImpl(this);
+		return new CacheImpl(this).start();
 	}
 
-	// TODO subContext not started ?
 	@Override
 	public Cache flushAndUnmount() {
 		flush();
-		return subContext instanceof Cache ? (Cache) subContext : this;
+		return subContext instanceof Cache ? ((Cache) subContext).start() : this;
 	}
 
-	// TODO subContext not started ?
 	@Override
 	public Cache discardAndUnmount() {
 		clear();
-		return subContext instanceof Cache ? (Cache) subContext : this;
+		return subContext instanceof Cache ? ((Cache) subContext).start() : this;
 	}
 
 	<T extends Generic> T bind(Class<?> clazz) {
@@ -505,18 +502,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 		return this.<GenericImpl> find(meta);
 	}
-
-	// @SuppressWarnings("unchecked")
-	// private <T extends Generic> T getMeta(HomeTreeNode homeTreeNode, Generic[] supers) {
-	// HomeTreeNode metaNode = homeTreeNode.metaNode;
-	// for (Generic superGeneric : supers)
-	// if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
-	// return (T) superGeneric;
-	// for (Generic superGeneric : supers)
-	// if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
-	// return superGeneric.getMeta();
-	// throw new IllegalStateException();
-	// }
 
 	private NavigableSet<Generic> getConcernedDependencies(final Generic[] supers, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
 		return new TreeSet<Generic>() {

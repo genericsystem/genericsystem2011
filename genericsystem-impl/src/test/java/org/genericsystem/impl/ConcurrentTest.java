@@ -19,7 +19,7 @@ public class ConcurrentTest extends AbstractTest {
 		Engine engine = GenericSystem.newInMemoryEngine();
 		Cache cache = engine.newCache().start();
 		Type car = cache.newType("Car");
-		cache.mountNewCache().start();
+		cache.mountNewCache();
 
 		assert cache.isAlive(car);
 		assert engine.getInheritings().contains(car);
@@ -125,7 +125,7 @@ public class ConcurrentTest extends AbstractTest {
 		// cache1.activate();
 
 		cache1.start();
-		//		cache1.pickNewTs();
+		// cache1.pickNewTs();
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
