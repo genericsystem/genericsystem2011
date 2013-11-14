@@ -871,7 +871,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 				orderAndRemoveDependencies(generic);
 				break;
 			case PROJECT:
-				// TODO impl
+				Generic base = ((GenericImpl) generic).getBaseComponent();
+				((GenericImpl) generic).project(base.getBasePos((Holder) generic));
+				generic.remove();
 				break;
 			}
 		}

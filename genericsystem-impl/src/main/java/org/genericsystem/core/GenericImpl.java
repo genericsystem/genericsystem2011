@@ -750,7 +750,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private void project(final int pos) {
+	public void project(final int pos) {
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final Generic[] components = (Generic[]) cartesianIterator.next();
