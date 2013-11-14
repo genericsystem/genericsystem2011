@@ -39,6 +39,7 @@ import org.genericsystem.iterator.AbstractAwareIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
+import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.map.AbstractMapProvider.AbstractExtendedMap;
 import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
@@ -452,6 +453,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return -1;// Unreachable
 	}
 
+	private GenericImpl getMeta(Class<?> clazz, Generic[] components) {
+		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
+		Class<?> meta = extendsAnnotation == null || Engine.class.equals(extendsAnnotation.meta()) ? EngineImpl.class : extendsAnnotation.meta();
+		if (EngineImpl.class.equals(meta)) {
+			if (components.length == 0 || MetaAttribute.class.equals(clazz))
+				return getEngine();
+			else if (components.length == 1 || MetaRelation.class.equals(clazz))
+				meta = MetaAttribute.class;
+			else
+				meta = MetaRelation.class;
+		}
+		return this.<GenericImpl> find(meta);
+	}
+
 	<T extends Generic> T bind(Generic meta, Serializable value, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
 		return bind(((GenericImpl) meta).bindInstanceNode(value), meta, supers, components, specializationClass, existsException, basePos);
 	}
@@ -460,11 +475,66 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return internalBind(homeTreeNode, meta, new Primaries(homeTreeNode, supers).toArray(), components, specializationClass, existsException, basePos);
 	}
 
+	protected NavigableSet<Generic> getExtendedDirectSupers(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
+		return new TreeSet<Generic>() {
+			private static final long serialVersionUID = 8568383988023387246L;
+			{
+				Iterator<Generic> iterator = getExtendedDirectSupersIterator(meta, isProperty, isSingular, basePos, primaries, components);
+				while (iterator.hasNext())
+					add(iterator.next());
+			}
+
+			Iterator<Generic> getExtendedDirectSupersIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
+				return new AbstractSelectableLeafIterator(getEngine()) {
+
+					@Override
+					protected boolean isSelectable() {
+						return true;
+					}
+
+					@Override
+					public boolean isSelected(Generic candidate) {
+						boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
+						if (result)
+							return true;
+						if (basePos != Statics.MULTIDIRECTIONAL)
+							if (GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components)) {
+								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
+									if (basePos < ((GenericImpl) candidate).components.length && !components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
+										if (components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos])) {
+											if (!candidate.inheritsFrom(find(NoInheritanceSystemType.class)))
+												if (isSingular || isProperty && (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components))))
+													return true;
+
+										}
+									} else {
+										if (((GenericImpl) candidate).equiv(new Primaries(candidate, primaries).toArray(), GenericImpl.enrich(components, ((GenericImpl) candidate).components)))
+											return true;
+									}
+								}
+							}
+						return false;
+					}
+				};
+			}
+		};
+	}
+
+	private Generic internalRebind(HomeTreeNode homeTreeNode, Generic dependency, HomeTreeNode[] primaries, Generic[] components, boolean isProperty, boolean isSingular, int basePos) {
+		NavigableSet<Generic> directSupers = getExtendedDirectSupers(dependency.getMeta(), isProperty, isSingular, basePos, primaries, components);
+		for (Generic directSuper : directSupers) {
+			primaries = new Primaries(directSuper, primaries).toArray();
+			components = GenericImpl.enrich(components, ((GenericImpl) directSuper).components);
+		}
+		return buildAndInsertComplex(homeTreeNode, dependency.getClass(), directSupers.toArray(new Generic[directSupers.size()]), components);
+	}
+
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, Generic meta, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) throws RollbackException {
 		assert homeTreeNode.getMetaLevel() <= 2;
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
+
 		NavigableSet<Generic> directSupers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, primaries, components);
 		for (Generic directSuper : directSupers) {
 			primaries = new Primaries(directSuper, primaries).toArray();
@@ -491,20 +561,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return bind;
 	}
 
-	private GenericImpl getMeta(Class<?> clazz, Generic[] components) {
-		Extends extendsAnnotation = clazz.getAnnotation(Extends.class);
-		Class<?> meta = extendsAnnotation == null || Engine.class.equals(extendsAnnotation.meta()) ? EngineImpl.class : extendsAnnotation.meta();
-		if (EngineImpl.class.equals(meta)) {
-			if (components.length == 0 || MetaAttribute.class.equals(clazz))
-				return getEngine();
-			else if (components.length == 1 || MetaRelation.class.equals(clazz))
-				meta = MetaAttribute.class;
-			else
-				meta = MetaRelation.class;
-		}
-		return this.<GenericImpl> find(meta);
-	}
-
 	private NavigableSet<Generic> getConcernedDependencies(final Generic[] supers, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
 		return new TreeSet<Generic>() {
 			private static final long serialVersionUID = -38728500742395848L;
@@ -518,7 +574,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 				}
 			}
 
-			@SuppressWarnings("unchecked")
 			<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic meta, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
 				return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) meta) {
 
@@ -533,13 +588,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 						if (isAncestorOf(primaries, components, ((GenericImpl) node).primaries, ((GenericImpl) node).components))
 							return Collections.emptyIterator();
 
-						if (meta.getMetaLevel() != node.getMetaLevel()) {
-							if (isSingular && basePos < ((GenericImpl) node).components.length && ((GenericImpl) node).components[basePos].inheritsFrom(components[basePos]))
-								return Collections.emptyIterator();
-							if (isProperty && Arrays.equals(((GenericImpl) node).components, components))
-								return Collections.emptyIterator();
+						if (Statics.MULTIDIRECTIONAL != basePos) {
+							if (meta.getMetaLevel() != node.getMetaLevel())
+								if (basePos < ((GenericImpl) node).components.length && ((GenericImpl) node).components[basePos].inheritsFrom(components[basePos]))
+									if (isSingular || (isProperty && Arrays.equals(((GenericImpl) node).components, components)))
+										return Collections.emptyIterator();
 						}
-
 						return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
 					}
 				}) {
@@ -548,13 +602,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 						if (isAncestorOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
 							return true;
 
-						if (meta.getMetaLevel() != next.getMetaLevel()) {
-							if (isSingular && basePos < ((GenericImpl) next).components.length && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos]))
-								return true;
-							if (isProperty && Arrays.equals(((GenericImpl) next).components, components))
-								return true;
+						if (Statics.MULTIDIRECTIONAL != basePos) {
+							if (meta.getMetaLevel() != next.getMetaLevel())
+								if (basePos < ((GenericImpl) next).components.length && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos])) {
+									if (isSingular || (isProperty && Arrays.equals(((GenericImpl) next).components, components)))
+										return true;
+								}
 						}
-
 						return false;
 					}
 				};

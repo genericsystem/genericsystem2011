@@ -15,16 +15,13 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.annotation.value.StringValue;
-import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.map.AxedPropertyClass;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,53 +90,6 @@ public abstract class AbstractContext implements Serializable {
 	public abstract boolean isScheduledToRemove(Generic generic);
 
 	public abstract boolean isAutomatic(Generic generic);
-
-	protected NavigableSet<Generic> getExtendedDirectSupers(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
-		return new TreeSet<Generic>() {
-			private static final long serialVersionUID = 8568383988023387246L;
-			{
-				Iterator<Generic> iterator = getExtendedDirectSupersIterator(meta, isProperty, isSingular, basePos, primaries, components);
-				while (iterator.hasNext())
-					add(iterator.next());
-			}
-
-			Iterator<Generic> getExtendedDirectSupersIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
-				return new AbstractSelectableLeafIterator(getEngine()) {
-
-					@Override
-					protected boolean isSelectable() {
-						return true;
-					}
-
-					@Override
-					public boolean isSelected(Generic candidate) {
-						boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
-						if (result)
-							return true;
-						if (basePos != Statics.MULTIDIRECTIONAL)
-							if (GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components)) {
-								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
-									if (basePos < ((GenericImpl) candidate).components.length && !components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
-										if (components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos])) {
-											if (!candidate.inheritsFrom(find(NoInheritanceSystemType.class)))
-												if (isSingular)
-													return true;
-											if (isProperty)
-												if (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components)))
-													return true;
-										}
-									} else {
-										if (((GenericImpl) candidate).equiv(new Primaries(candidate, primaries).toArray(), GenericImpl.enrich(components, ((GenericImpl) candidate).components)))
-											return true;
-									}
-								}
-							}
-						return false;
-					}
-				};
-			}
-		};
-	}
 
 	@SuppressWarnings("unchecked")
 	public <T extends Generic> T reFind(Generic generic) {
