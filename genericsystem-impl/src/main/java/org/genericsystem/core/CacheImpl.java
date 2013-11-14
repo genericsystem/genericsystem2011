@@ -234,30 +234,32 @@ public class CacheImpl extends AbstractContext implements Cache {
 		private static final long serialVersionUID = 8257917150315417734L;
 
 		private ConnectionMap reBind(HomeTreeNode homeTreeNode, Generic bind, Set<Generic> orderedDependencies, boolean isProperty, boolean isSingular, int basePos) {
-			for (Generic orderedDependency : orderedDependencies) {
-				HomeTreeNode newHomeTreeNode = ((GenericImpl) orderedDependency).getHomeTreeNode();
-				HomeTreeNode[] newPrimaries = ((GenericImpl) orderedDependency).primaries;
-				Generic[] newComponents = adjust(((GenericImpl) orderedDependency).selfToNullComponents());
-
-				if (isSingular || isProperty) {
-					if (((GenericImpl) bind).getComponent(basePos).equals(((Holder) orderedDependency).getComponent(basePos)))
-						continue;
-					if (((GenericImpl) orderedDependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos]))
-						newPrimaries = Statics.insertFirst(homeTreeNode, ((GenericImpl) orderedDependency).primaries);
-					else {
-						newHomeTreeNode = homeTreeNode;
-						newPrimaries = Statics.replace(((GenericImpl) orderedDependency).primaries, ((GenericImpl) orderedDependency).getHomeTreeNode(), newHomeTreeNode);
+			for (Generic dependency : orderedDependencies) {
+				HomeTreeNode newHomeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
+				HomeTreeNode[] primaries = ((GenericImpl) dependency).primaries;
+				Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
+				if (Statics.MULTIDIRECTIONAL != basePos) {
+					if (((GenericImpl) bind).getComponent(basePos).equals(((Holder) dependency).getComponent(basePos)))
+						continue;// Nothing to do
+					if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, components), Statics.truncate(basePos, ((GenericImpl) bind).selfToNullComponents())))) {
+						if (!((GenericImpl) dependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos])) {
+							newHomeTreeNode = homeTreeNode;
+							primaries = Statics.replace(((GenericImpl) dependency).primaries, ((GenericImpl) dependency).getHomeTreeNode(), newHomeTreeNode);
+						}
 					}
 				}
-
-				NavigableSet<Generic> directSupers = getExtendedDirectSupers(orderedDependency.getMeta(), isProperty, isSingular, basePos, newPrimaries, newComponents);
-				for (Generic directSuper : directSupers) {
-					newPrimaries = new Primaries(directSuper, newPrimaries).toArray();
-					newComponents = GenericImpl.enrich(newComponents, ((GenericImpl) directSuper).components);
-				}
-				put(orderedDependency, buildAndInsertComplex(newHomeTreeNode, orderedDependency.getClass(), directSupers.toArray(new Generic[directSupers.size()]), newComponents));
+				put(dependency, internalRebind(newHomeTreeNode, dependency, primaries, components, isProperty, isSingular, basePos));
 			}
 			return this;
+		}
+
+		private Generic internalRebind(HomeTreeNode homeTreeNode, Generic dependency, HomeTreeNode[] primaries, Generic[] components, boolean isProperty, boolean isSingular, int basePos) {
+			NavigableSet<Generic> directSupers = getExtendedDirectSupers(dependency.getMeta(), isProperty, isSingular, basePos, primaries, components);
+			for (Generic directSuper : directSupers) {
+				primaries = new Primaries(directSuper, primaries).toArray();
+				components = GenericImpl.enrich(components, ((GenericImpl) directSuper).components);
+			}
+			return buildAndInsertComplex(homeTreeNode, dependency.getClass(), directSupers.toArray(new Generic[directSupers.size()]), components);
 		}
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
@@ -519,15 +521,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		};
 	}
 
-	private Generic internalRebind(HomeTreeNode homeTreeNode, Generic dependency, HomeTreeNode[] primaries, Generic[] components, boolean isProperty, boolean isSingular, int basePos) {
-		NavigableSet<Generic> directSupers = getExtendedDirectSupers(dependency.getMeta(), isProperty, isSingular, basePos, primaries, components);
-		for (Generic directSuper : directSupers) {
-			primaries = new Primaries(directSuper, primaries).toArray();
-			components = GenericImpl.enrich(components, ((GenericImpl) directSuper).components);
-		}
-		return buildAndInsertComplex(homeTreeNode, dependency.getClass(), directSupers.toArray(new Generic[directSupers.size()]), components);
-	}
-
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T internalBind(HomeTreeNode homeTreeNode, Generic meta, HomeTreeNode[] primaries, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) throws RollbackException {
 		assert homeTreeNode.getMetaLevel() <= 2;
@@ -590,7 +583,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 						if (Statics.MULTIDIRECTIONAL != basePos) {
 							if (meta.getMetaLevel() != node.getMetaLevel())
 								if (basePos < ((GenericImpl) node).components.length && ((GenericImpl) node).components[basePos].inheritsFrom(components[basePos]))
-									if (isSingular || (isProperty && Arrays.equals(((GenericImpl) node).components, components)))
+									if (isSingular || isProperty && (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) node).components), Statics.truncate(basePos, components))))
 										return Collections.emptyIterator();
 						}
 						return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
@@ -604,7 +597,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 						if (Statics.MULTIDIRECTIONAL != basePos) {
 							if (meta.getMetaLevel() != next.getMetaLevel())
 								if (basePos < ((GenericImpl) next).components.length && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos])) {
-									if (isSingular || (isProperty && Arrays.equals(((GenericImpl) next).components, components)))
+									if (isSingular || (isProperty && (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) next).components), Statics.truncate(basePos, components)))))
 										return true;
 								}
 						}

@@ -4,7 +4,6 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.PropertyConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -206,21 +205,15 @@ public class PropertyConstraintTest extends AbstractTest {
 	public void testMultipleDefaultValuesAttribute2() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.newType("Vehicle");
-		final Attribute equipment = vehicle.setAttribute("Equipment");
-		equipment.enablePropertyConstraint();
-		assert equipment.isPropertyConstraintEnabled();
+		final Attribute power = vehicle.setAttribute("Power");
+		power.enablePropertyConstraint();
 		final Generic myVehicle = vehicle.newInstance("myVehicle");
-		final Generic result = myVehicle.setValue(equipment, "ABS");
-		assert vehicle.getAllInstances().contains(myVehicle);
-		new RollbackCatcher() {
+		Holder myVehicle235 = myVehicle.setValue(power, 235);
+		Holder vehicle233 = vehicle.setValue(power, 233);
+		assert !myVehicle235.isAlive();
+		assert myVehicle.getHolder(power).inheritsFrom(vehicle233);
+		assert myVehicle.getValue(power).equals(235);
 
-			@Override
-			public void intercept() {
-				vehicle.setValue(equipment, "GPS");
-				cache.flush();
-				// assert ((GenericImpl) result).reFind() != null;
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
 	}
 
 	public void testOK() {

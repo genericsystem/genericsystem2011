@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.MapProvider;
@@ -374,6 +373,16 @@ public interface Generic extends Comparable<Generic> {
 	 * @return The Holder.
 	 */
 	<T extends Holder> T getHolder(int metaLevel, Holder attribute, int basePos, Generic... targets);
+
+	/**
+	 * Returns the Holder of value.
+	 * 
+	 * @param attribute
+	 *            The attribute.
+	 * 
+	 * @return The Holder.
+	 */
+	<T extends Holder> T getHolder(Holder attribute, Generic... targets);
 
 	/**
 	 * Returns the Holder of value.

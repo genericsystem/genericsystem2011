@@ -2,12 +2,10 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -117,10 +115,10 @@ public class NotNullConstraintTest extends AbstractTest {
 		final Generic myBmw = car.newInstance("myBmw");
 		Holder holder = car.setValue(registration, 235);
 		myBmw.setValue(holder, null);
-		assert myBmw.getValue(registration) == null : myBmw.getHolder(Statics.CONCRETE, registration);
+		assert myBmw.getValue(registration) == null : myBmw.getHolder(registration);
 		assert !myBmw.getValues(registration).isEmpty();
 		myBmw.setValue(registration, null);// No exception
-		assert myBmw.getValue(registration) == null : myBmw.getHolder(Statics.CONCRETE, registration);
+		assert myBmw.getValue(registration) == null : myBmw.getHolder(registration);
 	}
 
 	public void testEnabledConstraintOnASimpleTypeThenCreateAnAttribute() {

@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -266,7 +265,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Serializable> T getValue(Holder attribute) {
-		Link holder = getHolder(Statics.CONCRETE, attribute);
+		Link holder = getHolder(attribute);
 		return holder != null ? holder.<T> getValue() : null;
 	}
 
@@ -459,6 +458,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int metaLevel, int basePos, Generic... targets) {
 		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(metaLevel, attribute, basePos), attribute, targets);
+	}
+
+	@Override
+	public <T extends Holder> T getHolder(Holder attribute, Generic... targets) {
+		return getHolder(Statics.CONCRETE, attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
