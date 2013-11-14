@@ -661,10 +661,6 @@ public interface Generic extends Comparable<Generic> {
 
 	<Key extends Serializable, Value extends Serializable> Map<Key, Value> getPropertiesMap();
 
-	// <Key extends Serializable> Map<Key, Serializable> getConstraintsMap();
-	//
-	// <Key extends Serializable> Map<Key, Serializable> getSystemPropertiesMap();
-
 	<T extends Generic> T addComponent(int pos, Generic newComponent);
 
 	<T extends Generic> T removeComponent(int pos, Generic newComponent);

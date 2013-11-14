@@ -21,6 +21,8 @@ import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.map.ConstraintsMapProvider;
+import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.jboss.seam.international.status.MessageFactory;
@@ -107,13 +109,13 @@ public class GenericBean implements Serializable {
 	}
 
 	public void addContraint(String key, String value) {
-		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getConstraintsMap().put(key, value);
+		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getMap(ConstraintsMapProvider.class).put(key, value);
 
 		messages.info("createRootProperty", key, value);
 	}
 
 	public void addSystemProperty(String key, String value) {
-		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getSystemPropertiesMap().put(key, value);
+		((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getMap(SystemPropertiesMapProvider.class).put(key, value);
 
 		messages.info("createRootProperty", key, value);
 	}
@@ -159,12 +161,12 @@ public class GenericBean implements Serializable {
 	}
 
 	public void removeContraint(Entry<Serializable, Serializable> entry) {
-		removeEntry(genericTreeBean.getSelectedTreeNode().getGeneric().getConstraintsMap(), entry);
+		removeEntry(genericTreeBean.getSelectedTreeNode().getGeneric().getMap(ConstraintsMapProvider.class), entry);
 
 	}
 
 	public void removeSystemProperty(Entry<Serializable, Serializable> entry) {
-		removeEntry(genericTreeBean.getSelectedTreeNode().getGeneric().getSystemPropertiesMap(), entry);
+		removeEntry(genericTreeBean.getSelectedTreeNode().getGeneric().getMap(SystemPropertiesMapProvider.class), entry);
 	}
 
 	private void removeEntry(Map<Serializable, Serializable> map, Entry<Serializable, Serializable> entry) {
@@ -261,12 +263,12 @@ public class GenericBean implements Serializable {
 
 	@SuppressWarnings("unchecked")
 	public List<Entry<Serializable, Serializable>> getContraintsMap() {
-		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNode().getGeneric().getConstraintsMap().entrySet();
+		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNode().getGeneric().getMap(ConstraintsMapProvider.class).entrySet();
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Entry<Serializable, Serializable>> getSystemPropertiesMap() {
-		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNode().getGeneric().getSystemPropertiesMap().entrySet();
+		return (List<Entry<Serializable, Serializable>>) genericTreeBean.getSelectedTreeNode().getGeneric().getMap(SystemPropertiesMapProvider.class).entrySet();
 	}
 
 	public boolean isSingular(Structural structural) {
