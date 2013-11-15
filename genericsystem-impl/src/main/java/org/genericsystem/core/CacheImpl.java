@@ -14,6 +14,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -451,12 +452,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
-			for (Generic dependency : orderedDependencies) {
-				Generic[] supers = adjust(((GenericImpl) dependency).supers);
-				Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
-				put(dependency, buildAndInsertComplex(((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) dependency).getClass(), supers, components));
-			}
+			for (Generic dependency : orderedDependencies)
+				reBindDependency(dependency);
 			return this;
+		}
+
+		private void reBindDependency(Generic dependency) {
+			Generic[] supers = adjust(((GenericImpl) dependency).supers);
+			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
+			put(dependency, buildAndInsertComplex(((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) dependency).getClass(), supers, components));
 		}
 
 		private Generic[] adjust(Generic... oldComponents) {
@@ -491,7 +495,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		if (result != null)
 			return result;
 		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(new Generic[] { meta }, vertex, isProperty, isSingular, basePos);
-		log.info("Dependencies : " + orderedDependencies);
 		for (Generic dependency : orderedDependencies.descendingSet())
 			simpleRemove(dependency);
 
@@ -848,19 +851,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 			switch (removeStrategy) {
 			case NORMAl:
 				orderAndRemoveDependenciesForRemove(generic);
-			break;
+				break;
 			case CONSERVE:
 				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
 				dependencies.remove(generic);
 				for (Generic dependency : dependencies)
 					bind(((GenericImpl) dependency).getHomeTreeNode(), dependency.getMeta(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), true, Statics.MULTIDIRECTIONAL);
-			break;
+				break;
 			case FORCE:
 				orderAndRemoveDependencies(generic);
-			break;
+				break;
 			case PROJECT:
-			// TODO impl
-			break;
+				((GenericImpl) generic).project();
+				generic.remove(RemoveStrategy.CONSERVE);
+				break;
 			}
 		}
 
