@@ -14,6 +14,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -422,30 +423,39 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private class ConnectionMap extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 8257917150315417734L;
 
-		private ConnectionMap reBind(HomeTreeNode homeTreeNode, Generic bind, Set<Generic> orderedDependencies, boolean isProperty, boolean isSingular, int basePos) {
+		private ConnectionMap reBind(HomeTreeNode homeTreeNode, Generic bind, Set<Generic> orderedDependencies, int basePos) {
 			for (Generic dependency : orderedDependencies) {
-				HomeTreeNode newHomeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
-				HomeTreeNode[] primaries = ((GenericImpl) dependency).primaries;
-				Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
-				if (Statics.MULTIDIRECTIONAL != basePos) {
-					if (((GenericImpl) bind).getComponent(basePos).equals(((Holder) dependency).getComponent(basePos)))
-						continue;// Nothing to do
-					if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, components), Statics.truncate(basePos, ((GenericImpl) bind).selfToNullComponents())))) {
-						if (!((GenericImpl) dependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos])) {
+				if (Statics.MULTIDIRECTIONAL == basePos || !((GenericImpl) bind).getComponent(basePos).equals(((Holder) dependency).getComponent(basePos)))
+					reBindDependency(homeTreeNode, bind, dependency, basePos);
+			}
+			return this;
+		}
+
+		private void reBindDependency(HomeTreeNode homeTreeNode, Generic bind, Generic dependency, int basePos) {
+			HomeTreeNode newHomeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
+			HomeTreeNode[] primaries = ((GenericImpl) dependency).primaries;
+			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
+			Generic meta = adjust(((GenericImpl) dependency).getMeta())[0];
+			boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
+			boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
+			if (Statics.MULTIDIRECTIONAL != basePos) {
+				if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, components), Statics.truncate(basePos, ((GenericImpl) bind).selfToNullComponents())))) {
+					if (!((GenericImpl) dependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos])) {
+						if (!dependency.inheritsFrom(find(NoInheritanceSystemType.class))) {
 							newHomeTreeNode = homeTreeNode;
 							primaries = Statics.replace(((GenericImpl) dependency).primaries, ((GenericImpl) dependency).getHomeTreeNode(), newHomeTreeNode);
 						}
 					}
 				}
-				put(dependency, internalFindOrBuild(dependency.getMeta(), new Vertex(CacheImpl.this, newHomeTreeNode, primaries, components), dependency.getClass(), isProperty, isSingular, basePos, false));
 			}
-			return this;
+			put(dependency, internalFindOrBuild(meta, new Vertex(CacheImpl.this, newHomeTreeNode, primaries, components), dependency.getClass(), isProperty, isSingular, basePos, false));
 		}
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
-			for (Generic orderedDependency : orderedDependencies) {
-				Generic build = buildAndInsertComplex(((GenericImpl) orderedDependency).getHomeTreeNode(), orderedDependency.getClass(), adjust(((GenericImpl) orderedDependency).supers), adjust(((GenericImpl) orderedDependency).components));
-				put(orderedDependency, build);
+			for (Generic dependency : orderedDependencies) {
+				Generic[] supers = adjust(((GenericImpl) dependency).supers);
+				Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
+				put(dependency, buildAndInsertComplex(((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) dependency).getClass(), supers, components));
 			}
 			return this;
 		}
@@ -481,12 +491,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
-
 		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(new Generic[] { meta }, vertex, isProperty, isSingular, basePos);
-		for (Generic generic : orderedDependencies.descendingSet())
-			simpleRemove(generic);
+		for (Generic dependency : orderedDependencies.descendingSet())
+			simpleRemove(dependency);
+
 		T bind = buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents());
-		new ConnectionMap().reBind(vertex.getHomeTreeNode(), bind, orderedDependencies, isProperty, isSingular, basePos);
+		new ConnectionMap().reBind(vertex.getHomeTreeNode(), bind, orderedDependencies, basePos);
 		return bind;
 	}
 
@@ -838,19 +848,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 			switch (removeStrategy) {
 			case NORMAl:
 				orderAndRemoveDependenciesForRemove(generic);
-			break;
+				break;
 			case CONSERVE:
 				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
 				dependencies.remove(generic);
 				for (Generic dependency : dependencies)
 					bind(((GenericImpl) dependency).getHomeTreeNode(), dependency.getMeta(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), true, Statics.MULTIDIRECTIONAL);
-			break;
+				break;
 			case FORCE:
 				orderAndRemoveDependencies(generic);
-			break;
+				break;
 			case PROJECT:
-			// TODO impl
-			break;
+				((GenericImpl) generic).project();
+				generic.remove(RemoveStrategy.CONSERVE);
+				break;
 			}
 		}
 
