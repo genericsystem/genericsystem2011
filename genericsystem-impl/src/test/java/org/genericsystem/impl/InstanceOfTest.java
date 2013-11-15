@@ -4,7 +4,6 @@ import java.util.Objects;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
@@ -84,13 +83,13 @@ public class InstanceOfTest extends AbstractTest {
 		assert Objects.equals(myVehicle.getValue(vehiclePower), 90);
 		assert Objects.equals(myCar.getValue(vehiclePower), 235);
 
-		assert v90.equals(myVehicle.getHolder(Statics.CONCRETE, vehiclePower));
-		assert v235.equals(myCar.getHolder(Statics.CONCRETE, vehiclePower));
+		assert v90.equals(myVehicle.getHolder(vehiclePower));
+		assert v235.equals(myCar.getHolder(vehiclePower));
 
 		v90.remove();
 
 		assert myVehicle.getValue(vehiclePower) == null;
-		assert myVehicle.getHolder(Statics.CONCRETE, vehiclePower) == null;
+		assert myVehicle.getHolder(vehiclePower) == null;
 
 		cache.flush();
 	}

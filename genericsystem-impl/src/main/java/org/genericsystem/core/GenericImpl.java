@@ -265,7 +265,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Serializable> T getValue(Holder attribute) {
-		Link holder = getHolder(Statics.CONCRETE, attribute);
+		Link holder = getHolder(attribute);
 		return holder != null ? holder.<T> getValue() : null;
 	}
 
@@ -377,21 +377,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	@Override
-	public <T extends Holder> Snapshot<T> getHolders(Holder attribute, Generic... targets) {
-		return getHolders(attribute, getBasePos(attribute), targets);
-	}
-
-	@Override
-	public <T extends Holder> Snapshot<T> getHolders(final Holder attribute, final int basePos, final Generic... targets) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return holdersIterator((Attribute) attribute, Statics.CONCRETE, basePos, targets);
-			}
-		};
-	}
-
 	// TODO clean
 	// @Override
 	// public void removePhantoms(Attribute attribute) {
@@ -458,6 +443,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int metaLevel, int basePos, Generic... targets) {
 		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(metaLevel, attribute, basePos), attribute, targets);
+	}
+
+	@Override
+	public <T extends Holder> T getHolder(Holder attribute, Generic... targets) {
+		return getHolder(Statics.CONCRETE, attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
@@ -756,7 +746,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			final Generic[] newComponents = enrich(components, GenericImpl.this.components);
 			for (Generic component : newComponents)
 				assert component.isAlive();
-			// if (!phantomExists(components)) {
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 				@Override
 				public boolean isSelected() {
@@ -766,7 +755,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (projection == null) {
 				((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), getMeta(), new Generic[] { this }, newComponents, null, false, Statics.MULTIDIRECTIONAL)).markAsAutomatic();
 			}
-			// }
 		}
 	}
 

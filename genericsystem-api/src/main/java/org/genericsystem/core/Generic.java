@@ -405,6 +405,16 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Returns an holder inherited from supplied metaholder.
 	 * 
+	 * @param metaholder - the holder which the new holder inherits from.
+	 * @param targets - the optinal targets for link.
+	 * 
+	 * @return the holder.
+	 */
+	<T extends Holder> T getHolder(Holder metaholder, Generic... targets);
+
+	/**
+	 * Returns an holder inherited from supplied metaholder.
+	 * 
 	 * @param metaLevel - meta level.
 	 * @param metaholder - the holder which the new holder inherits from.
 	 * @param basePos - the base position.

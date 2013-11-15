@@ -57,11 +57,11 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 			@Override
 			public Holder getValueHolder(Serializable key) {
 				Holder keyHolder = getKeyHolder(key);
-				return keyHolder != null ? keyHolder.getHolder(Statics.CONCRETE, getValueAttribute()) : null;
+				return keyHolder != null ? keyHolder.getHolder(getValueAttribute()) : null;
 			}
 
 			private Holder getKeyHolder(Serializable key) {
-				GenericImpl map = generic.getHolder(Statics.CONCRETE, AbstractMapProvider.this);
+				GenericImpl map = generic.getHolder(AbstractMapProvider.this);
 				return map != null ? map.getHolderByValue(Statics.CONCRETE, getKeyAttribute(), key) : null;
 			}
 
@@ -81,7 +81,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				return new AbstractSnapshot<Key>() {
 					@Override
 					public Iterator<Key> iterator() {
-						Holder map = generic.getHolder(Statics.CONCRETE, AbstractMapProvider.this);
+						Holder map = generic.getHolder(AbstractMapProvider.this);
 						if (map == null)
 							return Collections.emptyIterator();
 						Attribute key = getKeyAttribute();
@@ -89,7 +89,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 							@Override
 							public boolean isSelected() {
-								return next.getHolder(Statics.CONCRETE, getValueAttribute()) != null;
+								return next.getHolder(getValueAttribute()) != null;
 							}
 
 							@Override
@@ -112,7 +112,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 					@Override
 					public boolean isSelected() {
-						valueHolder = next.getHolder(Statics.CONCRETE, getValueAttribute());
+						valueHolder = next.getHolder(getValueAttribute());
 						return valueHolder != null;
 					}
 
