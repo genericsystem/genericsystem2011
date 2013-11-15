@@ -378,12 +378,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Holder> Snapshot<T> getHolders(Holder attribute, boolean readPhantoms, Generic... targets) {
-		return getHolders(attribute, getBasePos(attribute), readPhantoms, targets);
+	public <T extends Holder> Snapshot<T> getHolders(Holder attribute, Generic... targets) {
+		return getHolders(attribute, getBasePos(attribute), targets);
 	}
 
 	@Override
-	public <T extends Holder> Snapshot<T> getHolders(final Holder attribute, final int basePos, final boolean readPhantoms, final Generic... targets) {
+	public <T extends Holder> Snapshot<T> getHolders(final Holder attribute, final int basePos, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
@@ -1563,12 +1563,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T addComponent(int pos, Generic newComponent) {
+	public <T extends Generic> T addComponent(Generic newComponent, int pos) {
 		return getCurrentCache().addComponent(this, newComponent, pos);
 	}
 
 	@Override
-	public <T extends Generic> T removeComponent(int pos, Generic newComponent) {
+	public <T extends Generic> T removeComponent(Generic component, int pos) {
 		return getCurrentCache().removeComponent(this, pos);
 	}
 

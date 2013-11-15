@@ -617,123 +617,202 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Generic> Snapshot<T> getInheritings();
 
 	/**
+	 * Returns the composites.
 	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * Returns the composites Generic.
+	 * @return the collection of composites.
 	 * 
 	 * @see Snapshot
-	 * @return The composites Generic.
 	 */
 	<T extends Generic> Snapshot<T> getComposites();
 
 	/**
-	 * Returns true if the Generic is structural.
+	 * Returns true if this generic is a structural.
 	 * 
-	 * @return True if the Generic is structural.
+	 * @return true if this generic is a structural.
 	 */
 	boolean isStructural();
 
 	/**
-	 * Returns true if the Generic is concrete.
+	 * Returns true if this generic is a concrete.
 	 * 
-	 * @return True if the Generic is concrete.
+	 * @return true if this generic is a concrete.
 	 */
 	boolean isConcrete();
 
 	/**
-	 * Returns true if the Generic is meta.
+	 * Returns true if this generic is meta.
 	 * 
-	 * @return True if the Generic is meta.
+	 * @return true if this generic is meta.
 	 */
 	boolean isMeta();
 
 	/**
-	 * Returns true if the Generic is Map Provider.
+	 * Returns true if this generic is a Map Provider.
 	 * 
-	 * @return true if the Generic is Map Provider.
+	 * @return true if this generic is a Map Provider.
 	 */
 	boolean isMapProvider();
 
 	/**
-	 * Returns true if the Generic is tree.
+	 * Returns true if this generic is a tree.
 	 * 
-	 * @return True if the Generic is tree.
+	 * @return true if this generic is a tree.
 	 */
 	boolean isTree();
 
 	/**
-	 * Returns true if the Generic is root.
+	 * Returns true if thi generic is a root.
 	 * 
-	 * @return True if the Generic is root.
+	 * @return true if thi generic is a root.
 	 */
 	boolean isRoot();
 
 	/**
-	 * Returns true if the Generic is removable.
+	 * Returns true if this generic is removable.
 	 * 
-	 * 
-	 * @return True if the Generic is removable.
+	 * @return True if this generic is removable.
 	 */
 	boolean isRemovable();
 
 	/**
-	 * Log with slf4j.<br/>
-	 * Call the info() method.
+	 * Log the state of this generic with SLF4J.
 	 */
 	void log();
 
 	/**
-	 * Returns all available information except linkage information.
+	 * Returns all available information except information about links.
 	 * 
-	 * @return all available information except linkage information.
+	 * @return all available information except information about links.
 	 */
 	String info();
 
 	/**
-	 * remove or override value.
+	 * Abandon current value of attribute. This method set value of attrubute to null.
 	 * 
-	 * @param holder
+	 * @param attribute - attribute to abandon.
 	 */
-	void cancel(Holder holder);
+	void cancel(Holder attribute);
 
+	/**
+	 * Abandon all values of attribute. This method set value of attrubute to null.
+	 * 
+	 * @param attribute - attribute to abandon.
+	 * @param targets - optional targets for relation.
+	 */
 	void cancelAll(Holder attribute, Generic... targets);
 
+	/**
+	 * Abandon all values of attribute. This method set value of attrubute to null.
+	 * 
+	 * @param attribute - attribute to abandon.
+	 * @param basePos - base position.
+	 * @param targets - optional targets for relation.
+	 */
 	void cancelAll(Holder attribute, int basePos, Generic... targets);
 
 	/**
-	 * remove value
+	 * Abandon current value of attribute. This method remove the value holder node from the graph.
 	 * 
-	 * @param holder
+	 * @param attribute - attribute to abandon.
 	 */
 	void clear(Holder holder);
 
+	/**
+	 * Abandon all values of attribute. This method remove all value holder nodes from the graph.
+	 * 
+	 * @param attribute - attribute to abandon.
+	 * @param targets - optional targets for relation.
+	 */
 	void clearAll(Holder attribute, Generic... targets);
 
+	/**
+	 * Abandon all values of attribute. This method remove all value holder nodes from the graph.
+	 * 
+	 * @param attribute - attribute to abandon.
+	 * @param basePos - base position.
+	 * @param targets - optional targets for relation.
+	 */
 	void clearAll(Holder attribute, int basePos, Generic... targets);
 
+	/**
+	 * Returns the map associated with this generic. Map is found by class of Map Provider.
+	 * 
+	 * @param mapClass - class of Map Provider.
+	 * 
+	 * @return the map object.
+	 */
 	<Key extends Serializable, Value extends Serializable> Map<Key, Value> getMap(Class<? extends MapProvider> mapClass);
 
+	/**
+	 * Returns the map of properties associated with this generic.
+	 * 
+	 * @return the map with properties.
+	 */
 	<Key extends Serializable, Value extends Serializable> Map<Key, Value> getPropertiesMap();
 
-	<T extends Generic> T addComponent(int pos, Generic newComponent);
+	/**
+	 * Adds a new component into defined position in array of generic's components.
+	 * 
+	 * @param component - component to insert.
+	 * @param pos - position of component in array.
+	 * 
+	 * @return this generic.
+	 */
+	<T extends Generic> T addComponent(Generic component, int pos);
 
-	<T extends Generic> T removeComponent(int pos, Generic newComponent);
+	/**
+	 * Removes given component in defined position.
+	 * 
+	 * @param component - component to remove.
+	 * @param pos - position of component in array.
+	 * 
+	 * @return this generic.
+	 */
+	<T extends Generic> T removeComponent(Generic component, int pos);
 
+	/**
+	 * Adds a new super (generic which this inherits from).
+	 * 
+	 * @param newSuper - the new super generic.
+	 * 
+	 * @return this generic.
+	 */
 	<T extends Generic> T addSuper(Generic newSuper);
 
+	/**
+	 * Removes the super generic in defined position.
+	 * 
+	 * @param pos - position of super in array of supers.
+	 * 
+	 * @return this generic.
+	 */
 	<T extends Generic> T removeSuper(int pos);
 
+	/**
+	 * Sets the value.
+	 * 
+	 * @param value - value for this.
+	 * 
+	 * @return this generic.
+	 */
 	<T extends Generic> T setValue(Serializable value);
 
+	/**
+	 * Returns the other component of holder (not this generic and it's inheritings).
+	 * 
+	 * @param holder - the holder.
+	 * 
+	 * @return <tt>Snapshot</tt> of components.
+	 */
 	<T extends Generic> Snapshot<T> getOtherTargets(Holder holder);
 
-	<T extends Holder> Snapshot<T> getHolders(Holder attribute, boolean readPhantoms, Generic... targets);
-
-	<T extends Holder> Snapshot<T> getHolders(Holder attribute, int basePos, boolean readPhantoms, Generic... targets);
-
+	/**
+	 * Returns true if values of this generic and generic supplied in parameters are equal.
+	 * 
+	 * @param generic - the generic to compare.
+	 * 
+	 * @return true if values of this generic and generic supplied in parameters are equal.
+	 */
 	boolean fastValueEquals(Generic generic);
+
 }
