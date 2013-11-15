@@ -44,7 +44,7 @@ class Vertex {
 		return supers;
 	}
 
-	public <T extends Generic> T findAndMute(Generic meta, boolean isProperty, boolean isSingular, int basePos, boolean existsException) {
+	public <T extends Generic> T muteAndFind(Generic meta, boolean isProperty, boolean isSingular, int basePos, boolean existsException) {
 		computeSupersAndMute(meta, isProperty, isSingular, basePos);
 		return findInSupers(existsException);
 	}

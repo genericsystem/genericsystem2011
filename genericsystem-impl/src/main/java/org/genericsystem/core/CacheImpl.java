@@ -469,7 +469,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private <T extends Generic> T internalFindOrBuild(Generic meta, Vertex vertex, Class<?> specializationClass, boolean isProperty, boolean isSingular, int basePos, boolean existsException) {
-		T result = vertex.findAndMute(meta, isProperty, isSingular, basePos, existsException);
+		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
 		return buildAndInsertComplex(vertex.getHomeTreeNode(), specializationClass, vertex.getSupers(), vertex.getComponents());
@@ -478,7 +478,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	<T extends Generic> T internalBind(Generic meta, Vertex vertex, Class<?> specializationClass, boolean existsException, int basePos) throws RollbackException {
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-		T result = vertex.findAndMute(meta, isProperty, isSingular, basePos, existsException);
+		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
 
