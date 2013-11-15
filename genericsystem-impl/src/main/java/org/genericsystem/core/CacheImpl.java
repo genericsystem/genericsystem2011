@@ -14,7 +14,6 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -436,19 +435,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			HomeTreeNode[] primaries = ((GenericImpl) dependency).primaries;
 			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
 			Generic meta = adjust(((GenericImpl) dependency).getMeta())[0];
-			boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
-			boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-			if (Statics.MULTIDIRECTIONAL != basePos) {
-				if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, components), Statics.truncate(basePos, ((GenericImpl) bind).selfToNullComponents())))) {
-					if (!((GenericImpl) dependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos])) {
-						if (!dependency.inheritsFrom(find(NoInheritanceSystemType.class))) {
-							newHomeTreeNode = homeTreeNode;
-							primaries = Statics.replace(((GenericImpl) dependency).primaries, ((GenericImpl) dependency).getHomeTreeNode(), newHomeTreeNode);
-						}
-					}
-				}
-			}
-			put(dependency, internalFindOrBuild(meta, new Vertex(CacheImpl.this, newHomeTreeNode, primaries, components), dependency.getClass(), isProperty, isSingular, basePos, false));
+			put(dependency, internalFindOrBuild(meta, new Vertex(CacheImpl.this, newHomeTreeNode, primaries, components), dependency.getClass(), basePos, false));
 		}
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
@@ -475,13 +462,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	<T extends Generic> T internalFindOrBuild(Generic meta, Vertex vertex, Class<?> specializationClass, boolean existsException, int basePos) throws RollbackException {
+	<T extends Generic> T internalFindOrBuild(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException) throws RollbackException {
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-		return internalFindOrBuild(meta, vertex, specializationClass, isProperty, isSingular, basePos, existsException);
-	}
-
-	private <T extends Generic> T internalFindOrBuild(Generic meta, Vertex vertex, Class<?> specializationClass, boolean isProperty, boolean isSingular, int basePos, boolean existsException) {
 		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
@@ -499,6 +482,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			simpleRemove(dependency);
 
 		T bind = buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents());
+
 		new ConnectionMap().reBind(vertex.getHomeTreeNode(), bind, orderedDependencies, basePos);
 		return bind;
 	}
@@ -812,7 +796,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
 					HomeTreeNode[] primaries = Statics.replace(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode(), newHomeTreeNode);
 					Arrays.sort(primaries);
-					return internalFindOrBuild(old.getMeta(), new Vertex(UnsafeCache.this, newHomeTreeNode, primaries, ((GenericImpl) old).selfToNullComponents()), old.getClass(), false, Statics.MULTIDIRECTIONAL);
+					return internalFindOrBuild(old.getMeta(), new Vertex(UnsafeCache.this, newHomeTreeNode, primaries, ((GenericImpl) old).selfToNullComponents()), old.getClass(), Statics.MULTIDIRECTIONAL, false);
 				}
 
 			}.rebuildAll(old);
@@ -851,20 +835,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 			switch (removeStrategy) {
 			case NORMAl:
 				orderAndRemoveDependenciesForRemove(generic);
-				break;
+			break;
 			case CONSERVE:
 				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
 				dependencies.remove(generic);
 				for (Generic dependency : dependencies)
 					bind(((GenericImpl) dependency).getHomeTreeNode(), dependency.getMeta(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), true, Statics.MULTIDIRECTIONAL);
-				break;
+			break;
 			case FORCE:
 				orderAndRemoveDependencies(generic);
-				break;
+			break;
 			case PROJECT:
 				((GenericImpl) generic).project();
 				generic.remove(RemoveStrategy.CONSERVE);
-				break;
+			break;
 			}
 		}
 

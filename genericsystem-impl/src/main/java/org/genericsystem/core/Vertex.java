@@ -50,7 +50,7 @@ class Vertex {
 	}
 
 	void computeSupersAndMute(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
-		supers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos, primaries, components);
+		supers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos);
 		for (Generic directSuper : supers) {
 			primaries = new Primaries(directSuper, primaries).toArray();
 			components = GenericImpl.enrich(components, ((GenericImpl) directSuper).components);
@@ -72,7 +72,7 @@ class Vertex {
 		return null;
 	}
 
-	protected Generic[] getExtendedDirectSupers(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
+	protected Generic[] getExtendedDirectSupers(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
 		return new TreeSet<Generic>() {
 			private static final long serialVersionUID = 8568383988023387246L;
 			{
