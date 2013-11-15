@@ -27,12 +27,14 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		this.metaNode = metaNode == null ? this : metaNode;
 		this.value = value;
 		ts = getHomeTree().pickNewTs();
+		assert getMetaLevel() <= 2;
 	}
 
 	protected HomeTreeNode(long ts, HomeTreeNode metaNode, Serializable value) {
 		this.metaNode = metaNode == null ? this : metaNode;
 		this.value = value;
 		this.ts = ts;
+		assert getMetaLevel() <= 2;
 	}
 
 	public HomeTreeNode findInstanceNode(Serializable value) {

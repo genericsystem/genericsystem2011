@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -59,8 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Nicolas Feybesse
- * @author Michael Ory
+ * 
  */
 @SuppressWarnings("unchecked")
 public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute {
@@ -376,21 +376,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Holder> Snapshot<T> getHolders(final Holder attribute, final int basePos, final Generic... targets) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return holdersIterator((Attribute) attribute, Statics.CONCRETE, basePos, targets);
-			}
-		};
-	}
-
-	@Override
-	public <T extends Holder> Snapshot<T> getHolders(Holder attribute, boolean readPhantoms, Generic... targets) {
-		return getHolders(attribute, getBasePos(attribute), readPhantoms, targets);
-	}
-
-	@Override
-	public <T extends Holder> Snapshot<T> getHolders(final Holder attribute, final int basePos, final boolean readPhantoms, final Generic... targets) {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
@@ -1605,12 +1590,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T addComponent(int pos, Generic newComponent) {
+	public <T extends Generic> T addComponent(Generic newComponent, int pos) {
 		return getCurrentCache().addComponent(this, newComponent, pos);
 	}
 
 	@Override
-	public <T extends Generic> T removeComponent(int pos, Generic newComponent) {
+	public <T extends Generic> T removeComponent(Generic component, int pos) {
 		return getCurrentCache().removeComponent(this, pos);
 	}
 

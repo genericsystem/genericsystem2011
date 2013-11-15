@@ -44,7 +44,9 @@ public abstract class AbstractSelectablePostTreeIterator<T> extends AbstractAwar
 		next = null;
 	}
 
-	protected abstract boolean isSelectable();
+	protected boolean isSelectable() {
+		return true;
+	}
 
 	protected static class SelectableIterator<T> implements Iterator<T> {
 		private boolean selectable = true;
