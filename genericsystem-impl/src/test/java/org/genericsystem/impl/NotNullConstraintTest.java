@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -40,7 +41,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		assert car.getValue(vehiclePower).equals(90);
 		assert sportCar.getValue(vehiclePower).equals(250);
 		sportCar.cancelAll(vehiclePower);
-		assert Objects.equals(90, sportCar.getValue(vehiclePower)) : sportCar.getHolders(vehiclePower);
+		assert Objects.equals(null, sportCar.getValue(vehiclePower)) : sportCar.getHolders(vehiclePower);
 		sportCar.setValue(vehiclePower, 250);
 		sportCar.setValue(vehiclePower, null);
 		assert sportCar.getValue(vehiclePower) == null : sportCar.getValue(vehiclePower);
