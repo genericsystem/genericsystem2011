@@ -13,7 +13,7 @@ import org.genericsystem.generic.Relation;
  * <tt>Engine</tt> implements this interface.</p>
  * 
  * <p><tt>Generic System</tt> is a graph. Interface <tt>Generic</tt> represents the node of this
- * graph. This graph has entity <tt>Engine</tt> as it's root. Every new entity must to plugged on
+ * graph. This graph has entity <tt>Engine</tt> as it's root. Every new entity must to be plugged on
  * the graph formed by descendants of <tt>Engine</tt>.</p>
  * 
  * <h1>Meta-levels</h1>
