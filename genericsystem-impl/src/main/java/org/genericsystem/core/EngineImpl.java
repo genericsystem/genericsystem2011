@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.CacheImpl.UnsafeCache;

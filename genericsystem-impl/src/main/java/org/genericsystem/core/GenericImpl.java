@@ -761,7 +761,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			final Generic[] newComponents = enrich(components, GenericImpl.this.components);
 			for (Generic component : newComponents)
 				assert component.isAlive();
-			// if (!phantomExists(components)) {
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 				@Override
 				public boolean isSelected() {
@@ -771,7 +770,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (projection == null) {
 				((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), getMeta(), new Generic[] { this }, newComponents, null, false, Statics.MULTIDIRECTIONAL)).markAsAutomatic();
 			}
-			// }
 		}
 	}
 
