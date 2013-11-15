@@ -45,7 +45,7 @@ public class DragAndDropBean {
 		Generic target = ((GuiGenericsTreeNode) dropEvent.getDragValue()).getGeneric();
 		Attribute attribute = ((Structural) dropEvent.getDropValue()).getAttribute();
 		if (target.isStructural()) {
-			attribute.addComponent(attribute.getComponentsSize(), target);
+			attribute.addComponent(target, attribute.getComponentsSize());
 			messages.info("targetRelation", target, attribute);
 		} else if (target.isConcrete()) {
 			if (attribute.isReallyRelation()) {

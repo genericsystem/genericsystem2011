@@ -249,7 +249,7 @@ public class GenericBean implements Serializable {
 	}
 
 	public List<Holder> getHolders(StructuralWrapper structuralWrapper) {
-		return ((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getHolders(structuralWrapper.getStructural().getAttribute(), structuralWrapper.getStructural().getPosition(), structuralWrapper.isReadPhantoms());
+		return ((Type) genericTreeBean.getSelectedTreeNode().getGeneric()).getHolders(structuralWrapper.getStructural().getAttribute(), structuralWrapper.getStructural().getPosition());
 	}
 
 	public List<Generic> getOtherTargets(Holder holder) {
