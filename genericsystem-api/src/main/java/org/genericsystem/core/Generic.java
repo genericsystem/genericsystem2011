@@ -12,33 +12,35 @@ import org.genericsystem.generic.Relation;
  * <p>Almost everything in <tt>Generic System</tt> is <tt>Generic</tt>. Every entity held by
  * <tt>Engine</tt> implements this interface.</p>
  * 
- * <p><tt>Generic System</tt> is an graph. Interface <tt>Generic</tt> represents the node of this
- * graph. <tt>Engine</tt> is placed as the root of the graph. Every new entity must to plugged on
+ * <p><tt>Generic System</tt> is a graph. Interface <tt>Generic</tt> represents the node of this
+ * graph. This graph has entity <tt>Engine</tt> as it's root. Every new entity must to be plugged on
  * the graph formed by descendants of <tt>Engine</tt>.</p>
  * 
- * <p>In <tt>Generic System</tt> exists tree meta-levels of generics:
+ * <h1>Meta-levels</h1>
+ * <p>In <tt>Generic System</tt> exist tree meta-levels of generics:
  * <dl>
  * 	<dt>Meta<dt>
  * 	<dd>This level define the meta-model. Here we found generics necessairy for the function of
  * the system.</dd>
  * 	<dt>Structurals<dt>
- * 	<dd>On this level we find user-defined data-models. Structurals are <tt>Types</tt>,
- * <tt>Atttributes</tt> and <tt>Relations</tt> between Types.</dd>
+ * 	<dd>On this level we find user-defined data-models: <tt>Types</tt>,
+ * <tt>Atttributes</tt> and <tt>Relations</tt></dd>
  * 	<dt>Concretes<dt>
  * 	<dd>Data level. Level of the objects that inherit from user-defined classes. This level
  * defines business-data. Managed by <tt>Generic System</tt>.</dd>
  * </dl>
  * </p>
  * 
- * <p><tt>Generic System</tt> is the graph. From <tt>Generic</tt> we can access to related nodes. A
- * <tt>Generic</tt> has four categories of related nodes:
+ * <h1>Types of nodes</h1>
+ * <p><tt>Generic System</tt> is the graph. It is possible to access any related node of any
+ * <tt>Generic</tt>. <tt>Generic</tt> has four categories of related nodes:
  * <dl>
  * 	<dt>Supers</dt>
- * 	<dd>Nodes what <tt>Generic</tt> inherits from.</dd>
+ * 	<dd>Nodes that this <tt>Generic</tt> inherits from.</dd>
  * 	<dt>Inheretings</dt>
- * 	<dd>Node which inherit from this <tt>Generic</tt>.</dd>
+ * 	<dd>Nodes which inherit from this <tt>Generic</tt>.</dd>
  * 	<dt>Components</dt>
- * 	<dd>Nodes that contained by <tt>Generic</tt>.</dd>
+ * 	<dd>Nodes that contained by this <tt>Generic</tt>.</dd>
  * 	<dt>Composites</dt>
  * 	<dd>Nodes that contains this <tt>Generic</tt>.</dd>
  * </dl>
