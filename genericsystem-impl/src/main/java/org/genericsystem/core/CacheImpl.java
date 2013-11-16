@@ -413,7 +413,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic meta, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
-		return internalBind(meta, new Vertex(CacheImpl.this, homeTreeNode, new Primaries(homeTreeNode, supers).toArray(), components), specializationClass, existsException, basePos);
+		return internalBind(meta, new Vertex(CacheImpl.this, homeTreeNode, new Primaries(homeTreeNode, supers).toArray(), components), specializationClass, basePos, existsException);
 	}
 
 	private class ConnectionMap extends HashMap<Generic, Generic> {
@@ -427,7 +427,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 					else
 						reBindDependency(dependency);
 				else
-					// bind update dependency
+					// dependency is an update of bind
 					put(dependency, bind);
 			return this;
 		}
@@ -473,23 +473,24 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return buildAndInsertComplex(vertex.getHomeTreeNode(), specializationClass, vertex.getSupers(), vertex.getComponents());
 	}
 
-	<T extends Generic> T internalBind(Generic meta, Vertex vertex, Class<?> specializationClass, boolean existsException, int basePos) throws RollbackException {
+	<T extends Generic> T internalBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException) throws RollbackException {
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
-		NavigableSet<Generic> dependencies = vertex.getConcernedDependencies(new Generic[] { meta }, isProperty, isSingular, basePos);
+		Set<Generic> directDependencies = vertex.getDirectDependencies(meta, isProperty, isSingular, basePos);
 
 		NavigableSet<Generic> allDependencies = new TreeSet<>();
-		for (Generic dependency : dependencies)
+		for (Generic dependency : directDependencies)
 			allDependencies.addAll(orderDependencies(dependency));
+
 		for (Generic dependency : allDependencies.descendingSet())
 			simpleRemove(dependency);
 
 		T bind = buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents());
 
-		new ConnectionMap().reBind(vertex.getHomeTreeNode(), bind, dependencies, allDependencies, basePos);
+		new ConnectionMap().reBind(vertex.getHomeTreeNode(), bind, directDependencies, allDependencies, basePos);
 		return bind;
 	}
 

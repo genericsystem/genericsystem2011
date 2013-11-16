@@ -2,14 +2,13 @@ package org.genericsystem.core;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.Set;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.RollbackException;
-import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
@@ -78,15 +77,11 @@ class Vertex {
 	}
 
 	protected Generic[] getExtendedDirectSupers(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
-		return new TreeSet<Generic>() {
-			private static final long serialVersionUID = 8568383988023387246L;
-			{
-				Iterator<Generic> iterator = extendedDirectSupersIterator(meta, isProperty, isSingular, basePos, primaries, components);
-				while (iterator.hasNext())
-					add(iterator.next());
-			}
+		return new HashCache<Generic>() {
+			private static final long serialVersionUID = 5910353456286109539L;
 
-			Iterator<Generic> extendedDirectSupersIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos, final HomeTreeNode[] primaries, final Generic[] components) {
+			@Override
+			public Iterator<Generic> cacheSupplier() {
 				return new AbstractSelectableLeafIterator(cache.getEngine()) {
 
 					@Override
@@ -116,66 +111,69 @@ class Vertex {
 				};
 			}
 
-			@Override
-			public Generic[] toArray() {
-				return toArray(new Generic[size()]);
-			};
-		}.toArray();
+			public Generic[] toSortedArray() {
+				Generic[] array = toArray(new Generic[size()]);
+				Arrays.sort(array);
+				return array;
+			}
+		}.toSortedArray();
 	}
 
-	NavigableSet<Generic> getConcernedDependencies(final Generic[] supers, final boolean isProperty, final boolean isSingular, final int basePos) {
-		return new TreeSet<Generic>() {
-			private static final long serialVersionUID = -38728500742395848L;
-			{
-				for (Generic superGeneric : supers) {
-					Iterator<Generic> removeIterator = concernedDependenciesIterator(superGeneric, isProperty, isSingular, basePos);
-					while (removeIterator.hasNext())
-						add(removeIterator.next());
-				}
-			}
+	Set<Generic> getDirectDependencies(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
+		return new HashCache<Generic>() {
 
-			@SuppressWarnings("unchecked")
-			<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
-				return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) meta) {
+			private static final long serialVersionUID = 2372630315599176801L;
+
+			@Override
+			public Iterator<Generic> cacheSupplier() {
+				return new AbstractFilterIterator<Generic>(new AbstractPreTreeIterator<Generic>(meta) {
 					private static final long serialVersionUID = 3038922934693070661L;
 					{
 						next();
 					}
 
 					@Override
-					public Iterator<T> children(T node) {
-						if (isAncestorOf(((GenericImpl) node).primaries, ((GenericImpl) node).components) || isExtention(meta, node, isProperty, isSingular, basePos))
-							return Collections.emptyIterator();
-						return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
+					public Iterator<Generic> children(Generic node) {
+						return !isAncestorOf((GenericImpl) node) ? ((GenericImpl) node).<Generic> dependenciesIterator() : Collections.<Generic> emptyIterator();
 					}
 				}) {
 					@Override
 					public boolean isSelected() {
-						return isAncestorOf(((GenericImpl) next).primaries, ((GenericImpl) next).components) || isExtention(meta, next, isProperty, isSingular, basePos);
+						return isAncestorOf(((GenericImpl) next)) || isExtention(next, isProperty, isSingular, basePos);
 					}
 				};
 			}
 		};
 	}
 
-	private boolean isExtention(Generic meta, Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
+	private boolean isExtention(Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
 		if (Statics.MULTIDIRECTIONAL != basePos)
-			if (meta.getMetaLevel() != candidate.getMetaLevel())
-				if (basePos < ((GenericImpl) candidate).components.length && ((GenericImpl) candidate).components[basePos].inheritsFrom(components[basePos]))
+			if (basePos < ((GenericImpl) candidate).components.length)
+				if (((GenericImpl) candidate).components[basePos].inheritsFrom(components[basePos]))
 					if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components))))
 						return true;
 		return false;
 	}
 
-	private boolean isAncestorOf(final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-		if (GenericImpl.isSuperOf(primaries, components, subPrimaries, subComponents))
+	private boolean isAncestorOf(final GenericImpl dependency) {
+		if (GenericImpl.isSuperOf(primaries, components, dependency.primaries, dependency.components))
 			return true;
-		for (Generic component : subComponents)
-			if (component != null)
-				if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
-					if (isAncestorOf(((GenericImpl) component).primaries, ((GenericImpl) component).components))
-						return true;
+		for (Generic component : dependency.components)
+			if (!Arrays.equals(dependency.primaries, ((GenericImpl) component).primaries) || !Arrays.equals(dependency.components, ((GenericImpl) component).components))
+				if (isAncestorOf((GenericImpl) component))
+					return true;
 		return false;
+	}
+
+	private static abstract class HashCache<T> extends HashSet<T> {
+		private static final long serialVersionUID = 7083886154614346197L;
+		{
+			Iterator<T> iterator = cacheSupplier();
+			while (iterator.hasNext())
+				add(iterator.next());
+		}
+
+		public abstract Iterator<T> cacheSupplier();
 	}
 
 }
