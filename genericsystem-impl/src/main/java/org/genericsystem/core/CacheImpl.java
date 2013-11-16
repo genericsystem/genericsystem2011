@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,9 +31,7 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractAwareIterator;
-import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
-import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.map.AbstractMapProvider.AbstractExtendedMap;
 import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
@@ -422,11 +419,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private class ConnectionMap extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 8257917150315417734L;
 
-		private ConnectionMap reBind(HomeTreeNode homeTreeNode, Generic bind, Set<Generic> orderedDependencies, int basePos) {
-			for (Generic dependency : orderedDependencies) {
+		private ConnectionMap reBind(HomeTreeNode homeTreeNode, Generic bind, Set<Generic> dependencies, NavigableSet<Generic> allDependencies, int basePos) {
+			for (Generic dependency : allDependencies)
 				if (Statics.MULTIDIRECTIONAL == basePos || !((GenericImpl) bind).getComponent(basePos).equals(((Holder) dependency).getComponent(basePos)))
-					reBindDependency(homeTreeNode, bind, dependency, basePos);
-			}
+					if (dependencies.contains(dependency))
+						reBindDependency(homeTreeNode, bind, dependency, basePos);
+					else
+						reBindDependency(dependency);
+				else
+					// bind update dependency
+					put(dependency, bind);
 			return this;
 		}
 
@@ -477,79 +479,18 @@ public class CacheImpl extends AbstractContext implements Cache {
 		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
-		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(new Generic[] { meta }, vertex, isProperty, isSingular, basePos);
-		for (Generic dependency : orderedDependencies.descendingSet())
+		NavigableSet<Generic> dependencies = vertex.getConcernedDependencies(new Generic[] { meta }, isProperty, isSingular, basePos);
+
+		NavigableSet<Generic> allDependencies = new TreeSet<>();
+		for (Generic dependency : dependencies)
+			allDependencies.addAll(orderDependencies(dependency));
+		for (Generic dependency : allDependencies.descendingSet())
 			simpleRemove(dependency);
 
 		T bind = buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents());
 
-		new ConnectionMap().reBind(vertex.getHomeTreeNode(), bind, orderedDependencies, basePos);
+		new ConnectionMap().reBind(vertex.getHomeTreeNode(), bind, dependencies, allDependencies, basePos);
 		return bind;
-	}
-
-	private NavigableSet<Generic> getConcernedDependencies(final Generic[] supers, final Vertex vertex, final boolean isProperty, final boolean isSingular, final int basePos) {
-		return new TreeSet<Generic>() {
-			private static final long serialVersionUID = -38728500742395848L;
-			{
-				for (Generic superGeneric : supers) {
-					Iterator<Generic> removeIterator = concernedDependenciesIterator(superGeneric, vertex.getPrimaries(), vertex.getComponents(), isProperty, isSingular, basePos);
-					while (removeIterator.hasNext())
-						addAll(orderDependencies((GenericImpl) removeIterator.next()));
-				}
-			}
-
-			@SuppressWarnings("unchecked")
-			<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic meta, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
-				return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) meta) {
-
-					private static final long serialVersionUID = 3038922934693070661L;
-
-					{
-						next();
-					}
-
-					@Override
-					public Iterator<T> children(T node) {
-						if (isAncestorOf(primaries, components, ((GenericImpl) node).primaries, ((GenericImpl) node).components))
-							return Collections.emptyIterator();
-
-						if (Statics.MULTIDIRECTIONAL != basePos) {
-							if (meta.getMetaLevel() != node.getMetaLevel())
-								if (basePos < ((GenericImpl) node).components.length && ((GenericImpl) node).components[basePos].inheritsFrom(components[basePos]))
-									if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, ((GenericImpl) node).components), Statics.truncate(basePos, components))))
-										return Collections.emptyIterator();
-						}
-						return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
-					}
-				}) {
-					@Override
-					public boolean isSelected() {
-						if (isAncestorOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
-							return true;
-
-						if (Statics.MULTIDIRECTIONAL != basePos) {
-							if (meta.getMetaLevel() != next.getMetaLevel())
-								if (basePos < ((GenericImpl) next).components.length && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos])) {
-									if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, ((GenericImpl) next).components), Statics.truncate(basePos, components))))
-										return true;
-								}
-						}
-						return false;
-					}
-				};
-			}
-		};
-	}
-
-	public static boolean isAncestorOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-		if (GenericImpl.isSuperOf(primaries, components, subPrimaries, subComponents))
-			return true;
-		for (Generic component : subComponents)
-			if (component != null)
-				if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
-					if (isAncestorOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
-						return true;
-		return false;
 	}
 
 	<T extends Generic> T buildAndInsertComplex(HomeTreeNode homeTreeNode, Class<?> clazz, Generic[] supers, Generic[] components) {

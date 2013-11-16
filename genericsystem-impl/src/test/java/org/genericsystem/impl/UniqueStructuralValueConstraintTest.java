@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -21,14 +20,14 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 
 	public void testTwoTypesWithSameNameOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car  = cache.newType("Car");
+		Type car = cache.newType("Car");
 		Type car2 = cache.newType("Car");
 		assert Objects.equals(car, car2);
 	}
 
 	public void testAttributeWithSameNameAsTypeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car   = cache.newType("Car");
+		Type car = cache.newType("Car");
 		Type power = cache.newType("Power");
 		Attribute carPower = car.setAttribute("Power");
 		assert carPower.getSupers().contains(power);
@@ -63,11 +62,11 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	}
 
 	public void testRelationWithSameNameAsAttributeOnDifferentGenericsOK() {
-		Cache cache       = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car     = cache.newType("Car");
-		Type plane       = cache.newType("Plane");
-		Relation powerR  = car.setRelation("Power", plane);
-		Type color      = cache.newType("Color");
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.newType("Car");
+		Type plane = cache.newType("Plane");
+		Relation powerR = car.setRelation("Power", plane);
+		Type color = cache.newType("Color");
 		Attribute powerA = color.setAttribute("Power");
 		assert !Objects.equals(powerA, powerR);
 	}
@@ -106,7 +105,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	public void testTypeAndItsSubtypeKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.newType("Car");
-		//assert ((GenericImpl) car).isStructuralNamingConstraintEnabled();
+		// assert ((GenericImpl) car).isStructuralNamingConstraintEnabled();
 		assert car == car.newSubType("Car");
 	}
 
@@ -115,7 +114,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		final Type car = cache.newType("Car");
 		car.setAttribute("Power");
 		Generic power = cache.newType("Power");
-		assert car.getAttribute("Power").getSupers().get(1) == power;
+		assert car.getAttribute("Power").getSupers().get(1) == power : car.getAttribute("Power").getSupers().get(1);
 	}
 
 	// TODO: vhdjhvj
@@ -190,12 +189,12 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 
 	public void testLinkWithSameNameAsAttributeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car          = cache.newType("Car");
-		Type color        = cache.newType("Color");
-		Attribute power   = car.setAttribute("Power");
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Attribute power = car.setAttribute("Power");
 		Relation carColor = car.setRelation("CarColor", color);
-		Generic myCar     = car.newInstance("myCar");
-		Generic myColor   = color.newInstance("red");
+		Generic myCar = car.newInstance("myCar");
+		Generic myColor = color.newInstance("red");
 		Link myVehicleRed = myCar.setLink(carColor, "Power", myColor);
 		assert !Objects.equals(myVehicleRed, power);
 	}
