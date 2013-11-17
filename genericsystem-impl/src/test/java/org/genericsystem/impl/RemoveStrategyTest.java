@@ -83,7 +83,6 @@ public class RemoveStrategyTest extends AbstractTest {
 		Link carRed = car.setLink(carColor, "carRed", red);
 
 		Link myCarRed = myCar.setLink(carColor, "myCarRed", red);
-		assert myCarRed.getSupers().contains(carRed);
 
 		carRed.remove(RemoveStrategy.CONSERVE);
 		myCarRed = myCar.getLink(carColor);
