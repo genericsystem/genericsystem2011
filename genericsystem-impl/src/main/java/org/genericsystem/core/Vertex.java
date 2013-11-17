@@ -25,11 +25,11 @@ class Vertex {
 	private Generic[] components;
 	private Generic[] supers;
 
-	Vertex(CacheImpl cache, HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
+	Vertex(CacheImpl cache, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] aliveNullComponents) {
 		this.cache = cache;
 		this.homeTreeNode = homeTreeNode;
-		this.primaries = primaries;
-		this.components = components;
+		primaries = new Primaries(homeTreeNode, supers).toArray();
+		components = aliveNullComponents;
 	}
 
 	HomeTreeNode getHomeTreeNode() {
@@ -71,7 +71,7 @@ class Vertex {
 					else
 						return (T) directSuper;
 				else
-					cache.rollback(new FunctionalConsistencyViolationException(directSuper.info() + " " + supers));
+					cache.rollback(new FunctionalConsistencyViolationException("Found generic has not correct value : " + homeTreeNode + directSuper.info() + " " + Arrays.toString(supers)));
 		}
 		return null;
 	}
