@@ -13,7 +13,7 @@ public class TypeAndSubTypeTest extends AbstractTest {
 
 	public void testNewSubTypeWithEngine() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newSubType("Car");
+		Type car = cache.newType("Car");
 		assert car.isAlive();
 		assert car.isStructural();
 		assert ((GenericImpl) car).getComponents().size() == 0;

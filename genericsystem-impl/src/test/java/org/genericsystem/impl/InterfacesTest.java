@@ -12,8 +12,8 @@ public class InterfacesTest extends AbstractTest {
 		CacheImpl cache = (CacheImpl) GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.newType("Vehicle");
 		Type robot = cache.newType("Robot");
-		Type transformer = cache.newSubType("Transformer", vehicle, robot);
-		Type reverseTransformer = cache.newSubType("Transformer", robot, vehicle);
+		Type transformer = cache.newType("Transformer", vehicle, robot);
+		Type reverseTransformer = cache.newType("Transformer", robot, vehicle);
 
 		assert transformer == reverseTransformer : transformer.info() + reverseTransformer.info();
 	}
@@ -23,7 +23,7 @@ public class InterfacesTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType( "Car");
 		Type electric = cache.newType("Electric");
-		Type carElectric = cache.newSubType("CarElectric", car, vehicle, electric);
+		Type carElectric = cache.newType("CarElectric", car, vehicle, electric);
 		assert !carElectric.getSupers().contains(vehicle);
 	}
 

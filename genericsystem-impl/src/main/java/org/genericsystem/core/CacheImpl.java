@@ -332,7 +332,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newType(Serializable value) {
-		return this.<T> newSubType(value);
+		return this.<T> newType(value);
 	}
 
 	@Override
@@ -341,12 +341,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	public <T extends Type> T newSubType(Serializable value, Type... userSupers) {
-		return newSubType(value, userSupers, Statics.EMPTY_GENERIC_ARRAY);
+	public <T extends Type> T newType(Serializable value, Type... userSupers) {
+		return newType(value, userSupers, Statics.EMPTY_GENERIC_ARRAY);
 	}
 
 	@Override
-	public <T extends Type> T newSubType(Serializable value, Type[] userSupers, Generic... components) {
+	public <T extends Type> T newType(Serializable value, Type[] userSupers, Generic... components) {
 		return bind(getEngine(), value, userSupers, components, null, false, Statics.MULTIDIRECTIONAL);
 	}
 
