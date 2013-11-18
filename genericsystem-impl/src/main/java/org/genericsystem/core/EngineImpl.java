@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
-import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
 import org.genericsystem.generic.Attribute;
@@ -188,7 +187,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		SystemCache init(Class<?>... userClasses) {
 			List<Class<?>> classes = Arrays.<Class<?>> asList(EngineImpl.class, MetaAttribute.class, MetaRelation.class, NoInheritanceSystemType.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
-			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
+			CacheImpl cache = (CacheImpl) start(new CacheImpl(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				get(clazz);
 			for (Class<?> clazz : userClasses)

@@ -1,8 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,14 +12,12 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
-import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -33,9 +29,7 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractAwareIterator;
-import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
-import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.map.AbstractMapProvider.AbstractExtendedMap;
 import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
@@ -146,85 +140,126 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return true;
 	}
 
+	private <T extends Generic> NavigableSet<T> orderAndRemoveDependenciesForRemove(final T old) throws RollbackException {
+		try {
+			NavigableSet<T> orderedGenerics = orderDependenciesForRemove(old);
+			for (Generic generic : orderDependenciesForRemove(old).descendingSet())
+				removeGeneric(generic);
+			return orderedGenerics;
+		} catch (ConstraintViolationException e) {
+			rollback(e);
+			return null;
+		}
+	}
+
+	private <T extends Generic> NavigableSet<T> orderAndRemoveDependencies(final T old) {
+		try {
+			NavigableSet<T> orderedGenerics = orderDependencies(old);
+			for (T generic : orderedGenerics.descendingSet())
+				removeGeneric(generic);
+			return orderedGenerics;
+		} catch (ConstraintViolationException e) {
+			rollback(e);
+			return null;
+		}
+	}
+
+	abstract class Restructurator {
+		@SuppressWarnings("unchecked")
+		<T extends Generic> T rebuildAll(Generic old) {
+			NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old);
+			dependencies.remove(old);
+			ConnectionMap map = new ConnectionMap();
+			map.put(old, rebuild());
+			return (T) map.reBind(dependencies).get(old);
+		}
+
+		abstract Generic rebuild();
+	}
+
 	void remove(final Generic generic, final RemoveStrategy removeStrategy) throws RollbackException {
 		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
 			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
-		new UnsafeCacheManager<Object>() {
-			@Override
-			Object internalWork(UnsafeCache unsafeCache) throws ConstraintViolationException {
-				unsafeCache.unsafeRemove(generic, removeStrategy);
-				return null;
-			}
-		}.doWork();
-
-	}
-
-	private abstract class UnsafeCacheManager<T> {
-		private final UnsafeCache unsafeCache = new UnsafeCache(CacheImpl.this);
-
-		T doWork() throws RollbackException {
-			try {
-				unsafeCache.start();
-				T result = internalWork(unsafeCache);
-				unsafeCache.flush();
-				return result;
-			} catch (ConstraintViolationException ex) {
-				rollback(ex);
-				return null;
-			} catch (RollbackException ex) {
-				rollback(ex.getCause());
-				return null;
-			} finally {
-				start();
-			}
+		if (!isAlive(generic))
+			rollback(new AliveConstraintViolationException(generic + " is not alive"));
+		switch (removeStrategy) {
+		case NORMAl:
+			orderAndRemoveDependenciesForRemove(generic);
+		break;
+		case CONSERVE:
+			// TODO faire marcher ça
+			// new Restructurator() {
+			// @Override
+			// Generic rebuild() {
+			// return null;
+			// }
+			// }.rebuildAll(generic);
+			NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
+			dependencies.remove(generic);
+			for (Generic dependency : dependencies)
+				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, true);
+		break;
+		case FORCE:
+			orderAndRemoveDependencies(generic);
+		break;
+		case PROJECT:
+			((GenericImpl) generic).project();
+			remove(generic, RemoveStrategy.CONSERVE);
+		break;
 		}
-
-		abstract T internalWork(UnsafeCache unsafeCache) throws ConstraintViolationException;
 	}
 
 	<T extends Generic> T setValue(final Generic old, final Serializable value) {
-		return new UnsafeCacheManager<T>() {
+		return new Restructurator() {
 			@Override
-			T internalWork(UnsafeCache unsafeCache) throws ConstraintViolationException {
-				return unsafeCache.unsafeSetValue(old, value);
+			Generic rebuild() {
+				Generic meta = old.getMeta();
+				HomeTreeNode homeTreeNode = ((GenericImpl) meta).bindInstanceNode(value);
+				return dependencyBind(meta, new Vertex(CacheImpl.this, homeTreeNode, ((GenericImpl) old).supers, ((GenericImpl) old).selfToNullComponents()), old.getClass(), Statics.MULTIDIRECTIONAL, false);
 			}
-		}.doWork();
+		}.rebuildAll(old);
 	}
 
 	<T extends Generic> T addComponent(final Generic old, final Generic newComponent, final int pos) {
-		return new UnsafeCacheManager<T>() {
+		return new Restructurator() {
 			@Override
-			T internalWork(UnsafeCache unsafeCache) throws ConstraintViolationException {
-				return unsafeCache.unsafeAddComponent(old, newComponent, pos);
+			Generic rebuild() {
+				return dependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos)), old.getClass(),
+						Statics.MULTIDIRECTIONAL, false);
 			}
-		}.doWork();
+		}.rebuildAll(old);
 	}
 
 	<T extends Generic> T removeComponent(final Generic old, final int pos) {
-		return new UnsafeCacheManager<T>() {
+		return new Restructurator() {
 			@Override
-			T internalWork(UnsafeCache unsafeCache) throws ConstraintViolationException {
-				return unsafeCache.unsafeRemoveComponent(old, pos);
+			Generic rebuild() {
+				return dependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents())), old.getClass(),
+						Statics.MULTIDIRECTIONAL, false);
 			}
-		}.doWork();
+		}.rebuildAll(old);
 	}
 
 	<T extends Generic> T addSuper(final Generic old, final Generic newSuper) {
-		return new UnsafeCacheManager<T>() {
+		return new Restructurator() {
 			@Override
-			T internalWork(UnsafeCache unsafeCache) throws ConstraintViolationException {
-				return unsafeCache.unsafeAddSuper(old, newSuper);
+			Generic rebuild() {
+				return dependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents()), old.getClass(),
+						Statics.MULTIDIRECTIONAL, true);
 			}
-		}.doWork();
+		}.rebuildAll(old);
 	}
 
 	<T extends Generic> T removeSuper(final Generic old, final int pos) {
-		return new UnsafeCacheManager<T>() {
+		if (pos == 0 && ((GenericImpl) old).supers.length == 1)
+			rollback(new UnsupportedOperationException());
+		return new Restructurator() {
 			@Override
-			T internalWork(UnsafeCache unsafeCache) throws ConstraintViolationException {
-				return unsafeCache.unsafeRemoveSuper(old, pos);
+			Generic rebuild() {
+				return dependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents()), old.getClass(),
+						Statics.MULTIDIRECTIONAL, true);
 			}
-		}.doWork();
+		}.rebuildAll(old);
 	}
 
 	public <T extends Generic> T reBind(Generic generic) {
@@ -259,7 +294,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (int attempt = 0; attempt < Statics.ATTEMPTS; attempt++)
 			try {
 				checkConstraints();
-				// adds.removeAll(automatics);
 				getSubContext().apply(new Iterable<Generic>() {
 
 					@Override
@@ -347,7 +381,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Type[] userSupers, Generic... components) {
-		return bind(getEngine(), value, userSupers, components, null, false, Statics.MULTIDIRECTIONAL);
+		return bind(getEngine(), value, userSupers, components, null, Statics.MULTIDIRECTIONAL, false);
 	}
 
 	@Override
@@ -357,7 +391,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(getEngine(), value, new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, false, Statics.MULTIDIRECTIONAL);
+		return this.<T> bind(getEngine(), value, new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, Statics.MULTIDIRECTIONAL, false);
 	}
 
 	@Override
@@ -382,12 +416,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz, components);
 		Serializable value = findImplictValue(clazz);
-		return this.<T> bind(meta, value, Statics.insertFirst(meta, userSupers), components, clazz, false, Statics.MULTIDIRECTIONAL);
+		return this.<T> bind(meta, value, Statics.insertFirst(meta, userSupers), components, clazz, Statics.MULTIDIRECTIONAL, false);
 	}
 
 	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, boolean existsException, int axe, Generic... components) {
 		Generic[] sortAndCheck = ((GenericImpl) directSuper).sortAndCheck(components);
-		return bind(meta, value, new Generic[] { directSuper }, sortAndCheck, specializationClass, existsException, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe);
+		return bind(meta, value, new Generic[] { directSuper }, sortAndCheck, specializationClass, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe, existsException);
 	}
 
 	int findAxe(Generic[] sorts, Generic baseComponent) throws RollbackException {
@@ -412,52 +446,50 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<GenericImpl> find(meta);
 	}
 
-	<T extends Generic> T bind(Generic meta, Serializable value, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
-		return bind(((GenericImpl) meta).bindInstanceNode(value), meta, supers, components, specializationClass, existsException, basePos);
+	<T extends Generic> T bind(Generic meta, Serializable value, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean existsException) {
+		return bind(meta, ((GenericImpl) meta).bindInstanceNode(value), supers, components, specializationClass, basePos, existsException);
 	}
 
-	<T extends Generic> T bind(HomeTreeNode homeTreeNode, Generic meta, Generic[] supers, Generic[] components, Class<?> specializationClass, boolean existsException, int basePos) {
-		return internalBind(meta, new Vertex(CacheImpl.this, homeTreeNode, new Primaries(homeTreeNode, supers).toArray(), components), specializationClass, existsException, basePos);
+	<T extends Generic> T bind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean existsException) {
+		return internalBind(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), specializationClass, basePos, existsException);
 	}
 
 	private class ConnectionMap extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 8257917150315417734L;
 
-		private ConnectionMap reBind(HomeTreeNode homeTreeNode, Generic bind, Set<Generic> orderedDependencies, int basePos) {
-			for (Generic dependency : orderedDependencies) {
+		private ConnectionMap reBind(Generic bind, Set<Generic> directDependencies, NavigableSet<Generic> allDependencies, int basePos) {
+			for (Generic dependency : allDependencies)
 				if (Statics.MULTIDIRECTIONAL == basePos || !((GenericImpl) bind).getComponent(basePos).equals(((Holder) dependency).getComponent(basePos)))
-					reBindDependency(homeTreeNode, bind, dependency, basePos);
-			}
+					if (directDependencies.contains(dependency))
+						reBindDependency(bind, dependency, basePos);
+					else
+						reBindDependency(dependency);
+				else
+					// dependency is an update of bind
+					put(dependency, bind);
 			return this;
 		}
 
-		private void reBindDependency(HomeTreeNode homeTreeNode, Generic bind, Generic dependency, int basePos) {
+		private void reBindDependency(Generic bind, Generic dependency, int basePos) {
 			HomeTreeNode newHomeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
-			HomeTreeNode[] primaries = ((GenericImpl) dependency).primaries;
+			Generic[] supers = adjust(((GenericImpl) dependency).supers);
 			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
 			Generic meta = adjust(((GenericImpl) dependency).getMeta())[0];
-			boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
-			boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-			if (Statics.MULTIDIRECTIONAL != basePos) {
-				if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, components), Statics.truncate(basePos, ((GenericImpl) bind).selfToNullComponents())))) {
-					if (!((GenericImpl) dependency).components[basePos].inheritsFrom(((GenericImpl) bind).components[basePos])) {
-						if (!dependency.inheritsFrom(find(NoInheritanceSystemType.class))) {
-							newHomeTreeNode = homeTreeNode;
-							primaries = Statics.replace(((GenericImpl) dependency).primaries, ((GenericImpl) dependency).getHomeTreeNode(), newHomeTreeNode);
-						}
-					}
-				}
-			}
-			put(dependency, internalFindOrBuild(meta, new Vertex(CacheImpl.this, newHomeTreeNode, primaries, components), dependency.getClass(), isProperty, isSingular, basePos, false));
+			put(dependency, dependencyBind(meta, new Vertex(CacheImpl.this, newHomeTreeNode, supers, components), dependency.getClass(), basePos, false));
 		}
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
-			for (Generic dependency : orderedDependencies) {
-				Generic[] supers = adjust(((GenericImpl) dependency).supers);
-				Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
-				put(dependency, buildAndInsertComplex(((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) dependency).getClass(), supers, components));
-			}
+			for (Generic dependency : orderedDependencies)
+				reBindDependency(dependency);
 			return this;
+		}
+
+		private void reBindDependency(Generic dependency) {
+			Generic meta = adjust(((GenericImpl) dependency).getMeta())[0];
+			HomeTreeNode homeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
+			Generic[] supers = adjust(((GenericImpl) dependency).supers);
+			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
+			put(dependency, dependencyBind(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), dependency.getClass(), Statics.MULTIDIRECTIONAL, false));
 		}
 
 		private Generic[] adjust(Generic... oldComponents) {
@@ -472,97 +504,34 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	<T extends Generic> T internalFindOrBuild(Generic meta, Vertex vertex, Class<?> specializationClass, boolean existsException, int basePos) throws RollbackException {
-		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
-		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-		return internalFindOrBuild(meta, vertex, specializationClass, isProperty, isSingular, basePos, existsException);
-	}
-
-	private <T extends Generic> T internalFindOrBuild(Generic meta, Vertex vertex, Class<?> specializationClass, boolean isProperty, boolean isSingular, int basePos, boolean existsException) {
-		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
-		if (result != null)
-			return result;
-		return buildAndInsertComplex(vertex.getHomeTreeNode(), specializationClass, vertex.getSupers(), vertex.getComponents());
-	}
-
-	<T extends Generic> T internalBind(Generic meta, Vertex vertex, Class<?> specializationClass, boolean existsException, int basePos) throws RollbackException {
+	<T extends Generic> T dependencyBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException) throws RollbackException {
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
-		NavigableSet<Generic> orderedDependencies = getConcernedDependencies(new Generic[] { meta }, vertex, isProperty, isSingular, basePos);
-		for (Generic dependency : orderedDependencies.descendingSet())
+		return buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents());
+	}
+
+	<T extends Generic> T internalBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException) throws RollbackException {
+		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
+		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
+		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
+		if (result != null)
+			return result;
+		Set<Generic> directDependencies = vertex.getDirectDependencies(meta, isProperty, isSingular, basePos);
+
+		NavigableSet<Generic> allDependencies = new TreeSet<>();
+		for (Generic dependency : directDependencies)
+			allDependencies.addAll(orderDependencies(dependency));
+
+		for (Generic dependency : allDependencies.descendingSet())
 			simpleRemove(dependency);
 
 		T bind = buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents());
-		new ConnectionMap().reBind(vertex.getHomeTreeNode(), bind, orderedDependencies, basePos);
+
+		new ConnectionMap().reBind(bind, directDependencies, allDependencies, basePos);
 		return bind;
-	}
-
-	private NavigableSet<Generic> getConcernedDependencies(final Generic[] supers, final Vertex vertex, final boolean isProperty, final boolean isSingular, final int basePos) {
-		return new TreeSet<Generic>() {
-			private static final long serialVersionUID = -38728500742395848L;
-			{
-				for (Generic superGeneric : supers) {
-					Iterator<Generic> removeIterator = concernedDependenciesIterator(superGeneric, vertex.getPrimaries(), vertex.getComponents(), isProperty, isSingular, basePos);
-					while (removeIterator.hasNext())
-						addAll(orderDependencies((GenericImpl) removeIterator.next()));
-				}
-			}
-
-			@SuppressWarnings("unchecked")
-			<T extends Generic> Iterator<T> concernedDependenciesIterator(final Generic meta, final HomeTreeNode[] primaries, final Generic[] components, final boolean isProperty, final boolean isSingular, final int basePos) {
-				return new AbstractFilterIterator<T>(new AbstractPreTreeIterator<T>((T) meta) {
-
-					private static final long serialVersionUID = 3038922934693070661L;
-
-					{
-						next();
-					}
-
-					@Override
-					public Iterator<T> children(T node) {
-						if (isAncestorOf(primaries, components, ((GenericImpl) node).primaries, ((GenericImpl) node).components))
-							return Collections.emptyIterator();
-
-						if (Statics.MULTIDIRECTIONAL != basePos) {
-							if (meta.getMetaLevel() != node.getMetaLevel())
-								if (basePos < ((GenericImpl) node).components.length && ((GenericImpl) node).components[basePos].inheritsFrom(components[basePos]))
-									if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, ((GenericImpl) node).components), Statics.truncate(basePos, components))))
-										return Collections.emptyIterator();
-						}
-						return new ConcateIterator<T>(((GenericImpl) node).<T> directInheritingsIterator(), ((GenericImpl) node).<T> compositesIterator());
-					}
-				}) {
-					@Override
-					public boolean isSelected() {
-						if (isAncestorOf(primaries, components, ((GenericImpl) next).primaries, ((GenericImpl) next).components))
-							return true;
-
-						if (Statics.MULTIDIRECTIONAL != basePos) {
-							if (meta.getMetaLevel() != next.getMetaLevel())
-								if (basePos < ((GenericImpl) next).components.length && ((GenericImpl) next).components[basePos].inheritsFrom(components[basePos])) {
-									if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, ((GenericImpl) next).components), Statics.truncate(basePos, components))))
-										return true;
-								}
-						}
-						return false;
-					}
-				};
-			}
-		};
-	}
-
-	public static boolean isAncestorOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-		if (GenericImpl.isSuperOf(primaries, components, subPrimaries, subComponents))
-			return true;
-		for (Generic component : subComponents)
-			if (component != null)
-				if (!Arrays.equals(subPrimaries, ((GenericImpl) component).primaries) || !Arrays.equals(subComponents, ((GenericImpl) component).components))
-					if (isAncestorOf(primaries, components, ((GenericImpl) component).primaries, ((GenericImpl) component).components))
-						return true;
-		return false;
 	}
 
 	<T extends Generic> T buildAndInsertComplex(HomeTreeNode homeTreeNode, Class<?> clazz, Generic[] supers, Generic[] components) {
@@ -588,7 +557,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private boolean isConsistencyToCheck(CheckingType checkingType, boolean isFlushTime, Generic generic) {
 		if (isConstraintActivated(generic))
-			if (isFlushTime || isImmediatelyConsistencyCheckable((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()))
+			if (isFlushTime || ((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()).isImmediatelyConsistencyCheckable())
 				return true;
 		return false;
 	}
@@ -604,10 +573,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	protected boolean isConstraintValueSetting(Generic generic) {
 		return generic.isInstanceOf(find(ConstraintValue.class));
-	}
-
-	protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
-		return constraint.isImmediatelyConsistencyCheckable();
 	}
 
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
@@ -636,7 +601,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(final CheckingType checkingType, final boolean isFlushTime, final Generic generic) throws ConstraintViolationException {
-
 		for (final Attribute attribute : ((Type) generic).getAttributes()) {
 			AbstractExtendedMap<AxedPropertyClass, Serializable> constraintMap = ((GenericImpl) attribute).getConstraintsMap();
 			TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
@@ -646,7 +610,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				constraints.put(keyHolder, valueHolder);
 			}
 			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
-				if (CacheImpl.this.isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
+				if (isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
 					int axe = ((AxedPropertyClass) entry.getKey().getValue()).getAxe();
 					if (AbstractAxedConstraintImpl.class.isAssignableFrom(entry.getKey().getClass()) && attribute.getComponent(axe) != null && (generic.isInstanceOf(attribute.getComponent(axe)))) {
 						entry.getKey().check(attribute, generic, entry.getValue(), axe);
@@ -654,13 +618,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 				}
 			}
 		}
-
 		AbstractExtendedMap<AxedPropertyClass, Serializable> constraintMap = ((GenericImpl) generic).getConstraintsMap();
 		TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
 		for (Serializable key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-
 			constraints.put(keyHolder, valueHolder);
 		}
 
@@ -668,7 +630,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Holder valueHolder = entry.getValue();
 			AbstractConstraintImpl keyHolder = entry.getKey();
 
-			if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
+			if (isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
 				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
@@ -679,11 +641,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	public boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-		return (isFlushTime || isImmediatelyCheckable(constraint)) && constraint.isCheckedAt(generic, checkingType);
-	}
-
-	protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
-		return constraint.isImmediatelyCheckable();
+		return (isFlushTime || constraint.isImmediatelyCheckable()) && constraint.isCheckedAt(generic, checkingType);
 	}
 
 	@Override
@@ -778,131 +736,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@Override
 	public Snapshot<Type> getAllTypes() {
 		return getEngine().getAllInstances();
-	}
-
-	static class UnsafeCache extends CacheImpl {
-		private static final long serialVersionUID = 4843334203915625618L;
-
-		public UnsafeCache(Cache cache) {
-			super(cache);
-		}
-
-		public UnsafeCache(Engine engine) {
-			super(engine);
-		}
-
-		@Override
-		protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
-			return false;
-		}
-
-		@Override
-		protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
-			return false;
-		}
-
-		<T extends Generic> T unsafeSetValue(final Generic old, final Serializable value) throws ConstraintViolationException {
-			assert value != null;
-			return new Restructurator() {
-				@Override
-				Generic rebuild() {
-					HomeTreeNode newHomeTreeNode = ((GenericImpl) old).getHomeTreeNode().metaNode.bindInstanceNode(value);
-					HomeTreeNode[] primaries = Statics.replace(((GenericImpl) old).primaries, ((GenericImpl) old).getHomeTreeNode(), newHomeTreeNode);
-					Arrays.sort(primaries);
-					return internalFindOrBuild(old.getMeta(), new Vertex(UnsafeCache.this, newHomeTreeNode, primaries, ((GenericImpl) old).selfToNullComponents()), old.getClass(), false, Statics.MULTIDIRECTIONAL);
-				}
-
-			}.rebuildAll(old);
-		}
-
-		<T extends Generic> T unsafeAddComponent(final Generic old, final Generic newComponent, final int pos) throws ConstraintViolationException {
-			return new Restructurator() {
-				@Override
-				Generic rebuild() {
-					return bind(((GenericImpl) old).getHomeTreeNode(), old.getMeta(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.getClass(), false, Statics.MULTIDIRECTIONAL);
-				}
-			}.rebuildAll(old);
-		}
-
-		<T extends Generic> T unsafeRemoveComponent(final Generic old, final int pos) throws ConstraintViolationException {
-			return new Restructurator() {
-				@Override
-				Generic rebuild() {
-					return bind(((GenericImpl) old).getHomeTreeNode(), old.getMeta(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.getClass(), false, Statics.MULTIDIRECTIONAL);
-				}
-			}.rebuildAll(old);
-		}
-
-		<T extends Generic> T unsafeAddSuper(final Generic old, final Generic newSuper) throws ConstraintViolationException {
-			return new Restructurator() {
-				@Override
-				Generic rebuild() {
-					return bind(((GenericImpl) old).getHomeTreeNode(), old.getMeta(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), true, Statics.MULTIDIRECTIONAL);
-				}
-			}.rebuildAll(old);
-		}
-
-		void unsafeRemove(Generic generic, RemoveStrategy removeStrategy) throws ConstraintViolationException {
-			if (!isAlive(generic))
-				throw new AliveConstraintViolationException(generic + " is not alive");
-			switch (removeStrategy) {
-			case NORMAl:
-				orderAndRemoveDependenciesForRemove(generic);
-				break;
-			case CONSERVE:
-				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
-				dependencies.remove(generic);
-				for (Generic dependency : dependencies)
-					bind(((GenericImpl) dependency).getHomeTreeNode(), dependency.getMeta(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), true, Statics.MULTIDIRECTIONAL);
-				break;
-			case FORCE:
-				orderAndRemoveDependencies(generic);
-				break;
-			case PROJECT:
-				((GenericImpl) generic).project();
-				generic.remove(RemoveStrategy.CONSERVE);
-				break;
-			}
-		}
-
-		<T extends Generic> T unsafeRemoveSuper(final Generic old, final int pos) throws ConstraintViolationException {
-			if (pos == 0 && ((GenericImpl) old).supers.length == 1)
-				rollback(new UnsupportedOperationException());// kk ?
-			return new Restructurator() {
-				@Override
-				Generic rebuild() {
-					return bind(((GenericImpl) old).getHomeTreeNode(), old.getMeta(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), true, Statics.MULTIDIRECTIONAL);
-				}
-			}.rebuildAll(old);
-		}
-
-		private <T extends Generic> NavigableSet<T> orderAndRemoveDependencies(final T old) throws ConstraintViolationException {
-			NavigableSet<T> orderedGenerics = orderDependencies(old);
-			for (T generic : orderedGenerics.descendingSet())
-				removeGeneric(generic);
-			return orderedGenerics;
-		}
-
-		private <T extends Generic> NavigableSet<T> orderAndRemoveDependenciesForRemove(final T old) throws ConstraintViolationException {
-			NavigableSet<T> orderedGenerics = orderDependenciesForRemove(old);
-			for (T generic : orderedGenerics.descendingSet())
-				removeGeneric(generic);
-			return orderedGenerics;
-		}
-
-		abstract class Restructurator {
-			@SuppressWarnings("unchecked")
-			<T extends Generic> T rebuildAll(Generic old) throws ConstraintViolationException {
-				NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old);
-				dependencies.remove(old);
-				ConnectionMap map = new ConnectionMap();
-				map.put(old, rebuild());
-				return (T) map.reBind(dependencies).get(old);
-			}
-
-			abstract Generic rebuild();
-		}
-
 	}
 
 	@Override

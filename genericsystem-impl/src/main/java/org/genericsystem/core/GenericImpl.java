@@ -38,6 +38,7 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
+import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
@@ -60,6 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * @author Nicolas Feybesse
+ * @author Michael Ory
  * 
  */
 @SuppressWarnings("unchecked")
@@ -384,18 +387,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	// TODO clean
-	// @Override
-	// public void removePhantoms(Attribute attribute) {
-	// Snapshot<Holder> holders = getHolders(attribute, true);
-	// Iterator<Holder> iterator = holders.iterator();
-	// while (iterator.hasNext()) {
-	// Holder holder = iterator.next();
-	// if (holder.getValue() == null)
-	// holder.remove();
-	// }
-	// }
-
 	@Override
 	public <T extends Link> Snapshot<T> getLinks(final Relation relation, final Generic... targets) {
 		return getLinks(relation, getBasePos(relation), targets);
@@ -487,6 +478,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public <T extends Generic> Iterator<T> directInheritingsIterator() {
 		return getCurrentCache().directInheritingsIterator(this);
+	}
+
+	public <T extends Generic> Iterator<T> dependenciesIterator() {
+		return new ConcateIterator<T>(this.<T> directInheritingsIterator(), this.<T> compositesIterator());
 	}
 
 	@Override
@@ -760,10 +755,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			});
 
 			if (projection == null)
-				((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), getMeta(), new Generic[] { this }, newComponents, null, false, Statics.MULTIDIRECTIONAL)).markAsAutomatic();
+				((GenericImpl) getCurrentCache().bind(getMeta(), getHomeTreeNode(), new Generic[] { this }, newComponents, null, Statics.MULTIDIRECTIONAL, false)).markAsAutomatic();
 		}
 	}
 
+	// TODO KK => call project(Statics.MULDIRECTIONNAL)
 	public void project() {
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections());
 		while (cartesianIterator.hasNext()) {
@@ -779,7 +775,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			});
 
 			if (projection == null)
-				((GenericImpl) getCurrentCache().bind(getHomeTreeNode(), getMeta(), new Generic[] { this }, newComponents, null, false, Statics.MULTIDIRECTIONAL)).markAsAutomatic();
+				((GenericImpl) getCurrentCache().bind(getMeta(), getHomeTreeNode(), new Generic[] { this }, newComponents, null, Statics.MULTIDIRECTIONAL, false)).markAsAutomatic();
 		}
 	}
 
