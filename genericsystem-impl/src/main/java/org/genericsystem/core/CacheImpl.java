@@ -557,7 +557,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private boolean isConsistencyToCheck(CheckingType checkingType, boolean isFlushTime, Generic generic) {
 		if (isConstraintActivated(generic))
-			if (isFlushTime || isImmediatelyConsistencyCheckable((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()))
+			if (isFlushTime || ((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()).isImmediatelyConsistencyCheckable())
 				return true;
 		return false;
 	}
@@ -573,10 +573,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	protected boolean isConstraintValueSetting(Generic generic) {
 		return generic.isInstanceOf(find(ConstraintValue.class));
-	}
-
-	protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
-		return constraint.isImmediatelyConsistencyCheckable();
 	}
 
 	protected void checkConsistency(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
@@ -605,7 +601,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints(final CheckingType checkingType, final boolean isFlushTime, final Generic generic) throws ConstraintViolationException {
-
 		for (final Attribute attribute : ((Type) generic).getAttributes()) {
 			AbstractExtendedMap<AxedPropertyClass, Serializable> constraintMap = ((GenericImpl) attribute).getConstraintsMap();
 			TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
@@ -615,7 +610,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				constraints.put(keyHolder, valueHolder);
 			}
 			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
-				if (CacheImpl.this.isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
+				if (isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
 					int axe = ((AxedPropertyClass) entry.getKey().getValue()).getAxe();
 					if (AbstractAxedConstraintImpl.class.isAssignableFrom(entry.getKey().getClass()) && attribute.getComponent(axe) != null && (generic.isInstanceOf(attribute.getComponent(axe)))) {
 						entry.getKey().check(attribute, generic, entry.getValue(), axe);
@@ -623,13 +618,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 				}
 			}
 		}
-
 		AbstractExtendedMap<AxedPropertyClass, Serializable> constraintMap = ((GenericImpl) generic).getConstraintsMap();
 		TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
 		for (Serializable key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-
 			constraints.put(keyHolder, valueHolder);
 		}
 
@@ -637,7 +630,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Holder valueHolder = entry.getValue();
 			AbstractConstraintImpl keyHolder = entry.getKey();
 
-			if (CacheImpl.this.isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
+			if (isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
 				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
 				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
 				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
@@ -648,11 +641,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	public boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-		return (isFlushTime || isImmediatelyCheckable(constraint)) && constraint.isCheckedAt(generic, checkingType);
-	}
-
-	protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
-		return constraint.isImmediatelyCheckable();
+		return (isFlushTime || constraint.isImmediatelyCheckable()) && constraint.isCheckedAt(generic, checkingType);
 	}
 
 	@Override
