@@ -185,7 +185,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -198,14 +198,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 			dependencies.remove(generic);
 			for (Generic dependency : dependencies)
 				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, true);
-		break;
+			break;
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -366,7 +366,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T newType(Serializable value) {
-		return this.<T> newSubType(value);
+		return this.<T> newType(value);
 	}
 
 	@Override
@@ -375,12 +375,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	public <T extends Type> T newSubType(Serializable value, Type... userSupers) {
-		return newSubType(value, userSupers, Statics.EMPTY_GENERIC_ARRAY);
+	public <T extends Type> T newType(Serializable value, Type... userSupers) {
+		return newType(value, userSupers, Statics.EMPTY_GENERIC_ARRAY);
 	}
 
 	@Override
-	public <T extends Type> T newSubType(Serializable value, Type[] userSupers, Generic... components) {
+	public <T extends Type> T newType(Serializable value, Type[] userSupers, Generic... components) {
 		return bind(getEngine(), value, userSupers, components, null, Statics.MULTIDIRECTIONAL, false);
 	}
 

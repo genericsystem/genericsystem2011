@@ -55,7 +55,7 @@ public class GetSubTypeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type plane = cache.newType("Plane");
 		Type car = cache.newType("Car");
-		cache.newSubType("FlyingCar", car, plane);
+		cache.newType("FlyingCar", car, plane);
 		Generic subTypeFromPlane = plane.getSubType("FlyingCar");
 		Generic subTypeFromCar = car.getSubType("FlyingCar");
 		assert Objects.equals(subTypeFromPlane, subTypeFromCar);
@@ -111,7 +111,7 @@ public class GetSubTypeTest extends AbstractTest {
 		Type car = cache.newType("Car");
 		Attribute power = car.setAttribute("Power");
 		Attribute wheels = car.setAttribute("Wheels");
-		cache.newSubType("WheelsPower", power, wheels);
+		cache.newType("WheelsPower", power, wheels);
 		Generic subTypeFromPower = power.getSubType("WheelsPower");
 		Generic subTypeFromWheels = wheels.getSubType("WheelsPower");
 		assert Objects.equals(subTypeFromPower, subTypeFromWheels);
@@ -175,7 +175,7 @@ public class GetSubTypeTest extends AbstractTest {
 		Type plane = cache.newType("Plane");
 		Type human = cache.newType("Human");
 		Relation pilot = plane.setRelation("Pilot", human);
-		cache.newSubType("CarColorPilot", carColor, pilot);
+		cache.newType("CarColorPilot", carColor, pilot);
 		Generic subTypeFromCarColor = carColor.getSubType("CarColorPilot");
 		Generic subTypeFromPilot = pilot.getSubType("CarColorPilot");
 		assert Objects.equals(subTypeFromCarColor, subTypeFromPilot);

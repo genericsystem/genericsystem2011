@@ -18,7 +18,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType( "Window");
 		Type selectable = graphicComponent.newSubType( "Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 
 		assert selectableWindow.inheritsFrom(selectable);
 		assert selectableWindow.inheritsFrom(window);
@@ -29,7 +29,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
 		Type selectable = cache.newType("Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 		assert window.getDirectSubTypes().size() == 1 : window.getDirectSubTypes();
 		assert window.getDirectSubTypes().contains(selectableWindow) : window.getDirectSubTypes();
 
@@ -44,7 +44,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType( "Window");
 		Type selectable = graphicComponent.newSubType( "Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 
 		assert graphicComponent.getDirectSubTypes().size() == 2 : graphicComponent.getDirectSubTypes();
 		assert graphicComponent.getSubTypes().size() == 3 : graphicComponent.getSubTypes();
@@ -64,7 +64,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
 		Type selectable = cache.newType("Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 
 		Snapshot<Generic> allInstances = cache.getEngine().getAllInstances();
 		assert !allInstances.contains(cache.getEngine());
@@ -89,7 +89,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType( "Window");
 		Type selectable = graphicComponent.newSubType( "Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 
 		Snapshot<Generic> allSubTypes = graphicComponent.getSubTypes();
 		assert allSubTypes.size() == 3;
@@ -112,7 +112,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType( "Window");
 		Type selectable = graphicComponent.newSubType( "Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 
 		Snapshot<Generic> subTypes = graphicComponent.getDirectSubTypes();
 		assert subTypes.size() == 2;
@@ -141,7 +141,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.newType("Window");
 		Type selectable = cache.newType("Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 
 		assert selectableWindow.inheritsFrom(selectable);
 		assert selectableWindow.inheritsFrom(window);
@@ -153,7 +153,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType( "Window");
 		Type selectable = graphicComponent.newSubType( "Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 
 		Snapshot<Generic> subTypes = graphicComponent.getDirectSubTypes();
 		Snapshot<Generic> allSubTypes = graphicComponent.getSubTypes();
@@ -178,7 +178,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType( "Window");
 		Type selectable = graphicComponent.newSubType( "Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 		Attribute size = graphicComponent.setAttribute( "size");
 		Attribute selectedSelectable = selectable.setAttribute( "Selected");
 		Attribute height = selectableWindow.setAttribute( "height");
@@ -194,7 +194,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType( "Window");
 		Type selectable = graphicComponent.newSubType( "Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 		Attribute size = graphicComponent.setAttribute( "size");
 		Attribute selectedSelectable = selectable.setAttribute( "Selected");
 		Generic mySelectableWindow = selectableWindow.newInstance( "mySelectableWindow");
@@ -215,7 +215,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType( "Window");
 		Type selectable = graphicComponent.newSubType( "Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 
 		assert ((Holder) selectableWindow).getBaseComponent() == null : ((Holder) selectableWindow).getBaseComponent();
 	}
@@ -225,7 +225,7 @@ public class MultipleInheritanceTest extends AbstractTest {
 		Type graphicComponent = cache.newType("graphicComponent");
 		Type window = graphicComponent.newSubType( "Window");
 		Type selectable = graphicComponent.newSubType( "Selectable");
-		Type selectableWindow = cache.newSubType("selectableWindow", selectable, window);
+		Type selectableWindow = cache.newType("selectableWindow", selectable, window);
 
 		assert ((GenericImpl) selectableWindow).getTargetComponent() == null : ((GenericImpl) selectableWindow).getTargetComponent();
 	}

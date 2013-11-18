@@ -70,7 +70,7 @@ public class AddComponentSuperTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Type robot = cache.newType("Robot");
-		Type transformer = cache.newSubType("Transformer", robot, car);
+		Type transformer = cache.newType("Transformer", robot, car);
 		transformer = transformer.removeSuper(1);
 		assert !transformer.inheritsFrom(robot);
 		assert transformer.inheritsFrom(car);
@@ -82,9 +82,9 @@ public class AddComponentSuperTest extends AbstractTest {
 		Type vehicle = cache.newType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Type robot = cache.newType("Robot");
-		Type transformer = cache.newSubType("Transformer", robot, car);
+		Type transformer = cache.newType("Transformer", robot, car);
 		Type clonable = cache.newType("Clonable");
-		Type transformerClonable = cache.newSubType("TransformerClonable", transformer, clonable);
+		Type transformerClonable = cache.newType("TransformerClonable", transformer, clonable);
 		transformerClonable = transformerClonable.removeSuper(0);
 		assert transformerClonable.inheritsFrom(clonable);
 		assert !transformerClonable.inheritsFrom(robot);
