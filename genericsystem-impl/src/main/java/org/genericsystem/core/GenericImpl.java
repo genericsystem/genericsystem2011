@@ -629,6 +629,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return holder;
 	}
 
+	public <T extends Relation> T addSubProperty(Attribute attribute, Serializable value, Generic... targets) {
+		return addSubAttribute(attribute, value, targets).enableSingularConstraint();
+	}
+
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
 		return this.<T> bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, value, specializationClass, attribute, basePos, false, targets);
 	}
@@ -638,6 +642,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (int i = 0; i < additionals.length; i++)
 			if (i >= components.length || (components[i] != null && !components[i].inheritsFrom(additionals[i])))
 				result.add(additionals[i]);
+		return result.toArray(new Generic[result.size()]);
+	}
+
+	// TODO A IMPLEMENTER
+	public static Generic[] enrichSupers(Generic[] supers, Generic[] additionals) {
+		List<Generic> result = new ArrayList<>(Arrays.asList(supers));
+		for (int i = 0; i < additionals.length; i++)
+			for (int j = 0; j < supers.length; j++)
+				if (additionals[i].inheritsFrom(supers[j]))
+					result.add(i, additionals[i]);
+
 		return result.toArray(new Generic[result.size()]);
 	}
 
@@ -821,8 +836,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
 			return false;
 		boolean inheritance = ((GenericImpl) generic).isSuperOf2(this);
-		// boolean inheritance2 = inheritsFrom2(generic);
-		// assert inheritance == inheritance2 : "" + this.info() + generic.info() + " : " + inheritance + " != " + inheritance2;
+		boolean inheritance3 = ((GenericImpl) generic).isSuperOf3(this);
+		assert inheritance == inheritance3 : this.info() + generic.info() + " : " + inheritance + " != " + inheritance3;
 		boolean superOf = ((GenericImpl) generic).isSuperOf(this);
 		assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
 		return superOf;
@@ -871,6 +886,55 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public boolean isSuperOf(HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
 		return subHomeTreeNode.inheritsFrom(homeTreeNode) && isSuperOf(primaries, components, subPrimaries, subComponents);
+	}
+
+	public boolean isSuperOf3(Generic subGeneric) {
+		return isSuperOf3(((GenericImpl) subGeneric).getHomeTreeNode(), ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
+	}
+
+	public boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] subSupers, Generic[] subComponents) {
+		if (!isSuperOf3(homeTreeNode, subSupers))
+			return false;
+
+		if (!isSuperOf3(subComponents))
+			return false;
+
+		return true;
+	}
+
+	private boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] subSupers) {
+		if (homeTreeNode.inheritsFrom(getHomeTreeNode()))
+			return true;
+		for (Generic sub : subSupers)
+			if (sub.inheritsFrom(this))
+				return true;
+		return false;
+	}
+
+	private boolean isSuperOf3(Generic[] subComponents) {
+		if (components.length == subComponents.length) {
+			for (int i = 0; i < subComponents.length; i++) {
+				if (components[i] != null && subComponents[i] != null) {
+					if (!Arrays.equals(components, ((GenericImpl) components[i]).components) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
+						if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
+							return false;
+				}
+				if (components[i] == null) {
+					if (!Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
+						return false;
+				} else if (subComponents[i] == null)
+					if (!components[i].isEngine() && (!Arrays.equals(components, ((GenericImpl) components[i]).components)))
+						return false;
+			}
+			return true;
+		}
+
+		if (components.length < subComponents.length)
+			for (int i = 0; i < subComponents.length; i++)
+				if (isSuperOf3(Statics.truncate(i, subComponents)))
+					return true;
+
+		return false;
 	}
 
 	public static boolean isSuperOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
@@ -1513,6 +1577,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public boolean equiv(HomeTreeNode[] primaries, Generic[] components) {
 		return Arrays.equals(this.primaries, primaries) && Arrays.equals(this.components, nullToSelfComponent(components));
+	}
+
+	public boolean equiv(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
+		return getHomeTreeNode().equals(homeTreeNode) && Arrays.equals(this.supers, supers) && Arrays.equals(this.components, nullToSelfComponent(components));
 	}
 
 	public <T extends Generic> T reBind() {

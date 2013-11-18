@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.FunctionalConsistencyViolationException;
@@ -30,6 +31,7 @@ class Vertex {
 		this.homeTreeNode = homeTreeNode;
 		primaries = new Primaries(homeTreeNode, supers).toArray();
 		components = aliveNullComponents;
+		this.supers = supers;
 	}
 
 	HomeTreeNode getHomeTreeNode() {
@@ -86,11 +88,11 @@ class Vertex {
 
 					@Override
 					public boolean isSelected(Generic candidate) {
-						boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
+						boolean result = ((GenericImpl) candidate).isSuperOf3(homeTreeNode, supers, components);
 						if (result)
 							return true;
 						if (basePos != Statics.MULTIDIRECTIONAL)
-							if (GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components)) {
+							if (((GenericImpl) meta).isSuperOf3(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components)) {
 								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
 									if (basePos < ((GenericImpl) candidate).components.length)
 										if (!components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
@@ -101,7 +103,7 @@ class Vertex {
 
 											}
 										} else {
-											if (((GenericImpl) candidate).equiv(new Primaries(candidate, primaries).toArray(), GenericImpl.enrich(components, ((GenericImpl) candidate).components)))
+											if (((GenericImpl) candidate).equiv(homeTreeNode, GenericImpl.enrichSupers(supers, ((GenericImpl) candidate).supers), GenericImpl.enrich(components, ((GenericImpl) candidate).components)))
 												return true;
 										}
 								}
