@@ -215,7 +215,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Generic rebuild() {
 				Generic meta = old.getMeta();
 				HomeTreeNode homeTreeNode = ((GenericImpl) meta).bindInstanceNode(value);
-				return internalFindOrBuild(meta, new Vertex(CacheImpl.this, homeTreeNode, ((GenericImpl) old).supers, ((GenericImpl) old).selfToNullComponents()), old.getClass(), Statics.MULTIDIRECTIONAL, false);
+				return noDependencyBind(meta, new Vertex(CacheImpl.this, homeTreeNode, ((GenericImpl) old).supers, ((GenericImpl) old).selfToNullComponents()), old.getClass(), Statics.MULTIDIRECTIONAL, false);
 			}
 		}.rebuildAll(old);
 	}
@@ -224,8 +224,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new Restructurator() {
 			@Override
 			Generic rebuild() {
-				return internalFindOrBuild(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos)),
-						old.getClass(), Statics.MULTIDIRECTIONAL, false);
+				return noDependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos)), old.getClass(),
+						Statics.MULTIDIRECTIONAL, false);
 			}
 		}.rebuildAll(old);
 	}
@@ -234,7 +234,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new Restructurator() {
 			@Override
 			Generic rebuild() {
-				return internalFindOrBuild(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents())), old.getClass(),
+				return noDependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents())), old.getClass(),
 						Statics.MULTIDIRECTIONAL, false);
 			}
 		}.rebuildAll(old);
@@ -244,7 +244,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new Restructurator() {
 			@Override
 			Generic rebuild() {
-				return internalFindOrBuild(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents()), old.getClass(),
+				return noDependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents()), old.getClass(),
 						Statics.MULTIDIRECTIONAL, true);
 			}
 		}.rebuildAll(old);
@@ -256,7 +256,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new Restructurator() {
 			@Override
 			Generic rebuild() {
-				return internalFindOrBuild(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents()), old.getClass(),
+				return noDependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents()), old.getClass(),
 						Statics.MULTIDIRECTIONAL, true);
 			}
 		}.rebuildAll(old);
@@ -457,10 +457,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 	private class ConnectionMap extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 8257917150315417734L;
 
-		private ConnectionMap reBind(Generic bind, Set<Generic> dependencies, NavigableSet<Generic> allDependencies, int basePos) {
+		private ConnectionMap reBind(Generic bind, Set<Generic> directDependencies, NavigableSet<Generic> allDependencies, int basePos) {
 			for (Generic dependency : allDependencies)
 				if (Statics.MULTIDIRECTIONAL == basePos || !((GenericImpl) bind).getComponent(basePos).equals(((Holder) dependency).getComponent(basePos)))
-					if (dependencies.contains(dependency))
+					if (directDependencies.contains(dependency))
 						reBindDependency(bind, dependency, basePos);
 					else
 						reBindDependency(dependency);
@@ -475,7 +475,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Generic[] supers = adjust(((GenericImpl) dependency).supers);
 			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
 			Generic meta = adjust(((GenericImpl) dependency).getMeta())[0];
-			put(dependency, internalFindOrBuild(meta, new Vertex(CacheImpl.this, newHomeTreeNode, supers, components), dependency.getClass(), basePos, false));
+			put(dependency, noDependencyBind(meta, new Vertex(CacheImpl.this, newHomeTreeNode, supers, components), dependency.getClass(), basePos, false));
 		}
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
@@ -489,7 +489,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			HomeTreeNode homeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
 			Generic[] supers = adjust(((GenericImpl) dependency).supers);
 			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
-			put(dependency, internalFindOrBuild(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), dependency.getClass(), Statics.MULTIDIRECTIONAL, false));
+			put(dependency, noDependencyBind(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), dependency.getClass(), Statics.MULTIDIRECTIONAL, false));
 		}
 
 		private Generic[] adjust(Generic... oldComponents) {
@@ -504,13 +504,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	<T extends Generic> T internalFindOrBuild(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException) throws RollbackException {
+	<T extends Generic> T noDependencyBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException) throws RollbackException {
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
-		return buildAndInsertComplex(vertex.getHomeTreeNode(), specializationClass, vertex.getSupers(), vertex.getComponents());
+		return buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents());
 	}
 
 	<T extends Generic> T internalBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException) throws RollbackException {
