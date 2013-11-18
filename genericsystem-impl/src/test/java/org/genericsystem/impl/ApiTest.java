@@ -569,7 +569,7 @@ public class ApiTest extends AbstractTest {
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Type robot = cache.newType("Robot");
 		Attribute robotPower = robot.addProperty("power");
-		Type transformer = cache.newSubType("Transformer", vehicle, robot);
+		Type transformer = cache.newType("Transformer", vehicle, robot);
 		Relation transformerPower = ((GenericImpl) transformer).addProperty("power");
 		assert transformerPower.inheritsFrom(vehiclePower);
 		assert transformerPower.inheritsFrom(robotPower);
@@ -585,7 +585,7 @@ public class ApiTest extends AbstractTest {
 		Type robot = vehicle.newSubType("Robot");
 		Attribute robotPower = robot.addProperty("power");
 		assert robotPower.inheritsFrom(vehiclePower);
-		Type transformer = cache.newSubType("Transformer", car, robot);
+		Type transformer = cache.newType("Transformer", car, robot);
 		Relation transformerPower = ((GenericImpl) transformer).addProperty("power");
 		assert transformerPower.isSingularConstraintEnabled();
 		assert transformerPower.inheritsFrom(carPower);
