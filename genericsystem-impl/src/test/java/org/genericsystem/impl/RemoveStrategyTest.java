@@ -52,6 +52,23 @@ public class RemoveStrategyTest extends AbstractTest {
 		assert !myCarRed.isAlive();
 	}
 
+	public void testRemoveForce2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.newType("Car");
+		Type color = cache.newType("Color");
+		Relation carColor = car.setRelation("CarColor", color);
+		carColor.enableSingularConstraint();
+
+		Generic myCar = car.newInstance("myCar");
+		Generic red = color.newInstance("Red");
+		Link carRed = car.setLink(carColor, "carRed", red);
+
+		Link myCarRed = myCar.setLink(carColor, "myCarRed", red);
+
+		carRed.remove(RemoveStrategy.FORCE);
+		assert !myCarRed.isAlive();
+	}
+
 	public void testRemoveConserve() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.newType("Car");

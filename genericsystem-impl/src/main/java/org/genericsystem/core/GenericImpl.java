@@ -327,7 +327,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public void cancel(Holder holder) {
 		clear(holder);
-		holder = unambigousFirst(holdersIterator(holder, holder.getMetaLevel() + 1, getBasePos(holder)));
+		holder = unambigousFirst(holdersIterator(holder, holder.getMetaLevel(), getBasePos(holder)));
 		if (holder != null)
 			addHolder(holder, null, getBasePos(holder), holder.getMetaLevel(), Statics.truncate(getBasePos(holder), ((GenericImpl) holder).components));
 	}
@@ -349,7 +349,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void clear(Holder holder) {
-		holder = unambigousFirst(holdersIterator(holder, holder.getMetaLevel() + 1, getBasePos(holder)));
+		holder = unambigousFirst(holdersIterator(holder, holder.getMetaLevel(), getBasePos(holder)));
 		if (holder != null && equals(holder.getBaseComponent()))
 			holder.remove();
 	}
