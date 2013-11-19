@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -26,7 +25,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 	static final String MAP_VALUE = "map";
 
 	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> {
-		abstract public Holder getValueHolder(Serializable key);
+		abstract public Holder getValueHolder(K key);
 	}
 
 	@Override
@@ -51,28 +50,45 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Value get(Object key) {
-				Holder valueHolder = getValueHolder((Serializable) key);
+				Holder valueHolder = getValueHolder((Key) key);
 				return valueHolder != null ? valueHolder.<Value> getValue() : null;
 			}
 
+			private Holder getMapHolder() {
+				return ((GenericImpl) generic).<GenericImpl> getHolderByValue(Statics.CONCRETE, (Holder) AbstractMapProvider.this, MAP_VALUE);
+			}
+
+			private Holder getKeyHolder(Key key) {
+				Holder mapHolder = getMapHolder();
+				return mapHolder != null ? ((GenericImpl) mapHolder).getHolderByValue(Statics.CONCRETE, getRealKeyAttribute(key), key) : null;
+			}
+
 			@Override
-			public Holder getValueHolder(Serializable key) {
+			public Holder getValueHolder(Key key) {
 				Holder keyHolder = getKeyHolder(key);
 				return keyHolder != null ? keyHolder.getHolder(getValueAttribute()) : null;
 			}
 
-			private Holder getKeyHolder(Serializable key) {
-				GenericImpl map = generic.getHolder(AbstractMapProvider.this);
-				return map != null ? map.getHolderByValue(Statics.CONCRETE, getKeyAttribute(), key) : null;
+			private Attribute getValueAttribute() {
+				return getCurrentCache().<Attribute> find(getValueAttributeClass());
+			}
+
+			private Attribute getRealKeyAttribute(Key key) {
+				if (key instanceof AxedPropertyClass) {
+					Attribute attribute = getCurrentCache().find(((AxedPropertyClass) key).getClazz());
+					// TODO kk ?
+					if (attribute.<AxedPropertyClass> getValue().getAxe() == ((AxedPropertyClass) key).getAxe())
+						return attribute;
+				}
+				return getKeyAttribute();
 			}
 
 			@Override
 			public Value put(Key key, Value value) {
 				Value oldValue = get(key);
-				if (Objects.equals(oldValue, value))
+				if (Objects.equals(oldValue, value))// TODO KK
 					return oldValue;
-				Holder attribute = getRealKeyAttribute(key);
-				Holder keyHolder = generic.<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), attribute, (Serializable) key);
+				Holder keyHolder = ((GenericImpl) generic).<GenericImpl> setHolderByValue(AbstractMapProvider.this, MAP_VALUE).setHolderByValue(getSpecializationClass(key), getRealKeyAttribute(key), (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
 			}
@@ -139,6 +155,10 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	}
 
+	private Attribute getKeyAttribute() {
+		return getCurrentCache().<Attribute> find(getKeyAttributeClass());
+	}
+
 	protected <T extends GenericImpl> Class<T> getSpecializationClass(Key key) {
 		return null;
 	};
@@ -147,21 +167,4 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 	public abstract <T extends Attribute> Class<T> getValueAttributeClass();
 
-	private Attribute getKeyAttribute() {
-		return getCurrentCache().<Attribute> find(getKeyAttributeClass());
-	}
-
-	private Attribute getRealKeyAttribute(Key key) {
-		if (key instanceof AxedPropertyClass) {
-			Attribute attribute = getCurrentCache().find(((AxedPropertyClass) key).getClazz());
-			// TODO kk ?
-			if (attribute.<AxedPropertyClass> getValue().getAxe() == ((AxedPropertyClass) key).getAxe())
-				return attribute;
-		}
-		return getKeyAttribute();
-	}
-
-	private Attribute getValueAttribute() {
-		return getCurrentCache().<Attribute> find(getValueAttributeClass());
-	}
 }
