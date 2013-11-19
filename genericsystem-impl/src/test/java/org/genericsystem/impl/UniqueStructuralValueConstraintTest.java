@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -20,8 +21,8 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 
 	public void testTwoTypesWithSameNameOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.addType("Car");
-		Type car2 = cache.addType("Car");
+		Type car = cache.setType("Car");
+		Type car2 = cache.setType("Car");
 		assert Objects.equals(car, car2);
 	}
 

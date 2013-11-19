@@ -149,8 +149,8 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 
 	public void testComportementValueWithRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.addType("Human");
-		Type vehicle = cache.addType("Human");
+		Type human = cache.setType("Human");
+		Type vehicle = cache.setType("Human");
 		Relation humanDriveVehicle = human.setRelation("drive", vehicle);
 		assert !humanDriveVehicle.isReferentialIntegrity(Statics.BASE_POSITION);
 		Generic myck = human.newInstance("myck");

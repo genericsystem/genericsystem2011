@@ -89,7 +89,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
-		assert myVehicle.getLink(vehicleColor, cache.addType("Date")) == null;
-		assert myVehicle.getLinks(vehicleColor, cache.addType("Date")).size() == 0;
+		assert myVehicle.getLink(vehicleColor, cache.setType("Date")) == null;
+		assert myVehicle.getLinks(vehicleColor, cache.setType("Date")).size() == 0;
 	}
 }
