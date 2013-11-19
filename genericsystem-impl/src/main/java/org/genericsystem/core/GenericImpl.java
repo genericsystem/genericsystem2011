@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -875,9 +874,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public boolean isSuperOf3(Generic subGeneric) {
-		log.info("***************************************");
+		// log.info("***************************************");
 		boolean result1 = isSuperOf3(((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
-		log.info("------------------------------------");
+		// log.info("------------------------------------");
 		// boolean result2 = isSuperOf3(homeTreeNode, supers, components, subGeneric);
 		// assert result1 == result2 : result2 + this.info() + subGeneric.info();
 		return result1;
