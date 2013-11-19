@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import org.genericsystem.core.Statics.Components;
 import org.genericsystem.core.Statics.Primaries;
+import org.genericsystem.core.Statics.Supers;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.RollbackException;
@@ -30,6 +32,7 @@ class Vertex {
 		this.homeTreeNode = homeTreeNode;
 		primaries = new Primaries(homeTreeNode, supers).toArray();
 		components = aliveNullComponents;
+		this.supers = supers;
 	}
 
 	HomeTreeNode getHomeTreeNode() {
@@ -57,7 +60,7 @@ class Vertex {
 		supers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos);
 		for (Generic directSuper : supers) {
 			primaries = new Primaries(directSuper, primaries).toArray();
-			components = GenericImpl.enrich(components, ((GenericImpl) directSuper).components);
+			components = new Components(components, ((GenericImpl) directSuper).components).toArray();
 		}
 	}
 
@@ -86,11 +89,11 @@ class Vertex {
 
 					@Override
 					public boolean isSelected(Generic candidate) {
-						boolean result = GenericImpl.isSuperOf(((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components, primaries, components);
+						boolean result = ((GenericImpl) candidate).isSuperOf3(homeTreeNode, supers, components);
 						if (result)
 							return true;
 						if (basePos != Statics.MULTIDIRECTIONAL)
-							if (GenericImpl.isSuperOf(((GenericImpl) meta).primaries, ((GenericImpl) meta).components, ((GenericImpl) candidate).primaries, ((GenericImpl) candidate).components)) {
+							if (((GenericImpl) meta).isSuperOf3(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components)) {
 								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
 									if (basePos < ((GenericImpl) candidate).components.length)
 										if (!components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
@@ -101,7 +104,7 @@ class Vertex {
 
 											}
 										} else {
-											if (((GenericImpl) candidate).equiv(new Primaries(candidate, primaries).toArray(), GenericImpl.enrich(components, ((GenericImpl) candidate).components)))
+											if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), new Components(components, ((GenericImpl) candidate).components).toArray()))
 												return true;
 										}
 								}
@@ -175,5 +178,4 @@ class Vertex {
 
 		public abstract Iterator<T> cacheSupplier();
 	}
-
 }
