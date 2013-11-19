@@ -2,13 +2,15 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,8 +152,7 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {
-		}
+		private Flag() {}
 
 		@Override
 		public String toString() {
@@ -213,6 +214,67 @@ public class Statics {
 		return new SimpleDateFormat(Statics.PATTERN).format(new Date(ts / Statics.MILLI_TO_NANOSECONDS)) + "---" + ts;
 	}
 
+	public static Generic[] enrichComponents(Generic[] components, Generic[] additionals) {
+		List<Generic> result = new ArrayList<>(Arrays.asList(components));
+		for (int i = 0; i < additionals.length; i++)
+			if (i >= components.length || (components[i] != null && !components[i].inheritsFrom(additionals[i])))
+				result.add(additionals[i]);
+		return result.toArray(new Generic[result.size()]);
+	}
+
+	public static class Components extends ArrayList<Generic> {
+		private static final long serialVersionUID = -3285243912802228927L;
+
+		public Components(Generic[] components, Generic... adds) {
+			super(Arrays.asList(components));
+			for (int i = 0; i < adds.length; i++)
+				if (i >= components.length || (components[i] != null && !components[i].inheritsFrom(adds[i])))
+					add(adds[i]);
+		}
+
+		@Override
+		public Generic[] toArray() {
+			return toArray(new Generic[size()]);
+		}
+	}
+
+	public static class Supers extends TreeSet<Generic> {
+		private static final long serialVersionUID = 4756135385933890439L;
+
+		public Supers(Generic... supers) {
+			for (Generic superGeneric : supers)
+				add(superGeneric);
+		}
+
+		public Supers(Generic[] supers, Generic add) {
+			this(supers);
+			add(add);
+		}
+
+		public Supers(Generic[] supers, Generic[] adds) {
+			this(supers);
+			for (Generic add : adds)
+				add(add);
+		}
+
+		@Override
+		public Generic[] toArray() {
+			return toArray(new Generic[size()]);
+		}
+
+		@Override
+		public boolean add(Generic candidate) {
+			for (Generic generic : this)
+				if (generic.inheritsFrom(candidate))
+					return false;
+			Iterator<Generic> it = iterator();
+			while (it.hasNext())
+				if (candidate.inheritsFrom(it.next()))
+					it.remove();
+			return super.add(candidate);
+		}
+	}
+
 	public static class Primaries extends TreeSet<HomeTreeNode> {
 		private static final long serialVersionUID = 7222889429002770779L;
 
@@ -248,11 +310,9 @@ public class Statics {
 				if (homeTreeNode.inheritsFrom(candidate))
 					return false;
 			Iterator<HomeTreeNode> it = this.iterator();
-			while (it.hasNext()) {
-				HomeTreeNode next = it.next();
-				if (candidate.inheritsFrom(next))
+			while (it.hasNext())
+				if (candidate.inheritsFrom(it.next()))
 					it.remove();
-			}
 			return super.add(candidate);
 		}
 

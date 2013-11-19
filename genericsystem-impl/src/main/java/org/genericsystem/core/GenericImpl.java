@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -27,6 +26,7 @@ import org.genericsystem.constraints.UniqueValueConstraintImpl;
 import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
+import org.genericsystem.core.Statics.Components;
 import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.exception.AmbiguousSelectionException;
 import org.genericsystem.exception.RollbackException;
@@ -637,25 +637,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.<T> bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, value, specializationClass, attribute, basePos, false, targets);
 	}
 
-	public static Generic[] enrich(Generic[] components, Generic[] additionals) {
-		List<Generic> result = new ArrayList<>(Arrays.asList(components));
-		for (int i = 0; i < additionals.length; i++)
-			if (i >= components.length || (components[i] != null && !components[i].inheritsFrom(additionals[i])))
-				result.add(additionals[i]);
-		return result.toArray(new Generic[result.size()]);
-	}
-
-	// TODO A IMPLEMENTER
-	public static Generic[] enrichSupers(Generic[] supers, Generic[] additionals) {
-		List<Generic> result = new ArrayList<>(Arrays.asList(supers));
-		for (int i = 0; i < additionals.length; i++)
-			for (int j = 0; j < supers.length; j++)
-				if (additionals[i].inheritsFrom(supers[j]))
-					result.add(i, additionals[i]);
-
-		return result.toArray(new Generic[result.size()]);
-	}
-
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, Generic... targets) {
 		return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, getBasePos(attribute), targets);
 	}
@@ -759,7 +740,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final Generic[] components = (Generic[]) cartesianIterator.next();
-			final Generic[] newComponents = enrich(components, GenericImpl.this.components);
+			final Generic[] newComponents = new Components(components, GenericImpl.this.components).toArray();
 			for (Generic component : newComponents)
 				assert component.isAlive();
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
@@ -779,7 +760,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections());
 		while (cartesianIterator.hasNext()) {
 			final Generic[] components = (Generic[]) cartesianIterator.next();
-			final Generic[] newComponents = enrich(components, GenericImpl.this.components);
+			final Generic[] newComponents = new Components(components, GenericImpl.this.components).toArray();
 			for (Generic component : newComponents)
 				assert component.isAlive();
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {

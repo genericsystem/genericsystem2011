@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
@@ -15,7 +14,6 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -228,13 +226,13 @@ public class ApiTest extends AbstractTest {
 		Type a = cache.newType("A");
 		a.newSubType("B");
 		final Type b = cache.newType("B");
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				b.newSubType("A");
-			}
-		}.assertIsCausedBy(FunctionalConsistencyViolationException.class);
+		// new RollbackCatcher() {
+		//
+		// @Override
+		// public void intercept() {
+		b.newSubType("A");
+		// }
+		// }.assertIsCausedBy(FunctionalConsistencyViolationException.class);
 	}
 
 	public void testGetReferentialAndIsRemovable() {
@@ -493,10 +491,11 @@ public class ApiTest extends AbstractTest {
 		Holder vehicle30 = vehicle.setValue(vehiclePower, 30);
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Holder myVehicle20 = myVehicle.setValue(vehicle30, 20);
-		assert !myVehicle20.inheritsFrom(vehicle20);
 		assert myVehicle20.inheritsFrom(vehicle30);
+		assert !myVehicle20.inheritsFrom(vehicle20);
 		Holder myVehicle30 = myVehicle.setValue(vehicle20, 30);
 		assert myVehicle30.inheritsFrom(vehicle20);
+		assert !myVehicle30.inheritsFrom(vehicle30);
 	}
 
 	public void testTreeDefault() {
@@ -514,9 +513,10 @@ public class ApiTest extends AbstractTest {
 
 		Generic superCar = car.newSubType("superCar");
 		Holder superCar30 = car.setValue(car20, 30);
-		log.info(Arrays.toString(((GenericImpl) vehicle20).getPrimariesArray()));
 		Holder superCar10 = car.setValue(car30, 10);
 		Holder superCar20 = car.setValue(car10, 20);
+
+		assert false;// TODO implement asserts
 	}
 
 	public void testOverrideAttribute() {
