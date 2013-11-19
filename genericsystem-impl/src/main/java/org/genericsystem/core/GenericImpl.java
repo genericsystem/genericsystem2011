@@ -294,6 +294,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return setHolder(attribute, value, getBasePos(attribute), targets);
 	}
 
+	public <T extends Holder> T setHolderByValue(Class<?> specializationClass, Holder attribute, Serializable value, Generic... targets) {
+		Holder holder = getHolderByValue(Statics.CONCRETE, attribute, value);
+		return setHolder(specializationClass, holder != null ? holder : attribute, value, getBasePos(attribute), targets);
+	}
+
+	public <T extends Holder> T setHolderByValue(Holder attribute, Serializable value, Generic... targets) {
+		Holder holder = getHolderByValue(Statics.CONCRETE, attribute, value);
+		return setHolder(holder != null ? holder : attribute, value, getBasePos(attribute), targets);
+	}
+
 	@Override
 	public <T extends Holder> T addHolder(Holder attribute, int basePos, Serializable value, Generic... targets) {
 		return addHolder(attribute, value, basePos, Statics.CONCRETE, targets);
@@ -819,9 +829,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		boolean inheritance = ((GenericImpl) generic).isSuperOf2(this);
 		boolean inheritance3 = ((GenericImpl) generic).isSuperOf3(this);
 		assert inheritance == inheritance3 : this.info() + generic.info() + " : " + inheritance + " != " + inheritance3;
-		boolean superOf = ((GenericImpl) generic).isSuperOf(this);
-		assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
-		return superOf;
+		// boolean superOf = ((GenericImpl) generic).isSuperOf(this);
+		// assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
+		return inheritance3;
 	}
 
 	public boolean inheritsFrom2(Generic generic) {
@@ -870,21 +880,22 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public boolean isSuperOf3(Generic subGeneric) {
-		return isSuperOf3(((GenericImpl) subGeneric).getHomeTreeNode(), ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
+		return isSuperOf3(((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
 	}
 
-	public boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] subSupers, Generic[] subComponents) {
-		if (!isSuperOf3(homeTreeNode, subSupers))
+	public boolean isSuperOf3(HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
+		if (equiv(subHomeTreeNode, subSupers, subComponents))
+			return true;
+		if (!internalIsSuperOf3(subHomeTreeNode, subSupers))
 			return false;
-
-		if (!isSuperOf3(subComponents))
+		if (!internalIsSuperOf3(components, subComponents))
 			return false;
 
 		return true;
 	}
 
-	private boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] subSupers) {
-		if (homeTreeNode.inheritsFrom(getHomeTreeNode()))
+	private boolean internalIsSuperOf3(HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
+		if ((!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()) && subHomeTreeNode.inheritsFrom(getHomeTreeNode()))
 			return true;
 		for (Generic sub : subSupers)
 			if (sub.inheritsFrom(this))
@@ -892,12 +903,33 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return false;
 	}
 
-	private boolean isSuperOf3(Generic[] subComponents) {
+	// public static boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
+	// if (homeTreeNode.equals(homeTreeNode) && Arrays.equals(supers, subSupers) && Arrays.equals(components, subComponents))
+	// return true;
+	//
+	// if (!internalIsSuperOf3(homeTreeNode, supers, components, subHomeTreeNode, subSupers))
+	// return false;
+	//
+	// if (!internalIsSuperOf3(components, subComponents))
+	// return false;
+	// return true;
+	// }
+
+	// private static boolean internalIsSuperOf3(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
+	// if ((!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()) && subHomeTreeNode.inheritsFrom(homeTreeNode))
+	// return true;
+	// for (Generic subSuper : subSupers)
+	// if (isSuperOf3(homeTreeNode, supers, components, ((GenericImpl) subSuper).homeTreeNode, ((GenericImpl) subSuper).supers, ((GenericImpl) subSuper).components))
+	// return true;
+	// return false;
+	// }
+
+	private static boolean internalIsSuperOf3(Generic[] components, Generic[] subComponents) {
 		if (components.length == subComponents.length) {
 			for (int i = 0; i < subComponents.length; i++) {
 				if (components[i] != null && subComponents[i] != null) {
 					if (!Arrays.equals(components, ((GenericImpl) components[i]).components) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
-						if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
+						if (!((GenericImpl) components[i]).isSuperOf3(subComponents[i]))
 							return false;
 				}
 				if (components[i] == null) {
@@ -912,7 +944,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 		if (components.length < subComponents.length)
 			for (int i = 0; i < subComponents.length; i++)
-				if (isSuperOf3(Statics.truncate(i, subComponents)))
+				if (internalIsSuperOf3(components, Statics.truncate(i, subComponents)))
 					return true;
 
 		return false;
@@ -1759,9 +1791,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return null;
 		T result = iterator.next();
 		if (iterator.hasNext()) {
-			String message = "" + ((Generic) result).info();
+			String message = "" + ((Generic) result).getComponents().get(0).info();
 			while (iterator.hasNext())
-				message += " / " + ((Generic) iterator.next()).info();
+				message += " / " + ((Generic) iterator.next()).getComponents().get(0).info();
 			this.getCurrentCache().rollback(new AmbiguousSelectionException("Ambigous selection : " + message));
 		}
 		return result;
