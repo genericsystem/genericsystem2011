@@ -59,8 +59,8 @@ public class SystemPropertyTest extends AbstractTest {
 
 	public void cascadeRemoveTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
-		Type vehicle = cache.newType("Vehicle");
+		Type human = cache.addType("Human");
+		Type vehicle = cache.addType("Vehicle");
 		Relation humanPossessVehicle = human.setRelation("possess", vehicle);
 		assert !humanPossessVehicle.isCascadeRemove(0);
 		humanPossessVehicle.enableCascadeRemove(0);
@@ -88,8 +88,8 @@ public class SystemPropertyTest extends AbstractTest {
 
 	public void isEnabledSystemPropertyTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
-		Type vehicle = cache.newType("Vehicle");
+		Type human = cache.addType("Human");
+		Type vehicle = cache.addType("Vehicle");
 		Relation humanOwnVehicle = human.setRelation("ownership", vehicle);
 		// humanOwnVehicle.enableMultiDirectional();
 		// assert humanOwnVehicle.isMultiDirectional();
@@ -108,8 +108,8 @@ public class SystemPropertyTest extends AbstractTest {
 
 	public void isEnabledSystemPropertyAxedTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
-		Type vehicle = cache.newType("Vehicle");
+		Type human = cache.addType("Human");
+		Type vehicle = cache.addType("Vehicle");
 		Relation humanOwnVehicle = human.setRelation("ownership", vehicle);
 		humanOwnVehicle.enableCascadeRemove(0);
 		assert humanOwnVehicle.isCascadeRemove(0);
@@ -121,8 +121,8 @@ public class SystemPropertyTest extends AbstractTest {
 
 	public void isEnabledSystemPropertyAxedTest2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
-		Type vehicle = cache.newType("Vehicle");
+		Type human = cache.addType("Human");
+		Type vehicle = cache.addType("Vehicle");
 		Relation humanOwnVehicle = human.setRelation("ownership", vehicle);
 		humanOwnVehicle.enableCascadeRemove(0);
 		assert humanOwnVehicle.isCascadeRemove(0);
@@ -142,8 +142,8 @@ public class SystemPropertyTest extends AbstractTest {
 
 	public void cascadeRemoveProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableCascadeRemove(Statics.TARGET_POSITION);
 
@@ -164,8 +164,8 @@ public class SystemPropertyTest extends AbstractTest {
 
 	public void cascadeRemovePropertyDisabled() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type motor = cache.newType("Motor");
+		Type car = cache.addType("Car");
+		Type motor = cache.addType("Motor");
 		Relation powered = car.setRelation("powered by", motor);
 
 		Generic myBmw = car.newInstance("myBmw");

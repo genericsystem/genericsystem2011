@@ -15,8 +15,8 @@ public class RemoveStrategyTest extends AbstractTest {
 
 	public void testRemoveNormal() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
@@ -37,8 +37,8 @@ public class RemoveStrategyTest extends AbstractTest {
 
 	public void testRemoveForce() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
@@ -54,8 +54,8 @@ public class RemoveStrategyTest extends AbstractTest {
 
 	public void testRemoveForce2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
@@ -71,8 +71,8 @@ public class RemoveStrategyTest extends AbstractTest {
 
 	public void testRemoveConserve() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
@@ -91,8 +91,8 @@ public class RemoveStrategyTest extends AbstractTest {
 
 	public void testRemoveConserveNotSingular() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 
 		Generic myCar = car.newInstance("myCar");
@@ -109,8 +109,8 @@ public class RemoveStrategyTest extends AbstractTest {
 
 	public void testRemoveProject() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 

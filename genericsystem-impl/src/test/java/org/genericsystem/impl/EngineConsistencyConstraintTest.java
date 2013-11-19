@@ -11,7 +11,7 @@ public class EngineConsistencyConstraintTest extends AbstractTest {
 
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		try {
 			((EngineImpl) vehicle.getEngine()).start(GenericSystem.newCacheOnANewInMemoryEngine());
 		} catch (IllegalStateException ignore) {

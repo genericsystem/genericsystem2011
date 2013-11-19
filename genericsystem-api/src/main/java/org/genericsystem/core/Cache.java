@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
@@ -60,16 +61,6 @@ public interface Cache {
 	 */
 	<T extends Generic> T find(Class<?> clazz);
 
-	// /**
-	// * Returns the existing Type or creates a new one if it not yet exists.
-	// *
-	// * @param name
-	// * the type's name.
-	// *
-	// * @return the Type generic.
-	// */
-	// <T extends Type> T newType(Serializable name);
-
 	/**
 	 * Returns the existing Type or null if it not exists.
 	 * 
@@ -81,19 +72,19 @@ public interface Cache {
 	<T extends Type> T getType(Serializable name);
 
 	/**
-	 * Returns the existing Type or creates a new one if it not yet exists.
+	 * Creates a new type. Throws an exception if the type with the same name already exists.
 	 * 
 	 * @param name
-	 *            the type's name.
+	 * 				the type's name.
 	 * @param superTypes
-	 *            the array of super types.
+	 * 				the array of super types.
 	 * 
 	 * @return the Type generic.
 	 */
-	<T extends Type> T newType(Serializable name, Type... superTypes);
+	<T extends Type> T addType(Serializable name, Type... superTypes);
 
 	/**
-	 * Returns the existing Type or creates a new one if it not yet exists.
+	 * Creates a new type. Throws an exception if the type with the same name already exists.
 	 * 
 	 * @param name
 	 *            the type's name.
@@ -104,7 +95,33 @@ public interface Cache {
 	 * 
 	 * @return the Type generic.
 	 */
-	<T extends Type> T newType(Serializable name, Type[] superTypes, Generic... components);
+	<T extends Type> T addType(Serializable name, Type[] superTypes, Generic... components);
+
+	/**
+	 * Returns the type. If the type with given name does not exists method creates it.
+	 * 
+	 * @param name
+	 * 				the type's name.
+	 * @param superTypes
+	 * 				the array of super types.
+	 * 
+	 * @return the Type generic.
+	 */
+	<T extends Type> T setType(Serializable name, Type... superTypes);
+
+	/**
+	 * Returns the type. If the type with given name does not exists method creates it.
+	 * 
+	 * @param name
+	 *            the type's name.
+	 * @param superTypes
+	 *            the array of super types.
+	 * @param components
+	 *            the array of components.
+	 * 
+	 * @return the Type generic.
+	 */
+	<T extends Type> T setType(Serializable name, Type[] superTypes, Generic... components);
 
 	/**
 	 * Flush the content of current cache into it's subcache or into current user's transaction. If cache flush it's data into transaction modifications become available to other users.

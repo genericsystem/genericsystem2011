@@ -26,9 +26,9 @@ public class RelationTest extends AbstractTest {
 
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic myBmw = car.newInstance("myBmw");
-		Type color = cache.newType("Color");
+		Type color = cache.addType("Color");
 		Generic red = color.newInstance("red");
 		Generic yellow = color.newInstance("yellow");
 		Relation carColor = car.setRelation("carColor", color);
@@ -43,9 +43,9 @@ public class RelationTest extends AbstractTest {
 
 	public void test2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic myBmw = car.newInstance("myBmw");
-		Type color = cache.newType("Color");
+		Type color = cache.addType("Color");
 		Generic red = color.newInstance("red");
 		Generic yellow = color.newInstance("yellow");
 		Relation carColor = car.setRelation("carColor", color);
@@ -57,8 +57,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testToOneOverride() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		final Relation carColor = car.setRelation("driver", color);
 		carColor.enableSingularConstraint();
 		final Generic myBmw = car.newInstance("myBmw");
@@ -80,9 +80,9 @@ public class RelationTest extends AbstractTest {
 	public void testReverseTernaryAccess() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		final Type passenger = cache.newType("Passenger");
-		Type time = cache.newType("time");
+		Type car = cache.addType("Car");
+		final Type passenger = cache.addType("Passenger");
+		Type time = cache.addType("time");
 
 		final Relation carPassengerTime = car.setRelation("CarPassengerTime", passenger, time);
 		carPassengerTime.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -114,8 +114,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testSimple() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type person = cache.newType("Person");
+		Type car = cache.addType("Car");
+		Type person = cache.addType("Person");
 		Relation carDriver = car.setRelation("driver", person);
 		carDriver.enableSingularConstraint(Statics.TARGET_POSITION);
 		Generic myBmw = car.newInstance("myBmw");
@@ -128,8 +128,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testSimpleReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type person = cache.newType("Person");
+		Type car = cache.addType("Car");
+		Type person = cache.addType("Person");
 		Relation carDriver = car.setRelation("driver", person);
 		carDriver.enableSingularConstraint(Statics.TARGET_POSITION);
 		Generic myBmw = car.newInstance("myBmw");
@@ -140,9 +140,9 @@ public class RelationTest extends AbstractTest {
 
 	public void testSimpleTernary() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type person = cache.newType("Person");
-		Type time = cache.newType("Time");
+		Type car = cache.addType("Car");
+		Type person = cache.addType("Person");
+		Type time = cache.addType("Time");
 		Relation carDriverTime = car.setRelation("driver", person, time);
 		carDriverTime.enableSingularConstraint(Statics.TARGET_POSITION);
 
@@ -166,8 +166,8 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManyManyToManyImpl() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type passenger = cache.newType("Passenger");
+		Type car = cache.addType("Car");
+		Type passenger = cache.addType("Passenger");
 		final Relation carPassenger = car.setRelation("CarPassenger", passenger);
 		carPassenger.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carPassenger.isSingularConstraintEnabled(Statics.TARGET_POSITION);
@@ -189,9 +189,9 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManyManyToManyImplReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 
-		Type passenger = cache.newType("Passenger");
+		Type passenger = cache.addType("Passenger");
 
 		final Relation carPassenger = car.setRelation("CarPassenger", passenger);
 		carPassenger.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -213,9 +213,9 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManyManyToManyImplTernary() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type passenger = cache.newType("Passenger");
-		Type time = cache.newType("time");
+		Type car = cache.addType("Car");
+		Type passenger = cache.addType("Passenger");
+		Type time = cache.addType("time");
 
 		final Relation carPassengerTime = car.setRelation("CarPassenger", passenger, time);
 		carPassengerTime.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -240,9 +240,9 @@ public class RelationTest extends AbstractTest {
 	public void testToOne() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 
-		Type owner = cache.newType("Owner");
+		Type owner = cache.addType("Owner");
 
 		Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
@@ -263,8 +263,8 @@ public class RelationTest extends AbstractTest {
 	public void testToOneReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
 		Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
@@ -282,9 +282,9 @@ public class RelationTest extends AbstractTest {
 	public void testToOneTernary() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
-		Type time = cache.newType("Time");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
+		Type time = cache.addType("Time");
 
 		final Relation carOwnerTime = car.setRelation("CarOwnerTime", owner, time);
 		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
@@ -307,9 +307,9 @@ public class RelationTest extends AbstractTest {
 	public void testToOneInheritance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 
-		Type owner = cache.newType("Owner");
+		Type owner = cache.addType("Owner");
 
 		Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
@@ -331,8 +331,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testToOneInheritanceReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		final Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carColor.isSingularConstraintEnabled(Statics.BASE_POSITION);
@@ -357,9 +357,9 @@ public class RelationTest extends AbstractTest {
 	public void testToOneInheritanceTernary() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
-		Type time = cache.newType("Time");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
+		Type time = cache.addType("Time");
 
 		Relation carOwnerTime = car.setRelation("CarOwnerTime", owner, time);
 		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
@@ -382,8 +382,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testToOneNewTarget() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
 		Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
@@ -402,8 +402,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testToOneNewTargetReverse() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
 		final Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 
@@ -425,9 +425,9 @@ public class RelationTest extends AbstractTest {
 
 	public void testToOneNewTargetTernary() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
-		Type time = cache.newType("Time");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
+		Type time = cache.addType("Time");
 		Relation carOwnerTime = car.setRelation("CarOwner", owner, time);
 		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwnerTime.isSingularConstraintEnabled(Statics.BASE_POSITION);
@@ -448,8 +448,8 @@ public class RelationTest extends AbstractTest {
 	public void testToOneSameValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
 		Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
@@ -467,8 +467,8 @@ public class RelationTest extends AbstractTest {
 	public void testToOneSameValueReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
 		Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
@@ -486,9 +486,9 @@ public class RelationTest extends AbstractTest {
 	public void testToOneSameValueTernary() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
-		Type time = cache.newType("Time");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
+		Type time = cache.addType("Time");
 
 		final Relation carOwnerTime = car.setRelation("CarOwnerTime", owner, time);
 		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
@@ -511,8 +511,8 @@ public class RelationTest extends AbstractTest {
 	public void testToOneDifferentValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
 		Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
@@ -543,8 +543,8 @@ public class RelationTest extends AbstractTest {
 	public void testToOneDifferentValueReverse() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type owner = cache.newType("Owner");
+		Type car = cache.addType("Car");
+		Type owner = cache.addType("Owner");
 		final Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
@@ -573,8 +573,8 @@ public class RelationTest extends AbstractTest {
 	public void testOneToMany() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type tyre = cache.newType("Tyre");
+		Type car = cache.addType("Car");
+		Type tyre = cache.addType("Tyre");
 		Relation carTyres = car.setRelation("CarTyres", tyre);
 
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -597,8 +597,8 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManyReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type tyre = cache.newType("Tyre");
+		Type car = cache.addType("Car");
+		Type tyre = cache.addType("Tyre");
 		Relation carTyres = car.setRelation("CarTyres", tyre);
 
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -623,8 +623,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testOneToManyInheritance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type tyre = cache.newType("Tyre");
+		Type car = cache.addType("Car");
+		Type tyre = cache.addType("Tyre");
 		Relation carTyres = car.setRelation("CarTyres", tyre);
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
@@ -646,8 +646,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testSingularTargetDefaultColor() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		final Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 
 		car.newInstance("myBmw");
 		car.newInstance("myAudi");
@@ -668,8 +668,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testOneToManyInheritanceReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type person = cache.newType("person");
+		Type car = cache.addType("Car");
+		Type person = cache.addType("person");
 		Relation carPerson = car.setRelation("CarPersons", person);
 
 		carPerson.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -709,8 +709,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testOneToManyInheritanceReverse2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type person = cache.newType("person");
+		Type car = cache.addType("Car");
+		Type person = cache.addType("person");
 		Relation carPerson = car.setRelation("CarPersons", person);
 
 		carPerson.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -746,8 +746,8 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManyDifferentValue() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type tyre = cache.newType("Tyre");
+		Type car = cache.addType("Car");
+		Type tyre = cache.addType("Tyre");
 		final Relation carTyres = car.setRelation("CarTyres", tyre);
 
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -787,8 +787,8 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManyDifferentValueReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type tyre = cache.newType("Tyre");
+		Type car = cache.addType("Car");
+		Type tyre = cache.addType("Tyre");
 		final Relation carTyres = car.setRelation("CarTyres", tyre);
 
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -826,8 +826,8 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManySameValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type tyre = cache.newType("Tyre");
+		Type car = cache.addType("Car");
+		Type tyre = cache.addType("Tyre");
 		Relation carTyres = car.setRelation("CarTyres", tyre);
 
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -854,8 +854,8 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManySameValueReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type tyre = cache.newType("Tyre");
+		Type car = cache.addType("Car");
+		Type tyre = cache.addType("Tyre");
 		Relation carTyres = car.setRelation("CarTyres", tyre);
 
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -882,8 +882,8 @@ public class RelationTest extends AbstractTest {
 	public void testManyToMany() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 
 		Generic myBmw = car.newInstance("myBmw");
@@ -903,8 +903,8 @@ public class RelationTest extends AbstractTest {
 	public void testManyToManyReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 
 		Generic myBmw = car.newInstance("myBmw");
@@ -923,10 +923,10 @@ public class RelationTest extends AbstractTest {
 
 	public void testManyToManyInheritance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic yourAudi = car.newInstance("yourAudi");
 
-		Type color = cache.newType("Color");
+		Type color = cache.addType("Color");
 		Generic red = color.newInstance("red");
 
 		Relation carColor = car.setRelation("CarColor", color);
@@ -942,9 +942,9 @@ public class RelationTest extends AbstractTest {
 
 	public void testManyToManyInheritanceReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic yourAudi = car.newInstance("yourAudi");
-		Type color = cache.newType("Color");
+		Type color = cache.addType("Color");
 		Generic red = color.newInstance("red");
 
 		Relation carColor = car.setRelation("CarColor", color);
@@ -960,8 +960,8 @@ public class RelationTest extends AbstractTest {
 	public void testManyToManyPropertyConstraint() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 
 		carColor.enablePropertyConstraint();
@@ -986,8 +986,8 @@ public class RelationTest extends AbstractTest {
 	public void testManyToManyPropertyConstraintReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 
 		carColor.enablePropertyConstraint();
@@ -1015,9 +1015,9 @@ public class RelationTest extends AbstractTest {
 	public void testSimpleRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Type sportsCar = car.newSubType("SportsCar");
-		Type person = cache.newType("Person");
+		Type person = cache.addType("Person");
 		Type pilot = person.newSubType("Pilot");
 		Relation carDriver = car.setRelation("driver", person);
 		Relation sportsCarPilot = sportsCar.setRelation("driver", pilot);
@@ -1104,24 +1104,24 @@ public class RelationTest extends AbstractTest {
 
 	public void testCountAncestor() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation relation = vehicle.setRelation("pilot", human);
 		assert relation.getComponents().size() == 2 : relation.getComponents().size();
 	}
 
 	public void testDependency() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation relationPilot = vehicle.setRelation("pilot", human);
 		assert cache.getMetaRelation().getInheritings().contains(relationPilot);
 	}
 
 	public void testIsRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation relation = vehicle.setRelation("pilot", human);
 		assert !relation.inheritsFrom(vehicle);
 		assert !relation.inheritsFrom(human);
@@ -1130,9 +1130,9 @@ public class RelationTest extends AbstractTest {
 
 	public void testIsTernaryRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type level = cache.newType("Level");
-		Type human = cache.newType("Human");
+		Type car = cache.addType("Car");
+		Type level = cache.addType("Level");
+		Type human = cache.addType("Human");
 		Relation humanGames = human.setRelation("Games", car, level);
 		assert humanGames.isAttributeOf(human);
 		assert !humanGames.inheritsFrom(human);
@@ -1142,8 +1142,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testOnegetRelationsSnapshot() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type human = cache.newType("Human");
+		Type car = cache.addType("Car");
+		Type human = cache.addType("Human");
 		Relation carHuman = car.setRelation("pilot", human);
 		assert car.getRelations().size() == 1 : car.getRelations();
 		assert car.getRelations().contains(carHuman) : car.getRelations();
@@ -1151,8 +1151,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testTwogetRelationsSnapshot() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type human = cache.newType("Human");
+		Type car = cache.addType("Car");
+		Type human = cache.addType("Human");
 		Relation pilot = car.setRelation("pilot", human);
 		Relation passenger = car.setRelation("passenger", human);
 		assert car.getRelations().size() == 2 : car.getRelations();
@@ -1162,9 +1162,9 @@ public class RelationTest extends AbstractTest {
 
 	public void testSuperOnegetRelationsSnapshot() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Relation vehicleHuman = vehicle.setRelation("pilot", human);
 		assert car.getRelations().size() == 1 : car.getRelations();
 		assert car.getRelations().contains(vehicleHuman) : car.getRelations();
@@ -1172,9 +1172,9 @@ public class RelationTest extends AbstractTest {
 
 	public void testSuperTwogetRelationsSnapshot() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Relation pilot = vehicle.setRelation("pilot", human);
 		Relation passenger = vehicle.setRelation("passenger", human);
 		assert car.getRelations().size() == 2 : car.getRelations();
@@ -1184,8 +1184,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testDuplicateRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation humanPilotVehicle = vehicle.setRelation("pilot", human);
 		Relation humanPilotVehicle2 = vehicle.setRelation("pilot", human);
 		assert vehicle.getAttributes().contains(humanPilotVehicle);
@@ -1194,8 +1194,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testGetRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation humanPilotVehicle = human.setRelation("pilot", vehicle);
 		Relation getRelation = human.getRelation("pilot");
 		assert getRelation != null;
@@ -1205,9 +1205,9 @@ public class RelationTest extends AbstractTest {
 
 	public void testGetRelationWithTargets() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type bike = cache.newType("Bike");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type bike = cache.addType("Bike");
+		Type human = cache.addType("Human");
 		Relation humanPilot = human.setRelation("pilot", vehicle, bike);
 		Relation getRelation = human.getRelation("pilot");
 		assert human.getAttribute("pilot") != null;
@@ -1245,16 +1245,16 @@ public class RelationTest extends AbstractTest {
 
 	public void testTargetsAncestor() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 		assert possessVehicle.getTargetComponent().equals(vehicle);
 	}
 
 	public void testTargetsAncestorWithMultipleTarget() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle, human);
 		assert possessVehicle.getTargetComponent().equals(vehicle);
 		assert possessVehicle.getComponent(Statics.SECOND_TARGET_POSITION).equals(human);
@@ -1262,8 +1262,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testUnidirectionalRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 		assert human.getRelations().size() == 1;
 		assert human.getRelations().contains(possessVehicle);
@@ -1273,8 +1273,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testBidirectionalRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 
 		Snapshot<Relation> vehicleRelations = vehicle.getRelations();
@@ -1285,7 +1285,7 @@ public class RelationTest extends AbstractTest {
 
 	public void testRelationToHimself() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Relation brother = human.setRelation("brother", human);
 		// brother.enableMultiDirectional();
 		assert human.getRelations().size() == 1;
@@ -1298,7 +1298,7 @@ public class RelationTest extends AbstractTest {
 
 		assert Statics.BASE_POSITION == michael.getBasePos(brother);
 		assert ((GenericImpl) brother).getComponentsPositions(michael, quentin).equals(Arrays.asList(0, 1));
-		Type otherType = cache.newType("OtherType");
+		Type otherType = cache.addType("OtherType");
 		assert ((GenericImpl) brother).getComponentsPositions(michael, quentin, otherType).equals(Arrays.asList(0, 1, 2));
 		assert ((GenericImpl) brother).getComponentsPositions(otherType, michael, quentin).equals(Arrays.asList(2, 0, 1));
 
@@ -1310,8 +1310,8 @@ public class RelationTest extends AbstractTest {
 
 	public void testGetLinkFromTarget() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic myHuman = human.newInstance("myHuman");
@@ -1326,9 +1326,9 @@ public class RelationTest extends AbstractTest {
 
 	public void testGetLinkFromTarget2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
-		Type road = cache.newType("Road");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
+		Type road = cache.addType("Road");
 		Relation drivesOn = human.setRelation("DrivingOn", vehicle, road);
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic myHuman = human.newInstance("myHuman");
@@ -1346,11 +1346,11 @@ public class RelationTest extends AbstractTest {
 
 	public void testDefaultReverseLinks2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic myBmw = car.newInstance("myBmw");
 		Generic myAudi = car.newInstance("myAudi");
 		Generic myMercedes = car.newInstance("myMercedes");
-		Type color = cache.newType("Color");
+		Type color = cache.addType("Color");
 		Generic red = color.newInstance("red");
 
 		Relation carColor = car.setRelation("carColor", color);
@@ -1362,7 +1362,7 @@ public class RelationTest extends AbstractTest {
 
 	public void mytest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Generic myCar = car.newInstance("myCar");
 		Attribute vehiclePower = vehicle.addProperty("power");
@@ -1373,11 +1373,11 @@ public class RelationTest extends AbstractTest {
 
 	public void testDefaultReverseLinks() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic myBmw = car.newInstance("myBmw");
 		Generic myAudi = car.newInstance("myAudi");
 		Generic myMercedes = car.newInstance("myMercedes");
-		Type color = cache.newType("Color");
+		Type color = cache.addType("Color");
 		Generic red = color.newInstance("red");
 		Generic blue = color.newInstance("blue");
 		Relation carColor = car.setRelation("carColor", color).enableSingularConstraint();
@@ -1397,7 +1397,7 @@ public class RelationTest extends AbstractTest {
 
 	public void testDiamantKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type person = cache.newType("Person");
+		Type person = cache.addType("Person");
 		final Attribute age = person.setProperty("Age");
 		person.setValue(age, "25");
 
@@ -1411,7 +1411,7 @@ public class RelationTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				cache.newType("doctoral", student, teacher).getValue(age);
+				cache.addType("doctoral", student, teacher).getValue(age);
 
 			}
 		}.assertIsCausedBy(AmbiguousSelectionException.class);
@@ -1419,7 +1419,7 @@ public class RelationTest extends AbstractTest {
 
 	public void testDiamantOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type person = cache.newType("Person");
+		Type person = cache.addType("Person");
 		Attribute age = person.setProperty("Age");
 		person.setValue(age, "25");
 
@@ -1428,7 +1428,7 @@ public class RelationTest extends AbstractTest {
 
 		Type teacher = person.newSubType("Teacher");
 
-		assert "30" == cache.newType("doctoral", student, teacher).getValue(age);
+		assert "30" == cache.addType("doctoral", student, teacher).getValue(age);
 	}
 
 }

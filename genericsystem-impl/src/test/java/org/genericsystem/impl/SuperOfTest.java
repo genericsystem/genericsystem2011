@@ -23,23 +23,23 @@ public class SuperOfTest extends AbstractTest {
 	}
 
 	public void testMultiInheritings() {
-		Type vehicle = cache.newType("Vehicle");
-		Type robot = cache.newType("Robot");
-		cache.newType("Transformer", vehicle, robot);
+		Type vehicle = cache.addType("Vehicle");
+		Type robot = cache.addType("Robot");
+		cache.addType("Transformer", vehicle, robot);
 	}
 
 	public void testMultiInheritingsWithInstance() {
-		Type vehicle = cache.newType("Vehicle");
-		Type robot = cache.newType("Robot");
-		Type transformer = cache.newType("Transformer", vehicle, robot);
-		Attribute power = transformer.setProperty("Power");
-		Generic myTransformer = transformer.newInstance("myTransformer");
-		myTransformer.setValue(power, 123);
+		Type vehicle = cache.addType("Vehicle");
+		Type robot = cache.addType("Robot");
+		Type transformer = cache.addType("Transformer", vehicle, robot);
+		Attribute power = transformer.setProperty( "Power");
+		Generic myTransformer = transformer.newInstance( "myTransformer");
+		myTransformer.setValue( power, 123);
 
-		Type human = cache.newType("Human");
-		Relation humanPilotTransformer = human.setRelation("pilot", transformer);
-		Generic myck = human.newInstance("myck");
-		myck.setLink(humanPilotTransformer, "myPilot", myTransformer);
+		Type human = cache.addType("Human");
+		Relation humanPilotTransformer = human.setRelation( "pilot", transformer);
+		Generic myck = human.newInstance( "myck");
+		myck.setLink( humanPilotTransformer, "myPilot", myTransformer);
 	}
 
 	@AfterMethod
@@ -52,8 +52,8 @@ public class SuperOfTest extends AbstractTest {
 	}
 
 	private void internalCompare(Generic superGeneric, Generic inheritingGeneric) {
-		assert inheritingGeneric.inheritsFrom(superGeneric) == ((GenericImpl) superGeneric).isSuperOf3(inheritingGeneric) : "superGeneric : " + superGeneric + " inheritingGeneric : " + inheritingGeneric + " => "
-				+ inheritingGeneric.inheritsFrom(superGeneric) + " / " + ((GenericImpl) superGeneric).isSuperOf3(inheritingGeneric);
+		assert inheritingGeneric.inheritsFrom(superGeneric) == ((GenericImpl) superGeneric).isSuperOf(inheritingGeneric) : "superGeneric : " + superGeneric + " inheritingGeneric : " + inheritingGeneric + " => "
+				+ inheritingGeneric.inheritsFrom(superGeneric) + " / " + ((GenericImpl) superGeneric).isSuperOf(inheritingGeneric);
 		for (Generic inheriting : inheritingGeneric.getInheritings())
 			internalCompare(superGeneric, inheriting);
 		for (Generic composite : inheritingGeneric.getComposites())

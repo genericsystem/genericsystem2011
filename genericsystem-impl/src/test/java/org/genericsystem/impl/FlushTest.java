@@ -24,7 +24,7 @@ public class FlushTest extends AbstractTest {
 	public void testFlush() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		cache.flush();
 		engine.close();
 
@@ -36,7 +36,7 @@ public class FlushTest extends AbstractTest {
 	public void testNoFlush() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
-		Type animal = cache.newType("Animal");
+		Type animal = cache.addType("Animal");
 		Snapshot<Generic> snapshot = animal.getInheritings();
 		assert snapshot.isEmpty();
 		Type human = animal.newSubType("Human");
@@ -59,9 +59,9 @@ public class FlushTest extends AbstractTest {
 	public void testPartialFlush() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		cache.flush();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		engine.close();
 
 		cache = engine.newCache().start();
@@ -74,14 +74,14 @@ public class FlushTest extends AbstractTest {
 	public void testMultipleCache() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		cache.flush();
 		Snapshot<Generic> snapshot = engine.getInheritings();
 		assert snapshot.contains(human) : snapshot;
 		// cache.deactivate();
 
 		cache = engine.newCache().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		cache.flush();
 		engine.close();
 
@@ -94,13 +94,13 @@ public class FlushTest extends AbstractTest {
 	public void testMultipleCache2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		cache.flush();
 		Snapshot<Generic> snapshot = engine.getInheritings();
 		assert snapshot.contains(human) : snapshot;
 
 		cache = engine.newCache().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		cache.flush();
 
 		cache = engine.newCache();
@@ -114,7 +114,7 @@ public class FlushTest extends AbstractTest {
 	public void testMultipleCache3() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 
 		Cache cache2 = engine.newCache().start();
 		assert cache2.getType("Vehicle") == null;
@@ -129,8 +129,8 @@ public class FlushTest extends AbstractTest {
 	public void testAutomatics() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
@@ -149,8 +149,8 @@ public class FlushTest extends AbstractTest {
 	public void testAutomaticsNotFlushedOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 		Attribute intensity = carColor.setAttribute("Intensity");

@@ -13,7 +13,7 @@ public class InstancesTest extends AbstractTest {
 
 	public void testTypeInstances() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type newType = cache.newType("newType");
+		Type newType = cache.addType("newType");
 		Generic aNewType = newType.newInstance( "aNewType");
 		assert newType.getInstances().size() == 1;
 		assert newType.getInstances().contains(aNewType);
@@ -21,7 +21,7 @@ public class InstancesTest extends AbstractTest {
 
 	public void testSubTypeInstances() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type newType = cache.newType("newType");
+		Type newType = cache.addType("newType");
 		Type newSubType = newType.newSubType( "newSubType");
 		Generic aNewType = newType.newInstance( "aNewType");
 		Generic aNewSubType = newSubType.newInstance( "aNewSubType");
@@ -33,7 +33,7 @@ public class InstancesTest extends AbstractTest {
 
 	public void testAttributeInstances() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type newType = cache.newType("newType");
+		Type newType = cache.addType("newType");
 		Attribute newAttribute = cache.getEngine().setAttribute( "newAttribute");
 		Generic aNewType1 = newType.newInstance( "aNewType1");
 		Holder value1 = aNewType1.setValue( newAttribute, "value1");

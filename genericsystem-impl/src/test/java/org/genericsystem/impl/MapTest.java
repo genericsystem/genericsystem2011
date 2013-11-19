@@ -19,7 +19,7 @@ public class MapTest extends AbstractTest {
 
 	public void testPropertyMap() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Generic myBmw = car.newInstance("myBmw");
 		Map<Serializable, Serializable> vehicleMap = vehicle.getPropertiesMap();
@@ -50,7 +50,7 @@ public class MapTest extends AbstractTest {
 
 	public void testPropertyInherit() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Generic myBmw = car.newInstance("myBmw");
 		vehicle.getPropertiesMap().put("power", 123);
@@ -66,7 +66,7 @@ public class MapTest extends AbstractTest {
 
 	public void testPropertyInherit2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic myBmw = car.newInstance("myBmw");
 		car.getPropertiesMap().put("power", 123);
 		assert car.getPropertiesMap().get("power").equals(123) : car.getPropertiesMap();
@@ -78,7 +78,7 @@ public class MapTest extends AbstractTest {
 
 	public void testSingleMap() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type vehicle = cache.newType("Vehicle");
+		final Type vehicle = cache.addType("Vehicle");
 		vehicle.getPropertiesMap().put("power", 123);
 		vehicle.getPropertiesMap().put("power", 255);
 		assert !vehicle.getPropertiesMap().get("power").equals(123);
@@ -90,7 +90,7 @@ public class MapTest extends AbstractTest {
 	public void testOnInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		assert !cache.getEngine().isReferentialIntegrity(0);
-		assert !cache.newType("Vehicle").isReferentialIntegrity(0);
+		assert !cache.addType("Vehicle").isReferentialIntegrity(0);
 		assert !cache.find(NoInheritanceSystemType.class).isReferentialIntegrity(0);
 		// Type car = cache.newType("Car");
 		// Generic myBmw = car.newInstance("myBmw");
@@ -105,7 +105,7 @@ public class MapTest extends AbstractTest {
 
 	public void testProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		vehicle.getPropertiesMap().put("power", 123);
 		vehicle.getPropertiesMap().put("whell", 4);
@@ -118,7 +118,7 @@ public class MapTest extends AbstractTest {
 
 	public void testRemove() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		vehicle.getPropertiesMap().put("power", 123);
 		assert car.getPropertiesMap().get("power").equals(123);
@@ -135,7 +135,7 @@ public class MapTest extends AbstractTest {
 
 	public void testRemoveNotNull() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		vehicle.getPropertiesMap().put("power", 123);
 		assert car.getPropertiesMap().get("power").equals(123);
@@ -146,7 +146,7 @@ public class MapTest extends AbstractTest {
 
 	public void testRemove2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		vehicle.getPropertiesMap().put("power", 123);
 		assert car.getPropertiesMap().get("power").equals(123);
@@ -158,7 +158,7 @@ public class MapTest extends AbstractTest {
 
 	public void testOtherMap() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(MyMapProvider.class).start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.getMap(MyMapProvider.class).put("power", 123);
 		assert vehicle.getMap(MyMapProvider.class).get("power").equals(123);
 		vehicle.getMap(MyMapProvider.class).remove("power");
@@ -171,8 +171,8 @@ public class MapTest extends AbstractTest {
 
 	public void testSingularMap() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		assert !((Holder) vehicle).isSingularConstraintEnabled();
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color).<Relation> enableSingularConstraint(Statics.TARGET_POSITION);
 		assert vehicleColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);

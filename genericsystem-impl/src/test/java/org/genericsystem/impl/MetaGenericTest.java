@@ -27,7 +27,7 @@ public class MetaGenericTest extends AbstractTest {
 	public void testMetaForTypeAndSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
-		Type newType = cache.newType("newType");
+		Type newType = cache.addType("newType");
 		assert newType.getMeta().equals(engine);
 		Type newSubType = newType.newSubType("newSubType");
 		assert newSubType.getMeta().equals(engine);
@@ -36,7 +36,7 @@ public class MetaGenericTest extends AbstractTest {
 	public void testMetaForAttributeAndSubAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Attribute metaAttribute = cache.getEngine().getMetaAttribute();
-		Type newType = cache.newType("newType");
+		Type newType = cache.addType("newType");
 		Type newSubType = newType.newSubType("newSubType");
 		Attribute newAttribute = newType.setAttribute("newAttribute");
 		assert newAttribute.getMeta().equals(metaAttribute);
@@ -47,22 +47,22 @@ public class MetaGenericTest extends AbstractTest {
 	public void testMetaForRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Relation metaRelation = cache.getEngine().getMetaRelation();
-		Type newType1 = cache.newType("newType1");
-		Type newType2 = cache.newType("newType2");
+		Type newType1 = cache.addType("newType1");
+		Type newType2 = cache.addType("newType2");
 		Relation newRelation = newType1.setRelation("newType1NewType2", newType2);
 		assert newRelation.getMeta().equals(metaRelation) : newRelation.info();
 	}
 
 	public void testMetaForGeneric() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type newType = cache.newType("newType");
+		Type newType = cache.addType("newType");
 		Generic aNewType = newType.newInstance("aNewType");
 		assert aNewType.getMeta().equals(newType);
 	}
 
 	public void testMetaForValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type newType = cache.newType("newType");
+		Type newType = cache.addType("newType");
 		Attribute newAttribute = newType.setAttribute("newAttribute");
 		Generic aNewType = newType.newInstance("aNewType");
 		Holder value = aNewType.setValue(newAttribute, "aNewAttribute");
@@ -71,8 +71,8 @@ public class MetaGenericTest extends AbstractTest {
 
 	public void testMetaForLink() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type newType1 = cache.newType("newType1");
-		Type newType2 = cache.newType("newType2");
+		Type newType1 = cache.addType("newType1");
+		Type newType2 = cache.addType("newType2");
 		Relation newType1NewType2 = newType1.setRelation("newType1NewType2", newType2);
 		Generic aNewType1 = newType1.newInstance("aNewType1");
 		Generic aNewType2 = newType2.newInstance("aNewType2");

@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 	public void PropertySimpleAttributeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Attribute registration = vehicle.setAttribute("Registration");
 		Generic myCar = vehicle.newInstance("myCar");
 		myCar.setValue(registration, "315DT75");
@@ -22,7 +22,7 @@ public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 
 	public void PropertySimpleAttributeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		final Attribute registration = vehicle.setAttribute("Registration");
 		Generic myCar = vehicle.newInstance("myCar");
 		Generic yourCar = vehicle.newInstance("yourCar");
@@ -40,8 +40,8 @@ public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 	public void PropertySimpleRelationOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine()
 				.start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		final Relation driving = vehicle.setRelation("DrivingAlong", human);
 		Generic myCar = vehicle.newInstance("myCar");
 		Generic yourCar = vehicle.newInstance("yourCar");
@@ -55,8 +55,8 @@ public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 	public void PropertySimpleRelationKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine()
 				.start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		final Relation driving = vehicle.setRelation("DrivingAlong", human);
 		Generic myCar = vehicle.newInstance("myCar");
 		Generic yourCar = vehicle.newInstance("yourCar");

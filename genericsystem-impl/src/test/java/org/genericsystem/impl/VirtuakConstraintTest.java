@@ -11,7 +11,7 @@ public class VirtuakConstraintTest extends AbstractTest {
 
 	public void testVirtual() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.enableVirtualConstraint();
 		Type car = vehicle.newSubType("Car");
 		car.newInstance("myCar");
@@ -19,7 +19,7 @@ public class VirtuakConstraintTest extends AbstractTest {
 
 	public void testVirtualWithJump() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.enableVirtualConstraint();
 		Type car = vehicle.newSubType("Car");
 		Type superCar = car.newSubType("SuperCar");
@@ -28,7 +28,7 @@ public class VirtuakConstraintTest extends AbstractTest {
 
 	public void testVirtualKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type vehicle = cache.newType("Vehicle");
+		final Type vehicle = cache.addType("Vehicle");
 		vehicle.enableVirtualConstraint();
 		cache.flush();
 		new RollbackCatcher() {
@@ -44,7 +44,7 @@ public class VirtuakConstraintTest extends AbstractTest {
 
 	public void testVirtualKO2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type vehicle = cache.newType("Vehicle");
+		final Type vehicle = cache.addType("Vehicle");
 		vehicle.newInstance("myVehicle");
 		cache.flush();
 		new RollbackCatcher() {

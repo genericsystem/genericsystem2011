@@ -23,7 +23,7 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void requiredAddedAndRemoved() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Generic myFiat = vehicle.newInstance("myFiat");
 		final Attribute wheel = vehicle.setAttribute("wheel");
 		final Holder wheelMyFiat = myFiat.setValue(wheel, "4");
@@ -39,7 +39,7 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void requiredNeverAdded() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type vehicle = cache.newType("Vehicle");
+		final Type vehicle = cache.addType("Vehicle");
 		Attribute wheel = vehicle.setAttribute("wheel");
 		wheel.enableRequiredConstraint();
 		cache.flush();
@@ -56,7 +56,7 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void addOneRequired() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
 		cache.flush();
 
@@ -68,7 +68,7 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void addOneRequiredKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
 		cache.flush();
 		vehicle.newInstance("myFiat");
@@ -82,7 +82,7 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void requiredHeritageTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("car");
 		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
 		Generic myFiat = vehicle.newInstance("myFiat");
@@ -105,7 +105,7 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void addRequiredOnSubType() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Attribute power = vehicle.setAttribute("power").enableRequiredConstraint();
 		Type car = vehicle.newSubType("Car");
 		car.newInstance("myFiat").setValue(power, 123);
@@ -114,8 +114,8 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void addRequiredOnRelationBaseSideEmpty() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
 		car.newInstance("myCar");
@@ -130,8 +130,8 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void addRequiredOnRelationTargetSide() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.TARGET_POSITION);
 		assert carColor.isRequiredConstraintEnabled(Statics.TARGET_POSITION);
@@ -147,8 +147,8 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void addRequiredOnRelationBaseSideOk() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
 		car.newInstance("myFiat").bind(carColor, color);
@@ -157,8 +157,8 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void testRemoveRequiredOnRelationBaseSideKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
 		Generic red = color.newInstance("red");
@@ -175,8 +175,8 @@ public class RequiredConstraintTest extends AbstractTest {
 
 	public void addRequiredOnRelationOk() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.TARGET_POSITION);
 		car.bind(carColor, color.newInstance("red"));
