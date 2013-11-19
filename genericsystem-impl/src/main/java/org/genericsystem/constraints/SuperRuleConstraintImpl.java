@@ -31,13 +31,12 @@ public class SuperRuleConstraintImpl extends AbstractBooleanNoAxedConstraintImpl
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(SuperRuleConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
 	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
 		for (Generic directSuper : constraintBase.getSupers())
-			if (!((GenericImpl) directSuper).isSuperOf(constraintBase))
+			if (!((GenericImpl) directSuper).isSuperOf3(constraintBase))
 				throw new SuperRuleConstraintViolationException(constraintBase.info() + " should inherits from : " + directSuper.info());
 	}
 }

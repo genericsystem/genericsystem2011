@@ -161,6 +161,8 @@ class Vertex {
 	private boolean isAncestorOf(final GenericImpl dependency) {
 		if (GenericImpl.isSuperOf(primaries, components, dependency.primaries, dependency.components))
 			return true;
+		// if (GenericImpl.isSuperOf3(homeTreeNode, supers, components, dependency.homeTreeNode, dependency.supers, dependency.components))
+
 		for (Generic component : dependency.components)
 			if (!Arrays.equals(dependency.primaries, ((GenericImpl) component).primaries) || !Arrays.equals(dependency.components, ((GenericImpl) component).components))
 				if (isAncestorOf((GenericImpl) component))

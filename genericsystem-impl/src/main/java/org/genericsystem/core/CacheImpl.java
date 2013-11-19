@@ -635,7 +635,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (final Attribute attribute : ((Type) generic).getAttributes()) {
 			AbstractExtendedMap<AxedPropertyClass, Serializable> constraintMap = ((GenericImpl) attribute).getConstraintsMap();
 			TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
-			for (Serializable key : constraintMap.keySet()) {
+			for (AxedPropertyClass key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
 				constraints.put(keyHolder, valueHolder);
@@ -651,7 +651,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 		AbstractExtendedMap<AxedPropertyClass, Serializable> constraintMap = ((GenericImpl) generic).getConstraintsMap();
 		TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
-		for (Serializable key : constraintMap.keySet()) {
+		for (AxedPropertyClass key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
 			constraints.put(keyHolder, valueHolder);

@@ -113,6 +113,7 @@ public class SizeTest extends AbstractTest {
 		Type car = vehicle.newSubType("Car");
 		Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
+		// vehiclePower.enableSingularConstraint();
 		vehicle.setValue(vehiclePower, 123);
 		car.setValue(vehiclePower, 123);
 
