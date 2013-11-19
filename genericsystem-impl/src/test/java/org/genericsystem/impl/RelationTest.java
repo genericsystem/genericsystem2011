@@ -1411,7 +1411,7 @@ public class RelationTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				cache.newSubType("doctoral", student, teacher).getValue(age);
+				cache.newType("doctoral", student, teacher).getValue(age);
 
 			}
 		}.assertIsCausedBy(AmbiguousSelectionException.class);
@@ -1428,7 +1428,7 @@ public class RelationTest extends AbstractTest {
 
 		Type teacher = person.newSubType("Teacher");
 
-		assert "30" == cache.newSubType("doctoral", student, teacher).getValue(age);
+		assert "30" == cache.newType("doctoral", student, teacher).getValue(age);
 	}
 
 }

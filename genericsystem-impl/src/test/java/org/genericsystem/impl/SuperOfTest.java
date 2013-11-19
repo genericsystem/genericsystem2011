@@ -25,13 +25,13 @@ public class SuperOfTest extends AbstractTest {
 	public void testMultiInheritings() {
 		Type vehicle = cache.newType("Vehicle");
 		Type robot = cache.newType("Robot");
-		cache.newSubType("Transformer", vehicle, robot);
+		cache.newType("Transformer", vehicle, robot);
 	}
 
 	public void testMultiInheritingsWithInstance() {
 		Type vehicle = cache.newType("Vehicle");
 		Type robot = cache.newType("Robot");
-		Type transformer = cache.newSubType("Transformer", vehicle, robot);
+		Type transformer = cache.newType("Transformer", vehicle, robot);
 		Attribute power = transformer.setProperty( "Power");
 		Generic myTransformer = transformer.newInstance( "myTransformer");
 		myTransformer.setValue( power, 123);

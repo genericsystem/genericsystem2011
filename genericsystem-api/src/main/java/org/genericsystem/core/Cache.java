@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
@@ -10,145 +9,170 @@ import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 
 /**
- * A Cache is an environment where Generic are temporarily stored. <br />
- * It is mount on a sub-context that is a Cache or a transaction. <br/>
- * A Cache is never threadsafe.
+ * <p>
+ * <tt>Cache</tt> stores modifications before they are applied to <tt>Engine</tt>. Using caches assure concurency and data integrity.
+ * </p>
  * 
- * @author Nicolas Feybesse
- * @author Michael Ory
+ * <p>
+ * All modifications pass by cache before been persisted into <tt>Engine</tt>. Modifications in the cache can be persisted into <tt>Engine</tt> or abandoned. In th first case, data in Generic System change and changes become visible to all users. In the
+ * second case all modifications in the cache are lost and user return to the version in <tt>Engine</tt>.
+ * </p>
+ * 
+ * <p>
+ * <tt>Cache</tt> makes automatic rollback if an error occure during the work. Rollback cancel all modifications previously apported to the cache.
+ * </p>
+ * 
+ * <p>
+ * It is allowed to create a stack of caches. It is possible to mount one cache on another (to create so called "supercache"). To use supercaches helps to avoid avoid the loss of the work because of inexpected rollback. The quantity of caches in the stack
+ * is not limited.
+ * </p>
+ * 
+ * <p>
+ * The stack of caches is mount on <tt>Transaction</tt>. <tt>Transaction</tt> is unique for every user of the system.
+ * </p>
+ * 
+ * <p>
+ * <tt>Cache</tt> is not treadsafe.
+ * </p>
+ * 
+ * <p>
+ * This interface is a part of <tt>Generic System Core</tt>.
+ * </p>
  */
 public interface Cache {
 
 	/**
-	 * Return the Engine on witch this context has bean built. If sub context is another Cache, return the Engine of this another Cache.
+	 * Returns the Engine of this cache.
 	 * 
-	 * @return The Engine.
+	 * @return the engine.
 	 */
 	<T extends Engine> T getEngine();
 
 	/**
-	 * Find the Generic defined by class param. the generic must have been be built at startup<br/>
-	 * This class must be @SystemGeneric annotated.
-	 * 
-	 * @see SystemGeneric
+	 * Returns the generic found by it's class. This generic must to be created in startup. To create a startup built generic it's class must to be annotated @SystemGeneric.
 	 * 
 	 * @param clazz
-	 *            The class must be @SystemGeneric annotated.
-	 * @return A new Generic or the existing Generic.
+	 *            the class annotated @SystemGeneric.
+	 * 
+	 * @return generic Type defined by it's class.
+	 * 
+	 * @see SystemGeneric
 	 */
 	<T extends Generic> T find(Class<?> clazz);
 
-	/**
-	 * Create a new type or get the type with this value if it already exists.
-	 * 
-	 * @param value
-	 *            The type name.
-	 * 
-	 * @return A new type or the existing type.
-	 */
-	<T extends Type> T newType(Serializable value);
+	// /**
+	// * Returns the existing Type or creates a new one if it not yet exists.
+	// *
+	// * @param name
+	// * the type's name.
+	// *
+	// * @return the Type generic.
+	// */
+	// <T extends Type> T newType(Serializable name);
 
 	/**
-	 * Returns the requested type from the context.
+	 * Returns the existing Type or null if it not exists.
 	 * 
-	 * @param value
-	 *            The type name.
-	 * @return The requested type, or null if it does not exist.
+	 * @param name
+	 *            the type's name.
+	 * 
+	 * @return the Type generic or null if it not exists.
 	 */
-	<T extends Type> T getType(Serializable value);
+	<T extends Type> T getType(Serializable name);
 
 	/**
-	 * Create a new subtype or get the subtype with this value if it already exists.
+	 * Returns the existing Type or creates a new one if it not yet exists.
 	 * 
-	 * @param value
-	 *            The type name.
+	 * @param name
+	 *            the type's name.
 	 * @param superTypes
-	 *            The array of super types.
+	 *            the array of super types.
 	 * 
-	 * @return A new subtype or the existing subtype.
+	 * @return the Type generic.
 	 */
-	<T extends Type> T newSubType(Serializable value, Type... superTypes);
+	<T extends Type> T newType(Serializable name, Type... superTypes);
 
 	/**
-	 * Create a new subtype or get the subtype with this value if it already exists.
+	 * Returns the existing Type or creates a new one if it not yet exists.
 	 * 
-	 * @param value
-	 *            The type name.
+	 * @param name
+	 *            the type's name.
 	 * @param superTypes
-	 *            The array of super types.
+	 *            the array of super types.
 	 * @param components
-	 *            The array of components.
+	 *            the array of components.
 	 * 
-	 * @return A new subtype or the existing subtype.
+	 * @return the Type generic.
 	 */
-	<T extends Type> T newSubType(Serializable value, Type[] superTypes, Generic... components);
+	<T extends Type> T newType(Serializable name, Type[] superTypes, Generic... components);
 
 	/**
-	 * Flush Cache in the subcontext (that is a another Cache or a transaction).
+	 * Flush the content of current cache into it's subcache or into current user's transaction. If cache flush it's data into transaction modifications become available to other users.
 	 * 
 	 * @throws RollbackException
 	 */
 	void flush() throws RollbackException;
 
 	/**
-	 * Clear the Cache without flushing in the subcontext.
+	 * Clear the cache without flushing.
 	 */
 	void clear();
 
 	/**
-	 * Checks if a Generic is alive in this Cache.
+	 * Returns true if the generic was not removed from this cache or from any of it's sub caches.
 	 * 
-	 * @param Generic
-	 *            the Generic checked.
-	 * @return True if Generic is alive.
+	 * @param generic
+	 *            the generic to check.
+	 * 
+	 * @return true if the generic still present in any of caches in the current cache stack.
 	 */
 	boolean isAlive(Generic generic);
 
 	/**
-	 * Create a new tree or get the tree with this value if it already exists.
+	 * Returns the existing Tree or creates a new one if it not yet exists.
 	 * 
-	 * @param value
-	 *            The type name.
+	 * @param name
+	 *            the tree's name.
 	 * 
-	 * @return A new tree or the existing type.
+	 * @return the Tree generic.
 	 */
-	<T extends Tree> T newTree(Serializable value);
+	<T extends Tree> T newTree(Serializable name);
 
 	/**
-	 * Create a new tree or get the tree with this value if it already exists.
+	 * Returns the existing Tree or creates a new one if it not yet exists.
 	 * 
-	 * @param value
-	 *            The type name.
-	 * @param dim
-	 *            The dimension of tree.
+	 * @param name
+	 *            the tree's name.
+	 * @param dimension
+	 *            the dimension of the tree.
 	 * 
-	 * @return A new tree or the existing type.
+	 * @return the Tree generic.
 	 */
-	<T extends Tree> T newTree(Serializable value, int dim);
+	<T extends Tree> T newTree(Serializable name, int dimension);
 
 	/**
-	 * Create a new cache on the current cache.
+	 * Mounts and starts the new cache on this cache.
 	 * 
-	 * @return the new super Cache.
+	 * @return the new super cache.
 	 */
 	Cache mountNewCache();
 
 	/**
-	 * Flush this cache in the sub cache and return the sub cache.
+	 * Flushes this cache into it's sub cache. Returns it's sub cache after the flush. If this is the cache of the first level (cache mount dirrectly on current transaction) function returns the same cache.
 	 * 
 	 * @return the sub cache.
 	 */
 	Cache flushAndUnmount();
 
 	/**
-	 * Discard changes in this cache and return the sub cache.
+	 * Discards changes in this cache and returns the sub cache. If this is the cache of the first level (cache mount dirrectly on current transaction) function returns the same cache.
 	 * 
 	 * @return the sub cache.
 	 */
 	Cache discardAndUnmount();
 
 	/**
-	 * Returns the level of this cache. Level 1 is equivalent to transaction.
+	 * Returns the level of this cache. Level 1 is equivalent to the cache of first level (cache mount dirrectly on current transaction).
 	 * 
 	 * @return the level of this cache.
 	 */
@@ -157,30 +181,39 @@ public interface Cache {
 	/**
 	 * Returns the meta Attribute.
 	 * 
-	 * @return The meta attribute.
+	 * @return the meta attribute.
 	 */
 	<T extends Attribute> T getMetaAttribute();
 
 	/**
 	 * Returns the meta Relation.
 	 * 
-	 * @return The meta Relation.
+	 * @return the meta Relation.
 	 */
 	<T extends Relation> T getMetaRelation();
 
 	/**
-	 * Returns true if the Generic is removable.
+	 * Returns true if the generic is removable.
 	 * 
 	 * @param generic
-	 *            The remove Generic.
+	 *            the generic.
 	 * 
-	 * @return True if the Generic is removable.
+	 * @return true if the generic is removable.
 	 */
 	boolean isRemovable(Generic generic);
 
+	/**
+	 * Starts the execution of this cache.
+	 * 
+	 * @return this cache.
+	 */
 	Cache start();
 
+	/**
+	 * Returns all Types existing in current cache.
+	 * 
+	 * @return collection of Type generics.
+	 */
 	Snapshot<Type> getAllTypes();
-
 
 }
