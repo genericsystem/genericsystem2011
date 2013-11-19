@@ -61,7 +61,7 @@ public class GenericBean implements Serializable {
 	 *            - the name of new type.
 	 */
 	public void newType(String typeName) {
-		cacheProvider.getCurrentCache().newType(typeName);
+		cacheProvider.getCurrentCache().addType(typeName);
 		// genericTreeBean.rebuildTree();
 		genericTreeBean.getSelectedTreeNode().updateChildren();
 

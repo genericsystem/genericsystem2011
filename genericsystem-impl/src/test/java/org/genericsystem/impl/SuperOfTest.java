@@ -23,20 +23,20 @@ public class SuperOfTest extends AbstractTest {
 	}
 
 	public void testMultiInheritings() {
-		Type vehicle = cache.newType("Vehicle");
-		Type robot = cache.newType("Robot");
-		cache.newType("Transformer", vehicle, robot);
+		Type vehicle = cache.addType("Vehicle");
+		Type robot = cache.addType("Robot");
+		cache.addType("Transformer", vehicle, robot);
 	}
 
 	public void testMultiInheritingsWithInstance() {
-		Type vehicle = cache.newType("Vehicle");
-		Type robot = cache.newType("Robot");
-		Type transformer = cache.newType("Transformer", vehicle, robot);
+		Type vehicle = cache.addType("Vehicle");
+		Type robot = cache.addType("Robot");
+		Type transformer = cache.addType("Transformer", vehicle, robot);
 		Attribute power = transformer.setProperty( "Power");
 		Generic myTransformer = transformer.newInstance( "myTransformer");
 		myTransformer.setValue( power, 123);
 
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Relation humanPilotTransformer = human.setRelation( "pilot", transformer);
 		Generic myck = human.newInstance( "myck");
 		myck.setLink( humanPilotTransformer, "myPilot", myTransformer);

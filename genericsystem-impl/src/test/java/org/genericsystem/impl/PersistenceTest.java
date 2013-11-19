@@ -40,13 +40,13 @@ public class PersistenceTest {
 
 	public void testOnlyAType() {
 		Cache cache = initWorkingSpace();
-		cache.newType("Vehicle");
+		cache.addType("Vehicle");
 		closingWorkingSpace(cache);
 	}
 
 	public void testCustomTypeAndItsInstance() {
 		Cache cache = initWorkingSpace();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Attribute equipment = vehicle.setAttribute("Equipment");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
@@ -55,7 +55,7 @@ public class PersistenceTest {
 
 	public void testAddAndRemove() {
 		Cache cache = initWorkingSpace();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Type truck = vehicle.newSubType("Truck");
 		truck.newSubType("Van");
@@ -65,8 +65,8 @@ public class PersistenceTest {
 
 	public void testLink() {
 		Cache cache = initWorkingSpace();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
@@ -76,25 +76,25 @@ public class PersistenceTest {
 
 	public void testHeritage() {
 		Cache cache = initWorkingSpace();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.newSubType("Car");
 		closingWorkingSpace(cache);
 	}
 
 	public void testHeritageMultiple() {
 		Cache cache = initWorkingSpace();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
-		cache.newType("Transformer", vehicle, human);
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
+		cache.addType("Transformer", vehicle, human);
 		closingWorkingSpace(cache);
 	}
 
 	public void testHeritageMultipleDiamond() {
 		Cache cache = initWorkingSpace();
-		Type movable = cache.newType("Movable");
+		Type movable = cache.addType("Movable");
 		Type vehicle = movable.newSubType("Vehicle");
 		Type human = movable.newSubType("Human");
-		cache.newType("Transformer", vehicle, human);
+		cache.addType("Transformer", vehicle, human);
 		closingWorkingSpace(cache);
 	}
 

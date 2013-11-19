@@ -15,14 +15,14 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testInstanceIsConcrete() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic audi = car.newInstance("audi");
 		assert audi.isConcrete();
 	}
 
 	public void testCountAncestor() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic audi = car.newInstance("audi");
 		Snapshot<Generic> snapshot = audi.getSupers();
 		assert snapshot.size() == 1;
@@ -31,8 +31,8 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testInstanceIsConcreteWithValue() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("outsideColor", color);
 		Generic audi = car.newInstance("audi");
 		Generic red = color.newInstance("red");
@@ -42,8 +42,8 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testCountAncestorLink() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("outsideColor", color);
 		Generic audi = car.newInstance("audi");
 		Generic red = color.newInstance("red");
@@ -53,9 +53,9 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testTargetsAncestor() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Generic myck = human.newInstance("myck");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 		Link myckPossessMyVehicle = myck.setLink(possessVehicle, "myckPossessMyVehicle", myVehicle);
@@ -64,10 +64,10 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testTargetsAncestorWithMultipleTarget() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Generic myVehicle1 = vehicle.newInstance("myVehicle1");
 		Generic myVehicle2 = vehicle.newInstance("myVehicle2");
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Generic myck = human.newInstance("myck");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 		Link myckPossessMyVehicle1 = myck.setLink(possessVehicle, "myckPossessMyVehicle1", myVehicle1);
@@ -80,9 +80,9 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testUnidirectionalRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Generic myck = human.newInstance("myck");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 		Link myckPossessMyVehicle = myck.setLink(possessVehicle, "myckPossessMyVehicle", myVehicle);
@@ -94,9 +94,9 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testBidirectionalRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Generic myck = human.newInstance("myck");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
 		// assert !possessVehicle.isMultiDirectional();
@@ -115,7 +115,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testRelationToHimself() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Generic myck = human.newInstance("myck");
 		Generic quentin = human.newInstance("quentin");
 		Relation brother = human.setRelation("brother", human);
@@ -129,7 +129,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testRelationToHimselfUnidirectional() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Generic myck = human.newInstance("myck");
 		Generic quentin = human.newInstance("quentin");
 		Relation littleBrother = human.setRelation("littleBrother", human);
@@ -141,9 +141,9 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testNewInstanceBinaryRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic myBMW = car.newInstance("myBMW");
-		Type pilot = cache.newType("Pilot");
+		Type pilot = cache.addType("Pilot");
 		Generic myck = pilot.newInstance("Pilot");
 
 		Relation carPilot = car.setRelation("CarPilot", pilot);
@@ -154,11 +154,11 @@ public class InstanceAndLinkTest extends AbstractTest {
 
 	public void testNewInstanceTernaryRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic myBMW = car.newInstance("myBMW");
-		Type color = cache.newType("Color");
+		Type color = cache.addType("Color");
 		Generic blue = color.newInstance("Blue");
-		Type element = cache.newType("Element");
+		Type element = cache.addType("Element");
 		Generic door = element.newInstance("Door");
 
 		Relation carElementColor = car.setRelation("CarElementColor", element, color);

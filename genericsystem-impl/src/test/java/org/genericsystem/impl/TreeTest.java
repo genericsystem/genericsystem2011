@@ -157,7 +157,7 @@ public class TreeTest extends AbstractTest {
 		body.setSubNode("message1");
 		body.setSubNode("message2");
 
-		Type color = cache.newType("Color");
+		Type color = cache.addType("Color");
 		Generic red = color.newInstance("Red");
 		Generic blue = color.newInstance("Blue");
 		Generic yellow = color.newInstance("Yellow");

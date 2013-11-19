@@ -21,7 +21,7 @@ public class AnnotationTest extends AbstractTest {
 
 	public void testMultiDirectionalRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Generic michael = human.newInstance("Michael");
 		Generic quentin = human.newInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
@@ -43,8 +43,8 @@ public class AnnotationTest extends AbstractTest {
 
 	public void testSimpleDirectionalRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);

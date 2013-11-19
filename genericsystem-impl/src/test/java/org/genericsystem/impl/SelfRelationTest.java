@@ -13,8 +13,8 @@ public class SelfRelationTest extends AbstractTest {
 
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Generic red = color.newInstance("red");
 		Relation carOutsideColor = car.setRelation("outside", color);
 		car.setLink(carOutsideColor, "defaultOutside", red);
@@ -32,7 +32,7 @@ public class SelfRelationTest extends AbstractTest {
 
 	public void paternityRelationTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Relation paternity = human.setRelation("paternity", human);
 		Generic theFather = human.newInstance("theFather");
 		Generic theSon = human.newInstance("theSon");
@@ -46,7 +46,7 @@ public class SelfRelationTest extends AbstractTest {
 
 	public void fraternityRelationTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Relation fraternity = human.setRelation("brother", human);
 		// fraternity.enableMultiDirectional();
 		Generic theBrother1 = human.newInstance("theBrother1");

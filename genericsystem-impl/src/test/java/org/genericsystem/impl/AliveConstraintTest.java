@@ -13,8 +13,8 @@ public class AliveConstraintTest extends AbstractTest {
 
 	public void testPropertySimpleRelationKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type human = cache.newType("Human");
+		Type car = cache.addType("Car");
+		Type human = cache.addType("Human");
 		final Relation humanDriveCar = human.setRelation("Drive", car);
 		final Generic myCar = car.newInstance("myCar");
 		final Generic myHuman = human.newInstance("myHuman");
@@ -31,8 +31,8 @@ public class AliveConstraintTest extends AbstractTest {
 
 	public void testPropertySimpleRelationOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type human = cache.newType("Human");
+		Type car = cache.addType("Car");
+		Type human = cache.addType("Human");
 		Relation humanDriveCar = human.setRelation("Drive", car);
 		Generic myCar = car.newInstance("myCar");
 		Generic myHuman = human.newInstance("myHuman");

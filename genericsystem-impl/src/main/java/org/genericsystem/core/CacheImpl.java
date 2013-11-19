@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -185,7 +186,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -198,14 +199,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 			dependencies.remove(generic);
 			for (Generic dependency : dependencies)
 				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, true);
-		break;
+			break;
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -365,23 +366,53 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	// @Override
-	// public <T extends Type> T newType(Serializable value) {
-	// return this.<T> newType(value);
-	// }
+	//	public <T extends Type> T newType(Serializable value) {
+	//		return this.<T> newType(value);
+	//	}
 
 	@Override
 	public <T extends Type> T getType(final Serializable value) {
 		return getEngine().getSubType(value);
 	}
 
+	//	//@Override
+	//	public <T extends Type> T addType(Serializable value, Type... userSupers) {
+	//		return addType(value, userSupers, Statics.EMPTY_GENERIC_ARRAY);
+	//	}
+	//
+	//	//@Override
+	//	public <T extends Type> T addType(Serializable value, Type[] userSupers, Generic... components) {
+	//		return bind(getEngine(), value, userSupers, components, null, Statics.MULTIDIRECTIONAL, false);
+	//	}
+
+	//	@Override
+	//	public <T extends Type> T addType(Serializable name) {
+	//		return this.<T> addType(name);
+	//	}
+
 	@Override
-	public <T extends Type> T newType(Serializable value, Type... userSupers) {
-		return newType(value, userSupers, Statics.EMPTY_GENERIC_ARRAY);
+	public <T extends Type> T addType(Serializable name, Type... superTypes) {
+		return addType(name, superTypes, Statics.EMPTY_GENERIC_ARRAY);
 	}
 
 	@Override
-	public <T extends Type> T newType(Serializable value, Type[] userSupers, Generic... components) {
-		return bind(getEngine(), value, userSupers, components, null, Statics.MULTIDIRECTIONAL, false);
+	public <T extends Type> T addType(Serializable name, Type[] superTypes, Generic... components) {
+		return bind(getEngine(), name, superTypes, components, null, Statics.MULTIDIRECTIONAL, true);
+	}
+
+	//	@Override
+	//	public <T extends Type> T setType(Serializable name) {
+	//		return this.<T> setType(name);
+	//	}
+
+	@Override
+	public <T extends Type> T setType(Serializable name, Type... superTypes) {
+		return setType(name, superTypes, Statics.EMPTY_GENERIC_ARRAY);
+	}
+
+	@Override
+	public <T extends Type> T setType(Serializable name, Type[] superTypes, Generic... components) {
+		return bind(getEngine(), name, superTypes, components, null, Statics.MULTIDIRECTIONAL, false);
 	}
 
 	@Override
@@ -742,4 +773,5 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public int getLevel() {
 		return subContext.getLevel() + 1;
 	}
+
 }

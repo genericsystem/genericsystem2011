@@ -20,7 +20,7 @@ public class RemoveTest extends AbstractTest {
 
 	public void testRemoveType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.remove();
 		assert !vehicle.isAlive();
 		assert !cache.getEngine().getInheritings().contains(vehicle);
@@ -31,7 +31,7 @@ public class RemoveTest extends AbstractTest {
 			@Override
 			public void intercept() {
 				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-				Type vehicle = cache.newType("Vehicle");
+				Type vehicle = cache.addType("Vehicle");
 				vehicle.newSubType("Car");
 				vehicle.remove();
 			}
@@ -40,7 +40,7 @@ public class RemoveTest extends AbstractTest {
 
 	public void testRemoveAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Attribute power = vehicle.setAttribute("power");
 		power.remove();
 		assert !power.isAlive();
@@ -68,7 +68,7 @@ public class RemoveTest extends AbstractTest {
 
 	public void testRemoveProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type window = cache.newType("Window");
+		Type window = cache.addType("Window");
 		Attribute height = window.setProperty("Height");
 		Generic myWindow = window.newInstance("MyWindow");
 		Holder myHeight1 = ((Attribute) myWindow).setValue(height, 165);
@@ -80,9 +80,9 @@ public class RemoveTest extends AbstractTest {
 
 	public void testRemoveRelationWithSubRelation() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		Type man = human.newSubType("Man");
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		final Relation humanDriveVehicle = human.addRelation("drive", vehicle);
 		Relation manSubDriveCar = ((GenericImpl) man).addSubRelation(humanDriveVehicle, "subDrive", car);
@@ -103,7 +103,7 @@ public class RemoveTest extends AbstractTest {
 
 	public void testRemoveInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type window = cache.newType("Window");
+		Type window = cache.addType("Window");
 		Generic myWindow = window.newInstance("myWindow");
 		myWindow.remove();
 	}
@@ -113,7 +113,7 @@ public class RemoveTest extends AbstractTest {
 			@Override
 			public void intercept() {
 				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-				Type window = cache.newType("Window");
+				Type window = cache.addType("Window");
 				window.newInstance("myWindow");
 				window.remove();
 			}
@@ -136,8 +136,8 @@ public class RemoveTest extends AbstractTest {
 	public void testRemoveLinkWithItsAutomaticsOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 		Attribute intensity = carColor.setAttribute("Intensity");

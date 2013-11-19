@@ -15,7 +15,7 @@ public class ConsistencySizeConstraintTest extends AbstractTest {
 
 	public void consistencyAttributeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Attribute power = vehicle.setAttribute("power");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		power.newInstance(123, myVehicle); // or myVehicle.setValue(power, 123);
@@ -24,7 +24,7 @@ public class ConsistencySizeConstraintTest extends AbstractTest {
 
 	public void consistencyAttributeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		final Attribute power = vehicle.setAttribute("power");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		power.newInstance(123, myVehicle);
@@ -39,8 +39,8 @@ public class ConsistencySizeConstraintTest extends AbstractTest {
 
 	public void consistencyRelationBaseOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
@@ -50,8 +50,8 @@ public class ConsistencySizeConstraintTest extends AbstractTest {
 
 	public void consistencyRelationBaseKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Generic green = color.newInstance("green");
@@ -68,8 +68,8 @@ public class ConsistencySizeConstraintTest extends AbstractTest {
 
 	public void consistencyRelationTargetOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
@@ -79,8 +79,8 @@ public class ConsistencySizeConstraintTest extends AbstractTest {
 
 	public void consistencyRelationTargetKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type vehicle = cache.newType("Vehicle");
-		final Type color = cache.newType("Color");
+		final Type vehicle = cache.addType("Vehicle");
+		final Type color = cache.addType("Color");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		final Generic red = color.newInstance("red");
 		final Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
@@ -96,8 +96,8 @@ public class ConsistencySizeConstraintTest extends AbstractTest {
 
 	public void consistencyRelationDoubleOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Generic red = color.newInstance("red");
 		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);

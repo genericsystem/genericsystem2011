@@ -13,9 +13,9 @@ public class UnduplicateBindingConstraintTest extends AbstractTest {
 
 	public void testType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		cache.newType("Human");
+		cache.addType("Human");
 		final Cache cache2 = cache.getEngine().newCache().start();
-		cache2.newType("Human");
+		cache2.addType("Human");
 		cache.start();
 		cache.flush();
 		new RollbackCatcher() {
@@ -31,7 +31,7 @@ public class UnduplicateBindingConstraintTest extends AbstractTest {
 
 	public void testInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type human = cache.newType("Human");
+		Type human = cache.addType("Human");
 		cache.flush();
 		human.newInstance("michael");
 		final Cache cache2 = cache.getEngine().newCache().start();
@@ -51,8 +51,8 @@ public class UnduplicateBindingConstraintTest extends AbstractTest {
 
 	public void testRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		cache.flush();
 		car.setRelation("carColor", color);
 		final Cache cache2 = cache.getEngine().newCache().start();
@@ -72,9 +72,9 @@ public class UnduplicateBindingConstraintTest extends AbstractTest {
 
 	public void testLink() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic myCar = car.newInstance("myCar");
-		Type color = cache.newType("Color");
+		Type color = cache.addType("Color");
 		Generic red = color.newInstance("red");
 		Relation carColor = car.setRelation("carColor", color);
 		cache.flush();
