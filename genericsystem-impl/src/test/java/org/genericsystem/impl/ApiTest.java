@@ -516,7 +516,29 @@ public class ApiTest extends AbstractTest {
 		Holder superCar10 = car.setValue(car30, 10);
 		Holder superCar20 = car.setValue(car10, 20);
 
-		assert false;// TODO implement asserts
+		assert superCar30.inheritsFrom(car20);
+		assert !superCar30.inheritsFrom(car30);
+		assert !superCar30.inheritsFrom(car10);
+
+		assert !superCar10.inheritsFrom(car20);
+		assert superCar10.inheritsFrom(car30);
+		assert !superCar10.inheritsFrom(car10);
+
+		assert !superCar20.inheritsFrom(car20);
+		assert !superCar20.inheritsFrom(car30);
+		assert superCar20.inheritsFrom(car10);
+
+		assert superCar30.inheritsFrom(vehicle10);
+		assert !superCar30.inheritsFrom(vehicle20);
+		assert !superCar30.inheritsFrom(vehicle30);
+
+		assert !superCar10.inheritsFrom(vehicle10);
+		assert superCar10.inheritsFrom(vehicle20);
+		assert !superCar10.inheritsFrom(vehicle30);
+
+		assert !superCar20.inheritsFrom(vehicle10);
+		assert !superCar20.inheritsFrom(vehicle20);
+		assert superCar20.inheritsFrom(vehicle30);
 	}
 
 	public void testOverrideAttribute() {
