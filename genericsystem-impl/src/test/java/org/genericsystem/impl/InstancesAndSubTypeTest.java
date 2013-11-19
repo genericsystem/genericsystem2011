@@ -16,7 +16,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testInstancesSnapshotOfType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Generic myVehicle1 = vehicle.newInstance( "myVehicle1");
 		Generic myVehicle2 = vehicle.newInstance( "myVehicle2");
 		Generic myVehicle3 = vehicle.newInstance( "myVehicle3");
@@ -30,7 +30,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testAllInstancesSnapshotOfType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Generic myVehicle1 = vehicle.newInstance( "myVehicle1");
 		Generic myVehicle2 = vehicle.newInstance( "myVehicle2");
 		Generic myVehicle3 = vehicle.newInstance( "myVehicle3");
@@ -43,7 +43,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testInstancesSnapshotOfTypeWithSubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType( "Car");
 		car.newInstance( "myCar1");
 		Generic myVehicle1 = vehicle.newInstance( "myVehicle1");
@@ -58,7 +58,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testAllInstancesSnapshotOfTypeWithSubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType( "Car");
 		Generic myCar1 = car.newInstance( "myCar1");
 		Generic myVehicle1 = vehicle.newInstance( "myVehicle1");
@@ -77,7 +77,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testInstancesSnapshotOfAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute( "vehiclePower");
 		Generic myVehicle = vehicle.newInstance( "myVehicle");
 		Holder valueOfAttribute = myVehicle.setValue( vehiclePower, "233 HP");
@@ -90,7 +90,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testAllInstancesSnapshotOfAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute( "power");
 		Generic myVehicle = vehicle.newInstance( "myVehicle");
 		Holder valueOfAttribute = myVehicle.setValue( vehiclePower, "123");
@@ -101,8 +101,8 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testInstancesSnapshotOfRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation relation = color.setRelation( "relation", car);
 		Generic bmw = car.newInstance( "bmw");
 		Generic red = color.newInstance( "red");
@@ -113,9 +113,9 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testInstancesSnapshotOfRelationTernary() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
-		Type time = cache.newType("Time");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
+		Type time = cache.addType("Time");
 		Relation drive = human.setRelation( "drive", vehicle, time);
 		Generic myck = human.newInstance( "myck");
 		Generic myBmw = vehicle.newInstance( "myBmw");
@@ -127,8 +127,8 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testAllInstancesSnapshotOfRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		Relation driver = human.setRelation( "drive", vehicle);
 		Generic myBmw = vehicle.newInstance( "myBmw");
 		Generic myck = human.newInstance( "myck");
@@ -139,7 +139,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testOneSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType( "Car");
 		Snapshot<Generic> snapshot = vehicle.getDirectSubTypes();
 		assert snapshot.size() == 1;
@@ -148,7 +148,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testManySubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType( "Car");
 		car.newSubType( "ElectricCar");
 		Type truck = vehicle.newSubType( "Truck");
@@ -160,7 +160,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testManyAllSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType( "Car");
 		Type electricCar = car.newSubType( "ElectricCar");
 		Type truck = vehicle.newSubType( "Truck");
@@ -173,7 +173,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testSubTypeWithInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.newInstance( "myVehicle");
 		Type car = vehicle.newSubType( "Car");
 		car.newInstance( "myCar");
@@ -186,7 +186,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testAllSubTypeWithInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.newInstance( "myVehicle");
 		Type car = vehicle.newSubType( "Car");
 		Type electricCar = car.newSubType( "ElectricCar");
@@ -201,7 +201,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testSubTypeWithAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.setAttribute( "power");
 		Type car = vehicle.newSubType( "Car");
 		car.newInstance( "myCar");
@@ -214,7 +214,7 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testAllSubTypeWithAttribute() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.setAttribute( "power");
 		Type car = vehicle.newSubType( "Car");
 		Type electricCar = car.newSubType( "ElectricCar");
@@ -230,8 +230,8 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testSubTypeWithRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		human.setRelation( "drive", vehicle);
 		Type car = vehicle.newSubType( "Car");
 		car.newInstance( "myCar");
@@ -244,8 +244,8 @@ public class InstancesAndSubTypeTest extends AbstractTest {
 
 	public void testAllSubTypeWithRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type human = cache.newType("Human");
+		Type vehicle = cache.addType("Vehicle");
+		Type human = cache.addType("Human");
 		human.setRelation( "drive", vehicle);
 		Type car = vehicle.newSubType( "Car");
 		Type electricCar = car.newSubType( "ElectricCar");

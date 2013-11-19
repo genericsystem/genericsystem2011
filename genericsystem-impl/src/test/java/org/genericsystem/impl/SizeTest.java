@@ -15,8 +15,8 @@ public class SizeTest extends AbstractTest {
 
 	public void enableSize() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		vehicleColor.enableSizeConstraint(Statics.BASE_POSITION, 1);
 		assert vehicleColor.getSizeConstraint(Statics.BASE_POSITION) == 1 : vehicleColor.getSizeConstraint(Statics.BASE_POSITION);
@@ -25,8 +25,8 @@ public class SizeTest extends AbstractTest {
 
 	public void enableSizeInTargetPosition() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		vehicleColor.enableSizeConstraint(Statics.TARGET_POSITION, 1);
 		assert vehicleColor.getSizeConstraint(Statics.TARGET_POSITION) == 1 : vehicleColor.getSizeConstraint(Statics.TARGET_POSITION);
@@ -35,8 +35,8 @@ public class SizeTest extends AbstractTest {
 
 	public void enableSizeTwoAxe() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		vehicleColor.enableSizeConstraint(Statics.BASE_POSITION, 1);
 		vehicleColor.enableSizeConstraint(Statics.BASE_POSITION, 2);
@@ -48,8 +48,8 @@ public class SizeTest extends AbstractTest {
 
 	public void enableComplexSize() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		vehicleColor.enableSizeConstraint(Statics.BASE_POSITION, 1);
 		vehicleColor.enableSizeConstraint(Statics.TARGET_POSITION, 2);
@@ -61,7 +61,7 @@ public class SizeTest extends AbstractTest {
 
 	public void checkConstraintWithAttribute() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type vehicle = cache.newType("Vehicle");
+		final Type vehicle = cache.addType("Vehicle");
 		final Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
 		final Generic myVehicle = vehicle.newInstance("myVehicle");
@@ -76,7 +76,7 @@ public class SizeTest extends AbstractTest {
 
 	public void checkConstraintWithAttribute2() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type vehicle = cache.newType("Vehicle");
+		final Type vehicle = cache.addType("Vehicle");
 		final Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
 		final Generic myVehicle1 = vehicle.newInstance("myVehicle1");
@@ -92,7 +92,7 @@ public class SizeTest extends AbstractTest {
 
 	public void checkConstraintWithAttributeWithInherits() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		final Type car = vehicle.newSubType("Car");
 		final Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
@@ -109,10 +109,11 @@ public class SizeTest extends AbstractTest {
 
 	public void checkConstraintWithAttributeWithInherits2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
+		// vehiclePower.enableSingularConstraint();
 		vehicle.setValue(vehiclePower, 123);
 		car.setValue(vehiclePower, 123);
 
@@ -120,8 +121,8 @@ public class SizeTest extends AbstractTest {
 
 	public void checkConstraintWithRelation() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Type vehicle = cache.newType("Vehicle");
-		Type color = cache.newType("Color");
+		final Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
 		final Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		vehicleColor.enableSizeConstraint(Statics.BASE_POSITION, 1);
 		final Generic myVehicle1 = vehicle.newInstance("myVehicle1");

@@ -11,7 +11,7 @@ public class CacheTest extends AbstractTest {
 
 	public void testFlushCache1OK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		cache.flush();
 	}
@@ -19,7 +19,7 @@ public class CacheTest extends AbstractTest {
 	public void testFlushCacheOnCacheOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Cache cache2 = cache.mountNewCache();
-		Type vehicle = cache2.newType("Vehicle");
+		Type vehicle = cache2.addType("Vehicle");
 		assert cache2.getEngine().getInheritings().contains(vehicle);
 		cache.start();
 		assert !cache.getEngine().getInheritings().contains(vehicle);

@@ -13,7 +13,7 @@ public class ConsistencyRequiredConstraintTest extends AbstractTest {
 
 	public void ConsistencyAttributeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Attribute power = vehicle.setAttribute("power");
 		myVehicle.setValue(power, 123);
@@ -23,7 +23,7 @@ public class ConsistencyRequiredConstraintTest extends AbstractTest {
 
 	public void ConsistencyAttributeKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		vehicle.newInstance("myVehicle");
 		final Attribute power = vehicle.setAttribute("power");
 		new RollbackCatcher() {

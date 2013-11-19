@@ -19,7 +19,7 @@ public class IsolationCachesTest extends AbstractTest {
 		// Create a first cache for it.
 		Cache cache = engine.newCache().start();
 		// Adds a Vehicle Type in the cache and synchronizes it with engine.
-		final Generic vehicle = cache.newType("Vehicle");
+		final Generic vehicle = cache.addType("Vehicle");
 		cache.flush();
 		// cache.deactivate();
 
@@ -70,7 +70,7 @@ public class IsolationCachesTest extends AbstractTest {
 		// Create a first cache n°1 for engine.
 		Cache cache1 = engine.newCache().start();
 		// Adds a Vehicle Type in the cache n°1 without synchronization.
-		Generic vehicle = cache1.newType("Vehicle");
+		Generic vehicle = cache1.addType("Vehicle");
 		// cache1.deactivate();
 
 		// Creates a cache n°2 for engine.
@@ -101,7 +101,7 @@ public class IsolationCachesTest extends AbstractTest {
 		// Create a first cache for engine.
 		Cache cache1 = engine.newCache().start();
 		// Adds a Vehicle Type in the cache n°1 without synchronization.
-		Generic vehicle = cache1.newType("Vehicle");
+		Generic vehicle = cache1.addType("Vehicle");
 		// cache1.deactivate();
 
 		// Creates a cache n°2 for engine.
@@ -134,7 +134,7 @@ public class IsolationCachesTest extends AbstractTest {
 		// Create a first cache for engine.
 		Cache cache1 = engine.newCache().start();
 		// Adds a Vehicle Type and two instances in the cache n°1 and synchronizes it with engine.
-		Generic vehicle = cache1.newType("Vehicle");
+		Generic vehicle = cache1.addType("Vehicle");
 		vehicle.newInstance("Vehicle1");
 		vehicle.newInstance("Vehicle2");
 		cache1.flush();
@@ -175,7 +175,7 @@ public class IsolationCachesTest extends AbstractTest {
 		// Create a first cache for engine.
 		Cache cache1 = engine.newCache().start();
 		// Adds a Vehicle Type and two instances in the cache n°1 and synchronizes it with engine.
-		Generic vehicle = cache1.newType("Vehicle");
+		Generic vehicle = cache1.addType("Vehicle");
 		vehicle.newInstance("Vehicle1");
 		vehicle.newInstance("Vehicle2");
 		cache1.flush();

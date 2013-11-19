@@ -37,7 +37,7 @@ public class TypesTest extends AbstractTest {
 	}
 
 	public void testGetAttributes() {
-		Type human = cache.newType("Human");
+		Type human = cache.setType("Human");
 		Generic michael = human.newInstance("Michael");
 		Generic quentin = human.newInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
@@ -60,7 +60,7 @@ public class TypesTest extends AbstractTest {
 	}
 
 	public void testGetOtherTargets() {
-		Type human = cache.newType("Human");
+		Type human = cache.setType("Human");
 		Generic michael = human.newInstance("Michael");
 		Generic quentin = human.newInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
@@ -79,7 +79,7 @@ public class TypesTest extends AbstractTest {
 	}
 
 	public void testContraint() {
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.setType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty("power");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		myVehicle.getMap(ConstraintsMapProvider.class);

@@ -5,127 +5,124 @@ import java.lang.reflect.InvocationTargetException;
 import org.genericsystem.core.Factory.DefaultFactory;
 
 /**
- * GenericSystem utilities for manage engines and caches.
+ * <tt>Engine</tt> factory of Generic System. Assemble utilities for management of <tt>Engine</tt> and <tt>Caches</tt>.
  * 
  * @author Nicolas Feybesse
+ * @author Michael Ory
  */
 public class GenericSystem {
 
 	/**
-	 * Create new an in memory Engine, create a new Cache on it.
+	 * Creates a new In-Memory <tt>Engine</tt> and mount a new <tt>Cache</tt> on it.
 	 * 
 	 * @param userClasses
-	 *            List of user classes.
-	 * @return New activated Cache.
+	 *            the list of user classes.
+	 * 
+	 * @return a new active cache.
 	 */
 	public static Cache newCacheOnANewInMemoryEngine(Class<?>... userClasses) {
 		return newInMemoryEngine(new DefaultFactory(), userClasses).newCache();
 	}
 
 	/**
-	 * Create new an in memory Engine, create a new Cache on it.
+	 * Creates a new In-Memory <tt>Engine</tt> and mount a new <tt>Cache</tt> on it.
 	 * 
 	 * @param factory
-	 *            The factory to Generic.
+	 *            the factory for generic.
 	 * @param userClasses
-	 *            list of user classes
-	 * @return new activated Cache
+	 *            the list of user classes.
+	 * 
+	 * @return a new active cache.
 	 */
-	public static Cache newCacheOnANewInMemoryEngine(Factory factory,
-			Class<?>... userClasses) {
+	public static Cache newCacheOnANewInMemoryEngine(Factory factory, Class<?>... userClasses) {
 		return newInMemoryEngine(factory, userClasses).newCache();
 	}
 
 	/**
-	 * Create a new persistent engine, create a new Cache on it.
+	 * Creates a new Persistent <tt>Engine</tt> and mount a new <tt>Cache</tt> on it.
 	 * 
 	 * @param userClasses
-	 *            List of user classes.
-	 * @return New activated Cache.
+	 *            the list of user classes.
+	 * 
+	 * @return a new active cache.
 	 */
-	public static Cache newCacheOnANewPersistentEngine(String directoryPath,
-			Class<?>... userClasses) {
-		return newCacheOnANewPersistentEngine(new DefaultFactory(),
-				directoryPath, userClasses);
+	public static Cache newCacheOnANewPersistentEngine(String directoryPath, Class<?>... userClasses) {
+		return newCacheOnANewPersistentEngine(new DefaultFactory(), directoryPath, userClasses);
 	}
 
 	/**
-	 * Create a new persistent Engine, create a new Cache on it.
+	 * Creates a new Persistent <tt>Engine</tt> and mount a new <tt>Cache</tt> on it.
 	 * 
 	 * @param factory
-	 *            The factory to Generic.
+	 *            the factory for generic.
 	 * @param userClasses
-	 *            List of user classes.
-	 * @return New activated Cache.
+	 *            the list of user classes.
+	 * 
+	 * @return a new active cache.
 	 */
-	public static Cache newCacheOnANewPersistentEngine(Factory factory,
-			String directoryPath, Class<?>... userClasses) {
-		return newPersistentEngine(factory, directoryPath, userClasses)
-				.newCache();
+	public static Cache newCacheOnANewPersistentEngine(Factory factory, String directoryPath, Class<?>... userClasses) {
+		return newPersistentEngine(factory, directoryPath, userClasses).newCache();
 	}
 
 	/**
-	 * Creates a new in-memory Engine.
+	 * Creates and returns a new In-Memory <tt>Engine</tt>.
 	 * 
 	 * @param userClasses
-	 *            List of user classes.
+	 *            the list of user classes.
 	 * 
-	 * @return The new Engine.
+	 * @return a new engine.
 	 */
 	public static Engine newInMemoryEngine(Class<?>... userClasses) {
 		return newInMemoryEngine(new DefaultFactory(), userClasses);
 	}
 
 	/**
-	 * Creates a new in-memory Engine.
+	 * Creates and returns a new In-Memory <tt>Engine</tt>.
 	 * 
 	 * @param factory
-	 *            The factory to Generic.
+	 *            the factory for generic.
 	 * @param userClasses
-	 *            List of user classes.
+	 *            the list of user classes.
 	 * 
-	 * @return The new Engine.
+	 * @return a new engine.
 	 */
-	public static Engine newInMemoryEngine(Factory factory,
-			Class<?>... userClasses) {
+	public static Engine newInMemoryEngine(Factory factory, Class<?>... userClasses) {
 		return newPersistentEngine(factory, null, userClasses);
 	}
 
 	/**
-	 * Creates a new persistent Engine.
+	 * Creates and returns a new Persistent <tt>Engine</tt>.
 	 * 
 	 * @param directoryPath
-	 *            Directory of persistence.
+	 *            the directory of persistence.
 	 * @param userClasses
-	 *            List of user classes.
+	 *            the list of user classes.
 	 * 
-	 * @return The new Engine.
+	 * @return a new engine.
+	 * 
 	 * @throws InvocationTargetException
 	 */
-	public static Engine newPersistentEngine(String directoryPath,
-			Class<?>... userClasses) {
-		return newPersistentEngine(new DefaultFactory(), directoryPath,
-				userClasses);
+	public static Engine newPersistentEngine(String directoryPath, Class<?>... userClasses) {
+		return newPersistentEngine(new DefaultFactory(), directoryPath, userClasses);
 	}
 
 	/**
-	 * Creates a new persistent Engine.
+	 * Creates and returns a new Persistent <tt>Engine</tt>.
 	 * 
 	 * @param factory
-	 *            The factory to Generic.
+	 *            the factory for generic.
 	 * @param directoryPath
-	 *            Directory of persistence.
+	 *            the directory of persistence.
 	 * @param userClasses
-	 *            List of user classes.
+	 *            the list of user classes.
 	 * 
-	 * @return The new Engine.
+	 * @return a new engine.
+	 * 
 	 * @throws InvocationTargetException
 	 */
-	public static Engine newPersistentEngine(Factory factory,
-			String directoryPath, Class<?>... userClasses) {
+	public static Engine newPersistentEngine(Factory factory, String directoryPath, Class<?>... userClasses) {
 		try {
-			return factory.newEngine(new Config(directoryPath, factory),
-					userClasses);
+			return factory.newEngine(new Config(directoryPath, factory), userClasses);
 		} catch (SecurityException | IllegalArgumentException e) {
 			throw new IllegalStateException(e);
 		}

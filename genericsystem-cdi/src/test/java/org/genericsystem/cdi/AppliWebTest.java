@@ -9,8 +9,8 @@ import org.testng.annotations.Test;
 public class AppliWebTest extends AbstractTest {
 
 	public void testInstanceIsConcreteWithValue() {
-		Type car = cache.newType("Car");
-		Type color = cache.newType("Color");
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("outsideColor", color);
 		Generic audi = car.newInstance("audi");
 		Generic red = color.newInstance("red");

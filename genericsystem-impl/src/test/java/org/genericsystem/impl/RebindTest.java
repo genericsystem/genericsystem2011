@@ -16,7 +16,7 @@ public class RebindTest extends AbstractTest {
 
 	public void simpleTestRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Attribute carPower = car.setAttribute("Power");
 		Attribute vehiclePower = vehicle.setAttribute("Power");
@@ -27,7 +27,7 @@ public class RebindTest extends AbstractTest {
 
 	public void testRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Attribute carPower = car.setAttribute("Power");
 		Attribute carPowerUnit = carPower.setAttribute("Unit");
@@ -45,7 +45,7 @@ public class RebindTest extends AbstractTest {
 
 	public void testRebindDependencies2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Attribute carPower = car.setAttribute("Power");
 		Attribute vehiclePower = vehicle.setAttribute("Power");
@@ -55,11 +55,11 @@ public class RebindTest extends AbstractTest {
 
 	public void testRelationRebindDependencies() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type metal = cache.newType("metal");
+		Type metal = cache.addType("metal");
 		Type preciousMetal = metal.newSubType("preciousMetal");
 		Generic zink = metal.newInstance("zink");
 		Generic iron = preciousMetal.newInstance("iron");
-		Type color = cache.newType("color");
+		Type color = cache.addType("color");
 		Type primeColor = color.newSubType("primeColor");
 		Generic gray = color.newInstance("gray");
 		Generic yellow = primeColor.newInstance("yellow");
@@ -74,7 +74,7 @@ public class RebindTest extends AbstractTest {
 
 	public void rebindAttributeNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type color = cache.newType("color");
+		Type color = cache.addType("color");
 		Type primeColor = color.newSubType("primeColor");
 
 		Generic red = primeColor.newInstance("red");
@@ -91,7 +91,7 @@ public class RebindTest extends AbstractTest {
 
 	public void rebindTypeNode() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.newType("Vehicle");
+		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.newSubType("Car");
 		Generic mycar = car.newInstance("mycar");
 		Attribute carPower = car.setAttribute("power");
@@ -106,7 +106,7 @@ public class RebindTest extends AbstractTest {
 
 	public void rebindTypeTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		Generic myCar = car.newInstance("myCar");
 		Attribute power = car.setAttribute("Power");
 		Generic myCar123 = power.newInstance("123", myCar);
@@ -119,7 +119,7 @@ public class RebindTest extends AbstractTest {
 
 	public void rebindTypeTest2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.newType("Car");
+		Type car = cache.addType("Car");
 		car.remove();
 		((GenericImpl) car).reBind();
 	}
