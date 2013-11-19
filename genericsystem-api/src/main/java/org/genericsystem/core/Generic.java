@@ -3,50 +3,59 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.generic.Relation;
 
 /**
- * <p>Almost everything in <tt>Generic System</tt> is <tt>Generic</tt>. Every entity held by
- * <tt>Engine</tt> implements this interface.</p>
+ * <h1>Definition</h1>
+ * <p>
+ * Almost everything in <tt>Generic System</tt> is <tt>Generic</tt>. Every entity held by <tt>Engine</tt> implements this interface.
+ * </p>
  * 
- * <p><tt>Generic System</tt> is a graph. Interface <tt>Generic</tt> represents the node of this
- * graph. This graph has entity <tt>Engine</tt> as it's root. Every new entity must to be plugged on
- * the graph formed by descendants of <tt>Engine</tt>.</p>
+ * <p>
+ * <tt>Generic System</tt> is a graph. Interface <tt>Generic</tt> represents the node of this graph. This graph has entity <tt>Engine</tt> as it's root. Every new entity must to be plugged on the graph formed by descendants of <tt>Engine</tt>.
+ * </p>
  * 
  * <h1>Meta-levels</h1>
- * <p>In <tt>Generic System</tt> exist tree meta-levels of generics:
+ * <p>
+ * In <tt>Generic System</tt> exist tree meta-levels of generics:
  * <dl>
- * 	<dt>Meta<dt>
- * 	<dd>This level define the meta-model. Here we found generics necessairy for the function of
- * the system.</dd>
- * 	<dt>Structurals<dt>
- * 	<dd>On this level we find user-defined data-models: <tt>Types</tt>,
- * <tt>Atttributes</tt> and <tt>Relations</tt></dd>
- * 	<dt>Concretes<dt>
- * 	<dd>Data level. Level of the objects that inherit from user-defined classes. This level
- * defines business-data. Managed by <tt>Generic System</tt>.</dd>
+ * <dt>Meta
+ * <dt>
+ * <dd>This level define the meta-model. Here we found generics necessary for the function of the system.</dd>
+ * <dt>Structurals
+ * <dt>
+ * <dd>On this level we find user-defined data-models: <tt>Types</tt>, <tt>Attributes</tt> and <tt>Relations</tt></dd>
+ * <dt>Concretes
+ * <dt>
+ * <dd>Data level. Level of the objects that inherit from user-defined classes. This level defines business-data. Managed by <tt>Generic System</tt>.</dd>
  * </dl>
  * </p>
  * 
  * <h1>Types of nodes</h1>
- * <p><tt>Generic System</tt> is the graph. It is possible to access any related node of any
- * <tt>Generic</tt>. <tt>Generic</tt> has four categories of related nodes:
+ * <p>
+ * <tt>Generic System</tt> is the graph. It is possible to access any related node of any <tt>Generic</tt>. <tt>Generic</tt> has four categories of related nodes:
  * <dl>
- * 	<dt>Supers</dt>
- * 	<dd>Nodes that this <tt>Generic</tt> inherits from.</dd>
- * 	<dt>Inheretings</dt>
- * 	<dd>Nodes which inherit from this <tt>Generic</tt>.</dd>
- * 	<dt>Components</dt>
- * 	<dd>Nodes that contained by this <tt>Generic</tt>.</dd>
- * 	<dt>Composites</dt>
- * 	<dd>Nodes that contains this <tt>Generic</tt>.</dd>
+ * <dt>Supers</dt>
+ * <dd>Nodes that this <tt>Generic</tt> inherits from.</dd>
+ * <dt>Inheretings</dt>
+ * <dd>Nodes which inherit from this <tt>Generic</tt>.</dd>
+ * <dt>Components</dt>
+ * <dd>Nodes that contained by this <tt>Generic</tt>.</dd>
+ * <dt>Composites</dt>
+ * <dd>Nodes that contains this <tt>Generic</tt>.</dd>
  * </dl>
  * </p>
  * 
- * <p>This interface is a part of <tt>Generic System Core</tt>.</p>
+ * <p>
+ * This interface is a part of <tt>Generic System Core</tt>.
+ * </p>
+ * 
+ * @author Nicolas Feybesse
+ * @author Michael Ory
  */
 public interface Generic extends Comparable<Generic> {
 
@@ -65,24 +74,24 @@ public interface Generic extends Comparable<Generic> {
 	boolean isEngine();
 
 	/**
-	 * Returns <tt>true</tt> if this generic is direct instance of the model passed as parameter.
-	 * Model in parameters the mostly often is an <tt>Type</tt> but it can be other instance.
+	 * Returns <tt>true</tt> if this generic is direct instance of the meta passed as parameter.
 	 * 
-	 * @param model
-	 * 				the supposed model for current generic.
+	 * @param meta
+	 *            the meta.
 	 * 
-	 * @return <tt>true</tt> if this is the direct instance of model.
+	 * @return <tt>true</tt> if this is the direct instance of meta.
 	 */
-	boolean isInstanceOf(Generic model);
+	boolean isInstanceOf(Generic meta);
 
 	/**
-	 * Returns instantiation level of the generic. Generic System allows to create infinite meta
-	 * levels by inheretings of concretes. Three meta levels actually important to know in Generic
-	 * System:
+	 * Returns instantiation level of the generic. Generic System allows to create infinite meta levels by inheritance of concretes. Three meta levels actually important to know in Generic System:
 	 * <dl>
-	 * 	<dt>0</dt><dd>- Level of Meta-Objects (Engine, MetaAttribute and MetaRelation);</dd>
-	 * 	<dt>1</dt><dd>- Level of Structurals (types, attributes, relations);</dd>
-	 * 	<dt>>= 2</dt><dd>- Level of Concreets (instances, holders, links).</dd>
+	 * <dt>0</dt>
+	 * <dd>- Level of Meta-Objects (Engine, MetaAttribute and MetaRelation);</dd>
+	 * <dt>1</dt>
+	 * <dd>- Level of Structurals (Types, Attributes, Relations);</dd>
+	 * <dt>2</dt>
+	 * <dd>- Level of Concretes ("Instances", Holders, Links).</dd>
 	 * </dl>
 	 * 
 	 * @return the instantiation level.
@@ -90,14 +99,14 @@ public interface Generic extends Comparable<Generic> {
 	int getMetaLevel();
 
 	/**
-	 * Returns true if this generic is a Structural <tt>Type</tt>.
+	 * Returns true if this generic is a <tt>Type</tt>.
 	 * 
 	 * @return true if this is a <tt>Type</tt>.
 	 */
 	boolean isType();
 
 	/**
-	 * Returns true if this generic is a Structural <tt>Attribute</tt> or <tt>Relation</tt>.
+	 * Returns true if this generic is an <tt>Attribute</tt> or <tt>Relation</tt>.
 	 * 
 	 * @return true if the generic is an <tt>Attribute</tt> or <tt>Relation</tt>.
 	 */
@@ -125,22 +134,22 @@ public interface Generic extends Comparable<Generic> {
 	boolean isReallyRelation();
 
 	/**
-	 * Returns true if this generic is an <tt>Attribute</tt> of the base.
-	 * 
-	 * @param base
-	 * 				the supposed base for the current generic.
-	 * 
-	 * @return true if this is an <tt>Attribute</tt> of base.
-	 */
-	boolean isAttributeOf(Generic base);
-
-	/**
-	 * Returns true if this generic is an <tt>Attribute</tt> of the base in specified position.
+	 * Returns true if this generic is an <tt>Attribute</tt> of the generic.
 	 * 
 	 * @param generic
-	 * 				the supposed base for the current generic.
+	 *            the supposed "type" for the current generic.
+	 * 
+	 * @return true if this is an <tt>Attribute</tt> of generic.
+	 */
+	boolean isAttributeOf(Generic generic);
+
+	/**
+	 * Returns true if this generic is an <tt>Attribute</tt> of the generic in specified position.
+	 * 
+	 * @param generic
+	 *            the supposed "type" for the current generic.
 	 * @param basePos
-	 * 				position of this generic in the array of components of the base.
+	 *            position of this generic in the array of components of the "type".
 	 * 
 	 * @return true if this generic is an <tt>Attribute</tt> of the base in specified position.
 	 */
@@ -157,9 +166,9 @@ public interface Generic extends Comparable<Generic> {
 	 * Mark a instance of the <tt>Attribute</tt>.
 	 * 
 	 * @param attribute
-	 * 				the attribute.
+	 *            the attribute.
 	 * @param targets
-	 * 				the targets.
+	 *            the targets.
 	 * 
 	 * @return A new <tt>Generic</tt> or the existing <tt>Generic</tt>.
 	 */
@@ -169,69 +178,68 @@ public interface Generic extends Comparable<Generic> {
 	 * Bind this generic to targets via provided relation.
 	 * 
 	 * @param relation
-	 * 				the relation.
+	 *            the relation.
 	 * @param targets
-	 * 				the targets.
+	 *            the targets.
 	 * 
 	 * @return A new <tt>Generic</tt> or the existing <tt>Generic</tt>.
 	 */
 	<T extends Link> T bind(Link relation, Generic... targets);
 
 	/**
-	 * Returns the link which instanciates relation provoided in parameters, have the same base
-	 * postion in targets and points to all provided targets.
+	 * Returns the link which instantiates relation provided in parameters, have the same base position and points to all provided targets.
 	 * 
 	 * @param relation
-	 * 				the relation.
+	 *            the relation.
 	 * @param basePos
-	 * 				the base position in targets.
+	 *            the position of the based generic in relation.
 	 * @param targets
-	 * 				the optional targets.
+	 *            the optional targets.
 	 * 
 	 * @return A link or null.
 	 * 
-	 * @throws IllegalStateException Ambigous request for the Relation.
+	 * @throws RollbackException
+	 *             RollbackException is throw if the request is ambiguous. She return more one result.
 	 */
 	<T extends Link> T getLink(Link relation, int basePos, Generic... targets);
 
 	/**
-	 * Returns the link which instanciates relation provided in parameters and points to all
-	 * provided targets.
+	 * Returns the link which instantiates relation provided in parameters and points to all provided targets.
 	 * 
 	 * @param relation
-	 * 				the relation.
+	 *            the relation.
 	 * @param targets
-	 * 				the optional targets.
+	 *            the optional targets.
 	 * 
 	 * @return A link or null.
 	 * 
-	 * @throws IllegalStateException Ambigous request for the Relation.
+	 * @throws RollbackException
+	 *             RollbackException is throw if the request is ambiguous. She return more one result.
 	 */
 	<T extends Link> T getLink(Link relation, Generic... targets);
 
 	/**
-	 * Returns the links.
+	 * Returns the links which instantiates relation provided in parameters and points to all provided targets.
 	 * 
 	 * @param relation
-	 * 				the relation.
+	 *            the relation.
 	 * @param basePos
-	 * 				the base position.
+	 *            the position of the based generic in relation.
 	 * @param targets
-	 * 				the targets.
+	 *            the optional targets.
 	 * 
-	 * @return the collection of links.
-	 * 
+	 * @return the Snapshot of links.
 	 * @see Snapshot
 	 */
 	<T extends Link> Snapshot<T> getLinks(Relation relation, int basePos, Generic... targets);
 
 	/**
-	 * Returns the links.
+	 * Returns the links which instantiates relation provided in parameters and points to all provided targets.
 	 * 
 	 * @param relation
-	 * 				the relation.
+	 *            the relation.
 	 * @param targets
-	 * 				the targets.
+	 *            the targets.
 	 * 
 	 * @return the collection of links.
 	 * 
@@ -242,181 +250,160 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Creates a new link between this generic and targets.<br />
 	 * 
-	 * Parameters metalink can be of type <tt>Relation</tt> in the most cases. In the case when
-	 * there is a default link beetween one Structural and one Concrete, this default link must be
-	 * passed as parameter metalink.<br />
+	 * Parameters metalink can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link between one Structural and one Concrete, this default link must be passed as parameter metalink.<br />
 	 * 
-	 * Exception is thrown is there is another link instanciating the same metalink between the same
-	 * components. If the <tt>Singular Constraint</tt> is enabled on the property, then one link
-	 * will be created on the targets.
+	 * Exception is thrown is there is another link instantiating the same metalink between the same components. <br/>
+	 * 
+	 * If the <tt>Singular Constraint</tt> is enabled on the metalink, then one link will be created on the targets.
 	 * 
 	 * @param metalink
-	 * 				<tt>Relation</tt> or <tt>Link</tt> a new link inherits from.
+	 *            <tt>Relation</tt> or <tt>Link</tt> a new link inherits from.
 	 * @param value
-	 * 				the value of the new link.
+	 *            the value of the new link.
 	 * @param targets
-	 * 				targets of the new link.
+	 *            targets of the new link.
 	 * 
 	 * @return the link.
 	 */
 	<T extends Link> T addLink(Link metalink, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new link between this generic and targets. If the same link is already exists it
-	 * will be returned.<br />
+	 * Creates a new link between this generic and targets. If the same link is already exists it will be returned.<br />
 	 * 
-	 * Parameters metalink can be of type <tt>Relation</tt> in the most cases. In the case when
-	 * there is a default link beetween one Structural and one Concrete, this default link must be
-	 * passed as parameter metalink.<br />
+	 * Parameters metalink can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter metalink.<br />
 	 * 
-	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link
-	 * will be created on the targets.
+	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
 	 * @param metalink
-	 * 				<tt>Relation</tt> or <tt>Link</tt> a new link inherits from.
+	 *            <tt>Relation</tt> or <tt>Link</tt> a new link inherits from.
 	 * @param value
-	 * 				the value of the new link.
+	 *            the value of the new link.
 	 * @param targets
-	 * 				targets of the new link.
+	 *            targets of the new link.
 	 * 
 	 * @return the link.
 	 */
 	<T extends Link> T setLink(Link metalink, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new link between this generic and targets. If the same link is already exists it
-	 * will be returned.<br />
+	 * Creates a new link between this generic and targets. If the same link is already exists it will be returned.<br />
 	 * 
-	 * Parameter metalink can be of type <tt>Relation</tt> in the most cases. In the case when
-	 * there is a default link beetween one Structural and one Concrete, this default link must be
-	 * passed as parameter metalink.<br />
+	 * Parameter metalink can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter metalink.<br />
 	 * 
-	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link
-	 * will be created on the targets.
+	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
 	 * @param metalink
-	 * 				<tt>Relation</tt> or <tt>Link</tt> a new link inherits from.
+	 *            <tt>Relation</tt> or <tt>Link</tt> a new link inherits from.
 	 * @param value
-	 * 				the value of the new link.
+	 *            the value of the new link.
 	 * @param basePos
-	 * 				the base position.
+	 *            the position of the based generic in relation.
 	 * @param targets
-	 * 				targets of the new link.
+	 *            targets of the new link.
 	 * 
 	 * @return the link.
 	 */
 	<T extends Link> T setLink(Link metalink, Serializable value, int basePos, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. A new holder inherits from metaholder supplied in
-	 * parameters.<br />
+	 * Creates a new holder on this generic. A new holder inherits from metaholder supplied in parameters.<br />
 	 * 
-	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type
-	 * <tt>Holder</tt>.<br />
+	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
 	 * 
-	 * Exception is thrown if this generic has another holder that inherits from the same
-	 * metaholder. If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be
-	 * created on the targets.
+	 * Exception is thrown if this generic has another holder that inherits from the same metaholder.<br />
+	 * 
+	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param value
-	 * 				the value of holder.
+	 *            the value of holder.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optinal targets for link.
 	 * 
 	 * @return the holder.
 	 */
 	<T extends Holder> T addHolder(Holder metaholder, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. If the same holder exists already it will be returned.
-	 * A new holder inherits from metaholder supplied in parameters.<br />
+	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from metaholder supplied in parameters.<br />
 	 * 
-	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type
-	 * <tt>Holder</tt>.<br />
+	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
 	 * 
-	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be
-	 * created on the targets.
+	 * Exception is thrown if this generic has another holder that inherits from the same metaholder.<br />
+	 * 
+	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param basePos
-	 * 				the base position.
+	 *            the position of the based generic in relation.
 	 * @param value
-	 * 				the value of holder.
+	 *            the value of holder.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optinal targets for link.
 	 * 
 	 * @return the holder.
 	 */
 	<T extends Holder> T addHolder(Holder metaholder, int basePos, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. A new holder inherits from metaholder supplied in
-	 * parameters.<br />
+	 * Creates a new holder on this generic. A new holder inherits from metaholder supplied in parameters.<br />
 	 * 
-	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type
-	 * <tt>Holder</tt>.<br />
+	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
 	 * 
-	 * Exception is thrown if this generic has another holder that inherits from the same
-	 * metaholder. If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be
-	 * created on the targets.
+	 * Exception is thrown if this generic has another holder that inherits from the same metaholder.<br />
+	 * 
+	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param value
-	 * 				the value of holder.
+	 *            the value of holder.
 	 * @param basePos
-	 * 				the base position.
+	 *            the position of the based generic in relation.
 	 * @param metaLevel
-	 * 				meta level of attribute.
+	 *            meta level of attribute.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optinal targets for link.
 	 * 
 	 * @return the holder.
 	 */
 	<T extends Holder> T addHolder(Holder metaholder, Serializable value, int basePos, int metaLevel, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. If the same holder exists already it will be returned.
-	 * A new holder inherits from metaholder supplied in parameters.<br />
+	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from metaholder supplied in parameters.<br />
 	 * 
-	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type
-	 * <tt>Holder</tt>.<br />
+	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
 	 * 
-	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be
-	 * created on the targets.
+	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param value
-	 * 				the value of holder.
+	 *            the value of holder.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optinal targets for link.
 	 * 
 	 * @return the holder.
 	 */
 	<T extends Holder> T setHolder(Holder metaholder, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. If the same holder exists already it will be returned.
-	 * A new holder inherits from metaholder supplied in parameters.<br />
+	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from metaholder supplied in parameters.<br />
 	 * 
-	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type
-	 * <tt>Holder</tt>.<br />
+	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
 	 * 
-	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be
-	 * created on the targets.
+	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param basePos
-	 * 				the base position.
+	 *            the position of the based generic in relation.
 	 * @param value
-	 * 				the value of holder.
+	 *            the value of holder.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optinal targets for link.
 	 * 
 	 * @return the holder.
 	 */
@@ -426,7 +413,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns all targets of the relation.
 	 * 
 	 * @param relation
-	 * 				the relation.
+	 *            the relation.
 	 * 
 	 * @return the targets of relation.
 	 * 
@@ -438,11 +425,11 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns all targets of the relation.
 	 * 
 	 * @param relation
-	 * 				the relation.
+	 *            the relation.
 	 * @param basePos
-	 * 				the position of this generic in the array of relation's components.
+	 *            the position of the based generic in relation.
 	 * @param targetPos
-	 * 				the position of the target in the array of relation's components.
+	 *            the position of the target in the array of relation's components.
 	 * 
 	 * @return the targets of relation.
 	 * 
@@ -454,11 +441,11 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns all holders that inherit from metaholder supplied in parameters.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param basePos
-	 * 				the base position.
+	 *            the position of the based generic in relation.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optional targets for link.
 	 * 
 	 * @return the holders that inherit from metaholder.
 	 * 
@@ -470,9 +457,9 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns all holders that inherit from metaholder supplied in parameters.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optional targets for link.
 	 * 
 	 * @return the holders that inherit from metaholder.
 	 * 
@@ -484,9 +471,9 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns an holder inherited from supplied metaholder.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optional targets for link.
 	 * 
 	 * @return the holder.
 	 */
@@ -496,13 +483,13 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns an holder inherited from supplied metaholder.
 	 * 
 	 * @param metaLevel
-	 * 				meta level.
+	 *            meta level.
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param basePos
-	 * 				the base position.
+	 *            the position of the based generic in relation.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optional targets for link.
 	 * 
 	 * @return the holder.
 	 */
@@ -512,11 +499,11 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns an holder inherited from supplied metaholder.
 	 * 
 	 * @param metaLevel
-	 * 				meta level.
+	 *            meta level.
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param targets
-	 * 				the optinal targets for link.
+	 *            the optional targets for link.
 	 * 
 	 * @return the holder.
 	 */
@@ -526,7 +513,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns all values of one holder.
 	 * 
 	 * @param holder
-	 * 				the holder.
+	 *            the holder.
 	 * 
 	 * @return the values of one holder.
 	 * 
@@ -538,59 +525,57 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns the unique value of the holder supplied in parameters.
 	 * 
 	 * @param holder
-	 * 				the holder.
+	 *            the holder.
 	 * 
 	 * @return the value of holder.
 	 */
 	<S extends Serializable> S getValue(Holder holder);
 
 	/**
-	 * Creates a new value holder (<tt>Holder</tt>) inhereting from metagholder supplied as
-	 * parameter.<br />
+	 * Creates a new value holder (<tt>Holder</tt>) inheriting from metaholder supplied as parameter.<br />
 	 * 
-	 * If the same holder is already exists an exception will be thrown. If the <tt>Singular
-	 * Constraint</tt> is enabled on the attribute, then one value will be created.
+	 * If the same holder is already exists an exception will be thrown. <br/>
+	 * 
+	 * If the <tt>Singular Constraint</tt> is enabled on the attribute, then one value will be created.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param value
-	 * 				the value for new holder.
+	 *            the value for new holder.
 	 * 
 	 * @return the new value holder.
 	 */
 	<T extends Holder> T addValue(Holder metaholder, Serializable value);
 
 	/**
-	 * Creates a new value holder (<tt>Holder</tt>) inhereting from metagholder supplied as
-	 * parameter. If the same value holder exists already it will be returned.<br />
+	 * Creates a new value holder (<tt>Holder</tt>) inheriting from metaholder supplied as parameter. If the same value holder exists already it will be returned.<br />
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the attribute, then one value will be created.
 	 * 
 	 * @param metaholder
-	 * 				the holder which the new holder inherits from.
+	 *            the holder which the new holder inherits from.
 	 * @param value
-	 * 				the value for new holder.
+	 *            the value for new holder.
 	 * 
 	 * @return the new value holder.
 	 */
 	<T extends Holder> T setValue(Holder attribute, Serializable value);
 
 	/**
-	 * Returns true if this generic directly or indirrectly inherits from meta.
+	 * Returns true if this generic directly or indirectly inherits from meta.
 	 * 
 	 * @param meta
-	 * 				supposed meta generic which this generic iherits from.
+	 *            supposed meta generic which this generic inherits from.
 	 * 
 	 * @return true if this generic inherits from meta.
 	 */
 	boolean inheritsFrom(Generic meta);
 
 	/**
-	 * Returns true if this generic dirrectly or indirectly inherits from all supplied in parameters
-	 * meta generics.
+	 * Returns true if this generic directly or indirectly inherits from all supplied in parameters meta generics.
 	 * 
 	 * @param metas
-	 * 				array of meta generics to test.
+	 *            array of meta generics to test.
 	 * 
 	 * @return true if this generic inherits from all the given meta generics.
 	 */
@@ -611,8 +596,7 @@ public interface Generic extends Comparable<Generic> {
 	void remove(RemoveStrategy removeStrategy);
 
 	/**
-	 * Returns true if this generic was not removed from present cache or from any of it's sub
-	 * caches.
+	 * Returns true if this generic was not removed from present cache or from any of it's sub caches.
 	 * 
 	 * @return true if this generic still present in any of caches in the current cache stack.
 	 */
@@ -622,7 +606,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Enable referential integrity for component's position.
 	 * 
 	 * @param componentPos
-	 * 				the component's position implicated by the constraint.
+	 *            the component's position implicated by the constraint.
 	 * 
 	 * @return this.
 	 */
@@ -632,7 +616,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Disable referential integrity for component's position.
 	 * 
 	 * @param componentPos
-	 * 				the component's position implicated by the constraint.
+	 *            the component's position implicated by the constraint.
 	 * 
 	 * @return this.
 	 */
@@ -642,7 +626,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns true if the referential integrity is enabled for component's position.
 	 * 
 	 * @param componentPos
-	 * 				the component's position implicated by the constraint.
+	 *            the component's position implicated by the constraint.
 	 * 
 	 * @return true if the referential integrity is enabled.
 	 */
@@ -677,7 +661,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns the base position of an attribute.
 	 * 
 	 * @param attribute
-	 * 				the attribute.
+	 *            the attribute.
 	 * 
 	 * @return the base position of the attribute.
 	 */
@@ -694,7 +678,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Creates a new anonymous instance.
 	 * 
 	 * @param components
-	 * 				the components.
+	 *            the components.
 	 * 
 	 * @return the new anonymous instance.
 	 */
@@ -704,9 +688,9 @@ public interface Generic extends Comparable<Generic> {
 	 * Create a new instance or get the instance if it already exists.
 	 * 
 	 * @param value
-	 * 				the value.
+	 *            the value.
 	 * @param components
-	 * 				the components.
+	 *            the components.
 	 * 
 	 * @return the new instance.
 	 */
@@ -720,9 +704,9 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Generic> T getMeta();
 
 	/**
-	 * Returns inheritings.
-	 *
-	 * @return the inheritings Generic.
+	 * Returns inheriting.
+	 * 
+	 * @return the inheriting Generic.
 	 * 
 	 * @see Snapshot
 	 */
@@ -799,32 +783,32 @@ public interface Generic extends Comparable<Generic> {
 	String info();
 
 	/**
-	 * Abandon current value of attribute. This method set value of attrubute to null.
+	 * Abandon current value of attribute. This method set value of attribute to null.
 	 * 
 	 * @param attribute
-	 * 				the attribute to abandon.
+	 *            the attribute to abandon.
 	 */
 	void cancel(Holder attribute);
 
 	/**
-	 * Abandon all values of attribute. This method set value of attrubute to null.
+	 * Abandon all values of attribute. This method set value of attribute to null.
 	 * 
 	 * @param attribute
-	 * 				the attribute to abandon.
+	 *            the attribute to abandon.
 	 * @param targets
-	 * 				the optional targets for relation.
+	 *            the optional targets for relation.
 	 */
 	void cancelAll(Holder attribute, Generic... targets);
 
 	/**
-	 * Abandon all values of attribute. This method set value of attrubute to null.
+	 * Abandon all values of attribute. This method set value of attribute to null.
 	 * 
 	 * @param attribute
-	 * 				the attribute to abandon.
+	 *            the attribute to abandon.
 	 * @param basePos
-	 * 				the base position.
+	 *            the base position.
 	 * @param targets
-	 * 				the optional targets for relation.
+	 *            the optional targets for relation.
 	 */
 	void cancelAll(Holder attribute, int basePos, Generic... targets);
 
@@ -832,7 +816,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Abandon current value of attribute. This method remove the value holder node from the graph.
 	 * 
 	 * @param attribute
-	 * 				the attribute to abandon.
+	 *            the attribute to abandon.
 	 */
 	void clear(Holder holder);
 
@@ -840,9 +824,9 @@ public interface Generic extends Comparable<Generic> {
 	 * Abandon all values of attribute. This method remove all value holder nodes from the graph.
 	 * 
 	 * @param attribute
-	 * 				the attribute to abandon.
+	 *            the attribute to abandon.
 	 * @param targets
-	 * 				the optional targets for relation.
+	 *            the optional targets for relation.
 	 */
 	void clearAll(Holder attribute, Generic... targets);
 
@@ -850,11 +834,11 @@ public interface Generic extends Comparable<Generic> {
 	 * Abandon all values of attribute. This method remove all value holder nodes from the graph.
 	 * 
 	 * @param attribute
-	 * 				the attribute to abandon.
+	 *            the attribute to abandon.
 	 * @param basePos
-	 * 				the base position.
+	 *            the base position.
 	 * @param targets
-	 * 				the optional targets for relation.
+	 *            the optional targets for relation.
 	 */
 	void clearAll(Holder attribute, int basePos, Generic... targets);
 
@@ -862,7 +846,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns the map associated with this generic. Map is found by class of Map Provider.
 	 * 
 	 * @param mapClass
-	 * 				the class of Map Provider.
+	 *            the class of Map Provider.
 	 * 
 	 * @return the map object.
 	 */
@@ -879,9 +863,9 @@ public interface Generic extends Comparable<Generic> {
 	 * Adds a new component into defined position in array of generic's components.
 	 * 
 	 * @param component
-	 * 				the component to insert.
+	 *            the component to insert.
 	 * @param pos
-	 * 				the position of component in array.
+	 *            the position of component in array.
 	 * 
 	 * @return this generic.
 	 */
@@ -891,9 +875,9 @@ public interface Generic extends Comparable<Generic> {
 	 * Removes given component in defined position.
 	 * 
 	 * @param component
-	 * 				the component to remove.
+	 *            the component to remove.
 	 * @param pos
-	 * 				the position of component in array.
+	 *            the position of component in array.
 	 * 
 	 * @return this generic.
 	 */
@@ -903,7 +887,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Adds a new super (generic which this inherits from).
 	 * 
 	 * @param newSuper
-	 * 				the new super generic.
+	 *            the new super generic.
 	 * 
 	 * @return this generic.
 	 */
@@ -913,7 +897,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Removes the super generic in defined position.
 	 * 
 	 * @param pos
-	 * 				position of super in array of supers.
+	 *            position of super in array of supers.
 	 * 
 	 * @return this generic.
 	 */
@@ -923,17 +907,17 @@ public interface Generic extends Comparable<Generic> {
 	 * Sets the value.
 	 * 
 	 * @param value
-	 * 				the value for this generic.
+	 *            the value for this generic.
 	 * 
 	 * @return this generic.
 	 */
 	<T extends Generic> T setValue(Serializable value);
 
 	/**
-	 * Returns the other component of holder (not this generic and it's inheritings).
+	 * Returns the other component of holder (not this generic and it's inheriting).
 	 * 
 	 * @param holder
-	 * 				the holder.
+	 *            the holder.
 	 * 
 	 * @return <tt>Snapshot</tt> of components.
 	 */
@@ -943,7 +927,7 @@ public interface Generic extends Comparable<Generic> {
 	 * Returns true if values of this generic and generic supplied in parameters are equal.
 	 * 
 	 * @param generic
-	 * 				the generic to compare.
+	 *            the generic to compare.
 	 * 
 	 * @return true if values of this generic and generic supplied in parameters are equal.
 	 */
