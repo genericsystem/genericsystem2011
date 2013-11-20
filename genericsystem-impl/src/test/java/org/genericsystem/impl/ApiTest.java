@@ -224,14 +224,16 @@ public class ApiTest extends AbstractTest {
 	public void testCyclicInherits() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type a = cache.addType("A");
-		a.newSubType("B");
+		// a.newSubType("B");
 		final Type b = cache.addType("B");
 		// new RollbackCatcher() {
 		//
 		// @Override
 		// public void intercept() {
-		b.newSubType("A");
-		// }
+		Type aOnb = b.newSubType("A");
+		aOnb.log();
+		assert !a.inheritsFrom(aOnb);
+		assert !((GenericImpl) aOnb).isSuperOf3(a);
 		// }.assertIsCausedBy(FunctionalConsistencyViolationException.class);
 	}
 

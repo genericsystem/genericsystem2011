@@ -79,6 +79,17 @@ class Vertex {
 		return null;
 	}
 
+	private boolean isExtentedBy(Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
+		if (Statics.MULTIDIRECTIONAL != basePos)
+			if (basePos < ((GenericImpl) candidate).components.length)
+				if (!components[basePos].equals(((GenericImpl) candidate).components[basePos]))
+					if (components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos]))
+						if (!candidate.inheritsFrom(cache.find(NoInheritanceSystemType.class)))
+							if (isSingular || isProperty && (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components))))
+								return true;
+		return false;
+	}
+
 	protected Generic[] getExtendedDirectSupers(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
 		return new HashCache<Generic>() {
 			private static final long serialVersionUID = 5910353456286109539L;
@@ -93,22 +104,14 @@ class Vertex {
 						if (result)
 							return true;
 						if (basePos != Statics.MULTIDIRECTIONAL)
-							if (((GenericImpl) meta).isSuperOf3(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components)) {
+							if (((GenericImpl) meta).isSuperOf3(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components))
 								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
-									if (basePos < ((GenericImpl) candidate).components.length)
-										if (!components[basePos].equals(((GenericImpl) candidate).components[basePos])) {
-											if (components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos])) {
-												if (!candidate.inheritsFrom(cache.find(NoInheritanceSystemType.class)))
-													if (isSingular || isProperty && (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components))))
-														return true;
-
-											}
-										} else {
-											if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), new Components(components, ((GenericImpl) candidate).components).toArray()))
-												return true;
-										}
+									if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), new Components(components, ((GenericImpl) candidate).components).toArray()))
+										return true;
+									if (isExtentedBy(candidate, isProperty, isSingular, basePos))
+										return true;
 								}
-							}
+
 						return false;
 					}
 				};
@@ -159,10 +162,11 @@ class Vertex {
 	}
 
 	private boolean isAncestorOf(final GenericImpl dependency) {
-		if (GenericImpl.isSuperOf(primaries, components, dependency.primaries, dependency.components))
+		boolean result = (GenericImpl.isSuperOf(primaries, components, dependency.primaries, dependency.components));
+		// boolean result2 = (GenericImpl.isSuperOf3(homeTreeNode, supers, components, dependency));
+		// assert result == result2 : "isSuperOf : " + result + " isSuperOf3 : " + result2 + " homeTreeNode : " + homeTreeNode + " " + supers[0].info() + dependency.info();
+		if (result)
 			return true;
-		// if (GenericImpl.isSuperOf3(homeTreeNode, supers, components, dependency.homeTreeNode, dependency.supers, dependency.components))
-
 		for (Generic component : dependency.components)
 			if (!Arrays.equals(dependency.primaries, ((GenericImpl) component).primaries) || !Arrays.equals(dependency.components, ((GenericImpl) component).components))
 				if (isAncestorOf((GenericImpl) component))
