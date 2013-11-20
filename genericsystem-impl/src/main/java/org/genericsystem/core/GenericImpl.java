@@ -874,18 +874,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public boolean isSuperOf3(Generic subGeneric) {
-		// log.info("***************************************");
 		boolean result1 = isSuperOf3(((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
-		// log.info("------------------------------------");
-		// boolean result2 = isSuperOf3(homeTreeNode, supers, components, subGeneric);
-		// assert result1 == result2 : result2 + this.info() + subGeneric.info();
+		boolean result2 = isSuperOf3(homeTreeNode, supers, components, subGeneric);
+		assert result1 == result2 : result2 + this.info() + subGeneric.info();
 		return result1;
 	}
 
 	public boolean isSuperOf3(HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
-		if (equiv(subHomeTreeNode, subSupers, subComponents)) {
+		if (equiv(subHomeTreeNode, subSupers, subComponents))
 			return true;
-		}
 		if (!internalIsSuperOf3(subHomeTreeNode, subSupers))
 			return false;
 		if (!internalIsSuperOf3(components, subComponents))
@@ -898,39 +895,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return true;
 		for (Generic sub : subSupers)
 			if (sub.inheritsFrom(this))
-				return true;
-		return false;
-	}
-
-	public static boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Generic subGeneric) {
-		if (subGeneric.isEngine())
-			return ((GenericImpl) subGeneric).equiv(homeTreeNode, supers, components);
-		subGeneric.log();
-		return isSuperOf3(homeTreeNode, supers, components, ((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
-	}
-
-	public static boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
-		log.info("AAAAAAAAAAAAA2");
-		if (homeTreeNode.equals(subHomeTreeNode) && Arrays.equals(supers, subSupers) && Arrays.equals(components, subComponents))
-			return true;
-		log.info("BBBBBBBBBBBBB2");
-
-		if (!internalIsSuperOf3(homeTreeNode, supers, components, subHomeTreeNode, subSupers))
-			return false;
-		log.info("CCCCCCCCCCCCC2");
-
-		if (!internalIsSuperOf3(components, subComponents))
-			return false;
-		log.info("DDDDDDDDDDDDD2");
-
-		return true;
-	}
-
-	private static boolean internalIsSuperOf3(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
-		if (subHomeTreeNode.inheritsFrom(homeTreeNode) && (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()))
-			return true;
-		for (Generic subSuper : subSupers)
-			if (isSuperOf3(homeTreeNode, supers, components, subSuper))
 				return true;
 		return false;
 	}
@@ -958,6 +922,40 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (internalIsSuperOf3(components, Statics.truncate(i, subComponents)))
 					return true;
 
+		return false;
+	}
+
+	private static boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Generic subGeneric) {
+		if (subGeneric.isEngine())
+			return ((GenericImpl) subGeneric).equiv(homeTreeNode, supers, components);
+		if (((GenericImpl) subGeneric).equiv(homeTreeNode, supers, components))
+			return true;
+		if (!internalIsSuperOf3bis(homeTreeNode, supers, components, ((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers))
+			return false;
+		if (!internalIsSuperOf3(components, ((GenericImpl) subGeneric).components))
+			return false;
+		return true;
+	}
+
+	private static boolean internalIsSuperOf3bis(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
+		if (subHomeTreeNode.inheritsFrom(homeTreeNode) && (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()))
+			return true;
+		for (Generic sub : subSupers)
+			if (((GenericImpl) sub).inheritsFrom2(homeTreeNode, supers, components))
+				return true;
+		return false;
+	}
+
+	public boolean inheritsFrom2(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
+		if (equiv(homeTreeNode, supers, components))
+			return true;
+		if (getEngine().equiv(homeTreeNode, supers, components))
+			return true;
+		if (isEngine())
+			return false;
+		for (Generic directSuper : this.supers)
+			if (((GenericImpl) directSuper).inheritsFrom2(homeTreeNode, supers, components))
+				return true;
 		return false;
 	}
 
