@@ -145,15 +145,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic component : components) {
 			if (componentSet.add(component))
 				((GenericImpl) component).lifeManager.engineComposites.add(this);
-			if (this.isAutomatic() && !((GenericImpl) component).isAutomatic()) {
-				this.markAsNonAutomatic();
+			if (!this.isAutomatic() && ((GenericImpl) component).isAutomatic()) {
+				((GenericImpl) component).markAsNonAutomatic();
 			}
 		}
 
 		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : supers)
+		for (Generic effectiveSuper : supers) {
 			if (effectiveSupersSet.add(effectiveSuper))
 				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
+			if (!this.isAutomatic() && ((GenericImpl) effectiveSuper).isAutomatic()) {
+				((GenericImpl) effectiveSuper).markAsNonAutomatic();
+			}
+		}
+
 		return (T) this;
 	}
 
@@ -770,7 +775,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			});
 
 			if (projection == null)
-				((GenericImpl) getCurrentCache().bind(getMeta(), getHomeTreeNode(), new Generic[] { this }, newComponents, null, Statics.MULTIDIRECTIONAL, false)).markAsAutomatic();
+				getCurrentCache().bind(getMeta(), getHomeTreeNode(), new Generic[] { this }, newComponents, null, Statics.MULTIDIRECTIONAL, true, false);
 		}
 	}
 
@@ -1750,9 +1755,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().isAutomatic(this);
 	}
 
-	public boolean isFlushable() {
-		return getCurrentCache().isFlushable(this);
-	}
+	//	public boolean isFlushable() {
+	//		return getCurrentCache().isFlushable(this);
+	//	}
 
 	public GenericImpl markAsAutomatic() {
 		getCurrentCache().markAsAutomatic(this);
