@@ -14,7 +14,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.myadmin.beans.GuiGenericsTreeBean;
 import org.genericsystem.myadmin.beans.Structural;
 import org.genericsystem.myadmin.beans.StructuralImpl;
@@ -82,12 +81,9 @@ public class TypesTest extends AbstractTest {
 		Type vehicle = cache.setType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty("power");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
-		myVehicle.getMap(ConstraintsMapProvider.class);
 		Holder myVehicle123 = myVehicle.setValue(vehiclePower, "123");
 		myVehicle.cancel(myVehicle123);
 		assert !myVehicle123.isAlive();
-		vehicle.cancel(vehiclePower);
-		assert !vehiclePower.isAlive();
 	}
 
 }
