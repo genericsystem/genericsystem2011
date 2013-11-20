@@ -783,64 +783,64 @@ public interface Generic extends Comparable<Generic> {
 	String info();
 
 	/**
-	 * Abandon current value of attribute. This method set value of attribute to null.
+	 * Abandons current value of the holder setting it to null.
 	 * 
-	 * @param attribute
-	 *            the attribute to abandon.
+	 * @param holder
+	 *            the holder.
 	 */
-	void cancel(Holder attribute);
+	void cancel(Holder holder);
 
 	/**
-	 * Abandon all values of attribute. This method set value of attribute to null.
+	 * Abandons current value of the holder setting it to null.
 	 * 
-	 * @param attribute
-	 *            the attribute to abandon.
+	 * @param holder
+	 *            the holder.
 	 * @param targets
-	 *            the optional targets for relation.
+	 *            the optional targets for link.
 	 */
-	void cancelAll(Holder attribute, Generic... targets);
+	void cancelAll(Holder holder, Generic... targets);
 
 	/**
-	 * Abandon all values of attribute. This method set value of attribute to null.
+	 * Abandons current value of the holder setting it to null.
 	 * 
-	 * @param attribute
-	 *            the attribute to abandon.
+	 * @param holder
+	 *            the holder.
 	 * @param basePos
 	 *            the base position.
 	 * @param targets
-	 *            the optional targets for relation.
+	 *            the optional targets for link.
 	 */
-	void cancelAll(Holder attribute, int basePos, Generic... targets);
+	void cancelAll(Holder holder, int basePos, Generic... targets);
 
 	/**
-	 * Abandon current value of attribute. This method remove the value holder node from the graph.
+	 * Removes holder from the graph.
 	 * 
-	 * @param attribute
-	 *            the attribute to abandon.
+	 * @param holder
+	 *            the holder.
 	 */
 	void clear(Holder holder);
 
 	/**
-	 * Abandon all values of attribute. This method remove all value holder nodes from the graph.
+	 * Removes holder from the graph.
 	 * 
-	 * @param attribute
-	 *            the attribute to abandon.
+	 * @param holder
+	 *            the holder.
 	 * @param targets
 	 *            the optional targets for relation.
 	 */
-	void clearAll(Holder attribute, Generic... targets);
+	void clearAll(Holder holder, Generic... targets);
 
 	/**
-	 * Abandon all values of attribute. This method remove all value holder nodes from the graph.
+	 * Removes holder from the graph.
 	 * 
-	 * @param attribute
-	 *            the attribute to abandon.
+	 * @param holder
+	 *            the holder.
 	 * @param basePos
 	 *            the base position.
 	 * @param targets
 	 *            the optional targets for relation.
 	 */
-	void clearAll(Holder attribute, int basePos, Generic... targets);
+	void clearAll(Holder holder, int basePos, Generic... targets);
 
 	/**
 	 * Returns the map associated with this generic. Map is found by class of Map Provider.
