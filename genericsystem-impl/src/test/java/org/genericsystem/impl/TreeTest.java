@@ -24,7 +24,9 @@ public class TreeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.newTree("Tree");
 		tree.enableReferentialIntegrity(Statics.BASE_POSITION);
+		assert tree.isReferentialIntegrity(Statics.BASE_POSITION);
 		tree.disableReferentialIntegrity(Statics.BASE_POSITION);
+		assert !tree.isReferentialIntegrity(Statics.BASE_POSITION);
 	}
 
 	public void testTree() {
@@ -181,23 +183,18 @@ public class TreeTest extends AbstractTest {
 	public void visitTree() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.newTree("Tree");
-		final Node root = tree.newRoot("Root");
-
-		Node child = root.setNode("Child");
-		root.setNode("Child2");
-		child.setNode("Child3");
+		Node root = tree.newRoot("Root");
+		root.setNode("Child");
 
 		root.traverse(new Visitor() {
 			@Override
 			public void before(Node node) {
-				log.info("before : " + node);
 			}
 		});
 
 		root.traverse(new Visitor() {
 			@Override
 			public void after(Node node) {
-				log.info("after : " + node);
 			}
 		});
 	}

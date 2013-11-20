@@ -771,7 +771,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private Iterable<Generic>[] projections(final int pos) {
 		final Iterable<Generic>[] projections = new Iterable[components.length];
-		for (int i = 0; i < components.length; i++) {
+		for (int i = 0; i < projections.length; i++) {
 			final int column = i;
 			projections[i] = new Iterable<Generic>() {
 				@Override
