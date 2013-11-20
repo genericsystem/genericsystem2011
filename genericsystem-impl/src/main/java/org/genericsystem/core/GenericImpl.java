@@ -751,28 +751,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	public void project(final int pos) {
-		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
-		while (cartesianIterator.hasNext()) {
-			final Generic[] components = (Generic[]) cartesianIterator.next();
-			final Generic[] newComponents = new Components(components, GenericImpl.this.components).toArray();
-			for (Generic component : newComponents)
-				assert component.isAlive();
-			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
-				@Override
-				public boolean isSelected() {
-					return isSuperOf(new Primaries(getHomeTreeNode(), GenericImpl.this).toArray(), newComponents, ((GenericImpl) next).primaries, ((GenericImpl) next).components);
-				}
-			});
-
-			if (projection == null)
-				((GenericImpl) getCurrentCache().bind(getMeta(), getHomeTreeNode(), new Generic[] { this }, newComponents, null, Statics.MULTIDIRECTIONAL, false)).markAsAutomatic();
-		}
+	public void project() {
+		project(Statics.MULTIDIRECTIONAL);
 	}
 
-	// TODO KK => call project(Statics.MULDIRECTIONNAL)
-	public void project() {
-		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections());
+	public void project(final int pos) {
+		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final Generic[] components = (Generic[]) cartesianIterator.next();
 			final Generic[] newComponents = new Components(components, GenericImpl.this.components).toArray();
@@ -798,20 +782,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				@Override
 				public Iterator<Generic> iterator() {
 					return pos != column && components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator() : new SingletonIterator<Generic>(components[column]);
-				}
-			};
-		}
-		return projections;
-	}
-
-	private Iterable<Generic>[] projections() {
-		final Iterable<Generic>[] projections = new Iterable[components.length];
-		for (int i = 0; i < components.length; i++) {
-			final int column = i;
-			projections[i] = new Iterable<Generic>() {
-				@Override
-				public Iterator<Generic> iterator() {
-					return components[column].isStructural() ? ((GenericImpl) components[column]).allInstancesIterator() : new SingletonIterator<Generic>(components[column]);
 				}
 			};
 		}
