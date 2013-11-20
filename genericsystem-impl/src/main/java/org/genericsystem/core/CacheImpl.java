@@ -288,6 +288,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 		automatics.add(generic);
 	}
 
+	public void markAsNonAutomatic(Generic generic) {
+		automatics.remove(generic);
+	}
+
 	@Override
 	public void flush() throws RollbackException {
 		assert equals(getEngine().getCurrentCache());

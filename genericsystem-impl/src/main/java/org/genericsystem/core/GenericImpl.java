@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -127,23 +128,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-		for (Generic superGeneric : supers) {
-			if (this.equals(superGeneric) && !isEngine())
-				getCurrentCache().rollback(new IllegalStateException());
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-				getCurrentCache().rollback(new IllegalStateException());
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-				getCurrentCache().rollback(new IllegalStateException());
-		}
-		return this;
+					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+					for (Generic superGeneric : supers) {
+						if (this.equals(superGeneric) && !isEngine())
+							getCurrentCache().rollback(new IllegalStateException());
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+							getCurrentCache().rollback(new IllegalStateException());
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+							getCurrentCache().rollback(new IllegalStateException());
+					}
+					return this;
 	}
 
 	<T extends Generic> T plug() {
 		Set<Generic> componentSet = new HashSet<>();
-		for (Generic component : components)
+		for (Generic component : components) {
 			if (componentSet.add(component))
 				((GenericImpl) component).lifeManager.engineComposites.add(this);
+			if (this.isAutomatic() && !((GenericImpl) component).isAutomatic()) {
+				this.markAsNonAutomatic();
+			}
+		}
 
 		Set<Generic> effectiveSupersSet = new HashSet<>();
 		for (Generic effectiveSuper : supers)
@@ -1781,6 +1786,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public GenericImpl markAsAutomatic() {
 		getCurrentCache().markAsAutomatic(this);
+		return this;
+	}
+
+	public GenericImpl markAsNonAutomatic() {
+		getCurrentCache().markAsNonAutomatic(this);
 		return this;
 	}
 
