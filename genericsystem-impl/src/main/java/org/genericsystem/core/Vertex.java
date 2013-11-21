@@ -169,10 +169,10 @@ class Vertex {
 	}
 
 	private boolean isAncestorOf(final GenericImpl dependency) {
-		boolean result = (GenericImpl.isSuperOf(primaries, components, dependency.primaries, dependency.components));
-		// boolean result2 = (GenericImpl.isSuperOf3(homeTreeNode, supers, components, dependency));
+		// boolean result = (GenericImpl.isSuperOf(primaries, components, dependency.primaries, dependency.components));
+		boolean result2 = (GenericImpl.isSuperOf3(homeTreeNode, supers, components, dependency));
 		// assert result == result2 : "isSuperOf : " + result + " isSuperOf3 : " + result2 + " homeTreeNode : " + homeTreeNode + " " + supers[0].info() + dependency.info();
-		if (result)
+		if (result2)
 			return true;
 		for (Generic component : dependency.components)
 			if (!Arrays.equals(dependency.primaries, ((GenericImpl) component).primaries) || !Arrays.equals(dependency.components, ((GenericImpl) component).components))
