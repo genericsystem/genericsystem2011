@@ -15,12 +15,16 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 class Vertex {
+	protected static Logger log = LoggerFactory.getLogger(Vertex.class);
+
 	private final CacheImpl cache;
 	private HomeTreeNode homeTreeNode;
 	private HomeTreeNode[] primaries;
@@ -57,7 +61,9 @@ class Vertex {
 	}
 
 	void computeSupersAndMute(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
+		// log.info("YYYYYYYYYY" + Arrays.toString(supers) + Arrays.toString(components));
 		supers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos);
+		// log.info("ZZZZZZZZZZ" + Arrays.toString(supers) + Arrays.toString(components));
 		for (Generic directSuper : supers) {
 			primaries = new Primaries(directSuper, primaries).toArray();
 			components = new Components(components, ((GenericImpl) directSuper).components).toArray();
@@ -100,6 +106,7 @@ class Vertex {
 
 					@Override
 					public boolean isSelected(Generic candidate) {
+						// log.info("TTTTTTTTTT" + candidate + " " + homeTreeNode + " " + Arrays.toString(supers));
 						boolean result = ((GenericImpl) candidate).isSuperOf3(homeTreeNode, supers, components);
 						if (result)
 							return true;

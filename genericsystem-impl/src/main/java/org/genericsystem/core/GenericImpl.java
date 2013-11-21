@@ -793,7 +793,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 		boolean inheritance = ((GenericImpl) generic).isSuperOf2(this);
 		boolean inheritance3 = ((GenericImpl) generic).isSuperOf3(this);
-		assert inheritance == inheritance3 : this.info() + generic.info() + " : " + inheritance + " != " + inheritance3;
+		assert inheritance == inheritance3 : generic.info() + this.info() + " : " + inheritance + " != " + inheritance3;
 		// boolean superOf = ((GenericImpl) generic).isSuperOf(this);
 		// assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
 		return inheritance;
@@ -862,11 +862,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private boolean internalIsSuperOf3(HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
-		if (subHomeTreeNode.inheritsFrom(getHomeTreeNode()) && (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()))
-			return true;
-		for (Generic sub : subSupers)
-			if (sub.inheritsFrom(this))
+		if (subHomeTreeNode.inheritsFrom(homeTreeNode)) {
+			if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
 				return true;
+			// if (subHomeTreeNode.equals(homeTreeNode) && Statics.META == subHomeTreeNode.getMetaLevel())
+			// return true;
+			//
+			// if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()) {
+			// LOOP: for (Generic superGeneric : supers) {
+			// for (Generic subSuper : subSupers)
+			// if (subSuper.inheritsFrom(superGeneric))
+			// continue LOOP;
+			// return false;
+			// }
+			// return true;
+			// }
+		}
+		for (Generic sub : subSupers) {
+			if (sub.inheritsFrom(this)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -909,11 +925,28 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private static boolean internalIsSuperOf3bis(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
-		if (subHomeTreeNode.inheritsFrom(homeTreeNode) && (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()))
-			return true;
-		for (Generic sub : subSupers)
-			if (((GenericImpl) sub).inheritsFrom2(homeTreeNode, supers, components))
+		if (subHomeTreeNode.inheritsFrom(homeTreeNode)) {
+			if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
 				return true;
+
+			// if (subHomeTreeNode.equals(homeTreeNode) && Statics.META == subHomeTreeNode.getMetaLevel())
+			// return true;
+			//
+			// if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()) {
+			// LOOP: for (Generic superGeneric : supers) {
+			// for (Generic subSuper : subSupers)
+			// if (subSuper.inheritsFrom(superGeneric))
+			// continue LOOP;
+			// return false;
+			// }
+			// return true;
+			// }
+		}
+		for (Generic sub : subSupers)
+			if (((GenericImpl) sub).inheritsFrom2(homeTreeNode, supers, components)) {
+				// log.info("ZZZZZZ" + sub + " / " + homeTreeNode + " supers : " + Arrays.toString(supers) + " subSupers : " + Arrays.toString(subSupers) + "  = True");
+				return true;
+			}
 		return false;
 	}
 

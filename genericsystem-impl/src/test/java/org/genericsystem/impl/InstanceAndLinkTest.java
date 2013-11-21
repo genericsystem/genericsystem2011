@@ -44,7 +44,9 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
-		Relation carColor = car.setRelation("outsideColor", color);
+
+		Relation carColor = car.setRelation("carColor", color);
+		carColor.log();
 		Generic audi = car.newInstance("audi");
 		Generic red = color.newInstance("red");
 		Link audiIsRed = audi.setLink(carColor, "audiRed", red);
