@@ -172,6 +172,30 @@ public interface Cache {
 	<T extends Type> T setType(Serializable name, Type[] superTypes, Generic... components);
 
 	/**
+	 * Creates a new Tree. Throws an exception if the tree with the same name already exists.
+	 * 
+	 * @param name
+	 *            the tree's name.
+	 * 
+	 * @return the Tree.
+	 * @see Tree
+	 */
+	<T extends Tree> T addTree(Serializable name);
+
+	/**
+	 * Creates a new Tree. Throws an exception if the tree with the same name already exists.
+	 * 
+	 * @param name
+	 *            the tree's name.
+	 * @param dimension
+	 *            the dimension of the tree.
+	 * 
+	 * @return the Tree.
+	 * @see Tree
+	 */
+	<T extends Tree> T addTree(Serializable name, int dimension);
+
+	/**
 	 * Returns the existing Tree or creates a new one if it not yet exists.
 	 * 
 	 * @param name
@@ -180,7 +204,7 @@ public interface Cache {
 	 * @return the Tree.
 	 * @see Tree
 	 */
-	<T extends Tree> T newTree(Serializable name);
+	<T extends Tree> T setTree(Serializable name);
 
 	/**
 	 * Returns the existing Tree or creates a new one if it not yet exists.
@@ -193,7 +217,7 @@ public interface Cache {
 	 * @return the Tree.
 	 * @see Tree
 	 */
-	<T extends Tree> T newTree(Serializable name, int dimension);
+	<T extends Tree> T setTree(Serializable name, int dimension);
 
 	/**
 	 * Returns true if the generic was not removed from this cache or from any of it's sub caches.
