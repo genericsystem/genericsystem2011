@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -127,16 +128,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-					for (Generic superGeneric : supers) {
-						if (this.equals(superGeneric) && !isEngine())
-							getCurrentCache().rollback(new IllegalStateException());
-						if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-							getCurrentCache().rollback(new IllegalStateException());
-						if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-							getCurrentCache().rollback(new IllegalStateException());
-					}
-					return this;
+		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+		for (Generic superGeneric : supers) {
+			if (this.equals(superGeneric) && !isEngine())
+				getCurrentCache().rollback(new IllegalStateException());
+			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+				getCurrentCache().rollback(new IllegalStateException());
+			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+				getCurrentCache().rollback(new IllegalStateException());
+		}
+		return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -144,18 +145,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic component : components) {
 			if (componentSet.add(component))
 				((GenericImpl) component).lifeManager.engineComposites.add(this);
-			if (!this.isAutomatic() && ((GenericImpl) component).isAutomatic()) {
-				((GenericImpl) component).markAsNonAutomatic();
-			}
+			// if (!this.isAutomatic() && ((GenericImpl) component).isAutomatic()) {
+			// ((GenericImpl) component).markAsNonAutomatic();
+			// }
 		}
 
 		Set<Generic> effectiveSupersSet = new HashSet<>();
 		for (Generic effectiveSuper : supers) {
 			if (effectiveSupersSet.add(effectiveSuper))
 				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
-			if (!this.isAutomatic() && ((GenericImpl) effectiveSuper).isAutomatic()) {
-				((GenericImpl) effectiveSuper).markAsNonAutomatic();
-			}
+			// if (!this.isAutomatic() && ((GenericImpl) effectiveSuper).isAutomatic()) {
+			// ((GenericImpl) effectiveSuper).markAsNonAutomatic();
+			// }
 		}
 
 		return (T) this;
@@ -338,20 +339,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void cancelAll(Holder attribute, int basePos, Generic... targets) {
-		clearAll(attribute, targets);
-		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, attribute.getMetaLevel() + 1, basePos, targets);
-		while (holders.hasNext()) {
-			Holder holder = holders.next();
-			addHolder(holder, null, getBasePos(holder), holder.getMetaLevel(), Statics.truncate(getBasePos(holder), ((GenericImpl) holder).components));
-		}
+		internalClearAll(attribute, basePos, attribute.getMetaLevel() + 1, false, targets);
+		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, attribute.getMetaLevel(), basePos, targets);
+		while (holders.hasNext())
+			internalCancel(holders.next(), basePos);
 	}
 
 	@Override
 	public void cancel(Holder holder) {
-		clear(holder);
-		holder = unambigousFirst(holdersIterator(holder, holder.getMetaLevel(), getBasePos(holder)));
+		internalClear(unambigousFirst(holdersIterator(holder, holder.getMetaLevel() + 1, getBasePos(holder))), false);
+		internalCancel(unambigousFirst(holdersIterator(holder, holder.getMetaLevel(), getBasePos(holder))), getBasePos(holder));
+	}
+
+	private void internalCancel(Holder holder, int basePos) {
 		if (holder != null)
-			addHolder(holder, null, getBasePos(holder), holder.getMetaLevel(), Statics.truncate(getBasePos(holder), ((GenericImpl) holder).components));
+			addHolder(holder, null, getBasePos(holder), holder.getMetaLevel(), Statics.truncate(basePos, ((GenericImpl) holder).components));
 	}
 
 	@Override
@@ -361,19 +363,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void clearAll(Holder attribute, int basePos, Generic... targets) {
-		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, attribute.getMetaLevel() + 1, basePos, targets);
-		while (holders.hasNext()) {
-			Holder holder = holders.next();
-			if (equals(holder.getBaseComponent()))
+		internalClearAll(attribute, basePos, attribute.getMetaLevel(), true, targets);
+	}
+
+	private void internalClearAll(Holder attribute, int basePos, int metaLevel, boolean baseFilter, Generic... targets) {
+		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, metaLevel, basePos, targets);
+		while (holders.hasNext())
+			internalClear(holders.next(), baseFilter);
+	}
+
+	private void internalClear(Holder holder, boolean baseFilter) {
+		if (holder != null)
+			if (baseFilter) {
+				if (equals(holder.getBaseComponent()))
+					holder.remove();
+			} else
 				holder.remove();
-		}
 	}
 
 	@Override
 	public void clear(Holder holder) {
-		holder = unambigousFirst(holdersIterator(holder, holder.getMetaLevel(), getBasePos(holder)));
-		if (holder != null && equals(holder.getBaseComponent()))
-			holder.remove();
+		internalClear(unambigousFirst(holdersIterator(holder, holder.getMetaLevel(), getBasePos(holder))), true);
 	}
 
 	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {
@@ -1786,9 +1796,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().isAutomatic(this);
 	}
 
-	//	public boolean isFlushable() {
-	//		return getCurrentCache().isFlushable(this);
-	//	}
+	// public boolean isFlushable() {
+	// return getCurrentCache().isFlushable(this);
+	// }
 
 	public GenericImpl markAsAutomatic() {
 		getCurrentCache().markAsAutomatic(this);
