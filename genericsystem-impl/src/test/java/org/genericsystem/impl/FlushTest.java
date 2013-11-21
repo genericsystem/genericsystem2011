@@ -7,7 +7,6 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
@@ -164,7 +163,9 @@ public class FlushTest extends AbstractTest {
 		final Generic lada = car.newInstance("Lada");
 		mercedes.setLink(carColor, "ColorOfMercedes", grey);
 
-		red.getLink(carColor, lada).setValue(intensity, "60%");
+		Link link = red.getLink(carColor, lada);
+		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		link.setValue(intensity, "60%");
 
 		/* Link beetween Lada and color is not the same as link between Car and color */
 		assert !Objects.equals(lada.getLink(carColor, red), defaultCarColor);
@@ -194,19 +195,19 @@ public class FlushTest extends AbstractTest {
 		assert redToBMW != null;
 
 		/* Link from red to BMW is automatic */
-		assert ((GenericImpl) redToBMW).isAutomatic();
+		assert ((CacheImpl) cache).isAutomatic(redToBMW);
 
 		/* Link from red to BMW is not flushable */
-		//assert !((GenericImpl) redToBMW).isFlushable();
+		// assert !((GenericImpl) redToBMW).isFlushable();
 
 		/* Automatic link from red to Lada exists */
 		assert redToLada != null;
 
 		/* Link from red to Lada is automatic */
-		assert ((GenericImpl) redToLada).isAutomatic();
+		assert !((CacheImpl) cache).isAutomatic(redToLada);
 
 		/* Link from red to Lada is flushable */
-		//assert ((GenericImpl) redToLada).isFlushable();
+		// assert ((GenericImpl) redToLada).isFlushable();
 
 		cache.flush();
 		Cache cache2 = cache.getEngine().newCache().start();

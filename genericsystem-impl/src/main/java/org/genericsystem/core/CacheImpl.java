@@ -30,7 +30,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractAwareIterator;
-import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.AbstractMapProvider.AbstractExtendedMap;
 import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
@@ -76,9 +75,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T insert(Generic generic) throws RollbackException {
+	<T extends Generic> T insert(Generic generic, boolean automatic) throws RollbackException {
 		try {
-			addGeneric(generic);
+			addGeneric(generic, automatic);
 			return (T) generic;
 		} catch (ConstraintViolationException e) {
 			rollback(e);
@@ -215,7 +214,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Generic rebuild() {
 				Generic meta = old.getMeta();
 				HomeTreeNode homeTreeNode = ((GenericImpl) meta).bindInstanceNode(value);
-				return dependencyBind(meta, new Vertex(CacheImpl.this, homeTreeNode, ((GenericImpl) old).supers, ((GenericImpl) old).selfToNullComponents()), old.getClass(), Statics.MULTIDIRECTIONAL, false);
+				return dependencyBind(meta, new Vertex(CacheImpl.this, homeTreeNode, ((GenericImpl) old).supers, ((GenericImpl) old).selfToNullComponents()), old.getClass(), Statics.MULTIDIRECTIONAL, false, isAutomatic(old));
 			}
 		}.rebuildAll(old);
 	}
@@ -225,7 +224,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			@Override
 			Generic rebuild() {
 				return dependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos)), old.getClass(),
-						Statics.MULTIDIRECTIONAL, false);
+						Statics.MULTIDIRECTIONAL, false, isAutomatic(old));
 			}
 		}.rebuildAll(old);
 	}
@@ -235,7 +234,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			@Override
 			Generic rebuild() {
 				return dependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents())), old.getClass(),
-						Statics.MULTIDIRECTIONAL, false);
+						Statics.MULTIDIRECTIONAL, false, isAutomatic(old));
 			}
 		}.rebuildAll(old);
 	}
@@ -245,7 +244,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			@Override
 			Generic rebuild() {
 				return dependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents()), old.getClass(),
-						Statics.MULTIDIRECTIONAL, true);
+						Statics.MULTIDIRECTIONAL, true, isAutomatic(old));
 			}
 		}.rebuildAll(old);
 	}
@@ -257,7 +256,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			@Override
 			Generic rebuild() {
 				return dependencyBind(old.getMeta(), new Vertex(CacheImpl.this, ((GenericImpl) old).getHomeTreeNode(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents()), old.getClass(),
-						Statics.MULTIDIRECTIONAL, true);
+						Statics.MULTIDIRECTIONAL, true, isAutomatic(old));
 			}
 		}.rebuildAll(old);
 	}
@@ -266,9 +265,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return setValue(generic, generic.getValue());
 	}
 
+	private void automaticToManuel(Generic superGeneric) {
+		automatics.remove(superGeneric);
+		adds.add(superGeneric);
+	}
+
 	@Override
 	public boolean isAutomatic(Generic generic) {
-		return automatics.contains(generic) || subContext.isAutomatic(generic);
+		return automatics.contains(generic);
 	};
 
 	// public boolean isFlushable(Generic generic) {
@@ -283,14 +287,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	// return false;
 	// };
 
-	public void markAsAutomatic(Generic generic) {
-		automatics.add(generic);
-	}
-
-	public void markAsNonAutomatic(Generic generic) {
-		automatics.remove(generic);
-	}
-
 	@Override
 	public void flush() throws RollbackException {
 		assert equals(getEngine().getCurrentCache());
@@ -298,22 +294,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (int attempt = 0; attempt < Statics.ATTEMPTS; attempt++)
 			try {
 				checkConstraints();
-				getSubContext().apply(new Iterable<Generic>() {
-
-					@Override
-					public Iterator<Generic> iterator() {
-						return new AbstractFilterIterator<Generic>(adds.iterator()) {
-
-							@Override
-							public boolean isSelected() {
-								return !((GenericImpl) next).isAutomatic();
-							}
-
-						};
-					}
-
-				}, removes);
-
+				getSubContext().apply(adds, removes);
 				clear();
 				return;
 			} catch (ConcurrencyControlException e) {
@@ -341,7 +322,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public boolean isAlive(Generic generic) {
-		return adds.contains(generic) || (!removes.contains(generic) && getSubContext().isAlive(generic));
+		return adds.contains(generic) || automatics.contains(generic) || (!removes.contains(generic) && getSubContext().isAlive(generic));
 	}
 
 	@Override
@@ -506,12 +487,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return bind(meta, ((GenericImpl) meta).bindInstanceNode(value), supers, components, specializationClass, basePos, automatic, existsException);
 	}
 
-	@SuppressWarnings("unchecked")
 	<T extends Generic> T bind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean automatic, boolean existsException) {
-		GenericImpl generic = internalBind(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), specializationClass, basePos, existsException);
-		if (automatic)
-			generic.markAsAutomatic();
-		return (T) generic;
+		return internalBind(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), specializationClass, basePos, existsException, automatic);
 	}
 
 	private class ConnectionMap extends HashMap<Generic, Generic> {
@@ -535,7 +512,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			Generic[] supers = adjust(((GenericImpl) dependency).supers);
 			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
 			Generic meta = adjust(((GenericImpl) dependency).getMeta())[0];
-			put(dependency, dependencyBind(meta, new Vertex(CacheImpl.this, newHomeTreeNode, supers, components), dependency.getClass(), basePos, false));
+			put(dependency, dependencyBind(meta, new Vertex(CacheImpl.this, newHomeTreeNode, supers, components), dependency.getClass(), basePos, false, isAutomatic(dependency)));
 		}
 
 		private ConnectionMap reBind(Set<Generic> orderedDependencies) {
@@ -549,7 +526,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			HomeTreeNode homeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
 			Generic[] supers = adjust(((GenericImpl) dependency).supers);
 			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
-			put(dependency, dependencyBind(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), dependency.getClass(), Statics.MULTIDIRECTIONAL, false));
+			put(dependency, dependencyBind(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), dependency.getClass(), Statics.MULTIDIRECTIONAL, false, isAutomatic(dependency)));
 		}
 
 		private Generic[] adjust(Generic... oldComponents) {
@@ -564,16 +541,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	<T extends Generic> T dependencyBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException) throws RollbackException {
+	<T extends Generic> T dependencyBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException, boolean automatic) throws RollbackException {
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
-		return buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents());
+		return buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents(), automatic);
 	}
 
-	<T extends Generic> T internalBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException) throws RollbackException {
+	<T extends Generic> T internalBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException, boolean automatic) throws RollbackException {
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
@@ -588,14 +565,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic dependency : allDependencies.descendingSet())
 			simpleRemove(dependency);
 
-		T bind = buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents());
+		T bind = buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents(), automatic);
+		automaticToManuel(bind, automatic);
 
 		new ConnectionMap().reBind(bind, directDependencies, allDependencies, basePos);
 		return bind;
 	}
 
-	<T extends Generic> T buildAndInsertComplex(HomeTreeNode homeTreeNode, Class<?> clazz, Generic[] supers, Generic[] components) {
-		return insert(this.<EngineImpl> getEngine().buildComplex(homeTreeNode, clazz, supers, components));
+	private <T extends Generic> void automaticToManuel(T bind, boolean automatic) {
+		if (!automatic) {
+			for (Generic superGeneric : ((GenericImpl) bind).supers)
+				if (isAutomatic(superGeneric))
+					automaticToManuel(superGeneric);
+			for (Generic component : ((GenericImpl) bind).components)
+				if (isAutomatic(component))
+					automaticToManuel(component);
+		}
+	}
+
+	<T extends Generic> T buildAndInsertComplex(HomeTreeNode homeTreeNode, Class<?> clazz, Generic[] supers, Generic[] components, boolean automatic) {
+		return insert(this.<EngineImpl> getEngine().buildComplex(homeTreeNode, clazz, supers, components), automatic);
 	}
 
 	protected void triggersDependencies(Class<?> clazz) {
@@ -705,22 +694,29 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	void simpleAdd(Generic generic) {
-		adds.add(generic);
-		super.simpleAdd(generic);
+	void simpleAdd(Generic generic, boolean automatic) {
+		if (automatic)
+			automatics.add(generic);
+		else
+			adds.add(generic);
+		super.simpleAdd(generic, automatic);
 	}
 
 	@Override
 	void simpleRemove(Generic generic) {
-		if (adds.contains(generic))
-			adds.remove(generic);
-		else
-			removes.add(generic);
+		if (automatics.contains(generic))
+			automatics.remove(generic);
+		else {
+			if (adds.contains(generic))
+				adds.remove(generic);
+			else
+				removes.add(generic);
+		}
 		super.simpleRemove(generic);
 	}
 
-	private void addGeneric(Generic generic) throws ConstraintViolationException {
-		simpleAdd(generic);
+	private void addGeneric(Generic generic, boolean automatic) throws ConstraintViolationException {
+		simpleAdd(generic, automatic);
 		check(CheckingType.CHECK_ON_ADD_NODE, false, generic);
 	}
 
