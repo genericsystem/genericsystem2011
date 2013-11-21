@@ -231,7 +231,7 @@ public class ApiTest extends AbstractTest {
 		// @Override
 		// public void intercept() {
 		Type aOnb = b.newSubType("A");
-		aOnb.log();
+		// aOnb.log();
 		assert !a.inheritsFrom(aOnb);
 		assert !((GenericImpl) aOnb).isSuperOf3(a);
 		// }.assertIsCausedBy(FunctionalConsistencyViolationException.class);
