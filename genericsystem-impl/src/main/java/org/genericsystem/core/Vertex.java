@@ -6,10 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import org.genericsystem.core.Statics.Components;
-import org.genericsystem.core.Statics.Primaries;
 import org.genericsystem.core.Statics.Supers;
 import org.genericsystem.exception.ExistsException;
-import org.genericsystem.exception.FunctionalConsistencyViolationException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
@@ -27,14 +25,14 @@ class Vertex {
 
 	private final CacheImpl cache;
 	private HomeTreeNode homeTreeNode;
-	private HomeTreeNode[] primaries;
+	// private HomeTreeNode[] primaries;
 	private Generic[] components;
 	private Generic[] supers;
 
 	Vertex(CacheImpl cache, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] aliveNullComponents) {
 		this.cache = cache;
 		this.homeTreeNode = homeTreeNode;
-		primaries = new Primaries(homeTreeNode, supers).toArray();
+		// primaries = new Primaries(homeTreeNode, supers).toArray();
 		components = aliveNullComponents;
 		this.supers = supers;
 	}
@@ -43,9 +41,9 @@ class Vertex {
 		return homeTreeNode;
 	}
 
-	HomeTreeNode[] getPrimaries() {
-		return primaries;
-	}
+	// HomeTreeNode[] getPrimaries() {
+	// return primaries;
+	// }
 
 	Generic[] getComponents() {
 		return components;
@@ -65,24 +63,35 @@ class Vertex {
 		supers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos);
 		// log.info("ZZZZZZZZZZ" + Arrays.toString(supers) + Arrays.toString(components));
 		for (Generic directSuper : supers) {
-			primaries = new Primaries(directSuper, primaries).toArray();
+			// primaries = new Primaries(directSuper, primaries).toArray();
 			components = new Components(components, ((GenericImpl) directSuper).components).toArray();
 		}
 	}
 
 	@SuppressWarnings({ "unchecked" })
 	private <T extends Generic> T findInSupers(boolean existsException) throws RollbackException {
-		for (Generic directSuper : supers) {
-			if (((GenericImpl) directSuper).equiv(primaries, components))
-				if (supers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
-					if (existsException)
-						cache.rollback(new ExistsException(directSuper + " already exists !"));
-					else
-						return (T) directSuper;
+		if (supers.length == 1)
+			if (((GenericImpl) supers[0]).equiv(homeTreeNode, ((GenericImpl) supers[0]).supers, components))
+				if (existsException)
+					cache.rollback(new ExistsException(supers[0] + " already exists !"));
 				else
-					cache.rollback(new FunctionalConsistencyViolationException("Found generic has not correct value : " + homeTreeNode + directSuper.info() + " " + Arrays.toString(supers)));
-		}
+					return (T) supers[0];
 		return null;
+
+		// for (Generic directSuper : supers) {
+		// if (((GenericImpl) directSuper).equiv(primaries, components))
+		// if (supers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
+		// if (existsException)
+		// cache.rollback(new ExistsException(directSuper + " already exists !"));
+		// else {
+		// assert ((GenericImpl) directSuper).equiv(homeTreeNode, supers, components) : directSuper.info() + Arrays.toString(supers);
+		// return (T) directSuper;
+		// }
+		// else {
+		// cache.rollback(new FunctionalConsistencyViolationException("Found generic has not correct value : " + homeTreeNode + directSuper.info() + " " + Arrays.toString(supers)));
+		// }
+		// }
+		// return null;
 	}
 
 	private boolean isExtentedBy(Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
@@ -175,7 +184,8 @@ class Vertex {
 		if (result2)
 			return true;
 		for (Generic component : dependency.components)
-			if (!Arrays.equals(dependency.primaries, ((GenericImpl) component).primaries) || !Arrays.equals(dependency.components, ((GenericImpl) component).components))
+			// if (!Arrays.equals(dependency.primaries, ((GenericImpl) component).primaries) || !Arrays.equals(dependency.components, ((GenericImpl) component).components))
+			if (!dependency.equals(component))
 				if (isAncestorOf((GenericImpl) component))
 					return true;
 		return false;

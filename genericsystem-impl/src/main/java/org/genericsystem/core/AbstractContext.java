@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -38,6 +39,7 @@ public abstract class AbstractContext implements Serializable {
 	abstract <T extends Engine> T getEngine();
 
 	<T extends Generic> T plug(T generic) {
+		// TODO on gère pas les automatiques quand nous sommes dans la transaction
 		Set<Generic> componentSet = new HashSet<>();
 		for (Generic component : ((GenericImpl) generic).components)
 			if (componentSet.add(component))
@@ -95,7 +97,7 @@ public abstract class AbstractContext implements Serializable {
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isEngine() || generic.isAlive())
 			return (T) generic;
-		return fastFindBySuper(((GenericImpl) generic).homeTreeNode, ((GenericImpl) generic).primaries, reFind(((GenericImpl) generic).supers[0]), reFind(((GenericImpl) generic).components));
+		return fastFindBySuper(((GenericImpl) generic).homeTreeNode, reFind(((GenericImpl) generic).supers), reFind(((GenericImpl) generic).components));
 	}
 
 	private Generic[] reFind(Generic... generics) {
@@ -106,9 +108,9 @@ public abstract class AbstractContext implements Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T fastFindBySuper(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic superGeneric, Generic[] components) {
-		for (Generic generic : components.length == 0 || components[0] == null ? superGeneric.getInheritings() : components[0].getComposites())
-			if (((GenericImpl) generic).equiv(homeTreeNode, primaries, components))
+	<T extends Generic> T fastFindBySuper(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
+		for (Generic generic : components.length == 0 || components[0] == null ? supers[0].getInheritings() : components[0].getComposites())
+			if (((GenericImpl) generic).equiv(homeTreeNode, supers, components))
 				return (T) generic;
 		return null;
 	}
@@ -138,6 +140,7 @@ public abstract class AbstractContext implements Serializable {
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
 					for (T inheritingDependency : generic.<T> getInheritings())
+						// TODO clean
 						if (/* ((GenericImpl) inheritingDependency).isPhantom() || */((GenericImpl) inheritingDependency).isAutomatic())
 							addDependencies(inheritingDependency);
 						else if (!contains(inheritingDependency))
@@ -253,7 +256,7 @@ public abstract class AbstractContext implements Serializable {
 
 	void addAll(Iterable<Generic> generics) {
 		for (Generic generic : generics)
-			simpleAdd(generic);
+			simpleAdd(generic, false);
 	}
 
 	void removeAll(Iterable<Generic> generics) {
@@ -261,7 +264,7 @@ public abstract class AbstractContext implements Serializable {
 			simpleRemove(generic);
 	}
 
-	void simpleAdd(Generic generic) {
+	void simpleAdd(Generic generic, boolean automatic) {
 		plug(generic);
 	}
 

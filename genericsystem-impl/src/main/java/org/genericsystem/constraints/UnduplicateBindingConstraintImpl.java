@@ -1,7 +1,6 @@
 package org.genericsystem.constraints;
 
 import java.util.Iterator;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -37,8 +36,7 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(UnduplicateBindingConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
 	public void check(Generic instanceToCheck, final Generic baseConstraint) throws ConstraintViolationException {
@@ -46,14 +44,13 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 		final Generic[] components = ((GenericImpl) baseConstraint).getComponentsArray();
 
 		final HomeTreeNode homeTreeNode = ((GenericImpl) baseConstraint).getHomeTreeNode();
-		final HomeTreeNode[] primaries = ((GenericImpl) baseConstraint).getPrimariesArray();
 
 		Iterator<Generic> iterator = components.length == 0 || components[0] == null ? supers[0].getInheritings().iterator() : components[0].getComposites().iterator();
 		iterator = new AbstractFilterIterator<Generic>(iterator) {
 
 			@Override
 			public boolean isSelected() {
-				return !next.equals(baseConstraint) && ((GenericImpl) next).equiv(homeTreeNode, primaries, components);
+				return !next.equals(baseConstraint) && ((GenericImpl) next).equiv(homeTreeNode, supers, components);
 			}
 		};
 
