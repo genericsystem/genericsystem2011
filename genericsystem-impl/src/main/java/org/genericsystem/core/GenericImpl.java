@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -128,28 +127,37 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-		for (Generic superGeneric : supers) {
-			if (this.equals(superGeneric) && !isEngine())
-				getCurrentCache().rollback(new IllegalStateException());
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-				getCurrentCache().rollback(new IllegalStateException());
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-				getCurrentCache().rollback(new IllegalStateException());
-		}
-		return this;
+					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+					for (Generic superGeneric : supers) {
+						if (this.equals(superGeneric) && !isEngine())
+							getCurrentCache().rollback(new IllegalStateException());
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+							getCurrentCache().rollback(new IllegalStateException());
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+							getCurrentCache().rollback(new IllegalStateException());
+					}
+					return this;
 	}
 
 	<T extends Generic> T plug() {
 		Set<Generic> componentSet = new HashSet<>();
-		for (Generic component : components)
+		for (Generic component : components) {
 			if (componentSet.add(component))
 				((GenericImpl) component).lifeManager.engineComposites.add(this);
+			if (!this.isAutomatic() && ((GenericImpl) component).isAutomatic()) {
+				((GenericImpl) component).markAsNonAutomatic();
+			}
+		}
 
 		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : supers)
+		for (Generic effectiveSuper : supers) {
 			if (effectiveSupersSet.add(effectiveSuper))
 				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
+			if (!this.isAutomatic() && ((GenericImpl) effectiveSuper).isAutomatic()) {
+				((GenericImpl) effectiveSuper).markAsNonAutomatic();
+			}
+		}
+
 		return (T) this;
 	}
 
@@ -774,7 +782,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			});
 
 			if (projection == null)
-				((GenericImpl) getCurrentCache().bind(getMeta(), getHomeTreeNode(), new Generic[] { this }, newComponents, null, Statics.MULTIDIRECTIONAL, false)).markAsAutomatic();
+				getCurrentCache().bind(getMeta(), getHomeTreeNode(), new Generic[] { this }, newComponents, null, Statics.MULTIDIRECTIONAL, true, false);
 		}
 	}
 
@@ -797,14 +805,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public boolean inheritsFrom(Generic generic) {
 		if (generic == null)
 			return false;
-		if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
-			return false;
+		// if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
+		// return false;
+
 		boolean inheritance = ((GenericImpl) generic).isSuperOf2(this);
 		boolean inheritance3 = ((GenericImpl) generic).isSuperOf3(this);
 		assert inheritance == inheritance3 : this.info() + generic.info() + " : " + inheritance + " != " + inheritance3;
 		// boolean superOf = ((GenericImpl) generic).isSuperOf(this);
 		// assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
-		return inheritance3;
+		return inheritance;
 	}
 
 	public boolean inheritsFrom2(Generic generic) {
@@ -904,7 +913,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return false;
 	}
 
-	private static boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Generic subGeneric) {
+	public static boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Generic subGeneric) {
 		if (subGeneric.isEngine())
 			return ((GenericImpl) subGeneric).equiv(homeTreeNode, supers, components);
 		if (((GenericImpl) subGeneric).equiv(homeTreeNode, supers, components))
@@ -1752,12 +1761,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().isAutomatic(this);
 	}
 
-	public boolean isFlushable() {
-		return getCurrentCache().isFlushable(this);
-	}
+	//	public boolean isFlushable() {
+	//		return getCurrentCache().isFlushable(this);
+	//	}
 
 	public GenericImpl markAsAutomatic() {
 		getCurrentCache().markAsAutomatic(this);
+		return this;
+	}
+
+	public GenericImpl markAsNonAutomatic() {
+		getCurrentCache().markAsNonAutomatic(this);
 		return this;
 	}
 
