@@ -340,8 +340,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void cancel(Holder holder) {
-		clear(holder);
-		holder = unambigousFirst(holdersIterator(holder, holder.getMetaLevel(), getBasePos(holder)));
+		clear(holder, holder.getMetaLevel() + 1);
+		holder = unambigousFirst(holdersIterator(holder, holder.getMetaLevel() + 1, getBasePos(holder)));
+		log.info("holder " + holder);
 		if (holder != null)
 			addHolder(holder, null, getBasePos(holder), holder.getMetaLevel(), Statics.truncate(getBasePos(holder), ((GenericImpl) holder).components));
 	}
@@ -363,9 +364,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void clear(Holder holder) {
-		holder = unambigousFirst(holdersIterator(holder, holder.getMetaLevel(), getBasePos(holder)));
-		if (holder != null && equals(holder.getBaseComponent()))
+		clear(holder, holder.getMetaLevel());
+	}
+
+	private void clear(Holder holder, int metaLevel) {
+		holder = unambigousFirst(holdersIterator(holder, metaLevel, getBasePos(holder)));
+		log.info(this + " holder " + holder + " " + holder.getBaseComponent());
+		if (holder != null && equals(holder.getBaseComponent())) {
+			log.info("remove");
 			holder.remove();
+		}
 	}
 
 	public <T extends Generic> Iterator<T> thisFilter(Iterator<T> concreteIterator) {

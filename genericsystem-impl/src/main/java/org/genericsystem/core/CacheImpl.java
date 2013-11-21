@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -185,7 +186,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -198,14 +199,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 			dependencies.remove(generic);
 			for (Generic dependency : dependencies)
 				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, true);
-		break;
+			break;
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -396,7 +397,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T addType(Serializable name, Type[] superTypes, Generic... components) {
-		return bind(getEngine(), name, superTypes, components, null, Statics.MULTIDIRECTIONAL, true);
+		return internalSetType(name, true, superTypes, components);
 	}
 
 	// @Override
@@ -411,17 +412,39 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T setType(Serializable name, Type[] superTypes, Generic... components) {
-		return bind(getEngine(), name, superTypes, components, null, Statics.MULTIDIRECTIONAL, false);
+		return internalSetType(name, false, superTypes, components);
+	}
+
+	private <T extends Type> T internalSetType(Serializable name, boolean existsException, Type[] superTypes, Generic... components) {
+		return bind(name, null, existsException, superTypes, components);
 	}
 
 	@Override
-	public <T extends Tree> T newTree(Serializable value) {
-		return newTree(value, 1);
+	public <T extends Tree> T addTree(Serializable name) {
+		return addTree(name, 1);
 	}
 
 	@Override
-	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(getEngine(), value, new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, Statics.MULTIDIRECTIONAL, false);
+	public <T extends Tree> T addTree(Serializable name, int dim) {
+		return internalSetTree(name, dim, true);
+	}
+
+	@Override
+	public <T extends Tree> T setTree(Serializable name) {
+		return setTree(name, 1);
+	}
+
+	@Override
+	public <T extends Tree> T setTree(Serializable name, int dim) {
+		return internalSetTree(name, dim, false);
+	}
+
+	private <T extends Tree> T internalSetTree(Serializable name, int dim, boolean existsException) {
+		return bind(name, TreeImpl.class, existsException, new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim]);
+	}
+
+	private <T extends Generic> T bind(Serializable name, Class<?> specializationClass, boolean existsException, Generic[] superTypes, Generic... components) {
+		return this.<T> bind(getEngine(), name, superTypes, components, specializationClass, Statics.MULTIDIRECTIONAL, existsException);
 	}
 
 	@Override
