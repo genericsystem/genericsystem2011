@@ -12,6 +12,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -185,7 +186,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -197,15 +198,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 			NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
 			dependencies.remove(generic);
 			for (Generic dependency : dependencies)
-				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, true);
-		break;
+				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, false, true);
+			break;
+
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -271,20 +273,24 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return automatics.contains(generic) || subContext.isAutomatic(generic);
 	};
 
-	public boolean isFlushable(Generic generic) {
-		if (!isAutomatic(generic))
-			return true;
-		for (Generic inheriting : generic.getInheritings())
-			if (isFlushable(inheriting))
-				return true;
-		for (Generic composite : generic.getComposites())
-			if (isFlushable(composite))
-				return true;
-		return false;
-	};
+	//	public boolean isFlushable(Generic generic) {
+	//		if (!isAutomatic(generic))
+	//			return true;
+	//		for (Generic inheriting : generic.getInheritings())
+	//			if (isFlushable(inheriting))
+	//				return true;
+	//		for (Generic composite : generic.getComposites())
+	//			if (isFlushable(composite))
+	//				return true;
+	//		return false;
+	//	};
 
 	public void markAsAutomatic(Generic generic) {
 		automatics.add(generic);
+	}
+
+	public void markAsNonAutomatic(Generic generic) {
+		automatics.remove(generic);
 	}
 
 	@Override
@@ -302,7 +308,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 							@Override
 							public boolean isSelected() {
-								return ((GenericImpl) next).isFlushable();
+								return !((GenericImpl) next).isAutomatic();
 							}
 
 						};
@@ -396,7 +402,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T addType(Serializable name, Type[] superTypes, Generic... components) {
-		return bind(getEngine(), name, superTypes, components, null, Statics.MULTIDIRECTIONAL, true);
+		return bind(getEngine(), name, superTypes, components, null, Statics.MULTIDIRECTIONAL, false, true);
 	}
 
 	// @Override
@@ -411,7 +417,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T setType(Serializable name, Type[] superTypes, Generic... components) {
-		return bind(getEngine(), name, superTypes, components, null, Statics.MULTIDIRECTIONAL, false);
+		return bind(getEngine(), name, superTypes, components, null, Statics.MULTIDIRECTIONAL, false, false);
 	}
 
 	@Override
@@ -421,7 +427,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Tree> T newTree(Serializable value, int dim) {
-		return this.<T> bind(getEngine(), value, new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, Statics.MULTIDIRECTIONAL, false);
+		return this.<T> bind(getEngine(), value, new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim], TreeImpl.class, Statics.MULTIDIRECTIONAL, false, false);
 	}
 
 	@Override
@@ -446,12 +452,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz, components);
 		Serializable value = findImplictValue(clazz);
-		return this.<T> bind(meta, value, Statics.insertFirst(meta, userSupers), components, clazz, Statics.MULTIDIRECTIONAL, false);
+		return this.<T> bind(meta, value, Statics.insertFirst(meta, userSupers), components, clazz, Statics.MULTIDIRECTIONAL, false, false);
 	}
 
 	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, boolean existsException, int axe, Generic... components) {
 		Generic[] sortAndCheck = ((GenericImpl) directSuper).sortAndCheck(components);
-		return bind(meta, value, new Generic[] { directSuper }, sortAndCheck, specializationClass, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe, existsException);
+		return bind(meta, value, new Generic[] { directSuper }, sortAndCheck, specializationClass, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe, false, existsException);
 	}
 
 	int findAxe(Generic[] sorts, Generic baseComponent) throws RollbackException {
@@ -476,12 +482,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return this.<GenericImpl> find(meta);
 	}
 
-	<T extends Generic> T bind(Generic meta, Serializable value, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean existsException) {
-		return bind(meta, ((GenericImpl) meta).bindInstanceNode(value), supers, components, specializationClass, basePos, existsException);
+	<T extends Generic> T bind(Generic meta, Serializable value, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean automatic, boolean existsException) {
+		return bind(meta, ((GenericImpl) meta).bindInstanceNode(value), supers, components, specializationClass, basePos, automatic, existsException);
 	}
 
-	<T extends Generic> T bind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean existsException) {
-		return internalBind(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), specializationClass, basePos, existsException);
+	@SuppressWarnings("unchecked")
+	<T extends Generic> T bind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean automatic, boolean existsException) {
+		GenericImpl generic = internalBind(meta, new Vertex(CacheImpl.this, homeTreeNode, supers, components), specializationClass, basePos, existsException);
+		if (automatic)
+			generic.markAsAutomatic();
+		return (T) generic;
 	}
 
 	private class ConnectionMap extends HashMap<Generic, Generic> {
