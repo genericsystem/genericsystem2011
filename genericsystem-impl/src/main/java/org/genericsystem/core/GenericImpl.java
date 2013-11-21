@@ -145,18 +145,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic component : components) {
 			if (componentSet.add(component))
 				((GenericImpl) component).lifeManager.engineComposites.add(this);
-			if (!this.isAutomatic() && ((GenericImpl) component).isAutomatic()) {
-				((GenericImpl) component).markAsNonAutomatic();
-			}
+			// if (!this.isAutomatic() && ((GenericImpl) component).isAutomatic()) {
+			// ((GenericImpl) component).markAsNonAutomatic();
+			// }
 		}
 
 		Set<Generic> effectiveSupersSet = new HashSet<>();
 		for (Generic effectiveSuper : supers) {
 			if (effectiveSupersSet.add(effectiveSuper))
 				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
-			if (!this.isAutomatic() && ((GenericImpl) effectiveSuper).isAutomatic()) {
-				((GenericImpl) effectiveSuper).markAsNonAutomatic();
-			}
+			// if (!this.isAutomatic() && ((GenericImpl) effectiveSuper).isAutomatic()) {
+			// ((GenericImpl) effectiveSuper).markAsNonAutomatic();
+			// }
 		}
 
 		return (T) this;
