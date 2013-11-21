@@ -11,8 +11,7 @@ import org.genericsystem.core.Statics;
  * 
  */
 @SystemGeneric
-// @Extends(meta = MetaAttribute.class)
+// @Extends(MetaAttribute.class)
 @Components({ EngineImpl.class, EngineImpl.class })
 @StringValue(Statics.ROOT_NODE_VALUE)
-public class MetaRelation {
-}
+public class MetaRelation {}
