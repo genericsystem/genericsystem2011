@@ -141,15 +141,14 @@ public abstract class AbstractContext implements Serializable {
 				if (super.add((T) generic)) {// protect from loop
 					for (T inheritingDependency : generic.<T> getInheritings())
 						// TODO clean
-						// if (/* ((GenericImpl) inheritingDependency).isPhantom() || */((GenericImpl) inheritingDependency).isAutomatic())
-						// addDependencies(inheritingDependency);
-						// else
-						if (!contains(inheritingDependency))
+						if (/* ((GenericImpl) inheritingDependency).isPhantom() || */((GenericImpl) inheritingDependency).isAutomatic())
+							addDependencies(inheritingDependency);
+						else if (!contains(inheritingDependency))
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
 					for (T compositeDependency : generic.<T> getComposites())
 						if (!generic.equals(compositeDependency)) {
 							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components.length; componentPos++)
-								if (/* !((GenericImpl) compositeDependency).isAutomatic() && */((GenericImpl) compositeDependency).components[componentPos].equals(generic) && !contains(compositeDependency)
+								if (!((GenericImpl) compositeDependency).isAutomatic() && ((GenericImpl) compositeDependency).components[componentPos].equals(generic) && !contains(compositeDependency)
 										&& compositeDependency.isReferentialIntegrity(componentPos))
 									throw new ReferentialIntegrityConstraintViolationException(compositeDependency + " is Referential Integrity for ancestor " + generic + " by component position : " + componentPos);
 							addDependencies(compositeDependency);

@@ -1784,11 +1784,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	// TODO clean
-	// public boolean isAutomatic() {
-	// return getCurrentCache().isAutomatic(this);
-	// }
+	public boolean isAutomatic() {
+		return getCurrentCache().isAutomatic(this);
+	}
 
+	// TODO clean
 	// public boolean isFlushable() {
 	// return getCurrentCache().isFlushable(this);
 	// }
