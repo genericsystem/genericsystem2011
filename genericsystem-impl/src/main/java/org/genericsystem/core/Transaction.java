@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.util.HashSet;
+
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -76,9 +77,9 @@ public class Transaction extends AbstractContext {
 	}
 
 	@Override
-	protected void simpleAdd(Generic generic) {
+	protected void simpleAdd(Generic generic, boolean automatic) {
 		((GenericImpl) generic).getLifeManager().beginLife(getTs());
-		super.simpleAdd(generic);
+		super.simpleAdd(generic, automatic);
 	}
 
 	@Override

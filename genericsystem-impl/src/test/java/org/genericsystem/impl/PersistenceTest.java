@@ -100,7 +100,7 @@ public class PersistenceTest {
 
 	public void testTree() {
 		Cache cache = initWorkingSpace();
-		Tree tree = cache.newTree("Tree");
+		Tree tree = cache.setTree("Tree");
 		Node root = tree.newRoot("Root");
 		Node child = root.setNode("Child");
 		root.setNode("Child2");
@@ -110,7 +110,7 @@ public class PersistenceTest {
 
 	public void testInheritanceTree() {
 		Cache cache = initWorkingSpace();
-		Tree tree = cache.newTree("Tree");
+		Tree tree = cache.setTree("Tree");
 		Node root = tree.newRoot("Root");
 		Node child = root.setSubNode("Child");
 		root.setSubNode("Child2");

@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;

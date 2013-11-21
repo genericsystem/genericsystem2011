@@ -275,52 +275,52 @@ public class Statics {
 		}
 	}
 
-	public static class Primaries extends TreeSet<HomeTreeNode> {
-		private static final long serialVersionUID = 7222889429002770779L;
-
-		public Primaries(HomeTreeNode homeTreeNode, Generic... supers) {
-			add(homeTreeNode);
-			for (Generic superGeneric : supers)
-				for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
-					add(primary);
-		}
-
-		public Primaries(Generic... supers) {
-			// add(homeTreeNode);
-			for (Generic superGeneric : supers)
-				for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
-					add(primary);
-		}
-
-		public Primaries(HomeTreeNode... primaries) {
-			for (HomeTreeNode primary : primaries)
-				add(primary);
-		}
-
-		public Primaries(Generic generic, HomeTreeNode... primaries) {
-			for (HomeTreeNode primary : primaries)
-				add(primary);
-			for (HomeTreeNode primary : ((GenericImpl) generic).primaries)
-				add(primary);
-		}
-
-		@Override
-		public boolean add(HomeTreeNode candidate) {
-			for (HomeTreeNode homeTreeNode : this)
-				if (homeTreeNode.inheritsFrom(candidate))
-					return false;
-			Iterator<HomeTreeNode> it = this.iterator();
-			while (it.hasNext())
-				if (candidate.inheritsFrom(it.next()))
-					it.remove();
-			return super.add(candidate);
-		}
-
-		@Override
-		public HomeTreeNode[] toArray() {
-			return toArray(new HomeTreeNode[size()]);
-		}
-	}
+	// public static class Primaries extends TreeSet<HomeTreeNode> {
+	// private static final long serialVersionUID = 7222889429002770779L;
+	//
+	// public Primaries(HomeTreeNode homeTreeNode, Generic... supers) {
+	// add(homeTreeNode);
+	// for (Generic superGeneric : supers)
+	// for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
+	// add(primary);
+	// }
+	//
+	// public Primaries(Generic... supers) {
+	// // add(homeTreeNode);
+	// for (Generic superGeneric : supers)
+	// for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
+	// add(primary);
+	// }
+	//
+	// public Primaries(HomeTreeNode... primaries) {
+	// for (HomeTreeNode primary : primaries)
+	// add(primary);
+	// }
+	//
+	// public Primaries(Generic generic, HomeTreeNode... primaries) {
+	// for (HomeTreeNode primary : primaries)
+	// add(primary);
+	// for (HomeTreeNode primary : ((GenericImpl) generic).primaries)
+	// add(primary);
+	// }
+	//
+	// @Override
+	// public boolean add(HomeTreeNode candidate) {
+	// for (HomeTreeNode homeTreeNode : this)
+	// if (homeTreeNode.inheritsFrom(candidate))
+	// return false;
+	// Iterator<HomeTreeNode> it = this.iterator();
+	// while (it.hasNext())
+	// if (candidate.inheritsFrom(it.next()))
+	// it.remove();
+	// return super.add(candidate);
+	// }
+	//
+	// @Override
+	// public HomeTreeNode[] toArray() {
+	// return toArray(new HomeTreeNode[size()]);
+	// }
+	// }
 
 	public static <T extends Generic> Iterator<T> levelFilter(Iterator<T> iterator, final int instanciationLevel) {
 		return new AbstractFilterIterator<T>(iterator) {

@@ -87,7 +87,7 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 
 	public void consistencyTreeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Tree tree = cache.newTree("Tree");
+		final Tree tree = cache.setTree("Tree");
 		Node root = tree.newRoot(123);
 		root.setNode(456);
 		tree.setConstraintClass(Integer.class);
@@ -95,7 +95,7 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 
 	public void consistencyTreeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Tree tree = cache.newTree("Tree");
+		final Tree tree = cache.setTree("Tree");
 		Node root = tree.newRoot(123);
 		root.setNode("Child");
 		new RollbackCatcher() {
@@ -108,7 +108,7 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 
 	public void consistencyTreeKO2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Tree tree = cache.newTree("Tree");
+		final Tree tree = cache.setTree("Tree");
 		Node root = tree.newRoot("Root");
 		root.setNode("Child");
 		new RollbackCatcher() {
@@ -121,7 +121,7 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 
 	public void consistencyInheritanceTreeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Tree tree = cache.newTree("Tree");
+		final Tree tree = cache.setTree("Tree");
 		Node root = tree.newRoot(123);
 		root.setSubNode(456);
 		tree.setConstraintClass(Integer.class);
@@ -129,7 +129,7 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 
 	public void consistencyInheritanceTreeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Tree tree = cache.newTree("Tree");
+		final Tree tree = cache.setTree("Tree");
 		Node root = tree.newRoot(123);
 		root.setNode("Father");
 		root.setSubNode("Child");
@@ -143,7 +143,7 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 
 	public void consistencyInheritanceTreeKO2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		final Tree tree = cache.newTree("Tree");
+		final Tree tree = cache.setTree("Tree");
 		Node root = tree.newRoot("Root");
 		root.setSubNode("Child");
 		new RollbackCatcher() {
