@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -329,7 +330,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void cancelAll(Holder attribute, int basePos, Generic... targets) {
-		internalClearAll(attribute, basePos, attribute.getMetaLevel() + 1, false, targets);
+		internalClearAll(attribute, basePos, Statics.CONCRETE, false, targets);
 		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, attribute.getMetaLevel(), basePos, targets);
 		while (holders.hasNext())
 			internalCancel(holders.next(), basePos);
@@ -343,7 +344,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private void internalCancel(Holder holder, int basePos) {
 		if (holder != null)
-			addHolder(holder, null, getBasePos(holder), holder.getMetaLevel(), Statics.truncate(basePos, ((GenericImpl) holder).components));
+			setHolder(holder, null, getBasePos(holder), Statics.truncate(basePos, ((GenericImpl) holder).components));
 	}
 
 	@Override
@@ -750,6 +751,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				boolean selected = candidate.getMetaLevel() <= level && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) candidate).isAttributeOf(GenericImpl.this));
 				if (pos != Statics.MULTIDIRECTIONAL && selected && ((GenericImpl) candidate).isPseudoStructural(pos))
 					((GenericImpl) candidate).project(pos);
+
 				return selected;
 			}
 		};
@@ -767,13 +769,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic component : newComponents)
 				assert component.isAlive();
 			// Generic projection = this.unambigousFirst(componentsFilter(((GenericImpl) getMeta()).allInheritingsIteratorWithoutRoot(), components));
-			this.log();
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 				@Override
 				public boolean isSelected() {
-					// if ("DefaultCarColor".equals(homeTreeNode.getValue()))
-					log.info(next.info() + "homeTreeNode : " + getHomeTreeNode() + " " + Arrays.toString(((GenericImpl) next).components) + Arrays.toString(newComponents));
-					return isSuperOf3(getHomeTreeNode(), new Generic[] { GenericImpl.this }, newComponents, next);
+					// log.info(next.info() + "homeTreeNode : " + getHomeTreeNode() + " " + Arrays.toString(((GenericImpl) next).components) + Arrays.toString(newComponents));
+					return isSuperOf_(getHomeTreeNode(), new Generic[] { GenericImpl.this }, newComponents, next);
 				}
 			});
 
@@ -817,10 +817,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return false;
 		// if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
 		// return false;
-
 		boolean inheritance = ((GenericImpl) generic).isSuperOf2(this);
-		boolean inheritance3 = ((GenericImpl) generic).isSuperOf3(this);
-		assert inheritance == inheritance3 : generic.info() + this.info() + " : " + inheritance + " != " + inheritance3;
+		// boolean inheritance3 = ((GenericImpl) generic).isSuperOf3(this);
+		// assert inheritance == inheritance3 : generic.info() + this.info() + " : " + inheritance + " != " + inheritance3;
 		// boolean superOf = ((GenericImpl) generic).isSuperOf(this);
 		// assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
 		return inheritance;
@@ -858,58 +857,37 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return true;
 	}
 
-	// public boolean isSuperOf(Generic generic) {
-	// assert generic != null;
-	// if (equals(generic))
-	// return true;
-	// if (((GenericImpl) generic).isEngine())
-	// return isEngine();
-	// return isSuperOf(primaries, components, ((GenericImpl) generic).primaries, ((GenericImpl) generic).components);
-	// }
-
-	// public boolean isSuperOf(HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-	// return subHomeTreeNode.inheritsFrom(homeTreeNode) && isSuperOf(primaries, components, subPrimaries, subComponents);
-	// }
-
 	public boolean isSuperOf3(Generic subGeneric) {
-		boolean result1 = isSuperOf3(((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
-		boolean result2 = isSuperOf3(homeTreeNode, supers, components, subGeneric);
-		assert result1 == result2 : result2 + this.info() + subGeneric.info();
-		return result1;
+		// boolean result1 = isSuperOf3(((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
+		// boolean result2 = isSuperOf3(homeTreeNode, supers, components, subGeneric);
+		boolean result3 = isSuperOf_(homeTreeNode, supers, components, ((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
+		// assert result1 == result2 : result2 + this.info() + subGeneric.info();
+		// assert result2 == result3 : "" + result2 + " " + result3 + this.info() + subGeneric.info();
+		return result3;
+	}
+
+	public boolean isSuperOf_(HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
+		return isSuperOf3(subHomeTreeNode, subSupers, subComponents);
+		// return isSuperOf_(homeTreeNode, supers, components, subHomeTreeNode, subSupers, subComponents);
 	}
 
 	public boolean isSuperOf3(HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
 		if (equiv(subHomeTreeNode, subSupers, subComponents))
 			return true;
-		if (!internalIsSuperOf3(subHomeTreeNode, subSupers))
-			return false;
 		if (!internalIsSuperOf3(components, subComponents))
+			return false;
+		if (!internalIsSuperOf3(subHomeTreeNode, subSupers))
 			return false;
 		return true;
 	}
 
 	private boolean internalIsSuperOf3(HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
-		if (subHomeTreeNode.inheritsFrom(homeTreeNode)) {
+		if (subHomeTreeNode.inheritsFrom(homeTreeNode))
 			if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
 				return true;
-			// if (subHomeTreeNode.equals(homeTreeNode) && Statics.META == subHomeTreeNode.getMetaLevel())
-			// return true;
-			//
-			// if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()) {
-			// LOOP: for (Generic superGeneric : supers) {
-			// for (Generic subSuper : subSupers)
-			// if (subSuper.inheritsFrom(superGeneric))
-			// continue LOOP;
-			// return false;
-			// }
-			// return true;
-			// }
-		}
-		for (Generic sub : subSupers) {
-			if (sub.inheritsFrom(this)) {
+		for (Generic sub : subSupers)
+			if (sub.inheritsFrom(this))
 				return true;
-			}
-		}
 		return false;
 	}
 
@@ -939,59 +917,130 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return false;
 	}
 
-	public static boolean isSuperOf3(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Generic subGeneric) {
-		if (subGeneric.isEngine())
-			return ((GenericImpl) subGeneric).equiv(homeTreeNode, supers, components);
-
-		// if (!(((GenericImpl) subGeneric).homeTreeNode.equals(homeTreeNode) && Arrays.equals(((GenericImpl) subGeneric).supers, supers))) {
-		if (((GenericImpl) subGeneric).equiv(homeTreeNode, supers, components))
+	public static boolean isSuperOf_(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
+		if (homeTreeNode.equals(subHomeTreeNode) && Arrays.equals(supers, subSupers) && Arrays.equals(components, subComponents)) {
 			return true;
-		if (!internalIsSuperOf3bis(homeTreeNode, supers, components, ((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers))
+		}
+
+		if (homeTreeNode.getMetaLevel() > subHomeTreeNode.getMetaLevel())
 			return false;
+		if (subComponents.length < components.length)
+			return false;
+		else if (subComponents.length > components.length) {
+			for (int i = 0; i < subComponents.length; i++)
+				if (isSuperOf_(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.truncate(i, subComponents)))
+					return true;
+			return false;
+		}
+		assert subComponents.length == components.length;
+
+		for (Generic subSuper : subSupers) {
+			if (isSuperOf_(homeTreeNode, supers, components, ((GenericImpl) subSuper).homeTreeNode, ((GenericImpl) subSuper).supers, ((GenericImpl) subSuper).components)) {
+				return true;
+			}
+		}
+
+		for (int i = 0; i < subComponents.length; i++) {
+			assert subComponents[i] != null || components[i] != null;
+			if (components[i] != null && subComponents[i] != null) {
+				if (!((GenericImpl) subComponents[i]).inheritsFrom(components[i])) {
+					return false;
+				}
+				if (!subComponents[i].equals(components[i]))
+					for (Generic subSuper : ((GenericImpl) subComponents[i]).supers) {
+						if (subSuper.inheritsFrom(components[i]))
+							if (!subSuper.equals(subComponents[i]))
+								if (isSuperOf_(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.replace(i, subComponents, subSuper)))
+									return true;
+						// logValue(ConstraintValue.class, homeTreeNode, supers, components, true, subHomeTreeNode, subSupers, subComponents);
+
+						return false;
+					}
+			}
+			if (subComponents[i] == null) {
+				for (Generic subSuper : subSupers) {
+					if (subSuper.inheritsFrom(components[i]))
+						// if (!subSuper.equals(subComponents[i]))
+						if (isSuperOf_(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.replace(i, subComponents, subSuper)))
+							return true;
+					// logValue(ConstraintValue.class, homeTreeNode, supers, components, true, subHomeTreeNode, subSupers, subComponents);
+
+					return false;
+				}
+			}
+
+			if (components[i] == null) {
+				if (!((GenericImpl) subComponents[i]).equiv(homeTreeNode, supers, components))
+					for (Generic subSuper : ((GenericImpl) subComponents[i]).supers) {
+						if (subSuper.inheritsFrom(components[i]))
+							// if (!subSuper.equals(subComponents[i]))
+							if (isSuperOf_(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.replace(i, subComponents, subSuper)))
+								return true;
+						// logValue(ConstraintValue.class, homeTreeNode, supers, components, true, subHomeTreeNode, subSupers, subComponents);
+
+						return false;
+					}
+			}
+
+		}
+
+		assert subComponents.length == components.length;
+		assert Arrays.equals(components, subComponents) : components[0].info() + " " + subComponents[0].info();
+
+		if (subHomeTreeNode.inheritsFrom(homeTreeNode))
+			if (!subHomeTreeNode.equals(homeTreeNode))
+				return true;
+			else {
+				if (Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
+					if (areAllSupersReached(supers, subSupers))
+						return true;
+			}
+
+		// for (Generic subSuper : subSupers) {
+		// if (isSuperOf_(homeTreeNode, supers, components, ((GenericImpl) subSuper).homeTreeNode, ((GenericImpl) subSuper).supers, ((GenericImpl) subSuper).components)) {
+		// return true;
 		// }
-		if (!internalIsSuperOf3(components, ((GenericImpl) subGeneric).components))
-			return false;
+		// }
+
+		return false;
+	}
+
+	private static void logValue(Serializable value, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Serializable value2, HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
+		if (Objects.equals(homeTreeNode.getValue(), value) && Objects.equals(subHomeTreeNode.getValue(), value2)) {
+			log.info(homeTreeNode + "  " + subHomeTreeNode);
+			log.info(Arrays.toString(supers) + " " + Arrays.toString(subSupers));
+			log.info(Arrays.toString(components) + " " + Arrays.toString(subComponents));
+			// log.info(components[0].info() + " " + subComponents[0].info());
+		}
+	}
+
+	private static boolean areAllSupersReached(Generic[] supers, Generic[] subSupers) {
+		LOOP: for (Generic superGeneric : supers) {
+			for (Generic subSuper : subSupers) {
+				if (subSuper.inheritsFrom(superGeneric))
+					continue LOOP;
+			}
+			return false;// Warning
+		}
 		return true;
 	}
 
+	public static boolean isSuperOf_(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Generic subGeneric) {
+		boolean result = isSuperOf_(homeTreeNode, supers, components, ((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
+		return result;
+	}
+
 	private static boolean internalIsSuperOf3bis(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
-		if ("DefaultCarColor".equals(homeTreeNode.getValue()))
-			log.info("zz");
-		if (subHomeTreeNode.inheritsFrom(homeTreeNode)) {
+		if (subHomeTreeNode.inheritsFrom(homeTreeNode))
 			if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
 				return true;
-
-			// if (subHomeTreeNode.equals(homeTreeNode) && Statics.META == subHomeTreeNode.getMetaLevel())
-			// return true;
-			//
-			// if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel()) {
-			// LOOP: for (Generic superGeneric : supers) {
-			// for (Generic subSuper : subSupers)
-			// if (subSuper.inheritsFrom(superGeneric))
-			// continue LOOP;
-			// return false;
-			// }
-			// return true;
-			// }
-		}
-		// log.info("UUUUUUUUUUU" + Arrays.toString(subSupers));
-		for (Generic sub : subSupers) {
-			if ("DefaultCarColor".equals(homeTreeNode.getValue())) {
-				log.info("ZZZZZZ" + sub + " / " + homeTreeNode + " supers : " + Arrays.toString(supers) + " subSupers : " + sub);
-				log.info("ZZZZZZ" + sub + " / " + homeTreeNode + " components : " + Arrays.toString(components) + " subComponents : " + sub);
-			}
-			if (((GenericImpl) sub).inheritsFrom2(homeTreeNode, supers, components)) {
-				if ("DefaultCarColor".equals(homeTreeNode.getValue()))
-					log.info("RESULT" + sub + "  = True");
+		for (Generic sub : subSupers)
+			if (((GenericImpl) sub).inheritsFrom2(homeTreeNode, supers, components))
 				return true;
-			}
-		}
 		return false;
 	}
 
 	public boolean inheritsFrom2(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
-		if ("DefaultCarColor".equals(homeTreeNode.getValue()))
-			log.info("" + Arrays.toString(this.components) + " / " + Arrays.toString(components));
 		if (equiv(homeTreeNode, supers, components))
 			return true;
 		if (getEngine().equiv(homeTreeNode, supers, components))
@@ -1001,10 +1050,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic directSuper : this.supers)
 			if (((GenericImpl) directSuper).inheritsFrom2(homeTreeNode, supers, components))
 				return true;
-		if ("DefaultCarColor".equals(homeTreeNode.getValue()))
-			log.info("out");
 		return false;
 	}
+
+	// public boolean isSuperOf(Generic generic) {
+	// assert generic != null;
+	// if (equals(generic))
+	// return true;
+	// if (((GenericImpl) generic).isEngine())
+	// return isEngine();
+	// return isSuperOf(primaries, components, ((GenericImpl) generic).primaries, ((GenericImpl) generic).components);
+	// }
+
+	// public boolean isSuperOf(HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
+	// return subHomeTreeNode.inheritsFrom(homeTreeNode) && isSuperOf(primaries, components, subPrimaries, subComponents);
+	// }
 
 	// public static boolean isSuperOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
 	// if (primaries.length == subPrimaries.length && components.length == subComponents.length) {
@@ -1652,6 +1712,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getHomeTreeNode().equals(homeTreeNode) && Arrays.equals(this.supers, supers) && Arrays.equals(this.components, nullToSelfComponent(components));
 	}
 
+	public boolean equiv(HomeTreeNode homeTreeNode, Generic[] components) {
+		return getHomeTreeNode().equals(homeTreeNode) && Arrays.equals(this.components, nullToSelfComponent(components));
+	}
+
 	public <T extends Generic> T reBind() {
 		return getCurrentCache().reBind(this);
 	}
@@ -1839,9 +1903,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return null;
 		T result = iterator.next();
 		if (iterator.hasNext()) {
-			String message = "" + ((Generic) result).getComponents().get(0).info();
+			String message = "" + ((Generic) result).info();
 			while (iterator.hasNext())
-				message += " / " + ((Generic) iterator.next()).getComponents().get(0).info();
+				message += " / " + ((Generic) iterator.next()).info();
 			this.getCurrentCache().rollback(new AmbiguousSelectionException("Ambigous selection : " + message));
 		}
 		return result;

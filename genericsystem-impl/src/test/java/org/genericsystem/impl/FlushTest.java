@@ -139,6 +139,7 @@ public class FlushTest extends AbstractTest {
 		final Generic bmw = car.newInstance("Bmw");
 		Generic mercedes = car.newInstance("Mercedes");
 		mercedes.setLink(carColor, "ColorOfMercedes", grey);
+		mercedes.setLink(carColor, "DefaultCarColor", grey);
 		red.getLinks(carColor).get(0).log();
 		// red.getLinks(carColor).get(1).log();
 		assert red.getLinks(carColor).size() == 1;

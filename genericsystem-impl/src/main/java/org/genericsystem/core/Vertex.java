@@ -115,12 +115,14 @@ class Vertex {
 
 					@Override
 					public boolean isSelected(Generic candidate) {
-						// log.info("TTTTTTTTTT" + candidate + " " + homeTreeNode + " " + Arrays.toString(supers));
-						boolean result = ((GenericImpl) candidate).isSuperOf3(homeTreeNode, supers, components);
+						boolean result = ((GenericImpl) candidate).isSuperOf_(homeTreeNode, supers, components);
+						// if ("Power".equals(candidate.getValue()))
+						// log.info("XXXXXXXXX" + candidate.info() + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
+
 						if (result)
 							return true;
 						if (basePos != Statics.MULTIDIRECTIONAL)
-							if (((GenericImpl) meta).isSuperOf3(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components))
+							if (((GenericImpl) meta).isSuperOf_(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components))
 								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
 									if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), new Components(components, ((GenericImpl) candidate).components).toArray()))
 										return true;
@@ -161,7 +163,10 @@ class Vertex {
 				}) {
 					@Override
 					public boolean isSelected() {
-						return isAncestorOf(((GenericImpl) next)) || isExtention(next, isProperty, isSingular, basePos);
+						boolean result = isAncestorOf(((GenericImpl) next)) || isExtention(next, isProperty, isSingular, basePos);
+						// if ("Power".equals(next.getValue()))
+						// log.info("TTTTTTTTTT" + next + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
+						return result;
 					}
 				};
 			}
@@ -179,9 +184,12 @@ class Vertex {
 
 	private boolean isAncestorOf(final GenericImpl dependency) {
 		// boolean result = (GenericImpl.isSuperOf(primaries, components, dependency.primaries, dependency.components));
-		boolean result2 = (GenericImpl.isSuperOf3(homeTreeNode, supers, components, dependency));
+		boolean result = (GenericImpl.isSuperOf_(homeTreeNode, supers, components, dependency));
 		// assert result == result2 : "isSuperOf : " + result + " isSuperOf3 : " + result2 + " homeTreeNode : " + homeTreeNode + " " + supers[0].info() + dependency.info();
-		if (result2)
+		// if ("Power".equals(dependency.getValue()))
+		// log.info("UUUUUUUUUU" + dependency + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
+
+		if (result)
 			return true;
 		for (Generic component : dependency.components)
 			// if (!Arrays.equals(dependency.primaries, ((GenericImpl) component).primaries) || !Arrays.equals(dependency.components, ((GenericImpl) component).components))

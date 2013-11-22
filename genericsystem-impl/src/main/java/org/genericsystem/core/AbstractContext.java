@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -110,7 +109,7 @@ public abstract class AbstractContext implements Serializable {
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFindBySuper(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
 		for (Generic generic : components.length == 0 || components[0] == null ? supers[0].getInheritings() : components[0].getComposites())
-			if (((GenericImpl) generic).equiv(homeTreeNode, supers, components))
+			if (((GenericImpl) generic).equiv(homeTreeNode, components))// Warning
 				return (T) generic;
 		return null;
 	}

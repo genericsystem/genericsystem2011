@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -138,6 +137,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		vehicle.newInstance("myBus");
 
 		Attribute carRegistration = car.setAttribute("vehicleRegistration");
+		carRegistration.log();
 		Attribute vehicleRegistration = vehicle.setAttribute("vehicleRegistration");
 		carRegistration = ((GenericImpl) carRegistration).<Attribute> reFind();
 		carRegistration.enableSingularConstraint();

@@ -114,7 +114,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		final Type car = cache.addType("Car");
 		car.setAttribute("Power");
 		Generic power = cache.addType("Power");
-		assert car.getAttribute("Power").getSupers().get(1) == power : car.getAttribute("Power").getSupers().get(1);
+		assert car.getAttribute("Power").getSupers().contains(power);
 	}
 
 	// TODO: vhdjhvj

@@ -12,7 +12,6 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -185,7 +184,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-			break;
+		break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -200,11 +199,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, false, true);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-			break;
+		break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-			break;
+		break;
 		}
 	}
 
@@ -542,11 +541,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T dependencyBind(Generic meta, Vertex vertex, Class<?> specializationClass, int basePos, boolean existsException, boolean automatic) throws RollbackException {
+		// log.info("dependencyBind : " + vertex.getHomeTreeNode());
 		boolean isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		boolean isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		T result = vertex.muteAndFind(meta, isProperty, isSingular, basePos, existsException);
 		if (result != null)
 			return result;
+		// log.info("dependencyBind2 : " + Arrays.toString(vertex.getSupers()));
 		return buildAndInsertComplex(vertex.getHomeTreeNode(), ((GenericImpl) meta).specializeInstanceClass(specializationClass), vertex.getSupers(), vertex.getComponents(), automatic);
 	}
 

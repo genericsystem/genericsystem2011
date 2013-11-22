@@ -148,7 +148,7 @@ public class Statics {
 			log.info(message + " : " + (System.currentTimeMillis() - threadDebugged.get()));
 	}
 
-	private static class Flag implements Serializable {
+	static class Flag implements Serializable {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
