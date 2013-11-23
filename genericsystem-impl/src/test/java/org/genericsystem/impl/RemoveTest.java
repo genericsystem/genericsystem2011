@@ -149,7 +149,7 @@ public class RemoveTest extends AbstractTest {
 		final Generic bmw = car.newInstance("Bmw");
 		Generic mercedes = car.newInstance("Mercedes");
 		final Generic lada = car.newInstance("Lada");
-		mercedes.setLink(carColor, "ColorOfMercedes", grey);
+		mercedes.bind(carColor, grey);
 
 		red.getLink(carColor, lada).setValue(intensity, "60%");
 

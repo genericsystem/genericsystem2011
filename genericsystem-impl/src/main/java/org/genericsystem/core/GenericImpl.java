@@ -1,10 +1,8 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -27,7 +25,6 @@ import org.genericsystem.constraints.UniqueValueConstraintImpl;
 import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
-import org.genericsystem.core.Statics.Components;
 import org.genericsystem.exception.AmbiguousSelectionException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
@@ -765,21 +762,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final Generic[] components = (Generic[]) cartesianIterator.next();
-			final Generic[] newComponents = new Components(components, GenericImpl.this.components).toArray();
-			for (Generic component : newComponents)
+			// final Generic[] newComponents = new Components(components, GenericImpl.this.components).toArray();
+			for (Generic component : components)
 				assert component.isAlive();
 			// Generic projection = this.unambigousFirst(componentsFilter(((GenericImpl) getMeta()).allInheritingsIteratorWithoutRoot(), components));
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 				@Override
 				public boolean isSelected() {
-					// log.info(next.info() + "homeTreeNode : " + getHomeTreeNode() + " " + Arrays.toString(((GenericImpl) next).components) + Arrays.toString(newComponents));
-					return isSuperOf_(getHomeTreeNode(), new Generic[] { GenericImpl.this }, newComponents, next);
+					// log.info(next.info() + "homeTreeNode : " + ((GenericImpl) next).getHomeTreeNode() + " " + Arrays.toString(((GenericImpl) next).components) + Arrays.toString(components));
+					return isSuperOf_(((GenericImpl) getMeta()).bindInstanceNode(Statics.FLAG), new Generic[] { GenericImpl.this }, Statics.replace(pos, components, ((GenericImpl) next).getComponent(pos)), next);
 				}
 			});
 
 			if (projection == null) {
 				// assert false : this.getComponents() + Arrays.toString(newComponents);
-				getCurrentCache().bind(getMeta(), getHomeTreeNode(), new Generic[] { this }, newComponents, null, Statics.MULTIDIRECTIONAL, true, false);
+				getCurrentCache().bind(getMeta(), Statics.FLAG, new Generic[] { this }, components, null, Statics.MULTIDIRECTIONAL, true, false);
 			}
 		}
 	}
@@ -815,8 +812,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public boolean inheritsFrom(Generic generic) {
 		if (generic == null)
 			return false;
-		// if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
-		// return false;
+		if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
+			return false;
 		boolean inheritance = ((GenericImpl) generic).isSuperOf2(this);
 		// boolean inheritance3 = ((GenericImpl) generic).isSuperOf3(this);
 		// assert inheritance == inheritance3 : generic.info() + this.info() + " : " + inheritance + " != " + inheritance3;
@@ -1183,29 +1180,28 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
-		s += "toString    : " + this + "\n";
-		// s += "meta        : " + getMeta() + "\n";
-		s += "value       : " + getValue() + "\n";
-		s += "metaLevel   : " + getMetaLevel() + "\n";
+		s += " Name        : " + toString() + "\n";
+		s += " Meta        : " + getMeta() + " (" + System.identityHashCode(getMeta()) + ")\n";
+		s += " Category    : " + getCategoryString() + "\n";
 		s += "**********************************************************************\n";
-		s += "design date : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
-		s += "birth date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
-		s += "death date  : " + new SimpleDateFormat(Statics.PATTERN).format(new Date(getDeathTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
-		s += "**********************************************************************\n";
-		// for (HomeTreeNode primary : primaries)
-		// s += "primary     : " + primary + " (" + System.identityHashCode(primary) + ")\n";
-		for (Generic component : components)
-			s += "component   : " + component + " (" + System.identityHashCode(component) + ")\n";
 		for (Generic superGeneric : supers)
-			s += "super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
+			s += " Super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
+		for (Generic component : components)
+			s += " Component   : " + component + " (" + System.identityHashCode(component) + ")\n";
 		s += "**********************************************************************\n";
+
 		// for (Attribute attribute : getAttributes())
 		// if (!(attribute.getValue() instanceof Class) /* || !Constraint.class.isAssignableFrom((Class<?>) attribute.getValue()) */) {
-		// s += "attribute : " + attribute + "\n";
+		// s += ((GenericImpl) attribute).getCategoryString() + "   : " + attribute + " (" + System.identityHashCode(attribute) + ")\n";
 		// for (Holder holder : getHolders(attribute))
-		// s += "                          ----------> holder : " + holder + "\n";
+		// s += "                          ----------> " + ((GenericImpl) holder).getCategoryString() + " : " + holder + "\n";
 		// }
-		s += "**********************************************************************\n";
+		// s += "**********************************************************************\n";
+		// s += "design date : " + new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		// s += "birth date  : " + new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		// s += "death date  : " + new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(getDeathTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		// s += "**********************************************************************\n";
+
 		return s;
 	}
 

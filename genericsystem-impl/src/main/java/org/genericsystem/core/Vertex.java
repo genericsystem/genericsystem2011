@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import org.genericsystem.core.Statics.Components;
 import org.genericsystem.core.Statics.Supers;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
@@ -29,12 +28,12 @@ class Vertex {
 	private Generic[] components;
 	private Generic[] supers;
 
-	Vertex(CacheImpl cache, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] aliveNullComponents) {
+	Vertex(CacheImpl cache, HomeTreeNode homeTreeNode, Generic[] aliveSupers, Generic[] aliveNullComponents) {
 		this.cache = cache;
 		this.homeTreeNode = homeTreeNode;
 		// primaries = new Primaries(homeTreeNode, supers).toArray();
 		components = aliveNullComponents;
-		this.supers = supers;
+		supers = aliveSupers;
 	}
 
 	HomeTreeNode getHomeTreeNode() {
@@ -64,7 +63,7 @@ class Vertex {
 		// log.info("ZZZZZZZZZZ" + Arrays.toString(supers) + Arrays.toString(components));
 		for (Generic directSuper : supers) {
 			// primaries = new Primaries(directSuper, primaries).toArray();
-			components = new Components(components, ((GenericImpl) directSuper).components).toArray();
+			// components = new Components(components, ((GenericImpl) directSuper).components).toArray();
 		}
 	}
 
@@ -124,7 +123,7 @@ class Vertex {
 						if (basePos != Statics.MULTIDIRECTIONAL)
 							if (((GenericImpl) meta).isSuperOf_(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components))
 								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
-									if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), new Components(components, ((GenericImpl) candidate).components).toArray()))
+									if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), components/* new Components(components, ((GenericImpl) candidate).components).toArray() */))
 										return true;
 									if (isExtentedBy(candidate, isProperty, isSingular, basePos))
 										return true;

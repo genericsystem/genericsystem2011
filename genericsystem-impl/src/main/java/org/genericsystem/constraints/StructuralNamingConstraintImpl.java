@@ -39,9 +39,8 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
 		if (!constraintBase.isStructural() && constraintBase.getComponentsSize() == 0)
 			return;
-		Generic[] components = ((GenericImpl) constraintBase).getComponentsArray();
 		for (int i = 0; i < constraintBase.getComponentsSize(); i++)
-			for (Generic inherited : ((GenericImpl) components[i]).getAllInheritings()) {
+			for (Generic inherited : ((GenericImpl) ((GenericImpl) constraintBase).getComponent(i)).getAllInheritings()) {
 				Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL), constraintBase.getValue());
 				if (iterator.hasNext()) {
 					iterator.next();
