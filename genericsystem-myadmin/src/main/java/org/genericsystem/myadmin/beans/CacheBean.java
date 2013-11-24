@@ -3,13 +3,11 @@ package org.genericsystem.myadmin.beans;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.enterprise.event.Observes;
 import javax.faces.bean.RequestScoped;
 import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
@@ -30,8 +28,10 @@ public class CacheBean implements Serializable {
 
 	private static final long serialVersionUID = 1752488068961882618L;
 
-	@Inject private GsMessages messages;
-	@Inject private transient CacheProvider cacheProvider;
+	@Inject
+	private GsMessages messages;
+	@Inject
+	private transient CacheProvider cacheProvider;
 
 	/**
 	 * Creates new super cache.
@@ -78,7 +78,7 @@ public class CacheBean implements Serializable {
 	 * @return the formated timestamp of current cache.
 	 */
 	public String getCurrentCacheTs() {
-		return new SimpleDateFormat(Statics.INT_TS_PATTERN).format(new Date(((CacheImpl) cacheProvider.getCurrentCache()).getTs() / Statics.MILLI_TO_NANOSECONDS)).toString();
+		return new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(((CacheImpl) cacheProvider.getCurrentCache()).getTs() / Statics.MILLI_TO_NANOSECONDS)).toString();
 	}
 
 	public Cache getCache() {
@@ -92,7 +92,8 @@ public class CacheBean implements Serializable {
 	/**
 	 * Reset the timestamp of current transaction before the phase of RENDER_RESPONSE.
 	 * 
-	 * @param phaseEvent - event of JSF phase.
+	 * @param phaseEvent
+	 *            - event of JSF phase.
 	 * @throws ConstraintViolationException
 	 */
 	public void resetTransactionTs(@Observes @After @InvokeApplication PhaseEvent phaseEvent) throws ConstraintViolationException {
