@@ -1708,6 +1708,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getHomeTreeNode().equals(homeTreeNode) && Arrays.equals(this.supers, supers) && Arrays.equals(this.components, nullToSelfComponent(components));
 	}
 
+	// TODO KK : Remove this method
 	public boolean equiv(HomeTreeNode homeTreeNode, Generic[] components) {
 		return getHomeTreeNode().equals(homeTreeNode) && Arrays.equals(this.components, nullToSelfComponent(components));
 	}

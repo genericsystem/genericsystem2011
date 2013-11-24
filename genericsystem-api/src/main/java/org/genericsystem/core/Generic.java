@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -562,24 +561,24 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> T setValue(Holder attribute, Serializable value);
 
 	/**
-	 * Returns true if this generic directly or indirectly inherits from meta.
+	 * Returns true if this directly or indirectly inherits from generic.
 	 * 
-	 * @param meta
-	 *            supposed meta generic which this generic inherits from.
+	 * @param generics
+	 *            supposed generic which this generic inherits from.
 	 * 
 	 * @return true if this generic inherits from meta.
 	 */
-	boolean inheritsFrom(Generic meta);
+	boolean inheritsFrom(Generic generic);
 
 	/**
-	 * Returns true if this generic directly or indirectly inherits from all supplied in parameters meta generics.
+	 * Returns true if this directly or indirectly inherits from all supplied in parameters generics.
 	 * 
-	 * @param metas
-	 *            array of meta generics to test.
+	 * @param generics
+	 *            array of generics to test.
 	 * 
-	 * @return true if this generic inherits from all the given meta generics.
+	 * @return true if this generic inherits from all the given generics.
 	 */
-	boolean inheritsFromAll(Generic... metas);
+	boolean inheritsFromAll(Generic... generics);
 
 	/**
 	 * Removes this generic from engine.

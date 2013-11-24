@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
@@ -19,6 +21,7 @@ import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.ReferentialIntegrityConstraintViolationException;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.map.AxedPropertyClass;
@@ -95,37 +98,26 @@ public abstract class AbstractContext implements Serializable {
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isEngine() || generic.isAlive())
 			return (T) generic;
+		// TODO KK : we have to call GenericBuilder.find() here
 		return fastFindBySuper(((GenericImpl) generic).homeTreeNode, reFind(((GenericImpl) generic).supers), reFind(((GenericImpl) generic).components));
 	}
 
 	private Generic[] reFind(Generic... generics) {
-		Generic[] reBind = new Generic[generics.length];
+		Generic[] reFounds = new Generic[generics.length];
 		for (int i = 0; i < generics.length; i++)
-			reBind[i] = reFind(generics[i]);
-		return reBind;
+			reFounds[i] = reFind(generics[i]);
+		// TODO KK : if refind is null => exit caller method with null
+		return reFounds;
 	}
 
+	// TODO KK : Remove this method
 	@SuppressWarnings("unchecked")
 	<T extends Generic> T fastFindBySuper(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
 		for (Generic generic : components.length == 0 || components[0] == null ? supers[0].getInheritings() : components[0].getComposites())
-			if (((GenericImpl) generic).equiv(homeTreeNode, components))// Warning
+			if (((GenericImpl) generic).equiv(homeTreeNode, components))// // TODO KK : Remove this method
 				return (T) generic;
 		return null;
 	}
-
-	// <T extends Generic> T fastFindPhantom(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
-	// HomeTreeNode phantomHomeNode = homeTreeNode.metaNode.findInstanceNode(null);
-	// return phantomHomeNode != null ? this.<T> fastFindByComponents(phantomHomeNode, new Primaries(Statics.insertFirst(phantomHomeNode, primaries)).toArray(), components) : null;
-	// }
-
-	// @SuppressWarnings("unchecked")
-	// <T extends Generic> T fastFindByComponents(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
-	// for (Generic generic : components[components.length - 1].getComposites())
-	// if (((GenericImpl) generic).equiv(homeTreeNode, primaries, components))
-	// return (T) generic;
-	// return null;
-	//
-	// }
 
 	<T extends Generic> NavigableSet<T> orderDependenciesForRemove(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
 		return new TreeSet<T>() {
@@ -159,22 +151,59 @@ public abstract class AbstractContext implements Serializable {
 		};
 	}
 
-	<T extends Generic> NavigableSet<T> orderDependencies(final Generic generic) {
-		return new TreeSet<T>() {
+	NavigableSet<Generic> orderDependencies(final Generic generic) {
+		return new TreeSet<Generic>() {
 			private static final long serialVersionUID = 1053909994506452123L;
 			{
 				if (generic.isAlive())
 					addDependencies(generic);
 			}
 
-			@SuppressWarnings("unchecked")
-			public void addDependencies(Generic g) {
-				if (super.add((T) g)) {// protect from loop
-					for (T inheritingDependency : g.<T> getInheritings())
+			public void addDependencies(Generic dependency) {
+				if (super.add(dependency)) {// protect from loop
+					for (Generic inheritingDependency : dependency.<Generic> getInheritings())
 						addDependencies(inheritingDependency);
-					for (T compositeDependency : g.<T> getComposites())
+					for (Generic compositeDependency : dependency.<Generic> getComposites())
 						addDependencies(compositeDependency);
 				}
+			}
+		};
+	}
+
+	NavigableMap<Generic, Integer> orderDependencyMap(final Generic generic, final int basePos) {
+		return new TreeMap<Generic, Integer>() {
+			private static final long serialVersionUID = 1053909994506452123L;
+			{
+				if (generic.isAlive())
+					addDependencies(generic, basePos);
+			}
+
+			public void addDependencies(Generic generic, int basePos) {
+				if (!super.containsKey(generic)) {// protect from loop
+					put(generic, basePos);
+					for (Generic inheriting : generic.getInheritings())
+						addDependencies(inheriting, getInheritingPosition(inheriting, generic, basePos));
+					for (Generic composite : generic.getComposites())
+						addDependencies(composite, getCompositePosition(generic, (Holder) composite));
+				}
+			}
+
+			private int getInheritingPosition(Generic inheriting, Generic generic, int basePos) {
+				if (Statics.MULTIDIRECTIONAL == basePos)
+					return basePos;
+				if (inheriting.getComponentsSize() == ((GenericImpl) generic).components.length)
+					return basePos;
+				for (int i = basePos; i < inheriting.getComponentsSize(); i++)
+					if (generic.inheritsFrom(((Holder) inheriting).getComponent(i)))
+						return i;
+				return Statics.MULTIDIRECTIONAL;
+			}
+
+			private int getCompositePosition(Generic generic, Holder composite) {
+				for (int i = 0; i < composite.getComponentsSize(); i++)
+					if (generic.equals(composite.getComponent(i)))
+						return i;
+				throw new IllegalStateException();
 			}
 		};
 	}

@@ -8,10 +8,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -150,16 +150,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	private <T extends Generic> NavigableSet<T> orderAndRemoveDependencies(final T old) {
-		try {
-			NavigableSet<T> orderedGenerics = orderDependencies(old);
-			for (T generic : orderedGenerics.descendingSet())
-				removeGeneric(generic);
-			return orderedGenerics;
-		} catch (ConstraintViolationException e) {
-			rollback(e);
-			return null;
-		}
+	private NavigableSet<Generic> orderAndRemoveDependencies(final Generic old) {
+		NavigableSet<Generic> orderedGenerics = orderDependencies(old);
+		for (Generic dependency : orderedGenerics.descendingSet())
+			simpleRemove(dependency);
+		return orderedGenerics;
 	}
 
 	void remove(final Generic generic, final RemoveStrategy removeStrategy) throws RollbackException {
@@ -195,53 +190,63 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T setValue(final Generic old, final Serializable value) {
 		return new Restructurator() {
+			private static final long serialVersionUID = -8740556842703459056L;
+
 			@Override
 			Generic rebuild() {
 				Generic meta = old.getMeta();
 				HomeTreeNode homeTreeNode = ((GenericImpl) meta).bindInstanceNode(value);
-				return dependencyBind(meta, homeTreeNode, ((GenericImpl) old).supers, ((GenericImpl) old).selfToNullComponents(), old.getClass(), Statics.MULTIDIRECTIONAL, false, isAutomatic(old));
+				return bindDependency(meta, homeTreeNode, ((GenericImpl) old).supers, ((GenericImpl) old).selfToNullComponents(), old.getClass(), Statics.MULTIDIRECTIONAL, false, isAutomatic(old));
 			}
-		}.rebuildAll(old);
+		}.rebuildAll(old, Statics.MULTIDIRECTIONAL);
 	}
 
 	<T extends Generic> T addComponent(final Generic old, final Generic newComponent, final int pos) {
 		return new Restructurator() {
+			private static final long serialVersionUID = 8721991478541508274L;
+
 			@Override
 			Generic rebuild() {
-				return dependencyBind(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.getClass(), Statics.MULTIDIRECTIONAL,
+				return bindDependency(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.insertIntoArray(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.getClass(), Statics.MULTIDIRECTIONAL,
 						false, isAutomatic(old));
 			}
-		}.rebuildAll(old);
+		}.rebuildAll(old, Statics.MULTIDIRECTIONAL);
 	}
 
 	<T extends Generic> T removeComponent(final Generic old, final int pos) {
 		return new Restructurator() {
+			private static final long serialVersionUID = 56550167779119933L;
+
 			@Override
 			Generic rebuild() {
-				return dependencyBind(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.getClass(), Statics.MULTIDIRECTIONAL, false, isAutomatic(old));
+				return bindDependency(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers, Statics.truncate(pos, ((GenericImpl) old).selfToNullComponents()), old.getClass(), Statics.MULTIDIRECTIONAL, false, isAutomatic(old));
 			}
-		}.rebuildAll(old);
+		}.rebuildAll(old, Statics.MULTIDIRECTIONAL);
 	}
 
 	<T extends Generic> T addSuper(final Generic old, final Generic newSuper) {
 		return new Restructurator() {
+			private static final long serialVersionUID = -8032263893165253991L;
+
 			@Override
 			Generic rebuild() {
-				return dependencyBind(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), Statics.MULTIDIRECTIONAL, true,
+				return bindDependency(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), Statics.insertLastIntoArray(newSuper, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), Statics.MULTIDIRECTIONAL, true,
 						isAutomatic(old));
 			}
-		}.rebuildAll(old);
+		}.rebuildAll(old, Statics.MULTIDIRECTIONAL);
 	}
 
 	<T extends Generic> T removeSuper(final Generic old, final int pos) {
 		if (pos == 0 && ((GenericImpl) old).supers.length == 1)
 			rollback(new UnsupportedOperationException());
 		return new Restructurator() {
+			private static final long serialVersionUID = -1477153574889495455L;
+
 			@Override
 			Generic rebuild() {
-				return dependencyBind(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), Statics.MULTIDIRECTIONAL, true, isAutomatic(old));
+				return bindDependency(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), Statics.truncate(pos, ((GenericImpl) old).supers), ((GenericImpl) old).selfToNullComponents(), old.getClass(), Statics.MULTIDIRECTIONAL, true, isAutomatic(old));
 			}
-		}.rebuildAll(old);
+		}.rebuildAll(old, Statics.MULTIDIRECTIONAL);
 	}
 
 	public <T extends Generic> T reBind(Generic generic) {
@@ -457,59 +462,50 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return internalBind(meta, homeTreeNode, supers, components, specializationClass, basePos, existsException, automatic);
 	}
 
-	private abstract class Restructurator extends HashMap<Generic, Generic> {
+	abstract class Restructurator extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 946034598495324341L;
 
 		@SuppressWarnings("unchecked")
-		<T extends Generic> T rebuildAll(Generic old) {
-			NavigableSet<Generic> dependencies = orderAndRemoveDependencies(old);
-			dependencies.remove(old);
+		<T extends Generic> T rebuildAll(Generic old, int basePos) {
+			NavigableMap<Generic, Integer> dependenciesMap = orderDependencyMap(old, basePos);
+			for (Generic dependency : dependenciesMap.descendingMap().keySet())
+				simpleRemove(dependency);
+			dependenciesMap.remove(old);
 			put(old, rebuild());
-			return (T) reBind(dependencies).get(old);
+			return (T) reBind(dependenciesMap).get(old);
 		}
 
 		@SuppressWarnings("unchecked")
 		<T extends Generic> T rebuildAll(Set<Generic> directDependencies, int basePos) {
-			NavigableSet<Generic> allDependencies = new AllDependencies(directDependencies);
-			for (Generic dependency : allDependencies.descendingSet())
+			NavigableMap<Generic, Integer> dependenciesMap = new AllDependencies(directDependencies, basePos);
+			for (Generic dependency : dependenciesMap.descendingMap().keySet())
 				simpleRemove(dependency);
-			return (T) reBind(rebuild(), directDependencies, allDependencies, basePos);
+			return (T) reBind(rebuild(), dependenciesMap, basePos);
 		}
 
-		private Generic reBind(Generic bind, Set<Generic> directDependencies, NavigableSet<Generic> allDependencies, int basePos) {
-			for (Generic dependency : allDependencies)
-				if (Statics.MULTIDIRECTIONAL == basePos || !((GenericImpl) bind).getComponent(basePos).equals(((Holder) dependency).getComponent(basePos)))
-					if (directDependencies.contains(dependency))
-						reBindDependency(bind, dependency, basePos);
-					else
-						reBindDependency(dependency);
+		private Generic reBind(Generic bind, NavigableMap<Generic, Integer> dependenciesMap, int basePos) {
+			for (Entry<Generic, Integer> dependencyEntry : dependenciesMap.entrySet())
+				if (Statics.MULTIDIRECTIONAL == basePos || !((GenericImpl) bind).getComponent(basePos).equals(((Holder) dependencyEntry.getKey()).getComponent(basePos)))
+					reBindDependency(dependencyEntry.getKey(), dependencyEntry.getValue());
 				else
 					// dependency is an update of bind
-					put(dependency, bind);
+					put(dependencyEntry.getKey(), bind);
 			return bind;
 		}
 
-		private void reBindDependency(Generic bind, Generic dependency, int basePos) {
+		private void reBindDependency(Generic dependency, int basePos) {
 			HomeTreeNode newHomeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
 			Generic[] supers = adjust(((GenericImpl) dependency).supers);
 			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
 			Generic meta = adjust(((GenericImpl) dependency).getMeta())[0];
-			put(dependency, dependencyBind(meta, newHomeTreeNode, supers, components, dependency.getClass(), basePos, false, isAutomatic(dependency)));
-		}
-
-		private Restructurator reBind(Set<Generic> orderedDependencies) {
-			for (Generic dependency : orderedDependencies)
-				reBindDependency(dependency);
-			return this;
-		}
-
-		private void reBindDependency(Generic dependency) {
-			Generic meta = adjust(((GenericImpl) dependency).getMeta())[0];
-			HomeTreeNode homeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
-			Generic[] supers = adjust(((GenericImpl) dependency).supers);
-			Generic[] components = adjust(((GenericImpl) dependency).selfToNullComponents());
 			// should we rebind automatic dependencies ?
-			put(dependency, dependencyBind(meta, homeTreeNode, supers, components, dependency.getClass(), Statics.MULTIDIRECTIONAL, false, isAutomatic(dependency)));
+			put(dependency, bindDependency(meta, newHomeTreeNode, supers, components, dependency.getClass(), basePos, false, isAutomatic(dependency)));
+		}
+
+		private Restructurator reBind(Map<Generic, Integer> orderedDependenciesMap) {
+			for (Entry<Generic, Integer> dependencyEntry : orderedDependenciesMap.entrySet())
+				reBindDependency(dependencyEntry.getKey(), dependencyEntry.getValue());
+			return this;
 		}
 
 		private Generic[] adjust(Generic... oldComponents) {
@@ -523,38 +519,23 @@ public class CacheImpl extends AbstractContext implements Cache {
 			return newComponents;
 		}
 
+		<T extends Generic> T bindDependency(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean existsException, boolean automatic) throws RollbackException {
+			return new GenericBuilder(CacheImpl.this, meta, homeTreeNode, supers, components, basePos).bindDependency(specializationClass, existsException, automatic);
+		}
+
 		abstract Generic rebuild();
 	}
 
-	<T extends Generic> T dependencyBind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean existsException, boolean automatic) throws RollbackException {
-		GenericBuilder builder = new GenericBuilder(this, meta, homeTreeNode, supers, components, basePos);
-		T result = builder.find(existsException);
-		if (result != null)
-			return result;
-		return insert(builder.build(specializationClass), automatic);
-	}
-
 	<T extends Generic> T internalBind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, final Class<?> specializationClass, int basePos, boolean existsException, final boolean automatic) throws RollbackException {
-		final GenericBuilder builder = new GenericBuilder(this, meta, homeTreeNode, supers, components, basePos);
-		T result = builder.find(existsException);
-		if (result != null)
-			return result;
-		return new Restructurator() {
-			private static final long serialVersionUID = 1370210509322258062L;
-
-			@Override
-			Generic rebuild() {
-				return insert(builder.build(specializationClass), automatic);
-			}
-		}.rebuildAll(builder.getDirectDependencies(), basePos);
+		return new GenericBuilder(this, meta, homeTreeNode, supers, components, basePos).internalBind(specializationClass, basePos, existsException, automatic);
 	}
 
-	private class AllDependencies extends TreeSet<Generic> {
+	private class AllDependencies extends TreeMap<Generic, Integer> {
 		private static final long serialVersionUID = -1925554375663814593L;
 
-		private AllDependencies(Set<Generic> directDependencies) {
+		private AllDependencies(Set<Generic> directDependencies, int basePos) {
 			for (Generic dependency : directDependencies)
-				addAll(orderDependencies(dependency));
+				putAll(orderDependencyMap(dependency, basePos));
 		}
 	}
 

@@ -55,8 +55,29 @@ class GenericBuilder {
 		return null;
 	}
 
-	<T extends Generic> T build(Class<?> specializationClass) {
-		return cache.<EngineImpl> getEngine().buildComplex(homeTreeNode, ((GenericImpl) meta).specializeInstanceClass(specializationClass), supers, components);
+	<T extends Generic> T bindDependency(Class<?> specializationClass, boolean existsException, boolean automatic) throws RollbackException {
+		T result = find(existsException);
+		if (result != null)
+			return result;
+		return buildDependency(specializationClass, automatic);
+	}
+
+	private <T extends Generic> T buildDependency(Class<?> specializationClass, boolean automatic) {
+		return cache.<T> insert(cache.<EngineImpl> getEngine().buildComplex(homeTreeNode, ((GenericImpl) meta).specializeInstanceClass(specializationClass), supers, components), automatic);
+	}
+
+	<T extends Generic> T internalBind(final Class<?> specializationClass, int basePos, boolean existsException, final boolean automatic) throws RollbackException {
+		T result = find(existsException);
+		if (result != null)
+			return result;
+		return cache.new Restructurator() {
+			private static final long serialVersionUID = 1370210509322258062L;
+
+			@Override
+			Generic rebuild() {
+				return GenericBuilder.this.buildDependency(specializationClass, automatic);
+			}
+		}.rebuildAll(getDirectDependencies(), basePos);
 	}
 
 	private boolean isExtentedBy(Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
