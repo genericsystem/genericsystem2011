@@ -38,7 +38,6 @@ public abstract class AbstractContext implements Serializable {
 	abstract <T extends Engine> T getEngine();
 
 	<T extends Generic> T plug(T generic) {
-		// TODO on gère pas les automatiques quand nous sommes dans la transaction
 		Set<Generic> componentSet = new HashSet<>();
 		for (Generic component : ((GenericImpl) generic).components)
 			if (componentSet.add(component))
@@ -253,9 +252,9 @@ public abstract class AbstractContext implements Serializable {
 		addAll(adds);
 	}
 
-	void addAll(Iterable<Generic> generics) {
+	final void addAll(Iterable<Generic> generics) {
 		for (Generic generic : generics)
-			simpleAdd(generic, false);
+			simpleAdd(generic);
 	}
 
 	void removeAll(Iterable<Generic> generics) {
@@ -263,7 +262,7 @@ public abstract class AbstractContext implements Serializable {
 			simpleRemove(generic);
 	}
 
-	void simpleAdd(Generic generic, boolean automatic) {
+	void simpleAdd(Generic generic) {
 		plug(generic);
 	}
 

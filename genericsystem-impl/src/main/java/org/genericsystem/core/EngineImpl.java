@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.Statics.AnonymousReference;
@@ -206,12 +207,18 @@ public class EngineImpl extends GenericImpl implements Engine {
 				return systemProperty;
 			if (!startupTime)
 				throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
-			CacheImpl cache = getCurrentCache();
 			T result = getCurrentCache().<T> bind(clazz);
 			put(clazz, result);
 			((GenericImpl) result).mountConstraints(clazz);
-			cache.triggersDependencies(clazz);
+			triggersDependencies(clazz);
 			return result;
+		}
+
+		private void triggersDependencies(Class<?> clazz) {
+			Dependencies dependenciesClass = clazz.getAnnotation(Dependencies.class);
+			if (dependenciesClass != null)
+				for (Class<?> dependencyClass : dependenciesClass.value())
+					get(dependencyClass);
 		}
 	}
 

@@ -19,56 +19,33 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * 
  */
-class Vertex {
-	protected static Logger log = LoggerFactory.getLogger(Vertex.class);
+class GenericBuilder {
+	protected static Logger log = LoggerFactory.getLogger(GenericBuilder.class);
 
 	private final CacheImpl cache;
 	private HomeTreeNode homeTreeNode;
 	// private HomeTreeNode[] primaries;
 	private Generic[] components;
 	private Generic[] supers;
+	private Generic meta;
+	boolean isSingular;
+	boolean isProperty;
+	int basePos;
 
-	Vertex(CacheImpl cache, HomeTreeNode homeTreeNode, Generic[] aliveSupers, Generic[] aliveNullComponents) {
+	GenericBuilder(CacheImpl cache, Generic meta, HomeTreeNode homeTreeNode, Generic[] aliveSupers, Generic[] aliveNullComponents, int basePos) {
 		this.cache = cache;
+		this.meta = meta;
 		this.homeTreeNode = homeTreeNode;
-		// primaries = new Primaries(homeTreeNode, supers).toArray();
-		components = aliveNullComponents;
 		supers = aliveSupers;
-	}
-
-	HomeTreeNode getHomeTreeNode() {
-		return homeTreeNode;
-	}
-
-	// HomeTreeNode[] getPrimaries() {
-	// return primaries;
-	// }
-
-	Generic[] getComponents() {
-		return components;
-	}
-
-	Generic[] getSupers() {
-		return supers;
-	}
-
-	public <T extends Generic> T muteAndFind(Generic meta, boolean isProperty, boolean isSingular, int basePos, boolean existsException) {
-		computeSupersAndMute(meta, isProperty, isSingular, basePos);
-		return findInSupers(existsException);
-	}
-
-	void computeSupersAndMute(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
-		// log.info("YYYYYYYYYY" + Arrays.toString(supers) + Arrays.toString(components));
+		components = aliveNullComponents;
+		this.basePos = basePos;
+		isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
+		isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		supers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos);
-		// log.info("ZZZZZZZZZZ" + Arrays.toString(supers) + Arrays.toString(components));
-		for (Generic directSuper : supers) {
-			// primaries = new Primaries(directSuper, primaries).toArray();
-			// components = new Components(components, ((GenericImpl) directSuper).components).toArray();
-		}
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	private <T extends Generic> T findInSupers(boolean existsException) throws RollbackException {
+	<T extends Generic> T find(boolean existsException) throws RollbackException {
 		if (supers.length == 1)
 			if (((GenericImpl) supers[0]).equiv(homeTreeNode, ((GenericImpl) supers[0]).supers, components))
 				if (existsException)
@@ -76,21 +53,10 @@ class Vertex {
 				else
 					return (T) supers[0];
 		return null;
+	}
 
-		// for (Generic directSuper : supers) {
-		// if (((GenericImpl) directSuper).equiv(primaries, components))
-		// if (supers.length == 1 && homeTreeNode.equals(((GenericImpl) directSuper).homeTreeNode))
-		// if (existsException)
-		// cache.rollback(new ExistsException(directSuper + " already exists !"));
-		// else {
-		// assert ((GenericImpl) directSuper).equiv(homeTreeNode, supers, components) : directSuper.info() + Arrays.toString(supers);
-		// return (T) directSuper;
-		// }
-		// else {
-		// cache.rollback(new FunctionalConsistencyViolationException("Found generic has not correct value : " + homeTreeNode + directSuper.info() + " " + Arrays.toString(supers)));
-		// }
-		// }
-		// return null;
+	<T extends Generic> T build(Class<?> specializationClass) {
+		return cache.<EngineImpl> getEngine().buildComplex(homeTreeNode, ((GenericImpl) meta).specializeInstanceClass(specializationClass), supers, components);
 	}
 
 	private boolean isExtentedBy(Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
@@ -142,7 +108,7 @@ class Vertex {
 		}.toSortedArray();
 	}
 
-	Set<Generic> getDirectDependencies(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
+	Set<Generic> getDirectDependencies() {
 		return new HashCache<Generic>() {
 
 			private static final long serialVersionUID = 2372630315599176801L;
@@ -208,4 +174,5 @@ class Vertex {
 
 		public abstract Iterator<T> cacheSupplier();
 	}
+
 }
