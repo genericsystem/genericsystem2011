@@ -465,27 +465,24 @@ public class CacheImpl extends AbstractContext implements Cache {
 	abstract class Restructurator extends HashMap<Generic, Generic> {
 		private static final long serialVersionUID = 946034598495324341L;
 
-		@SuppressWarnings("unchecked")
 		<T extends Generic> T rebuildAll(Generic old, int basePos) {
 			NavigableMap<Generic, Integer> dependenciesMap = orderDependencyMap(old, basePos);
-			removeAll(dependenciesMap);
-			Generic bind = rebuild();
-			dependenciesMap.remove(old);
-			put(old, bind);
-			reBind(dependenciesMap);
-			return (T) bind;
+			return rebuildAll(old, dependenciesMap);
+		}
+
+		<T extends Generic> T rebuildAll(Generic old, Set<Generic> directDependencies, int basePos) {
+			NavigableMap<Generic, Integer> dependenciesMap = new AllDependencies(directDependencies, basePos);
+			return rebuildAll(old, dependenciesMap);
 		}
 
 		@SuppressWarnings("unchecked")
-		<T extends Generic> T rebuildAll(Set<Generic> directDependencies, int basePos) {
-			NavigableMap<Generic, Integer> dependenciesMap = new AllDependencies(directDependencies, basePos);
+		<T extends Generic> T rebuildAll(Generic old, NavigableMap<Generic, Integer> dependenciesMap) {
 			removeAll(dependenciesMap);
 			Generic bind = rebuild();
-			for (Generic dependency : directDependencies)
-				if (Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) bind).getComponent(basePos).equals((((GenericImpl) dependency).getComponent(basePos)))) {
-					put(dependency, bind);
-					dependenciesMap.remove(dependency);
-				}
+			if (old != null) {
+				dependenciesMap.remove(old);
+				put(old, bind);
+			}
 			reBind(dependenciesMap);
 			return (T) bind;
 		}
