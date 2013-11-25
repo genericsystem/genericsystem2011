@@ -316,10 +316,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().bind(meta, value, specializationClass, directSuper, existsException, basePos, Statics.insertIntoArray(this, targets, basePos));
 	}
 
-	// public <T extends Holder> T find(HomeTreeNode homeTreeNode, Holder directSuper, int basePos, Generic... targets) {
-	// return getCurrentCache().fastFindBySuper(homeTreeNode, new Primaries(homeTreeNode, directSuper).toArray(), directSuper, Statics.insertIntoArray(this, targets, basePos));
-	// }
-
 	@Override
 	public void cancelAll(Holder attribute, Generic... targets) {
 		cancelAll(attribute, getBasePos(attribute), targets);
@@ -1549,16 +1545,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (T) this;
 	}
 
-	// @Override
-	// public <T extends Generic> T disableSizeConstraint(int basePos) {
-	// setConstraintValue(SizeConstraintImpl.class, basePos, Statics.MULTIDIRECTIONAL);
-	// return (T) this;
-	// }
 	@Override
 	public <T extends Generic> T disableSizeConstraint(int basePos) {
-		// TODO different des autres
 		setConstraintValue(SizeConstraintImpl.class, basePos, false);
-		// getConstraintsMap().getValueHolder(new AxedPropertyClass(SizeConstraintImpl.class, basePos)).remove();
 		return (T) this;
 	}
 
@@ -1696,21 +1685,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return result;
 	}
 
-	// public boolean equiv(HomeTreeNode homeTreeNode, HomeTreeNode[] primaries, Generic[] components) {
-	// return this.homeTreeNode.equals(homeTreeNode) && Arrays.equals(this.primaries, primaries) && Arrays.equals(this.components, nullToSelfComponent(components));
-	// }
-	//
-	// public boolean equiv(HomeTreeNode[] primaries, Generic[] components) {
-	// return Arrays.equals(this.primaries, primaries) && Arrays.equals(this.components, nullToSelfComponent(components));
-	// }
-
 	public boolean equiv(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
 		return getHomeTreeNode().equals(homeTreeNode) && Arrays.equals(this.supers, supers) && Arrays.equals(this.components, nullToSelfComponent(components));
-	}
-
-	// TODO KK : Remove this method
-	public boolean equiv(HomeTreeNode homeTreeNode, Generic[] components) {
-		return getHomeTreeNode().equals(homeTreeNode) && Arrays.equals(this.components, nullToSelfComponent(components));
 	}
 
 	public <T extends Generic> T reBind() {

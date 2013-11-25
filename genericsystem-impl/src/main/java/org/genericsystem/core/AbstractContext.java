@@ -94,31 +94,6 @@ public abstract class AbstractContext implements Serializable {
 
 	public abstract boolean isAutomatic(Generic generic);
 
-	@SuppressWarnings("unchecked")
-	public <T extends Generic> T reFind(Generic generic) {
-		if (generic.isEngine() || generic.isAlive())
-			return (T) generic;
-		// TODO KK : we have to call GenericBuilder.find() here
-		return fastFindBySuper(((GenericImpl) generic).homeTreeNode, reFind(((GenericImpl) generic).supers), reFind(((GenericImpl) generic).components));
-	}
-
-	private Generic[] reFind(Generic... generics) {
-		Generic[] reFounds = new Generic[generics.length];
-		for (int i = 0; i < generics.length; i++)
-			reFounds[i] = reFind(generics[i]);
-		// TODO KK : if refind is null => exit caller method with null
-		return reFounds;
-	}
-
-	// TODO KK : Remove this method
-	@SuppressWarnings("unchecked")
-	<T extends Generic> T fastFindBySuper(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
-		for (Generic generic : components.length == 0 || components[0] == null ? supers[0].getInheritings() : components[0].getComposites())
-			if (((GenericImpl) generic).equiv(homeTreeNode, components))// // TODO KK : Remove this method
-				return (T) generic;
-		return null;
-	}
-
 	<T extends Generic> NavigableSet<T> orderDependenciesForRemove(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
 		return new TreeSet<T>() {
 			private static final long serialVersionUID = -6526972335865898198L;
@@ -130,8 +105,7 @@ public abstract class AbstractContext implements Serializable {
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
 					for (T inheritingDependency : generic.<T> getInheritings())
-						// TODO clean
-						if (/* ((GenericImpl) inheritingDependency).isPhantom() || */((GenericImpl) inheritingDependency).isAutomatic())
+						if (((GenericImpl) inheritingDependency).isAutomatic())
 							addDependencies(inheritingDependency);
 						else if (!contains(inheritingDependency))
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);

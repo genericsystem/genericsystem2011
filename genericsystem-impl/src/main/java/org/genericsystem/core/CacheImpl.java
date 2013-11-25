@@ -755,4 +755,20 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public int getLevel() {
 		return subContext.getLevel() + 1;
 	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Generic> T reFind(Generic generic) {
+		if (generic.isEngine() || generic.isAlive())
+			return (T) generic;
+		return new GenericBuilder(this, reFind(generic.getMeta()), ((GenericImpl) generic).getHomeTreeNode(), reFind(((GenericImpl) generic).supers), reFind(((GenericImpl) generic).selfToNullComponents()), Statics.MULTIDIRECTIONAL).find(false);
+	}
+
+	private Generic[] reFind(Generic... generics) {
+		Generic[] reFounds = new Generic[generics.length];
+		for (int i = 0; i < generics.length; i++)
+			reFounds[i] = reFind(generics[i]);
+		// TODO KK : if refind is null => exit caller method with null
+		return reFounds;
+	}
+
 }
