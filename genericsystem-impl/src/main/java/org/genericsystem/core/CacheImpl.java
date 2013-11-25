@@ -468,29 +468,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 		@SuppressWarnings("unchecked")
 		<T extends Generic> T rebuildAll(Generic old, int basePos) {
 			NavigableMap<Generic, Integer> dependenciesMap = orderDependencyMap(old, basePos);
-			for (Generic dependency : dependenciesMap.descendingMap().keySet())
-				simpleRemove(dependency);
+			removeAll(dependenciesMap);
+			Generic bind = rebuild();
 			dependenciesMap.remove(old);
-			put(old, rebuild());
-			return (T) reBind(dependenciesMap).get(old);
+			put(old, bind);
+			reBind(dependenciesMap);
+			return (T) bind;
 		}
 
 		@SuppressWarnings("unchecked")
 		<T extends Generic> T rebuildAll(Set<Generic> directDependencies, int basePos) {
 			NavigableMap<Generic, Integer> dependenciesMap = new AllDependencies(directDependencies, basePos);
-			for (Generic dependency : dependenciesMap.descendingMap().keySet())
-				simpleRemove(dependency);
-			return (T) reBind(rebuild(), dependenciesMap, basePos);
-		}
-
-		private Generic reBind(Generic bind, NavigableMap<Generic, Integer> dependenciesMap, int basePos) {
-			for (Entry<Generic, Integer> dependencyEntry : dependenciesMap.entrySet())
-				if (Statics.MULTIDIRECTIONAL == basePos || !((GenericImpl) bind).getComponent(basePos).equals(((Holder) dependencyEntry.getKey()).getComponent(basePos)))
-					reBindDependency(dependencyEntry.getKey(), dependencyEntry.getValue());
-				else
-					// dependency is an update of bind
-					put(dependencyEntry.getKey(), bind);
-			return bind;
+			removeAll(dependenciesMap);
+			Generic bind = rebuild();
+			for (Generic dependency : directDependencies)
+				if (Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) bind).getComponent(basePos).equals((((GenericImpl) dependency).getComponent(basePos)))) {
+					put(dependency, bind);
+					dependenciesMap.remove(dependency);
+				}
+			reBind(dependenciesMap);
+			return (T) bind;
 		}
 
 		private void reBindDependency(Generic dependency, int basePos) {
@@ -502,10 +499,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 			put(dependency, bindDependency(meta, newHomeTreeNode, supers, components, dependency.getClass(), basePos, false, isAutomatic(dependency)));
 		}
 
-		private Restructurator reBind(Map<Generic, Integer> orderedDependenciesMap) {
+		private void removeAll(NavigableMap<Generic, Integer> dependenciesMap) {
+			for (Generic dependency : dependenciesMap.descendingMap().keySet())
+				simpleRemove(dependency);
+		}
+
+		private void reBind(Map<Generic, Integer> orderedDependenciesMap) {
 			for (Entry<Generic, Integer> dependencyEntry : orderedDependenciesMap.entrySet())
 				reBindDependency(dependencyEntry.getKey(), dependencyEntry.getValue());
-			return this;
 		}
 
 		private Generic[] adjust(Generic... oldComponents) {
