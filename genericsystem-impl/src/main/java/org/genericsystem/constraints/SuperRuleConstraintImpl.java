@@ -36,7 +36,7 @@ public class SuperRuleConstraintImpl extends AbstractBooleanNoAxedConstraintImpl
 	@Override
 	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
 		for (Generic directSuper : constraintBase.getSupers())
-			if (!((GenericImpl) directSuper).isSuperOf3(constraintBase))
+			if (!((GenericImpl) directSuper).isSuperOf_(constraintBase))
 				throw new SuperRuleConstraintViolationException(constraintBase.info() + " should inherits from : " + directSuper.info());
 	}
 }

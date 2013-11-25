@@ -99,8 +99,10 @@ public class ApiTest extends AbstractTest {
 		Relation carColor = car.setRelation("CarColor", color);
 		Generic myAudi = car.newInstance("myAudi");
 		Generic red = color.newInstance("red");
+
 		Link carRed = car.bind(carColor, red);
 		Link myAudiRed = myAudi.bind(carColor, red);
+
 		assert myAudiRed.inheritsFrom(carRed);
 		assert !red.getLinks(carColor).contains(carRed) : red.getLinks(carColor);
 	}
@@ -233,7 +235,7 @@ public class ApiTest extends AbstractTest {
 		Type aOnb = b.newSubType("A");
 		// aOnb.log();
 		assert !a.inheritsFrom(aOnb);
-		assert !((GenericImpl) aOnb).isSuperOf3(a);
+		assert !((GenericImpl) aOnb).isSuperOf_(a);
 		// }.assertIsCausedBy(FunctionalConsistencyViolationException.class);
 	}
 

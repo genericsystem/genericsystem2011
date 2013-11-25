@@ -267,7 +267,7 @@ public class AnnotationTest extends AbstractTest {
 		Generic myTransformerChildrenGames = cache.find(MyTransformerChildrenGames.class);
 
 		assert myTransformerChildrenGames.inheritsFrom(transformerChildrenGames) : myTransformerChildrenGames.info() + transformerChildrenGames.info();
-		assert ((GenericImpl) transformerChildrenGames).isSuperOf3(myTransformerChildrenGames);
+		assert ((GenericImpl) transformerChildrenGames).isSuperOf_(myTransformerChildrenGames);
 
 		assert !myTransformerChildrenGames.inheritsFrom(myGames);
 		assert !myTransformerChildrenGames.inheritsFrom(myChildren);
