@@ -10,6 +10,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -32,11 +33,9 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Feybesse
  * 
  */
-public abstract class AbstractContext implements Serializable {
+public abstract class AbstractContext {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractContext.class);
-
-	private static final long serialVersionUID = -6036571074310729022L;
 
 	abstract <T extends Engine> T getEngine();
 

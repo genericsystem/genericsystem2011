@@ -1,6 +1,5 @@
 package org.genericsystem.cdi;
 
-import java.io.Serializable;
 import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
@@ -15,9 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class EngineProvider implements Serializable {
-
-	private static final long serialVersionUID = 4557162364822967228L;
+public class EngineProvider {
 
 	protected static Logger log = LoggerFactory.getLogger(EngineProvider.class);
 
@@ -64,7 +61,7 @@ public class EngineProvider implements Serializable {
 		log.info("-  directory path : " + persistentDirectoryProvider.getDirectoryPath());
 		log.info("-  userClasses : " + Arrays.toString(userClassesProvider.getUserClassesArray()));
 		log.info("-----------------------------------------------------------------------------------------------");
-		//engine = GenericSystem.newPersistentEngine(factory, persistentDirectoryProvider.getDirectoryPath(), userClassesProvider.getUserClassesArray());
+		// engine = GenericSystem.newPersistentEngine(factory, persistentDirectoryProvider.getDirectoryPath(), userClassesProvider.getUserClassesArray());
 		engine = GenericSystem.newInMemoryEngine(factory, userClassesProvider.getUserClassesArray());
 	}
 

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,16 @@ public class Statics {
 	private static Logger log = LoggerFactory.getLogger(Statics.class);
 
 	private static ThreadLocal<Long> threadDebugged = new ThreadLocal<Long>();
+
+	private static ThreadLocal<Engine> engineLocal = new ThreadLocal<Engine>();
+
+	public static void setEngineLocal(Engine engine) {
+		engineLocal.set(engine);
+	}
+
+	public static Engine getEngineLocal() {
+		return engineLocal.get();
+	}
 
 	public static final Flag FLAG = new Flag();
 	public static final Generic[] EMPTY_GENERIC_ARRAY = new Generic[] {};
@@ -152,7 +163,8 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {}
+		private Flag() {
+		}
 
 		@Override
 		public String toString() {

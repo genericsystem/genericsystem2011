@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -323,7 +324,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void cancelAll(Holder attribute, int basePos, Generic... targets) {
-		internalClearAll(attribute, basePos, Statics.CONCRETE, false, targets);
+		internalClearAll(attribute, basePos, attribute.getMetaLevel() + 1, false, targets);
 		Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, attribute.getMetaLevel(), basePos, targets);
 		while (holders.hasNext())
 			internalCancel(holders.next(), basePos);

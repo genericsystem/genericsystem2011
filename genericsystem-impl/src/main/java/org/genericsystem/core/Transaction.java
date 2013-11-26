@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.util.HashSet;
+
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -10,8 +11,6 @@ import org.genericsystem.exception.OptimisticLockConstraintViolationException;
  * 
  */
 public class Transaction extends AbstractContext {
-
-	private static final long serialVersionUID = 3123447500772450391L;
 
 	private transient long ts;
 

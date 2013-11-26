@@ -1,5 +1,9 @@
 package org.genericsystem.core;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,11 +16,14 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
+import org.genericsystem.core.Archiver.SnapshotLoader;
+import org.genericsystem.core.Archiver.SnapshotWriter;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -41,8 +48,7 @@ import org.genericsystem.tree.TreeImpl;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class CacheImpl extends AbstractContext implements Cache {
-	private static final long serialVersionUID = 6124326077696104707L;
+public class CacheImpl extends AbstractContext implements Cache, Externalizable {
 
 	private AbstractContext subContext;
 
@@ -165,7 +171,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -180,11 +186,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, false, true);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -769,6 +775,53 @@ public class CacheImpl extends AbstractContext implements Cache {
 			reFounds[i] = reFind(generics[i]);
 		// TODO KK : if refind is null => exit caller method with null
 		return reFounds;
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
+		out.writeInt(adds.size());
+		for (Generic add : adds) {
+			SnapshotWriter.writeGeneric((GenericImpl) add, null, null, homeTreeMap);
+		}
+		out.writeInt(removes.size());
+		for (Generic remove : removes) {
+			SnapshotWriter.writeGeneric((GenericImpl) remove, null, null, homeTreeMap);
+		}
+		out.writeInt(automatics.size());
+		for (Generic automatic : automatics) {
+			SnapshotWriter.writeGeneric((GenericImpl) automatic, null, null, homeTreeMap);
+		}
+		if (subContext instanceof CacheImpl) {
+			out.writeBoolean(true);
+			((Externalizable) subContext).writeExternal(out);
+		} else {
+			out.writeBoolean(false);
+			Statics.setEngineLocal(getEngine());
+		}
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		Engine engine = Statics.getEngineLocal();
+		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
+		Map<Long, Generic> genericMap = new HashMap<>();
+		int addSize = in.readInt();
+		for (int i = 0; i < addSize; i++) {
+			SnapshotLoader.loadGeneric(engine.getFactory(), null, null, homeTreeMap, genericMap);
+		}
+		int removeSize = in.readInt();
+		for (int i = 0; i < removeSize; i++) {
+			SnapshotLoader.loadGeneric(engine.getFactory(), null, null, homeTreeMap, genericMap);
+		}
+		int automaticSize = in.readInt();
+		for (int i = 0; i < automaticSize; i++) {
+			SnapshotLoader.loadGeneric(engine.getFactory(), null, null, homeTreeMap, genericMap);
+		}
+
+		boolean isCache = in.readBoolean();
+		if (isCache)
+			((Externalizable) subContext).readExternal(in);
 	}
 
 }

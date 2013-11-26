@@ -43,7 +43,7 @@ public class Archiver {
 		prepareAndLockDirectory(directoryPath);
 		String snapshotPath = getSnapshotPath();
 		if (snapshotPath != null)
-			new SnapshotLoader().loadSnapshot(snapshotPath);
+			SnapshotLoader.loadSnapshot(engine, snapshotPath);
 		else
 			((EngineImpl) engine).restoreEngine();
 	}
@@ -122,7 +122,7 @@ public class Archiver {
 			}
 	}
 
-	private static class SnapshotWriter {
+	public static class SnapshotWriter {
 
 		public static void doSnapshot(File directory, Engine engine) {
 			String path = directory.getAbsolutePath() + File.separator;
@@ -154,7 +154,7 @@ public class Archiver {
 				writeGeneric(((GenericImpl) orderGeneric), tmpFormal, tmpContent, homeTreeMap);
 		}
 
-		private static void writeGeneric(GenericImpl generic, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
+		public static void writeGeneric(GenericImpl generic, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
 			writeTs(generic, tmpFormal);
 			tmpContent.writeLong(generic.homeTreeNode.ts);
 			if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
@@ -206,61 +206,62 @@ public class Archiver {
 
 	}
 
-	private class SnapshotLoader extends HashMap<Long, Generic> {
-		private static final long serialVersionUID = 3139276947667714316L;
+	public static class SnapshotLoader {// extends HashMap<Long, Generic> {
+		// private static final long serialVersionUID = 3139276947667714316L;
 
-		public void loadSnapshot(String path) {
+		public static void loadSnapshot(Engine engine, String path) {
 			try (ObjectInputStream contentInputStream = new ObjectInputStream(readContent(path)); ObjectInputStream formalInputStream = new ObjectInputStream(readFormal(path));) {
 				Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
-				Engine engine = loadEngine(formalInputStream, contentInputStream, homeTreeMap);
+				Map<Long, Generic> genericMap = new HashMap<>();
+				engine = restoreEngine(engine, formalInputStream, contentInputStream, homeTreeMap, genericMap);
 				for (;;)
-					loadGeneric(engine, formalInputStream, contentInputStream, homeTreeMap);
+					loadGeneric(engine.getFactory(), formalInputStream, contentInputStream, homeTreeMap, genericMap);
 			} catch (EOFException ignore) {
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
 
-		private ZipInputStream readFormal(String path) throws IOException {
+		private static ZipInputStream readFormal(String path) throws IOException {
 			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(path + Statics.ZIP_EXTENSION)));
 			inputStream.getNextEntry();
 			inputStream.getNextEntry();
 			return inputStream;
 		}
 
-		private ZipInputStream readContent(String path) throws IOException {
+		private static ZipInputStream readContent(String path) throws IOException {
 			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(path + Statics.ZIP_EXTENSION)));
 			inputStream.getNextEntry();
 			return inputStream;
 		}
 
-		private Engine loadEngine(ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap) throws IOException, ClassNotFoundException {
+		private static Engine restoreEngine(Engine engine, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(formalInputStream);
 			long homeTreeNodeTs = contentInputStream.readLong();
 			contentInputStream.readLong();
 			contentInputStream.readObject();
 			((EngineImpl) engine).restoreEngine(homeTreeNodeTs, ts[0], ts[1], ts[2], ts[3]);
-			put(ts[0], engine);
+			genericMap.put(ts[0], engine);
 			homeTreeMap.put(homeTreeNodeTs, ((EngineImpl) engine).homeTreeNode);
 			return engine;
 		}
 
-		private void loadGeneric(Engine engine, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap) throws IOException, ClassNotFoundException {
+		public static void loadGeneric(Factory factory, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(formalInputStream);
 			long homeTreeNodeTs = contentInputStream.readLong();
 			HomeTreeNode homeTreeNode = homeTreeMap.get(homeTreeNodeTs);
 			if (null == homeTreeNode)
 				homeTreeNode = homeTreeMap.get(contentInputStream.readLong()).bindInstanceNode(homeTreeNodeTs, (Serializable) contentInputStream.readObject());
-			Generic[] supers = loadAncestors(formalInputStream);
-			Generic[] components = loadAncestors(formalInputStream);
-			Generic generic = engine.getFactory().newGeneric((Class<?>) formalInputStream.readObject());
+			Generic[] supers = loadAncestors(formalInputStream, genericMap);
+			Generic[] components = loadAncestors(formalInputStream, genericMap);
+			Generic generic = factory.newGeneric((Class<?>) formalInputStream.readObject());
 			((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components).plug();
 			if (!homeTreeMap.containsKey(homeTreeNodeTs))
 				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode);
-			put(ts[0], generic);
+			genericMap.put(ts[0], generic);
 		}
 
-		private long[] loadTs(ObjectInputStream in) throws IOException {
+		private static long[] loadTs(ObjectInputStream in) throws IOException {
 			long[] ts = new long[4];
 			ts[0] = in.readLong(); // designTs
 			ts[1] = in.readLong(); // birthTs
@@ -269,14 +270,13 @@ public class Archiver {
 			return ts;
 		}
 
-		private Generic[] loadAncestors(ObjectInputStream in) throws IOException {
+		private static Generic[] loadAncestors(ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
 			int length = in.readInt();
 			Generic[] ancestors = new Generic[length];
 			for (int index = 0; index < length; index++)
-				ancestors[index] = get(in.readLong());
+				ancestors[index] = genericMap.get(in.readLong());
 			return ancestors;
 		}
-
 	}
 
 }
