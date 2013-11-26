@@ -70,6 +70,14 @@ class GenericBuilder {
 		T result = find(existsException);
 		if (result != null)
 			return result;
+		Generic old = null;
+		Set<Generic> directDependencies = getDirectDependencies();
+		for (Generic dependency : directDependencies)
+			if (Statics.MULTIDIRECTIONAL != basePos && (((GenericImpl) dependency).getComponent(basePos)).equals(components[basePos])) {
+				assert old == null;
+				old = dependency;
+			}
+
 		return cache.new Restructurator() {
 			private static final long serialVersionUID = 1370210509322258062L;
 
@@ -77,7 +85,7 @@ class GenericBuilder {
 			Generic rebuild() {
 				return GenericBuilder.this.buildDependency(specializationClass, automatic);
 			}
-		}.rebuildAll(getDirectDependencies(), basePos);
+		}.rebuildAll(old, getDirectDependencies(), basePos);
 	}
 
 	private boolean isExtentedBy(Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
@@ -178,7 +186,6 @@ class GenericBuilder {
 		if (result)
 			return true;
 		for (Generic component : dependency.components)
-			// if (!Arrays.equals(dependency.primaries, ((GenericImpl) component).primaries) || !Arrays.equals(dependency.components, ((GenericImpl) component).components))
 			if (!dependency.equals(component))
 				if (isAncestorOf((GenericImpl) component))
 					return true;
