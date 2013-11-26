@@ -65,7 +65,7 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	public void testType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, Myck.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, Myck.class).start();
 		Type vehicle = cache.find(Vehicle.class);
 		Type human = cache.find(Human.class);
 		Type myck = cache.find(Myck.class);

@@ -44,7 +44,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void specializeAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Power.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Power.class).start();
 		Attribute power = cache.find(Power.class);
 		assert power instanceof Power;
 	}
@@ -491,12 +491,15 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute("power");
+
 		Holder vehicle20 = vehicle.setValue(vehiclePower, 20);
 		Holder vehicle30 = vehicle.setValue(vehiclePower, 30);
 		Generic myVehicle = vehicle.newInstance("myVehicle");
+
 		Holder myVehicle20 = myVehicle.setValue(vehicle30, 20);
 		assert myVehicle20.inheritsFrom(vehicle30);
 		assert !myVehicle20.inheritsFrom(vehicle20);
+
 		Holder myVehicle30 = myVehicle.setValue(vehicle20, 30);
 		assert myVehicle30.inheritsFrom(vehicle20);
 		assert !myVehicle30.inheritsFrom(vehicle30);

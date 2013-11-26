@@ -7,7 +7,7 @@ import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
-public class VirtuakConstraintTest extends AbstractTest {
+public class VirtualConstraintTest extends AbstractTest {
 
 	public void testVirtual() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();

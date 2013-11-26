@@ -130,7 +130,7 @@ public interface Factory extends Serializable {
 
 		@Override
 		public Cache getCacheLocal() {
-			throw new CacheAwareException("Unable to find the current cache. Have you forget to call start(Cache cache) method ?");
+			throw new CacheAwareException("Unable to find the current cache. Have you forget to call start() method on current cache ?");
 		}
 	}
 

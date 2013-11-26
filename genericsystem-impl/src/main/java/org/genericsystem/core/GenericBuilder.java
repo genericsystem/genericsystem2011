@@ -37,6 +37,7 @@ class GenericBuilder {
 		this.meta = meta;
 		this.homeTreeNode = homeTreeNode;
 		supers = aliveSupers;
+		assert supers.length != 0;
 		components = aliveNullComponents;
 		this.basePos = basePos;
 		isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
@@ -77,7 +78,8 @@ class GenericBuilder {
 				assert old == null;
 				old = dependency;
 			}
-
+		for (Generic dependency : directDependencies)
+			assert !Arrays.asList(supers).contains(dependency) : Arrays.toString(supers);
 		return cache.new Restructurator() {
 			private static final long serialVersionUID = 1370210509322258062L;
 
@@ -110,8 +112,9 @@ class GenericBuilder {
 					@Override
 					public boolean isSelected(Generic candidate) {
 						boolean result = ((GenericImpl) candidate).isSuperOf_(homeTreeNode, supers, components);
-						// if ("Power".equals(candidate.getValue()))
-						// log.info("XXXXXXXXX" + candidate.info() + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
+						if ("Car".equals(candidate.getValue())) {
+							log.info("XXXXXXXXX" + candidate.info() + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
+						}
 
 						if (result)
 							return true;

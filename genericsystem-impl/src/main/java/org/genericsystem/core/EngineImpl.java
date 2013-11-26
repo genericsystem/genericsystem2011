@@ -7,6 +7,7 @@ import java.util.List;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
+import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
 import org.genericsystem.generic.Attribute;
@@ -188,7 +189,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		SystemCache init(Class<?>... userClasses) {
 			List<Class<?>> classes = Arrays.<Class<?>> asList(EngineImpl.class, MetaAttribute.class, MetaRelation.class, NoInheritanceSystemType.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
-			CacheImpl cache = (CacheImpl) start(new CacheImpl(EngineImpl.this));
+			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				get(clazz);
 			for (Class<?> clazz : userClasses)
@@ -203,8 +204,10 @@ public class EngineImpl extends GenericImpl implements Engine {
 		public <T extends Generic> T get(Class<?> clazz) {
 			assert !Engine.class.equals(clazz);
 			T systemProperty = (T) super.get(clazz);
-			if (systemProperty != null)
+			if (systemProperty != null) {
+				assert systemProperty.isAlive();
 				return systemProperty;
+			}
 			if (!startupTime)
 				throw new IllegalStateException("Class : " + clazz + " has not been built at startup");
 			T result = getCurrentCache().<T> bind(clazz);
@@ -227,4 +230,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 		archiver.close();
 	}
 
+	@Override
+	public String toString() {
+		Serializable value = getValue();
+		if (null == value)
+			return "null" + (supers.length >= 2 ? "[" + supers[1] + "]" : "");
+		return value instanceof Class ? ((Class<?>) value).getSimpleName() : value.toString();
+	}
 }

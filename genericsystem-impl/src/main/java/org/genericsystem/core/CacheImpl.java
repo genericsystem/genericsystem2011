@@ -158,10 +158,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	void remove(final Generic generic, final RemoveStrategy removeStrategy) throws RollbackException {
-		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
-			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
-		if (!isAlive(generic))
-			rollback(new AliveConstraintViolationException(generic + " is not alive"));
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
@@ -497,8 +493,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		private void removeAll(NavigableMap<Generic, Integer> dependenciesMap) {
-			for (Generic dependency : dependenciesMap.descendingMap().keySet())
+			for (Generic dependency : dependenciesMap.descendingMap().keySet()) {
 				simpleRemove(dependency);
+			}
 		}
 
 		private void reBind(Map<Generic, Integer> orderedDependenciesMap) {
@@ -525,7 +522,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T internalBind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, final Class<?> specializationClass, int basePos, boolean existsException, final boolean automatic) throws RollbackException {
-		return new GenericBuilder(this, meta, homeTreeNode, supers, components, basePos).internalBind(specializationClass, basePos, existsException, automatic);
+		return new GenericBuilder(this, meta, homeTreeNode, supers.length != 0 ? supers : new Generic[] { getEngine() }, components, basePos).internalBind(specializationClass, basePos, existsException, automatic);
 	}
 
 	private class AllDependencies extends TreeMap<Generic, Integer> {
@@ -537,9 +534,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	protected void check(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+	protected void check(CheckingType checkingType, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics)
-			check(checkingType, isFlushTime, generic);
+			check(checkingType, true, generic);
 	}
 
 	protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
@@ -549,9 +546,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	private boolean isConsistencyToCheck(CheckingType checkingType, boolean isFlushTime, Generic generic) {
 		if (isConstraintActivated(generic))
-			if (isFlushTime || ((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()).isImmediatelyConsistencyCheckable())
+			if (isFlushTime || isImmediatelyConsistencyCheckable(((AbstractConstraintImpl) ((Holder) generic).getBaseComponent())))
 				return true;
 		return false;
+	}
+
+	protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
+		return constraint.isImmediatelyConsistencyCheckable();
 	}
 
 	protected boolean isConstraintActivated(Generic generic) {
@@ -632,12 +633,26 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	public boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-		return (isFlushTime || constraint.isImmediatelyCheckable()) && constraint.isCheckedAt(generic, checkingType);
+	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
+		return (isFlushTime || isImmediatelyCheckable(constraint)) && constraint.isCheckedAt(generic, checkingType);
+	}
+
+	protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
+		return constraint.isImmediatelyCheckable();
 	}
 
 	@Override
 	void simpleRemove(Generic generic) {
+		log.info("remove : " + generic.info() + " " + generic.getClass());
+		// if (generic.getComponentsSize() == 1) {
+		// log.info("baseComponent : " + ((Holder) generic).getBaseComponent().info());
+		// if (((Holder) generic).getBaseComponent().getComponentsSize() == 1)
+		// log.info("baseComponent : " + ((Holder) ((Holder) generic).getBaseComponent()).getBaseComponent().info());
+		// }
+		if (!isAlive(generic))
+			rollback(new AliveConstraintViolationException(generic + " is not alive"));
+		if (generic.getClass().isAnnotationPresent(SystemGeneric.class) && generic.equals(find(generic.getClass())))
+			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
 		if (!automatics.remove(generic))
 			if (!adds.remove(generic))
 				removes.add(generic);
@@ -680,8 +695,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private void checkConstraints() throws ConstraintViolationException {
-		check(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-		check(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+		check(CheckingType.CHECK_ON_ADD_NODE, adds);
+		check(CheckingType.CHECK_ON_REMOVE_NODE, removes);
 	}
 
 	static class CacheDependencies implements TimestampedDependencies {
@@ -766,6 +781,30 @@ public class CacheImpl extends AbstractContext implements Cache {
 			reFounds[i] = reFind(generics[i]);
 		// TODO KK : if refind is null => exit caller method with null
 		return reFounds;
+	}
+
+	static class UnsafeCache extends CacheImpl {
+		private static final long serialVersionUID = 6486978435494748435L;
+
+		public UnsafeCache(Engine engine) {
+			super(engine);
+		}
+
+		@Override
+		protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
+			return false;
+		}
+
+		@Override
+		protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
+			return false;
+		}
+
+		@Override
+		protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+			if (isFlushTime)
+				super.check(checkingType, isFlushTime, generic);
+		}
 	}
 
 }

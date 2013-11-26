@@ -1,8 +1,10 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -702,7 +704,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			while (contains(freePosition) || (freePosition < components.length && !component.inheritsFrom(components[freePosition])))
 				freePosition++;
 			if (freePosition >= max)
-				getCurrentCache().rollback(new IllegalStateException("Unable to find a valid position for : " + component + " " + Arrays.toString(components) + " " + max));
+				getCurrentCache().rollback(new IllegalStateException("Unable to find a valid position for : " + component.info() + " in : " + Arrays.toString(components) + " " + components[0].info()));
 			add(freePosition);
 			return freePosition;
 		}
@@ -860,8 +862,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public boolean isSuperOf_(HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
-		return isSuperOf3(subHomeTreeNode, subSupers, subComponents);
-		// return isSuperOf_(homeTreeNode, supers, components, subHomeTreeNode, subSupers, subComponents);
+		// return isSuperOf3(subHomeTreeNode, subSupers, subComponents);
+		return isSuperOf_(homeTreeNode, supers, components, subHomeTreeNode, subSupers, subComponents);
 	}
 
 	public boolean isSuperOf3(HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
@@ -978,22 +980,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 
 		assert subComponents.length == components.length;
-		assert Arrays.equals(components, subComponents) : components[0].info() + " " + subComponents[0].info();
+		assert Arrays.equals(components, subComponents) : Arrays.toString(components) + " " + Arrays.toString(subComponents);
 
-		if (subHomeTreeNode.inheritsFrom(homeTreeNode))
+		if (subHomeTreeNode.inheritsFrom(homeTreeNode)) {
 			if (!subHomeTreeNode.equals(homeTreeNode))
 				return true;
-			else {
-				if (Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
-					if (areAllSupersReached(supers, subSupers))
-						return true;
-			}
-
-		// for (Generic subSuper : subSupers) {
-		// if (isSuperOf_(homeTreeNode, supers, components, ((GenericImpl) subSuper).homeTreeNode, ((GenericImpl) subSuper).supers, ((GenericImpl) subSuper).components)) {
-		// return true;
-		// }
-		// }
+			if (Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
+				if (areAllSupersReached(supers, subSupers))
+					return true;
+		}
 
 		return false;
 	}
@@ -1183,6 +1178,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		s += " Name        : " + toString() + "\n";
 		s += " Meta        : " + getMeta() + " (" + System.identityHashCode(getMeta()) + ")\n";
 		s += " Category    : " + getCategoryString() + "\n";
+		s += " Class       : " + getClass().getSimpleName() + "\n";
 		s += "**********************************************************************\n";
 		for (Generic superGeneric : supers)
 			s += " Super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
@@ -1197,10 +1193,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		// s += "                          ----------> " + ((GenericImpl) holder).getCategoryString() + " : " + holder + "\n";
 		// }
 		// s += "**********************************************************************\n";
-		// s += "design date : " + new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
+		s += "design date : " + new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(getDesignTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
 		// s += "birth date  : " + new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(getBirthTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
 		// s += "death date  : " + new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(getDeathTs() / Statics.MILLI_TO_NANOSECONDS)) + "\n";
-		// s += "**********************************************************************\n";
+		s += "**********************************************************************\n";
 
 		return s;
 	}
@@ -1860,11 +1856,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public boolean isAutomatic() {
 		return getCurrentCache().isAutomatic(this);
 	}
-
-	// TODO clean
-	// public boolean isFlushable() {
-	// return getCurrentCache().isFlushable(this);
-	// }
 
 	public CacheImpl getCurrentCache() {
 		return getEngine().getCurrentCache();

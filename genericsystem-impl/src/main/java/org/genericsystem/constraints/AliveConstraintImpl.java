@@ -31,8 +31,7 @@ public class AliveConstraintImpl extends AbstractBooleanNoAxedConstraintImpl imp
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(AliveConstraintImpl.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
-	}
+	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
