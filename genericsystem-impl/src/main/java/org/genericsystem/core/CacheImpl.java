@@ -326,21 +326,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return getEngine().getSubType(value);
 	}
 
-	// //@Override
-	// public <T extends Type> T addType(Serializable value, Type... userSupers) {
-	// return addType(value, userSupers, Statics.EMPTY_GENERIC_ARRAY);
-	// }
-	//
-	// //@Override
-	// public <T extends Type> T addType(Serializable value, Type[] userSupers, Generic... components) {
-	// return bind(getEngine(), value, userSupers, components, null, Statics.MULTIDIRECTIONAL, false);
-	// }
-
-	// @Override
-	// public <T extends Type> T addType(Serializable name) {
-	// return this.<T> addType(name);
-	// }
-
 	@Override
 	public <T extends Type> T addType(Serializable name, Type... superTypes) {
 		return addType(name, superTypes, Statics.EMPTY_GENERIC_ARRAY);
@@ -350,11 +335,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public <T extends Type> T addType(Serializable name, Type[] superTypes, Generic... components) {
 		return internalSetType(name, true, superTypes, components);
 	}
-
-	// @Override
-	// public <T extends Type> T setType(Serializable name) {
-	// return this.<T> setType(name);
-	// }
 
 	@Override
 	public <T extends Type> T setType(Serializable name, Type... superTypes) {
@@ -474,13 +454,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 		@SuppressWarnings("unchecked")
 		<T extends Generic> T rebuildAll(Generic old, NavigableMap<Generic, Integer> dependenciesMap) {
 			removeAll(dependenciesMap);
-			Generic bind = rebuild();
+			// log.info("Dependencies : " + dependenciesMap.keySet());
+			Generic build = rebuild();
+			// log.info("" + build + dependenciesMap.keySet());
 			if (old != null) {
 				dependenciesMap.remove(old);
-				put(old, bind);
+				put(old, build);
 			}
 			reBind(dependenciesMap);
-			return (T) bind;
+			return (T) build;
 		}
 
 		private void reBindDependency(Generic dependency, int basePos) {
@@ -643,7 +625,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	void simpleRemove(Generic generic) {
-		log.info("remove : " + generic.info() + " " + generic.getClass());
+		// log.info("remove : " + generic.info() + " " + generic.getClass());
 		// if (generic.getComponentsSize() == 1) {
 		// log.info("baseComponent : " + ((Holder) generic).getBaseComponent().info());
 		// if (((Holder) generic).getBaseComponent().getComponentsSize() == 1)

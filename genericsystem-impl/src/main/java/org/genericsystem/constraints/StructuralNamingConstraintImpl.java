@@ -43,9 +43,9 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 			for (Generic inherited : ((GenericImpl) ((GenericImpl) constraintBase).getComponent(i)).getAllInheritings()) {
 				Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL), constraintBase.getValue());
 				if (iterator.hasNext()) {
-					iterator.next();
+					Generic next = iterator.next();
 					if (iterator.hasNext())
-						throw new UniqueStructuralValueConstraintViolationException(iterator.next().info());
+						throw new UniqueStructuralValueConstraintViolationException(next.info() + iterator.next().info());
 				}
 			}
 	}

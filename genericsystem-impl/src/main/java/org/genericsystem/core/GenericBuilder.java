@@ -78,8 +78,11 @@ class GenericBuilder {
 				assert old == null;
 				old = dependency;
 			}
-		for (Generic dependency : directDependencies)
+		for (Generic dependency : directDependencies) {
 			assert !Arrays.asList(supers).contains(dependency) : Arrays.toString(supers);
+			assert !Arrays.asList(components).contains(dependency) : Arrays.toString(components);
+		}
+		// log.info("Supers : " + Arrays.toString(supers));
 		return cache.new Restructurator() {
 			private static final long serialVersionUID = 1370210509322258062L;
 
@@ -111,15 +114,15 @@ class GenericBuilder {
 
 					@Override
 					public boolean isSelected(Generic candidate) {
-						boolean result = ((GenericImpl) candidate).isSuperOf_(homeTreeNode, supers, components);
-						if ("Car".equals(candidate.getValue())) {
-							log.info("XXXXXXXXX" + candidate.info() + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
-						}
+						boolean result = ((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components);
+						// if ("Power".equals(candidate.getValue())) {
+						// log.info("XXXXXXXXX" + candidate.info() + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
+						// }
 
 						if (result)
 							return true;
 						if (basePos != Statics.MULTIDIRECTIONAL)
-							if (((GenericImpl) meta).isSuperOf_(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components))
+							if (((GenericImpl) meta).isSuperOf(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components))
 								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
 									if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), components/* new Components(components, ((GenericImpl) candidate).components).toArray() */))
 										return true;
@@ -181,7 +184,7 @@ class GenericBuilder {
 
 	private boolean isAncestorOf(final GenericImpl dependency) {
 		// boolean result = (GenericImpl.isSuperOf(primaries, components, dependency.primaries, dependency.components));
-		boolean result = (GenericImpl.isSuperOf_(homeTreeNode, supers, components, dependency));
+		boolean result = (GenericImpl.isSuperOf(homeTreeNode, supers, components, dependency));
 		// assert result == result2 : "isSuperOf : " + result + " isSuperOf3 : " + result2 + " homeTreeNode : " + homeTreeNode + " " + supers[0].info() + dependency.info();
 		// if ("Power".equals(dependency.getValue()))
 		// log.info("UUUUUUUUUU" + dependency + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);

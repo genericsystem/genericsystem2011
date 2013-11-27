@@ -232,9 +232,6 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	@Override
 	public String toString() {
-		Serializable value = getValue();
-		if (null == value)
-			return "null" + (supers.length >= 2 ? "[" + supers[1] + "]" : "");
-		return value instanceof Class ? ((Class<?>) value).getSimpleName() : value.toString();
+		return "ENGINE";
 	}
 }
