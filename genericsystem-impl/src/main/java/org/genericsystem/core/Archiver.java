@@ -154,7 +154,7 @@ public class Archiver {
 				writeGeneric(((GenericImpl) orderGeneric), tmpFormal, tmpContent, homeTreeMap);
 		}
 
-		public static void writeGeneric(GenericImpl generic, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
+		private static void writeGeneric(GenericImpl generic, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
 			writeTs(generic, tmpFormal);
 			tmpContent.writeLong(generic.homeTreeNode.ts);
 			if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
@@ -246,7 +246,7 @@ public class Archiver {
 			return engine;
 		}
 
-		public static void loadGeneric(Factory factory, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
+		private static void loadGeneric(Factory factory, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(formalInputStream);
 			long homeTreeNodeTs = contentInputStream.readLong();
 			HomeTreeNode homeTreeNode = homeTreeMap.get(homeTreeNodeTs);

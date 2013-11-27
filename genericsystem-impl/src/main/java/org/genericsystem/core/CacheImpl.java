@@ -3,7 +3,9 @@ package org.genericsystem.core;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -22,8 +24,6 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
-import org.genericsystem.core.Archiver.SnapshotLoader;
-import org.genericsystem.core.Archiver.SnapshotWriter;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -61,6 +61,12 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 
 	public CacheImpl(Cache cache) {
 		subContext = (CacheImpl) cache;
+		clear();
+	}
+
+	// TODO call by Serialization
+	public CacheImpl() {
+		// subContext = (CacheImpl) cache;
 		clear();
 	}
 
@@ -164,10 +170,6 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 	}
 
 	void remove(final Generic generic, final RemoveStrategy removeStrategy) throws RollbackException {
-		if (generic.getClass().isAnnotationPresent(SystemGeneric.class))
-			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
-		if (!isAlive(generic))
-			rollback(new AliveConstraintViolationException(generic + " is not alive"));
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
@@ -336,21 +338,6 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 		return getEngine().getSubType(value);
 	}
 
-	// //@Override
-	// public <T extends Type> T addType(Serializable value, Type... userSupers) {
-	// return addType(value, userSupers, Statics.EMPTY_GENERIC_ARRAY);
-	// }
-	//
-	// //@Override
-	// public <T extends Type> T addType(Serializable value, Type[] userSupers, Generic... components) {
-	// return bind(getEngine(), value, userSupers, components, null, Statics.MULTIDIRECTIONAL, false);
-	// }
-
-	// @Override
-	// public <T extends Type> T addType(Serializable name) {
-	// return this.<T> addType(name);
-	// }
-
 	@Override
 	public <T extends Type> T addType(Serializable name, Type... superTypes) {
 		return addType(name, superTypes, Statics.EMPTY_GENERIC_ARRAY);
@@ -360,11 +347,6 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 	public <T extends Type> T addType(Serializable name, Type[] superTypes, Generic... components) {
 		return internalSetType(name, true, superTypes, components);
 	}
-
-	// @Override
-	// public <T extends Type> T setType(Serializable name) {
-	// return this.<T> setType(name);
-	// }
 
 	@Override
 	public <T extends Type> T setType(Serializable name, Type... superTypes) {
@@ -484,13 +466,15 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 		@SuppressWarnings("unchecked")
 		<T extends Generic> T rebuildAll(Generic old, NavigableMap<Generic, Integer> dependenciesMap) {
 			removeAll(dependenciesMap);
-			Generic bind = rebuild();
+			// log.info("Dependencies : " + dependenciesMap.keySet());
+			Generic build = rebuild();
+			// log.info("" + build + dependenciesMap.keySet());
 			if (old != null) {
 				dependenciesMap.remove(old);
-				put(old, bind);
+				put(old, build);
 			}
 			reBind(dependenciesMap);
-			return (T) bind;
+			return (T) build;
 		}
 
 		private void reBindDependency(Generic dependency, int basePos) {
@@ -503,8 +487,9 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 		}
 
 		private void removeAll(NavigableMap<Generic, Integer> dependenciesMap) {
-			for (Generic dependency : dependenciesMap.descendingMap().keySet())
+			for (Generic dependency : dependenciesMap.descendingMap().keySet()) {
 				simpleRemove(dependency);
+			}
 		}
 
 		private void reBind(Map<Generic, Integer> orderedDependenciesMap) {
@@ -531,7 +516,7 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 	}
 
 	<T extends Generic> T internalBind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, final Class<?> specializationClass, int basePos, boolean existsException, final boolean automatic) throws RollbackException {
-		return new GenericBuilder(this, meta, homeTreeNode, supers, components, basePos).internalBind(specializationClass, basePos, existsException, automatic);
+		return new GenericBuilder(this, meta, homeTreeNode, supers.length != 0 ? supers : new Generic[] { getEngine() }, components, basePos).internalBind(specializationClass, basePos, existsException, automatic);
 	}
 
 	private class AllDependencies extends TreeMap<Generic, Integer> {
@@ -543,9 +528,9 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 		}
 	}
 
-	protected void check(CheckingType checkingType, boolean isFlushTime, Iterable<Generic> generics) throws ConstraintViolationException {
+	protected void check(CheckingType checkingType, Iterable<Generic> generics) throws ConstraintViolationException {
 		for (Generic generic : generics)
-			check(checkingType, isFlushTime, generic);
+			check(checkingType, true, generic);
 	}
 
 	protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
@@ -555,9 +540,13 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 
 	private boolean isConsistencyToCheck(CheckingType checkingType, boolean isFlushTime, Generic generic) {
 		if (isConstraintActivated(generic))
-			if (isFlushTime || ((AbstractConstraintImpl) ((Holder) generic).getBaseComponent()).isImmediatelyConsistencyCheckable())
+			if (isFlushTime || isImmediatelyConsistencyCheckable(((AbstractConstraintImpl) ((Holder) generic).getBaseComponent())))
 				return true;
 		return false;
+	}
+
+	protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
+		return constraint.isImmediatelyConsistencyCheckable();
 	}
 
 	protected boolean isConstraintActivated(Generic generic) {
@@ -638,12 +627,26 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 		}
 	}
 
-	public boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
-		return (isFlushTime || constraint.isImmediatelyCheckable()) && constraint.isCheckedAt(generic, checkingType);
+	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
+		return (isFlushTime || isImmediatelyCheckable(constraint)) && constraint.isCheckedAt(generic, checkingType);
+	}
+
+	protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
+		return constraint.isImmediatelyCheckable();
 	}
 
 	@Override
 	void simpleRemove(Generic generic) {
+		// log.info("remove : " + generic.info() + " " + generic.getClass());
+		// if (generic.getComponentsSize() == 1) {
+		// log.info("baseComponent : " + ((Holder) generic).getBaseComponent().info());
+		// if (((Holder) generic).getBaseComponent().getComponentsSize() == 1)
+		// log.info("baseComponent : " + ((Holder) ((Holder) generic).getBaseComponent()).getBaseComponent().info());
+		// }
+		if (!isAlive(generic))
+			rollback(new AliveConstraintViolationException(generic + " is not alive"));
+		if (generic.getClass().isAnnotationPresent(SystemGeneric.class) && generic.equals(find(generic.getClass())))
+			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
 		if (!automatics.remove(generic))
 			if (!adds.remove(generic))
 				removes.add(generic);
@@ -686,8 +689,8 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 	}
 
 	private void checkConstraints() throws ConstraintViolationException {
-		check(CheckingType.CHECK_ON_ADD_NODE, true, adds);
-		check(CheckingType.CHECK_ON_REMOVE_NODE, true, removes);
+		check(CheckingType.CHECK_ON_ADD_NODE, adds);
+		check(CheckingType.CHECK_ON_REMOVE_NODE, removes);
 	}
 
 	static class CacheDependencies implements TimestampedDependencies {
@@ -776,19 +779,6 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
-		out.writeInt(adds.size());
-		for (Generic add : adds) {
-			SnapshotWriter.writeGeneric((GenericImpl) add, null, null, homeTreeMap);
-		}
-		out.writeInt(removes.size());
-		for (Generic remove : removes) {
-			SnapshotWriter.writeGeneric((GenericImpl) remove, null, null, homeTreeMap);
-		}
-		out.writeInt(automatics.size());
-		for (Generic automatic : automatics) {
-			SnapshotWriter.writeGeneric((GenericImpl) automatic, null, null, homeTreeMap);
-		}
 		if (subContext instanceof CacheImpl) {
 			out.writeBoolean(true);
 			((Externalizable) subContext).writeExternal(out);
@@ -796,29 +786,139 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 			out.writeBoolean(false);
 			Statics.setEngineLocal(getEngine());
 		}
+
+		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
+		out.writeInt(adds.size());
+		for (Generic add : adds)
+			writeGeneric((GenericImpl) add, (ObjectOutputStream) out, homeTreeMap);
+		out.writeInt(automatics.size());
+		for (Generic automatic : automatics)
+			writeGeneric((GenericImpl) automatic, (ObjectOutputStream) out, homeTreeMap);
+		out.writeInt(removes.size());
+		for (Generic remove : removes)
+			out.writeLong(((GenericImpl) remove).getDesignTs());
+	}
+
+	private static void writeGeneric(GenericImpl generic, ObjectOutputStream outputStream, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
+		writeTs(generic, outputStream);
+		outputStream.writeLong(generic.homeTreeNode.ts);
+		if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
+			outputStream.writeLong(generic.homeTreeNode.metaNode.ts);
+			outputStream.writeObject(generic.homeTreeNode.getValue());
+			homeTreeMap.put(generic.homeTreeNode.ts, generic.homeTreeNode);
+		}
+		if (generic.isEngine())
+			return;
+		writeAncestors(generic.getSupers(), outputStream);
+		writeAncestors(generic.getComponents(), outputStream);
+		outputStream.writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
+	}
+
+	private static void writeTs(Generic generic, ObjectOutputStream tmpFormal) throws IOException {
+		tmpFormal.writeLong(((GenericImpl) generic).getDesignTs());
+		tmpFormal.writeLong(((GenericImpl) generic).getBirthTs());
+		tmpFormal.writeLong(((GenericImpl) generic).getLastReadTs());
+		tmpFormal.writeLong(((GenericImpl) generic).getDeathTs());
+	}
+
+	private static void writeAncestors(Snapshot<Generic> dependencies, ObjectOutputStream formalObjectOutput) throws IOException {
+		formalObjectOutput.writeInt(dependencies.size());
+		for (Generic dependency : dependencies)
+			formalObjectOutput.writeLong(((GenericImpl) dependency).getDesignTs());
 	}
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		Engine engine = Statics.getEngineLocal();
+		if (in.readBoolean()) {
+			subContext = new CacheImpl();
+			((Externalizable) subContext).readExternal(in);
+		} else
+			// TODO get TS transaction
+			subContext = new Transaction(engine);
+
 		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 		Map<Long, Generic> genericMap = new HashMap<>();
 		int addSize = in.readInt();
-		for (int i = 0; i < addSize; i++) {
-			SnapshotLoader.loadGeneric(engine.getFactory(), null, null, homeTreeMap, genericMap);
-		}
-		int removeSize = in.readInt();
-		for (int i = 0; i < removeSize; i++) {
-			SnapshotLoader.loadGeneric(engine.getFactory(), null, null, homeTreeMap, genericMap);
-		}
+		for (int i = 0; i < addSize; i++)
+			adds.add(loadGeneric(engine, (ObjectInputStream) in, homeTreeMap, genericMap));
 		int automaticSize = in.readInt();
-		for (int i = 0; i < automaticSize; i++) {
-			SnapshotLoader.loadGeneric(engine.getFactory(), null, null, homeTreeMap, genericMap);
+		for (int i = 0; i < automaticSize; i++)
+			automatics.add(loadGeneric(engine, (ObjectInputStream) in, homeTreeMap, genericMap));
+		int removeSize = in.readInt();
+		for (int i = 0; i < removeSize; i++)
+			removes.add(findByDesignTs(engine, (ObjectInputStream) in, genericMap));
+	}
+
+	private static Generic loadGeneric(Engine engine, ObjectInputStream inputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
+		long[] ts = loadTs(inputStream);
+		long homeTreeNodeTs = inputStream.readLong();
+		HomeTreeNode homeTreeNode = homeTreeMap.get(homeTreeNodeTs);
+		if (null == homeTreeNode) {
+			long metaTs = inputStream.readLong();
+			homeTreeNode = ((GenericImpl) engine).getHomeTreeNode().ts == metaTs ? ((GenericImpl) engine).getHomeTreeNode() : homeTreeMap.get(metaTs);
+			homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, (Serializable) inputStream.readObject());
+		}
+		Generic[] supers = loadAncestors(engine, inputStream, genericMap);
+		Generic[] components = loadAncestors(engine, inputStream, genericMap);
+		Generic generic = engine.getFactory().newGeneric((Class<?>) inputStream.readObject());
+		((CacheImpl) engine.getCurrentCache()).plug(((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components));
+		if (!homeTreeMap.containsKey(homeTreeNodeTs))
+			homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode);
+		genericMap.put(ts[0], generic);
+		return generic;
+	}
+
+	private static long[] loadTs(ObjectInputStream in) throws IOException {
+		long[] ts = new long[4];
+		ts[0] = in.readLong(); // designTs
+		ts[1] = in.readLong(); // birthTs
+		ts[2] = in.readLong(); // lastReadTs
+		ts[3] = in.readLong(); // deathTs
+		return ts;
+	}
+
+	private static Generic[] loadAncestors(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
+		int length = in.readInt();
+		Generic[] ancestors = new Generic[length];
+		for (int index = 0; index < length; index++)
+			ancestors[index] = findByDesignTs(engine, in, genericMap);
+		return ancestors;
+	}
+
+	private static Generic findByDesignTs(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
+		long ts = in.readLong();
+		Generic superGeneric = genericMap.get(ts);
+		if (superGeneric == null) {
+			if (ts == ((EngineImpl) engine).getDesignTs())
+				return engine;
+			return ((EngineImpl) engine).findByDesignTs(ts);
+		} else
+			return superGeneric;
+	}
+	
+	static class UnsafeCache extends CacheImpl {
+		private static final long serialVersionUID = 6486978435494748435L;
+
+		public UnsafeCache(Engine engine) {
+			super(engine);
 		}
 
-		boolean isCache = in.readBoolean();
-		if (isCache)
-			((Externalizable) subContext).readExternal(in);
+		@Override
+		protected boolean isImmediatelyCheckable(AbstractConstraintImpl constraint) {
+			return false;
+		}
+
+		@Override
+		protected boolean isImmediatelyConsistencyCheckable(AbstractConstraintImpl constraint) {
+			return false;
+		}
+
+		@Override
+		protected void check(CheckingType checkingType, boolean isFlushTime, Generic generic) throws ConstraintViolationException {
+			if (isFlushTime)
+				super.check(checkingType, isFlushTime, generic);
+		}
 	}
 
 }
