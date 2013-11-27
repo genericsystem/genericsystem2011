@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
@@ -16,9 +17,9 @@ public class CancelClearTest extends AbstractTest {
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Type car = vehicle.newSubType("Car");
 		assert car.getAttribute("power").equals(vehiclePower);
-		car.cancel(vehiclePower);
-		assert !car.getAttributes().contains(vehiclePower);
-		assert car.getAttribute(vehiclePower, null) != null;
+		car.cancel(vehiclePower, Statics.STRUCTURAL);
+		car.getHolder(vehiclePower).info();
+		assert car.getHolder(vehiclePower).getValue() == null : car.getHolder(vehiclePower);
 	}
 
 	public void testCancelValue() {
@@ -39,7 +40,7 @@ public class CancelClearTest extends AbstractTest {
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
 		Type car = vehicle.newSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
-		car.cancel(vehiclePower);
+		car.cancel(vehiclePower, Statics.STRUCTURAL);
 		assert car.getValue(vehiclePower) == null : car.getValue(vehiclePower);
 	}
 
@@ -61,7 +62,7 @@ public class CancelClearTest extends AbstractTest {
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
 		Type car = vehicle.newSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
-		car.cancelAll(vehiclePower);
+		car.cancelAll(vehiclePower, Statics.STRUCTURAL);
 		assert car.getValue(vehiclePower) == null : car.getValue(vehiclePower);
 	}
 
@@ -71,8 +72,8 @@ public class CancelClearTest extends AbstractTest {
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Type car = vehicle.newSubType("Car");
 		assert car.getAttribute("power").equals(vehiclePower);
-		car.cancel(vehiclePower);
-		car.clear(vehiclePower);
+		car.cancel(vehiclePower, Statics.STRUCTURAL);
+		car.clear(vehiclePower, Statics.STRUCTURAL);
 		assert car.getAttributes().contains(vehiclePower);
 		assert car.getAttribute(vehiclePower, "power") == vehiclePower;
 	}
@@ -96,8 +97,8 @@ public class CancelClearTest extends AbstractTest {
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
 		Type car = vehicle.newSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
-		car.cancel(vehiclePower);
-		car.clear(vehiclePower);
+		car.cancel(vehiclePower, Statics.STRUCTURAL);
+		car.clear(vehiclePower, Statics.STRUCTURAL);
 		assert car.getValue(vehiclePower) == null : car.getHolder(vehiclePower);
 	}
 
@@ -120,9 +121,9 @@ public class CancelClearTest extends AbstractTest {
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
 		Type car = vehicle.newSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
-		car.cancelAll(vehiclePower);
-		car.clearAll(vehiclePower);
-		assert car.getValue(vehiclePower) == null : car.getHolder(vehiclePower);
+		car.cancelAll(vehiclePower, Statics.STRUCTURAL);
+		car.clearAll(vehiclePower, Statics.STRUCTURAL);
+		assert car.getHolder(vehiclePower) == vehicle233 : car.getHolder(vehiclePower);
 	}
 
 }
