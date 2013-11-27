@@ -101,6 +101,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Type human = cache.addType("Human");
 		Generic myck = human.newInstance("myck");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
+		possessVehicle.log();
 		// assert !possessVehicle.isMultiDirectional();
 		// possessVehicle.enableMultiDirectional();
 		// assert possessVehicle.isMultiDirectional();

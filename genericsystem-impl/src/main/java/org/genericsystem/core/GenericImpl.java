@@ -958,7 +958,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private static boolean areAllSupersReached(Generic[] supers, HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
 		for (Generic superGeneric : supers)
-			if (((GenericImpl) superGeneric).isSuperOf(subHomeTreeNode, subSupers, subComponents))
+			if (!((GenericImpl) superGeneric).isSuperOf(subHomeTreeNode, subSupers, subComponents))
 				return false;
 		return true;
 	}
