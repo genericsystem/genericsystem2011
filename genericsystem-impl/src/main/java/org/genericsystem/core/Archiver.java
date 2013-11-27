@@ -154,7 +154,7 @@ public class Archiver {
 				writeGeneric(((GenericImpl) orderGeneric), tmpFormal, tmpContent, homeTreeMap);
 		}
 
-		private static void writeGeneric(GenericImpl generic, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
+		public static void writeGeneric(GenericImpl generic, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
 			writeTs(generic, tmpFormal);
 			tmpContent.writeLong(generic.homeTreeNode.ts);
 			if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
@@ -215,7 +215,7 @@ public class Archiver {
 				Map<Long, Generic> genericMap = new HashMap<>();
 				engine = restoreEngine(engine, formalInputStream, contentInputStream, homeTreeMap, genericMap);
 				for (;;)
-					loadGeneric(engine.getFactory(), formalInputStream, contentInputStream, homeTreeMap, genericMap);
+					loadGeneric(engine, formalInputStream, contentInputStream, homeTreeMap, genericMap);
 			} catch (EOFException ignore) {
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
@@ -246,19 +246,23 @@ public class Archiver {
 			return engine;
 		}
 
-		private static void loadGeneric(Factory factory, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
+		public static Generic loadGeneric(Engine engine, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(formalInputStream);
 			long homeTreeNodeTs = contentInputStream.readLong();
 			HomeTreeNode homeTreeNode = homeTreeMap.get(homeTreeNodeTs);
-			if (null == homeTreeNode)
-				homeTreeNode = homeTreeMap.get(contentInputStream.readLong()).bindInstanceNode(homeTreeNodeTs, (Serializable) contentInputStream.readObject());
-			Generic[] supers = loadAncestors(formalInputStream, genericMap);
-			Generic[] components = loadAncestors(formalInputStream, genericMap);
-			Generic generic = factory.newGeneric((Class<?>) formalInputStream.readObject());
+			if (null == homeTreeNode) {
+				long metaTs = contentInputStream.readLong();
+				homeTreeNode = ((GenericImpl) engine).getHomeTreeNode().ts == metaTs ? ((GenericImpl) engine).getHomeTreeNode() : homeTreeMap.get(metaTs);
+				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, (Serializable) contentInputStream.readObject());
+			}
+			Generic[] supers = loadAncestors(engine, formalInputStream, genericMap);
+			Generic[] components = loadAncestors(engine, formalInputStream, genericMap);
+			Generic generic = engine.getFactory().newGeneric((Class<?>) formalInputStream.readObject());
 			((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components).plug();
 			if (!homeTreeMap.containsKey(homeTreeNodeTs))
 				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode);
 			genericMap.put(ts[0], generic);
+			return generic;
 		}
 
 		private static long[] loadTs(ObjectInputStream in) throws IOException {
@@ -270,13 +274,22 @@ public class Archiver {
 			return ts;
 		}
 
-		private static Generic[] loadAncestors(ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
+		// private static Generic[] loadAncestors(ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
+		// int length = in.readInt();
+		// Generic[] ancestors = new Generic[length];
+		// for (int index = 0; index < length; index++)
+		// ancestors[index] = genericMap.get(in.readLong());
+		// return ancestors;
+		// }
+
+		private static Generic[] loadAncestors(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
 			int length = in.readInt();
 			Generic[] ancestors = new Generic[length];
 			for (int index = 0; index < length; index++)
-				ancestors[index] = genericMap.get(in.readLong());
+				ancestors[index] = CacheImpl.findByDesignTs(engine, in, genericMap);
 			return ancestors;
 		}
+
 	}
 
 }

@@ -155,6 +155,11 @@ public class EngineImpl extends GenericImpl implements Engine {
 		return (CacheImpl) currentCache;
 	}
 
+	@Deprecated
+	public CacheImpl getCacheLocal() {
+		return (CacheImpl) cacheLocal.get();
+	}
+
 	class RootTreeNode extends HomeTreeNode {
 		RootTreeNode() {
 			super(null, Statics.ROOT_NODE_VALUE);

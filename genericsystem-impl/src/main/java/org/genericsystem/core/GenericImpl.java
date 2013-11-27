@@ -140,15 +140,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	<T extends Generic> T plug() {
-		Set<Generic> componentSet = new HashSet<>();
-		for (Generic component : components)
-			if (componentSet.add(component))
-				((GenericImpl) component).lifeManager.engineComposites.add(this);
+		if (getEngine().getCacheLocal() != null)
+			getCurrentCache().plug(this);
+		else {
+			Set<Generic> componentSet = new HashSet<>();
+			for (Generic component : components)
+				if (componentSet.add(component))
+					((GenericImpl) component).lifeManager.engineComposites.add(this);
 
-		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : supers)
-			if (effectiveSupersSet.add(effectiveSuper))
-				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
+			Set<Generic> effectiveSupersSet = new HashSet<>();
+			for (Generic effectiveSuper : supers)
+				if (effectiveSupersSet.add(effectiveSuper))
+					((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
+		}
 
 		return (T) this;
 	}
