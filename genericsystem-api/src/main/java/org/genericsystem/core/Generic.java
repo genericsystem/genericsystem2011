@@ -2,6 +2,7 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.Map;
+
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -782,7 +783,7 @@ public interface Generic extends Comparable<Generic> {
 	String info();
 
 	/**
-	 * Abandons current value of the holder setting it to null.
+	 * Abandons concrete values of the holder setting it to null.
 	 * 
 	 * @param holder
 	 *            the holder.
@@ -791,6 +792,16 @@ public interface Generic extends Comparable<Generic> {
 
 	/**
 	 * Abandons current value of the holder setting it to null.
+	 * 
+	 * @param holder
+	 *            the holder.
+	 * @param metaLevel
+	 *            meta level for the modified values
+	 */
+	public void cancel(Holder holder, int metaLevel);
+
+	/**
+	 * Abandons concrete values of the holder setting it to null.
 	 * 
 	 * @param holder
 	 *            the holder.
@@ -804,12 +815,26 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param holder
 	 *            the holder.
-	 * @param basePos
-	 *            the base position.
+	 * @param metaLevel
+	 *            meta level for the modified values
 	 * @param targets
 	 *            the optional targets for link.
 	 */
-	void cancelAll(Holder holder, int basePos, Generic... targets);
+	void cancelAll(Holder attribute, int metaLevel, Generic... targets);
+
+	/**
+	 * Abandons current value of the holder setting it to null.
+	 * 
+	 * @param holder
+	 *            the holder.
+	 * @param basePos
+	 *            the base position.
+	 * @param metaLevel
+	 *            meta level for the modified values
+	 * @param targets
+	 *            the optional targets for link.
+	 */
+	void cancelAll(Holder holder, int basePos, int metaLevel, Generic... targets);
 
 	/**
 	 * Removes holder from the graph.
@@ -818,6 +843,16 @@ public interface Generic extends Comparable<Generic> {
 	 *            the holder.
 	 */
 	void clear(Holder holder);
+
+	/**
+	 * Removes holder from the graph.
+	 * 
+	 * @param holder
+	 *            the holder.
+	 * @param metaLevel
+	 *            meta level for the modified values
+	 */
+	void clear(Holder holder, int metaLevel);
 
 	/**
 	 * Removes holder from the graph.
@@ -834,12 +869,26 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param holder
 	 *            the holder.
-	 * @param basePos
-	 *            the base position.
+	 * @param metaLevel
+	 *            meta level for the modified values
 	 * @param targets
 	 *            the optional targets for relation.
 	 */
-	void clearAll(Holder holder, int basePos, Generic... targets);
+	void clearAll(Holder attribute, int metaLevel, Generic... targets);
+
+	/**
+	 * Removes holder from the graph.
+	 * 
+	 * @param holder
+	 *            the holder.
+	 * @param basePos
+	 *            the base position.
+	 * @param metaLevel
+	 *            meta level for the modified values
+	 * @param targets
+	 *            the optional targets for relation.
+	 */
+	void clearAll(Holder holder, int basePos, int metaLevel, Generic... targets);
 
 	/**
 	 * Returns the map associated with this generic. Map is found by class of Map Provider.
