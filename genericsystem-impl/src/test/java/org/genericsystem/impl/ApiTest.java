@@ -594,6 +594,7 @@ public class ApiTest extends AbstractTest {
 
 	public void testMultipleInheritance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		cache.getMetaAttribute().log();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("Power");
 		Type robot = cache.addType("Robot");

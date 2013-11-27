@@ -18,7 +18,6 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -175,7 +174,7 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-			break;
+		break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -190,11 +189,11 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, false, true);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-			break;
+		break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-			break;
+		break;
 		}
 	}
 
@@ -639,12 +638,6 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 
 	@Override
 	void simpleRemove(Generic generic) {
-		// log.info("remove : " + generic.info() + " " + generic.getClass());
-		// if (generic.getComponentsSize() == 1) {
-		// log.info("baseComponent : " + ((Holder) generic).getBaseComponent().info());
-		// if (((Holder) generic).getBaseComponent().getComponentsSize() == 1)
-		// log.info("baseComponent : " + ((Holder) ((Holder) generic).getBaseComponent()).getBaseComponent().info());
-		// }
 		if (!isAlive(generic))
 			rollback(new AliveConstraintViolationException(generic + " is not alive"));
 		if (generic.getClass().isAnnotationPresent(SystemGeneric.class) && generic.equals(find(generic.getClass())))
