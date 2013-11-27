@@ -896,7 +896,7 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 		} else
 			return superGeneric;
 	}
-	
+
 	static class UnsafeCache extends CacheImpl {
 		private static final long serialVersionUID = 6486978435494748435L;
 

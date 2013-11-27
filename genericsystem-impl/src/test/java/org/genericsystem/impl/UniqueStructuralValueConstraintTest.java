@@ -22,7 +22,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.setType("Car");
 		Type car2 = cache.setType("Car");
-		assert Objects.equals(car, car2);
+		assert Objects.equals(car, car2) : car.info() + car2.info();
 	}
 
 	public void testAttributeWithSameNameAsTypeOK() {

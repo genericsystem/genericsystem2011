@@ -65,7 +65,7 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	public void testType() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, Myck.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Human.class, Myck.class).start();
 		Type vehicle = cache.find(Vehicle.class);
 		Type human = cache.find(Human.class);
 		Type myck = cache.find(Myck.class);
@@ -267,7 +267,7 @@ public class AnnotationTest extends AbstractTest {
 		Generic myTransformerChildrenGames = cache.find(MyTransformerChildrenGames.class);
 
 		assert myTransformerChildrenGames.inheritsFrom(transformerChildrenGames) : myTransformerChildrenGames.info() + transformerChildrenGames.info();
-		assert ((GenericImpl) transformerChildrenGames).isSuperOf_(myTransformerChildrenGames);
+		assert ((GenericImpl) transformerChildrenGames).isSuperOf(myTransformerChildrenGames);
 
 		assert !myTransformerChildrenGames.inheritsFrom(myGames);
 		assert !myTransformerChildrenGames.inheritsFrom(myChildren);

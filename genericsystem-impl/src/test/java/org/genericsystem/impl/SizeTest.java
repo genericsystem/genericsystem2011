@@ -115,13 +115,7 @@ public class SizeTest extends AbstractTest {
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
 		// vehiclePower.enableSingularConstraint();
 		vehicle.setValue(vehiclePower, 123);
-		new RollbackCatcher() {
-			@Override
-			public void intercept() {
-				car.setValue(vehiclePower, 123);
-			}
-		}.assertIsCausedBy(SizeConstraintViolationException.class);
-
+		car.setValue(vehiclePower, 123);
 	}
 
 	public void checkConstraintWithRelation() {

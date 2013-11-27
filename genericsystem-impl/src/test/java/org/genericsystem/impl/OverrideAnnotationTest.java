@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 public class OverrideAnnotationTest extends AbstractTest {
 
 	public void test() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Car.class, Man.class, OutsideColor.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Car.class, Man.class, OutsideColor.class).start();
 		Type vehicle = cache.find(Vehicle.class);
 		Type car = cache.find(Car.class);
 		Type human = cache.find(Human.class);

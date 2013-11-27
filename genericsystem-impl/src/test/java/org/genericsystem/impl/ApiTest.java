@@ -44,7 +44,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void specializeAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Power.class);
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine(Vehicle.class, Power.class).start();
 		Attribute power = cache.find(Power.class);
 		assert power instanceof Power;
 	}
@@ -235,7 +235,7 @@ public class ApiTest extends AbstractTest {
 		Type aOnb = b.newSubType("A");
 		// aOnb.log();
 		assert !a.inheritsFrom(aOnb);
-		assert !((GenericImpl) aOnb).isSuperOf_(a);
+		assert !((GenericImpl) aOnb).isSuperOf(a);
 		// }.assertIsCausedBy(FunctionalConsistencyViolationException.class);
 	}
 
@@ -491,12 +491,15 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute("power");
+
 		Holder vehicle20 = vehicle.setValue(vehiclePower, 20);
 		Holder vehicle30 = vehicle.setValue(vehiclePower, 30);
 		Generic myVehicle = vehicle.newInstance("myVehicle");
+
 		Holder myVehicle20 = myVehicle.setValue(vehicle30, 20);
 		assert myVehicle20.inheritsFrom(vehicle30);
 		assert !myVehicle20.inheritsFrom(vehicle20);
+
 		Holder myVehicle30 = myVehicle.setValue(vehicle20, 30);
 		assert myVehicle30.inheritsFrom(vehicle20);
 		assert !myVehicle30.inheritsFrom(vehicle30);
@@ -564,7 +567,7 @@ public class ApiTest extends AbstractTest {
 		Relation carPower = ((GenericImpl) car).addSubAttribute(vehiclePower, "power2");
 		Generic myCar = car.newInstance("myCar");
 		Holder myCar233 = myCar.setValue(vehiclePower, 233);
-		assert myCar233.inheritsFrom(carPower) : myCar233.info();
+		assert !myCar233.inheritsFrom(carPower) : myCar233.info();
 	}
 
 	public void testOverrideProperty() {
@@ -586,17 +589,21 @@ public class ApiTest extends AbstractTest {
 		Relation carPower = ((GenericImpl) car).addSubProperty(vehiclePower, "power2");
 		Generic myCar = car.newInstance("myCar");
 		Holder myCar233 = myCar.setValue(vehiclePower, 233);
-		assert myCar233.inheritsFrom(carPower) : myCar233.info();
+		assert !myCar233.inheritsFrom(carPower) : myCar233.info();
 	}
 
 	public void testMultipleInheritance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Attribute vehiclePower = vehicle.addProperty("power");
+		Attribute vehiclePower = vehicle.addProperty("Power");
 		Type robot = cache.addType("Robot");
-		Attribute robotPower = robot.addProperty("power");
+		Attribute robotPower = robot.addProperty("Power");
 		Type transformer = cache.addType("Transformer", vehicle, robot);
-		Relation transformerPower = ((GenericImpl) transformer).addProperty("power");
+		assert transformer.inheritsFrom(robot);
+		assert transformer.inheritsFrom(vehicle);
+		assert cache.getMetaAttribute().inheritsFrom(cache.getEngine());
+		log.info("-----------------------------------------------------------------------------------------");
+		Attribute transformerPower = ((GenericImpl) transformer).addProperty("Power");
 		assert transformerPower.inheritsFrom(vehiclePower);
 		assert transformerPower.inheritsFrom(robotPower);
 	}
