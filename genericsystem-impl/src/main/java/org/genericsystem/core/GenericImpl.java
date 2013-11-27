@@ -940,14 +940,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		assert subComponents.length == components.length;
 		assert Arrays.equals(components, subComponents) : Arrays.toString(components) + " " + Arrays.toString(subComponents);
 
-		if (subHomeTreeNode.inheritsFrom(homeTreeNode)) {
-			if (!subHomeTreeNode.equals(homeTreeNode))
+		if (subHomeTreeNode.inheritsFrom(homeTreeNode))
+			if (areAllSupersReached(supers, subHomeTreeNode, subSupers, subComponents))
 				return true;
-			if (Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
-				if (areAllSupersReached(supers, subSupers))
-					return true;
-		}
-
 		return false;
 	}
 
@@ -961,14 +956,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	private static boolean areAllSupersReached(Generic[] supers, Generic[] subSupers) {
-		LOOP: for (Generic superGeneric : supers) {
-			for (Generic subSuper : subSupers) {
-				if (subSuper.inheritsFrom(superGeneric))
-					continue LOOP;
-			}
-			return false;// Warning
-		}
+	private static boolean areAllSupersReached(Generic[] supers, HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
+		for (Generic superGeneric : supers)
+			if (((GenericImpl) superGeneric).isSuperOf(subHomeTreeNode, subSupers, subComponents))
+				return false;
 		return true;
 	}
 
