@@ -895,13 +895,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return false;
 		if (subComponents.length < components.length)
 			return false;
-		else if (subComponents.length > components.length) {
-			for (int i = 0; i < subComponents.length; i++)
-				if (isSuperOf(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.truncate(i, subComponents)))
-					return true;
-			return false;
-		}
-		assert subComponents.length == components.length;
 
 		// direct inheritance of subsupers
 		for (Generic subSuper : subSupers)
@@ -919,23 +912,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 		logValue("BBB", "Power", homeTreeNode, supers, components, "Power", subHomeTreeNode, subSupers, subComponents);
 
+		if (subComponents.length > components.length) {
+			for (int i = 0; i < subComponents.length; i++)
+				if (isSuperOf(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.truncate(i, subComponents)))
+					return true;
+			return false;
+		}
+
+		assert subComponents.length == components.length;
+
 		for (int i = 0; i < subComponents.length; i++) {
 			assert subComponents[i] != null || components[i] != null;
 			if (components[i] != null && subComponents[i] != null) {
 				if (!((GenericImpl) subComponents[i]).inheritsFrom(components[i]))
 					return false;
-				if (!subComponents[i].equals(components[i]))
-					for (Generic subSuper : ((GenericImpl) subComponents[i]).supers) {
-						if (subSuper.inheritsFrom(components[i]))
-							if (!subSuper.equals(subComponents[i])) {
-								// logValue("BBB", "Power", homeTreeNode, supers, components, "Power", subHomeTreeNode, subSupers, subComponents);
-								if (isSuperOf(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.replace(i, subComponents, subSuper))) {
-									// logValue("CCC", "Power", homeTreeNode, supers, components, "Power", subHomeTreeNode, subSupers, subComponents);
-									return true;
-								}
-							}
-						return false;
-					}
+				// if (!subComponents[i].equals(components[i]))
+				// for (Generic subSuper : ((GenericImpl) subComponents[i]).supers) {
+				// if (subSuper.inheritsFrom(components[i]))
+				// if (!subSuper.equals(subComponents[i])) {
+				// // logValue("BBB", "Power", homeTreeNode, supers, components, "Power", subHomeTreeNode, subSupers, subComponents);
+				// if (isSuperOf(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.replace(i, subComponents, subSuper))) {
+				// // logValue("CCC", "Power", homeTreeNode, supers, components, "Power", subHomeTreeNode, subSupers, subComponents);
+				// return true;
+				// }
+				// }
+				// return false;
+				// }
 			} else if (subComponents[i] == null) {
 				for (Generic subSuper : subSupers) {
 					if (subSuper.inheritsFrom(components[i]))
@@ -959,7 +961,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 
 		}
-		assert Arrays.equals(components, subComponents) : Arrays.toString(components) + " " + Arrays.toString(subComponents);
+		// assert Arrays.equals(components, subComponents) : Arrays.toString(components) + " " + Arrays.toString(subComponents);
 
 		return true;
 	}

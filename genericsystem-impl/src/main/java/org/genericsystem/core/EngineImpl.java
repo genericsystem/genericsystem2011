@@ -91,6 +91,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 			@Override
 			public Iterator<T> children(T node) {
+				// TODO KK ? node.dependenciesIterator calls getCurrentCache(). Do we want that ?
 				return ((GenericImpl) node).dependenciesIterator();
 			}
 		}) {

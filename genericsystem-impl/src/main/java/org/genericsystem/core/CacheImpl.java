@@ -820,7 +820,7 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 	public static Generic findByDesignTs(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
 		long ts = in.readLong();
 		Generic superGeneric = genericMap.get(ts);
-		if (superGeneric == null)
+		if (superGeneric == null) // KK tree has null components !!!
 			return ts == ((EngineImpl) engine).getDesignTs() ? engine : ((EngineImpl) engine).findByDesignTs(ts);
 		return superGeneric;
 	}
