@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
@@ -91,7 +92,6 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 			@Override
 			public Iterator<T> children(T node) {
-				// TODO KK ? node.dependenciesIterator calls getCurrentCache(). Do we want that ?
 				return ((GenericImpl) node).dependenciesIterator();
 			}
 		}) {

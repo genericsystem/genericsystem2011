@@ -29,8 +29,6 @@ import java.util.zip.ZipOutputStream;
  */
 public class Archiver {
 
-	// private static final Logger log = LoggerFactory.getLogger(Archiver.class);
-
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 	private Engine engine;
@@ -206,8 +204,7 @@ public class Archiver {
 
 	}
 
-	public static class SnapshotLoader {// extends HashMap<Long, Generic> {
-		// private static final long serialVersionUID = 3139276947667714316L;
+	public static class SnapshotLoader {
 
 		public static void loadSnapshot(Engine engine, String path) {
 			try (ObjectInputStream contentInputStream = new ObjectInputStream(readContent(path)); ObjectInputStream formalInputStream = new ObjectInputStream(readFormal(path));) {
@@ -273,14 +270,6 @@ public class Archiver {
 			ts[3] = in.readLong(); // deathTs
 			return ts;
 		}
-
-		// private static Generic[] loadAncestors(ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
-		// int length = in.readInt();
-		// Generic[] ancestors = new Generic[length];
-		// for (int index = 0; index < length; index++)
-		// ancestors[index] = genericMap.get(in.readLong());
-		// return ancestors;
-		// }
 
 		private static Generic[] loadAncestors(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
 			int length = in.readInt();

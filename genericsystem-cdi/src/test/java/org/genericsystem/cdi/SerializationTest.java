@@ -1,4 +1,4 @@
-package org.genericsystem.impl;
+package org.genericsystem.cdi;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,7 +9,6 @@ import java.io.ObjectOutputStream;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -18,7 +17,7 @@ import org.testng.annotations.Test;
 public class SerializationTest extends AbstractTest {
 
 	public void testAdds() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
 		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();) {
 			new ObjectOutputStream(outputStream).writeObject(cache);// writeExternal
@@ -28,12 +27,12 @@ public class SerializationTest extends AbstractTest {
 			assert cache.getType("Vehicle") != vehicle;
 			assert cache.getType("Vehicle").getValue().equals(vehicle.getValue());
 		} catch (IOException | ClassNotFoundException e) {
-			assert false : e.getMessage();
+			e.printStackTrace();
 		}
 	}
 
 	public void testSuperCache() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
 		Cache superCache = cache.mountNewCache();
 		Attribute vehiclePower = vehicle.addAttribute("power");
@@ -45,7 +44,7 @@ public class SerializationTest extends AbstractTest {
 			Type vehicle2 = cache.getType("Vehicle");
 			assert vehicle2 != vehicle;
 			assert vehicle2.getValue().equals(vehicle.getValue());
-			assert vehicle2.getAttribute("power") != null;
+			assert vehicle2.getAttribute("power") != null : vehicle2.getAttribute("power");
 			assert vehicle2.getAttribute("power") != vehiclePower;
 			assert ((CacheImpl) cache).getSubContext() instanceof Cache;
 		} catch (IOException | ClassNotFoundException e) {
@@ -54,7 +53,7 @@ public class SerializationTest extends AbstractTest {
 	}
 
 	public void testAutomatics() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute("power");
 		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();) {
@@ -73,7 +72,7 @@ public class SerializationTest extends AbstractTest {
 	}
 
 	public void testRemoves() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
 		Generic myVehicle = vehicle.newInstance("myVehicle");
 		Cache superCache = cache.mountNewCache();

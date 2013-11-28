@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -947,8 +948,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (!subComponents[i].inheritsFrom(components[i]))
 					return false;
 			} else if (subComponents[i] == null) {
-				if (!(((GenericImpl) components[i]).isSuperOf(subHomeTreeNode, subSupers, subComponents)))
-					return false;
+				if (!((GenericImpl) components[i]).equiv(homeTreeNode, supers, components))
+					if (!(((GenericImpl) components[i]).isSuperOf(subHomeTreeNode, subSupers, subComponents)))
+						return false;
 			} else if (components[i] == null) {
 				if (!isSuperOf(homeTreeNode, supers, components, subComponents[i]))
 					return false;

@@ -26,16 +26,6 @@ public class Statics {
 
 	private static ThreadLocal<Long> threadDebugged = new ThreadLocal<Long>();
 
-	private static ThreadLocal<Engine> engineLocal = new ThreadLocal<Engine>();
-
-	public static void setEngineLocal(Engine engine) {
-		engineLocal.set(engine);
-	}
-
-	public static Engine getEngineLocal() {
-		return engineLocal.get();
-	}
-
 	public static final Flag FLAG = new Flag();
 	public static final Generic[] EMPTY_GENERIC_ARRAY = new Generic[] {};
 	public static final String ROOT_NODE_VALUE = "Engine";
