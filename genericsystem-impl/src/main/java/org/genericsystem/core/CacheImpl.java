@@ -1,11 +1,7 @@
 package org.genericsystem.core;
 
-import java.io.Externalizable;
 import java.io.IOException;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,13 +14,12 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
-import org.genericsystem.core.Archiver.SnapshotLoader;
-import org.genericsystem.core.Archiver.SnapshotWriter;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -49,25 +44,19 @@ import org.genericsystem.tree.TreeImpl;
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
-public class CacheImpl extends AbstractContext implements Cache, Externalizable {
+public class CacheImpl extends AbstractContext implements Cache {
 
-	private AbstractContext subContext;
+	protected AbstractContext subContext;
 
 	private transient Map<Generic, TimestampedDependencies> compositeDependenciesMap;
 	private transient Map<Generic, TimestampedDependencies> inheritingDependenciesMap;
 
-	private Set<Generic> adds;
-	private Set<Generic> removes;
-	private Set<Generic> automatics;
+	protected Set<Generic> adds;
+	protected Set<Generic> removes;
+	protected Set<Generic> automatics;
 
 	public CacheImpl(Cache cache) {
 		subContext = (CacheImpl) cache;
-		clear();
-	}
-
-	// TODO call by Serialization
-	public CacheImpl() {
-		// subContext = (CacheImpl) cache;
 		clear();
 	}
 
@@ -174,7 +163,7 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -189,11 +178,11 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, false, true);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -393,7 +382,7 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 
 	@Override
 	public Cache mountNewCache() {
-		return new CacheImpl(this).start();
+		return getEngine().getFactory().newCache(this).start();
 	}
 
 	@Override
@@ -772,61 +761,15 @@ public class CacheImpl extends AbstractContext implements Cache, Externalizable 
 		return reFounds;
 	}
 
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
-		if (subContext instanceof CacheImpl) {
-			out.writeBoolean(true);
-			((Externalizable) subContext).writeExternal(out);
-		} else {
-			out.writeBoolean(false);
-			out.writeLong(((Transaction) subContext).getTs());
-			Statics.setEngineLocal(getEngine());
-		}
-
-		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
-		out.writeInt(adds.size());
-		for (Generic add : adds)
-			SnapshotWriter.writeGeneric((GenericImpl) add, (ObjectOutputStream) out, (ObjectOutputStream) out, homeTreeMap);
-		out.writeInt(automatics.size());
-		for (Generic automatic : automatics)
-			SnapshotWriter.writeGeneric((GenericImpl) automatic, (ObjectOutputStream) out, (ObjectOutputStream) out, homeTreeMap);
-		out.writeInt(removes.size());
-		for (Generic remove : removes)
-			out.writeLong(((GenericImpl) remove).getDesignTs());
-	}
-
-	@Override
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		Engine engine = Statics.getEngineLocal();
-		if (in.readBoolean()) {
-			subContext = new CacheImpl();
-			((Externalizable) subContext).readExternal(in);
-		} else
-			subContext = new Transaction(in.readLong(), engine);
-
-		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
-		Map<Long, Generic> genericMap = new HashMap<>();
-		int addSize = in.readInt();
-		for (int i = 0; i < addSize; i++)
-			adds.add(SnapshotLoader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
-		int automaticSize = in.readInt();
-		for (int i = 0; i < automaticSize; i++)
-			automatics.add(SnapshotLoader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
-		int removeSize = in.readInt();
-		for (int i = 0; i < removeSize; i++)
-			removes.add(findByDesignTs(engine, (ObjectInputStream) in, genericMap));
-	}
-
 	public static Generic findByDesignTs(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
 		long ts = in.readLong();
 		Generic superGeneric = genericMap.get(ts);
-		if (superGeneric == null) // KK tree has null components !!!
+		if (((EngineImpl) engine).getCacheLocal() != null && superGeneric == null) // TODO KK ?
 			return ts == ((EngineImpl) engine).getDesignTs() ? engine : ((EngineImpl) engine).findByDesignTs(ts);
 		return superGeneric;
 	}
 
 	static class UnsafeCache extends CacheImpl {
-		private static final long serialVersionUID = 6486978435494748435L;
 
 		public UnsafeCache(Engine engine) {
 			super(engine);

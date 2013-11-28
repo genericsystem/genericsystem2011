@@ -15,6 +15,10 @@ public class CdiFactory extends DefaultFactory {
 	@Inject
 	private Instance<Cache> cache;
 
+	public CdiFactory() {
+		super(CacheSerializable.class);
+	}
+
 	@Override
 	public Cache getCacheLocal() {
 		return cache.get();

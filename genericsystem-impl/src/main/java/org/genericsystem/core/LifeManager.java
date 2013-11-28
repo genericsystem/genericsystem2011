@@ -18,9 +18,9 @@ public class LifeManager {
 
 	private final long designTs;
 	private long birthTs;
+	private AtomicLong lastReadTs;
 	private long deathTs;
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	private AtomicLong lastReadTs;
 	EngineDependencies engineDirectInheritings = new EngineDependencies();
 	EngineDependencies engineComposites = new EngineDependencies();
 
