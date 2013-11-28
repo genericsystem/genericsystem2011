@@ -878,6 +878,39 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isSuperOf(homeTreeNode, supers, components, ((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
 	}
 
+	public boolean inheritsFrom(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
+		if (equiv(homeTreeNode, supers, components))
+			return true;
+		if (homeTreeNode.getMetaLevel() > getMetaLevel())
+			return false;
+		if (this.components.length < components.length)
+			return false;
+		for (Generic subSuper : this.supers)
+			if (isSuperOf(homeTreeNode, supers, components, ((GenericImpl) subSuper).homeTreeNode, ((GenericImpl) subSuper).supers, ((GenericImpl) subSuper).components))
+				return true;
+		if (!this.homeTreeNode.inheritsFrom(homeTreeNode))
+			return false;
+		for (Generic superGeneric : supers)
+			if (!(inheritsFrom(superGeneric)))
+				return false;
+		if (this.components.length > components.length) {
+			for (int i = 0; i < this.components.length; i++)
+				if (isSuperOf(homeTreeNode, supers, components, this.homeTreeNode, this.supers, Statics.truncate(i, this.components)))
+					return true;
+			return false;
+		}
+		assert this.components.length == components.length;
+		for (int i = 0; i < this.components.length; i++)
+			if (components[i] != null) {
+				if (!(this.components[i].inheritsFrom(components[i])))
+					return false;
+			} else if (!((GenericImpl) this.components[i]).inheritsFrom(homeTreeNode, supers, components))
+				return false;
+		return true;
+
+		// return isSuperOf(homeTreeNode, supers, components, homeTreeNode, supers, components);
+	}
+
 	public static boolean isSuperOf(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Generic subGeneric) {
 		return isSuperOf(homeTreeNode, supers, components, ((GenericImpl) subGeneric).homeTreeNode, ((GenericImpl) subGeneric).supers, ((GenericImpl) subGeneric).components);
 	}
@@ -895,74 +928,31 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return false;
 		if (subComponents.length < components.length)
 			return false;
-
-		// direct inheritance of subsupers
 		for (Generic subSuper : subSupers)
 			if (isSuperOf(homeTreeNode, supers, components, ((GenericImpl) subSuper).homeTreeNode, ((GenericImpl) subSuper).supers, ((GenericImpl) subSuper).components))
 				return true;
-
 		if (!subHomeTreeNode.inheritsFrom(homeTreeNode))
 			return false;
-
-		logValue("AAA", "Power", homeTreeNode, supers, components, "Power", subHomeTreeNode, subSupers, subComponents);
-
 		for (Generic superGeneric : supers)
 			if (!((GenericImpl) superGeneric).isSuperOf(subHomeTreeNode, subSupers, subComponents))
 				return false;
-
-		logValue("BBB", "Power", homeTreeNode, supers, components, "Power", subHomeTreeNode, subSupers, subComponents);
-
 		if (subComponents.length > components.length) {
 			for (int i = 0; i < subComponents.length; i++)
 				if (isSuperOf(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.truncate(i, subComponents)))
 					return true;
 			return false;
 		}
-
-		assert subComponents.length == components.length;
-
-		for (int i = 0; i < subComponents.length; i++) {
-			assert subComponents[i] != null || components[i] != null;
+		for (int i = 0; i < subComponents.length; i++)
 			if (components[i] != null && subComponents[i] != null) {
-				if (!((GenericImpl) subComponents[i]).inheritsFrom(components[i]))
+				if (!subComponents[i].inheritsFrom(components[i]))
 					return false;
-				// if (!subComponents[i].equals(components[i]))
-				// for (Generic subSuper : ((GenericImpl) subComponents[i]).supers) {
-				// if (subSuper.inheritsFrom(components[i]))
-				// if (!subSuper.equals(subComponents[i])) {
-				// // logValue("BBB", "Power", homeTreeNode, supers, components, "Power", subHomeTreeNode, subSupers, subComponents);
-				// if (isSuperOf(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.replace(i, subComponents, subSuper))) {
-				// // logValue("CCC", "Power", homeTreeNode, supers, components, "Power", subHomeTreeNode, subSupers, subComponents);
-				// return true;
-				// }
-				// }
-				// return false;
-				// }
 			} else if (subComponents[i] == null) {
-				for (Generic subSuper : subSupers) {
-					if (subSuper.inheritsFrom(components[i]))
-						// if (!subSuper.equals(subComponents[i]))
-						if (isSuperOf(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.replace(i, subComponents, subSuper)))
-							return true;
-					// logValue(ConstraintValue.class, homeTreeNode, supers, components, true, subHomeTreeNode, subSupers, subComponents);
-
+				if (!(((GenericImpl) components[i]).isSuperOf(subHomeTreeNode, subSupers, subComponents)))
 					return false;
-				}
 			} else if (components[i] == null) {
-				if (!((GenericImpl) subComponents[i]).equiv(homeTreeNode, supers, components))
-					for (Generic subSuper : ((GenericImpl) subComponents[i]).supers) {
-						if (subSuper.inheritsFrom(components[i]))
-							// if (!subSuper.equals(subComponents[i]))
-							if (isSuperOf(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.replace(i, subComponents, subSuper)))
-								return true;
-						// logValue(ConstraintValue.class, homeTreeNode, supers, components, true, subHomeTreeNode, subSupers, subComponents);
-						return false;
-					}
+				if (!isSuperOf(homeTreeNode, supers, components, subComponents[i]))
+					return false;
 			}
-
-		}
-		// assert Arrays.equals(components, subComponents) : Arrays.toString(components) + " " + Arrays.toString(subComponents);
-
 		return true;
 	}
 
@@ -977,62 +967,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			log.info("\n");
 		}
 	}
-
-	// public boolean isSuperOf3(HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
-	// if (equiv(subHomeTreeNode, subSupers, subComponents))
-	// return true;
-	// if (!internalIsSuperOf3(components, subComponents))
-	// return false;
-	// if (!internalIsSuperOf3(subHomeTreeNode, subSupers))
-	// return false;
-	// return true;
-	// }
-	//
-	// private boolean internalIsSuperOf3(HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
-	// if (subHomeTreeNode.inheritsFrom(homeTreeNode))
-	// if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
-	// return true;
-	// for (Generic sub : subSupers)
-	// if (sub.inheritsFrom(this))
-	// return true;
-	// return false;
-	// }
-
-	// private static boolean internalIsSuperOf3(Generic[] components, Generic[] subComponents) {
-	// if (components.length == subComponents.length) {
-	// for (int i = 0; i < subComponents.length; i++) {
-	// if (components[i] != null && subComponents[i] != null) {
-	// if (!Arrays.equals(components, ((GenericImpl) components[i]).components) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
-	// if (!(subComponents[i].inheritsFrom(components[i])))
-	// return false;
-	// }
-	// if (components[i] == null) {
-	// if (!Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
-	// return false;
-	// } else if (subComponents[i] == null)
-	// if (!components[i].isEngine() && (!Arrays.equals(components, ((GenericImpl) components[i]).components)))
-	// return false;
-	// }
-	// return true;
-	// }
-	//
-	// if (components.length < subComponents.length)
-	// for (int i = 0; i < subComponents.length; i++)
-	// if (internalIsSuperOf3(components, Statics.truncate(i, subComponents)))
-	// return true;
-	//
-	// return false;
-	// }
-
-	// private static boolean internalIsSuperOf3bis(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, HomeTreeNode subHomeTreeNode, Generic[] subSupers) {
-	// if (subHomeTreeNode.inheritsFrom(homeTreeNode))
-	// if (!subHomeTreeNode.equals(homeTreeNode) || Statics.CONCRETE != subHomeTreeNode.getMetaLevel())
-	// return true;
-	// for (Generic sub : subSupers)
-	// if (((GenericImpl) sub).inheritsFrom2(homeTreeNode, supers, components))
-	// return true;
-	// return false;
-	// }
 
 	public boolean inheritsFrom2(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
 		if (equiv(homeTreeNode, supers, components))
