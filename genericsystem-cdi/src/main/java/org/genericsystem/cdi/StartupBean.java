@@ -23,7 +23,6 @@ public class StartupBean implements Extension {
 	private Logger log = LoggerFactory.getLogger(StartupBean.class);
 
 	public void onStartup(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
-
 		// BoundSessionContext ctx = Container.instance().deploymentManager().instance().select(BoundSessionContext.class).get();
 		// MapInstance<String, Object> map = new HashMap<>();
 		// ctx.associate(map);
@@ -38,7 +37,7 @@ public class StartupBean implements Extension {
 			Type clazz = bean.getBeanClass();
 			// (bean instanceof ProducerMethod) ? ((ProducerMethod<?, ?>) bean).getWeldAnnotated().getBaseType() : bean.getBeanClass();
 			if (clazz instanceof Class) {
-				Class<?> classToProvide = (Class) clazz;
+				Class<?> classToProvide = (Class<?>) clazz;
 				if (classToProvide.getAnnotation(SystemGeneric.class) != null) {
 					log.info("Generic System: providing " + classToProvide);
 					userClasses.addUserClasse(classToProvide);
