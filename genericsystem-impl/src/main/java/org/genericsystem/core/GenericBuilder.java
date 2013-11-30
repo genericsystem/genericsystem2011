@@ -11,6 +11,7 @@ import org.genericsystem.exception.RollbackException;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
+import org.genericsystem.iterator.ArrayIterator;
 import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,17 +33,16 @@ class GenericBuilder {
 	boolean isProperty;
 	int basePos;
 
-	GenericBuilder(CacheImpl cache, Generic meta, HomeTreeNode homeTreeNode, Generic[] aliveSupers, Generic[] aliveNullComponents, int basePos) {
+	GenericBuilder(CacheImpl cache, Generic meta, HomeTreeNode homeTreeNode, Generic[] aliveSupers, Generic[] aliveNullComponents, int basePos, boolean respectSupers) {
 		this.cache = cache;
 		this.meta = meta;
 		this.homeTreeNode = homeTreeNode;
-		supers = aliveSupers;
-		assert supers.length != 0;
 		components = aliveNullComponents;
 		this.basePos = basePos;
 		isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-		supers = getExtendedDirectSupers(meta, isProperty, isSingular, basePos);
+		supers = new Supers(aliveSupers).toArray();
+		supers = getExtendedDirectSupers(respectSupers);
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -104,20 +104,22 @@ class GenericBuilder {
 		return false;
 	}
 
-	protected Generic[] getExtendedDirectSupers(final Generic meta, final boolean isProperty, final boolean isSingular, final int basePos) {
+	protected Generic[] getExtendedDirectSupers(final boolean respectSupers) {
 		return new HashCache<Generic>() {
 			private static final long serialVersionUID = 5910353456286109539L;
 
 			@Override
 			public Iterator<Generic> cacheSupplier() {
-				return new AbstractSelectableLeafIterator(cache.getEngine()) {
+				final Engine engine = cache.getEngine();
+				return new AbstractSelectableLeafIterator(engine) {
+					{
+						if (respectSupers && !supers[0].equals(engine))
+							iterators.put(engine, new SelectableIterator<>(new ArrayIterator<>(supers)));
+					}
 
 					@Override
 					public boolean isSelected(Generic candidate) {
 						boolean result = ((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components);
-						// if ("Power".equals(candidate.getValue())) {
-						// log.info("XXXXXXXXX" + candidate.info() + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
-						// }
 
 						if (result)
 							return true;

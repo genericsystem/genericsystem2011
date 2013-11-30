@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -702,6 +701,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().bind(this, value, null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
+	// TODO KK replace newSubType by addSubType and setSubType
 	@Override
 	public <T extends Type> T newSubType(Serializable value, Generic... components) {
 		return getCurrentCache().bind(getMeta(), value, null, this, false, Statics.MULTIDIRECTIONAL, components);
@@ -952,6 +952,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					if (!(((GenericImpl) components[i]).isSuperOf(subHomeTreeNode, subSupers, subComponents)))
 						return false;
 			} else if (components[i] == null) {
+				// if (!((GenericImpl) subComponents[i]).equiv(homeTreeNode, subSupers, subComponents))
 				if (!isSuperOf(homeTreeNode, supers, components, subComponents[i]))
 					return false;
 			}
@@ -982,58 +983,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return true;
 		return false;
 	}
-
-	// // Conserve this!!!
-	//
-	// public boolean isSuperOf(Generic generic) {
-	// assert generic != null;
-	// if (equals(generic))
-	// return true;
-	// if (((GenericImpl) generic).isEngine())
-	// return isEngine();
-	// return isSuperOf(primaries, components, ((GenericImpl) generic).primaries, ((GenericImpl) generic).components);
-	// }
-
-	// // Conserve this!!!
-	// public boolean isSuperOf(HomeTreeNode subHomeTreeNode, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-	// return subHomeTreeNode.inheritsFrom(homeTreeNode) && isSuperOf(primaries, components, subPrimaries, subComponents);
-	// }
-
-	// // Conserve this!!!
-	// public static boolean isSuperOf(HomeTreeNode[] primaries, Generic[] components, final HomeTreeNode[] subPrimaries, Generic[] subComponents) {
-	// if (primaries.length == subPrimaries.length && components.length == subComponents.length) {
-	// for (int i = 0; i < subPrimaries.length; i++) {
-	// if (!subPrimaries[i].inheritsFrom(primaries[i]))
-	// return false;
-	// }
-	// for (int i = 0; i < subComponents.length; i++) {
-	// if (components[i] != null && subComponents[i] != null) {
-	// if (!Arrays.equals(primaries, ((GenericImpl) components[i]).primaries) || !Arrays.equals(components, ((GenericImpl) components[i]).components) || !Arrays.equals(subPrimaries, ((GenericImpl) subComponents[i]).primaries)
-	// || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
-	// if (!((GenericImpl) components[i]).isSuperOf(subComponents[i]))
-	// return false;
-	// }
-	// if (components[i] == null) {
-	// if (!Arrays.equals(subPrimaries, ((GenericImpl) subComponents[i]).primaries) || !Arrays.equals(subComponents, ((GenericImpl) subComponents[i]).components))
-	// return false;
-	// } else if (subComponents[i] == null)
-	// if (!components[i].isEngine() && (!Arrays.equals(primaries, ((GenericImpl) components[i]).primaries) || !Arrays.equals(components, ((GenericImpl) components[i]).components)))
-	// return false;
-	// }
-	// return true;
-	// }
-	//
-	// if (components.length <= subComponents.length && primaries.length < subPrimaries.length)
-	// for (int i = 0; i < subPrimaries.length; i++)
-	// if (isSuperOf(primaries, components, Statics.truncate(i, subPrimaries), subComponents))
-	// return true;
-	// if (components.length < subComponents.length && primaries.length <= subPrimaries.length)
-	// for (int i = 0; i < subComponents.length; i++)
-	// if (isSuperOf(primaries, components, subPrimaries, Statics.truncate(i, subComponents)))
-	// return true;
-	//
-	// return false;
-	// }
 
 	@Override
 	public void remove() {

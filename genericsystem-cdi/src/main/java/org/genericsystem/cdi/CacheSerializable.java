@@ -8,9 +8,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.enterprise.inject.spi.BeanManager;
-
 import org.genericsystem.core.Archiver.SnapshotLoader;
 import org.genericsystem.core.Archiver.SnapshotWriter;
 import org.genericsystem.core.Cache;
@@ -20,6 +18,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.HomeTreeNode;
 import org.genericsystem.core.Transaction;
+import org.jboss.arquillian.testenricher.cdi.container.CDIExtension;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.jboss.solder.core.Veto;
@@ -64,7 +63,12 @@ public class CacheSerializable extends CacheImpl implements Externalizable {
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		BeanManager beanManager = new BeanManagerLocator().getBeanManager();
+		BeanManager beanManager;
+		try {
+			beanManager = new BeanManagerLocator().getBeanManager();
+		} catch (Exception e) {
+			beanManager = CDIExtension.getBeanManager();
+		}
 		assert beanManager != null;
 		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
 		if (in.readBoolean()) {
@@ -72,7 +76,7 @@ public class CacheSerializable extends CacheImpl implements Externalizable {
 			((Externalizable) subContext).readExternal(in);
 		} else
 			subContext = new Transaction(in.readLong(), engine);
-
+		this.start();
 		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 		Map<Long, Generic> genericMap = new HashMap<>();
 		int addSize = in.readInt();
