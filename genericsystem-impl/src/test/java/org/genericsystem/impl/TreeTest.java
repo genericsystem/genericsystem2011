@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Random;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -168,10 +167,17 @@ public class TreeTest extends AbstractTest {
 		graphicComponentColor.enablePropertyConstraint();
 		graphicComponentColor.enableSingularConstraint();
 		assert graphicComponentColor.isPropertyConstraintEnabled();
+		assert graphicComponentColor.isSingularConstraintEnabled();
 
-		webPage.bind(graphicComponentColor, red);
+		Generic webPageRed = webPage.bind(graphicComponentColor, red);
+
 		Link bind = header.bind(graphicComponentColor, blue);
-		assert bind == header.bind(graphicComponentColor, blue);
+		assert bind.inheritsFrom(webPageRed);
+		log.info("-----------------------------");
+		Link bind2 = header.bind(graphicComponentColor, blue);
+		assert bind2.inheritsFrom(webPageRed);
+		assert bind.isAlive();
+		assert bind == bind2 : bind.info() + " " + bind2.info();
 		footer.bind(graphicComponentColor, yellow);
 
 		assert red.equals(body.getLink(graphicComponentColor).getTargetComponent()) : body.getLinks(graphicComponentColor);
@@ -188,14 +194,12 @@ public class TreeTest extends AbstractTest {
 
 		root.traverse(new Visitor() {
 			@Override
-			public void before(Node node) {
-			}
+			public void before(Node node) {}
 		});
 
 		root.traverse(new Visitor() {
 			@Override
-			public void after(Node node) {
-			}
+			public void after(Node node) {}
 		});
 	}
 
