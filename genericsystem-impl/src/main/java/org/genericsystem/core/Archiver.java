@@ -41,7 +41,7 @@ public class Archiver {
 		prepareAndLockDirectory(directoryPath);
 		String snapshotPath = getSnapshotPath();
 		if (snapshotPath != null)
-			SnapshotLoader.loadSnapshot(engine, snapshotPath);
+			new SnapshotLoader().loadSnapshot(engine, snapshotPath);
 		else
 			((EngineImpl) engine).restoreEngine();
 	}
@@ -206,7 +206,7 @@ public class Archiver {
 
 	public static class SnapshotLoader {
 
-		public static void loadSnapshot(Engine engine, String path) {
+		public void loadSnapshot(Engine engine, String path) {
 			try (ObjectInputStream contentInputStream = new ObjectInputStream(readContent(path)); ObjectInputStream formalInputStream = new ObjectInputStream(readFormal(path));) {
 				Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 				Map<Long, Generic> genericMap = new HashMap<>();
@@ -232,7 +232,7 @@ public class Archiver {
 			return inputStream;
 		}
 
-		private static Engine restoreEngine(Engine engine, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
+		protected Engine restoreEngine(Engine engine, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(formalInputStream);
 			long homeTreeNodeTs = contentInputStream.readLong();
 			contentInputStream.readLong();
@@ -243,7 +243,7 @@ public class Archiver {
 			return engine;
 		}
 
-		public static Generic loadGeneric(Engine engine, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
+		public Generic loadGeneric(Engine engine, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
 			long[] ts = loadTs(formalInputStream);
 			long homeTreeNodeTs = contentInputStream.readLong();
 			HomeTreeNode homeTreeNode = homeTreeMap.get(homeTreeNodeTs);
@@ -255,14 +255,18 @@ public class Archiver {
 			Generic[] supers = loadAncestors(engine, formalInputStream, genericMap);
 			Generic[] components = loadAncestors(engine, formalInputStream, genericMap);
 			Generic generic = engine.getFactory().newGeneric((Class<?>) formalInputStream.readObject());
-			((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components).plug();
+			restoreAndPlug((GenericImpl) generic, homeTreeNode, ts, supers, components);
 			if (!homeTreeMap.containsKey(homeTreeNodeTs))
 				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode);
 			genericMap.put(ts[0], generic);
 			return generic;
 		}
 
-		private static long[] loadTs(ObjectInputStream in) throws IOException {
+		protected void restoreAndPlug(GenericImpl generic, HomeTreeNode homeTreeNode, long[] ts, Generic[] supers, Generic[] components) {
+			generic.restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components).plug();
+		}
+
+		protected long[] loadTs(ObjectInputStream in) throws IOException {
 			long[] ts = new long[4];
 			ts[0] = in.readLong(); // designTs
 			ts[1] = in.readLong(); // birthTs
@@ -271,14 +275,13 @@ public class Archiver {
 			return ts;
 		}
 
-		private static Generic[] loadAncestors(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
+		protected Generic[] loadAncestors(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
 			int length = in.readInt();
 			Generic[] ancestors = new Generic[length];
 			for (int index = 0; index < length; index++)
-				ancestors[index] = CacheImpl.findByDesignTs(engine, in, genericMap);
+				ancestors[index] = genericMap.get(in.readLong());
 			return ancestors;
 		}
-
 	}
 
 }

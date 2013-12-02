@@ -39,7 +39,7 @@ public abstract class AbstractContext {
 
 	abstract <T extends Engine> T getEngine();
 
-	<T extends Generic> T plug(T generic) {
+	public <T extends Generic> T plug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
 		for (Generic component : ((GenericImpl) generic).components)
 			if (componentSet.add(component))
@@ -273,6 +273,8 @@ public abstract class AbstractContext {
 	}
 
 	abstract int getLevel();
+
+	abstract Generic searchByDesignTs(long ts);
 
 	interface TimestampedDependencies {
 

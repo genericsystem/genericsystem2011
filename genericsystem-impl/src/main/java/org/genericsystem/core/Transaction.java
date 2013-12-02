@@ -5,6 +5,8 @@ import java.util.HashSet;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
+import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
+import org.genericsystem.iterator.AbstractFilterIterator;
 
 /**
  * @author Nicolas Feybesse
@@ -124,5 +126,15 @@ public class Transaction extends AbstractContext {
 	@Override
 	int getLevel() {
 		return 0;
+	}
+
+	@Override
+	Generic searchByDesignTs(final long ts) {
+		return ((EngineImpl) engine).unambigousFirst(new AbstractFilterIterator<Generic>(new ConcateIterator<Generic>(getDirectInheritingsDependencies(engine).iterator(getTs()), getCompositeDependencies(engine).iterator(getTs()))) {
+			@Override
+			public boolean isSelected() {
+				return ((GenericImpl) next).getDesignTs() == ts;
+			}
+		});
 	}
 }

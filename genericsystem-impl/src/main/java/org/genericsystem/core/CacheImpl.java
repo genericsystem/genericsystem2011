@@ -14,6 +14,7 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -90,6 +91,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
+	public void stop() {
+		this.<EngineImpl> getEngine().stop(this);
+	}
+
+	@Override
 	TimestampedDependencies getDirectInheritingsDependencies(Generic directSuper) {
 		TimestampedDependencies dependencies = inheritingDependenciesMap.get(directSuper);
 		if (dependencies == null) {
@@ -162,7 +168,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -177,11 +183,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, false, true);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -760,12 +766,21 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return reFounds;
 	}
 
-	public static Generic findByDesignTs(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
+	public Generic findByDesignTs(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
 		long ts = in.readLong();
 		Generic superGeneric = genericMap.get(ts);
-		if (((EngineImpl) engine).getCacheLocal() != null && superGeneric == null) // TODO KK ?
-			return ts == ((EngineImpl) engine).getDesignTs() ? engine : ((EngineImpl) engine).findByDesignTs(ts);
-		return superGeneric;
+		return superGeneric != null ? superGeneric : ((GenericImpl) engine).getDesignTs() == ts ? engine : searchByDesignTs(ts);
+	}
+
+	@Override
+	Generic searchByDesignTs(long ts) {
+		for (Generic add : adds)
+			if (((GenericImpl) add).getDesignTs() == ts)
+				return add;
+		for (Generic automatic : automatics)
+			if (((GenericImpl) automatic).getDesignTs() == ts)
+				return automatic;
+		return subContext.searchByDesignTs(ts);
 	}
 
 	static class UnsafeCache extends CacheImpl {
