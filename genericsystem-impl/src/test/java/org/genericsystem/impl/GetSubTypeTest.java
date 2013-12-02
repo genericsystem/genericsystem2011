@@ -5,6 +5,7 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.exception.SuperRuleConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -107,14 +108,17 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeDiamondInheritingAttribute() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.addType("Car");
-		Attribute power = car.setAttribute("Power");
-		Attribute wheels = car.setAttribute("Wheels");
-		cache.addType("WheelsPower", power, wheels);
-		Generic subTypeFromPower = power.getSubType("WheelsPower");
-		Generic subTypeFromWheels = wheels.getSubType("WheelsPower");
-		assert Objects.equals(subTypeFromPower, subTypeFromWheels);
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		Type car = vehicle.newSubType("Car");
+		final Attribute power = car.setAttribute("Power");
+		final Attribute wheels = car.setAttribute("Wheels");
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				cache.addType("WheelsPower", power, wheels);
+			}
+		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}
 
 	// Relation
@@ -168,16 +172,18 @@ public class GetSubTypeTest extends AbstractTest {
 	}
 
 	public void testGetSubTypeDiamondInheritingRelation() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
-		Relation carColor = car.setRelation("CarColor", color);
+		final Relation carColor = car.setRelation("CarColor", color);
 		Type plane = cache.addType("Plane");
 		Type human = cache.addType("Human");
-		Relation pilot = plane.setRelation("Pilot", human);
-		cache.addType("CarColorPilot", carColor, pilot);
-		Generic subTypeFromCarColor = carColor.getSubType("CarColorPilot");
-		Generic subTypeFromPilot = pilot.getSubType("CarColorPilot");
-		assert Objects.equals(subTypeFromCarColor, subTypeFromPilot);
+		final Relation pilot = plane.setRelation("Pilot", human);
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				cache.addType("CarColorPilot", carColor, pilot);
+			}
+		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}
 }

@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.exception.SuperRuleConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -25,7 +26,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 			public void intercept() {
 				myBMW.setLink(runsOver, "myBMWRunsOverYourDog", yourDog);
 			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}
 
 	public void malformedRelationInstanceTooFewTargets() {
@@ -42,7 +43,7 @@ public class LinkTypeCheckTest extends AbstractTest {
 			public void intercept() {
 				myBMW.setLink(runsOver, "myBMWRunsOverYourDog", yourDog);
 			}
-		}.assertIsCausedBy(IllegalStateException.class);
+		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}
 
 	public void relationInstanceTooMuchTargets() {
