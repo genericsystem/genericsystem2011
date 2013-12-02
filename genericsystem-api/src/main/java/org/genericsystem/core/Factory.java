@@ -48,7 +48,7 @@ public interface Factory extends Serializable {
 	 */
 	Cache newCache(Engine engine);
 
-	Cache getCacheLocal();
+	Cache getContextCache();
 
 	/**
 	 * Default Factory.
@@ -59,38 +59,49 @@ public interface Factory extends Serializable {
 
 		private static final long serialVersionUID = 374055825050083792L;
 
-		private Class<Generic> genericClass;
-		private Constructor<Engine> engineConstructor;
-		private Constructor<Cache> cacheConstructorOnCache;
-		private Constructor<Cache> cacheConstructorOnEngine;
+		private Class<? extends Generic> genericClass;
+		private Constructor<? extends Engine> engineConstructor;
+		private Constructor<? extends Cache> cacheConstructorOnCache;
+		private Constructor<? extends Cache> cacheConstructorOnEngine;
 
-		@SuppressWarnings({ "static-access", "unchecked" })
-		public DefaultFactory(Class<?>... classes) {
+		public DefaultFactory() {
 			try {
-				engineConstructor = this.<Engine> getImplementation((Class<Engine>) Class.forName("org.genericsystem.core.EngineImpl"), classes).getConstructor(Config.class, Class[].class);
-				genericClass = this.<Generic> getImplementation((Class<Generic>) Class.forName("org.genericsystem.core.GenericImpl"), classes);
-				cacheConstructorOnCache = this.<Cache> getImplementation((Class<Cache>) Class.forName("org.genericsystem.core.CacheImpl"), classes).getConstructor(Cache.class);
-				cacheConstructorOnEngine = this.<Cache> getImplementation((Class<Cache>) Class.forName("org.genericsystem.core.CacheImpl"), classes).getConstructor(Engine.class);
+				engineConstructor = getEngineClass().getConstructor(Config.class, Class[].class);
+				genericClass = getGenericClass();
+				Class<? extends Cache> cacheClass = getCacheClass();
+				cacheConstructorOnCache = cacheClass.getConstructor(Cache.class);
+				cacheConstructorOnEngine = cacheClass.getConstructor(Engine.class);
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
 				throw new IllegalStateException(e);
 			}
 		}
 
-		public DefaultFactory() {
-			this(new Class<?>[0]);
+		@SuppressWarnings("unchecked")
+		protected Class<? extends Generic> getGenericClass() throws ClassNotFoundException {
+			return (Class<Generic>) Class.forName("org.genericsystem.core.GenericImpl");
 		}
 
 		@SuppressWarnings("unchecked")
-		private static <T> Class<T> getImplementation(Class<T> interfaceClass, Class<?>[] classes) {
-			for (Class<?> clazz : classes)
-				if (interfaceClass.isAssignableFrom(clazz)) {
-					if (!Generic.class.equals(interfaceClass))
-						return (Class<T>) clazz;
-					if (!Engine.class.isAssignableFrom(clazz))
-						return (Class<T>) clazz;
-				}
-			return interfaceClass;
+		protected Class<? extends Engine> getEngineClass() throws ClassNotFoundException {
+			return (Class<Engine>) Class.forName("org.genericsystem.core.EngineImpl");
 		}
+
+		@SuppressWarnings("unchecked")
+		protected Class<? extends Cache> getCacheClass() throws ClassNotFoundException {
+			return (Class<Cache>) Class.forName("org.genericsystem.core.CacheImpl");
+		}
+
+		// @SuppressWarnings("unchecked")
+		// private static <T> Class<T> getImplementation(Class<T> interfaceClass, Class<?>[] classes) {
+		// for (Class<?> clazz : classes)
+		// if (interfaceClass.isAssignableFrom(clazz)) {
+		// if (!Generic.class.equals(interfaceClass))
+		// return (Class<T>) clazz;
+		// if (!Engine.class.isAssignableFrom(clazz))
+		// return (Class<T>) clazz;
+		// }
+		// return interfaceClass;
+		// }
 
 		@Override
 		public Engine newEngine(Config config, Class<?>... userClasses) {
@@ -129,7 +140,7 @@ public interface Factory extends Serializable {
 		}
 
 		@Override
-		public Cache getCacheLocal() {
+		public Cache getContextCache() {
 			throw new CacheAwareException("Unable to find the current cache. Have you forget to call start() method on current cache ?");
 		}
 	}

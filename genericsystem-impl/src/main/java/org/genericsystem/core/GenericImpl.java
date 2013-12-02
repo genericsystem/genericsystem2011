@@ -152,7 +152,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (effectiveSupersSet.add(effectiveSuper))
 					((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
 		}
-
 		return (T) this;
 	}
 
@@ -191,7 +190,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic superGeneric : supers)
 			if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
 				return superGeneric.getMeta();
-		getCurrentCache().rollback(new IllegalStateException("Unable to find a meta for : " + this.info()));
+		getCurrentCache().rollback(new IllegalStateException("Unable to find a meta for : " + this));
 		return null;// Unreachable
 	}
 

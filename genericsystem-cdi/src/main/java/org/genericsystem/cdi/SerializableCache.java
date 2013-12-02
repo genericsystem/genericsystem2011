@@ -24,18 +24,18 @@ import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.jboss.solder.core.Veto;
 
 @Veto
-public class CacheSerializable extends CacheImpl implements Externalizable {
+public class SerializableCache extends CacheImpl implements Externalizable {
 
-	public CacheSerializable() {
+	public SerializableCache() {
 		// call by serialization
 		super((Cache) null);
 	}
 
-	public CacheSerializable(Cache cache) {
+	public SerializableCache(Cache cache) {
 		super(cache);
 	}
 
-	public CacheSerializable(Engine engine) {
+	public SerializableCache(Engine engine) {
 		super(engine);
 	}
 
@@ -72,7 +72,7 @@ public class CacheSerializable extends CacheImpl implements Externalizable {
 		assert beanManager != null;
 		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
 		if (in.readBoolean()) {
-			subContext = new CacheSerializable();
+			subContext = new SerializableCache();
 			((Externalizable) subContext).readExternal(in);
 		} else
 			subContext = new Transaction(in.readLong(), engine);

@@ -6,7 +6,7 @@ import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
-public class AppliWebTest extends AbstractTest {
+public class InjectionTest extends AbstractTest {
 
 	public void testInstanceIsConcreteWithValue() {
 		Type car = cache.addType("Car");

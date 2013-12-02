@@ -151,7 +151,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 	public CacheImpl getCurrentCache() {
 		Cache currentCache = cacheLocal.get();
 		if (currentCache == null)
-			currentCache = start(factory.getCacheLocal());
+			currentCache = start(factory.getContextCache());
 		return (CacheImpl) currentCache;
 	}
 

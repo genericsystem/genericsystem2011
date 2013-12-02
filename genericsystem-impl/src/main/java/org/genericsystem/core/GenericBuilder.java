@@ -93,15 +93,27 @@ class GenericBuilder {
 		}.rebuildAll(old, getDirectDependencies(), basePos);
 	}
 
-	private boolean isExtentedBy(Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
+	private boolean isExtentedBy(Generic candidate) {
+
 		if (Statics.MULTIDIRECTIONAL != basePos)
 			if (basePos < ((GenericImpl) candidate).components.length)
 				if (!components[basePos].equals(((GenericImpl) candidate).components[basePos]))
-					if (components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos]))
-						if (!candidate.inheritsFrom(cache.find(NoInheritanceSystemType.class)))
-							if (isSingular || isProperty && (Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components))))
+					if (!candidate.inheritsFrom(cache.find(NoInheritanceSystemType.class))) {
+						if (homeTreeNode.getMetaLevel() == candidate.getMetaLevel()) {
+							if (isSingular && components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos]))
 								return true;
+							if (isProperty && areComponentsInheriting(components, ((GenericImpl) candidate).components))
+								return true;
+						}
+					}
 		return false;
+	}
+
+	private boolean areComponentsInheriting(Generic[] subComponents, Generic[] components) {
+		for (int i = 0; i < components.length; i++)
+			if (!subComponents[i].inheritsFrom(components[i]))
+				return false;
+		return true;
 	}
 
 	protected Generic[] getExtendedDirectSupers(final boolean respectSupers) {
@@ -120,18 +132,14 @@ class GenericBuilder {
 					@Override
 					public boolean isSelected(Generic candidate) {
 						boolean result = ((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components);
-
 						if (result)
 							return true;
-						if (basePos != Statics.MULTIDIRECTIONAL)
-							if (((GenericImpl) meta).isSuperOf(((GenericImpl) candidate).homeTreeNode, ((GenericImpl) candidate).supers, ((GenericImpl) candidate).components))
-								if (meta.getMetaLevel() != candidate.getMetaLevel()) {
-									if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), components/* new Components(components, ((GenericImpl) candidate).components).toArray() */))
-										return true;
-									if (isExtentedBy(candidate, isProperty, isSingular, basePos))
-										return true;
-								}
-
+						if (basePos != Statics.MULTIDIRECTIONAL) {
+							if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), components))
+								return true;
+							if (isExtentedBy(candidate))
+								return true;
+						}
 						return false;
 					}
 				};
@@ -178,9 +186,12 @@ class GenericBuilder {
 	private boolean isExtention(Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
 		if (Statics.MULTIDIRECTIONAL != basePos)
 			if (basePos < ((GenericImpl) candidate).components.length)
-				if (((GenericImpl) candidate).components[basePos].inheritsFrom(components[basePos]))
-					if (isSingular || (isProperty && Arrays.equals(Statics.truncate(basePos, ((GenericImpl) candidate).components), Statics.truncate(basePos, components))))
+				if (homeTreeNode.getMetaLevel() == candidate.getMetaLevel()) {
+					if (isSingular && ((GenericImpl) candidate).components[basePos].inheritsFrom(components[basePos]))
 						return true;
+					if (isProperty && areComponentsInheriting((((GenericImpl) candidate).components), components))
+						return true;
+				}
 		return false;
 	}
 

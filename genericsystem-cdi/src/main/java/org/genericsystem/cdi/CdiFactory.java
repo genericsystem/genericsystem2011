@@ -3,7 +3,6 @@ package org.genericsystem.cdi;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Factory.DefaultFactory;
 
@@ -15,12 +14,8 @@ public class CdiFactory extends DefaultFactory {
 	@Inject
 	private Instance<Cache> cache;
 
-	public CdiFactory() {
-		super(CacheSerializable.class);
-	}
-
 	@Override
-	public Cache getCacheLocal() {
-		return cache.get();
+	protected Class<SerializableCache> getCacheClass() throws ClassNotFoundException {
+		return SerializableCache.class;
 	}
 }
