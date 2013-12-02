@@ -6,19 +6,28 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import javax.inject.Inject;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
+import org.jboss.arquillian.testenricher.cdi.container.CDIExtension;
 import org.testng.annotations.Test;
 
 @Test
 public class SerializationTest extends AbstractTest {
 
+	@Inject
+	private CDIExtension cdiExtension;
+
 	public void testAdds() {
 		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
+
+		assert null != cdiExtension.getBeanManager();
+
 		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();) {
 			new ObjectOutputStream(outputStream).writeObject(cache);// writeExternal
 
