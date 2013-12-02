@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -112,7 +113,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return restore(homeTreeNode, null, Long.MAX_VALUE, 0L, Long.MAX_VALUE, directSupers, components);
 	}
 
-	final GenericImpl restore(HomeTreeNode homeTreeNode, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] supers, Generic[] components) {
+	public final GenericImpl restore(HomeTreeNode homeTreeNode, Long designTs, long birthTs, long lastReadTs, long deathTs, Generic[] supers, Generic[] components) {
 		assert homeTreeNode != null;
 		this.homeTreeNode = homeTreeNode;
 		this.supers = supers;
@@ -139,19 +140,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	<T extends Generic> T plug() {
-		if (getEngine().getCacheLocal() != null)
-			getCurrentCache().plug(this);
-		else {
-			Set<Generic> componentSet = new HashSet<>();
-			for (Generic component : components)
-				if (componentSet.add(component))
-					((GenericImpl) component).lifeManager.engineComposites.add(this);
+		Set<Generic> componentSet = new HashSet<>();
+		for (Generic component : components)
+			if (componentSet.add(component))
+				((GenericImpl) component).lifeManager.engineComposites.add(this);
 
-			Set<Generic> effectiveSupersSet = new HashSet<>();
-			for (Generic effectiveSuper : supers)
-				if (effectiveSupersSet.add(effectiveSuper))
-					((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
-		}
+		Set<Generic> effectiveSupersSet = new HashSet<>();
+		for (Generic effectiveSuper : supers)
+			if (effectiveSupersSet.add(effectiveSuper))
+				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
 		return (T) this;
 	}
 
