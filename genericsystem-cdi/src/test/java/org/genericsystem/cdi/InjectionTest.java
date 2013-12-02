@@ -12,8 +12,8 @@ public class InjectionTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("outsideColor", color);
-		Generic audi = car.newInstance("audi");
-		Generic red = color.newInstance("red");
+		Generic audi = car.addInstance("audi");
+		Generic red = color.addInstance("red");
 		audi.setLink(carColor, "audiRed", red);
 		assert audi.getTargets(carColor).contains(red) : audi.getTargets(carColor);
 	}

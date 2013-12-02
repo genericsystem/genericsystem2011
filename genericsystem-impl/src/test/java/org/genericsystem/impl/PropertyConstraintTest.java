@@ -20,7 +20,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute equipment = vehicle.setAttribute("Equipment");
 		equipment.enablePropertyConstraint();
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
 	}
 
@@ -29,7 +29,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		final Attribute equipment = vehicle.setAttribute("Equipment");
 		equipment.enablePropertyConstraint();
-		final Generic myVehicle = vehicle.newInstance("myVehicle");
+		final Generic myVehicle = vehicle.addInstance("myVehicle");
 		Holder abs = myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
 		assert !abs.isAlive();
@@ -39,7 +39,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute equipment = vehicle.setAttribute("Equipment");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
 	}
@@ -49,7 +49,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute equipment = vehicle.setAttribute("Equipment");
 		equipment.disablePropertyConstraint();
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
 	}
@@ -61,9 +61,9 @@ public class PropertyConstraintTest extends AbstractTest {
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 
 		vehicleColor.enablePropertyConstraint();
-		Generic myVehicle = vehicle.newInstance("MyVehicle");
-		Generic red = color.newInstance("red");
-		Generic blue = color.newInstance("blue");
+		Generic myVehicle = vehicle.addInstance("MyVehicle");
+		Generic red = color.addInstance("red");
+		Generic blue = color.addInstance("blue");
 		Link myVehicleRed = myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		myVehicle.setLink(vehicleColor, "myVehicleBlue", blue);
 		assert myVehicleRed.isAlive();
@@ -75,8 +75,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		final Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		vehicleColor.enablePropertyConstraint();
-		final Generic myVehicle = vehicle.newInstance("myVehicle");
-		final Generic red = color.newInstance("red");
+		final Generic myVehicle = vehicle.addInstance("myVehicle");
+		final Generic red = color.addInstance("red");
 		Link myVehicleRed = myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		Link myVehicleRedAgain = myVehicle.setLink(vehicleColor, "myVehicleRedAgain", red);
 		assert !myVehicleRed.isAlive();
@@ -90,10 +90,10 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type pilot = cache.addType("Pilot");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color, pilot);
 		vehicleColor.enablePropertyConstraint();
-		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic red = color.newInstance("red");
-		Generic myPilot = pilot.newInstance("myPilot");
-		Generic anotherPilot = pilot.newInstance("anotherPilot");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
+		Generic red = color.addInstance("red");
+		Generic myPilot = pilot.addInstance("myPilot");
+		Generic anotherPilot = pilot.addInstance("anotherPilot");
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red, myPilot);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red, anotherPilot);
 	}
@@ -105,9 +105,9 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type pilot = cache.addType("Pilot");
 		final Relation vehicleColor = vehicle.setRelation("VehicleColor", color, pilot);
 		vehicleColor.enablePropertyConstraint();
-		final Generic myVehicle = vehicle.newInstance("myVehicle");
-		final Generic red = color.newInstance("red");
-		final Generic myPilot = pilot.newInstance("myPilot");
+		final Generic myVehicle = vehicle.addInstance("myVehicle");
+		final Generic red = color.addInstance("red");
+		final Generic myPilot = pilot.addInstance("myPilot");
 		Link myVehicleRed = myVehicle.setLink(vehicleColor, "myVehicleRed", red, myPilot);
 		Link myVehicleRedAgain = myVehicle.setLink(vehicleColor, "myVehicleRedAgain", red, myPilot);
 		assert !myVehicleRed.isAlive();
@@ -117,20 +117,20 @@ public class PropertyConstraintTest extends AbstractTest {
 	public void testSingleValueAttributeForSubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		Attribute equipment = vehicle.setAttribute("Equipment");
 		equipment.enablePropertyConstraint();
-		Generic myCar = car.newInstance("myCar");
+		Generic myCar = car.addInstance("myCar");
 		myCar.setValue(equipment, "ABS");
 	}
 
 	public void testMultipleValuesAttributeForSubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		final Attribute equipment = vehicle.setAttribute("Equipment");
 		equipment.enablePropertyConstraint();
-		final Generic myCar = car.newInstance("myCar");
+		final Generic myCar = car.addInstance("myCar");
 		Holder absValue = myCar.setValue(equipment, "ABS");
 		Holder gpsValue = myCar.setValue(equipment, "GPS");
 		assert !absValue.isAlive();
@@ -143,7 +143,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car", vehicle);
 		final Attribute equipment = vehicle.setAttribute("Equipment");
 		equipment.enablePropertyConstraint();
-		final Generic myCar = car.newInstance("myCar");
+		final Generic myCar = car.addInstance("myCar");
 		Holder absValue = myCar.setValue(equipment, "ABS");
 		Holder gpsValue = myCar.setValue(equipment, "GPS");
 		assert !absValue.isAlive();
@@ -153,12 +153,12 @@ public class PropertyConstraintTest extends AbstractTest {
 	public void testSameTarget() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		Type color = cache.addType("Color");
 		final Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		vehicleColor.enablePropertyConstraint();
-		final Generic myCar = car.newInstance("myCar");
-		final Generic red = color.newInstance("red");
+		final Generic myCar = car.addInstance("myCar");
+		final Generic red = color.addInstance("red");
 		Link myVehiclePower = myCar.setLink(vehicleColor, "myVehiclePower", red);
 		Link myVehiclePower2 = myCar.setLink(vehicleColor, "myVehiclePower2", red);
 		assert !myVehiclePower.isAlive();
@@ -168,13 +168,13 @@ public class PropertyConstraintTest extends AbstractTest {
 	public void testBinaryRelationBetweenSubtypeAndSameTarget() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
-		final Type bike = car.newSubType("Bike");
+		Type car = vehicle.addSubType("Car");
+		final Type bike = car.addSubType("Bike");
 		Type color = cache.addType("Color");
 		final Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		vehicleColor.enablePropertyConstraint();
-		final Generic myBike = bike.newInstance("myBike");
-		final Generic red = color.newInstance("red");
+		final Generic myBike = bike.addInstance("myBike");
+		final Generic red = color.addInstance("red");
 		Link myVehicleRed = myBike.setLink(vehicleColor, "myVehicleRed", red);
 		Link myVehicleRedAgain = myBike.setLink(vehicleColor, "myVehicleRedAgain", red);
 		assert !myVehicleRed.isAlive();
@@ -184,8 +184,8 @@ public class PropertyConstraintTest extends AbstractTest {
 	public void testMutlipleInstances() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newAnonymousInstance();
-		Generic myVehicle2 = vehicle.newAnonymousInstance();
+		Generic myVehicle = vehicle.addAnonymousInstance();
+		Generic myVehicle2 = vehicle.addAnonymousInstance();
 		assert myVehicle != myVehicle2 : myVehicle.info() + myVehicle2.info();
 	}
 
@@ -194,7 +194,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Type vehicle = cache.addType("Vehicle");
 		final Attribute equipment = vehicle.setAttribute("Equipment");
 		equipment.enablePropertyConstraint();
-		final Generic myVehicle = vehicle.newInstance("myVehicle");
+		final Generic myVehicle = vehicle.addInstance("myVehicle");
 		Holder absValue = vehicle.setValue(equipment, "ABS");
 		Holder gpsValue = myVehicle.setValue(equipment, "GPS");
 		// Todo check remove old value
@@ -207,7 +207,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Type vehicle = cache.addType("Vehicle");
 		final Attribute power = vehicle.setAttribute("Power");
 		power.enablePropertyConstraint();
-		final Generic myVehicle = vehicle.newInstance("myVehicle");
+		final Generic myVehicle = vehicle.addInstance("myVehicle");
 		Holder myVehicle235 = myVehicle.setValue(power, 235);
 		Holder vehicle233 = vehicle.setValue(power, 233);
 		assert !myVehicle235.isAlive();
@@ -220,8 +220,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
 		Relation carOutsideColor = car.setRelation("outside", color);
-		Generic myBmw = car.newInstance("myBmw");
-		Generic red = color.newInstance("red");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic red = color.addInstance("red");
 		carOutsideColor.enablePropertyConstraint();
 		myBmw.setLink(carOutsideColor, "20%", red);
 		myBmw.setLink(carOutsideColor, "40%", red);
@@ -233,8 +233,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
 		Relation carOutsideColor = car.setRelation("outside", color);
-		Generic myBmw = car.newInstance("myBmw");
-		Generic red = color.newInstance("red");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic red = color.addInstance("red");
 		carOutsideColor.enableSingularConstraint(Statics.BASE_POSITION);
 		myBmw.setLink(carOutsideColor, "20%", red);
 		myBmw.setLink(carOutsideColor, "40%", red);
@@ -246,8 +246,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
 		final Relation carOutsideColor = car.setRelation("outside", color);
-		final Generic myBmw = car.newInstance("myBmw");
-		final Generic red = color.newInstance("red");
+		final Generic myBmw = car.addInstance("myBmw");
+		final Generic red = color.addInstance("red");
 		carOutsideColor.enableSingularConstraint(Statics.TARGET_POSITION);
 		myBmw.setLink(carOutsideColor, "20%", red);
 		new RollbackCatcher() {

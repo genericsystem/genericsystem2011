@@ -15,7 +15,7 @@ public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute registration = vehicle.setAttribute("Registration");
-		Generic myCar = vehicle.newInstance("myCar");
+		Generic myCar = vehicle.addInstance("myCar");
 		myCar.setValue(registration, "315DT75");
 		registration.enableUniqueValueConstraint();
 	}
@@ -24,8 +24,8 @@ public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		final Attribute registration = vehicle.setAttribute("Registration");
-		Generic myCar = vehicle.newInstance("myCar");
-		Generic yourCar = vehicle.newInstance("yourCar");
+		Generic myCar = vehicle.addInstance("myCar");
+		Generic yourCar = vehicle.addInstance("yourCar");
 		myCar.setValue(registration, "315DT75");
 		yourCar.setValue(registration, "315DT75");
 		new RollbackCatcher() {
@@ -43,10 +43,10 @@ public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type human = cache.addType("Human");
 		final Relation driving = vehicle.setRelation("DrivingAlong", human);
-		Generic myCar = vehicle.newInstance("myCar");
-		Generic yourCar = vehicle.newInstance("yourCar");
-		Generic myHuman = human.newInstance("myHuman");
-		Generic yourHuman = human.newInstance("yourHuman");
+		Generic myCar = vehicle.addInstance("myCar");
+		Generic yourCar = vehicle.addInstance("yourCar");
+		Generic myHuman = human.addInstance("myHuman");
+		Generic yourHuman = human.addInstance("yourHuman");
 		myCar.setLink(driving, "my_driving", myHuman);
 		yourCar.setLink(driving, "your_driving", yourHuman);
 		driving.enableUniqueValueConstraint();
@@ -58,10 +58,10 @@ public class ConsistencyUniqueValueConstraintTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type human = cache.addType("Human");
 		final Relation driving = vehicle.setRelation("DrivingAlong", human);
-		Generic myCar = vehicle.newInstance("myCar");
-		Generic yourCar = vehicle.newInstance("yourCar");
-		Generic myHuman = human.newInstance("myHuman");
-		Generic yourHuman = human.newInstance("yourHuman");
+		Generic myCar = vehicle.addInstance("myCar");
+		Generic yourCar = vehicle.addInstance("yourCar");
+		Generic myHuman = human.addInstance("myHuman");
+		Generic yourHuman = human.addInstance("yourHuman");
 		myCar.setLink(driving, "my_driving", myHuman);
 		yourCar.setLink(driving, "your_driving", yourHuman);
 		yourCar.setLink(driving, "my_driving", yourHuman);

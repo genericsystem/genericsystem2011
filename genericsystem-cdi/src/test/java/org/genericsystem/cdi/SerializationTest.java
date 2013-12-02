@@ -69,7 +69,7 @@ public class SerializationTest extends AbstractTest {
 		cache.start();
 		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Cache superCache = cache.mountNewCache();
 		myVehicle.remove();
 		Cache superCacheClone = deSerialize(serialize(superCache)).start();

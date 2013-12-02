@@ -17,8 +17,8 @@ public class UniqueValueConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		final Attribute registration = car.setAttribute("Registration");
 		registration.enableUniqueValueConstraint();
-		final Generic myCar = car.newInstance("myCar");
-		final Generic yourCar = car.newInstance("yourCar");
+		final Generic myCar = car.addInstance("myCar");
+		final Generic yourCar = car.addInstance("yourCar");
 		myCar.setValue(registration, "315DT75");
 
 		new RollbackCatcher() {
@@ -39,12 +39,12 @@ public class UniqueValueConstraintTest extends AbstractTest {
 		final Relation driving = car.setRelation("DrivingAlong", human, road);
 		driving.enableUniqueValueConstraint();
 
-		final Generic myCar = car.newInstance("myCar");
-		final Generic myHuman = human.newInstance("myHuman");
-		final Generic myRoad = road.newInstance("myRoad");
-		final Generic yourCar = car.newInstance("yourCar");
-		final Generic yourHuman = human.newInstance("yourHuman");
-		final Generic yourRoad = road.newInstance("yourRoad");
+		final Generic myCar = car.addInstance("myCar");
+		final Generic myHuman = human.addInstance("myHuman");
+		final Generic myRoad = road.addInstance("myRoad");
+		final Generic yourCar = car.addInstance("yourCar");
+		final Generic yourHuman = human.addInstance("yourHuman");
+		final Generic yourRoad = road.addInstance("yourRoad");
 		myCar.setLink(driving, "_MY_driving", myHuman, myRoad);
 		yourCar.setLink(driving, "_YOUR_driving", yourHuman, yourRoad);
 

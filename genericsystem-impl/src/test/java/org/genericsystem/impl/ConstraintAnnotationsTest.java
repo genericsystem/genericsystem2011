@@ -27,7 +27,7 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 		assert String.class.equals(unit.getConstraintClass());
 		Type car = cache.find(Car.class);
 		Attribute electrikPower = cache.find(ElectrikPower.class);
-		final Generic myBMW = car.newInstance("myBMW");
+		final Generic myBMW = car.addInstance("myBMW");
 		assert electrikPower.getBaseComponent() != null : electrikPower.info();
 		final Holder electrikPowerMyBMW = myBMW.setValue(electrikPower, 106);
 		electrikPowerMyBMW.setValue(unit, "Nm");

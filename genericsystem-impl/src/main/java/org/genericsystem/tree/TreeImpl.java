@@ -22,7 +22,7 @@ public class TreeImpl extends GenericImpl implements Tree {
 
 	@Override
 	public <T extends Node> T newRoot(Serializable value, int dim) {
-		return newInstance(value, new Generic[dim]);
+		return addInstance(value, new Generic[dim]);
 	}
 
 	// TODO KK

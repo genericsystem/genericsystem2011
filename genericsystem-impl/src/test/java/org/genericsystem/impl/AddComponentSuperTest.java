@@ -26,9 +26,7 @@ public class AddComponentSuperTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type color = cache.addType("Color");
 		Type vehicleColor = vehicle.addAttribute("VehicleColor");
-		assert vehicle.getRelation("VehicleColor") == null;
 		vehicleColor = vehicleColor.addComponent(color, 1);
-		assert vehicle.getRelation("VehicleColor") != null;
 		assert vehicle.getRelation("VehicleColor").getComponent(0).equals(vehicle);
 		assert vehicle.getRelation("VehicleColor").getComponent(1).equals(color);
 		assert vehicle.getRelation("VehicleColor").inheritsFrom(cache.getMetaRelation());
@@ -58,7 +56,7 @@ public class AddComponentSuperTest extends AbstractTest {
 	public void addSuperOnType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		Type robot = cache.addType("Robot");
 		car = car.addSuper(robot);
 		assert car.inheritsFrom(robot);
@@ -68,7 +66,7 @@ public class AddComponentSuperTest extends AbstractTest {
 	public void removeSuperOnType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		Type robot = cache.addType("Robot");
 		Type transformer = cache.addType("Transformer", robot, car);
 		transformer = transformer.removeSuper(1);
@@ -80,7 +78,7 @@ public class AddComponentSuperTest extends AbstractTest {
 	public void addRemoveComplexSuperOnType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		Type robot = cache.addType("Robot");
 		Type transformer = cache.addType("Transformer", robot, car);
 		Type clonable = cache.addType("Clonable");

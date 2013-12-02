@@ -330,7 +330,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T getType(final Serializable value) {
-		return getEngine().getSubType(value);
+		return getEngine().getAllSubType(value);
 	}
 
 	@Override

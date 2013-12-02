@@ -14,7 +14,7 @@ public class ConsistencyRequiredConstraintTest extends AbstractTest {
 	public void ConsistencyAttributeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Attribute power = vehicle.setAttribute("power");
 		myVehicle.setValue(power, 123);
 		power.enableRequiredConstraint();
@@ -24,7 +24,7 @@ public class ConsistencyRequiredConstraintTest extends AbstractTest {
 	public void ConsistencyAttributeKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		vehicle.newInstance("myVehicle");
+		vehicle.addInstance("myVehicle");
 		final Attribute power = vehicle.setAttribute("power");
 		new RollbackCatcher() {
 			@Override

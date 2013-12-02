@@ -60,11 +60,11 @@ public class InstanceOfTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		assert myVehicle.isInstanceOf(vehicle);
 
-		Type car = vehicle.newSubType("Car");
-		Generic myCar = car.newInstance("myCar");
+		Type car = vehicle.addSubType("Car");
+		Generic myCar = car.addInstance("myCar");
 		assert myCar.isInstanceOf(car);
 
 		assert myCar.isInstanceOf(vehicle);
@@ -100,10 +100,10 @@ public class InstanceOfTest extends AbstractTest {
 		Type mammal = cache.addType("Mammal");
 
 		Type human = cache.addType("Human", animal, mammal);
-		Generic michael = human.newInstance("Michael");
+		Generic michael = human.addInstance("Michael");
 
 		Type canid = cache.addType("Canid", animal, mammal);
-		Generic milou = canid.newInstance("Milou");
+		Generic milou = canid.addInstance("Milou");
 		assert michael.isInstanceOf(human);
 		assert !michael.isInstanceOf(canid);
 		assert michael.isInstanceOf(animal);
@@ -119,7 +119,7 @@ public class InstanceOfTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Type car1 = cache.addType("Car1", vehicle);
-		Type car2 = vehicle.newSubType("Car2");
+		Type car2 = vehicle.addSubType("Car2");
 
 		assert car1.getSupers().get(0).equals(car2.getSupers().get(0));
 	}

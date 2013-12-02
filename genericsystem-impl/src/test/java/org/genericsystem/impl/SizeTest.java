@@ -64,12 +64,12 @@ public class SizeTest extends AbstractTest {
 		final Type vehicle = cache.addType("Vehicle");
 		final Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
-		final Generic myVehicle = vehicle.newInstance("myVehicle");
-		vehiclePower.newInstance(123, myVehicle);
+		final Generic myVehicle = vehicle.addInstance("myVehicle");
+		vehiclePower.addInstance(123, myVehicle);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				vehiclePower.newInstance(126, myVehicle);
+				vehiclePower.addInstance(126, myVehicle);
 			}
 		}.assertIsCausedBy(SizeConstraintViolationException.class);
 	}
@@ -79,7 +79,7 @@ public class SizeTest extends AbstractTest {
 		final Type vehicle = cache.addType("Vehicle");
 		final Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
-		final Generic myVehicle1 = vehicle.newInstance("myVehicle1");
+		final Generic myVehicle1 = vehicle.addInstance("myVehicle1");
 		myVehicle1.setValue(vehiclePower, 123);
 		new RollbackCatcher() {
 
@@ -93,10 +93,10 @@ public class SizeTest extends AbstractTest {
 	public void checkConstraintWithAttributeWithInherits() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		final Type car = vehicle.newSubType("Car");
+		final Type car = vehicle.addSubType("Car");
 		final Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
-		final Generic myCar1 = car.newInstance("myCar1");
+		final Generic myCar1 = car.addInstance("myCar1");
 		myCar1.setValue(vehiclePower, 123);
 		new RollbackCatcher() {
 
@@ -110,7 +110,7 @@ public class SizeTest extends AbstractTest {
 	public void checkConstraintWithAttributeWithInherits2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		final Type car = vehicle.newSubType("Car");
+		final Type car = vehicle.addSubType("Car");
 		final Attribute vehiclePower = vehicle.setAttribute("power");
 		vehiclePower.enableSizeConstraint(Statics.BASE_POSITION, 1);
 		// vehiclePower.enableSingularConstraint();
@@ -124,14 +124,14 @@ public class SizeTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		final Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
 		vehicleColor.enableSizeConstraint(Statics.BASE_POSITION, 1);
-		final Generic myVehicle1 = vehicle.newInstance("myVehicle1");
-		final Generic red = color.newInstance("red");
-		vehicleColor.newInstance("link1", myVehicle1, red);
+		final Generic myVehicle1 = vehicle.addInstance("myVehicle1");
+		final Generic red = color.addInstance("red");
+		vehicleColor.addInstance("link1", myVehicle1, red);
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				vehicleColor.newInstance("link2", myVehicle1, red);
+				vehicleColor.addInstance("link2", myVehicle1, red);
 			}
 		}.assertIsCausedBy(SizeConstraintViolationException.class);
 	}

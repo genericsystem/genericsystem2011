@@ -65,9 +65,9 @@ public class FunctionalTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
 		final Attribute carPower = car.setProperty("Power");
-		Generic myCar = car.newInstance("myCar");
+		Generic myCar = car.addInstance("myCar");
 		myCar.setValue(carPower, 233);
-		Generic yourCar = car.newInstance("yourCar");
+		Generic yourCar = car.addInstance("yourCar");
 		yourCar.setValue(carPower, 89);
 		Snapshot<Generic> carInstancesWithPowerHigherThan90HP = car.getAllInstances().filter(new Filter<Generic>() {
 			@Override
@@ -85,10 +85,10 @@ public class FunctionalTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 
-		Snapshot<Generic> snapshot = vehicle.getSubTypes();
+		Snapshot<Generic> snapshot = vehicle.getAllSubTypes();
 		assert snapshot.isEmpty();
 
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert snapshot.size() == 1;
 		assert snapshot.contains(car);
 

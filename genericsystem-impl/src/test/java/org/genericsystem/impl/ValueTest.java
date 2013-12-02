@@ -17,7 +17,7 @@ public class ValueTest extends AbstractTest {
 
 	public void testValueOfType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Serializable value = cache.getEngine().newSubType( "Car").getValue();
+		Serializable value = cache.getEngine().addSubType( "Car").getValue();
 		assert value != null;
 		assert value.equals("Car");
 	}

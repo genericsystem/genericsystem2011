@@ -48,7 +48,7 @@ public class PersistenceTest {
 		Cache cache = initWorkingSpace();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute equipment = vehicle.setAttribute("Equipment");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
 		closingWorkingSpace(cache);
 	}
@@ -56,9 +56,9 @@ public class PersistenceTest {
 	public void testAddAndRemove() {
 		Cache cache = initWorkingSpace();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
-		Type truck = vehicle.newSubType("Truck");
-		truck.newSubType("Van");
+		Type car = vehicle.addSubType("Car");
+		Type truck = vehicle.addSubType("Truck");
+		truck.addSubType("Van");
 		car.remove();
 		closingWorkingSpace(cache);
 	}
@@ -68,8 +68,8 @@ public class PersistenceTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type color = cache.addType("Color");
 		Relation vehicleColor = vehicle.setRelation("VehicleColor", color);
-		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic red = color.newInstance("red");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
+		Generic red = color.addInstance("red");
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		closingWorkingSpace(cache);
 	}
@@ -77,7 +77,7 @@ public class PersistenceTest {
 	public void testHeritage() {
 		Cache cache = initWorkingSpace();
 		Type vehicle = cache.addType("Vehicle");
-		vehicle.newSubType("Car");
+		vehicle.addSubType("Car");
 		closingWorkingSpace(cache);
 	}
 
@@ -92,8 +92,8 @@ public class PersistenceTest {
 	public void testHeritageMultipleDiamond() {
 		Cache cache = initWorkingSpace();
 		Type movable = cache.addType("Movable");
-		Type vehicle = movable.newSubType("Vehicle");
-		Type human = movable.newSubType("Human");
+		Type vehicle = movable.addSubType("Vehicle");
+		Type human = movable.addSubType("Human");
 		cache.addType("Transformer", vehicle, human);
 		closingWorkingSpace(cache);
 	}

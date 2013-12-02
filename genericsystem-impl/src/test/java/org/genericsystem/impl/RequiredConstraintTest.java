@@ -24,7 +24,7 @@ public class RequiredConstraintTest extends AbstractTest {
 	public void requiredAddedAndRemoved() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myFiat = vehicle.newInstance("myFiat");
+		Generic myFiat = vehicle.addInstance("myFiat");
 		final Attribute wheel = vehicle.setAttribute("wheel");
 		final Holder wheelMyFiat = myFiat.setValue(wheel, "4");
 		wheel.enableRequiredConstraint();
@@ -44,7 +44,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		wheel.enableRequiredConstraint();
 		cache.flush();
 
-		vehicle.newInstance("myFiat");
+		vehicle.addInstance("myFiat");
 
 		new RollbackCatcher() {
 			@Override
@@ -60,7 +60,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
 		cache.flush();
 
-		Generic myFiat = vehicle.newInstance("myFiat");
+		Generic myFiat = vehicle.addInstance("myFiat");
 
 		myFiat.setValue(vehicleWheel, "myFiatWheel");
 		cache.flush();
@@ -71,7 +71,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
 		cache.flush();
-		vehicle.newInstance("myFiat");
+		vehicle.addInstance("myFiat");
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
@@ -83,10 +83,10 @@ public class RequiredConstraintTest extends AbstractTest {
 	public void requiredHeritageTest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("car");
+		Type car = vehicle.addSubType("car");
 		Attribute vehicleWheel = vehicle.setAttribute("vehicleWheel").enableRequiredConstraint();
-		Generic myFiat = vehicle.newInstance("myFiat");
-		Generic myCar = car.newInstance("myCar");
+		Generic myFiat = vehicle.addInstance("myFiat");
+		Generic myCar = car.addInstance("myCar");
 		myFiat.setValue(vehicleWheel, "myFiatWheel");
 		myCar.setValue(vehicleWheel, "myFiatWheel");
 		cache.flush();
@@ -107,8 +107,8 @@ public class RequiredConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute power = vehicle.setAttribute("power").enableRequiredConstraint();
-		Type car = vehicle.newSubType("Car");
-		car.newInstance("myFiat").setValue(power, 123);
+		Type car = vehicle.addSubType("Car");
+		car.addInstance("myFiat").setValue(power, 123);
 		cache.flush();
 	}
 
@@ -118,7 +118,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
-		car.newInstance("myCar");
+		car.addInstance("myCar");
 		new RollbackCatcher() {
 
 			@Override
@@ -135,7 +135,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.TARGET_POSITION);
 		assert carColor.isRequiredConstraintEnabled(Statics.TARGET_POSITION);
-		color.newInstance("red");
+		color.addInstance("red");
 		new RollbackCatcher() {
 
 			@Override
@@ -151,7 +151,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
-		car.newInstance("myFiat").bind(carColor, color);
+		car.addInstance("myFiat").bind(carColor, color);
 		cache.flush();
 	}
 
@@ -161,8 +161,8 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.BASE_POSITION);
-		Generic red = color.newInstance("red");
-		Generic myFiat = car.newInstance("myFiat");
+		Generic red = color.addInstance("red");
+		Generic myFiat = car.addInstance("myFiat");
 		final Link myFiatRed = myFiat.setLink(carColor, "myFiatRed", red);
 		new RollbackCatcher() {
 			@Override
@@ -179,7 +179,7 @@ public class RequiredConstraintTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableRequiredConstraint(Statics.TARGET_POSITION);
-		car.bind(carColor, color.newInstance("red"));
+		car.bind(carColor, color.addInstance("red"));
 		cache.flush();
 	}
 

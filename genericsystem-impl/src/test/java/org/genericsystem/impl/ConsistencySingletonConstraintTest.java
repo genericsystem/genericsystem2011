@@ -12,15 +12,15 @@ public class ConsistencySingletonConstraintTest extends AbstractTest {
 	public void consistencyTypeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		vehicle.newInstance("myVehicle");
+		vehicle.addInstance("myVehicle");
 		vehicle.enableSingletonConstraint();
 	}
 
 	public void consistencyTypeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.addType("Vehicle");
-		vehicle.newInstance("myVehicle");
-		vehicle.newInstance("myVehicle2");
+		vehicle.addInstance("myVehicle");
+		vehicle.addInstance("myVehicle2");
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {

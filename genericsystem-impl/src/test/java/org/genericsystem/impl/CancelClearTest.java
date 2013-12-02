@@ -15,7 +15,7 @@ public class CancelClearTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getAttribute("power").equals(vehiclePower);
 		car.cancel(vehiclePower, Statics.STRUCTURAL);
 		car.getHolder(vehiclePower).info();
@@ -27,7 +27,7 @@ public class CancelClearTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancel(vehicle233);
 		assert car.getValue(vehiclePower) == null : car.getValue(vehiclePower);
@@ -38,7 +38,7 @@ public class CancelClearTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancel(vehiclePower, Statics.STRUCTURAL);
 		assert car.getValue(vehiclePower) == null : car.getValue(vehiclePower);
@@ -49,7 +49,7 @@ public class CancelClearTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancelAll(vehicle233);
 		assert car.getValue(vehiclePower) == null : car.getValue(vehiclePower);
@@ -60,7 +60,7 @@ public class CancelClearTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancelAll(vehiclePower, Statics.STRUCTURAL);
 		assert car.getValue(vehiclePower) == null : car.getValue(vehiclePower);
@@ -70,12 +70,12 @@ public class CancelClearTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getAttribute("power").equals(vehiclePower);
 		car.cancel(vehiclePower, Statics.STRUCTURAL);
 		car.clear(vehiclePower, Statics.STRUCTURAL);
 		assert car.getAttributes().contains(vehiclePower);
-		assert car.getAttribute(vehiclePower, "power") == vehiclePower;
+		assert car.getAttribute("power") == vehiclePower;
 	}
 
 	public void testClearValue() {
@@ -83,7 +83,7 @@ public class CancelClearTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancel(vehicle233);
 		car.clear(vehicle233);
@@ -95,7 +95,7 @@ public class CancelClearTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancel(vehiclePower, Statics.STRUCTURAL);
 		car.clear(vehiclePower, Statics.STRUCTURAL);
@@ -107,7 +107,7 @@ public class CancelClearTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancelAll(vehicle233);
 		car.clearAll(vehicle233);
@@ -119,7 +119,7 @@ public class CancelClearTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Holder vehicle233 = vehicle.addValue(vehiclePower, 233);
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancelAll(vehiclePower, Statics.STRUCTURAL);
 		car.clearAll(vehiclePower, Statics.STRUCTURAL);

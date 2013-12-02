@@ -17,14 +17,14 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 	public void consistencyTypeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		vehicle.newInstance("myVehicle");
+		vehicle.addInstance("myVehicle");
 		vehicle.setConstraintClass(String.class);
 	}
 
 	public void consistencyTypeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.addType("Vehicle");
-		vehicle.newInstance(123);
+		vehicle.addInstance(123);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
@@ -36,7 +36,7 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 	public void consistencyAttributeOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Attribute power = vehicle.setAttribute("power");
 		myVehicle.setValue(power, 123);
 		power.setConstraintClass(Integer.class);
@@ -45,7 +45,7 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 	public void consistencyAttributeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		final Attribute power = vehicle.setAttribute("power");
 		myVehicle.setValue(power, "123");
 		new RollbackCatcher() {
@@ -59,9 +59,9 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 	public void consistencyRelationOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
+		Generic red = color.addInstance("red");
 		Relation vehicleColor = vehicle.addRelation("vehicleColor", color);
 		myVehicle.setLink(vehicleColor, 80, red);
 		vehicleColor.setConstraintClass(Integer.class);
@@ -70,9 +70,9 @@ public class ConsistencyInstanceClassConstraintTest extends AbstractTest {
 	public void consistencyRelationKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
+		Generic red = color.addInstance("red");
 		final Relation vehicleColor = vehicle.addRelation("vehicleColor", color);
 		assert vehicleColor.isStructural();
 		myVehicle.setLink(vehicleColor, "link", red);

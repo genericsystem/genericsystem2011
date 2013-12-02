@@ -160,9 +160,9 @@ public class TreeTest extends AbstractTest {
 		body.setSubNode("message2");
 
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("Red");
-		Generic blue = color.newInstance("Blue");
-		Generic yellow = color.newInstance("Yellow");
+		Generic red = color.addInstance("Red");
+		Generic blue = color.addInstance("Blue");
+		Generic yellow = color.addInstance("Yellow");
 
 		Relation graphicComponentColor = graphicComponent.setRelation("GraphicComponentColor", color);
 		graphicComponentColor.enablePropertyConstraint();
