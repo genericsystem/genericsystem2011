@@ -25,13 +25,12 @@ class GenericBuilder {
 
 	private final CacheImpl cache;
 	private HomeTreeNode homeTreeNode;
-	// private HomeTreeNode[] primaries;
 	private Generic[] components;
 	private Generic[] supers;
 	private Generic meta;
-	boolean isSingular;
-	boolean isProperty;
-	int basePos;
+	private boolean isSingular;
+	private boolean isProperty;
+	private int basePos;
 
 	GenericBuilder(CacheImpl cache, Generic meta, HomeTreeNode homeTreeNode, Generic[] aliveSupers, Generic[] aliveNullComponents, int basePos, boolean respectSupers) {
 		this.cache = cache;
@@ -48,7 +47,7 @@ class GenericBuilder {
 	@SuppressWarnings({ "unchecked" })
 	<T extends Generic> T find(boolean existsException) throws RollbackException {
 		if (supers.length == 1)
-			if (((GenericImpl) supers[0]).equiv(homeTreeNode, ((GenericImpl) supers[0]).supers, components))
+			if (((GenericImpl) supers[0]).equiv(homeTreeNode, components))
 				if (existsException)
 					cache.rollback(new ExistsException(supers[0] + " already exists !"));
 				else
@@ -82,7 +81,6 @@ class GenericBuilder {
 			assert !Arrays.asList(supers).contains(dependency) : Arrays.toString(supers);
 			assert !Arrays.asList(components).contains(dependency) : Arrays.toString(components);
 		}
-		// log.info("Supers : " + Arrays.toString(supers));
 		return cache.new Restructurator() {
 			private static final long serialVersionUID = 1370210509322258062L;
 
@@ -94,7 +92,8 @@ class GenericBuilder {
 	}
 
 	private boolean isExtentedBy(Generic candidate) {
-
+		if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), components))
+			return true;
 		if (Statics.MULTIDIRECTIONAL != basePos)
 			if (basePos < ((GenericImpl) candidate).components.length)
 				if (!components[basePos].equals(((GenericImpl) candidate).components[basePos]))
@@ -131,15 +130,10 @@ class GenericBuilder {
 
 					@Override
 					public boolean isSelected(Generic candidate) {
-						boolean result = ((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components);
-						if (result)
+						if (((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components))
 							return true;
-						if (basePos != Statics.MULTIDIRECTIONAL) {
-							if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), components))
-								return true;
-							if (isExtentedBy(candidate))
-								return true;
-						}
+						if (isExtentedBy(candidate))
+							return true;
 						return false;
 					}
 				};
