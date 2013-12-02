@@ -1,1 +1,2 @@
 org.genericsystem.cdi.StartupBean
+org.jboss.arquillian.testenricher.cdi.container.CDIExtension
