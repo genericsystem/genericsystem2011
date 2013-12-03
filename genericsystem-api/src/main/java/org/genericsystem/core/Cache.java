@@ -52,6 +52,13 @@ public interface Cache {
 	Cache start();
 
 	/**
+	 * Stop the execution of this cache.
+	 * 
+	 * @return this cache.
+	 */
+	void stop();
+
+	/**
 	 * Flush the content of current cache into it's subcache or into current user's transaction. If cache flush it's data into transaction modifications become available to other users.
 	 * 
 	 * @throws RollbackException

@@ -33,9 +33,9 @@ public class UnduplicateBindingConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.addType("Human");
 		cache.flush();
-		human.newInstance("michael");
+		human.addInstance("michael");
 		final Cache cache2 = cache.getEngine().newCache().start();
-		human.newInstance("michael");
+		human.addInstance("michael");
 		cache.start();
 		cache.flush();
 		new RollbackCatcher() {
@@ -73,9 +73,9 @@ public class UnduplicateBindingConstraintTest extends AbstractTest {
 	public void testLink() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic myCar = car.newInstance("myCar");
+		Generic myCar = car.addInstance("myCar");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
+		Generic red = color.addInstance("red");
 		Relation carColor = car.setRelation("carColor", color);
 		cache.flush();
 		assert myCar.isAlive();

@@ -675,28 +675,6 @@ public interface Generic extends Comparable<Generic> {
 	int getSupersSize();
 
 	/**
-	 * Creates a new anonymous instance.
-	 * 
-	 * @param components
-	 *            the components.
-	 * 
-	 * @return the new anonymous instance.
-	 */
-	<T extends Generic> T newAnonymousInstance(Generic... components);
-
-	/**
-	 * Create a new instance or get the instance if it already exists.
-	 * 
-	 * @param value
-	 *            the value.
-	 * @param components
-	 *            the components.
-	 * 
-	 * @return the new instance.
-	 */
-	<T extends Generic> T newInstance(Serializable value, Generic... components);
-
-	/**
 	 * Return the meta.
 	 * 
 	 * @return the meta.

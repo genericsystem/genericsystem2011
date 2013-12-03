@@ -8,7 +8,9 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.enterprise.inject.spi.BeanManager;
+
 import org.genericsystem.core.Archiver.SnapshotLoader;
 import org.genericsystem.core.Archiver.SnapshotWriter;
 import org.genericsystem.core.Cache;
@@ -24,18 +26,18 @@ import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.jboss.solder.core.Veto;
 
 @Veto
-public class CacheSerializable extends CacheImpl implements Externalizable {
+public class SerializableCache extends CacheImpl implements Externalizable {
 
-	public CacheSerializable() {
+	public SerializableCache() {
 		// call by serialization
 		super((Cache) null);
 	}
 
-	public CacheSerializable(Cache cache) {
+	public SerializableCache(Cache cache) {
 		super(cache);
 	}
 
-	public CacheSerializable(Engine engine) {
+	public SerializableCache(Engine engine) {
 		super(engine);
 	}
 
@@ -72,7 +74,7 @@ public class CacheSerializable extends CacheImpl implements Externalizable {
 		assert beanManager != null;
 		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
 		if (in.readBoolean()) {
-			subContext = new CacheSerializable();
+			subContext = new SerializableCache();
 			((Externalizable) subContext).readExternal(in);
 		} else
 			subContext = new Transaction(in.readLong(), engine);
@@ -80,13 +82,32 @@ public class CacheSerializable extends CacheImpl implements Externalizable {
 		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 		Map<Long, Generic> genericMap = new HashMap<>();
 		int addSize = in.readInt();
+		SerializableSnapshotLoader loader = new SerializableSnapshotLoader();
 		for (int i = 0; i < addSize; i++)
-			adds.add(SnapshotLoader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
+			adds.add(loader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
 		int automaticSize = in.readInt();
 		for (int i = 0; i < automaticSize; i++)
-			automatics.add(SnapshotLoader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
+			automatics.add(loader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
 		int removeSize = in.readInt();
 		for (int i = 0; i < removeSize; i++)
 			removes.add(findByDesignTs(engine, (ObjectInputStream) in, genericMap));
 	}
+
+	private static class SerializableSnapshotLoader extends SnapshotLoader {
+
+		protected Generic[] loadAncestors(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
+			int length = in.readInt();
+			Generic[] ancestors = new Generic[length];
+			for (int index = 0; index < length; index++)
+				ancestors[index] = ((CacheImpl) engine.getCurrentCache()).findByDesignTs(engine, in, genericMap);
+			return ancestors;
+		}
+
+		@Override
+		protected void restoreAndPlug(GenericImpl generic, HomeTreeNode homeTreeNode, long[] ts, Generic[] supers, Generic[] components) {
+			GenericImpl restore = generic.restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components);
+			((CacheImpl) restore.getCurrentCache()).plug(restore);
+		}
+	}
+
 }

@@ -22,7 +22,7 @@ public class IteratorTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Type truck = cache.addType("Truck");
-		Type car = vehicle.newSubType( "Car");
+		Type car = vehicle.addSubType( "Car");
 		AbstractSnapshot<Generic> snapshot = new AbstractSnapshot<Generic>() {
 			@Override
 			public Iterator<Generic> iterator() {
@@ -62,11 +62,11 @@ public class IteratorTest extends AbstractTest {
 	public void testPreTreeWithTypeAndSubType() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		car.newSubType( "bmw");
-		car.newSubType( "audi");
+		car.addSubType( "bmw");
+		car.addSubType( "audi");
 		Type pilot = cache.addType("Pilot");
-		pilot.newSubType( "pilot1");
-		pilot.newSubType( "pilot2");
+		pilot.addSubType( "pilot1");
+		pilot.addSubType( "pilot2");
 		Snapshot<Generic> snapshot = new AbstractSnapshot<Generic>() {
 			@Override
 			public Iterator<Generic> iterator() {
@@ -87,8 +87,8 @@ public class IteratorTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type human = cache.addType("Human");
 		Relation humanDriveCar = human.setRelation( "drive", car);
-		Generic audi = car.newInstance( "audi");
-		Generic myck = human.newInstance( "myck");
+		Generic audi = car.addInstance( "audi");
+		Generic myck = human.addInstance( "myck");
 		Link link = myck.setLink( humanDriveCar, "myckAudi", audi);
 		Snapshot<Link> snapshot = myck.getLinks( humanDriveCar);
 		assert snapshot.size() == 1 : snapshot;

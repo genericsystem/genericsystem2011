@@ -12,7 +12,7 @@ public class CacheTest extends AbstractTest {
 	public void testFlushCache1OK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		cache.flush();
 	}
 

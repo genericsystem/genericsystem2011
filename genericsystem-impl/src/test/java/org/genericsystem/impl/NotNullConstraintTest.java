@@ -21,15 +21,15 @@ public class NotNullConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		final Attribute registration = car.setAttribute("Registration");
 		registration.enableRequiredConstraint();
-		final Generic myCar = car.newInstance("myCar");
+		final Generic myCar = car.addInstance("myCar");
 		myCar.setValue(registration, null);
 	}
 
 	public void testPropertySimpleProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
-		Type sportCar = car.newSubType("Sportcar");
+		Type car = vehicle.addSubType("Car");
+		Type sportCar = car.addSubType("Sportcar");
 		Attribute vehiclePower = vehicle.setProperty("Power");
 		car.setValue(vehiclePower, 80);
 		sportCar.setValue(vehiclePower, 250);
@@ -55,9 +55,9 @@ public class NotNullConstraintTest extends AbstractTest {
 		final Relation driving = car.setRelation("DrivingAlong", human, road);
 		// driving.enableRequiredConstraint();
 
-		final Generic myCar = car.newInstance("myCar");
-		final Generic myHuman = human.newInstance("myHuman");
-		final Generic myRoad = road.newInstance("myRoad");
+		final Generic myCar = car.addInstance("myCar");
+		final Generic myHuman = human.addInstance("myHuman");
+		final Generic myRoad = road.addInstance("myRoad");
 
 		assert myCar.getLinks(driving).isEmpty();
 		myCar.setLink(driving, null, myHuman, myRoad);
@@ -85,34 +85,34 @@ public class NotNullConstraintTest extends AbstractTest {
 	public void testEnabledConstraintOnASimpleTypeThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		car.newSubType(null);
+		car.addSubType(null);
 	}
 
 	public void testEnableThenDisableConstraintOnASimpleTypeThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.addType("Car");
-		Type expected = car.newSubType(null);
-		Generic actual = car.getSubType(null);
+		Type expected = car.addSubType(null);
+		Generic actual = car.getAllSubType(null);
 		assert expected == actual;
 	}
 
 	public void testEnableSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		car.newSubType(null);
+		car.addSubType(null);
 	}
 
 	public void testDisabledSeveralTimesConstraintOnASimpleTypeHasNoSideEffectThenCreateASubtype() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.addType("Car");
-		car.newSubType(null);
+		car.addSubType(null);
 	}
 
 	public void testConstraintIsDisabledByDefaultOnASimpleTypeThenCreateAnAttribute() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
 		final Attribute registration = car.setProperty("Registration");
-		final Generic myBmw = car.newInstance("myBmw");
+		final Generic myBmw = car.addInstance("myBmw");
 		Holder holder = car.setValue(registration, 235);
 		myBmw.setValue(holder, null);
 		assert myBmw.getValue(registration) == null : myBmw.getHolder(registration);
@@ -125,16 +125,16 @@ public class NotNullConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute registration = vehicle.setAttribute("Registration");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		car.setValue(registration, null);
 	}
 
 	public void testEnableConstraintOnAComplexeHierarchyOfTypes() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
-		Generic myBmw = car.newInstance("myBmw");
-		vehicle.newInstance("myBus");
+		Type car = vehicle.addSubType("Car");
+		Generic myBmw = car.addInstance("myBmw");
+		vehicle.addInstance("myBus");
 
 		Attribute carRegistration = car.setAttribute("vehicleRegistration");
 		carRegistration.log();

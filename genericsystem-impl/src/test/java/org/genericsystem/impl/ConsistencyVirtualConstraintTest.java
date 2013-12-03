@@ -18,15 +18,15 @@ public class ConsistencyVirtualConstraintTest extends AbstractTest {
 	public void consistencyTypeOK2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
-		car.newAnonymousInstance();
+		Type car = vehicle.addSubType("Car");
+		car.addAnonymousInstance();
 		vehicle.enableVirtualConstraint();
 	}
 
 	public void consistencyTypeKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.addType("Vehicle");
-		vehicle.newInstance("myVehicle");
+		vehicle.addInstance("myVehicle");
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {

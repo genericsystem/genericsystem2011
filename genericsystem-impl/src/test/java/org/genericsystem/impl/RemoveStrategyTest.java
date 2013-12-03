@@ -20,8 +20,8 @@ public class RemoveStrategyTest extends AbstractTest {
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
-		Generic myCar = car.newInstance("myCar");
-		Generic red = color.newInstance("Red");
+		Generic myCar = car.addInstance("myCar");
+		Generic red = color.addInstance("Red");
 		final Link carRed = car.setLink(carColor, "carRed", red);
 
 		myCar.setLink(carColor, "myCarRed", red);
@@ -42,8 +42,8 @@ public class RemoveStrategyTest extends AbstractTest {
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
-		Generic myCar = car.newInstance("myCar");
-		Generic red = color.newInstance("Red");
+		Generic myCar = car.addInstance("myCar");
+		Generic red = color.addInstance("Red");
 		Link carRed = car.setLink(carColor, "carRed", red);
 
 		Link myCarRed = myCar.setLink(carColor, "myCarRed", red);
@@ -59,8 +59,8 @@ public class RemoveStrategyTest extends AbstractTest {
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
-		Generic myCar = car.newInstance("myCar");
-		Generic red = color.newInstance("Red");
+		Generic myCar = car.addInstance("myCar");
+		Generic red = color.addInstance("Red");
 		Link carRed = car.setLink(carColor, "carRed", red);
 
 		Link myCarRed = myCar.setLink(carColor, "myCarRed", red);
@@ -76,8 +76,8 @@ public class RemoveStrategyTest extends AbstractTest {
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
-		Generic myCar = car.newInstance("myCar");
-		Generic red = color.newInstance("Red");
+		Generic myCar = car.addInstance("myCar");
+		Generic red = color.addInstance("Red");
 		Link carRed = car.setLink(carColor, "carRed", red);
 
 		Link myCarRed = myCar.setLink(carColor, "myCarRed", red);
@@ -95,8 +95,8 @@ public class RemoveStrategyTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 
-		Generic myCar = car.newInstance("myCar");
-		Generic red = color.newInstance("Red");
+		Generic myCar = car.addInstance("myCar");
+		Generic red = color.addInstance("Red");
 		Link carRed = car.setLink(carColor, "carRed", red);
 
 		Link myCarRed = myCar.setLink(carColor, "myCarRed", red);
@@ -114,8 +114,8 @@ public class RemoveStrategyTest extends AbstractTest {
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
-		Generic myCar = car.newInstance("myCar");
-		Generic red = color.newInstance("Red");
+		Generic myCar = car.addInstance("myCar");
+		Generic red = color.addInstance("Red");
 		Link carRed = car.setLink(carColor, "carRed", red);
 
 		carRed.remove(RemoveStrategy.PROJECT);

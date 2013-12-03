@@ -147,8 +147,8 @@ public class SystemPropertyTest extends AbstractTest {
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableCascadeRemove(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic red = color.newInstance("red");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic red = color.addInstance("red");
 		Link myBmwRed = myBmw.setLink(carColor, "myBmwRed", red);
 
 		myBmwRed.remove();
@@ -168,8 +168,8 @@ public class SystemPropertyTest extends AbstractTest {
 		Type motor = cache.addType("Motor");
 		Relation powered = car.setRelation("powered by", motor);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic myMotor = motor.newInstance("myMotor");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic myMotor = motor.addInstance("myMotor");
 		Link myBmwPoweredMyMotor = myBmw.setLink(powered, "myBmwPoweredMyMotor", myMotor);
 
 		myBmwPoweredMyMotor.remove();

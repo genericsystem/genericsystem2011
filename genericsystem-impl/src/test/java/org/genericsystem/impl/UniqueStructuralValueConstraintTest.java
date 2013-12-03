@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -39,7 +40,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		final Type plane = cache.addType("Plane");
 		Generic relation = car.setRelation("Plane", plane);
 		assert car.getAttribute("Plane") == relation;
-		assert cache.getEngine().getSubTypes("Plane").contains(plane);
+		assert cache.getEngine().getAllSubTypes("Plane").contains(plane);
 	}
 
 	// Attribute
@@ -106,7 +107,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.addType("Car");
 		// assert ((GenericImpl) car).isStructuralNamingConstraintEnabled();
-		assert car == car.newSubType("Car");
+		assert car == car.setSubType("Car");
 	}
 
 	public void testOneTypeAndOneAttributeWithSameNameOK() {
@@ -139,15 +140,15 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	public void testTwoInstancesWithSameNameOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic myCar = car.newInstance("myCar");
-		Generic myCar2 = car.newInstance("myCar");
+		Generic myCar = car.setInstance("myCar");
+		Generic myCar2 = car.setInstance("myCar");
 		assert Objects.equals(myCar, myCar2);
 	}
 
 	public void testInstanceWithSameNameAsTypeOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.addType("Car");
-		Generic iCar = car.newInstance("Car");
+		Generic iCar = car.addInstance("Car");
 		assert !Objects.equals(car, iCar);
 	}
 
@@ -157,7 +158,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
 		Attribute power = car.setAttribute("Power");
-		Generic myCar = car.newInstance("myCar");
+		Generic myCar = car.addInstance("myCar");
 		Holder myPower1 = myCar.setValue(power, 20000);
 		Holder myPower2 = myCar.setValue(power, 20000);
 		assert myPower1 == myPower2;
@@ -168,7 +169,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
 		Attribute power = car.setAttribute("Power");
-		Generic myCar = car.newInstance("myCar");
+		Generic myCar = car.addInstance("myCar");
 		Holder myPower = myCar.setValue(power, "Car");
 		assert !Objects.equals(myPower, car);
 	}
@@ -180,8 +181,8 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
-		Generic myCar = car.newInstance("myCar");
-		Generic myColor = color.newInstance("red");
+		Generic myCar = car.addInstance("myCar");
+		Generic myColor = color.addInstance("red");
 		Link myVehicleRed1 = myCar.setLink(carColor, "myVehicleRed", myColor);
 		Link myVehicleRed2 = myCar.setLink(carColor, "myVehicleRed", myColor);
 		assert Objects.equals(myVehicleRed1, myVehicleRed2);
@@ -193,8 +194,8 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		Attribute power = car.setAttribute("Power");
 		Relation carColor = car.setRelation("CarColor", color);
-		Generic myCar = car.newInstance("myCar");
-		Generic myColor = color.newInstance("red");
+		Generic myCar = car.addInstance("myCar");
+		Generic myColor = color.addInstance("red");
 		Link myVehicleRed = myCar.setLink(carColor, "Power", myColor);
 		assert !Objects.equals(myVehicleRed, power);
 	}
@@ -203,8 +204,8 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type plant = cache.addType("Plant");
 		Type collection = cache.addType("Collection");
-		Type tree1 = plant.newSubType("Tree");
-		Type tree2 = collection.newSubType("Tree");
+		Type tree1 = plant.addSubType("Tree");
+		Type tree2 = collection.addSubType("Tree");
 		assert !Objects.equals(tree1, tree2);
 	}
 }

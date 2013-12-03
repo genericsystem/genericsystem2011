@@ -3,6 +3,7 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -26,10 +27,10 @@ public class RelationTest extends AbstractTest {
 	public void test() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic myBmw = car.newInstance("myBmw");
+		Generic myBmw = car.addInstance("myBmw");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
-		Generic yellow = color.newInstance("yellow");
+		Generic red = color.addInstance("red");
+		Generic yellow = color.addInstance("yellow");
 		Relation carColor = car.setRelation("carColor", color);
 		Link carRed = car.bind(carColor, red);
 		assert carRed.inheritsFrom(carColor);
@@ -43,10 +44,10 @@ public class RelationTest extends AbstractTest {
 	public void test2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic myBmw = car.newInstance("myBmw");
+		Generic myBmw = car.addInstance("myBmw");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
-		Generic yellow = color.newInstance("yellow");
+		Generic red = color.addInstance("red");
+		Generic yellow = color.addInstance("yellow");
 		Relation carColor = car.setRelation("carColor", color);
 		carColor.enableSingularConstraint();
 
@@ -60,10 +61,10 @@ public class RelationTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		final Relation carColor = car.setRelation("driver", color);
 		carColor.enableSingularConstraint();
-		final Generic myBmw = car.newInstance("myBmw");
-		car.newInstance("myAudi");
-		Generic red = color.newInstance("red");
-		final Generic blue = color.newInstance("blue");
+		final Generic myBmw = car.addInstance("myBmw");
+		car.addInstance("myAudi");
+		Generic red = color.addInstance("red");
+		final Generic blue = color.addInstance("blue");
 		car.bind(carColor, red);
 		assert myBmw.getTargets(carColor).contains(red) : myBmw.getTargets(carColor);
 
@@ -87,12 +88,12 @@ public class RelationTest extends AbstractTest {
 		carPassengerTime.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carPassengerTime.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		final Generic myBmw = car.newInstance("myBmw");
-		final Generic michael = passenger.newInstance("michael");
-		passenger.newInstance("nicolas");
-		Generic today = time.newInstance("today");
-		final Generic yesterday = time.newInstance("yesterday");
-		Generic yourAudi = car.newInstance("yourAudi");
+		final Generic myBmw = car.addInstance("myBmw");
+		final Generic michael = passenger.addInstance("michael");
+		passenger.addInstance("nicolas");
+		Generic today = time.addInstance("today");
+		final Generic yesterday = time.addInstance("yesterday");
+		Generic yourAudi = car.addInstance("yourAudi");
 
 		michael.bind(carPassengerTime, myBmw, today);
 
@@ -117,9 +118,9 @@ public class RelationTest extends AbstractTest {
 		Type person = cache.addType("Person");
 		Relation carDriver = car.setRelation("driver", person);
 		carDriver.enableSingularConstraint(Statics.TARGET_POSITION);
-		Generic myBmw = car.newInstance("myBmw");
-		Generic me = person.newInstance("me");
-		Generic you = person.newInstance("you");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic me = person.addInstance("me");
+		Generic you = person.addInstance("you");
 		myBmw.bind(carDriver, me);
 		myBmw.bind(carDriver, you);
 		assert myBmw.getLinks(carDriver).size() == 2 : myBmw.getLinks(carDriver);
@@ -131,8 +132,8 @@ public class RelationTest extends AbstractTest {
 		Type person = cache.addType("Person");
 		Relation carDriver = car.setRelation("driver", person);
 		carDriver.enableSingularConstraint(Statics.TARGET_POSITION);
-		Generic myBmw = car.newInstance("myBmw");
-		Generic me = person.newInstance("me");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic me = person.addInstance("me");
 		me.bind(carDriver, myBmw);
 		assert me.getLinks(carDriver).size() == 1;
 	}
@@ -145,11 +146,11 @@ public class RelationTest extends AbstractTest {
 		Relation carDriverTime = car.setRelation("driver", person, time);
 		carDriverTime.enableSingularConstraint(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic me = person.newInstance("me");
-		Generic you = person.newInstance("you");
-		Generic myTime = time.newInstance("myTime");
-		Generic yourTime = time.newInstance("yourTime");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic me = person.addInstance("me");
+		Generic you = person.addInstance("you");
+		Generic myTime = time.addInstance("myTime");
+		Generic yourTime = time.addInstance("yourTime");
 
 		myBmw.bind(carDriverTime, me, myTime);
 		myBmw.bind(carDriverTime, you, yourTime);
@@ -171,9 +172,9 @@ public class RelationTest extends AbstractTest {
 		carPassenger.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carPassenger.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		final Generic myBmw = car.newInstance("myBmw");
-		final Generic michael = passenger.newInstance("michael");
-		Generic nicolas = passenger.newInstance("nicolas");
+		final Generic myBmw = car.addInstance("myBmw");
+		final Generic michael = passenger.addInstance("michael");
+		Generic nicolas = passenger.addInstance("nicolas");
 
 		myBmw.setLink(carPassenger, "30%", michael);
 		myBmw.setLink(carPassenger, "40%", nicolas);
@@ -196,10 +197,10 @@ public class RelationTest extends AbstractTest {
 		carPassenger.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carPassenger.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		final Generic myBmw = car.newInstance("myBmw");
+		final Generic myBmw = car.addInstance("myBmw");
 
-		final Generic michael = passenger.newInstance("michael");
-		Generic nicolas = passenger.newInstance("nicolas");
+		final Generic michael = passenger.addInstance("michael");
+		Generic nicolas = passenger.addInstance("nicolas");
 
 		Link link30 = michael.setLink(carPassenger, "30%", myBmw);
 		Link link40 = nicolas.setLink(carPassenger, "40%", myBmw);
@@ -220,11 +221,11 @@ public class RelationTest extends AbstractTest {
 		carPassengerTime.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carPassengerTime.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		final Generic myBmw = car.newInstance("myBmw");
-		final Generic yourAudi = car.newInstance("yourAudi");
-		final Generic michael = passenger.newInstance("michael");
-		final Generic today = time.newInstance("today");
-		Generic nicolas = passenger.newInstance("nicolas");
+		final Generic myBmw = car.addInstance("myBmw");
+		final Generic yourAudi = car.addInstance("yourAudi");
+		final Generic michael = passenger.addInstance("michael");
+		final Generic today = time.addInstance("today");
+		Generic nicolas = passenger.addInstance("nicolas");
 
 		myBmw.setLink(carPassengerTime, "30%", michael, today);
 		myBmw.setLink(carPassengerTime, "40%", nicolas, today);
@@ -247,10 +248,10 @@ public class RelationTest extends AbstractTest {
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic yourAudi = car.newInstance("yourAudi");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic yourAudi = car.addInstance("yourAudi");
 
-		Generic sven = owner.newInstance("sven");
+		Generic sven = owner.addInstance("sven");
 
 		myBmw.bind(carOwner, sven);
 		yourAudi.bind(carOwner, sven);
@@ -268,9 +269,9 @@ public class RelationTest extends AbstractTest {
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic yourAudi = car.newInstance("yourAudi");
-		Generic sven = owner.newInstance("sven");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic yourAudi = car.addInstance("yourAudi");
+		Generic sven = owner.addInstance("sven");
 
 		sven.bind(carOwner, myBmw);
 		sven.bind(carOwner, yourAudi);
@@ -289,11 +290,11 @@ public class RelationTest extends AbstractTest {
 		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwnerTime.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance("myBmw");
-		Generic nicolas = owner.newInstance("nicolas");
-		final Generic michael = owner.newInstance("michael");
-		Generic today = time.newInstance("today");
-		final Generic yesterday = time.newInstance("yesterday");
+		final Generic myBmw = car.addInstance("myBmw");
+		Generic nicolas = owner.addInstance("nicolas");
+		final Generic michael = owner.addInstance("michael");
+		Generic today = time.addInstance("today");
+		final Generic yesterday = time.addInstance("yesterday");
 
 		Link myBmwNicolasToday = myBmw.bind(carOwnerTime, nicolas, today);
 		assert myBmw.getLinks(carOwnerTime).size() == 1 : myBmw.getLinks(carOwnerTime);
@@ -314,10 +315,10 @@ public class RelationTest extends AbstractTest {
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
+		Generic myBmw = car.addInstance("myBmw");
 
-		Generic me = owner.newInstance("me");
-		Generic you = owner.newInstance("you");
+		Generic me = owner.addInstance("me");
+		Generic you = owner.addInstance("you");
 
 		Link carMe = car.setLink(carOwner, "defaultOwner", me);
 		assert myBmw.getLink(carOwner).getBaseComponent().equals(car);
@@ -336,9 +337,9 @@ public class RelationTest extends AbstractTest {
 		carColor.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carColor.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance("myBmw");
-		Generic red = color.newInstance("red");
-		final Generic yellow = color.newInstance("yellow");
+		final Generic myBmw = car.addInstance("myBmw");
+		Generic red = color.addInstance("red");
+		final Generic yellow = color.addInstance("yellow");
 
 		red.setLink(carColor, "defaultColor", car);
 		assert myBmw.getLink(carColor).getBaseComponent().equals(car);
@@ -364,11 +365,11 @@ public class RelationTest extends AbstractTest {
 		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwnerTime.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic me = owner.newInstance("me");
-		Generic you = owner.newInstance("you");
-		Generic today = time.newInstance("today");
-		Generic yesterday = time.newInstance("yesterday");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic me = owner.addInstance("me");
+		Generic you = owner.addInstance("you");
+		Generic today = time.addInstance("today");
+		Generic yesterday = time.addInstance("yesterday");
 
 		Link carMeToday = car.setLink(carOwnerTime, "defaultOwner", me, today);
 		assert myBmw.getLink(carOwnerTime).getBaseComponent().equals(car);
@@ -387,9 +388,9 @@ public class RelationTest extends AbstractTest {
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic me = owner.newInstance("me");
-		Generic you = owner.newInstance("you");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic me = owner.addInstance("me");
+		Generic you = owner.addInstance("you");
 
 		Link myBmwMe = myBmw.bind(carOwner, me);
 		assert myBmw.getLinks(carOwner).contains(myBmwMe);
@@ -406,9 +407,9 @@ public class RelationTest extends AbstractTest {
 		final Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance("myBmw");
-		Generic me = owner.newInstance("me");
-		final Generic you = owner.newInstance("you");
+		final Generic myBmw = car.addInstance("myBmw");
+		Generic me = owner.addInstance("me");
+		final Generic you = owner.addInstance("you");
 
 		Link myBmwMe = me.bind(carOwner, myBmw);
 		assert me.getLinks(carOwner).contains(myBmwMe);
@@ -431,10 +432,10 @@ public class RelationTest extends AbstractTest {
 		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwnerTime.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic me = owner.newInstance("me");
-		Generic you = owner.newInstance("you");
-		Generic today = time.newInstance("today");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic me = owner.addInstance("me");
+		Generic you = owner.addInstance("you");
+		Generic today = time.addInstance("today");
 
 		Link myBmwMeToday = myBmw.bind(carOwnerTime, me, today);
 		assert myBmw.getLinks(carOwnerTime).contains(myBmwMeToday);
@@ -453,8 +454,8 @@ public class RelationTest extends AbstractTest {
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic me = owner.newInstance("me");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic me = owner.addInstance("me");
 
 		Link myBmwMe1 = myBmw.setLink(carOwner, "value1", me);
 		Link myBmwMe2 = myBmw.setLink(carOwner, "value1", me);
@@ -472,8 +473,8 @@ public class RelationTest extends AbstractTest {
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic me = owner.newInstance("me");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic me = owner.addInstance("me");
 
 		Link myBmwMe1 = me.setLink(carOwner, "value1", myBmw);
 		Link myBmwMe2 = me.setLink(carOwner, "value1", myBmw);
@@ -493,10 +494,10 @@ public class RelationTest extends AbstractTest {
 		carOwnerTime.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwnerTime.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance("myBmw");
-		final Generic me = owner.newInstance("me");
-		Generic today = time.newInstance("today");
-		time.newInstance("yesterday");
+		final Generic myBmw = car.addInstance("myBmw");
+		final Generic me = owner.addInstance("me");
+		Generic today = time.addInstance("today");
+		time.addInstance("yesterday");
 
 		Link myBmwMe1 = myBmw.setLink(carOwnerTime, "value1", me, today);
 		Link myBmwMe2 = myBmw.setLink(carOwnerTime, "value1", me, today);
@@ -516,8 +517,8 @@ public class RelationTest extends AbstractTest {
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic me = owner.newInstance("me");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic me = owner.addInstance("me");
 
 		Link myBmwMe1 = myBmw.setLink(carOwner, "value1", me);
 		Link myBmwMe2 = myBmw.setLink(carOwner, "value2", me);
@@ -548,8 +549,8 @@ public class RelationTest extends AbstractTest {
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
 
-		final Generic myBmw = car.newInstance("myBmw");
-		final Generic me = owner.newInstance("me");
+		final Generic myBmw = car.addInstance("myBmw");
+		final Generic me = owner.addInstance("me");
 		me.setLink(carOwner, "value1", myBmw);
 
 		new RollbackCatcher() {
@@ -579,11 +580,11 @@ public class RelationTest extends AbstractTest {
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic frontLeft = tyre.newInstance("frontLeft");
-		Generic frontRight = tyre.newInstance("frontRight");
-		Generic rearLeft = tyre.newInstance("rearLeft");
-		Generic rearRight = tyre.newInstance("rearRight");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic frontLeft = tyre.addInstance("frontLeft");
+		Generic frontRight = tyre.addInstance("frontRight");
+		Generic rearLeft = tyre.addInstance("rearLeft");
+		Generic rearRight = tyre.addInstance("rearRight");
 
 		myBmw.bind(carTyres, frontLeft);
 		myBmw.bind(carTyres, frontRight);
@@ -603,11 +604,11 @@ public class RelationTest extends AbstractTest {
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic frontLeft = tyre.newInstance("frontLeft");
-		Generic frontRight = tyre.newInstance("frontRight");
-		Generic rearLeft = tyre.newInstance("rearLeft");
-		Generic rearRight = tyre.newInstance("rearRight");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic frontLeft = tyre.addInstance("frontLeft");
+		Generic frontRight = tyre.addInstance("frontRight");
+		Generic rearLeft = tyre.addInstance("rearLeft");
+		Generic rearRight = tyre.addInstance("rearRight");
 
 		frontLeft.bind(carTyres, myBmw);
 		frontRight.bind(carTyres, myBmw);
@@ -627,12 +628,12 @@ public class RelationTest extends AbstractTest {
 		Relation carTyres = car.setRelation("CarTyres", tyre);
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
-		Generic myBmw = car.newInstance("myBmw");
-		Generic frontLeft = tyre.newInstance("frontLeft");
-		Generic frontRight = tyre.newInstance("frontRight");
-		Generic rearLeft = tyre.newInstance("rearLeft");
-		Generic rearRight = tyre.newInstance("rearRight");
-		Generic center = tyre.newInstance("center");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic frontLeft = tyre.addInstance("frontLeft");
+		Generic frontRight = tyre.addInstance("frontRight");
+		Generic rearLeft = tyre.addInstance("rearLeft");
+		Generic rearRight = tyre.addInstance("rearRight");
+		Generic center = tyre.addInstance("center");
 		car.setLink(carTyres, "defaultTyre", center);
 		assert center.getHolders(carTyres, 1).size() == 1;
 		assert myBmw.getLink(carTyres).getBaseComponent().equals(myBmw);
@@ -648,9 +649,9 @@ public class RelationTest extends AbstractTest {
 		final Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
 
-		car.newInstance("myBmw");
-		car.newInstance("myAudi");
-		final Generic red = color.newInstance("red");
+		car.addInstance("myBmw");
+		car.addInstance("myAudi");
+		final Generic red = color.addInstance("red");
 
 		final Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -674,16 +675,16 @@ public class RelationTest extends AbstractTest {
 		carPerson.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carPerson.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
+		car.addInstance("myBmw");
 
 		// Generic michael = person.newInstance( "michael");
 		// Generic nicolas = person.newInstance( "nicolas");
 		// Generic sven = person.newInstance( "sven");
 		// Generic sofiane = person.newInstance( "sofiane");
-		Generic pierre = person.newInstance("pierre");
+		Generic pierre = person.addInstance("pierre");
 
-		Link carPierre = pierre.setLink(carPerson, "defaultPerson", car);
-		Generic myAudi = car.newInstance("myAudi");
+		pierre.setLink(carPerson, "defaultPerson", car);
+		car.addInstance("myAudi");
 		// should throw a singular constraint exception
 
 		// assert myBmw.getLink( carPerson).getBaseComponent().equals(car);
@@ -715,12 +716,12 @@ public class RelationTest extends AbstractTest {
 		carPerson.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carPerson.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic michael = person.newInstance("michael");
-		Generic nicolas = person.newInstance("nicolas");
-		Generic sven = person.newInstance("sven");
-		Generic sofiane = person.newInstance("sofiane");
-		Generic pierre = person.newInstance("pierre");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic michael = person.addInstance("michael");
+		Generic nicolas = person.addInstance("nicolas");
+		Generic sven = person.addInstance("sven");
+		Generic sofiane = person.addInstance("sofiane");
+		Generic pierre = person.addInstance("pierre");
 
 		Link carPierre = pierre.setLink(carPerson, "defaultPerson", car);
 		assert myBmw.getLink(carPerson).getBaseComponent().equals(myBmw) : myBmw.getLink(carPerson);
@@ -754,11 +755,11 @@ public class RelationTest extends AbstractTest {
 		carTyres.enablePropertyConstraint();
 		assert carTyres.isPropertyConstraintEnabled();
 
-		final Generic myBmw = car.newInstance("myBmw");
-		Generic frontLeft = tyre.newInstance("frontLeft");
-		Generic frontRight = tyre.newInstance("frontRight");
-		Generic rearLeft = tyre.newInstance("rearLeft");
-		final Generic rearRight = tyre.newInstance("rearRight");
+		final Generic myBmw = car.addInstance("myBmw");
+		Generic frontLeft = tyre.addInstance("frontLeft");
+		Generic frontRight = tyre.addInstance("frontRight");
+		Generic rearLeft = tyre.addInstance("rearLeft");
+		final Generic rearRight = tyre.addInstance("rearRight");
 
 		myBmw.bind(carTyres, frontLeft);
 		myBmw.bind(carTyres, frontRight);
@@ -795,11 +796,11 @@ public class RelationTest extends AbstractTest {
 		carTyres.enablePropertyConstraint();
 		assert carTyres.isPropertyConstraintEnabled();
 
-		final Generic myBmw = car.newInstance("myBmw");
-		Generic frontLeft = tyre.newInstance("frontLeft");
-		Generic frontRight = tyre.newInstance("frontRight");
-		Generic rearLeft = tyre.newInstance("rearLeft");
-		final Generic rearRight = tyre.newInstance("rearRight");
+		final Generic myBmw = car.addInstance("myBmw");
+		Generic frontLeft = tyre.addInstance("frontLeft");
+		Generic frontRight = tyre.addInstance("frontRight");
+		Generic rearLeft = tyre.addInstance("rearLeft");
+		final Generic rearRight = tyre.addInstance("rearRight");
 
 		frontLeft.bind(carTyres, myBmw);
 		frontRight.bind(carTyres, myBmw);
@@ -832,11 +833,11 @@ public class RelationTest extends AbstractTest {
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic frontLeft = tyre.newInstance("frontLeft");
-		Generic frontRight = tyre.newInstance("frontRight");
-		Generic rearLeft = tyre.newInstance("rearLeft");
-		Generic rearRight = tyre.newInstance("rearRight");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic frontLeft = tyre.addInstance("frontLeft");
+		Generic frontRight = tyre.addInstance("frontRight");
+		Generic rearLeft = tyre.addInstance("rearLeft");
+		Generic rearRight = tyre.addInstance("rearRight");
 
 		myBmw.bind(carTyres, frontLeft);
 		myBmw.bind(carTyres, frontRight);
@@ -860,11 +861,11 @@ public class RelationTest extends AbstractTest {
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic frontLeft = tyre.newInstance("frontLeft");
-		Generic frontRight = tyre.newInstance("frontRight");
-		Generic rearLeft = tyre.newInstance("rearLeft");
-		Generic rearRight = tyre.newInstance("rearRight");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic frontLeft = tyre.addInstance("frontLeft");
+		Generic frontRight = tyre.addInstance("frontRight");
+		Generic rearLeft = tyre.addInstance("rearLeft");
+		Generic rearRight = tyre.addInstance("rearRight");
 
 		frontLeft.bind(carTyres, myBmw);
 		frontRight.bind(carTyres, myBmw);
@@ -885,10 +886,10 @@ public class RelationTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic yourAudi = car.newInstance("yourAudi");
-		Generic red = color.newInstance("red");
-		Generic blue = color.newInstance("blue");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic yourAudi = car.addInstance("yourAudi");
+		Generic red = color.addInstance("red");
+		Generic blue = color.addInstance("blue");
 
 		myBmw.bind(carColor, red);
 		myBmw.bind(carColor, blue);
@@ -906,10 +907,10 @@ public class RelationTest extends AbstractTest {
 		Type color = cache.addType("Color");
 		Relation carColor = car.setRelation("CarColor", color);
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic yourAudi = car.newInstance("yourAudi");
-		Generic red = color.newInstance("red");
-		Generic blue = color.newInstance("blue");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic yourAudi = car.addInstance("yourAudi");
+		Generic red = color.addInstance("red");
+		Generic blue = color.addInstance("blue");
 
 		red.bind(carColor, myBmw);
 		blue.bind(carColor, myBmw);
@@ -923,10 +924,10 @@ public class RelationTest extends AbstractTest {
 	public void testManyToManyInheritance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic yourAudi = car.newInstance("yourAudi");
+		Generic yourAudi = car.addInstance("yourAudi");
 
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
+		Generic red = color.addInstance("red");
 
 		Relation carColor = car.setRelation("CarColor", color);
 		Link carRed = car.setLink(carColor, "defaultColor", red);
@@ -942,9 +943,9 @@ public class RelationTest extends AbstractTest {
 	public void testManyToManyInheritanceReverse() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic yourAudi = car.newInstance("yourAudi");
+		Generic yourAudi = car.addInstance("yourAudi");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
+		Generic red = color.addInstance("red");
 
 		Relation carColor = car.setRelation("CarColor", color);
 		red.setLink(carColor, "defaultColor", car);
@@ -965,10 +966,10 @@ public class RelationTest extends AbstractTest {
 
 		carColor.enablePropertyConstraint();
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic yourAudi = car.newInstance("yourAudi");
-		Generic red = color.newInstance("red");
-		Generic blue = color.newInstance("blue");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic yourAudi = car.addInstance("yourAudi");
+		Generic red = color.addInstance("red");
+		Generic blue = color.addInstance("blue");
 
 		myBmw.setLink(carColor, "value1", red);
 		Link bmwRed2 = myBmw.setLink(carColor, "value2", red);
@@ -991,10 +992,10 @@ public class RelationTest extends AbstractTest {
 
 		carColor.enablePropertyConstraint();
 
-		Generic myBmw = car.newInstance("myBmw");
-		Generic yourAudi = car.newInstance("yourAudi");
-		Generic red = color.newInstance("red");
-		Generic blue = color.newInstance("blue");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic yourAudi = car.addInstance("yourAudi");
+		Generic red = color.addInstance("red");
+		Generic blue = color.addInstance("blue");
 
 		red.setLink(carColor, "value1", myBmw);
 		Link bmwRed2 = red.setLink(carColor, "value2", myBmw);
@@ -1015,18 +1016,18 @@ public class RelationTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.addType("Car");
-		Type sportsCar = car.newSubType("SportsCar");
+		Type sportsCar = car.addSubType("SportsCar");
 		Type person = cache.addType("Person");
-		Type pilot = person.newSubType("Pilot");
+		Type pilot = person.addSubType("Pilot");
 		Relation carDriver = car.setRelation("driver", person);
 		Relation sportsCarPilot = sportsCar.setRelation("driver", pilot);
-		Generic myBmw = car.newInstance("myBmw");
-		Generic yourAudi = car.newInstance("yourAudi");
-		Generic ourFerrari = sportsCar.newInstance("ourFerrari");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic yourAudi = car.addInstance("yourAudi");
+		Generic ourFerrari = sportsCar.addInstance("ourFerrari");
 
-		Generic me = person.newInstance("me");
-		Generic you = person.newInstance("you");
-		Generic ayrton = pilot.newInstance("Ayrton");
+		Generic me = person.addInstance("me");
+		Generic you = person.addInstance("you");
+		Generic ayrton = pilot.addInstance("Ayrton");
 
 		myBmw.bind(carDriver, me);
 		myBmw.bind(carDriver, ayrton);
@@ -1144,7 +1145,6 @@ public class RelationTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type human = cache.addType("Human");
 		Relation carHuman = car.setRelation("pilot", human);
-		assert car.getRelations().size() == 1 : car.getRelations();
 		assert car.getRelations().contains(carHuman) : car.getRelations();
 	}
 
@@ -1154,7 +1154,6 @@ public class RelationTest extends AbstractTest {
 		Type human = cache.addType("Human");
 		Relation pilot = car.setRelation("pilot", human);
 		Relation passenger = car.setRelation("passenger", human);
-		assert car.getRelations().size() == 2 : car.getRelations();
 		assert car.getRelations().contains(pilot) : car.getRelations();
 		assert car.getRelations().contains(passenger) : car.getRelations();
 	}
@@ -1162,21 +1161,19 @@ public class RelationTest extends AbstractTest {
 	public void testSuperOnegetRelationsSnapshot() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		Type human = cache.addType("Human");
 		Relation vehicleHuman = vehicle.setRelation("pilot", human);
-		assert car.getRelations().size() == 1 : car.getRelations();
 		assert car.getRelations().contains(vehicleHuman) : car.getRelations();
 	}
 
 	public void testSuperTwogetRelationsSnapshot() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		Type human = cache.addType("Human");
 		Relation pilot = vehicle.setRelation("pilot", human);
 		Relation passenger = vehicle.setRelation("passenger", human);
-		assert car.getRelations().size() == 2 : car.getRelations();
 		assert car.getRelations().contains(pilot) : car.getRelations();
 		assert car.getRelations().contains(passenger) : car.getRelations();
 	}
@@ -1196,9 +1193,7 @@ public class RelationTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type human = cache.addType("Human");
 		Relation humanPilotVehicle = human.setRelation("pilot", vehicle);
-		Relation getRelation = human.getRelation("pilot");
-		assert getRelation != null;
-		assert getRelation.equals(humanPilotVehicle);
+		assert human.getRelation("pilot").equals(humanPilotVehicle);
 		assert human.getRelation("passenger") == null;
 	}
 
@@ -1208,10 +1203,7 @@ public class RelationTest extends AbstractTest {
 		Type bike = cache.addType("Bike");
 		Type human = cache.addType("Human");
 		Relation humanPilot = human.setRelation("pilot", vehicle, bike);
-		Relation getRelation = human.getRelation("pilot");
-		assert human.getAttribute("pilot") != null;
-		assert getRelation != null;
-		assert getRelation.equals(humanPilot);
+		assert human.getRelation("pilot").equals(humanPilot);
 		assert human.getRelation("passenger") == null;
 	}
 
@@ -1264,7 +1256,6 @@ public class RelationTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type human = cache.addType("Human");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
-		assert human.getRelations().size() == 1;
 		assert human.getRelations().contains(possessVehicle);
 		assert human.getRelation("HumanPossessVehicle").equals(possessVehicle);
 		assert vehicle.getRelation("HumanPossessVehicle").equals(possessVehicle);
@@ -1287,13 +1278,12 @@ public class RelationTest extends AbstractTest {
 		Type human = cache.addType("Human");
 		Relation brother = human.setRelation("brother", human);
 		// brother.enableMultiDirectional();
-		assert human.getRelations().size() == 1;
 		assert human.getRelations().contains(brother);
 		assert human.getRelation("brother").equals(brother);
 
-		Generic michael = human.newInstance("michael");
-		Generic quentin = human.newInstance("quentin");
-		Link holder = michael.bind(brother, quentin);
+		Generic michael = human.addInstance("michael");
+		Generic quentin = human.addInstance("quentin");
+		michael.bind(brother, quentin);
 
 		assert Statics.BASE_POSITION == michael.getBasePos(brother);
 		assert ((GenericImpl) brother).getComponentsPositions(michael, quentin).equals(Arrays.asList(0, 1));
@@ -1312,8 +1302,8 @@ public class RelationTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type human = cache.addType("Human");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
-		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic myHuman = human.newInstance("myHuman");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
+		Generic myHuman = human.addInstance("myHuman");
 		Link possession = myHuman.setLink(possessVehicle, "possession", myVehicle);
 		assert possessVehicle.getTargetComponent().equals(vehicle);
 
@@ -1329,9 +1319,9 @@ public class RelationTest extends AbstractTest {
 		Type human = cache.addType("Human");
 		Type road = cache.addType("Road");
 		Relation drivesOn = human.setRelation("DrivingOn", vehicle, road);
-		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic myHuman = human.newInstance("myHuman");
-		Generic myRoad = road.newInstance("myRoad");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
+		Generic myHuman = human.addInstance("myHuman");
+		Generic myRoad = road.addInstance("myRoad");
 		Link driving = myHuman.setLink(drivesOn, "myDrivingOn", myVehicle, myRoad);
 		assert drivesOn.getTargetComponent().equals(vehicle);
 
@@ -1346,11 +1336,11 @@ public class RelationTest extends AbstractTest {
 	public void testDefaultReverseLinks2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic myBmw = car.newInstance("myBmw");
-		Generic myAudi = car.newInstance("myAudi");
-		Generic myMercedes = car.newInstance("myMercedes");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic myAudi = car.addInstance("myAudi");
+		Generic myMercedes = car.addInstance("myMercedes");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
+		Generic red = color.addInstance("red");
 
 		Relation carColor = car.setRelation("carColor", color);
 		car.bind(carColor, red);
@@ -1362,8 +1352,8 @@ public class RelationTest extends AbstractTest {
 	public void mytest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
-		Generic myCar = car.newInstance("myCar");
+		Type car = vehicle.addSubType("Car");
+		Generic myCar = car.addInstance("myCar");
 		Attribute vehiclePower = vehicle.addProperty("power");
 		Holder car255 = car.setValue(vehiclePower, 255);
 		assert myCar.setValue(vehiclePower, 300).inheritsFrom(car255);
@@ -1373,12 +1363,12 @@ public class RelationTest extends AbstractTest {
 	public void testDefaultReverseLinks() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic myBmw = car.newInstance("myBmw");
-		Generic myAudi = car.newInstance("myAudi");
-		Generic myMercedes = car.newInstance("myMercedes");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic myAudi = car.addInstance("myAudi");
+		Generic myMercedes = car.addInstance("myMercedes");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
-		Generic blue = color.newInstance("blue");
+		Generic red = color.addInstance("red");
+		Generic blue = color.addInstance("blue");
 		Relation carColor = car.setRelation("carColor", color).enableSingularConstraint();
 		Link carRed = car.setLink(carColor, "carRed", red);
 		myBmw.bind(carColor, red);
@@ -1400,10 +1390,10 @@ public class RelationTest extends AbstractTest {
 		final Attribute age = person.setProperty("Age");
 		person.setValue(age, "25");
 
-		final Type student = person.newSubType("Student");
+		final Type student = person.addSubType("Student");
 		student.setValue(age, "30");
 
-		final Type teacher = person.newSubType("Teacher");
+		final Type teacher = person.addSubType("Teacher");
 		teacher.setValue(age, "20");
 
 		new RollbackCatcher() {
@@ -1422,10 +1412,10 @@ public class RelationTest extends AbstractTest {
 		Attribute age = person.setProperty("Age");
 		person.setValue(age, "25");
 
-		Type student = person.newSubType("Student");
+		Type student = person.addSubType("Student");
 		student.setValue(age, "30");
 
-		Type teacher = person.newSubType("Teacher");
+		Type teacher = person.addSubType("Teacher");
 
 		assert "30" == cache.addType("doctoral", student, teacher).getValue(age);
 	}

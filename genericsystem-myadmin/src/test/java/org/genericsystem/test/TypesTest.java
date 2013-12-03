@@ -37,8 +37,8 @@ public class TypesTest extends AbstractTest {
 
 	public void testGetAttributes() {
 		Type human = cache.setType("Human");
-		Generic michael = human.newInstance("Michael");
-		Generic quentin = human.newInstance("Quentin");
+		Generic michael = human.addInstance("Michael");
+		Generic quentin = human.addInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
 		// isBrotherOf.enableMultiDirectional();
 		quentin.bind(isBrotherOf, michael);
@@ -60,8 +60,8 @@ public class TypesTest extends AbstractTest {
 
 	public void testGetOtherTargets() {
 		Type human = cache.setType("Human");
-		Generic michael = human.newInstance("Michael");
-		Generic quentin = human.newInstance("Quentin");
+		Generic michael = human.addInstance("Michael");
+		Generic quentin = human.addInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
 		// isBrotherOf.enableMultiDirectional();
 		Link link = quentin.bind(isBrotherOf, michael);
@@ -80,7 +80,7 @@ public class TypesTest extends AbstractTest {
 	public void testContraint() {
 		Type vehicle = cache.setType("Vehicle");
 		Attribute vehiclePower = vehicle.setProperty("power");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Holder myVehicle123 = myVehicle.setValue(vehiclePower, "123");
 		myVehicle.cancel(myVehicle123);
 		assert !myVehicle123.isAlive();

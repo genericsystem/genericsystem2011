@@ -28,10 +28,10 @@ public class StructuralSnapshotTest extends AbstractTest {
 	public void testStructuralSnapshotWithSubType2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType( "Car");
+		Type car = vehicle.addSubType( "Car");
 		Attribute carPower = car.setAttribute( "Power");
 		Type human = cache.addType("Human");
-		human.newSubType( "Pilot");
+		human.addSubType( "Pilot");
 		Relation vehicleHuman = vehicle.setRelation( "Drive", human);
 		assert car.getAttributes().contains(vehicleHuman);
 		assert car.getAttributes().contains(carPower);

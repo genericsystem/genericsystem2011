@@ -16,7 +16,7 @@ public class CompareToTest extends AbstractTest {
 	public void testCompareTo() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic audi = car.newInstance("audi");
+		Generic audi = car.addInstance("audi");
 		assert car.compareTo(audi) < 0;
 		assert audi.compareTo(car) > 0;
 		assert car.compareTo(car) == 0;
@@ -25,7 +25,7 @@ public class CompareToTest extends AbstractTest {
 	public void testSort() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Generic audi = car.newInstance("audi");
+		Generic audi = car.addInstance("audi");
 		List<Generic> l = new ArrayList<>();
 		l.add(audi);
 		l.add(car);

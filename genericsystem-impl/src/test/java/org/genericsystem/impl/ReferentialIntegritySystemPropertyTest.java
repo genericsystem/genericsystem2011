@@ -72,7 +72,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 	public void testRemoveTypeWithInstance() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type car = cache.addType("Car");
-		car.newInstance("myCar");
+		car.addInstance("myCar");
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
@@ -131,7 +131,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Type human = cache.addType("Human");
 		Attribute weight = human.setAttribute("weight");
 		assert !weight.isReferentialIntegrity(Statics.BASE_POSITION);
-		Generic myck = human.newInstance("myck");
+		Generic myck = human.addInstance("myck");
 		Holder myckWeight90 = myck.setValue(weight, 90);
 		assert !myckWeight90.isReferentialIntegrity(Statics.BASE_POSITION);
 	}
@@ -142,7 +142,7 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Attribute weight = human.setAttribute("weight");
 		weight.enableReferentialIntegrity(Statics.BASE_POSITION);
 		assert weight.isReferentialIntegrity(Statics.BASE_POSITION);
-		Generic myck = human.newInstance("myck");
+		Generic myck = human.addInstance("myck");
 		Holder myckWeight90 = myck.setValue(weight, 90);
 		assert myckWeight90.isReferentialIntegrity(Statics.BASE_POSITION);
 	}
@@ -153,8 +153,8 @@ public class ReferentialIntegritySystemPropertyTest extends AbstractTest {
 		Type vehicle = cache.setType("Human");
 		Relation humanDriveVehicle = human.setRelation("drive", vehicle);
 		assert !humanDriveVehicle.isReferentialIntegrity(Statics.BASE_POSITION);
-		Generic myck = human.newInstance("myck");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myck = human.addInstance("myck");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Link myckMyDriveMyVehicle = myck.setLink(humanDriveVehicle, "myDrive", myVehicle);
 		assert !myckMyDriveMyVehicle.isReferentialIntegrity(Statics.BASE_POSITION);
 	}

@@ -21,7 +21,7 @@ public abstract class AbstractTest extends Arquillian {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
-		javaArchive.addClasses(CacheProvider.class, CacheSerializable.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, CdiFactory.class);
+		javaArchive.addClasses(CacheProvider.class, SerializableCache.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, CdiFactory.class);
 		javaArchive.addPackage(Expressions.class.getPackage());
 		javaArchive.addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
 		return javaArchive;

@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
@@ -22,7 +23,18 @@ public class SerializationTest extends AbstractTest {
 		Cache clone = deSerialize(serialize(cache)).start();
 		assert clone.getType("Vehicle") != vehicle;
 		assert clone.getType("Vehicle").getValue().equals(vehicle.getValue());
+	}
 
+	public void testAddsWithFlush() {
+		cache.start();
+		cache.clear();
+		Type color = cache.addType("Color");
+		cache.flush();
+		Type vehicle = cache.addType("Vehicle");
+		Cache clone = deSerialize(serialize(cache)).start();
+		assert clone.getType("Vehicle") != vehicle;
+		assert clone.getType("Vehicle").getValue().equals(vehicle.getValue());
+		assert clone.getType("Color") == color : clone.getType("Color");
 	}
 
 	public void testSuperCache() {
@@ -57,7 +69,7 @@ public class SerializationTest extends AbstractTest {
 		cache.start();
 		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Cache superCache = cache.mountNewCache();
 		myVehicle.remove();
 		Cache superCacheClone = deSerialize(serialize(superCache)).start();

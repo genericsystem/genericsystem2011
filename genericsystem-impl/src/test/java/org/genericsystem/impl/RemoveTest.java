@@ -32,7 +32,7 @@ public class RemoveTest extends AbstractTest {
 			public void intercept() {
 				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 				Type vehicle = cache.addType("Vehicle");
-				vehicle.newSubType("Car");
+				vehicle.addSubType("Car");
 				vehicle.remove();
 			}
 		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
@@ -70,20 +70,20 @@ public class RemoveTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.addType("Window");
 		Attribute height = window.setProperty("Height");
-		Generic myWindow = window.newInstance("MyWindow");
+		Generic myWindow = window.addInstance("MyWindow");
 		Holder myHeight1 = ((Attribute) myWindow).setValue(height, 165);
 		myHeight1.remove();
 		assert cache.getEngine().getInheritings().contains(window);
 		assert !cache.getEngine().getInheritings().contains(height);
-		assert !cache.getEngine().getSubTypes().contains(myHeight1);
+		assert !cache.getEngine().getAllSubTypes().contains(myHeight1);
 	}
 
 	public void testRemoveRelationWithSubRelation() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.addType("Human");
-		Type man = human.newSubType("Man");
+		Type man = human.addSubType("Man");
 		Type vehicle = cache.addType("Vehicle");
-		Type car = vehicle.newSubType("Car");
+		Type car = vehicle.addSubType("Car");
 		final Relation humanDriveVehicle = human.addRelation("drive", vehicle);
 		Relation manSubDriveCar = ((GenericImpl) man).addSubRelation(humanDriveVehicle, "subDrive", car);
 		cache.flush();
@@ -104,7 +104,7 @@ public class RemoveTest extends AbstractTest {
 	public void testRemoveInstance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type window = cache.addType("Window");
-		Generic myWindow = window.newInstance("myWindow");
+		Generic myWindow = window.addInstance("myWindow");
 		myWindow.remove();
 	}
 
@@ -114,7 +114,7 @@ public class RemoveTest extends AbstractTest {
 			public void intercept() {
 				Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 				Type window = cache.addType("Window");
-				window.newInstance("myWindow");
+				window.addInstance("myWindow");
 				window.remove();
 			}
 		}.assertIsCausedBy(ReferentialIntegrityConstraintViolationException.class);
@@ -142,13 +142,13 @@ public class RemoveTest extends AbstractTest {
 		carColor.enableSingularConstraint();
 		Attribute intensity = carColor.setAttribute("Intensity");
 
-		Generic red = color.newInstance("Red");
-		Generic grey = color.newInstance("Grey");
+		Generic red = color.addInstance("Red");
+		Generic grey = color.addInstance("Grey");
 		Link defaultCarColor = car.setLink(carColor, "DefaultCarColor", red); // default color of car
 
-		final Generic bmw = car.newInstance("Bmw");
-		Generic mercedes = car.newInstance("Mercedes");
-		final Generic lada = car.newInstance("Lada");
+		final Generic bmw = car.addInstance("Bmw");
+		Generic mercedes = car.addInstance("Mercedes");
+		final Generic lada = car.addInstance("Lada");
 		mercedes.bind(carColor, grey);
 
 		red.getLink(carColor, lada).setValue(intensity, "60%");

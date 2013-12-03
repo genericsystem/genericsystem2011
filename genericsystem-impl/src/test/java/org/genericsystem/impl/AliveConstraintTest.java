@@ -16,8 +16,8 @@ public class AliveConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type human = cache.addType("Human");
 		final Relation humanDriveCar = human.setRelation("Drive", car);
-		final Generic myCar = car.newInstance("myCar");
-		final Generic myHuman = human.newInstance("myHuman");
+		final Generic myCar = car.addInstance("myCar");
+		final Generic myHuman = human.addInstance("myHuman");
 		myHuman.remove();
 		assert !myHuman.isAlive();
 
@@ -34,8 +34,8 @@ public class AliveConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type human = cache.addType("Human");
 		Relation humanDriveCar = human.setRelation("Drive", car);
-		Generic myCar = car.newInstance("myCar");
-		Generic myHuman = human.newInstance("myHuman");
+		Generic myCar = car.addInstance("myCar");
+		Generic myHuman = human.addInstance("myHuman");
 
 		assert myHuman.isAlive();
 		myHuman.setLink(humanDriveCar, "myHumanDriveCar", myCar);

@@ -59,7 +59,7 @@ public class ConcurrentTest extends AbstractTest {
 		Engine engine = GenericSystem.newInMemoryEngine();
 		final Cache cache1 = engine.newCache().start();
 		final Type car = cache1.addType("Car");
-		Generic bmw = car.newInstance("bmw");
+		Generic bmw = car.addInstance("bmw");
 		cache1.flush();
 		assert car.getInstances().contains(bmw);
 

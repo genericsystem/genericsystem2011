@@ -13,17 +13,17 @@ public class VirtualConstraintTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		vehicle.enableVirtualConstraint();
-		Type car = vehicle.newSubType("Car");
-		car.newInstance("myCar");
+		Type car = vehicle.addSubType("Car");
+		car.addInstance("myCar");
 	}
 
 	public void testVirtualWithJump() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		vehicle.enableVirtualConstraint();
-		Type car = vehicle.newSubType("Car");
-		Type superCar = car.newSubType("SuperCar");
-		superCar.newInstance("mySuperCar");
+		Type car = vehicle.addSubType("Car");
+		Type superCar = car.addSubType("SuperCar");
+		superCar.addInstance("mySuperCar");
 	}
 
 	public void testVirtualKO() {
@@ -34,18 +34,18 @@ public class VirtualConstraintTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				vehicle.newInstance("myVehicle");
+				vehicle.addInstance("myVehicle");
 			}
 		}.assertIsCausedBy(VirtualConstraintException.class);
 		vehicle.disableVirtualConstraint();
 		assert !vehicle.isVirtualConstraintEnabled();
-		vehicle.newInstance("myVehicle");
+		vehicle.addInstance("myVehicle");
 	}
 
 	public void testVirtualKO2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		final Type vehicle = cache.addType("Vehicle");
-		vehicle.newInstance("myVehicle");
+		vehicle.addInstance("myVehicle");
 		cache.flush();
 		new RollbackCatcher() {
 			@Override

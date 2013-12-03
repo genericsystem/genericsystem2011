@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
@@ -37,7 +38,7 @@ public class FlushTest extends AbstractTest {
 		Type animal = cache.addType("Animal");
 		Snapshot<Generic> snapshot = animal.getInheritings();
 		assert snapshot.isEmpty();
-		Type human = animal.newSubType("Human");
+		Type human = animal.addSubType("Human");
 		assert snapshot.size() == 1;
 		assert snapshot.contains(human);
 
@@ -132,12 +133,12 @@ public class FlushTest extends AbstractTest {
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
-		Generic red = color.newInstance("Red");
-		Generic grey = color.newInstance("Grey");
+		Generic red = color.addInstance("Red");
+		Generic grey = color.addInstance("Grey");
 		assert car.setLink(carColor, "CarRed", red).isSingularConstraintEnabled(0); // default color of car
 
-		final Generic bmw = car.newInstance("Bmw");
-		Generic mercedes = car.newInstance("Mercedes");
+		final Generic bmw = car.addInstance("Bmw");
+		Generic mercedes = car.addInstance("Mercedes");
 		mercedes.bind(carColor, grey);
 		assert red.getLinks(carColor).size() == 1;
 		assert red.getLink(carColor).getBaseComponent().equals(bmw);
@@ -154,14 +155,14 @@ public class FlushTest extends AbstractTest {
 
 		Attribute intensity = carColor.setAttribute("Intensity");
 
-		Generic red = color.newInstance("red");
-		Generic grey = color.newInstance("grey");
+		Generic red = color.addInstance("red");
+		Generic grey = color.addInstance("grey");
 
 		Link defaultCarColor = car.setLink(carColor, "carRed", red); // default color of car
 
-		final Generic bmw = car.newInstance("bmw");
-		Generic mercedes = car.newInstance("mercedes");
-		final Generic audi = car.newInstance("audi");
+		final Generic bmw = car.addInstance("bmw");
+		Generic mercedes = car.addInstance("mercedes");
+		final Generic audi = car.addInstance("audi");
 
 		mercedes.bind(carColor, grey);
 

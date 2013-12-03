@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.List;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -22,8 +23,8 @@ public class AnnotationTest extends AbstractTest {
 	public void testMultiDirectionalRelation() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type human = cache.addType("Human");
-		Generic michael = human.newInstance("Michael");
-		Generic quentin = human.newInstance("Quentin");
+		Generic michael = human.addInstance("Michael");
+		Generic quentin = human.addInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
 		// isBrotherOf.enableMultiDirectional();
 		Link link = quentin.bind(isBrotherOf, michael);
@@ -45,8 +46,8 @@ public class AnnotationTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Type color = cache.addType("Color");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic red = color.newInstance("red");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
+		Generic red = color.addInstance("red");
 		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
 		// vehicleColor.enableMultiDirectional();
 		Link link = myVehicle.bind(vehicleColor, red);
@@ -88,8 +89,8 @@ public class AnnotationTest extends AbstractTest {
 		// assert !car.isAutomatic();
 		// assert car.getImplicit().isAutomatic();
 		// assert !myCar.isAutomatic();
-		assert vehicle.getDirectSubTypes().size() == 1;
-		assert vehicle.getDirectSubTypes().contains(car);
+		assert vehicle.getSubTypes().size() == 1;
+		assert vehicle.getSubTypes().contains(car);
 		assert car.getSupers().size() == 1 : car.getSupers();
 		assert car.getSupers().contains(vehicle);
 	}
@@ -131,7 +132,6 @@ public class AnnotationTest extends AbstractTest {
 		cache.find(Vehicle.class);
 		Type human = cache.find(Human.class);
 		Relation possess = cache.find(HumanPossessVehicle.class);
-		assert human.getRelations().size() == 1;
 		assert human.getRelations().contains(possess);
 	}
 
@@ -142,7 +142,6 @@ public class AnnotationTest extends AbstractTest {
 		Relation possessVehicle = cache.find(HumanPossessVehicle.class);
 		Relation possessCar = cache.find(HumanPossessCar.class);
 		assert possessCar.inheritsFrom(possessVehicle);
-		assert human.getRelations().size() == 1 : human.getRelations();
 		assert human.getRelations().contains(possessCar) : human.getRelations();
 
 	}
@@ -154,9 +153,7 @@ public class AnnotationTest extends AbstractTest {
 		Type man = cache.find(Man.class);
 		Relation humanPossessVehicle = cache.find(HumanPossessVehicle.class);
 		Relation manPossessCar = cache.find(ManPossessCar.class);
-		assert human.getRelations().size() == 1;
 		assert human.getRelations().contains(humanPossessVehicle);
-		assert man.getRelations().size() == 1;
 		assert man.getRelations().contains(manPossessCar) : man.getRelations();
 		assert manPossessCar.inheritsFrom(humanPossessVehicle);
 	}
@@ -167,7 +164,6 @@ public class AnnotationTest extends AbstractTest {
 		Type human = cache.find(Human.class);
 		cache.find(Time.class);
 		Relation possess = cache.find(HumanPossessVehicleTime.class);
-		assert human.getRelations().size() == 1;
 		assert human.getRelations().contains(possess);
 	}
 
@@ -178,22 +174,22 @@ public class AnnotationTest extends AbstractTest {
 		Type selectable = cache.find(Selectable.class);
 		Type selectableWindow = cache.find(SelectableWindow.class);
 
-		assert graphicComponent.getDirectSubTypes().size() == 2 : graphicComponent.getDirectSubTypes();
-		assert graphicComponent.getDirectSubTypes().contains(selectable);
-		assert graphicComponent.getDirectSubTypes().contains(window) : graphicComponent.getDirectSubTypes();
-
-		assert graphicComponent.getSubTypes().size() == 3 : graphicComponent.getSubTypes();
+		assert graphicComponent.getSubTypes().size() == 2 : graphicComponent.getSubTypes();
 		assert graphicComponent.getSubTypes().contains(selectable);
-		assert graphicComponent.getSubTypes().contains(window);
-		assert graphicComponent.getSubTypes().contains(selectableWindow);
+		assert graphicComponent.getSubTypes().contains(window) : graphicComponent.getSubTypes();
 
-		assert window.getDirectSubTypes().size() == 1 : window.getDirectSubTypes();
-		assert window.getDirectSubTypes().contains(selectableWindow) : window.getDirectSubTypes();
+		assert graphicComponent.getAllSubTypes().size() == 3 : graphicComponent.getAllSubTypes();
+		assert graphicComponent.getAllSubTypes().contains(selectable);
+		assert graphicComponent.getAllSubTypes().contains(window);
+		assert graphicComponent.getAllSubTypes().contains(selectableWindow);
 
-		assert selectable.getDirectSubTypes().size() == 1 : selectable.getDirectSubTypes();
-		assert selectable.getDirectSubTypes().contains(selectableWindow) : selectable.getDirectSubTypes();
+		assert window.getSubTypes().size() == 1 : window.getSubTypes();
+		assert window.getSubTypes().contains(selectableWindow) : window.getSubTypes();
 
-		assert selectableWindow.getDirectSubTypes().size() == 0;
+		assert selectable.getSubTypes().size() == 1 : selectable.getSubTypes();
+		assert selectable.getSubTypes().contains(selectableWindow) : selectable.getSubTypes();
+
+		assert selectableWindow.getSubTypes().size() == 0;
 		assert selectableWindow.inheritsFrom(selectable);
 		assert selectableWindow.inheritsFrom(window);
 		assert selectableWindow.inheritsFrom(graphicComponent);
@@ -302,42 +298,52 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Games {}
+	public static class Games {
+	}
 
 	@SystemGeneric
 	@Extends(meta = Games.class)
-	public static class MyGames {}
+	public static class MyGames {
+	}
 
 	@SystemGeneric
-	public static class Children {}
+	public static class Children {
+	}
 
 	@SystemGeneric
 	@Extends(meta = Children.class)
-	public static class MyChildren {}
+	public static class MyChildren {
+	}
 
 	@SystemGeneric
 	@Extends({ Games.class, Children.class })
-	public static class ChildrenGames {}
+	public static class ChildrenGames {
+	}
 
 	@SystemGeneric
 	@Extends(meta = ChildrenGames.class)
-	public static class MyChildrenGames {}
+	public static class MyChildrenGames {
+	}
 
 	@SystemGeneric
 	@Extends({ Human.class, Vehicle.class })
-	public static class Transformer {}
+	public static class Transformer {
+	}
 
 	@SystemGeneric
 	@Extends(meta = Transformer.class)
-	public static class MyTransformer {}
+	public static class MyTransformer {
+	}
 
 	@SystemGeneric
 	@Extends({ Transformer.class, ChildrenGames.class })
-	public static class TransformerChildrenGames {}
+	public static class TransformerChildrenGames {
+	}
 
 	@SystemGeneric
 	@Extends(meta = TransformerChildrenGames.class)
-	public static class MyTransformerChildrenGames {}
+	public static class MyTransformerChildrenGames {
+	}
 
 	@SystemGeneric
 	public static class GraphicComponent {
@@ -386,7 +392,8 @@ public class AnnotationTest extends AbstractTest {
 
 	@SystemGeneric
 	@Extends(meta = Vehicle.class)
-	public static class MyVehicle {}
+	public static class MyVehicle {
+	}
 
 	@SystemGeneric
 	@Components(Vehicle.class)
@@ -409,7 +416,8 @@ public class AnnotationTest extends AbstractTest {
 
 	@SystemGeneric
 	@Extends(meta = Car.class)
-	public static class myCar {}
+	public static class myCar {
+	}
 
 	@SystemGeneric
 	@Components(Car.class)
@@ -424,32 +432,40 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Human {}
+	public static class Human {
+	}
 
 	@SystemGeneric
-	public static class Man extends Human {}
+	public static class Man extends Human {
+	}
 
 	@SystemGeneric
 	@Extends(meta = Human.class)
-	public static class Myck {}
+	public static class Myck {
+	}
 
 	@SystemGeneric
-	public static class Time {}
+	public static class Time {
+	}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class })
-	public static class HumanPossessVehicle {}
+	public static class HumanPossessVehicle {
+	}
 
 	@SystemGeneric
 	@Components({ Human.class, Car.class })
-	public static class HumanPossessCar extends HumanPossessVehicle {}
+	public static class HumanPossessCar extends HumanPossessVehicle {
+	}
 
 	@SystemGeneric
 	@Components({ Man.class, Car.class })
-	public static class ManPossessCar extends HumanPossessVehicle {}
+	public static class ManPossessCar extends HumanPossessVehicle {
+	}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class, Time.class })
-	public static class HumanPossessVehicleTime {}
+	public static class HumanPossessVehicleTime {
+	}
 
 }

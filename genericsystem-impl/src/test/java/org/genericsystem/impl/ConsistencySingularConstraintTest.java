@@ -16,10 +16,10 @@ public class ConsistencySingularConstraintTest extends AbstractTest {
 	public void consistencyRelationBaseOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic myVehicle2 = vehicle.newInstance("myVehicle2");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
+		Generic myVehicle2 = vehicle.addInstance("myVehicle2");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
+		Generic red = color.addInstance("red");
 		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		myVehicle2.setLink(vehicleColor, "myVehicle2Red", red);
@@ -29,10 +29,10 @@ public class ConsistencySingularConstraintTest extends AbstractTest {
 	public void consistencyRelationBaseKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
-		Generic green = color.newInstance("green");
+		Generic red = color.addInstance("red");
+		Generic green = color.addInstance("green");
 		final Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		myVehicle.setLink(vehicleColor, "myVehicleGreen", green);
@@ -48,10 +48,10 @@ public class ConsistencySingularConstraintTest extends AbstractTest {
 	public void consistencyRelationTargetOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
-		Generic green = color.newInstance("green");
+		Generic red = color.addInstance("red");
+		Generic green = color.addInstance("green");
 		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		myVehicle.setLink(vehicleColor, "myVehicleGreen", green);
@@ -61,10 +61,10 @@ public class ConsistencySingularConstraintTest extends AbstractTest {
 	public void consistencyRelationTargetKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic myVehicle2 = vehicle.newInstance("myVehicle2");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
+		Generic myVehicle2 = vehicle.addInstance("myVehicle2");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
+		Generic red = color.addInstance("red");
 		final Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		myVehicle2.setLink(vehicleColor, "myVehicleRed", red);
@@ -80,9 +80,9 @@ public class ConsistencySingularConstraintTest extends AbstractTest {
 	public void consistencyRelationDoubleOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		Type color = cache.addType("Color");
-		Generic red = color.newInstance("red");
+		Generic red = color.addInstance("red");
 		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
 		myVehicle.setLink(vehicleColor, "myVehicleRed", red);
 		vehicleColor.enableSingularConstraint(Statics.TARGET_POSITION);
@@ -92,8 +92,8 @@ public class ConsistencySingularConstraintTest extends AbstractTest {
 	public void consistencyAttributeBaseOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
-		Generic myVehicle2 = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.setInstance("myVehicle");
+		Generic myVehicle2 = vehicle.setInstance("myVehicle");
 		Attribute power = vehicle.setAttribute("power");
 		myVehicle.setValue(power, 123);
 		myVehicle2.setValue(power, 123);
@@ -103,14 +103,14 @@ public class ConsistencySingularConstraintTest extends AbstractTest {
 	public void consistencyAttributeBaseKO() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Generic myVehicle = vehicle.newInstance("myVehicle");
+		Generic myVehicle = vehicle.addInstance("myVehicle");
 		final Attribute power = vehicle.setAttribute("power");
 		myVehicle.setValue(power, 123);
 		myVehicle.setValue(power, 236);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-			power.enableSingularConstraint(Statics.BASE_POSITION);
+				power.enableSingularConstraint(Statics.BASE_POSITION);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}
