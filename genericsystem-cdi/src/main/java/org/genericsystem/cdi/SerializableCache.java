@@ -8,7 +8,9 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.enterprise.inject.spi.BeanManager;
+
 import org.genericsystem.core.AbstractContext;
 import org.genericsystem.core.Archiver.SnapshotLoader;
 import org.genericsystem.core.Archiver.SnapshotWriter;
@@ -63,31 +65,39 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		BeanManager beanManager = getBeanManager();
+		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
+		Cache currentCache = engine.getCurrentCache();
+		try {
+			subContext = in.readBoolean() ? (AbstractContext) in.readObject() : new Transaction(in.readLong(), engine);
+			this.start();
+			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
+			Map<Long, Generic> genericMap = new HashMap<>();
+			int addSize = in.readInt();
+			SerializableSnapshotLoader loader = new SerializableSnapshotLoader();
+			for (int i = 0; i < addSize; i++)
+				adds.add(loader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
+			int automaticSize = in.readInt();
+			for (int i = 0; i < automaticSize; i++)
+				automatics.add(loader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
+			int removeSize = in.readInt();
+			for (int i = 0; i < removeSize; i++)
+				removes.add(findByDesignTs(engine, (ObjectInputStream) in, genericMap));
+		} finally {
+			currentCache.start();
+		}
+	}
+
+	private BeanManager getBeanManager() {
 		BeanManager beanManager;
 		try {
 			beanManager = new BeanManagerLocator().getBeanManager();
 		} catch (Exception e) {
 			beanManager = CDIExtension.getBeanManager();
 		}
-		assert beanManager != null;
-		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
-		if (in.readBoolean())
-			subContext = (AbstractContext) in.readObject();
-		else
-			subContext = new Transaction(in.readLong(), engine);
-		this.start();
-		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
-		Map<Long, Generic> genericMap = new HashMap<>();
-		int addSize = in.readInt();
-		SerializableSnapshotLoader loader = new SerializableSnapshotLoader();
-		for (int i = 0; i < addSize; i++)
-			adds.add(loader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
-		int automaticSize = in.readInt();
-		for (int i = 0; i < automaticSize; i++)
-			automatics.add(loader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
-		int removeSize = in.readInt();
-		for (int i = 0; i < removeSize; i++)
-			removes.add(findByDesignTs(engine, (ObjectInputStream) in, genericMap));
+		if (beanManager == null)
+			throw new IllegalStateException();
+		return beanManager;
 	}
 
 	private static class SerializableSnapshotLoader extends SnapshotLoader {
