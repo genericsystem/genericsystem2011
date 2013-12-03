@@ -139,20 +139,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	<T extends Generic> T plug() {
-		if (getEngine().getCacheLocal() != null)
-			getCurrentCache().plug(this);
-		else {
-			Set<Generic> componentSet = new HashSet<>();
-			for (Generic component : components)
-				if (componentSet.add(component))
-					((GenericImpl) component).lifeManager.engineComposites.add(this);
+		Set<Generic> componentSet = new HashSet<>();
+		for (Generic component : components)
+			if (componentSet.add(component))
+				((GenericImpl) component).lifeManager.engineComposites.add(this);
 
-			Set<Generic> effectiveSupersSet = new HashSet<>();
-			for (Generic effectiveSuper : supers)
-				if (effectiveSupersSet.add(effectiveSuper))
-					((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
-		}
-
+		Set<Generic> effectiveSupersSet = new HashSet<>();
+		for (Generic effectiveSuper : supers)
+			if (effectiveSupersSet.add(effectiveSuper))
+				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
 		return (T) this;
 	}
 
@@ -191,7 +186,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic superGeneric : supers)
 			if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
 				return superGeneric.getMeta();
-		getCurrentCache().rollback(new IllegalStateException("Unable to find a meta for : " + this.info()));
+		getCurrentCache().rollback(new IllegalStateException("Unable to find a meta for : " + this));
 		return null;// Unreachable
 	}
 
@@ -353,7 +348,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private void internalCancel(Holder holder, int basePos) {
 		if (holder != null)
-			setHolder(holder, null, getBasePos(holder), Statics.truncate(basePos, ((GenericImpl) holder).components)).log();
+			setHolder(holder, null, getBasePos(holder), Statics.truncate(basePos, ((GenericImpl) holder).components));
 	}
 
 	@Override
@@ -577,33 +572,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Attribute> T getAttribute(final Serializable value, Generic... targets) {
-		return getAttribute(getCurrentCache().getMetaAttribute(), value, targets);
-	}
-
-	@Override
-	public <T extends Attribute> T getAttribute(Attribute attribute, final Serializable value, Generic... targets) {
-		return this.unambigousFirst(this.targetsFilter(Statics.valueFilter(this.<T> holdersIterator(Statics.STRUCTURAL, attribute, Statics.MULTIDIRECTIONAL), value), attribute, targets));
-	}
-
-	private <T extends Relation> Iterator<T> relationsIterator(boolean readPhantom) {
-		return new AbstractFilterIterator<T>(GenericImpl.this.<T> attributesIterator()) {
-			@Override
-			public boolean isSelected() {
-				return next.isRelation();
-			}
-		};
-
+	public <T extends Attribute> T getAttribute(Serializable value, Generic... targets) {
+		Attribute metaAttribute = getCurrentCache().getMetaAttribute();
+		return this.unambigousFirst(targetsFilter(Statics.valueFilter(this.<T> holdersIterator(Statics.STRUCTURAL, metaAttribute, Statics.MULTIDIRECTIONAL), value), metaAttribute, targets));
 	}
 
 	@Override
 	public <T extends Relation> Snapshot<T> getRelations() {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return relationsIterator(false);
-			}
-		};
+		return getAttributes();
 	}
 
 	public <T extends Generic> T reFind() {
@@ -611,8 +587,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Relation> T getRelation(final Serializable value) {
-		return this.unambigousFirst(Statics.valueFilter(this.<T> relationsIterator(value == null), value));
+	public <T extends Relation> T getRelation(Serializable value, Generic... targets) {
+		Relation metaRelation = getCurrentCache().getMetaRelation();
+		return this.unambigousFirst(targetsFilter(Statics.valueFilter(this.<T> holdersIterator(Statics.STRUCTURAL, metaRelation, Statics.MULTIDIRECTIONAL), value), metaRelation, targets));
 	}
 
 	@Override
@@ -692,18 +669,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T newAnonymousInstance(Generic... components) {
-		return newInstance(getEngine().pickNewAnonymousReference(), components);
+	public <T extends Generic> T addAnonymousInstance(Generic... components) {
+		return addInstance(getEngine().pickNewAnonymousReference(), components);
 	}
 
 	@Override
-	public <T extends Generic> T newInstance(Serializable value, Generic... components) {
+	public <T extends Generic> T setAnonymousInstance(Generic... components) {
+		return setInstance(getEngine().pickNewAnonymousReference(), components);
+	}
+
+	@Override
+	public <T extends Generic> T addInstance(Serializable value, Generic... components) {
+		return getCurrentCache().bind(this, value, null, this, true, Statics.MULTIDIRECTIONAL, components);
+	}
+
+	@Override
+	public <T extends Generic> T setInstance(Serializable value, Generic... components) {
 		return getCurrentCache().bind(this, value, null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
-	// TODO KK replace newSubType by addSubType and setSubType
 	@Override
-	public <T extends Type> T newSubType(Serializable value, Generic... components) {
+	public <T extends Type> T addSubType(Serializable value, Generic... components) {
+		return getCurrentCache().bind(getMeta(), value, null, this, true, Statics.MULTIDIRECTIONAL, components);
+	}
+
+	@Override
+	public <T extends Type> T setSubType(Serializable value, Generic... components) {
 		return getCurrentCache().bind(getMeta(), value, null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
@@ -1213,24 +1204,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> Snapshot<T> getDirectSubTypes() {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return directSubTypesIterator();
-			}
-		};
-	}
-
-	private <T extends Generic> Iterator<T> directSubTypesIterator() {
-		return Statics.levelFilter(this.<T> directInheritingsIterator(), getMetaLevel());
+	public <T extends Type> T getSubType(Serializable value) {
+		return unambigousFirst(Statics.<T> valueFilter(this.<T> subTypesIterator(), value));
 	}
 
 	@Override
 	public <T extends Generic> Snapshot<T> getSubTypes() {
-
 		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return subTypesIterator();
+			}
+		};
+	}
 
+	private <T extends Generic> Iterator<T> subTypesIterator() {
+		return Statics.levelFilter(GenericImpl.this.<T> directInheritingsIterator(), getMetaLevel());
+	}
+
+	@Override
+	public <T extends Generic> Snapshot<T> getAllSubTypes() {
+		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
 				return allSubTypesIteratorWithoutRoot();
@@ -1239,12 +1233,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> T getSubType(final Serializable value) {
+	public <T extends Generic> T getAllSubType(Serializable value) {
 		return this.unambigousFirst(Statics.<T> valueFilter(this.<T> allSubTypesIteratorWithoutRoot(), value));
 	}
 
 	@Override
-	public <T extends Generic> Snapshot<T> getSubTypes(final String name) {
+	public <T extends Generic> Snapshot<T> getAllSubTypes(final String name) {
 		return new AbstractSnapshot<T>() {
 
 			@Override
@@ -1578,6 +1572,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public boolean equiv(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
 		return getHomeTreeNode().equals(homeTreeNode) && Arrays.equals(this.supers, supers) && Arrays.equals(this.components, nullToSelfComponent(components));
+	}
+
+	public boolean equiv(HomeTreeNode homeTreeNode, Generic[] components) {
+		return getHomeTreeNode().equals(homeTreeNode) && Arrays.equals(this.components, nullToSelfComponent(components));
 	}
 
 	public <T extends Generic> T reBind() {
