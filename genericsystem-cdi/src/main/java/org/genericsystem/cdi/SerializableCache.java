@@ -104,9 +104,8 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		}
 
 		@Override
-		protected void restoreAndPlug(GenericImpl generic, HomeTreeNode homeTreeNode, long[] ts, Generic[] supers, Generic[] components) {
-			GenericImpl restore = generic.restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components);
-			((CacheImpl) restore.getCurrentCache()).plug(restore);
+		protected void plug(GenericImpl generic) {
+			((CacheImpl) generic.getCurrentCache()).plug(generic);
 		}
 	}
 
