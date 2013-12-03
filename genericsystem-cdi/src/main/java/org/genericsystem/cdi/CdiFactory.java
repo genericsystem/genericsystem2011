@@ -18,4 +18,9 @@ public class CdiFactory extends DefaultFactory {
 	protected Class<SerializableCache> getCacheClass() throws ClassNotFoundException {
 		return SerializableCache.class;
 	}
+
+	@Override
+	public Cache getContextCache() {
+		return cache.get();
+	}
 }

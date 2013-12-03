@@ -27,6 +27,10 @@ import org.jboss.solder.core.Veto;
 @Veto
 public class SerializableCache extends CacheImpl implements Externalizable {
 
+	public SerializableCache() {
+		super((Cache) null);
+	}
+
 	public SerializableCache(Cache cache) {
 		super(cache);
 	}
@@ -39,7 +43,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 	public void writeExternal(ObjectOutput out) throws IOException {
 		if (subContext instanceof CacheImpl) {
 			out.writeBoolean(true);
-			((Externalizable) subContext).writeExternal(out);
+			out.writeObject(subContext);
 		} else {
 			out.writeBoolean(false);
 			out.writeLong(((Transaction) subContext).getTs());
@@ -67,9 +71,9 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		}
 		assert beanManager != null;
 		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
-		if (in.readBoolean()) {
+		if (in.readBoolean())
 			subContext = (AbstractContext) in.readObject();
-		} else
+		else
 			subContext = new Transaction(in.readLong(), engine);
 		this.start();
 		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
@@ -99,7 +103,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 
 		@Override
 		protected void plug(GenericImpl generic) {
-			((CacheImpl) generic.getCurrentCache()).plug(generic);
+			generic.getCurrentCache().plug(generic);
 		}
 	}
 
