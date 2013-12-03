@@ -820,21 +820,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	// TODO KK
 	public boolean inheritsFrom(Generic generic) {
-		if (generic == null)
-			return false;
-		if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
-			return false;
-		boolean inheritance = ((GenericImpl) generic).isSuperOf2(this);
-		// boolean inheritance3 = ((GenericImpl) generic).isSuperOf3(this);
-		// assert inheritance == inheritance3 : generic.info() + this.info() + " : " + inheritance + " != " + inheritance3;
-		// boolean superOf = ((GenericImpl) generic).isSuperOf(this);
-		// assert inheritance == superOf : "" + this.info() + generic.info() + " : " + inheritance + " != " + superOf;
-		return inheritance;
-	}
-
-	public boolean inheritsFrom2(Generic generic) {
 		if (equals(generic))
 			return true;
 		if (generic.isEngine())
@@ -842,7 +828,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (getDesignTs() < ((GenericImpl) generic).getDesignTs())
 			return false;
 		for (Generic directSuper : supers)
-			if (((GenericImpl) directSuper).inheritsFrom2(generic))
+			if (((GenericImpl) directSuper).inheritsFrom(generic))
 				return true;
 		return false;
 	}
@@ -926,9 +912,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return true;
 		if (!subHomeTreeNode.inheritsFrom(homeTreeNode))
 			return false;
-		for (Generic superGeneric : supers)
+		for (Generic superGeneric : supers) {
 			if (!((GenericImpl) superGeneric).isSuperOf(subHomeTreeNode, subSupers, subComponents))
 				return false;
+		}
 		if (subComponents.length > components.length) {
 			for (int i = 0; i < subComponents.length; i++)
 				if (isSuperOf(homeTreeNode, supers, components, subHomeTreeNode, subSupers, Statics.truncate(i, subComponents)))
@@ -944,7 +931,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					if (!(((GenericImpl) components[i]).isSuperOf(subHomeTreeNode, subSupers, subComponents)))
 						return false;
 			} else if (components[i] == null) {
-				// if (!((GenericImpl) subComponents[i]).equiv(homeTreeNode, subSupers, subComponents))
 				if (!isSuperOf(homeTreeNode, supers, components, subComponents[i]))
 					return false;
 			}

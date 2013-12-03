@@ -92,8 +92,6 @@ class GenericBuilder {
 	}
 
 	private boolean isExtentedBy(Generic candidate) {
-		if (((GenericImpl) candidate).equiv(homeTreeNode, new Supers(supers, ((GenericImpl) candidate).supers).toArray(), components))
-			return true;
 		if (Statics.MULTIDIRECTIONAL != basePos)
 			if (basePos < ((GenericImpl) candidate).components.length)
 				if (!components[basePos].equals(((GenericImpl) candidate).components[basePos]))
@@ -132,8 +130,10 @@ class GenericBuilder {
 					public boolean isSelected(Generic candidate) {
 						if (((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components))
 							return true;
-						if (isExtentedBy(candidate))
+						if (isExtentedBy(candidate)) {
+							supers = new Supers(supers, candidate).toArray();
 							return true;
+						}
 						return false;
 					}
 				};
