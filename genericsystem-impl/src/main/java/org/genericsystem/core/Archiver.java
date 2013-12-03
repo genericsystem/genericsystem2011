@@ -255,15 +255,15 @@ public class Archiver {
 			Generic[] supers = loadAncestors(engine, formalInputStream, genericMap);
 			Generic[] components = loadAncestors(engine, formalInputStream, genericMap);
 			Generic generic = engine.getFactory().newGeneric((Class<?>) formalInputStream.readObject());
-			restoreAndPlug((GenericImpl) generic, homeTreeNode, ts, supers, components);
+			plug(((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components));
 			if (!homeTreeMap.containsKey(homeTreeNodeTs))
 				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode);
 			genericMap.put(ts[0], generic);
 			return generic;
 		}
 
-		protected void restoreAndPlug(GenericImpl generic, HomeTreeNode homeTreeNode, long[] ts, Generic[] supers, Generic[] components) {
-			generic.restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components).plug();
+		protected void plug(GenericImpl generic) {
+			generic.plug();
 		}
 
 		protected long[] loadTs(ObjectInputStream in) throws IOException {

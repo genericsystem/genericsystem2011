@@ -8,9 +8,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.enterprise.inject.spi.BeanManager;
-
+import org.genericsystem.core.AbstractContext;
 import org.genericsystem.core.Archiver.SnapshotLoader;
 import org.genericsystem.core.Archiver.SnapshotWriter;
 import org.genericsystem.core.Cache;
@@ -29,7 +28,6 @@ import org.jboss.solder.core.Veto;
 public class SerializableCache extends CacheImpl implements Externalizable {
 
 	public SerializableCache() {
-		// call by serialization
 		super((Cache) null);
 	}
 
@@ -45,7 +43,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 	public void writeExternal(ObjectOutput out) throws IOException {
 		if (subContext instanceof CacheImpl) {
 			out.writeBoolean(true);
-			((Externalizable) subContext).writeExternal(out);
+			out.writeObject(subContext);
 		} else {
 			out.writeBoolean(false);
 			out.writeLong(((Transaction) subContext).getTs());
@@ -73,10 +71,9 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		}
 		assert beanManager != null;
 		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
-		if (in.readBoolean()) {
-			subContext = new SerializableCache();
-			((Externalizable) subContext).readExternal(in);
-		} else
+		if (in.readBoolean())
+			subContext = (AbstractContext) in.readObject();
+		else
 			subContext = new Transaction(in.readLong(), engine);
 		this.start();
 		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
@@ -95,6 +92,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 
 	private static class SerializableSnapshotLoader extends SnapshotLoader {
 
+		@Override
 		protected Generic[] loadAncestors(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
 			int length = in.readInt();
 			Generic[] ancestors = new Generic[length];
@@ -104,9 +102,8 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		}
 
 		@Override
-		protected void restoreAndPlug(GenericImpl generic, HomeTreeNode homeTreeNode, long[] ts, Generic[] supers, Generic[] components) {
-			GenericImpl restore = generic.restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components);
-			((CacheImpl) restore.getCurrentCache()).plug(restore);
+		protected void plug(GenericImpl generic) {
+			generic.getCurrentCache().plug(generic);
 		}
 	}
 
