@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -600,11 +599,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Attribute> T setProperty(Serializable value, Generic... targets) {
-		return setAttribute(value, targets).enableSingularConstraint();
+		return setAttribute(value, targets).enablePropertyConstraint();
 	}
 
 	public <T extends Attribute> T setSubProperty(Attribute property, Serializable value, Generic... targets) {
-		return setSubAttribute(property, value, targets).enableSingularConstraint();
+		return setSubAttribute(property, value, targets).enablePropertyConstraint();
 	}
 
 	@Override
@@ -1580,7 +1579,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Attribute> T addProperty(Serializable value, Generic... targets) {
-		return addAttribute(value, targets).enableSingularConstraint();
+		return addAttribute(value, targets).enablePropertyConstraint();
 	}
 
 	@Override

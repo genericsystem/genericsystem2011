@@ -88,25 +88,48 @@ class GenericBuilder {
 			Generic rebuild() {
 				return GenericBuilder.this.buildDependency(specializationClass, automatic);
 			}
-		}.rebuildAll(old, getDirectDependencies(), basePos);
+		}.rebuildAll(old, directDependencies, basePos);
 	}
 
-	private boolean isExtentedBy(Generic candidate) {
-		if (Statics.MULTIDIRECTIONAL != basePos)
-			if (basePos < ((GenericImpl) candidate).components.length)
-				if (!components[basePos].equals(((GenericImpl) candidate).components[basePos]))
-					if (!candidate.inheritsFrom(cache.find(NoInheritanceSystemType.class))) {
-						if (homeTreeNode.getMetaLevel() == candidate.getMetaLevel()) {
-							if (isSingular && components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos]))
-								return true;
-							if (isProperty && areComponentsInheriting(components, ((GenericImpl) candidate).components))
-								return true;
-						}
+	Set<Generic> getDirectDependencies() {
+		return new HashCache<Generic>() {
+
+			private static final long serialVersionUID = 2372630315599176801L;
+
+			@Override
+			public Iterator<Generic> cacheSupplier() {
+				return new AbstractFilterIterator<Generic>(new AbstractPreTreeIterator<Generic>(meta) {
+					private static final long serialVersionUID = 3038922934693070661L;
+					{
+						next();
 					}
+
+					@Override
+					public Iterator<Generic> children(Generic node) {
+						return !isAncestorOf(node) ? ((GenericImpl) node).<Generic> dependenciesIterator() : Collections.<Generic> emptyIterator();
+					}
+				}) {
+					@Override
+					public boolean isSelected() {
+						return isAncestorOf((next)) || isExtention(next);
+					}
+				};
+			}
+		};
+	}
+
+	private boolean isExtention(Generic candidate) {
+		if (homeTreeNode.getMetaLevel() == candidate.getMetaLevel()) {
+			if (Statics.MULTIDIRECTIONAL != basePos && basePos < ((GenericImpl) candidate).components.length)
+				if (isSingular && ((GenericImpl) candidate).components[basePos].inheritsFrom(components[basePos]))
+					return true;
+			if (isProperty && areComponentsInheriting((((GenericImpl) candidate).components), components))
+				return true;
+		}
 		return false;
 	}
 
-	private boolean areComponentsInheriting(Generic[] subComponents, Generic[] components) {
+	private static boolean areComponentsInheriting(Generic[] subComponents, Generic[] components) {
 		for (int i = 0; i < components.length; i++)
 			if (!subComponents[i].inheritsFrom(components[i]))
 				return false;
@@ -147,60 +170,26 @@ class GenericBuilder {
 		}.toSortedArray();
 	}
 
-	Set<Generic> getDirectDependencies() {
-		return new HashCache<Generic>() {
-
-			private static final long serialVersionUID = 2372630315599176801L;
-
-			@Override
-			public Iterator<Generic> cacheSupplier() {
-				return new AbstractFilterIterator<Generic>(new AbstractPreTreeIterator<Generic>(meta) {
-					private static final long serialVersionUID = 3038922934693070661L;
-					{
-						next();
-					}
-
-					@Override
-					public Iterator<Generic> children(Generic node) {
-						return !isAncestorOf((GenericImpl) node) ? ((GenericImpl) node).<Generic> dependenciesIterator() : Collections.<Generic> emptyIterator();
-					}
-				}) {
-					@Override
-					public boolean isSelected() {
-						boolean result = isAncestorOf(((GenericImpl) next)) || isExtention(next, isProperty, isSingular, basePos);
-						// if ("Power".equals(next.getValue()))
-						// log.info("TTTTTTTTTT" + next + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
-						return result;
-					}
-				};
-			}
-		};
-	}
-
-	private boolean isExtention(Generic candidate, boolean isProperty, boolean isSingular, int basePos) {
+	private boolean isExtentedBy(Generic candidate) {
 		if (Statics.MULTIDIRECTIONAL != basePos)
 			if (basePos < ((GenericImpl) candidate).components.length)
-				if (homeTreeNode.getMetaLevel() == candidate.getMetaLevel()) {
-					if (isSingular && ((GenericImpl) candidate).components[basePos].inheritsFrom(components[basePos]))
-						return true;
-					if (isProperty && areComponentsInheriting((((GenericImpl) candidate).components), components))
-						return true;
-				}
+				if (!components[basePos].equals(((GenericImpl) candidate).components[basePos]))
+					if (!candidate.inheritsFrom(cache.find(NoInheritanceSystemType.class)))
+						if (homeTreeNode.getMetaLevel() == candidate.getMetaLevel()) {
+							if (isSingular && components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos]))
+								return true;
+							if (isProperty && areComponentsInheriting(components, ((GenericImpl) candidate).components))
+								return true;
+						}
 		return false;
 	}
 
-	private boolean isAncestorOf(final GenericImpl dependency) {
-		// boolean result = (GenericImpl.isSuperOf(primaries, components, dependency.primaries, dependency.components));
-		boolean result = (GenericImpl.isSuperOf(homeTreeNode, supers, components, dependency));
-		// assert result == result2 : "isSuperOf : " + result + " isSuperOf3 : " + result2 + " homeTreeNode : " + homeTreeNode + " " + supers[0].info() + dependency.info();
-		// if ("Power".equals(dependency.getValue()))
-		// log.info("UUUUUUUUUU" + dependency + " " + homeTreeNode + " " + Arrays.toString(supers) + " " + Arrays.toString(components) + " " + result);
-
-		if (result)
+	private boolean isAncestorOf(final Generic dependency) {
+		if (GenericImpl.isSuperOf(homeTreeNode, supers, components, dependency))
 			return true;
-		for (Generic component : dependency.components)
+		for (Generic component : ((GenericImpl) dependency).components)
 			if (!dependency.equals(component))
-				if (isAncestorOf((GenericImpl) component))
+				if (isAncestorOf(component))
 					return true;
 		return false;
 	}

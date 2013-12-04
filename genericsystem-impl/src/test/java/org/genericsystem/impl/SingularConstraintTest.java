@@ -77,7 +77,7 @@ public class SingularConstraintTest extends AbstractTest {
 		Attribute vehiclePower = vehicle.setProperty("Power");
 		car.setValue(vehiclePower, 50);
 		assert vehicle.getValue(vehiclePower) == null;
-		assert vehiclePower.isSingularConstraintEnabled();
+		assert vehiclePower.isPropertyConstraintEnabled();
 		assert car.getValue(vehiclePower).equals(50);
 	}
 
