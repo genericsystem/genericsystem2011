@@ -265,25 +265,22 @@ public class EngineImpl extends GenericImpl implements Engine {
 		private static final long serialVersionUID = -2021341943811568201L;
 		private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-		long ts = pickNewTs();
-		long time = -1L;
-
 		public void startScheduler() {
 			scheduler.scheduleAtFixedRate(new Runnable() {
 				@Override
 				public void run() {
-					runGarbage(ts + Statics.LIFE_TIME_OUT);
+					runGarbage(pickNewTs() + Statics.LIFE_TIME_OUT);
 				}
 			}, Statics.GARBAGE_INITIAL_DELAY, Statics.GARBAGE_PERIOD, TimeUnit.MILLISECONDS);
 		}
 
 		public void runGarbage(long timeOut) {
-			synchronized (getEngine()) {
-				time = time == -1L ? ts : time + Statics.GARBAGE_PERIOD;
+			long ts = pickNewTs();
+			synchronized (EngineImpl.this) {
 				Iterator<Generic> iterator = GarbageCollectorManager.this.iterator();
 				while (iterator.hasNext()) {
 					Generic generic = iterator.next();
-					if (time >= timeOut) {
+					if (ts - ((GenericImpl) generic).getDeathTs() >= timeOut) {
 						((GenericImpl) generic).unplug();
 						iterator.remove();
 					}

@@ -267,8 +267,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 		// Exception cause = null;
 		for (int attempt = 0; attempt < Statics.ATTEMPTS; attempt++)
 			try {
-				// if (getTs() > Statics.LIFE_TIME_OUT)
-				// throw new ConcurrencyControlException("The timestamp cache (" + getTs() + ") is begger than the life time out : " + Statics.LIFE_TIME_OUT);
+				if (getEngine().pickNewTs() - getTs() > getTs() + Statics.LIFE_TIME_OUT)
+					throw new ConcurrencyControlException("The timestamp cache (" + getTs() + ") is begger than the life time out : " + Statics.LIFE_TIME_OUT);
 				checkConstraints();
 				getSubContext().apply(adds, removes);
 				clear();
