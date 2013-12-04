@@ -9,12 +9,15 @@ import org.genericsystem.core.AbstractContext.TimestampedDependencies;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
 import org.genericsystem.iterator.AbstractGeneralAwareIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 public class LifeManager {
+	protected static Logger log = LoggerFactory.getLogger(LifeManager.class);
 
 	private final long designTs;
 	private long birthTs;
@@ -114,7 +117,7 @@ public class LifeManager {
 		// }
 	}
 
-	void writeUnlock() {
+	public void writeUnlock() {
 		lock.writeLock().unlock();
 	}
 
@@ -147,15 +150,15 @@ public class LifeManager {
 	public class EngineDependencies implements TimestampedDependencies, Serializable {
 
 		private static final long serialVersionUID = 8737884947844732434L;
-		private node head = null;
-		private node tail = null;
+		private Node head = null;
+		private Node tail = null;
 
 		@Override
 		public void add(Generic element) {
 			// assert isWriteLockedByCurrentThread();
 			assert element != null;
 
-			node newNode = new node(element);
+			Node newNode = new Node(element);
 			if (head == null)
 				head = newNode;
 			else
@@ -165,23 +168,23 @@ public class LifeManager {
 
 		@Override
 		public void remove(Generic generic) {
-			assert isWriteLockedByCurrentThread();
+			// assert isWriteLockedByCurrentThread();
 			assert generic != null : "generic is null";
 			assert head != null : "head is null";
 
-			node currentNode = head;
+			Node currentNode = head;
 
 			Generic currentContent = currentNode.content;
 			if (generic.equals(currentContent)) {
-				node next = currentNode.next;
+				Node next = currentNode.next;
 				head = next != null ? next : null;
 				return;
 			}
 
-			node nextNode = currentNode.next;
+			Node nextNode = currentNode.next;
 			while (nextNode != null) {
 				Generic nextGeneric = nextNode.content;
-				node nextNextNode = nextNode.next;
+				Node nextNextNode = nextNode.next;
 				if (generic.equals(nextGeneric)) {
 					nextNode.content = null;
 					if (nextNextNode == null)
@@ -200,7 +203,7 @@ public class LifeManager {
 			return new InternalIterator(ts);
 		}
 
-		private class InternalIterator extends AbstractGeneralAwareIterator<node, Generic> {
+		private class InternalIterator extends AbstractGeneralAwareIterator<Node, Generic> {
 
 			private long ts;
 
@@ -211,7 +214,7 @@ public class LifeManager {
 			@Override
 			protected void advance() {
 				do {
-					node nextNode = (next == null) ? head : next.next;
+					Node nextNode = (next == null) ? head : next.next;
 					if (nextNode == null) {
 						/*
 						 * if (iterationTs <= lock.getLastReadTs()) { currentNode = head; if (currentNode == null) return; } else {
@@ -244,12 +247,12 @@ public class LifeManager {
 		}
 	}
 
-	private static class node implements Serializable {
+	private static class Node implements Serializable {
 		private static final long serialVersionUID = -2908772989746062209L;
 		Generic content;
-		node next;
+		Node next;
 
-		private node(Generic content) {
+		private Node(Generic content) {
 			this.content = content;
 		}
 	}

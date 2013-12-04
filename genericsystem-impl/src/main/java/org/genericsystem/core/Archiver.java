@@ -104,7 +104,7 @@ public class Archiver {
 					public void run() {
 						SnapshotWriter.doSnapshot(directory, engine);
 					}
-				}, Statics.SESSION_TIMEOUT, Statics.SNAPSHOTS_PERIOD, TimeUnit.MILLISECONDS);
+				}, Statics.SNAPSHOTS_INITIAL_DELAY, Statics.SNAPSHOTS_PERIOD, TimeUnit.MILLISECONDS);
 			}
 	}
 

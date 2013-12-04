@@ -4,7 +4,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
@@ -36,11 +40,15 @@ public class EngineImpl extends GenericImpl implements Engine {
 	private Factory factory;
 	private Archiver archiver;
 
+	private final GarbageCollectorManager garbageCollectorManager;
+
 	public EngineImpl(Config config, Class<?>... userClasses) {
 		factory = config.getFactory();
 		archiver = new Archiver(this, config.getDirectoryPath());
 		systemCache.init(userClasses);
 		archiver.startScheduler();
+		garbageCollectorManager = new GarbageCollectorManager();
+		garbageCollectorManager.startScheduler();
 	}
 
 	void restoreEngine() {
@@ -56,6 +64,10 @@ public class EngineImpl extends GenericImpl implements Engine {
 	@Override
 	public Factory getFactory() {
 		return factory;
+	}
+
+	public GarbageCollectorManager getGarbageCollectorManager() {
+		return garbageCollectorManager;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -248,6 +260,38 @@ public class EngineImpl extends GenericImpl implements Engine {
 		}
 	}
 
+	public class GarbageCollectorManager extends LinkedHashSet<Generic> {
+
+		private static final long serialVersionUID = -2021341943811568201L;
+		private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+		long ts = pickNewTs();
+		long time = -1L;
+
+		public void startScheduler() {
+			scheduler.scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
+					runGarbage(ts + Statics.LIFE_TIME_OUT);
+				}
+			}, Statics.GARBAGE_INITIAL_DELAY, Statics.GARBAGE_PERIOD, TimeUnit.MILLISECONDS);
+		}
+
+		public void runGarbage(long timeOut) {
+			synchronized (getEngine()) {
+				time = time == -1L ? ts : time + Statics.GARBAGE_PERIOD;
+				Iterator<Generic> iterator = GarbageCollectorManager.this.iterator();
+				while (iterator.hasNext()) {
+					Generic generic = iterator.next();
+					if (time >= timeOut) {
+						((GenericImpl) generic).unplug();
+						iterator.remove();
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	public void close() {
 		archiver.close();
@@ -255,6 +299,6 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 	@Override
 	public String toString() {
-		return "Engine";
+		return Statics.ROOT_NODE_VALUE;
 	}
 }

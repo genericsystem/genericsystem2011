@@ -59,9 +59,12 @@ public class Statics {
 	public static final String LOCK_FILE_NAME = ".lock";
 	public static final String ZIP_EXTENSION = GS_EXTENSION + ".zip";
 	public static final long MILLI_TO_NANOSECONDS = 1000000L;
-	public static final long SNAPSHOTS_PERIOD = 1000L;
-	public static final long SESSION_TIMEOUT = 1000L;
 	public static final long ARCHIVER_COEFF = 5L;
+	public static final long SNAPSHOTS_PERIOD = 1000L;
+	public static final long SNAPSHOTS_INITIAL_DELAY = 1000L;
+	public static final long GARBAGE_PERIOD = 1000L;
+	public static final long GARBAGE_INITIAL_DELAY = 1000L;
+	public static final long LIFE_TIME_OUT = 3000L;
 
 	public static Generic[] insertIntoArray(Generic generic, Generic[] targets, int basePos) {
 		if (basePos < 0 || basePos > targets.length)

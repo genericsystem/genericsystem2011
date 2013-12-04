@@ -85,7 +85,7 @@ public class Transaction extends AbstractContext {
 	@Override
 	protected void simpleRemove(Generic generic) {
 		((GenericImpl) generic).getLifeManager().kill(getTs());
-		// TODO add generic to garbage collector here
+		getEngine().getGarbageCollectorManager().add(generic);
 	}
 
 	private class LockedLifeManager extends HashSet<LifeManager> {

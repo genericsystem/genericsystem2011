@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -149,6 +150,24 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (effectiveSupersSet.add(effectiveSuper))
 				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.add(this);
 		return (T) this;
+	}
+
+	<T extends Generic> T unplug() {
+		Set<Generic> componentSet = new HashSet<>();
+		for (Generic component : components)
+			if (componentSet.add(component))
+				((GenericImpl) component).lifeManager.engineComposites.remove(this);
+
+		Set<Generic> effectiveSupersSet = new HashSet<>();
+		for (Generic effectiveSuper : supers)
+			if (effectiveSupersSet.add(effectiveSuper))
+				((GenericImpl) effectiveSuper).lifeManager.engineDirectInheritings.remove(this);
+		return (T) this;
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		log.info("FINALIZE " + info());
 	}
 
 	public LifeManager getLifeManager() {

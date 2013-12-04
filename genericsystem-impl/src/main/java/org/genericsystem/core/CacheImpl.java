@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -71,7 +70,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		inheritingDependenciesMap = new HashMap<>();
 		adds = new LinkedHashSet<>();
 		removes = new LinkedHashSet<>();
-		automatics = new HashSet<>();
+		automatics = new LinkedHashSet<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -263,14 +262,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public void flush() throws RollbackException {
-		assert equals(getEngine().getCurrentCache());
-		Exception cause = null;
+		// TODO clean
+		// assert equals(getEngine().getCurrentCache());
+		// Exception cause = null;
 		for (int attempt = 0; attempt < Statics.ATTEMPTS; attempt++)
 			try {
+				// if (getTs() > Statics.LIFE_TIME_OUT)
+				// throw new ConcurrencyControlException("The timestamp cache (" + getTs() + ") is begger than the life time out : " + Statics.LIFE_TIME_OUT);
 				checkConstraints();
 				getSubContext().apply(adds, removes);
 				clear();
-				return;
+				// return;
 			} catch (ConcurrencyControlException e) {
 				try {
 					Thread.sleep(Statics.ATTEMPT_SLEEP);
@@ -282,11 +284,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 				// log.info("MvccException : " + e + " attempt : " + attempt);
 
 				pickNewTs();
-				continue;
+				// continue;
 			} catch (Exception e) {
 				rollback(e);
 			}
-		rollback(cause);
+		// rollback(cause);
 	}
 
 	protected void rollback(Throwable e) throws RollbackException {
@@ -636,9 +638,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 			rollback(new AliveConstraintViolationException(generic + " is not alive"));
 		if (generic.getClass().isAnnotationPresent(SystemGeneric.class) && generic.equals(find(generic.getClass())))
 			rollback(new NotRemovableException("Cannot remove " + generic + " because it is System Generic annotated"));
-		if (!automatics.remove(generic))
-			if (!adds.remove(generic))
-				removes.add(generic);
+		if (!(automatics.remove(generic) || adds.remove(generic)))
+			removes.add(generic);
 		super.simpleRemove(generic);
 	}
 
