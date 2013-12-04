@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
@@ -622,7 +621,7 @@ public class ApiTest extends AbstractTest {
 		assert robotPower.inheritsFrom(vehiclePower);
 		Type transformer = cache.addType("Transformer", car, robot);
 		Relation transformerPower = ((GenericImpl) transformer).addProperty("power");
-		assert transformerPower.isSingularConstraintEnabled();
+		assert transformerPower.isPropertyConstraintEnabled();
 		assert transformerPower.inheritsFrom(carPower);
 		assert transformerPower.inheritsFrom(robotPower);
 	}

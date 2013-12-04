@@ -35,7 +35,7 @@ public class NotNullConstraintTest extends AbstractTest {
 		sportCar.setValue(vehiclePower, 250);
 		assert car.getValue(vehiclePower).equals(80);
 		assert sportCar.getValue(vehiclePower).equals(250);
-		assert vehiclePower.isSingularConstraintEnabled();
+		assert vehiclePower.isPropertyConstraintEnabled();
 		car.setValue(vehiclePower, 90);
 		assert car.getValue(vehiclePower).equals(90);
 		assert sportCar.getValue(vehiclePower).equals(250);
