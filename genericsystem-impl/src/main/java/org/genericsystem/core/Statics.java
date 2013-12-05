@@ -64,7 +64,7 @@ public class Statics {
 	public static final long SNAPSHOTS_INITIAL_DELAY = 1000L;
 	public static final long GARBAGE_PERIOD = 1000L;
 	public static final long GARBAGE_INITIAL_DELAY = 1000L;
-	public static final long LIFE_TIME_OUT = 3000L;
+	public static final long LIFE_TIME_OUT = 1386174608777L;// 30 minutes
 
 	public static Generic[] insertIntoArray(Generic generic, Generic[] targets, int basePos) {
 		if (basePos < 0 || basePos > targets.length)
