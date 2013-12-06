@@ -12,8 +12,8 @@ import java.util.Map;
 import javax.enterprise.inject.spi.BeanManager;
 
 import org.genericsystem.core.AbstractContext;
-import org.genericsystem.core.Archiver.SnapshotLoader;
-import org.genericsystem.core.Archiver.SnapshotWriter;
+import org.genericsystem.core.AbstractWriter;
+import org.genericsystem.core.AbstractWriter.AbstractLoader;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
@@ -54,13 +54,32 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 		out.writeInt(adds.size());
 		for (Generic add : adds)
-			SnapshotWriter.writeGeneric((GenericImpl) add, (ObjectOutputStream) out, (ObjectOutputStream) out, homeTreeMap);
+			new SerializableWriter(out).writeGeneric((GenericImpl) add, homeTreeMap);
 		out.writeInt(automatics.size());
 		for (Generic automatic : automatics)
-			SnapshotWriter.writeGeneric((GenericImpl) automatic, (ObjectOutputStream) out, (ObjectOutputStream) out, homeTreeMap);
+			new SerializableWriter(out).writeGeneric((GenericImpl) automatic, homeTreeMap);
 		out.writeInt(removes.size());
 		for (Generic remove : removes)
 			out.writeLong(((GenericImpl) remove).getDesignTs());
+	}
+
+	private static class SerializableWriter extends AbstractWriter {
+		private ObjectOutput out;
+
+		public SerializableWriter(ObjectOutput out) {
+			this.out = out;
+		}
+
+		@Override
+		public ObjectOutputStream getFormalOutputStream() {
+			return (ObjectOutputStream) out;
+		}
+
+		@Override
+		public ObjectOutputStream getContentOutputStream() {
+			return getFormalOutputStream();
+		}
+
 	}
 
 	@Override
@@ -74,12 +93,12 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 			Map<Long, Generic> genericMap = new HashMap<>();
 			int addSize = in.readInt();
-			SerializableSnapshotLoader loader = new SerializableSnapshotLoader();
+			SerializableLoader loader = new SerializableLoader(in);
 			for (int i = 0; i < addSize; i++)
-				adds.add(loader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
+				adds.add(loader.loadGeneric(engine, homeTreeMap, genericMap));
 			int automaticSize = in.readInt();
 			for (int i = 0; i < automaticSize; i++)
-				automatics.add(loader.loadGeneric(engine, (ObjectInputStream) in, (ObjectInputStream) in, homeTreeMap, genericMap));
+				automatics.add(loader.loadGeneric(engine, homeTreeMap, genericMap));
 			int removeSize = in.readInt();
 			for (int i = 0; i < removeSize; i++)
 				removes.add(findByDesignTs(engine, (ObjectInputStream) in, genericMap));
@@ -100,20 +119,31 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		return beanManager;
 	}
 
-	private static class SerializableSnapshotLoader extends SnapshotLoader {
+	private static class SerializableLoader extends AbstractLoader {
+		private ObjectInput in;
+
+		public SerializableLoader(ObjectInput in) {
+			this.in = in;
+		}
 
 		@Override
-		protected Generic[] loadAncestors(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
-			int length = in.readInt();
-			Generic[] ancestors = new Generic[length];
-			for (int index = 0; index < length; index++)
-				ancestors[index] = ((CacheImpl) engine.getCurrentCache()).findByDesignTs(engine, in, genericMap);
-			return ancestors;
+		public ObjectInputStream getContentInputStream() {
+			return getFormalInputStream();
+		}
+
+		@Override
+		public ObjectInputStream getFormalInputStream() {
+			return (ObjectInputStream) in;
 		}
 
 		@Override
 		protected void plug(GenericImpl generic) {
 			generic.getCurrentCache().plug(generic);
+		}
+
+		@Override
+		protected Generic loadAncestor(Engine engine, Map<Long, Generic> genericMap) throws IOException {
+			return ((CacheImpl) engine.getCurrentCache()).findByDesignTs(engine, getFormalInputStream(), genericMap);
 		}
 	}
 

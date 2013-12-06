@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.channels.OverlappingFileLockException;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -22,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import org.genericsystem.core.AbstractWriter.AbstractLoader;
 
 /**
  * @author Nicolas Feybesse
@@ -41,7 +42,7 @@ public class Archiver {
 		prepareAndLockDirectory(directoryPath);
 		String snapshotPath = getSnapshotPath();
 		if (snapshotPath != null)
-			new SnapshotLoader().loadSnapshot(engine, snapshotPath);
+			new ZipLoader().loadSnapshot(snapshotPath);
 		else
 			((EngineImpl) engine).restoreEngine();
 	}
@@ -102,7 +103,7 @@ public class Archiver {
 				scheduler.scheduleAtFixedRate(new Runnable() {
 					@Override
 					public void run() {
-						SnapshotWriter.doSnapshot(directory, engine);
+						new ZipWriter(directory).doSnapshot();
 					}
 				}, Statics.SNAPSHOTS_INITIAL_DELAY, Statics.SNAPSHOTS_PERIOD, TimeUnit.MILLISECONDS);
 			}
@@ -112,7 +113,7 @@ public class Archiver {
 		if (lockFile != null)
 			try {
 				scheduler.shutdown();
-				SnapshotWriter.doSnapshot(directory, engine);
+				new ZipWriter(directory).doSnapshot();
 				lockFile.close();
 				lockFile = null;
 			} catch (IOException e) {
@@ -120,15 +121,34 @@ public class Archiver {
 			}
 	}
 
-	public static class SnapshotWriter {
+	public class ZipWriter extends AbstractWriter {
+		private ObjectOutputStream formalOutputStream;
+		private ObjectOutputStream contentOutputStream;
 
-		public static void doSnapshot(File directory, Engine engine) {
-			String path = directory.getAbsolutePath() + File.separator;
-			String fileName = Statics.getFilename(engine.pickNewTs());
+		private String path;
+		private String fileName;
+
+		public ZipWriter(File directory) {
+			path = directory.getAbsolutePath() + File.separator;
+			fileName = Statics.getFilename(engine.pickNewTs());
+		}
+
+		public ObjectOutputStream getFormalOutputStream() {
+			return formalOutputStream;
+		}
+
+		public ObjectOutputStream getContentOutputStream() {
+			return contentOutputStream;
+		}
+
+		public void doSnapshot() {
 			try (ByteArrayOutputStream formalOutputStream = new ByteArrayOutputStream(); ZipOutputStream zipOutput = new ZipOutputStream(new FileOutputStream(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));) {
 
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.CONTENT_EXTENSION));
-				saveSnapshot(engine, new ObjectOutputStream(formalOutputStream), new ObjectOutputStream(zipOutput));
+				this.formalOutputStream = new ObjectOutputStream(formalOutputStream);
+				this.contentOutputStream = new ObjectOutputStream(zipOutput);
+
+				writeGenerics();
 				zipOutput.closeEntry();
 
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.FORMAL_EXTENSION));
@@ -140,47 +160,19 @@ public class Archiver {
 				zipOutput.close();
 
 				new File(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(path + fileName + Statics.ZIP_EXTENSION));
-				manageOldSnapshots(directory);
+				manageOldSnapshots();
 			} catch (IOException ioe) {
 				throw new IllegalStateException(ioe);
 			}
 		}
 
-		private static void saveSnapshot(Engine engine, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent) throws IOException {
+		private void writeGenerics() throws IOException {
 			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 			for (Generic orderGeneric : new Transaction(engine).orderDependencies(engine))
-				writeGeneric(((GenericImpl) orderGeneric), tmpFormal, tmpContent, homeTreeMap);
+				writeGeneric(((GenericImpl) orderGeneric), homeTreeMap);
 		}
 
-		public static void writeGeneric(GenericImpl generic, ObjectOutputStream tmpFormal, ObjectOutputStream tmpContent, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
-			writeTs(generic, tmpFormal);
-			tmpContent.writeLong(generic.homeTreeNode.ts);
-			if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
-				tmpContent.writeLong(generic.homeTreeNode.metaNode.ts);
-				tmpContent.writeObject(generic.homeTreeNode.getValue());
-				homeTreeMap.put(generic.homeTreeNode.ts, generic.homeTreeNode);
-			}
-			if (generic.isEngine())
-				return;
-			writeAncestors(generic.getSupers(), tmpFormal);
-			writeAncestors(generic.getComponents(), tmpFormal);
-			tmpFormal.writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
-		}
-
-		private static void writeTs(Generic generic, ObjectOutputStream tmpFormal) throws IOException {
-			tmpFormal.writeLong(((GenericImpl) generic).getDesignTs());
-			tmpFormal.writeLong(((GenericImpl) generic).getBirthTs());
-			tmpFormal.writeLong(((GenericImpl) generic).getLastReadTs());
-			tmpFormal.writeLong(((GenericImpl) generic).getDeathTs());
-		}
-
-		private static void writeAncestors(Snapshot<Generic> dependencies, ObjectOutputStream formalObjectOutput) throws IOException {
-			formalObjectOutput.writeInt(dependencies.size());
-			for (Generic dependency : dependencies)
-				formalObjectOutput.writeLong(((GenericImpl) dependency).getDesignTs());
-		}
-
-		private static void manageOldSnapshots(File directory) {
+		private void manageOldSnapshots() {
 			NavigableMap<Long, File> snapshotsMap = snapshotsMap(directory);
 			long lastTs = snapshotsMap.lastKey();
 			long firstTs = snapshotsMap.firstKey();
@@ -193,94 +185,76 @@ public class Archiver {
 						ts = snapshotTs;
 		}
 
-		private static long minInterval(long periodNumber) {
+		private long minInterval(long periodNumber) {
 			return (long) Math.floor(periodNumber / Statics.ARCHIVER_COEFF);
 		}
 
-		private static void removeSnapshot(NavigableMap<Long, File> snapshotsMap, long ts) {
+		private void removeSnapshot(NavigableMap<Long, File> snapshotsMap, long ts) {
 			snapshotsMap.get(ts).delete();
 			snapshotsMap.remove(ts);
 		}
 
 	}
 
-	public static class SnapshotLoader {
+	public class ZipLoader extends AbstractLoader {
+		private ObjectInputStream contentInputStream;
+		private ObjectInputStream formalInputStream;
 
-		public void loadSnapshot(Engine engine, String path) {
-			try (ObjectInputStream contentInputStream = new ObjectInputStream(readContent(path)); ObjectInputStream formalInputStream = new ObjectInputStream(readFormal(path));) {
+		public ObjectInputStream getContentInputStream() {
+			return contentInputStream;
+		}
+
+		public ObjectInputStream getFormalInputStream() {
+			return formalInputStream;
+		}
+
+		public void loadSnapshot(String path) {
+			try {
+				contentInputStream = new ObjectInputStream(readContent(path));
+				formalInputStream = new ObjectInputStream(readFormal(path));
 				Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 				Map<Long, Generic> genericMap = new HashMap<>();
-				engine = restoreEngine(engine, formalInputStream, contentInputStream, homeTreeMap, genericMap);
+				engine = restoreEngine(homeTreeMap, genericMap);
 				for (;;)
-					loadGeneric(engine, formalInputStream, contentInputStream, homeTreeMap, genericMap);
+					loadGeneric(engine, homeTreeMap, genericMap);
 			} catch (EOFException ignore) {
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
 
-		private static ZipInputStream readFormal(String path) throws IOException {
+		private ZipInputStream readFormal(String path) throws IOException {
 			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(path + Statics.ZIP_EXTENSION)));
 			inputStream.getNextEntry();
 			inputStream.getNextEntry();
 			return inputStream;
 		}
 
-		private static ZipInputStream readContent(String path) throws IOException {
+		private ZipInputStream readContent(String path) throws IOException {
 			ZipInputStream inputStream = new ZipInputStream(new FileInputStream(new File(path + Statics.ZIP_EXTENSION)));
 			inputStream.getNextEntry();
 			return inputStream;
 		}
 
-		protected Engine restoreEngine(Engine engine, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
-			long[] ts = loadTs(formalInputStream);
-			long homeTreeNodeTs = contentInputStream.readLong();
-			contentInputStream.readLong();
-			contentInputStream.readObject();
+		protected Engine restoreEngine(Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
+			long[] ts = loadTs();
+			long homeTreeNodeTs = getContentInputStream().readLong();
+			getContentInputStream().readLong();
+			getContentInputStream().readObject();
 			((EngineImpl) engine).restoreEngine(homeTreeNodeTs, ts[0], ts[1], ts[2], ts[3]);
 			genericMap.put(ts[0], engine);
 			homeTreeMap.put(homeTreeNodeTs, ((EngineImpl) engine).homeTreeNode);
 			return engine;
 		}
 
-		public Generic loadGeneric(Engine engine, ObjectInputStream formalInputStream, ObjectInputStream contentInputStream, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
-			long[] ts = loadTs(formalInputStream);
-			long homeTreeNodeTs = contentInputStream.readLong();
-			HomeTreeNode homeTreeNode = homeTreeMap.get(homeTreeNodeTs);
-			if (null == homeTreeNode) {
-				long metaTs = contentInputStream.readLong();
-				homeTreeNode = ((GenericImpl) engine).getHomeTreeNode().ts == metaTs ? ((GenericImpl) engine).getHomeTreeNode() : homeTreeMap.get(metaTs);
-				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, (Serializable) contentInputStream.readObject());
-			}
-			Generic[] supers = loadAncestors(engine, formalInputStream, genericMap);
-			Generic[] components = loadAncestors(engine, formalInputStream, genericMap);
-			Generic generic = engine.getFactory().newGeneric((Class<?>) formalInputStream.readObject());
-			plug(((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components));
-			if (!homeTreeMap.containsKey(homeTreeNodeTs))
-				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode);
-			genericMap.put(ts[0], generic);
-			return generic;
-		}
-
+		@Override
 		protected void plug(GenericImpl generic) {
 			generic.plug();
 		}
 
-		protected long[] loadTs(ObjectInputStream in) throws IOException {
-			long[] ts = new long[4];
-			ts[0] = in.readLong(); // designTs
-			ts[1] = in.readLong(); // birthTs
-			ts[2] = in.readLong(); // lastReadTs
-			ts[3] = in.readLong(); // deathTs
-			return ts;
-		}
-
-		protected Generic[] loadAncestors(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
-			int length = in.readInt();
-			Generic[] ancestors = new Generic[length];
-			for (int index = 0; index < length; index++)
-				ancestors[index] = genericMap.get(in.readLong());
-			return ancestors;
+		@Override
+		protected Generic loadAncestor(Engine engine, Map<Long, Generic> genericMap) throws IOException {
+			return genericMap.get(getFormalInputStream().readLong());
 		}
 	}
 
