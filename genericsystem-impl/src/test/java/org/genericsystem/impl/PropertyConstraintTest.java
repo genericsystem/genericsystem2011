@@ -1,5 +1,7 @@
 package org.genericsystem.impl;
 
+import java.util.Arrays;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -32,6 +34,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Generic myVehicle = vehicle.addInstance("myVehicle");
 		Holder abs = myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
+		assert myVehicle.getValues(equipment).containsAll(Arrays.asList("GPS"));
+		assert Arrays.asList("GPS").containsAll(myVehicle.getValues(equipment));
 		assert !abs.isAlive();
 	}
 
@@ -42,6 +46,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic myVehicle = vehicle.addInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
+		assert myVehicle.getValues(equipment).containsAll(Arrays.asList("ABS", "GPS"));
+		assert Arrays.asList("ABS", "GPS").containsAll(myVehicle.getValues(equipment));
 	}
 
 	public void testMultipleValuesAttributeWithDisabledConstraint() {
@@ -52,6 +58,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic myVehicle = vehicle.addInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
+		assert myVehicle.getValues(equipment).containsAll(Arrays.asList("ABS", "GPS"));
+		assert Arrays.asList("ABS", "GPS").containsAll(myVehicle.getValues(equipment));
 	}
 
 	public void testBinaryRelationDifferentTarget() {
@@ -200,6 +208,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		// Todo check remove old value
 		assert absValue.isAlive();
 		assert myVehicle.getValue(equipment).equals(gpsValue.getValue());
+		assert vehicle.getValue(equipment).equals(absValue.getValue());
 	}
 
 	public void testMultipleDefaultValuesAttribute2() {
@@ -211,8 +220,10 @@ public class PropertyConstraintTest extends AbstractTest {
 		Holder myVehicle235 = myVehicle.setValue(power, 235);
 		Holder vehicle233 = vehicle.setValue(power, 233);
 		assert !myVehicle235.isAlive();
+		assert vehicle233.isAlive();
 		assert myVehicle.getHolder(power).inheritsFrom(vehicle233);
 		assert myVehicle.getValue(power).equals(235);
+		assert vehicle.getValue(power).equals(233);
 	}
 
 	public void testOK() {
