@@ -73,7 +73,7 @@ class GenericBuilder {
 		Generic old = null;
 		Set<Generic> directDependencies = getDirectDependencies();
 		for (Generic dependency : directDependencies)
-			if (Statics.MULTIDIRECTIONAL != basePos && (((GenericImpl) dependency).getComponent(basePos)).equals(components[basePos])) {
+			if (!existsException && Statics.MULTIDIRECTIONAL != basePos && (((GenericImpl) dependency).getComponent(basePos)).equals(components[basePos])) {
 				assert old == null;
 				old = dependency;
 			}
