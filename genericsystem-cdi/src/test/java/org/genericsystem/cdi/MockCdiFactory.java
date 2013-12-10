@@ -39,7 +39,10 @@ public class MockCdiFactory extends CdiFactory {
 
 		@Override
 		protected BeanManager getBeanManager() {
-			return CDIExtension.getBeanManager();
+			BeanManager beanManager = CDIExtension.getBeanManager();
+			if (beanManager == null)
+				throw new IllegalStateException();
+			return beanManager;
 		}
 	}
 

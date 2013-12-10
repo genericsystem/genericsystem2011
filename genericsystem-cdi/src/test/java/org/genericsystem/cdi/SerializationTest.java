@@ -57,7 +57,7 @@ public class SerializationTest extends AbstractTest {
 		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute("power");
-		Cache clone = deSerialize(serialize(cache)).start();
+		deSerialize(serialize(cache)).start();
 		Type vehicle2 = cache.getType("Vehicle");
 		assert vehicle2 != vehicle;
 		assert vehicle2.getValue().equals(vehicle.getValue());
