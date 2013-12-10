@@ -16,6 +16,7 @@ import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
+import org.genericsystem.exception.CacheAwareException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.iterator.AbstractFilterIterator;
@@ -160,7 +161,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	@Override
-	public CacheImpl getCurrentCache() {
+	public CacheImpl getCurrentCache() throws CacheAwareException {
 		Cache currentCache = cacheLocal.get();
 		if (currentCache == null)
 			currentCache = start(factory.getContextCache());

@@ -21,7 +21,6 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.HomeTreeNode;
 import org.genericsystem.core.Transaction;
-import org.jboss.arquillian.testenricher.cdi.container.CDIExtension;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.jboss.solder.core.Veto;
@@ -107,12 +106,12 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		}
 	}
 
-	private BeanManager getBeanManager() {
-		BeanManager beanManager;
+	protected BeanManager getBeanManager() {
+		BeanManager beanManager = null;
 		try {
 			beanManager = new BeanManagerLocator().getBeanManager();
 		} catch (Exception e) {
-			beanManager = CDIExtension.getBeanManager();
+			throw new IllegalStateException(e);
 		}
 		if (beanManager == null)
 			throw new IllegalStateException();

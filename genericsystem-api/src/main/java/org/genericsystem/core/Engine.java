@@ -1,5 +1,6 @@
 package org.genericsystem.core;
 
+import org.genericsystem.exception.CacheAwareException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -52,5 +53,12 @@ public interface Engine extends Type {
 	 */
 	long pickNewTs();
 
-	Cache getCurrentCache();
+	/**
+	 * Returns the current cache.
+	 * 
+	 * @return the current cache.
+	 * @throws CacheAwareException
+	 *             if no current cache.
+	 */
+	Cache getCurrentCache() throws CacheAwareException;
 }

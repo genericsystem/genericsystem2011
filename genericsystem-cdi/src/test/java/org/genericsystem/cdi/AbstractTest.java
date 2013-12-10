@@ -6,9 +6,9 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.exception.RollbackException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.asset.Asset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.solder.el.Expressions;
 import org.slf4j.Logger;
@@ -21,9 +21,16 @@ public abstract class AbstractTest extends Arquillian {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
-		javaArchive.addClasses(CacheProvider.class, SerializableCache.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, CdiFactory.class);
+		javaArchive.addClasses(CacheProvider.class, SerializableCache.class, MockCdiFactory.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, CdiFactory.class);
 		javaArchive.addPackage(Expressions.class.getPackage());
-		javaArchive.addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("<beans xmlns=\"http://java.sun.com/xml/ns/javaee\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\" http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/beans_1_0.xsd\">");
+		stringBuilder.append("<alternatives> ");
+		stringBuilder.append("<class>org.genericsystem.cdi.MockCdiFactory</class>");
+		stringBuilder.append(" </alternatives>");
+		stringBuilder.append("</beans>");
+		Asset asset = new StringAsset(stringBuilder.toString());
+		javaArchive.addAsManifestResource(asset, "beans.xml");
 		return javaArchive;
 	}
 
