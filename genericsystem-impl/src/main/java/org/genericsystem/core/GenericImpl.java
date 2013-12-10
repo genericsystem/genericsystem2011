@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
@@ -806,7 +805,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			if (projection == null) {
 				// assert false : this.getComponents() + Arrays.toString(newComponents);
-				getCurrentCache().bind(getMeta(), Statics.FLAG, new Generic[] { this }, components, null, Statics.MULTIDIRECTIONAL, true, false);
+				getCurrentCache().internalBind(getMeta(), Statics.FLAG, new Generic[] { this }, components, null, Statics.MULTIDIRECTIONAL, true, false);
 			}
 		}
 	}
