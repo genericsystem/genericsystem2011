@@ -312,6 +312,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return setHolder(attribute, value, getBasePos(attribute), targets);
 	}
 
+	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, Generic... targets) {
+		return setHolder(specializationClass, attribute, value, getBasePos(attribute), targets);
+	}
+
 	@Override
 	public <T extends Holder> T addHolder(Holder attribute, int basePos, Serializable value, Generic... targets) {
 		return addHolder(attribute, value, basePos, Statics.CONCRETE, targets);
@@ -658,10 +662,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.<T> bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, value, specializationClass, attribute, basePos, false, targets);
 	}
 
-	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, Generic... targets) {
-		return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, getBasePos(attribute), targets);
-	}
-
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, basePos, targets);
 	}
@@ -795,7 +795,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			if (projection == null) {
 				// assert false : this.getComponents() + Arrays.toString(newComponents);
-				getCurrentCache().bind(getMeta(), Statics.FLAG, new Generic[] { this }, components, null, Statics.MULTIDIRECTIONAL, true, false);
+				getCurrentCache().internalBind(getMeta(), Statics.FLAG, new Generic[] { this }, components, null, Statics.MULTIDIRECTIONAL, true, false);
 			}
 		}
 	}
