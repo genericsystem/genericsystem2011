@@ -6,6 +6,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.RequiredConstraintViolationException;
+import org.genericsystem.exception.SizeConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -43,7 +44,6 @@ public class RequiredConstraintTest extends AbstractTest {
 		Attribute wheel = vehicle.setAttribute("wheel");
 		wheel.enableRequiredConstraint();
 		cache.flush();
-
 		vehicle.addInstance("myFiat");
 
 		new RollbackCatcher() {
@@ -78,6 +78,20 @@ public class RequiredConstraintTest extends AbstractTest {
 				cache.flush();
 			}
 		}.assertIsCausedBy(RequiredConstraintViolationException.class);
+	}
+
+	public void addOneSizeKO() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		vehicle.setAttribute("vehicleWheel").enableSizeConstraint(0, 1);
+		cache.flush();
+		vehicle.addInstance("myFiat");
+		new RollbackCatcher() {
+			@Override
+			public void intercept() {
+				cache.flush();
+			}
+		}.assertIsCausedBy(SizeConstraintViolationException.class);
 	}
 
 	public void requiredHeritageTest() {

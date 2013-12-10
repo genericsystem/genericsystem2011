@@ -573,53 +573,59 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 	}
 
-	private static class ConstraintComparator implements Comparator<AbstractConstraintImpl> {
-		@Override
-		public int compare(AbstractConstraintImpl o1, AbstractConstraintImpl o2) {
-			if (o1.getPriority() == o2.getPriority())
-				return o1.getClass().getSimpleName().compareTo(o2.getClass().getSimpleName());
-			return Integer.compare(o1.getPriority(), o2.getPriority());
-		}
-	}
-
 	private void checkConstraints(final CheckingType checkingType, final boolean isFlushTime, final Generic generic) throws ConstraintViolationException {
 		for (final Attribute attribute : ((Type) generic).getAttributes()) {
 			AbstractExtendedMap<AxedPropertyClass, Serializable> constraintMap = ((GenericImpl) attribute).getConstraintsMap();
-			TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
+			PriorityConstraintMap constraints = new PriorityConstraintMap();
 			for (AxedPropertyClass key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-				constraints.put(keyHolder, valueHolder);
+				if (isCheckable(keyHolder, attribute, checkingType, isFlushTime) && isAxedConstraint(keyHolder) && isInstanceOf(generic, attribute, ((AxedPropertyClass) keyHolder.getValue()).getAxe()))
+					constraints.put(keyHolder, valueHolder);
 			}
-			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
-				if (isCheckable(entry.getKey(), attribute, checkingType, isFlushTime)) {
-					int axe = ((AxedPropertyClass) entry.getKey().getValue()).getAxe();
-					if (AbstractAxedConstraintImpl.class.isAssignableFrom(entry.getKey().getClass()) && attribute.getComponent(axe) != null && (generic.isInstanceOf(attribute.getComponent(axe)))) {
-						entry.getKey().check(attribute, generic, entry.getValue(), axe);
-					}
-				}
-			}
+			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet())
+				entry.getKey().check(attribute, generic, entry.getValue(), ((AxedPropertyClass) entry.getKey().getValue()).getAxe());
 		}
 		AbstractExtendedMap<AxedPropertyClass, Serializable> constraintMap = ((GenericImpl) generic).getConstraintsMap();
-		TreeMap<AbstractConstraintImpl, Holder> constraints = new TreeMap<>(new ConstraintComparator());
+		PriorityConstraintMap constraints = new PriorityConstraintMap();
 		for (AxedPropertyClass key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-			constraints.put(keyHolder, valueHolder);
+			if (isCheckable(keyHolder, generic, checkingType, isFlushTime) && generic.getMetaLevel() - ((Holder) keyHolder.getBaseComponent()).getBaseComponent().getMetaLevel() >= 1)
+				constraints.put(keyHolder, valueHolder);
 		}
 
 		for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet()) {
-			Holder valueHolder = entry.getValue();
 			AbstractConstraintImpl keyHolder = entry.getKey();
-
-			if (isCheckable(keyHolder, generic, checkingType, isFlushTime)) {
-				Generic baseConstraint = ((Holder) keyHolder.getBaseComponent()).getBaseComponent();
-				int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
-				if (generic.getMetaLevel() - baseConstraint.getMetaLevel() >= 1)
-					keyHolder.check(baseConstraint, AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()) ? ((Attribute) generic).getComponent(axe) : generic, valueHolder, axe);
-			}
-
+			int axe = ((AxedPropertyClass) keyHolder.getValue()).getAxe();
+			keyHolder.check(((Holder) keyHolder.getBaseComponent()).getBaseComponent(), isAxedConstraint(keyHolder) ? ((Attribute) generic).getComponent(axe) : generic, entry.getValue(), axe);
 		}
+	}
+
+	private boolean isAxedConstraint(AbstractConstraintImpl constraint) {
+		return AbstractAxedConstraintImpl.class.isAssignableFrom(constraint.getClass());
+	}
+
+	private boolean isInstanceOf(Generic generic, Attribute attribute, int axe) {
+		return attribute.getComponent(axe) != null && generic.isInstanceOf(attribute.getComponent(axe));
+	}
+
+	private static class PriorityConstraintMap extends TreeMap<AbstractConstraintImpl, Holder> {
+
+		private static final long serialVersionUID = -1661589109737403438L;
+
+		@Override
+		public Comparator<? super AbstractConstraintImpl> comparator() {
+			return new Comparator<AbstractConstraintImpl>() {
+				@Override
+				public int compare(AbstractConstraintImpl constraint, AbstractConstraintImpl compareConstraint) {
+					if (constraint.getPriority() == compareConstraint.getPriority())
+						return constraint.getClass().getSimpleName().compareTo(compareConstraint.getClass().getSimpleName());
+					return Integer.compare(constraint.getPriority(), compareConstraint.getPriority());
+				}
+			};
+		}
+
 	}
 
 	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {
