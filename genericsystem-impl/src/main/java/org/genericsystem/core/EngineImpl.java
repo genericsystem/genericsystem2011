@@ -228,6 +228,9 @@ public class EngineImpl extends GenericImpl implements Engine {
 			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				get(clazz);
+			((GenericImpl) get(ConstraintsMapProvider.class)).enablePropertyConstraint();
+			((GenericImpl) get(PropertiesMapProvider.class)).enablePropertyConstraint();
+			((GenericImpl) get(SystemPropertiesMapProvider.class)).enablePropertyConstraint();
 			for (Class<?> clazz : userClasses)
 				get(clazz);
 			cache.flush();

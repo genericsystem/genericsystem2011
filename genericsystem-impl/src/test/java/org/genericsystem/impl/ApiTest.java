@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
@@ -594,7 +595,6 @@ public class ApiTest extends AbstractTest {
 
 	public void testMultipleInheritance() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		cache.getMetaAttribute().log();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("Power");
 		Type robot = cache.addType("Robot");
@@ -611,16 +611,13 @@ public class ApiTest extends AbstractTest {
 	public void testMultipleInheritanceDiamond() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Attribute vehiclePower = vehicle.addProperty("power");
+		vehicle.addProperty("power");
 		Type car = vehicle.addSubType("Car");
 		Attribute carPower = car.addProperty("power");
-		assert carPower.inheritsFrom(vehiclePower);
 		Type robot = vehicle.addSubType("Robot");
 		Attribute robotPower = robot.addProperty("power");
-		assert robotPower.inheritsFrom(vehiclePower);
 		Type transformer = cache.addType("Transformer", car, robot);
 		Relation transformerPower = ((GenericImpl) transformer).addProperty("power");
-		assert transformerPower.isPropertyConstraintEnabled();
 		assert transformerPower.inheritsFrom(carPower);
 		assert transformerPower.inheritsFrom(robotPower);
 	}
