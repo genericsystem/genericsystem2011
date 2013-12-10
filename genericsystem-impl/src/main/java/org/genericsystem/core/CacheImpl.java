@@ -13,7 +13,6 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -167,7 +166,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-			break;
+		break;
 		case CONSERVE:
 			// TODO faire marcher ça
 			// new Restructurator() {
@@ -179,14 +178,14 @@ public class CacheImpl extends AbstractContext implements Cache {
 			NavigableSet<Generic> dependencies = orderAndRemoveDependencies(generic);
 			dependencies.remove(generic);
 			for (Generic dependency : dependencies)
-				bind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, false, true);
+				internalBind(dependency.getMeta(), ((GenericImpl) dependency).getHomeTreeNode(), ((GenericImpl) generic).supers, ((GenericImpl) dependency).components, dependency.getClass(), Statics.MULTIDIRECTIONAL, false, true);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-			break;
+		break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-			break;
+		break;
 		}
 	}
 
@@ -438,11 +437,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T bind(Generic meta, Serializable value, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean automatic, boolean existsException) {
-		return bind(meta, ((GenericImpl) meta).bindInstanceNode(value), supers, components, specializationClass, basePos, automatic, existsException);
-	}
-
-	<T extends Generic> T bind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, Class<?> specializationClass, int basePos, boolean automatic, boolean existsException) {
-		return internalBind(meta, homeTreeNode, supers, components, specializationClass, basePos, existsException, automatic);
+		return internalBind(meta, ((GenericImpl) meta).bindInstanceNode(value), supers, components, specializationClass, basePos, automatic, existsException);
 	}
 
 	abstract class Restructurator extends HashMap<Generic, Generic> {
@@ -510,7 +505,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		abstract Generic rebuild();
 	}
 
-	<T extends Generic> T internalBind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, final Class<?> specializationClass, int basePos, boolean existsException, final boolean automatic) throws RollbackException {
+	<T extends Generic> T internalBind(Generic meta, HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components, final Class<?> specializationClass, int basePos, final boolean automatic, boolean existsException) throws RollbackException {
 		return new GenericBuilder(this, meta, homeTreeNode, supers.length != 0 ? supers : new Generic[] { getEngine() }, components, basePos, true).internalBind(specializationClass, basePos, existsException, automatic);
 	}
 
