@@ -603,7 +603,6 @@ public class ApiTest extends AbstractTest {
 		assert transformer.inheritsFrom(robot);
 		assert transformer.inheritsFrom(vehicle);
 		assert cache.getMetaAttribute().inheritsFrom(cache.getEngine());
-		log.info("-----------------------------------------------------------------------------------------");
 		Attribute transformerPower = ((GenericImpl) transformer).addProperty("Power");
 		assert transformerPower.inheritsFrom(vehiclePower);
 		assert transformerPower.inheritsFrom(robotPower);

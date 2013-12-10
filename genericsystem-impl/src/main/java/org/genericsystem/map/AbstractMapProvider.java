@@ -5,7 +5,6 @@ import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -55,7 +54,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 			}
 
 			private Holder getMapHolder() {
-				return ((GenericImpl) generic).<GenericImpl> getHolderByValue(Statics.CONCRETE, (Holder) AbstractMapProvider.this, MAP_VALUE);
+				return ((GenericImpl) generic).<GenericImpl> getHolder(Statics.CONCRETE, (Holder) AbstractMapProvider.this);
 			}
 
 			private Holder getKeyHolder(Key key) {
@@ -86,9 +85,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 			@Override
 			public Value put(Key key, Value value) {
 				Value oldValue = get(key);
-				if (Objects.equals(oldValue, value))// TODO KK
-					return oldValue;
-				Holder keyHolder = ((GenericImpl) generic).<GenericImpl> setHolderByValue(AbstractMapProvider.this, MAP_VALUE).setHolderByValue(getSpecializationClass(key), getRealKeyAttribute(key), (Serializable) key);
+				Holder keyHolder = ((GenericImpl) generic).<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), getRealKeyAttribute(key), (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
 			}

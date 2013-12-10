@@ -311,14 +311,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return setHolder(attribute, value, getBasePos(attribute), targets);
 	}
 
-	public <T extends Holder> T setHolderByValue(Class<?> specializationClass, Holder attribute, Serializable value, Generic... targets) {
-		Holder holder = getHolderByValue(Statics.CONCRETE, attribute, value);
-		return setHolder(specializationClass, holder != null ? holder : attribute, value, getBasePos(attribute), targets);
-	}
-
-	public <T extends Holder> T setHolderByValue(Holder attribute, Serializable value, Generic... targets) {
-		Holder holder = getHolderByValue(Statics.CONCRETE, attribute, value);
-		return setHolder(holder != null ? holder : attribute, value, getBasePos(attribute), targets);
+	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, Generic... targets) {
+		return setHolder(specializationClass, attribute, value, getBasePos(attribute), targets);
 	}
 
 	@Override
@@ -666,11 +660,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
 		return this.<T> bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, value, specializationClass, attribute, basePos, false, targets);
 	}
-
-	// TODO clean
-	// public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, Generic... targets) {
-	// return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, getBasePos(attribute), targets);
-	// }
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int basePos, Generic... targets) {
 		return this.<T> setHolder(specializationClass, attribute, value, Statics.CONCRETE, basePos, targets);
