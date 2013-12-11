@@ -14,10 +14,97 @@ import org.testng.annotations.Test;
 @Test
 public class UniqueValueConstraintTest extends AbstractTest {
 
-	//Tests d'heritage
-	private void testHeritage(Type vehicle, Type truck){
+	// Tests d'heritage
+	private void testHeritage(Type vehicle, Type truck) {
 		assert vehicle.getSubTypes().contains(truck);
 		assert truck.inheritsFrom(vehicle);
+	}
+
+	public void testPropertyMultiAttributeOnDerivedClassKO() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+
+		final Type truck = vehicle.addSubType("truck");
+
+		// plaque d'immatriculation d'un vehicule
+		final Attribute registration = vehicle.setAttribute("Registration");
+		registration.enableUniqueValueConstraint();
+		final Attribute registration2 = truck.setAttribute("Registration");
+
+		final Generic myVehicle = vehicle.addInstance("myVehicle");
+		final Generic myTruck = truck.addInstance("myTruck");
+
+		myVehicle.setValue(registration, "315DT75");
+		myTruck.setValue(registration2, "315DT76");
+		myTruck.setValue(registration2, "315DT77");
+
+		assert myVehicle.getValues(registration).get(0).equals("315DT75");
+		assert myVehicle.getValues(registration).size() == 1;
+
+		assert myTruck.getValues(registration).get(0).equals("315DT76");
+		assert myTruck.getValues(registration).get(1).equals("315DT77");
+		assert myTruck.getValues(registration).size() == 2;
+
+		assert myTruck.getValues(registration2).get(0).equals("315DT76");
+		assert myTruck.getValues(registration2).get(1).equals("315DT77");
+		assert myTruck.getValues(registration2).size() == 2;
+
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				myTruck.setValue(registration2, "315DT75");
+			}
+		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
+
+	}
+
+	public void testPropertyMultiAttributeOnDerivedClassOK() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+
+		final Type truck = vehicle.addSubType("truck");
+
+		final Type superTruck = truck.addSubType("superTruck");
+
+		// plaque d'immatriculation d'un vehicule
+		final Attribute registration = vehicle.setAttribute("Registration");
+		registration.enableUniqueValueConstraint();
+
+		final Attribute registration3 = truck.setAttribute("Registration");
+		registration3.disableUniqueValueConstraint();
+		assert !registration3.isUniqueValueConstraintEnabled();
+
+		final Attribute registration2 = truck.setAttribute("Registration");
+		registration2.disableUniqueValueConstraint();
+		assert !registration2.isUniqueValueConstraintEnabled();
+
+		final Generic myVehicle = vehicle.addInstance("myVehicle");
+		final Generic myTruck = truck.addInstance("myTruck");
+		final Generic mySuperTruck = superTruck.addInstance("mySuperTruck");
+		final Generic mySuperTruck2 = superTruck.addInstance("mySuperTruck2");
+
+		myVehicle.setValue(registration, "315DT75");
+		myTruck.setValue(registration2, "315DT76");
+		myTruck.setValue(registration2, "315DT77");
+		mySuperTruck.setValue(registration2, "315DT77");
+		mySuperTruck.setValue(registration2, "315DT76");
+		mySuperTruck2.setValue(registration2, "315DT76");
+		mySuperTruck2.setValue(registration2, "315DT77");
+
+		assert myVehicle.getValues(registration).get(0).equals("315DT75");
+		assert myVehicle.getValues(registration).size() == 1;
+
+		assert myTruck.getValues(registration).get(0).equals("315DT76");
+		assert myTruck.getValues(registration).get(1).equals("315DT77");
+		assert myTruck.getValues(registration).size() == 2;
+
+		assert mySuperTruck.getValues(registration2).get(0).equals("315DT77");
+		assert mySuperTruck.getValues(registration2).get(1).equals("315DT76");
+		assert mySuperTruck.getValues(registration2).size() == 2;
+		assert mySuperTruck2.getValues(registration2).get(0).equals("315DT76");
+		assert mySuperTruck2.getValues(registration2).get(1).equals("315DT77");
+		assert mySuperTruck2.getValues(registration2).size() == 2;
 	}
 
 	public void testPropertySimpleAttributeOnDerivedClassOK() {
@@ -26,7 +113,7 @@ public class UniqueValueConstraintTest extends AbstractTest {
 
 		final Type truck = vehicle.addSubType("truck");
 
-		//plaque d'immatriculation d'un camion
+		// plaque d'immatriculation d'un camion
 		final Attribute registration = vehicle.setAttribute("Registration");
 		final Attribute registration2 = truck.setAttribute("Registration");
 		registration2.enableUniqueValueConstraint();
@@ -41,40 +128,25 @@ public class UniqueValueConstraintTest extends AbstractTest {
 		myVehicle.setValue(registration, "315DT75");
 		myVehicle.setValue(registration, "315DT76");
 
-		assert myVehicle.getValues(registration).containsAll(Arrays.asList("315DT75", "315DT76"));
-		assert Arrays.asList("315DT75", "315DT76").containsAll(myVehicle.getValues(registration));
+		assert myVehicle.getValues(registration).get(0).equals("315DT75");
+		assert myVehicle.getValues(registration).get(1).equals("315DT76");
+		assert myVehicle.getValues(registration).size() == 2;
+
+		assert !registration.equals(registration2);
+
+		assert myTruck.getValues(registration).get(0).equals("315DT75");
+		assert myTruck.getValues(registration).size() == 1;
 
 		assert registration.isAlive();
 		assert myTruck.isAlive();
 		assert myVehicle.isAlive();
 	}
-	public void testPropertySimpleAttributeOnDerivedClassBisKO() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type vehicle = cache.addType("Vehicle");
 
-		final Type truck = vehicle.addSubType("truck");
-
-		//plaque d'immatriculation d'un vehicule
-		final Attribute registration = truck.setAttribute("Registration");
-		registration.enableUniqueValueConstraint();
-
-		final Generic myVehicle = vehicle.addInstance("myVehicle");
-		final Generic myTruck = truck.addInstance("myTruck");
-
-		myTruck.setValue(registration, "315DT75");
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				myVehicle.setValue(registration, "315DT75");
-			}
-		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
-	}
 	public void testPropertySimpleAttributeFromBaseClassKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 
-		//plaque d'immatriculation d'un vehicule
+		// plaque d'immatriculation d'un vehicule
 		final Attribute registration = vehicle.setAttribute("Registration");
 		registration.enableUniqueValueConstraint();
 
@@ -83,7 +155,7 @@ public class UniqueValueConstraintTest extends AbstractTest {
 		final Generic myVehicle = vehicle.addInstance("myVehicle");
 		final Generic myTruck = truck.addInstance("myTruck");
 
-		//Tests d'heritage
+		// Tests d'heritage
 		testHeritage(vehicle, truck);
 
 		myTruck.setValue(registration, "315DT75");
@@ -95,11 +167,12 @@ public class UniqueValueConstraintTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
+
 	public void testPropertySimpleAttributeFromDerivedClassKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 
-		//plaque d'immatriculation d'un vehicule
+		// plaque d'immatriculation d'un vehicule
 		final Attribute registration = vehicle.setAttribute("Registration");
 		registration.enableUniqueValueConstraint();
 
@@ -108,7 +181,7 @@ public class UniqueValueConstraintTest extends AbstractTest {
 		final Generic myVehicle = vehicle.addInstance("myVehicle");
 		final Generic myTruck = truck.addInstance("myTruck");
 
-		//Tests d'heritage
+		// Tests d'heritage
 		testHeritage(vehicle, truck);
 
 		myVehicle.setValue(registration, "315DT75");
@@ -125,7 +198,7 @@ public class UniqueValueConstraintTest extends AbstractTest {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 
-		//plaque d'immatriculation d'un vehicule
+		// plaque d'immatriculation d'un vehicule
 		final Attribute registration = vehicle.setAttribute("Registration");
 		registration.enableUniqueValueConstraint();
 
@@ -135,8 +208,8 @@ public class UniqueValueConstraintTest extends AbstractTest {
 		final Generic myCar = car.addInstance("myCar");
 		final Generic myTruck = truck.addInstance("myTruck");
 
-		//Tests d'heritage
-		assert vehicle.getSubTypes().containsAll(Arrays.asList(car,truck));
+		// Tests d'heritage
+		assert vehicle.getSubTypes().containsAll(Arrays.asList(car, truck));
 		assert car.inheritsFrom(vehicle);
 		assert truck.inheritsFrom(vehicle);
 
@@ -145,12 +218,13 @@ public class UniqueValueConstraintTest extends AbstractTest {
 
 			@Override
 			public void intercept() {
-				//violation de l'unicite de la plaque d'immatriculation:
-				//un camion et une voiture ne peuvent pas avoir la meme plaque d'immatriculation
+				// violation de l'unicite de la plaque d'immatriculation:
+				// un camion et une voiture ne peuvent pas avoir la meme plaque d'immatriculation
 				myTruck.setValue(registration, "315DT75");
 			}
 		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
+
 	public void testPropertySimpleAttributeKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
@@ -168,6 +242,7 @@ public class UniqueValueConstraintTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(UniqueValueConstraintViolationException.class);
 	}
+
 	public void testPropertySimpleAttributeOK() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
@@ -180,8 +255,9 @@ public class UniqueValueConstraintTest extends AbstractTest {
 		yourCar.setValue(registration, "315DT76");
 		assert myCar.getValues(registration).contains("315DT74");
 		assert myCar.getValues(registration).contains("315DT75");
-		assert yourCar.getValue(registration).equals("315DT76"):yourCar.getValue(registration);
+		assert yourCar.getValue(registration).equals("315DT76") : yourCar.getValue(registration);
 	}
+
 	public void testPropertySimpleRelationKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
