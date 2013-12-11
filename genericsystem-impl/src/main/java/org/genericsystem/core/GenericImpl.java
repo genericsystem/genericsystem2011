@@ -167,7 +167,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	protected void finalize() throws Throwable {
-		log.info("FINALIZE " + info());
+		// TODO clean
+		// log.info("FINALIZE " + info());
 	}
 
 	public LifeManager getLifeManager() {

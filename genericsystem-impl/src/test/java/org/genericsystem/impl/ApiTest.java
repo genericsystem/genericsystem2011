@@ -597,6 +597,7 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addProperty("Power");
+		vehiclePower.enableVirtualConstraint();
 		Type robot = cache.addType("Robot");
 		Attribute robotPower = robot.addProperty("Power");
 		Type transformer = cache.addType("Transformer", vehicle, robot);
@@ -606,6 +607,8 @@ public class ApiTest extends AbstractTest {
 		Attribute transformerPower = ((GenericImpl) transformer).addProperty("Power");
 		assert transformerPower.inheritsFrom(vehiclePower);
 		assert transformerPower.inheritsFrom(robotPower);
+		assert transformerPower.isPropertyConstraintEnabled();
+		assert transformerPower.isVirtualConstraintEnabled();
 	}
 
 	public void testMultipleInheritanceDiamond() {
@@ -620,5 +623,6 @@ public class ApiTest extends AbstractTest {
 		Relation transformerPower = ((GenericImpl) transformer).addProperty("power");
 		assert transformerPower.inheritsFrom(carPower);
 		assert transformerPower.inheritsFrom(robotPower);
+		assert transformerPower.isPropertyConstraintEnabled();
 	}
 }
