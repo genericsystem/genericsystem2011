@@ -73,6 +73,15 @@ class GenericBuilder {
 			return result;
 		Generic old = null;
 		Set<Generic> directDependencies = getDirectDependencies();
+		// log.info("---------------------------------------------------");
+		// for (Generic dependency : directDependencies) {
+		// log.info("dependency : " + dependency.info());
+		// log.info("isExtention " + isExtention(dependency));
+		// log.info("isSuperOf " + GenericImpl.isSuperOf(homeTreeNode, supers, components, dependency));
+		// }
+		// log.info("homeTreeNode : " + homeTreeNode);
+		// log.info("supers : " + Arrays.toString(supers));
+		// log.info("components : " + Arrays.toString(components));
 		for (Generic dependency : directDependencies)
 			if (!existsException && Statics.MULTIDIRECTIONAL != basePos && (((GenericImpl) dependency).getComponent(basePos)).equals(components[basePos])) {
 				assert old == null;
