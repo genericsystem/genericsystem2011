@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.genericsystem.core.Statics.Supers;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
@@ -119,12 +120,13 @@ class GenericBuilder {
 	}
 
 	private boolean isExtention(Generic candidate) {
-		if (homeTreeNode.getMetaLevel() == candidate.getMetaLevel()) {
-			if (Statics.MULTIDIRECTIONAL != basePos && basePos < ((GenericImpl) candidate).components.length)
+		if (candidate.getMeta().equals(meta)) {
+			if (Statics.MULTIDIRECTIONAL != basePos && basePos < ((GenericImpl) candidate).components.length) {
 				if (isSingular && ((GenericImpl) candidate).components[basePos].inheritsFrom(components[basePos]))
 					return true;
-			if (isProperty && areComponentsInheriting((((GenericImpl) candidate).components), components))
-				return true;
+				if (isProperty && areComponentsInheriting((((GenericImpl) candidate).components), components))
+					return true;
+			}
 		}
 		return false;
 	}
