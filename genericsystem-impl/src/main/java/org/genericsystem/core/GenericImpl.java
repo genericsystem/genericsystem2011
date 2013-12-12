@@ -127,16 +127,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
 					assert !g1.inheritsFrom(g2) : "" + Arrays.toString(supers);
-		assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
-		for (Generic superGeneric : supers) {
-			if (this.equals(superGeneric) && !isEngine())
-				getCurrentCache().rollback(new IllegalStateException());
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
-				getCurrentCache().rollback(new IllegalStateException());
-			if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
-				getCurrentCache().rollback(new IllegalStateException());
-		}
-		return this;
+					assert getMetaLevel() == homeTreeNode.getMetaLevel() : getMetaLevel() + " " + homeTreeNode.getMetaLevel() + " " + (homeTreeNode instanceof RootTreeNode);
+					for (Generic superGeneric : supers) {
+						if (this.equals(superGeneric) && !isEngine())
+							getCurrentCache().rollback(new IllegalStateException());
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) > 1)
+							getCurrentCache().rollback(new IllegalStateException());
+						if ((getMetaLevel() - superGeneric.getMetaLevel()) < 0)
+							getCurrentCache().rollback(new IllegalStateException());
+					}
+					return this;
 	}
 
 	<T extends Generic> T plug() {
@@ -167,7 +167,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	protected void finalize() throws Throwable {
-		log.info("FINALIZE " + info());
+		// TODO clean
+		// log.info("FINALIZE " + info());
 	}
 
 	public LifeManager getLifeManager() {
@@ -1505,7 +1506,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T disableUniqueValueConstraint() {
-		setConstraintValue(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		setConstraintValue(UniqueValueConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
 		return (T) this;
 	}
 
