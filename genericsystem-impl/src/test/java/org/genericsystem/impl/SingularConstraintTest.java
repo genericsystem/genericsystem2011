@@ -43,7 +43,6 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void testHeritageSingularOK() {
-
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute power = vehicle.setAttribute("power");
@@ -156,6 +155,7 @@ public class SingularConstraintTest extends AbstractTest {
 		cache.flush();
 		Link humanDriveVehicleLink2 = myck.setLink(humanDriveVehicle, "myckDrive", nicoVehicle);
 		assert !humanDriveVehicleLink1.isAlive();
+		assert humanDriveVehicleLink2.isAlive();
 		assert myck.getLink(humanDriveVehicle).equals(humanDriveVehicleLink2);
 		assert myck.getLink(humanDriveVehicle, nicoVehicle).equals(humanDriveVehicleLink2);
 		nico.setLink(humanDriveVehicle, "nicoDrive", myckVehicle);
@@ -266,10 +266,10 @@ public class SingularConstraintTest extends AbstractTest {
 	// Rapportés depuis 2010 ----------------------------------------------------------------------
 
 	public void noMoreThanOneAttributePerEntity() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		final Generic myBmw = car.addInstance("myBmw");
-		final Attribute registration = car.setAttribute("registration");
+		Generic myBmw = car.addInstance("myBmw");
+		Attribute registration = car.setAttribute("registration");
 		registration.enableSingularConstraint();
 		Holder myBmwRegistration1 = myBmw.setValue(registration, "AB123CD");
 		Holder myBmwRegistration2 = myBmw.setValue(registration, "DC321BA");
@@ -278,29 +278,63 @@ public class SingularConstraintTest extends AbstractTest {
 		assert !myBmwRegistration1.isAlive();
 	}
 
-	// public void noMoreThanOneAttributePerEntity2() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-	// Type car = cache.newType("Car");
-	// Type frenchCar = car.newSubType( "frenchCar");
-	// Attribute registration = car.addAttribute( "registration");
-	// final Attribute frenchRegistration = frenchCar.addSubAttribute( registration, "French Registration");
-	// registration.enableSingularConstraint();
-	// final Generic myBmw = frenchCar.newInstance( "myBmw");
-	// myBmw.setValue( registration, "AB123CD");
-	// new RollbackCatcher() {
-	// @Override
-	// public void intercept() {
-	// myBmw.setValue( frenchRegistration, "JAIME75");
-	// }
-	// }.assertIsCausedBy(SingularConstraintViolationException.class);
-	// }
+	public void addSingularAndSubTypeTestOK() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
+		Relation vehicleColor = vehicle.setRelation("vehicleColor", color);
+		vehicleColor.enableSingularConstraint();
+		assert vehicleColor.isSingularConstraintEnabled();
+
+		Type car = vehicle.addSubType("Car");
+		// Relation carColor = ((GenericImpl)car).setSubRelation(vehicleColor,"carColor", color);
+
+		Relation carColor = car.setRelation("vehicleColor", color);
+		assert carColor.isSingularConstraintEnabled();
+
+		Generic myCar = car.addInstance("myCar");
+		Generic red = color.addInstance("red");
+		Generic yellow = color.addInstance("yellow");
+
+		Link myCarRed = myCar.setLink(carColor, "myCarRed", red);
+		Link myCarYellow = myCar.setLink(carColor, "myCarYellow", yellow);
+
+		assert !myCarRed.isAlive();
+		assert myCarYellow.isAlive();
+		assert myCar.getLinks(carColor).size() == 1 : myCar.getLinks(carColor);
+		assert myCar.getLink(carColor) == myCarYellow;
+	}
+
+	public void deactivateSingularONSubTypeOK() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		Type color = cache.addType("Color");
+
+		vehicle.setRelation("vehicleColor", color).enableSingularConstraint();
+
+		Type car = vehicle.addSubType("Car");
+		Relation carColor = car.setRelation("vehicleColor", color).disableSingularConstraint();
+
+		Generic myCar = car.addInstance("myCar");
+		Generic red = color.addInstance("red");
+		Generic yellow = color.addInstance("yellow");
+
+		Link myCarRed = myCar.setLink(carColor, "myCarRed", red);
+		Link myCarYellow = myCar.setLink(carColor, "myCarYellow", yellow);
+
+		assert myCarRed.isAlive();
+		assert myCarYellow.isAlive();
+		assert myCar.getLinks(carColor).size() == 2 : myCar.getLinks(carColor);
+		assert myCar.getLinks(carColor).get(0) == myCarRed;
+		assert myCar.getLinks(carColor).get(1) == myCarYellow;
+	}
+
 
 	public void singularForTargetAxe() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("car");
 		Type color = cache.addType("color");
-		final Relation carColor = car.setRelation("carColor", color);
-		carColor.enableSingularConstraint(Statics.TARGET_POSITION);
+		final Relation carColor = car.setRelation("carColor", color).enableSingularConstraint(Statics.TARGET_POSITION);
 		Generic myBmw = car.addInstance("myBmw");
 		final Generic myAudi = car.addInstance("myAudi");
 		final Generic yellow = color.addInstance("yellow");
@@ -315,21 +349,20 @@ public class SingularConstraintTest extends AbstractTest {
 	}
 
 	public void singularForTargetAxe2() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("vehicle");
+		Type color = cache.addType("color");
+		final Relation vehicleColor = vehicle.setRelation("vehicleColor", color).enableSingularConstraint(Statics.TARGET_POSITION);
+		final Generic myVehicle = vehicle.addInstance("myVehicle");
+		Generic red = color.addInstance("red");
+		myVehicle.setLink(vehicleColor, "myCarRed", red);
+		final Generic yellow = color.addInstance("yellow");
+		myVehicle.setLink(vehicleColor, "myCarYellow", yellow);
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				Type mother = cache.addType("mother");
-				Type children = cache.addType("children");
-				Relation myChildren = mother.setRelation("myChildren", children);
-				myChildren.enableSingularConstraint(Statics.TARGET_POSITION);
 
-				Generic mama1 = mother.addInstance("mama1");
-				Generic baby1 = children.addInstance("baby1");
-				mama1.setLink(myChildren, "mama1_baby1", baby1);
-				Generic baby2 = children.addInstance("baby2");
-				mama1.setLink(myChildren, "mama1_baby2", baby2);
-				mama1.setLink(myChildren, "test", baby2);
+				myVehicle.setLink(vehicleColor, "myCarYellow2", yellow);
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
 	}

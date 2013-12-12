@@ -1,7 +1,5 @@
 package org.genericsystem.impl;
 
-import java.util.Arrays;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -34,8 +32,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		final Generic myVehicle = vehicle.addInstance("myVehicle");
 		Holder abs = myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
-		assert myVehicle.getValues(equipment).containsAll(Arrays.asList("GPS"));
-		assert Arrays.asList("GPS").containsAll(myVehicle.getValues(equipment));
+		assert myVehicle.getValues(equipment).get(0).equals("GPS");
+		assert myVehicle.getValues(equipment).size() == 1;
 		assert !abs.isAlive();
 	}
 
@@ -46,8 +44,9 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic myVehicle = vehicle.addInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
-		assert myVehicle.getValues(equipment).containsAll(Arrays.asList("ABS", "GPS"));
-		assert Arrays.asList("ABS", "GPS").containsAll(myVehicle.getValues(equipment));
+		assert myVehicle.getValues(equipment).get(0).equals("ABS");
+		assert myVehicle.getValues(equipment).get(1).equals("GPS");
+		assert myVehicle.getValues(equipment).size() == 2;
 	}
 
 	public void testMultipleValuesAttributeWithDisabledConstraint() {
@@ -58,8 +57,9 @@ public class PropertyConstraintTest extends AbstractTest {
 		Generic myVehicle = vehicle.addInstance("myVehicle");
 		myVehicle.setValue(equipment, "ABS");
 		myVehicle.setValue(equipment, "GPS");
-		assert myVehicle.getValues(equipment).containsAll(Arrays.asList("ABS", "GPS"));
-		assert Arrays.asList("ABS", "GPS").containsAll(myVehicle.getValues(equipment));
+		assert myVehicle.getValues(equipment).get(0).equals("ABS");
+		assert myVehicle.getValues(equipment).get(1).equals("GPS");
+		assert myVehicle.getValues(equipment).size() == 2;
 	}
 
 	public void testBinaryRelationDifferentTarget() {
@@ -130,6 +130,51 @@ public class PropertyConstraintTest extends AbstractTest {
 		equipment.enablePropertyConstraint();
 		Generic myCar = car.addInstance("myCar");
 		myCar.setValue(equipment, "ABS");
+	}
+
+	public void testMultipleValuesAttributeForTypeAndSubtypeKO() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		Type car = vehicle.addSubType("Car");
+
+		final Attribute equipment = vehicle.setAttribute("Equipment");
+		equipment.enablePropertyConstraint();
+
+		final Attribute equipment2 = car.setAttribute("Equipment");
+
+		final Generic myCar = car.addInstance("myCar");
+		myCar.setValue(equipment2, "ABS");
+		myCar.setValue(equipment2, "GPS");
+
+		assert myCar.getValues(equipment2).get(0).equals("GPS");
+		assert myCar.getValues(equipment2).size() == 1;
+	}
+
+	public void testMultipleValuesAttributeForTypeAndSubtypeOK() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		Type car = vehicle.addSubType("Car");
+
+		final Attribute equipment = vehicle.setAttribute("Equipment");
+		equipment.enablePropertyConstraint();
+
+		final Attribute equipment2 = car.setAttribute("Equipment");
+		equipment2.disablePropertyConstraint();
+
+		Generic myVehicle = vehicle.addInstance("myVehicle");
+		myVehicle.setValue(equipment, "ABS");
+		myVehicle.setValue(equipment, "CLIM");
+
+		final Generic myCar = car.addInstance("myCar");
+		myCar.setValue(equipment, "ABS");
+		myCar.setValue(equipment, "GPS");
+
+		assert myVehicle.getValues(equipment).get(0).equals("CLIM");
+		assert myVehicle.getValues(equipment).size() == 1;
+
+		assert myCar.getValues(equipment2).get(0).equals("ABS");
+		assert myCar.getValues(equipment2).get(1).equals("GPS");
+		assert myCar.getValues(equipment2).size() == 2;
 	}
 
 	public void testMultipleValuesAttributeForSubtype() {
@@ -236,7 +281,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		carOutsideColor.enablePropertyConstraint();
 		myBmw.setLink(carOutsideColor, "20%", red);
 		myBmw.setLink(carOutsideColor, "40%", red);
-		myBmw.getLink(carOutsideColor, red);
+		assert myBmw.getLink(carOutsideColor, red).getValue().equals("40%");
 	}
 
 	public void testOK2() {
@@ -249,7 +294,7 @@ public class PropertyConstraintTest extends AbstractTest {
 		carOutsideColor.enableSingularConstraint(Statics.BASE_POSITION);
 		myBmw.setLink(carOutsideColor, "20%", red);
 		myBmw.setLink(carOutsideColor, "40%", red);
-		myBmw.getLink(carOutsideColor, red);
+		assert myBmw.getLink(carOutsideColor, red).getValue().equals("40%");
 	}
 
 	public void testOK3() {
