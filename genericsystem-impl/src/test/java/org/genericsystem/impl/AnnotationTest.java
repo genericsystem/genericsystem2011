@@ -1,14 +1,12 @@
 package org.genericsystem.impl;
 
 import java.util.List;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.IntValue;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -263,7 +261,6 @@ public class AnnotationTest extends AbstractTest {
 		Generic myTransformerChildrenGames = cache.find(MyTransformerChildrenGames.class);
 
 		assert myTransformerChildrenGames.inheritsFrom(transformerChildrenGames) : myTransformerChildrenGames.info() + transformerChildrenGames.info();
-		assert ((GenericImpl) transformerChildrenGames).isSuperOf(myTransformerChildrenGames);
 
 		assert !myTransformerChildrenGames.inheritsFrom(myGames);
 		assert !myTransformerChildrenGames.inheritsFrom(myChildren);
@@ -298,52 +295,42 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Games {
-	}
+	public static class Games {}
 
 	@SystemGeneric
 	@Extends(meta = Games.class)
-	public static class MyGames {
-	}
+	public static class MyGames {}
 
 	@SystemGeneric
-	public static class Children {
-	}
+	public static class Children {}
 
 	@SystemGeneric
 	@Extends(meta = Children.class)
-	public static class MyChildren {
-	}
+	public static class MyChildren {}
 
 	@SystemGeneric
 	@Extends({ Games.class, Children.class })
-	public static class ChildrenGames {
-	}
+	public static class ChildrenGames {}
 
 	@SystemGeneric
 	@Extends(meta = ChildrenGames.class)
-	public static class MyChildrenGames {
-	}
+	public static class MyChildrenGames {}
 
 	@SystemGeneric
 	@Extends({ Human.class, Vehicle.class })
-	public static class Transformer {
-	}
+	public static class Transformer {}
 
 	@SystemGeneric
 	@Extends(meta = Transformer.class)
-	public static class MyTransformer {
-	}
+	public static class MyTransformer {}
 
 	@SystemGeneric
 	@Extends({ Transformer.class, ChildrenGames.class })
-	public static class TransformerChildrenGames {
-	}
+	public static class TransformerChildrenGames {}
 
 	@SystemGeneric
 	@Extends(meta = TransformerChildrenGames.class)
-	public static class MyTransformerChildrenGames {
-	}
+	public static class MyTransformerChildrenGames {}
 
 	@SystemGeneric
 	public static class GraphicComponent {
@@ -392,8 +379,7 @@ public class AnnotationTest extends AbstractTest {
 
 	@SystemGeneric
 	@Extends(meta = Vehicle.class)
-	public static class MyVehicle {
-	}
+	public static class MyVehicle {}
 
 	@SystemGeneric
 	@Components(Vehicle.class)
@@ -416,8 +402,7 @@ public class AnnotationTest extends AbstractTest {
 
 	@SystemGeneric
 	@Extends(meta = Car.class)
-	public static class myCar {
-	}
+	public static class myCar {}
 
 	@SystemGeneric
 	@Components(Car.class)
@@ -432,40 +417,32 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Human {
-	}
+	public static class Human {}
 
 	@SystemGeneric
-	public static class Man extends Human {
-	}
+	public static class Man extends Human {}
 
 	@SystemGeneric
 	@Extends(meta = Human.class)
-	public static class Myck {
-	}
+	public static class Myck {}
 
 	@SystemGeneric
-	public static class Time {
-	}
+	public static class Time {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class })
-	public static class HumanPossessVehicle {
-	}
+	public static class HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Car.class })
-	public static class HumanPossessCar extends HumanPossessVehicle {
-	}
+	public static class HumanPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Man.class, Car.class })
-	public static class ManPossessCar extends HumanPossessVehicle {
-	}
+	public static class ManPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class, Time.class })
-	public static class HumanPossessVehicleTime {
-	}
+	public static class HumanPossessVehicleTime {}
 
 }
