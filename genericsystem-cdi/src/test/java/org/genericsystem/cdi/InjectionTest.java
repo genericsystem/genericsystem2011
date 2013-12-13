@@ -26,7 +26,7 @@ public class InjectionTest extends AbstractTest {
 
 	@Inject
 	@InjectClass(Vehicle.class)
-	private Generic vehicle;
+	private Vehicle vehicle;
 
 	public void testAnnotType() {
 		vehicle.info();
