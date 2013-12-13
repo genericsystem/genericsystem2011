@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
@@ -318,7 +317,6 @@ public class ApiTest extends AbstractTest {
 		Type aOnb = b.addSubType("A");
 		// aOnb.log();
 		assert !a.inheritsFrom(aOnb);
-		assert !((GenericImpl) aOnb).isSuperOf(a);
 		// }.assertIsCausedBy(FunctionalConsistencyViolationException.class);
 	}
 

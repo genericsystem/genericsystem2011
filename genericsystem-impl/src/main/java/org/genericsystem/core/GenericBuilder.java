@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.genericsystem.core.Statics.Supers;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
@@ -196,7 +195,7 @@ class GenericBuilder {
 	}
 
 	private boolean isAncestorOf(final Generic dependency) {
-		if (GenericImpl.isSuperOf(homeTreeNode, supers, components, dependency))
+		if (((GenericImpl) dependency).inheritsFrom(homeTreeNode, supers, components))
 			return true;
 		for (Generic component : ((GenericImpl) dependency).components)
 			if (!dependency.equals(component))
