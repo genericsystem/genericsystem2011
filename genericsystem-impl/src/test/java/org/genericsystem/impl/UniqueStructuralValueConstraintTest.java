@@ -118,13 +118,12 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		assert car.getAttribute("Power").getSupers().contains(power);
 	}
 
-	// TODO: vhdjhvj
 	public void testTwoTypesWithSameRelationKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
 		final Type plane = cache.addType("Plane");
 		final Type color = cache.addType("Color");
-		Relation cr1 = car.setRelation("ColorRelation", color);
+		car.setRelation("ColorRelation", color);
 
 		new RollbackCatcher() {
 

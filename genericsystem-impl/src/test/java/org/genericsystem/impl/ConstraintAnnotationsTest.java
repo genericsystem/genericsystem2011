@@ -71,8 +71,6 @@ public class ConstraintAnnotationsTest extends AbstractTest {
 
 	@SystemGeneric
 	@PropertyConstraint
-	// TODO clean
-	// @Extends(value = GraphicComponent.class, others = { GraphicComponent.class })
 	@Extends(GraphicComponent.class)
 	public static class Selectable {
 
