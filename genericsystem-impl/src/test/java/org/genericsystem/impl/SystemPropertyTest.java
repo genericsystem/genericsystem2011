@@ -133,13 +133,6 @@ public class SystemPropertyTest extends AbstractTest {
 		assert !humanOwnVehicle.isCascadeRemove(1);
 	}
 
-	// TODO clean
-	// public void testAskOnHimSelft() {
-	// Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-	// ((GenericImpl) cache.find(CascadeRemoveSystemProperty.class)).isBooleanSystemPropertyEnabled(CascadeRemoveSystemProperty.class);
-	// ((GenericImpl) cache.find(NoReferentialIntegritySystemProperty.class)).isBooleanSystemPropertyEnabled(NoReferentialIntegritySystemProperty.class);
-	// }
-
 	public void cascadeRemoveProperty() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");

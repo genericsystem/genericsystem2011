@@ -34,9 +34,9 @@ public class SuperRuleConstraintImpl extends AbstractBooleanNoAxedConstraintImpl
 	public static class DefaultValue extends GenericImpl implements Holder {}
 
 	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
-		for (Generic directSuper : constraintBase.getSupers())
-			if (!((GenericImpl) directSuper).isSuperOf(constraintBase))
+	public void check(Generic constraintBase, Generic instanceToCheck) throws ConstraintViolationException {
+		for (Generic directSuper : instanceToCheck.getSupers())
+			if (!((GenericImpl) directSuper).isSuperOf(((GenericImpl) instanceToCheck).getHomeTreeNode(), ((GenericImpl) instanceToCheck).getSupersArray(), ((GenericImpl) instanceToCheck).getComponentsArray()))
 				throw new SuperRuleConstraintViolationException(constraintBase.info() + " should inherits from : " + directSuper.info());
 	}
 }

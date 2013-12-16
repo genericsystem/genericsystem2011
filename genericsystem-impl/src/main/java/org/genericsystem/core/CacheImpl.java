@@ -14,11 +14,13 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
+import org.genericsystem.constraints.PropertyConstraintImpl;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -167,7 +169,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			new Restructurator() {
 				private static final long serialVersionUID = 7326023526567814490L;
@@ -179,11 +181,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(generic, Statics.MULTIDIRECTIONAL);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -581,7 +583,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (AxedPropertyClass key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-				if (isCheckable(keyHolder, attribute, checkingType, isFlushTime) && isAxedConstraint(keyHolder) && isInstanceOf(generic, attribute, ((AxedPropertyClass) keyHolder.getValue()).getAxe()))
+				if (isCheckable(keyHolder, attribute, checkingType, isFlushTime) && (isAxedConstraint(keyHolder) || PropertyConstraintImpl.class.isAssignableFrom(keyHolder.getClass()))
+						&& isInstanceOf(generic, attribute, ((AxedPropertyClass) keyHolder.getValue()).getAxe()))
 					constraints.put(keyHolder, valueHolder);
 			}
 			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet())
