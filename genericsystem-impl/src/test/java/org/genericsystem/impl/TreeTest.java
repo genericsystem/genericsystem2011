@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Random;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -31,7 +32,7 @@ public class TreeTest extends AbstractTest {
 	public void testTree() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.setTree("Tree");
-		final Node root = tree.newRoot("Root");
+		final Node root = tree.addRoot("Root");
 		Node child = root.setNode("Child");
 		Node child2 = root.setNode("Child2");
 		Node child3 = child.setNode("Child3");
@@ -92,7 +93,7 @@ public class TreeTest extends AbstractTest {
 	public void testInheritingTree() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.setTree("Tree");
-		final Node root = tree.newRoot("Root");
+		final Node root = tree.addRoot("Root");
 		Node child = root.setSubNode("Child");
 		Node child2 = root.setSubNode("Child2");
 		Node child3 = child.setSubNode("Child3");
@@ -130,10 +131,10 @@ public class TreeTest extends AbstractTest {
 	public void testGenealogicTree() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree bitree = cache.setTree("Tree", 2);
-		Node grandFather = bitree.newRoot("grandFather", 2);
-		Node grandMother = bitree.newRoot("grandMother", 2);
+		Node grandFather = bitree.addRoot("grandFather", 2);
+		Node grandMother = bitree.addRoot("grandMother", 2);
 		assert grandMother.inheritsFrom(bitree) : grandMother.info();
-		Node mother = bitree.newRoot("mother", 2);
+		Node mother = bitree.addRoot("mother", 2);
 		Node father = grandFather.setNode("father", grandMother);
 		Node fatherSister = grandFather.setNode("fatherSister", grandMother);
 		father.setNode("son", mother);
@@ -151,7 +152,7 @@ public class TreeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Tree graphicComponent = cache.setTree("GraphicComponent");
-		Node webPage = graphicComponent.newRoot("webPage");
+		Node webPage = graphicComponent.addRoot("webPage");
 		Node header = webPage.setSubNode("header");
 		Node body = webPage.setSubNode("body");
 		Node footer = webPage.setSubNode("footer");
@@ -189,7 +190,7 @@ public class TreeTest extends AbstractTest {
 	public void visitTree() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Tree tree = cache.setTree("Tree");
-		Node root = tree.newRoot("Root");
+		Node root = tree.addRoot("Root");
 		root.setNode("Child");
 
 		root.traverse(new Visitor() {
@@ -208,7 +209,7 @@ public class TreeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath).start();
 		assert cache.getMetaAttribute().isMeta();
 		Tree tree = cache.setTree("Tree");
-		Node root = tree.newRoot("Root");
+		Node root = tree.addRoot("Root");
 		Node child = root.setNode("Child");
 		root.setNode("Child2");
 		child.setNode("Child3");
@@ -222,7 +223,7 @@ public class TreeTest extends AbstractTest {
 		String directoryPath = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
 		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(directoryPath).start();
 		Tree tree = cache.setTree("Tree");
-		Node root = tree.newRoot("Root");
+		Node root = tree.addRoot("Root");
 		Node child = root.setSubNode("Child");
 		root.setSubNode("Child2");
 		child.setSubNode("Child3");

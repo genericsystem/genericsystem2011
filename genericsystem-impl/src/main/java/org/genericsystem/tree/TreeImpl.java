@@ -16,12 +16,12 @@ import org.genericsystem.snapshot.AbstractSnapshot;
 public class TreeImpl extends GenericImpl implements Tree {
 
 	@Override
-	public <T extends Node> T newRoot(Serializable value) {
-		return newRoot(value, 1);
+	public <T extends Node> T addRoot(Serializable value) {
+		return addRoot(value, 1);
 	}
 
 	@Override
-	public <T extends Node> T newRoot(Serializable value, int dim) {
+	public <T extends Node> T addRoot(Serializable value, int dim) {
 		return addInstance(value, new Generic[dim]);
 	}
 
@@ -45,5 +45,10 @@ public class TreeImpl extends GenericImpl implements Tree {
 	@Override
 	public String getCategoryString() {
 		return "Tree";
+	}
+
+	@Override
+	public <T extends Node> T setRoot(Serializable value, Node root) {
+		return setInstance(value, root);
 	}
 }

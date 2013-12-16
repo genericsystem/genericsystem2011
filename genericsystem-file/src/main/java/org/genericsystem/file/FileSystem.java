@@ -15,6 +15,7 @@ import org.genericsystem.file.FileSystem.FileType;
 import org.genericsystem.file.FileSystem.FileType.File;
 import org.genericsystem.file.FileSystem.FileType.FileContent;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Node;
 import org.genericsystem.tree.NodeImpl;
 import org.genericsystem.tree.TreeImpl;
 import org.slf4j.Logger;
@@ -34,11 +35,13 @@ public class FileSystem extends TreeImpl {
 
 	public static class Directory extends NodeImpl {
 		public <T extends File> Snapshot<T> getFiles() {
-			return getHolders(getEngine().getCurrentCache().<Attribute> find(FileType.class));
+			return getHolders(getEngine().getCurrentCache().<Attribute> find(
+					FileType.class));
 		}
 
 		public <T extends File> T getFile(String name) {
-			return getHolderByValue(Statics.CONCRETE, getEngine().getCurrentCache().<Attribute> find(FileType.class), name);
+			return getHolderByValue(Statics.CONCRETE, getEngine()
+					.getCurrentCache().<Attribute> find(FileType.class), name);
 		}
 
 		public <T extends File> T addFile(String name) {
@@ -46,17 +49,19 @@ public class FileSystem extends TreeImpl {
 		}
 
 		public <T extends File> T addFile(String name, byte[] content) {
-			T result = addHolder(getEngine().getCurrentCache().<Attribute> find(FileType.class), name);
+			T result = addHolder(getEngine().getCurrentCache()
+					.<Attribute> find(FileType.class), name);
 			result.setContent(content);
 			return result;
 		}
 
-		public <T extends File> T touchFile(String name) {
-			return touchFile(name, EMPTY);
+		public <T extends File> T setFile(String name) {
+			return setFile(name, EMPTY);
 		}
 
-		public <T extends File> T touchFile(String name, byte[] content) {
-			T result = setHolder(getEngine().getCurrentCache().<Attribute> find(FileType.class), name);
+		public <T extends File> T setFile(String name, byte[] content) {
+			T result = setHolder(getEngine().getCurrentCache()
+					.<Attribute> find(FileType.class), name);
 			result.setContent(content);
 			return result;
 		}
@@ -73,7 +78,7 @@ public class FileSystem extends TreeImpl {
 			return addNode(name);
 		}
 
-		public <T extends Directory> T touchDirectory(String name) {
+		public <T extends Directory> T setDirectory(String name) {
 			return setNode(name);
 		}
 
@@ -103,11 +108,15 @@ public class FileSystem extends TreeImpl {
 
 		public static class File extends GenericImpl {
 			public byte[] getContent() {
-				return this.<byte[]> getValues(getEngine().getCurrentCache().<Attribute> find(FileContent.class)).get(0);
+				return this.<byte[]> getValues(
+						getEngine().getCurrentCache().<Attribute> find(
+								FileContent.class)).get(0);
 			}
 
 			public <T extends Generic> T setContent(byte[] content) {
-				return setValue(getEngine().getCurrentCache().<Attribute> find(FileContent.class), content);
+				return setValue(
+						getEngine().getCurrentCache().<Attribute> find(
+								FileContent.class), content);
 			}
 
 			public String getShortPath() {
@@ -131,14 +140,14 @@ public class FileSystem extends TreeImpl {
 
 	public <T extends Directory> T addRootDirectory(String name) {
 		if (getRootDirectory(name) != null)
-			throw new IllegalStateException("Root directory : " + name + " already exists");
-		return touchRootDirectory(name);
+			throw new IllegalStateException("Root directory : " + name
+					+ " already exists");
+		return addRoot(name);
 	}
 
-	public <T extends Directory> T touchRootDirectory(String name) {
-		return newRoot(name);
+	public <T extends Directory> T setRootDirectory(String name,Directory racine) {
+		return setRoot(name,racine);
 	}
-
 	public byte[] getFileContent(String resource) {
 		if (resource.startsWith(SEPARATOR))
 			resource = resource.substring(1);
@@ -157,17 +166,20 @@ public class FileSystem extends TreeImpl {
 		return file.getContent();
 	}
 
-	public <T extends File> T touchFile(String resource) {
-		return touchFile(resource, EMPTY);
+	public <T extends File> T setFile(String resource) {
+		return setFile(resource, EMPTY);
 	}
 
-	public <T extends File> T touchFile(String resource, byte[] content) {
+	public <T extends File> T setFile(String resource, byte[] content) {
 		if (resource.startsWith(SEPARATOR))
 			resource = resource.substring(1);
-		String[] files = resource.split(SEPARATOR);
-		Directory directory = touchRootDirectory(files[0]);
-		for (int i = 1; i < files.length - 1; i++)
-			directory = directory.touchDirectory(files[i]);
-		return directory.touchFile(files[files.length - 1], content);
+		String[] pathToResource = resource.split(SEPARATOR);
+		String rootValue = pathToResource[0];
+		Directory directory = getRootByValue(rootValue);
+		directory = (Directory) setRootDirectory(rootValue, directory);
+		for (int i = 1; i < pathToResource.length - 1; i++)
+			directory = directory.setDirectory(pathToResource[i]);
+		return directory.setFile(pathToResource[pathToResource.length - 1],
+				content);
 	}
 }

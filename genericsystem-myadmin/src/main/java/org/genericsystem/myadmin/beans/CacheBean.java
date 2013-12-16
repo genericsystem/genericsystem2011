@@ -78,7 +78,7 @@ public class CacheBean implements Serializable {
 	 * @return the formated timestamp of current cache.
 	 */
 	public String getCurrentCacheTs() {
-		return new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(((CacheImpl) cacheProvider.getCurrentCache()).getTs() / Statics.MILLI_TO_NANOSECONDS)).toString();
+		return "";//new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(((CacheImpl) cacheProvider.getCurrentCache()).getTs() / Statics.MILLI_TO_NANOSECONDS)).toString();
 	}
 
 	public Cache getCache() {
