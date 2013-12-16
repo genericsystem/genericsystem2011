@@ -195,12 +195,14 @@ public class TreeTest extends AbstractTest {
 
 		root.traverse(new Visitor() {
 			@Override
-			public void before(Node node) {}
+			public void before(Node node) {
+			}
 		});
 
 		root.traverse(new Visitor() {
 			@Override
-			public void after(Node node) {}
+			public void after(Node node) {
+			}
 		});
 	}
 
