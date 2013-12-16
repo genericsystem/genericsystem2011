@@ -48,7 +48,13 @@ public class TreeImpl extends GenericImpl implements Tree {
 	}
 
 	@Override
-	public <T extends Node> T setRoot(Serializable value, Node root) {
-		return setInstance(value, root);
+	public <T extends Node> T setRoot(Serializable value) {
+		return setRoot(value);
 	}
+
+	@Override
+	public <T extends Node> T setRoot(Serializable value, int dim) {
+		return setInstance(value, new Generic[dim]);
+	}
+
 }

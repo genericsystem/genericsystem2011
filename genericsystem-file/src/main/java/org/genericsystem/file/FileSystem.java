@@ -135,8 +135,8 @@ public class FileSystem extends TreeImpl {
 		return addRoot(name);
 	}
 
-	public <T extends Directory> T setRootDirectory(String name, Directory racine) {
-		return setRoot(name, racine);
+	public <T extends Directory> T setRootDirectory(String name) {
+		return setRoot(name);
 	}
 
 	public byte[] getFileContent(String resource) {
@@ -165,9 +165,7 @@ public class FileSystem extends TreeImpl {
 		if (resource.startsWith(SEPARATOR))
 			resource = resource.substring(1);
 		String[] pathToResource = resource.split(SEPARATOR);
-		String rootValue = pathToResource[0];
-		Directory directory = getRootByValue(rootValue);
-		directory = (Directory) setRootDirectory(rootValue, directory);
+		Directory directory = setRootDirectory(pathToResource[0]);
 		for (int i = 1; i < pathToResource.length - 1; i++)
 			directory = directory.setDirectory(pathToResource[i]);
 		return directory.setFile(pathToResource[pathToResource.length - 1], content);
