@@ -20,7 +20,7 @@ public class MyMapProvider extends AbstractMapProvider<Serializable, Serializabl
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Attribute> Class<T> getKeyAttributeClass() {
+	public <T extends Attribute> Class<T> getKeyAttributeClass(Serializable key) {
 		return (Class<T>) MyKey.class;
 	}
 

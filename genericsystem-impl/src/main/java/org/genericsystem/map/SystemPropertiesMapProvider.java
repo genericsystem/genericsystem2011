@@ -28,8 +28,8 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T extends Attribute> Class<T> getKeyAttributeClass() {
-		return (Class<T>) SystemPropertyKey.class;
+	public <T extends Attribute> Class<T> getKeyAttributeClass(AxedPropertyClass key) {
+		return (Class<T>) (key == null ? SystemPropertyKey.class : key.getClazz());
 	}
 
 	@Override

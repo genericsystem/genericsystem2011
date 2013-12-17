@@ -43,8 +43,8 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T extends Attribute> Class<T> getKeyAttributeClass() {
-		return (Class<T>) ConstraintKey.class;
+	public <T extends Attribute> Class<T> getKeyAttributeClass(AxedPropertyClass key) {
+		return (Class<T>) (key == null ? ConstraintKey.class : key.getClazz());
 	}
 
 	@Override
