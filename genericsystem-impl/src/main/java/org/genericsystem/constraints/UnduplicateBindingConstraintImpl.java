@@ -1,6 +1,7 @@
 package org.genericsystem.constraints;
 
 import java.util.Iterator;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -18,25 +19,31 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
-import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 @SystemGeneric
-@Extends(meta = ConstraintKey.class)
-@Components(MapInstance.class)
-@Dependencies(UnduplicateBindingConstraintImpl.DefaultValue.class)
-@AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
+@Extends(ConstraintKey.class)
+@Components(ConstraintsMapProvider.class)
+@Dependencies({ UnduplicateBindingConstraintImpl.DefaultKey.class, UnduplicateBindingConstraintImpl.DefaultValue.class })
 @Priority(-1)
 public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
+	@Extends(meta = UnduplicateBindingConstraintImpl.class)
+	@Components(ConstraintsMapProvider.class)
+	@AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
+	public static class DefaultKey {
+	}
+
+	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
-	@Components(UnduplicateBindingConstraintImpl.class)
+	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {}
+	public static class DefaultValue {
+	}
 
 	@Override
 	public void check(Generic instanceToCheck, final Generic baseConstraint) throws ConstraintViolationException {

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
@@ -14,8 +15,6 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.PropertyConstraintViolationException;
-import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -67,14 +66,8 @@ public class ApiTest extends AbstractTest {
 		car.setValue(vehiclePower, 233);
 		Type robot = vehicle.setSubType("Robot");
 		robot.setValue(vehiclePower, 233);
-		final Type transformer = cache.setType("Transformer", car, robot);
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				transformer.setInstance("myTransformer");
-			}
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
+		Type transformer = cache.setType("Transformer", car, robot);
+		transformer.setInstance("myTransformer");
 	}
 
 	public void testPropertyWithMultiInheritance() {
@@ -107,14 +100,8 @@ public class ApiTest extends AbstractTest {
 		car.setValue(vehiclePower, 233);
 		Type robot = vehicle.setSubType("Robot");
 		robot.setValue(vehiclePower, 233);
-		final Type transformer = cache.setType("Transformer", car, robot);
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				transformer.setInstance("myTransformer");
-			}
-		}.assertIsCausedBy(PropertyConstraintViolationException.class);
+		Type transformer = cache.setType("Transformer", car, robot);
+		transformer.setInstance("myTransformer");
 	}
 
 	public void specializeGeneric() {

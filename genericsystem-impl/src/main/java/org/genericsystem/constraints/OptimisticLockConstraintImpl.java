@@ -18,25 +18,30 @@ import org.genericsystem.exception.OptimisticLockConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
-import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 @SystemGeneric
-@Extends(meta = ConstraintKey.class)
-@Components(MapInstance.class)
-@Dependencies(OptimisticLockConstraintImpl.DefaultValue.class)
-@AxedConstraintValue(OptimisticLockConstraintImpl.class)
+@Extends(ConstraintKey.class)
+@Components(ConstraintsMapProvider.class)
+@Dependencies({ OptimisticLockConstraintImpl.DefaultKey.class, OptimisticLockConstraintImpl.DefaultValue.class })
 @Priority(0)
 public class OptimisticLockConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
+	@Extends(meta = OptimisticLockConstraintImpl.class)
+	@Components(ConstraintsMapProvider.class)
+	@AxedConstraintValue(OptimisticLockConstraintImpl.class)
+	public static class DefaultKey {
+	}
+
+	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
-	@Components(OptimisticLockConstraintImpl.class)
+	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
+	public static class DefaultValue {
 	}
 
 	@Override
