@@ -14,6 +14,8 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
+import org.genericsystem.exception.PropertyConstraintViolationException;
+import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -33,6 +35,86 @@ public class ApiTest extends AbstractTest {
 	@Components(Vehicle.class)
 	public static class Power extends GenericImpl {
 
+	}
+
+	public void testSingularWithMultiInheritance() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.setType("Vehicle");
+		Attribute vehiclePower = vehicle.setAttribute("power").enableSingularConstraint();
+		Type car = vehicle.setSubType("Car");
+		car.setValue(vehiclePower, 233);
+		Type robot = vehicle.setSubType("Robot");
+		robot.setValue(vehiclePower, 233);
+		cache.setType("Transformer", car, robot);
+	}
+
+	public void testSingularWithMultiInheritance2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.setType("Vehicle");
+		Attribute vehiclePower = vehicle.setAttribute("power").enableSingularConstraint();
+		Type car = vehicle.setSubType("Car");
+		car.setValue(vehiclePower, 233);
+		Type robot = vehicle.setSubType("Robot");
+		cache.setType("Transformer", car, robot);
+		robot.setValue(vehiclePower, 233);
+	}
+
+	public void testSingularWithMultiInheritanceWithValue() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.setType("Vehicle");
+		Attribute vehiclePower = vehicle.setAttribute("power").enableSingularConstraint();
+		Type car = vehicle.setSubType("Car");
+		car.setValue(vehiclePower, 233);
+		Type robot = vehicle.setSubType("Robot");
+		robot.setValue(vehiclePower, 233);
+		final Type transformer = cache.setType("Transformer", car, robot);
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				transformer.setInstance("myTransformer");
+			}
+		}.assertIsCausedBy(SingularConstraintViolationException.class);
+	}
+
+	public void testPropertyWithMultiInheritance() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.setType("Vehicle");
+		Attribute vehiclePower = vehicle.setProperty("power");
+		Type car = vehicle.setSubType("Car");
+		car.setValue(vehiclePower, 233);
+		Type robot = vehicle.setSubType("Robot");
+		robot.setValue(vehiclePower, 233);
+		cache.setType("Transformer", car, robot);
+	}
+
+	public void testPropertyWithMultiInheritance2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.setType("Vehicle");
+		Attribute vehiclePower = vehicle.setProperty("power");
+		Type car = vehicle.setSubType("Car");
+		car.setValue(vehiclePower, 233);
+		Type robot = vehicle.setSubType("Robot");
+		cache.setType("Transformer", car, robot);
+		robot.setValue(vehiclePower, 233);
+	}
+
+	public void testPropertyWithMultiInheritanceWithValue() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.setType("Vehicle");
+		Attribute vehiclePower = vehicle.setAttribute("power").enableSingularConstraint();
+		Type car = vehicle.setSubType("Car");
+		car.setValue(vehiclePower, 233);
+		Type robot = vehicle.setSubType("Robot");
+		robot.setValue(vehiclePower, 233);
+		final Type transformer = cache.setType("Transformer", car, robot);
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				transformer.setInstance("myTransformer");
+			}
+		}.assertIsCausedBy(PropertyConstraintViolationException.class);
 	}
 
 	public void specializeGeneric() {

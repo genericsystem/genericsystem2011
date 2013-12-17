@@ -55,7 +55,7 @@ public class GsResolver extends DefaultResourceResolver {
 				return new URL("", "", 0, resource, new GsStreamHandler(fileContent));
 			URL url = super.resolveUrl(resource);
 			if (url != null) {
-				File file = fileSystem.touchFile(resource, asByteArray(((ByteArrayInputStream) url.getContent())));
+				File file = fileSystem.setFile(resource, asByteArray(((ByteArrayInputStream) url.getContent())));
 				return new URL("", "", 0, resource, new GsStreamHandler(file.getContent()));
 			}
 		} catch (ContextNotActiveException ignore) {

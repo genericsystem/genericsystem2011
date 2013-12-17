@@ -51,11 +51,11 @@ public class FileSystem extends TreeImpl {
 			return result;
 		}
 
-		public <T extends File> T touchFile(String name) {
-			return touchFile(name, EMPTY);
+		public <T extends File> T setFile(String name) {
+			return setFile(name, EMPTY);
 		}
 
-		public <T extends File> T touchFile(String name, byte[] content) {
+		public <T extends File> T setFile(String name, byte[] content) {
 			T result = setHolder(getEngine().getCurrentCache().<Attribute> find(FileType.class), name);
 			result.setContent(content);
 			return result;
@@ -73,7 +73,7 @@ public class FileSystem extends TreeImpl {
 			return addNode(name);
 		}
 
-		public <T extends Directory> T touchDirectory(String name) {
+		public <T extends Directory> T setDirectory(String name) {
 			return setNode(name);
 		}
 
@@ -132,11 +132,11 @@ public class FileSystem extends TreeImpl {
 	public <T extends Directory> T addRootDirectory(String name) {
 		if (getRootDirectory(name) != null)
 			throw new IllegalStateException("Root directory : " + name + " already exists");
-		return touchRootDirectory(name);
+		return addRoot(name);
 	}
 
-	public <T extends Directory> T touchRootDirectory(String name) {
-		return newRoot(name);
+	public <T extends Directory> T setRootDirectory(String name) {
+		return setRoot(name);
 	}
 
 	public byte[] getFileContent(String resource) {
@@ -157,17 +157,17 @@ public class FileSystem extends TreeImpl {
 		return file.getContent();
 	}
 
-	public <T extends File> T touchFile(String resource) {
-		return touchFile(resource, EMPTY);
+	public <T extends File> T setFile(String resource) {
+		return setFile(resource, EMPTY);
 	}
 
-	public <T extends File> T touchFile(String resource, byte[] content) {
+	public <T extends File> T setFile(String resource, byte[] content) {
 		if (resource.startsWith(SEPARATOR))
 			resource = resource.substring(1);
-		String[] files = resource.split(SEPARATOR);
-		Directory directory = touchRootDirectory(files[0]);
-		for (int i = 1; i < files.length - 1; i++)
-			directory = directory.touchDirectory(files[i]);
-		return directory.touchFile(files[files.length - 1], content);
+		String[] pathToResource = resource.split(SEPARATOR);
+		Directory directory = setRootDirectory(pathToResource[0]);
+		for (int i = 1; i < pathToResource.length - 1; i++)
+			directory = directory.setDirectory(pathToResource[i]);
+		return directory.setFile(pathToResource[pathToResource.length - 1], content);
 	}
 }
