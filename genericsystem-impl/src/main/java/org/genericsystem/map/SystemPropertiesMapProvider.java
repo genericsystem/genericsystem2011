@@ -11,7 +11,6 @@ import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Holder;
 import org.genericsystem.map.SystemPropertiesMapProvider.MapInstance;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceProperty;
@@ -29,8 +28,8 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T extends Attribute> Class<T> getKeyAttributeClass() {
-		return (Class<T>) SystemPropertyKey.class;
+	public <T extends Attribute> Class<T> getKeyAttributeClass(AxedPropertyClass key) {
+		return (Class<T>) (key == null ? SystemPropertyKey.class : key.getClazz());
 	}
 
 	@Override
@@ -39,31 +38,24 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 		return (Class<T>) SystemPropertyValue.class;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected <T extends GenericImpl> Class<T> getSpecializationClass(AxedPropertyClass key) {
-		return (Class<T>) key.getClazz();
-	}
-
 	@SystemGeneric
 	@Components(SystemPropertiesMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class SystemPropertyKey extends GenericImpl implements Attribute {
+	public static class SystemPropertyKey extends GenericImpl {
 	}
 
 	@SystemGeneric
+	@NoInheritance
 	@Components(SystemPropertyKey.class)
 	@SingularConstraint
-	@NoInheritance
-	// @RequiredConstraint
-	public static class SystemPropertyValue extends GenericImpl implements Attribute {
+	public static class SystemPropertyValue extends GenericImpl {
 	}
 
 	@SystemGeneric
 	@Extends(meta = SystemPropertiesMapProvider.class)
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
+	public static class MapInstance extends GenericImpl {
 	}
 
 }
