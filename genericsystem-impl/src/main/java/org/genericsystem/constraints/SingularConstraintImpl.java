@@ -3,7 +3,6 @@ package org.genericsystem.constraints;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
@@ -11,13 +10,12 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SingularConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
-import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 @SystemGeneric
-@Extends(meta = ConstraintKey.class)
-@Components(MapInstance.class)
-@AxedConstraintValue(SingularConstraintImpl.class)
+@Extends(ConstraintKey.class)
+@Components(ConstraintsMapProvider.class)
 public class SingularConstraintImpl extends AbstractBooleanAxedConstraintImpl implements Holder {
 
 	@Override

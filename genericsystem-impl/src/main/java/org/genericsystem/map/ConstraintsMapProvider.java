@@ -1,6 +1,7 @@
 package org.genericsystem.map;
 
 import java.io.Serializable;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -27,6 +28,7 @@ import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
@@ -36,7 +38,7 @@ import org.genericsystem.generic.Holder;
  */
 @SystemGeneric
 @Components(EngineImpl.class)
-@Dependencies({ RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, InstanceClassConstraintImpl.class, OptimisticLockConstraintImpl.class,
+@Dependencies({ MapInstance.class, RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, InstanceClassConstraintImpl.class, OptimisticLockConstraintImpl.class,
 		PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueValueConstraintImpl.class, VirtualConstraintImpl.class, StructuralNamingConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Serializable> {
 
@@ -61,17 +63,20 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 	@SystemGeneric
 	@Components(ConstraintsMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class ConstraintKey extends GenericImpl implements Attribute {}
+	public static class ConstraintKey extends GenericImpl implements Attribute {
+	}
 
 	@SystemGeneric
 	@NoInheritance
 	@Components(ConstraintKey.class)
 	@SingularConstraint
-	public static class ConstraintValue extends GenericImpl implements Attribute {}
+	public static class ConstraintValue extends GenericImpl implements Attribute {
+	}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.class)
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {}
+	public static class MapInstance extends GenericImpl implements Holder {
+	}
 }

@@ -7,15 +7,14 @@ import java.util.Set;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UniqueValueConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
-import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * 
@@ -23,9 +22,8 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
  * @author Nicolas Feybesse
  */
 @SystemGeneric
-@Extends(meta = ConstraintKey.class)
-@Components(MapInstance.class)
-@AxedConstraintValue(UniqueValueConstraintImpl.class)
+@Extends(ConstraintKey.class)
+@Components(ConstraintsMapProvider.class)
 public class UniqueValueConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@Override

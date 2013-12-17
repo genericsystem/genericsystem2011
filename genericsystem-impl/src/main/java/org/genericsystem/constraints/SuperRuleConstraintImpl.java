@@ -14,24 +14,30 @@ import org.genericsystem.exception.SuperRuleConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
-import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 @SystemGeneric
-@Extends(meta = ConstraintKey.class)
-@Components(MapInstance.class)
-@Dependencies(SuperRuleConstraintImpl.DefaultValue.class)
-@AxedConstraintValue(SuperRuleConstraintImpl.class)
+@Extends(ConstraintKey.class)
+@Components(ConstraintsMapProvider.class)
+@Dependencies({ SuperRuleConstraintImpl.DefaultKey.class, SuperRuleConstraintImpl.DefaultValue.class })
 public class SuperRuleConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
+	@Extends(meta = SuperRuleConstraintImpl.class)
+	@Components(ConstraintsMapProvider.class)
+	@AxedConstraintValue(SuperRuleConstraintImpl.class)
+	public static class DefaultKey extends SuperRuleConstraintImpl {
+	}
+
+	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
-	@Components(SuperRuleConstraintImpl.class)
+	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {}
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
 	@Override
 	public void check(Generic constraintBase, Generic instanceToCheck) throws ConstraintViolationException {

@@ -14,24 +14,30 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
-import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 @SystemGeneric
-@Extends(meta = ConstraintKey.class)
-@Components(MapInstance.class)
-@Dependencies(AliveConstraintImpl.DefaultValue.class)
-@AxedConstraintValue(AliveConstraintImpl.class)
+@Extends(ConstraintKey.class)
+@Components(ConstraintsMapProvider.class)
+@Dependencies({ AliveConstraintImpl.DefaultKey.class, AliveConstraintImpl.DefaultValue.class })
 public class AliveConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
+	@Extends(meta = AliveConstraintImpl.class)
+	@Components(ConstraintsMapProvider.class)
+	@AxedConstraintValue(AliveConstraintImpl.class)
+	public static class DefaultKey extends AliveConstraintImpl {
+	}
+
+	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
-	@Components(AliveConstraintImpl.class)
+	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {}
+	public static class DefaultValue extends GenericImpl implements Holder {
+	}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {

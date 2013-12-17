@@ -3,15 +3,14 @@ package org.genericsystem.constraints;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
-import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.SizeConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
+import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
-import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
  * @author Nicolas Feybesse
@@ -19,9 +18,8 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
  * 
  */
 @SystemGeneric
-@Extends(meta = ConstraintKey.class)
-@Components(MapInstance.class)
-@AxedConstraintValue(SizeConstraintImpl.class)
+@Extends(ConstraintKey.class)
+@Components(ConstraintsMapProvider.class)
 public class SizeConstraintImpl extends AbstractAxedConstraintImpl implements Holder {
 
 	@Override
