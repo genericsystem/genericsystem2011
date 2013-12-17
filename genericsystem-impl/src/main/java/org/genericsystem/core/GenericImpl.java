@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -774,12 +773,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				if (selected && pos != Statics.MULTIDIRECTIONAL) {
 					if (((GenericImpl) candidate).isPseudoStructural(pos))
 						((GenericImpl) candidate).project(pos);
-					if (level == candidate.getMetaLevel() && !equals(((GenericImpl) candidate).components[pos])) {
-						GenericBuilder gb = new GenericBuilder(getCurrentCache(), candidate.getMeta(), ((GenericImpl) candidate).getHomeTreeNode(), new Generic[] { candidate.getMeta() }, Statics.replace(pos, ((GenericImpl) candidate).components,
-								GenericImpl.this), Statics.MULTIDIRECTIONAL, true);
-						if (gb.containsSuperInMultipleInheritanceValue(candidate))
-							gb.bindDependency(candidate.getClass(), false, true);
-					}
+					// if (level == candidate.getMetaLevel() && !equals(((GenericImpl) candidate).components[pos])) {
+					// GenericBuilder gb = new GenericBuilder(getCurrentCache(), candidate.getMeta(), ((GenericImpl) candidate).getHomeTreeNode(), new Generic[] { candidate.getMeta() }, Statics.replace(pos, ((GenericImpl) candidate).components,
+					// GenericImpl.this), Statics.MULTIDIRECTIONAL, true);
+					// if (gb.containsSuperInMultipleInheritanceValue(candidate))
+					// gb.bindDependency(candidate.getClass(), false, true);
+					// }
 				}
 				return selected;
 			}

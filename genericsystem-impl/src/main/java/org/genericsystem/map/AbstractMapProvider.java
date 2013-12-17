@@ -60,7 +60,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			private Holder getKeyHolder(Key key) {
 				Holder mapHolder = getMapHolder();
-				return mapHolder != null ? ((GenericImpl) mapHolder).getHolderByValue(Statics.CONCRETE, getRealKeyAttribute(key), key) : null;
+				return mapHolder != null ? ((GenericImpl) mapHolder).getHolderByValue(Statics.CONCRETE, getKeyAttribute(key), key) : null;
 			}
 
 			@Override
@@ -73,17 +73,10 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				return getCurrentCache().<Attribute> find(getValueAttributeClass());
 			}
 
-			private Attribute getRealKeyAttribute(Key key) {
-				if (key instanceof AxedPropertyClass) {
-					return getCurrentCache().find(((AxedPropertyClass) key).getClazz());
-				}
-				return getKeyAttribute();
-			}
-
 			@Override
 			public Value put(Key key, Value value) {
 				Value oldValue = get(key);
-				Holder keyHolder = ((GenericImpl) generic).<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getRealKeyAttribute(key), (Serializable) key);
+				Holder keyHolder = ((GenericImpl) generic).<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getKeyAttribute(key), (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
 			}
@@ -109,7 +102,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			private Iterator<Holder> getAllKeysIterator() {
 				Holder map = generic.getHolder(AbstractMapProvider.this);
-				return map == null ? Collections.<Holder> emptyIterator() : ((GenericImpl) map).<Holder> holdersIterator(getKeyAttribute());
+				return map == null ? Collections.<Holder> emptyIterator() : ((GenericImpl) map).<Holder> holdersIterator(getKeyAttribute(null));
 			}
 
 			class InternalIterator<T> extends AbstractProjectorAndFilterIterator<Holder, T> {
@@ -145,11 +138,11 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 		};
 	}
 
-	private Attribute getKeyAttribute() {
-		return getCurrentCache().<Attribute> find(getKeyAttributeClass());
+	private Attribute getKeyAttribute(Key key) {
+		return getCurrentCache().<Attribute> find(getKeyAttributeClass(key));
 	}
 
-	public abstract <T extends Attribute> Class<T> getKeyAttributeClass();
+	public abstract <T extends Attribute> Class<T> getKeyAttributeClass(Key key);
 
 	public abstract <T extends Attribute> Class<T> getValueAttributeClass();
 
