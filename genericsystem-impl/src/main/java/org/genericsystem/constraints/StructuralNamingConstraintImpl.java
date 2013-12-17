@@ -32,14 +32,14 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 	@Extends(meta = StructuralNamingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(StructuralNamingConstraintImpl.class)
-	public static class DefaultKey extends StructuralNamingConstraintImpl {
+	public static class DefaultKey {
 	}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
+	public static class DefaultValue {
 	}
 
 	@Override

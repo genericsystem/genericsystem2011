@@ -29,14 +29,14 @@ public class AliveConstraintImpl extends AbstractBooleanNoAxedConstraintImpl imp
 	@Extends(meta = AliveConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(AliveConstraintImpl.class)
-	public static class DefaultKey extends AliveConstraintImpl {
+	public static class DefaultKey {
 	}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
+	public static class DefaultValue {
 	}
 
 	@Override

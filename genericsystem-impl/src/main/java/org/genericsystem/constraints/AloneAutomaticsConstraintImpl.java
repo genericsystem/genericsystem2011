@@ -8,7 +8,6 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.AloneAutomaticsConstraintViolationException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Holder;
@@ -29,14 +28,14 @@ public class AloneAutomaticsConstraintImpl extends AbstractBooleanNoAxedConstrai
 	@Extends(meta = AloneAutomaticsConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(AloneAutomaticsConstraintImpl.class)
-	public static class DefaultKey extends AloneAutomaticsConstraintImpl {
+	public static class DefaultKey {
 	}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
+	public static class DefaultValue {
 	}
 
 	@Override

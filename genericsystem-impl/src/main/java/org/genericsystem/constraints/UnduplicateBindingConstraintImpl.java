@@ -35,14 +35,14 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	@Extends(meta = UnduplicateBindingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
-	public static class DefaultKey extends UnduplicateBindingConstraintImpl {
+	public static class DefaultKey {
 	}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
+	public static class DefaultValue {
 	}
 
 	@Override

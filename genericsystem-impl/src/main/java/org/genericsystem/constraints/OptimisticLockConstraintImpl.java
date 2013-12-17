@@ -34,14 +34,14 @@ public class OptimisticLockConstraintImpl extends AbstractBooleanNoAxedConstrain
 	@Extends(meta = OptimisticLockConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(OptimisticLockConstraintImpl.class)
-	public static class DefaultKey extends OptimisticLockConstraintImpl {
+	public static class DefaultKey {
 	}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
+	public static class DefaultValue {
 	}
 
 	@Override

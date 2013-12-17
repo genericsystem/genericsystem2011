@@ -29,14 +29,14 @@ public class SuperRuleConstraintImpl extends AbstractBooleanNoAxedConstraintImpl
 	@Extends(meta = SuperRuleConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(SuperRuleConstraintImpl.class)
-	public static class DefaultKey extends SuperRuleConstraintImpl {
+	public static class DefaultKey {
 	}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue extends GenericImpl implements Holder {
+	public static class DefaultValue {
 	}
 
 	@Override
