@@ -27,7 +27,6 @@ import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.EngineImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 
 /**
@@ -54,29 +53,23 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 		return (Class<T>) ConstraintValue.class;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected <T extends GenericImpl> Class<T> getSpecializationClass(AxedPropertyClass key) {
-		return (Class<T>) key.getClazz();
-	}
-
 	@SystemGeneric
 	@Components(ConstraintsMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class ConstraintKey extends GenericImpl implements Attribute {
+	public static class ConstraintKey extends GenericImpl {
 	}
 
 	@SystemGeneric
 	@NoInheritance
 	@Components(ConstraintKey.class)
 	@SingularConstraint
-	public static class ConstraintValue extends GenericImpl implements Attribute {
+	public static class ConstraintValue extends GenericImpl {
 	}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.class)
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
+	public static class MapInstance extends GenericImpl {
 	}
 }

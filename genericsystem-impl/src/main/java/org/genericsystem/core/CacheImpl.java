@@ -536,9 +536,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private boolean isConsistencyToCheck(CheckingType checkingType, boolean isFlushTime, Generic generic) {
-		if (isConstraintActivated(generic))
-			if (isFlushTime || isImmediatelyConsistencyCheckable(((AbstractConstraintImpl) ((Holder) generic).getBaseComponent())))
+		if (isConstraintActivated(generic)) {
+			Generic keyHolder = ((Holder) generic).getBaseComponent();
+			assert ((AxedPropertyClass) keyHolder.getValue()).getClazz().equals(keyHolder.getMeta().getClass());
+			if (isFlushTime || isImmediatelyConsistencyCheckable(((AbstractConstraintImpl) ((Holder) generic).getBaseComponent().getMeta())))
 				return true;
+		}
 		return false;
 	}
 
@@ -565,7 +568,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 			AbstractConstraintImpl constraint = keyHolder.getMeta();
 			int axe = keyHolder.<AxedPropertyClass> getValue().getAxe();
 			Attribute constraintBase = keyHolder.<Holder> getBaseComponent().getBaseComponent();
-			if (!AbstractAxedConstraintImpl.class.isAssignableFrom(keyHolder.getClass()))
+			if (!(constraint instanceof AbstractAxedConstraintImpl))
 				constraint.check(constraintBase, generic, (Holder) generic, axe);
 			else {
 				Type component = constraintBase.getComponent(axe);
@@ -598,6 +601,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		PriorityConstraintMap constraints = new PriorityConstraintMap();
 		for (AxedPropertyClass key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
+			assert valueHolder != null : key.getClazz();
 			GenericImpl keyHolder = valueHolder.getBaseComponent();
 			AbstractConstraintImpl constraint = keyHolder.getMeta();
 			if (isCheckable(constraint, generic, checkingType, isFlushTime) && generic.getMetaLevel() - ((Holder) keyHolder.getBaseComponent()).getBaseComponent().getMetaLevel() >= 1)

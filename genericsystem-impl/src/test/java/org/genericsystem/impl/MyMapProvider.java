@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.io.Serializable;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
@@ -31,7 +32,7 @@ public class MyMapProvider extends AbstractMapProvider<Serializable, Serializabl
 
 	@SystemGeneric
 	@Components(MyMapProvider.class)
-	public static class MyKey extends GenericImpl implements Attribute {
+	public static class MyKey extends GenericImpl {
 
 	}
 
@@ -39,7 +40,7 @@ public class MyMapProvider extends AbstractMapProvider<Serializable, Serializabl
 	@Components(MyKey.class)
 	@SingularConstraint
 	@RequiredConstraint
-	public static class MyValue extends GenericImpl implements Attribute {
+	public static class MyValue extends GenericImpl {
 
 	}
 
