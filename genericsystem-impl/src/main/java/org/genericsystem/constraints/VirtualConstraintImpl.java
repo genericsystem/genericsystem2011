@@ -2,7 +2,6 @@ package org.genericsystem.constraints;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
-import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
@@ -20,7 +19,7 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 @SystemGeneric
 @Extends(ConstraintKey.class)
 @Components(ConstraintsMapProvider.class)
-@NoInheritance
+// @NoInheritance
 public class VirtualConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@Override

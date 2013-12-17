@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -82,7 +83,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 			@Override
 			public Value put(Key key, Value value) {
 				Value oldValue = get(key);
-				Holder keyHolder = ((GenericImpl) generic).<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getSpecializationClass(key), getRealKeyAttribute(key), (Serializable) key);
+				Holder keyHolder = ((GenericImpl) generic).<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getRealKeyAttribute(key), (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
 			}
@@ -147,10 +148,6 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 	private Attribute getKeyAttribute() {
 		return getCurrentCache().<Attribute> find(getKeyAttributeClass());
 	}
-
-	protected <T extends GenericImpl> Class<T> getSpecializationClass(Key key) {
-		return null;
-	};
 
 	public abstract <T extends Attribute> Class<T> getKeyAttributeClass();
 
