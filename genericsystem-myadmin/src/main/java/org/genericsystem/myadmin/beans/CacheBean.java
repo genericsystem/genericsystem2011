@@ -1,17 +1,16 @@
 package org.genericsystem.myadmin.beans;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 import javax.enterprise.event.Observes;
 import javax.faces.bean.RequestScoped;
 import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
-import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.jboss.seam.faces.event.qualifier.After;
@@ -78,7 +77,7 @@ public class CacheBean implements Serializable {
 	 * @return the formated timestamp of current cache.
 	 */
 	public String getCurrentCacheTs() {
-		return new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(((CacheImpl) cacheProvider.getCurrentCache()).getTs() / Statics.MILLI_TO_NANOSECONDS)).toString();
+		return "";// new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(((CacheImpl) cacheProvider.getCurrentCache()).getTs() / Statics.MILLI_TO_NANOSECONDS)).toString();
 	}
 
 	public Cache getCache() {

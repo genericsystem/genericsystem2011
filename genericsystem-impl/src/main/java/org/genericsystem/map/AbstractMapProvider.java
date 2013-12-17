@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Statics;
@@ -75,10 +74,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			private Attribute getRealKeyAttribute(Key key) {
 				if (key instanceof AxedPropertyClass) {
-					Attribute attribute = getCurrentCache().find(((AxedPropertyClass) key).getClazz());
-					// TODO kk ?
-					if (attribute.<AxedPropertyClass> getValue().getAxe() == ((AxedPropertyClass) key).getAxe())
-						return attribute;
+					return getCurrentCache().find(((AxedPropertyClass) key).getClazz());
 				}
 				return getKeyAttribute();
 			}
@@ -91,57 +87,8 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				return oldValue;
 			}
 
-			@Override
-			public Set<Key> keySet() {
-				return new AbstractSnapshot<Key>() {
-					@Override
-					public Iterator<Key> iterator() {
-						Holder map = generic.getHolder(AbstractMapProvider.this);
-						if (map == null)
-							return Collections.emptyIterator();
-						Attribute key = getKeyAttribute();
-						return new AbstractProjectorAndFilterIterator<Holder, Key>(((GenericImpl) map).<Holder> holdersIterator(key, Statics.CONCRETE, getBasePos(key))) {
-
-							@Override
-							public boolean isSelected() {
-								return next.getHolder(getValueAttribute()) != null;
-							}
-
-							@Override
-							protected Key project() {
-								return next.getValue();
-							}
-						};
-					}
-				};
-			}
-
 			private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {
-				Holder map = generic.getHolder(Statics.CONCRETE, AbstractMapProvider.this);
-				if (map == null)
-					return Collections.emptyIterator();
-				Attribute key = getKeyAttribute();
-				return new AbstractProjectorAndFilterIterator<Holder, Map.Entry<Key, Value>>(((GenericImpl) map).<Holder> holdersIterator(key, Statics.CONCRETE, getBasePos(key))) {
-
-					private Holder valueHolder;
-
-					@Override
-					public boolean isSelected() {
-						valueHolder = next.getHolder(getValueAttribute());
-						return valueHolder != null;
-					}
-
-					@Override
-					public void remove() {
-						assert next.isAlive();
-						Holder map = next.getBaseComponent();
-						if (generic.equals(map.getBaseComponent()))
-							next.remove();
-						else {
-							put(next.<Key> getValue(), null);
-						}
-					}
-
+				return new InternalIterator<Entry<Key, Value>>() {
 					@Override
 					protected Map.Entry<Key, Value> project() {
 						return new AbstractMap.SimpleImmutableEntry<Key, Value>(next.<Key> getValue(), valueHolder.<Value> getValue());
@@ -149,8 +96,52 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				};
 			}
 
-		};
+			@Override
+			public Set<Key> keySet() {
+				return new AbstractSnapshot<Key>() {
+					@Override
+					public Iterator<Key> iterator() {
+						return new InternalIterator<Key>();
+					}
+				};
+			}
 
+			private Iterator<Holder> getAllKeysIterator() {
+				Holder map = generic.getHolder(AbstractMapProvider.this);
+				return map == null ? Collections.<Holder> emptyIterator() : ((GenericImpl) map).<Holder> holdersIterator(getKeyAttribute());
+			}
+
+			class InternalIterator<T> extends AbstractProjectorAndFilterIterator<Holder, T> {
+
+				public InternalIterator() {
+					super(getAllKeysIterator());
+				}
+
+				protected Holder valueHolder;
+
+				@Override
+				public boolean isSelected() {
+					valueHolder = next.getHolder(getValueAttribute());
+					return valueHolder != null;
+				}
+
+				@Override
+				protected T project() {
+					return next.getValue();
+				}
+
+				@Override
+				public void remove() {
+					assert next.isAlive();
+					Holder map = next.getBaseComponent();
+					if (generic.equals(map.getBaseComponent()))
+						next.remove();
+					else
+						put(next.<Key> getValue(), null);
+				}
+
+			}
+		};
 	}
 
 	private Attribute getKeyAttribute() {

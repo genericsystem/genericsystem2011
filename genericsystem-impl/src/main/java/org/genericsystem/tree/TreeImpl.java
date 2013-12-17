@@ -2,8 +2,8 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
-
 import org.genericsystem.annotation.InstanceGenericClass;
+import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
@@ -13,15 +13,16 @@ import org.genericsystem.generic.Tree;
 import org.genericsystem.snapshot.AbstractSnapshot;
 
 @InstanceGenericClass(NodeImpl.class)
+@NoInheritance
 public class TreeImpl extends GenericImpl implements Tree {
 
 	@Override
-	public <T extends Node> T newRoot(Serializable value) {
-		return newRoot(value, 1);
+	public <T extends Node> T addRoot(Serializable value) {
+		return addRoot(value, 1);
 	}
 
 	@Override
-	public <T extends Node> T newRoot(Serializable value, int dim) {
+	public <T extends Node> T addRoot(Serializable value, int dim) {
 		return addInstance(value, new Generic[dim]);
 	}
 
@@ -46,4 +47,15 @@ public class TreeImpl extends GenericImpl implements Tree {
 	public String getCategoryString() {
 		return "Tree";
 	}
+
+	@Override
+	public <T extends Node> T setRoot(Serializable value) {
+		return setRoot(value);
+	}
+
+	@Override
+	public <T extends Node> T setRoot(Serializable value, int dim) {
+		return setInstance(value, new Generic[dim]);
+	}
+
 }

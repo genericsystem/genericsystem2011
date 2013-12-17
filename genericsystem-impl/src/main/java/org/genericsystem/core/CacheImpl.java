@@ -14,11 +14,13 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
+import org.genericsystem.constraints.PropertyConstraintImpl;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -36,7 +38,6 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintValue;
 import org.genericsystem.snapshot.PseudoConcurrentSnapshot;
 import org.genericsystem.systemproperties.MetaAttribute;
 import org.genericsystem.systemproperties.MetaRelation;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.genericsystem.tree.TreeImpl;
 
 /**
@@ -167,7 +168,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAl:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			new Restructurator() {
 				private static final long serialVersionUID = 7326023526567814490L;
@@ -179,11 +180,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(generic, Statics.MULTIDIRECTIONAL);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -375,7 +376,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private <T extends Tree> T internalSetTree(Serializable name, int dim, boolean existsException) {
-		return bind(name, TreeImpl.class, existsException, new Generic[] { find(NoInheritanceSystemType.class) }, new Generic[dim]);
+		return this.<Type> bind(name, TreeImpl.class, existsException, new Generic[] { getEngine() }, new Generic[dim]).disableInheritance();
 	}
 
 	private <T extends Generic> T bind(Serializable name, Class<?> specializationClass, boolean existsException, Generic[] superTypes, Generic... components) {
@@ -581,7 +582,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (AxedPropertyClass key : constraintMap.keySet()) {
 				Holder valueHolder = constraintMap.getValueHolder(key);
 				AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
-				if (isCheckable(keyHolder, attribute, checkingType, isFlushTime) && isAxedConstraint(keyHolder) && isInstanceOf(generic, attribute, ((AxedPropertyClass) keyHolder.getValue()).getAxe()))
+				if (isCheckable(keyHolder, attribute, checkingType, isFlushTime) && (isAxedConstraint(keyHolder) || PropertyConstraintImpl.class.isAssignableFrom(keyHolder.getClass()))
+						&& isInstanceOf(generic, attribute, ((AxedPropertyClass) keyHolder.getValue()).getAxe()))
 					constraints.put(keyHolder, valueHolder);
 			}
 			for (Entry<AbstractConstraintImpl, Holder> entry : constraints.entrySet())
@@ -591,6 +593,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		PriorityConstraintMap constraints = new PriorityConstraintMap();
 		for (AxedPropertyClass key : constraintMap.keySet()) {
 			Holder valueHolder = constraintMap.getValueHolder(key);
+			// log.info("zzzz" + key);
 			AbstractConstraintImpl keyHolder = valueHolder.<AbstractConstraintImpl> getBaseComponent();
 			if (isCheckable(keyHolder, generic, checkingType, isFlushTime) && generic.getMetaLevel() - ((Holder) keyHolder.getBaseComponent()).getBaseComponent().getMetaLevel() >= 1)
 				constraints.put(keyHolder, valueHolder);

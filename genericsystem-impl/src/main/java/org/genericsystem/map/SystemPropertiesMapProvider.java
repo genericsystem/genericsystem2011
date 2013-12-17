@@ -3,6 +3,7 @@ package org.genericsystem.map;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.SingularConstraint;
@@ -12,7 +13,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
+import org.genericsystem.systemproperties.NoInheritanceProperty;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
 
 /**
@@ -22,7 +23,7 @@ import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
  */
 @SystemGeneric
 @Components(EngineImpl.class)
-@Dependencies({ NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class })
+@Dependencies({ NoInheritanceProperty.class, NoReferentialIntegritySystemProperty.class, CascadeRemoveSystemProperty.class })
 public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropertyClass, Boolean> {
 
 	@Override
@@ -46,23 +47,19 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 	@SystemGeneric
 	@Components(SystemPropertiesMapProvider.class)
 	@InstanceValueClassConstraint(AxedPropertyClass.class)
-	public static class SystemPropertyKey extends GenericImpl implements Attribute {
-	}
+	public static class SystemPropertyKey extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Components(SystemPropertyKey.class)
 	@SingularConstraint
-	@Extends(NoInheritanceSystemType.class)
+	@NoInheritance
 	// @RequiredConstraint
-	// @InheritanceDisabled
-	public static class SystemPropertyValue extends GenericImpl implements Attribute {
-	}
+	public static class SystemPropertyValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
 	@Extends(meta = SystemPropertiesMapProvider.class)
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
-	public static class MapInstance extends GenericImpl implements Holder {
-	}
+	public static class MapInstance extends GenericImpl implements Holder {}
 
 }

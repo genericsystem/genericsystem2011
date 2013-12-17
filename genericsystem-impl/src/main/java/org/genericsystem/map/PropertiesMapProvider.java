@@ -4,6 +4,7 @@ import java.io.Serializable;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
@@ -13,7 +14,6 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.map.PropertiesMapProvider.PropertyKey;
 import org.genericsystem.map.PropertiesMapProvider.PropertyValue;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
 
 /**
  * @author Nicolas Feybesse
@@ -43,9 +43,8 @@ public class PropertiesMapProvider extends AbstractMapProvider<AxedPropertyClass
 	@SystemGeneric
 	@Components(PropertyKey.class)
 	@SingularConstraint
-	@Extends(NoInheritanceSystemType.class)
+	@NoInheritance
 	// @RequiredConstraint
-	// @InheritanceDisabled
 	public static class PropertyValue extends GenericImpl implements Attribute {}
 
 	@SystemGeneric
