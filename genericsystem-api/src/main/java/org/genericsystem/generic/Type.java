@@ -1,7 +1,6 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 
@@ -273,6 +272,27 @@ public interface Type extends Generic {
 	 * @return the new anonymous instance.
 	 */
 	<T extends Generic> T setAnonymousInstance(Generic... components);
+
+	/**
+	 * Enable inheritance.
+	 * 
+	 * @return Return this.
+	 */
+	<T extends Relation> T enableInheritance();
+
+	/**
+	 * Disable inheritance.
+	 * 
+	 * @return Return this.
+	 */
+	<T extends Relation> T disableInheritance();
+
+	/**
+	 * Returns true if the inheritance is enabled for this type
+	 * 
+	 * @return true if the inheritance is enabled for the component position
+	 */
+	boolean isInheritanceEnabled();
 
 	/**
 	 * Enable singleton constraint.

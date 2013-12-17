@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
@@ -26,7 +25,6 @@ import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.systemproperties.MetaAttribute;
 import org.genericsystem.systemproperties.MetaRelation;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
 
 /**
  * @author Nicolas Feybesse
@@ -224,7 +222,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 		private boolean startupTime = true;
 
 		SystemCache init(Class<?>... userClasses) {
-			List<Class<?>> classes = Arrays.<Class<?>> asList(EngineImpl.class, MetaAttribute.class, MetaRelation.class, NoInheritanceSystemType.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
+			List<Class<?>> classes = Arrays.<Class<?>> asList(EngineImpl.class, MetaAttribute.class, MetaRelation.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
 			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				get(clazz);

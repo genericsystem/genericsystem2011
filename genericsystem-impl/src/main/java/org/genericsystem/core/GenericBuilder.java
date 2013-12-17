@@ -8,11 +8,11 @@ import java.util.Set;
 import org.genericsystem.core.Statics.Supers;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.iterator.ArrayIterator;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +42,27 @@ class GenericBuilder {
 		isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		supers = new Supers(aliveSupers).toArray();
 		supers = getExtendedDirectSupers(respectSupers);
+	}
+
+	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {
+		if (supers.length <= 1 || !containsSuper(candidate))
+			return false;
+		log.info("" + candidate + " " + sameHomeTreeNode());
+		return (sameHomeTreeNode());
+	}
+
+	boolean containsSuper(Generic candidate) {
+		for (Generic superGenenic : supers)
+			if (candidate.equals(superGenenic))
+				return true;
+		return false;
+	}
+
+	boolean sameHomeTreeNode() {
+		for (Generic superGenenic : supers)
+			if (!homeTreeNode.equals(((GenericImpl) superGenenic).homeTreeNode))
+				return false;
+		return true;
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -184,7 +205,7 @@ class GenericBuilder {
 		if (Statics.MULTIDIRECTIONAL != basePos)
 			if (basePos < ((GenericImpl) candidate).components.length)
 				if (!components[basePos].equals(((GenericImpl) candidate).components[basePos]))
-					if (!candidate.inheritsFrom(cache.find(NoInheritanceSystemType.class)))
+					if ((((Attribute) meta).isInheritanceEnabled()))
 						if (homeTreeNode.getMetaLevel() == candidate.getMetaLevel()) {
 							if (isSingular && components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos]))
 								return true;

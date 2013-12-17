@@ -1,6 +1,8 @@
 package org.genericsystem.impl;
 
+import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.VirtualConstraintException;
 import org.genericsystem.generic.Type;
@@ -23,6 +25,8 @@ public class VirtualConstraintTest extends AbstractTest {
 		vehicle.enableVirtualConstraint();
 		Type car = vehicle.addSubType("Car");
 		Type superCar = car.addSubType("SuperCar");
+		assert !(cache.<GenericImpl> find(VirtualConstraintImpl.class)).isInheritanceEnabled();
+		assert !superCar.isVirtualConstraintEnabled();
 		superCar.addInstance("mySuperCar");
 	}
 

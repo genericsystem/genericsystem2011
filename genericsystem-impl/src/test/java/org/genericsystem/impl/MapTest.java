@@ -11,7 +11,6 @@ import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
 import org.testng.annotations.Test;
 
 @Test
@@ -85,22 +84,6 @@ public class MapTest extends AbstractTest {
 		assert vehicle.getPropertiesMap().get("power").equals(255);
 		vehicle.getPropertiesMap().remove("power");
 		assert vehicle.getPropertiesMap().isEmpty();
-	}
-
-	public void testOnInstance() {
-		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		assert !cache.getEngine().isReferentialIntegrity(0);
-		assert !cache.addType("Vehicle").isReferentialIntegrity(0);
-		assert !cache.find(NoInheritanceSystemType.class).isReferentialIntegrity(0);
-		// Type car = cache.newType("Car");
-		// Generic myBmw = car.newInstance("myBmw");
-		// myBmw.getProperties().put("power", 123);
-		// assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
-		// myBmw.getProperties().put("wheel", 4);
-		// assert myBmw.getProperties().get("power").equals(123) : myBmw.getProperties();
-		// assert myBmw.getProperties().get("wheel").equals(4);
-		// myBmw.getProperties().remove("power");
-		// assert myBmw.getProperties().get("power") == null;
 	}
 
 	public void testProperty() {

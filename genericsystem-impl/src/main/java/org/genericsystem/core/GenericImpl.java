@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.genericsystem.annotation.InstanceGenericClass;
+import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
 import org.genericsystem.annotation.constraints.PropertyConstraint;
 import org.genericsystem.annotation.constraints.SingletonConstraint;
@@ -54,7 +55,7 @@ import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.snapshot.AbstractSnapshot;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
+import org.genericsystem.systemproperties.NoInheritanceProperty;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -482,6 +483,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, Generic... targets) {
+		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(Statics.CONCRETE, attribute, getBasePos(attribute)), attribute, targets);
+	}
+
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int metaLevel, int basePos, Generic... targets) {
 		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(metaLevel, attribute, basePos), attribute, targets);
 	}
@@ -742,7 +747,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Generic> Iterator<T> holdersIterator(final int level, Holder origin, int basePos) {
 		if (Statics.STRUCTURAL == level)
 			basePos = Statics.MULTIDIRECTIONAL;
-		return origin.inheritsFrom(getEngine().getCurrentCache().find(NoInheritanceSystemType.class)) ? this.<T> noInheritanceIterator(level, basePos, origin) : this.<T> inheritanceIterator(level, origin, basePos);
+		return ((Attribute) origin).isInheritanceEnabled() ? this.<T> inheritanceIterator(level, origin, basePos) : this.<T> noInheritanceIterator(level, basePos, origin);
 	}
 
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final int metaLevel, int pos, final Generic origin) {
@@ -765,9 +770,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			@Override
 			public final boolean isSelected(Generic candidate) {
 				boolean selected = candidate.getMetaLevel() <= level && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) candidate).isAttributeOf(GenericImpl.this));
-				if (pos != Statics.MULTIDIRECTIONAL && selected && ((GenericImpl) candidate).isPseudoStructural(pos))
-					((GenericImpl) candidate).project(pos);
-
+				if (selected && pos != Statics.MULTIDIRECTIONAL) {
+					if (((GenericImpl) candidate).isPseudoStructural(pos))
+						((GenericImpl) candidate).project(pos);
+					if (level == candidate.getMetaLevel() && !equals(((GenericImpl) candidate).components[pos])) {
+						GenericBuilder gb = new GenericBuilder(getCurrentCache(), candidate.getMeta(), ((GenericImpl) candidate).getHomeTreeNode(), new Generic[] { candidate.getMeta() }, Statics.replace(pos, ((GenericImpl) candidate).components,
+								GenericImpl.this), Statics.MULTIDIRECTIONAL, true);
+						if (gb.containsSuperInMultipleInheritanceValue(candidate))
+							gb.bindDependency(candidate.getClass(), false, true);
+					}
+				}
 				return selected;
 			}
 		};
@@ -1306,6 +1318,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	void mountConstraints(Class<?> clazz) {
+		if (clazz.getAnnotation(NoInheritance.class) != null)
+			disableInheritance();
+
 		if (clazz.getAnnotation(VirtualConstraint.class) != null)
 			enableVirtualConstraint();
 
@@ -1337,16 +1352,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	/************** SYSTEM PROPERTY **************/
 	/*********************************************/
 
-	private <T extends Generic> Serializable getSystemPropertyValue(Class<T> constraintClass, int pos) {
-		return getSystemPropertiesMap().get(new AxedPropertyClass(constraintClass, pos));
+	private <T extends Generic> Serializable getSystemPropertyValue(Class<T> propertyClass, int pos) {
+		return getSystemPropertiesMap().get(new AxedPropertyClass(propertyClass, pos));
 	}
 
-	public <T extends Generic> void setSystemPropertyValue(Class<T> constraintClass, int pos, Serializable value) {
-		getSystemPropertiesMap().put(new AxedPropertyClass(constraintClass, pos), value);
+	public <T extends Generic> void setSystemPropertyValue(Class<T> propertyClass, int pos, Serializable value) {
+		getSystemPropertiesMap().put(new AxedPropertyClass(propertyClass, pos), value);
 	}
 
-	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> constraintClass, int pos) {
-		Serializable value = getSystemPropertyValue(constraintClass, pos);
+	private <T extends Generic> boolean isSystemPropertyEnabled(Class<T> propertyClass, int pos) {
+		Serializable value = getSystemPropertyValue(propertyClass, pos);
 		return value != null && !Boolean.FALSE.equals(value);
 	}
 
@@ -1378,6 +1393,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isCascadeRemove(int basePos) {
 		return isSystemPropertyEnabled(CascadeRemoveSystemProperty.class, basePos);
+	}
+
+	@Override
+	public <T extends Relation> T enableInheritance() {
+		setSystemPropertyValue(NoInheritanceProperty.class, Statics.BASE_POSITION, false);
+		return (T) this;
+	}
+
+	@Override
+	public <T extends Relation> T disableInheritance() {
+		setSystemPropertyValue(NoInheritanceProperty.class, Statics.BASE_POSITION, true);
+		return (T) this;
+	}
+
+	@Override
+	public boolean isInheritanceEnabled() {
+		if (!GenericImpl.class.equals(getClass()))
+			return !getClass().isAnnotationPresent(NoInheritance.class);
+		return !isSystemPropertyEnabled(NoInheritanceProperty.class, Statics.BASE_POSITION);
 	}
 
 	@Override
