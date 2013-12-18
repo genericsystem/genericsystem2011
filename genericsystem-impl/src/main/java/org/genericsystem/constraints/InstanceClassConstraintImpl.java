@@ -21,8 +21,8 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 public class InstanceClassConstraintImpl extends AbstractConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase, Holder constraintValue, int axe) throws ConstraintViolationException {
-		for (Generic instance : ((Attribute) instanceToCheck).getInstances())
+	public void check(Generic modified, Holder constraintValue) throws ConstraintViolationException {
+		for (Generic instance : ((Attribute) getConstraintBase(constraintValue)).getInstances())
 			if (!constraintValue.<Class<?>> getValue().isAssignableFrom(instance.getValue().getClass()))
 				throw new InstanceClassConstraintViolationException(instance.getValue() + " should be " + constraintValue.getValue());
 	}
