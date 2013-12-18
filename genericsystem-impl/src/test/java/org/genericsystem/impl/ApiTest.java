@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
@@ -675,7 +674,7 @@ public class ApiTest extends AbstractTest {
 		assert transformerPower.inheritsFrom(vehiclePower);
 		assert transformerPower.inheritsFrom(robotPower);
 		assert transformerPower.isPropertyConstraintEnabled();
-		assert transformerPower.isVirtualConstraintEnabled();
+		assert !transformerPower.isVirtualConstraintEnabled();
 	}
 
 	public void testMultipleInheritanceDiamond() {

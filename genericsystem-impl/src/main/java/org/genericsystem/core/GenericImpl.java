@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -79,8 +78,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	Generic[] components;
 
-	// HomeTreeNode[] primaries;
-
 	public Generic[] getSupersArray() {
 		return supers.clone();
 	}
@@ -88,10 +85,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public Generic[] getComponentsArray() {
 		return components.clone();
 	}
-
-	// public HomeTreeNode[] getPrimariesArray() {
-	// return primaries.clone();
-	// }
 
 	@Override
 	public boolean fastValueEquals(Generic generic) {
@@ -121,9 +114,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Arrays.sort(supers);
 		this.components = nullToSelfComponent(components);
 		lifeManager = new LifeManager(designTs == null ? getEngine().pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
-		// primaries = !isEngine() ? new Primaries(homeTreeNode, supers).toArray() : new HomeTreeNode[] { homeTreeNode };
-		// assert primaries.length != 0;
-
 		for (Generic g1 : supers)
 			for (Generic g2 : supers)
 				if (!g1.equals(g2))
@@ -507,6 +497,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.unambigousFirst(this.<T> holdersIterator(attribute, metaLevel, basePos, targets));
 	}
 
+	public <T extends Holder> T getHolderByValue(Holder attribute, Serializable value, final Generic... targets) {
+		return getHolderByValue(Statics.CONCRETE, attribute, value, targets);
+	}
+
 	public <T extends Holder> T getHolderByValue(int metaLevel, Holder attribute, Serializable value, final Generic... targets) {
 		return getHolderByValue(metaLevel, attribute, value, getBasePos(attribute), targets);
 	}
@@ -777,8 +771,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					if (level == candidate.getMetaLevel() && !equals(((GenericImpl) candidate).components[pos])) {
 						GenericBuilder gb = new GenericBuilder(getCurrentCache(), candidate.getMeta(), ((GenericImpl) candidate).getHomeTreeNode(), new Generic[] { candidate.getMeta() }, Statics.replace(pos, ((GenericImpl) candidate).components,
 								GenericImpl.this), Statics.MULTIDIRECTIONAL, true);
-						if (gb.containsSuperInMultipleInheritanceValue(candidate))
+						if (gb.containsSuperInMultipleInheritanceValue(candidate)) {
 							gb.bindDependency(candidate.getClass(), false, true);
+						}
 					}
 				}
 				return selected;
