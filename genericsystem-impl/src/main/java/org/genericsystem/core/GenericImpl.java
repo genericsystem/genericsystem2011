@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -789,22 +790,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final Generic[] components = (Generic[]) cartesianIterator.next();
-			// final Generic[] newComponents = new Components(components, GenericImpl.this.components).toArray();
-			for (Generic component : components)
-				assert component.isAlive();
-			// Generic projection = this.unambigousFirst(componentsFilter(((GenericImpl) getMeta()).allInheritingsIteratorWithoutRoot(), components));
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 				@Override
 				public boolean isSelected() {
-					// log.info(next.info() + "homeTreeNode : " + ((GenericImpl) next).getHomeTreeNode() + " " + Arrays.toString(((GenericImpl) next).components) + Arrays.toString(components));
 					return ((GenericImpl) next).inheritsFrom(((GenericImpl) getMeta()).bindInstanceNode(Statics.FLAG), new Generic[] { GenericImpl.this }, Statics.replace(pos, components, ((GenericImpl) next).getComponent(pos)));
 				}
 			});
 
-			if (projection == null) {
-				// assert false : this.getComponents() + Arrays.toString(newComponents);
+			if (projection == null)
 				getCurrentCache().internalBind(getMeta(), Statics.FLAG, new Generic[] { this }, components, null, Statics.MULTIDIRECTIONAL, true, false);
-			}
 		}
 	}
 

@@ -89,6 +89,26 @@ public class RemoveStrategyTest extends AbstractTest {
 		assert myCarRed.getSupers().contains(carColor);
 	}
 
+	public void testRemoveConserve2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
+		Relation carColor = car.setRelation("CarColor", color);
+		carColor.enableSingularConstraint();
+
+		Generic myCar = car.addInstance("myCar");
+		Generic red = color.addInstance("Red");
+		Link carRed = car.setLink(carColor, "carRed", red);
+
+		Link myCarRed = myCar.setLink(carRed, "myCarRed", red);
+		assert myCarRed.getSupers().contains(carRed);
+
+		carRed.remove(RemoveStrategy.CONSERVE);
+		myCarRed = myCar.getLink(carColor);
+		assert myCarRed.isAlive();
+		assert myCarRed.getSupers().contains(carColor);
+	}
+
 	public void testRemoveConserveNotSingular() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
@@ -120,7 +140,7 @@ public class RemoveStrategyTest extends AbstractTest {
 
 		carRed.remove(RemoveStrategy.PROJECT);
 		assert !carRed.isAlive();
-		assert myCar.getTargets(carColor).contains(red) : myCar.getTargets(carColor);
+		assert myCar.getLink(carColor, red) != null;
 	}
 
 }
