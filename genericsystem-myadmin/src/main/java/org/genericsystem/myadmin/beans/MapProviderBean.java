@@ -25,7 +25,7 @@ import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
+import org.genericsystem.systemproperties.NoInheritanceProperty;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +44,12 @@ public class MapProviderBean implements Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(MapProviderBean.class);
 
-	@Inject private GuiGenericsTreeBean genericTreeBean;	// generic tree bean
-	@Inject private PopupPanelBean popupPanelBean;		// Popup Panel bean
-	@Inject private GsMessages messages;				// messages bean
+	@Inject
+	private GuiGenericsTreeBean genericTreeBean; // generic tree bean
+	@Inject
+	private PopupPanelBean popupPanelBean; // Popup Panel bean
+	@Inject
+	private GsMessages messages; // messages bean
 
 	private String key;
 	private int pos;
@@ -170,7 +173,7 @@ public class MapProviderBean implements Serializable {
 			} else {
 				if (mapProviderClass == SystemPropertiesMapProvider.class) {
 					items.add(new SelectItem(CascadeRemoveSystemProperty.class, CascadeRemoveSystemProperty.class.getSimpleName()));
-					items.add(new SelectItem(NoInheritanceSystemType.class, NoInheritanceSystemType.class.getSimpleName()));
+					items.add(new SelectItem(NoInheritanceProperty.class, NoInheritanceProperty.class.getSimpleName()));
 					items.add(new SelectItem(NoReferentialIntegritySystemProperty.class, NoReferentialIntegritySystemProperty.class.getSimpleName()));
 				}
 			}

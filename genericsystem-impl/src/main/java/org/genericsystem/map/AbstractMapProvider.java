@@ -6,10 +6,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.MapProvider;
@@ -25,6 +23,8 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 	static final String MAP_VALUE = "map";
 
 	public static abstract class AbstractExtendedMap<K, V> extends AbstractMap<K, V> {
+		abstract public Holder getKeyHolder(K key);
+
 		abstract public Holder getValueHolder(K key);
 	}
 
@@ -38,7 +38,12 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				return new AbstractSnapshot<Entry<Key, Value>>() {
 					@Override
 					public Iterator<Entry<Key, Value>> iterator() {
-						return entriesIterator(generic);
+						return new InternalIterator<Entry<Key, Value>>() {
+							@Override
+							protected Map.Entry<Key, Value> project() {
+								return new AbstractMap.SimpleImmutableEntry<Key, Value>(next.<Key> getValue(), valueHolder.<Value> getValue());
+							}
+						};
 					}
 				};
 			}
@@ -54,13 +59,30 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				return valueHolder != null ? valueHolder.<Value> getValue() : null;
 			}
 
-			private Holder getMapHolder() {
-				return ((GenericImpl) generic).<GenericImpl> getHolder(Statics.CONCRETE, (Holder) AbstractMapProvider.this);
+			protected Holder getMapHolder() {
+				return ((GenericImpl) generic).<GenericImpl> getHolder(AbstractMapProvider.this);
 			}
 
-			private Holder getKeyHolder(Key key) {
+			private boolean isMapHolderInherited(Holder mapHolder) {
+				Generic mapComponent = mapHolder.getBaseComponent();
+				if (!mapComponent.equals(generic))
+					if (mapComponent.getMetaLevel() == generic.getMetaLevel())
+						return true;
+				return false;
+			}
+
+			@Override
+			public Holder getKeyHolder(Key key) {
 				Holder mapHolder = getMapHolder();
-				return mapHolder != null ? ((GenericImpl) mapHolder).getHolderByValue(Statics.CONCRETE, getKeyAttribute(key), key) : null;
+				Attribute keyAttribute = getKeyAttribute(key);
+				if (!keyAttribute.isInheritanceEnabled())
+					if (isMapHolderInherited(mapHolder))
+						return null;
+				return getKeyHolder(mapHolder, keyAttribute, key);
+			}
+
+			private Holder getKeyHolder(Holder mapHolder, Attribute keyAttribute, Key key) {
+				return mapHolder != null ? ((GenericImpl) mapHolder).getHolderByValue(keyAttribute, key) : null;
 			}
 
 			@Override
@@ -69,25 +91,12 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				return keyHolder != null ? keyHolder.getHolder(getValueAttribute()) : null;
 			}
 
-			private Attribute getValueAttribute() {
-				return getCurrentCache().<Attribute> find(getValueAttributeClass());
-			}
-
 			@Override
 			public Value put(Key key, Value value) {
 				Value oldValue = get(key);
 				Holder keyHolder = ((GenericImpl) generic).<GenericImpl> setHolder(AbstractMapProvider.this, MAP_VALUE).setHolder(getKeyAttribute(key), (Serializable) key);
 				keyHolder.setHolder(getValueAttribute(), value);
 				return oldValue;
-			}
-
-			private Iterator<Entry<Key, Value>> entriesIterator(final Generic generic) {
-				return new InternalIterator<Entry<Key, Value>>() {
-					@Override
-					protected Map.Entry<Key, Value> project() {
-						return new AbstractMap.SimpleImmutableEntry<Key, Value>(next.<Key> getValue(), valueHolder.<Value> getValue());
-					}
-				};
 			}
 
 			@Override
@@ -112,10 +121,18 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				}
 
 				protected Holder valueHolder;
+				Holder mapHolder = getMapHolder();
+				Attribute valueAttribute = getValueAttribute();
 
 				@Override
 				public boolean isSelected() {
-					valueHolder = next.getHolder(getValueAttribute());
+					Attribute keyAttribute = getKeyAttribute(next.<Key> getValue());
+					if (!keyAttribute.isInheritanceEnabled() && isMapHolderInherited(mapHolder))
+						return false;
+					Holder keyHolder = getKeyHolder(mapHolder, keyAttribute, next.<Key> getValue());
+					if (keyHolder == null)
+						return false;
+					valueHolder = next.getHolder(valueAttribute);
 					return valueHolder != null;
 				}
 
@@ -136,6 +153,10 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			}
 		};
+	}
+
+	private Attribute getValueAttribute() {
+		return getCurrentCache().<Attribute> find(getValueAttributeClass());
 	}
 
 	private Attribute getKeyAttribute(Key key) {

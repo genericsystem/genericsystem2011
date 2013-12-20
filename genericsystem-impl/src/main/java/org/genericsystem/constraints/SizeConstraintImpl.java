@@ -23,7 +23,8 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 public class SizeConstraintImpl extends AbstractAxedConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic constraintBase, Generic modified, Holder constraintValue) throws ConstraintViolationException {
+	public void internalCheck(Generic modified, Holder constraintValue) throws ConstraintViolationException {
+		Generic constraintBase = getConstraintBase(constraintValue);
 		if (constraintValue.getValue() instanceof Integer)
 			if (modified.getHolders((Attribute) constraintBase).size() != (Integer) (constraintValue).getValue())
 				throw new SizeConstraintViolationException("Multiple links of " + constraintBase + ", and the maximum size is " + constraintValue);

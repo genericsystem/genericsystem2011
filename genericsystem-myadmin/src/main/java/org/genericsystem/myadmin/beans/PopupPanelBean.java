@@ -16,7 +16,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.myadmin.util.GsMessages;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
-import org.genericsystem.systemproperties.NoInheritanceSystemType;
+import org.genericsystem.systemproperties.NoInheritanceProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +82,7 @@ public class PopupPanelBean implements Serializable {
 	public List<SelectItem> getSystemPropertiesClass() {
 		List<SelectItem> list = new ArrayList<>();
 		list.add(new SelectItem(CascadeRemoveSystemProperty.class, "CascadeRemoveSystemProperty"));
-		list.add(new SelectItem(NoInheritanceSystemType.class, "NoInheritanceSystemType"));
+		list.add(new SelectItem(NoInheritanceProperty.class, "NoInheritanceSystemType"));
 		return list;
 	}
 

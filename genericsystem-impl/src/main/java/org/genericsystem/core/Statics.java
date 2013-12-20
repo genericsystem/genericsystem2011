@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
@@ -355,19 +354,6 @@ public class Statics {
 		};
 	}
 
-	public static <T extends Generic> Iterator<T> entryFilter(Iterator<T> iterator, final Map.Entry<Serializable, Serializable> entry) {
-		return new AbstractFilterIterator<T>(iterator) {
-
-			@SuppressWarnings("rawtypes")
-			@Override
-			public boolean isSelected() {
-				if (next.getValue() == null && ((GenericImpl) next).supers[1].getValue() instanceof Map.Entry)
-					return ((Map.Entry) ((GenericImpl) next).supers[1].getValue()).getKey().equals(entry.getKey());
-				return Objects.equals(entry.getKey(), ((Map.Entry) next.getValue()).getKey());
-			}
-		};
-	}
-
 	public static <T extends Generic> Iterator<T> nullFilter(Iterator<T> iterator) {
 		return new AbstractFilterIterator<T>(iterator) {
 
@@ -377,17 +363,4 @@ public class Statics {
 			}
 		};
 	}
-
-	// public static <T> T unambigousFirst(Iterator<T> iterator) {
-	// if (!iterator.hasNext())
-	// return null;
-	// T result = iterator.next();
-	// if (iterator.hasNext()) {
-	// String message = "" + ((Generic) result).info();
-	// while (iterator.hasNext())
-	// message += " / " + ((Generic) iterator.next()).info();
-	// throw new IllegalStateException("Ambigous selection : " + message);
-	// }
-	// return result;
-	// }
 }

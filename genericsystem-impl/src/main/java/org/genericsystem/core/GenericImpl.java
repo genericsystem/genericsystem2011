@@ -20,6 +20,7 @@ import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.constraints.UniqueValueConstraint;
 import org.genericsystem.annotation.constraints.VirtualConstraint;
 import org.genericsystem.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.constraints.MetaLevelConstraintImpl;
 import org.genericsystem.constraints.PropertyConstraintImpl;
 import org.genericsystem.constraints.RequiredConstraintImpl;
 import org.genericsystem.constraints.SingletonConstraintImpl;
@@ -1366,6 +1367,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Generic> boolean isConstraintEnabled(Class<T> constraintClass, int pos) {
 		Serializable value = getConstraintValue(constraintClass, pos);
 		return null != value && !Boolean.FALSE.equals(value);
+	}
+
+	public <T extends Relation> T enableMetaLevelConstraintAttribute() {
+		setSystemPropertyValue(MetaLevelConstraintImpl.class, Statics.MULTIDIRECTIONAL, true);
+		return (T) this;
+	}
+
+	public <T extends Relation> T disableMetaLevelConstraintAttribute() {
+		setSystemPropertyValue(MetaLevelConstraintImpl.class, Statics.MULTIDIRECTIONAL, false);
+		return (T) this;
 	}
 
 	@Override
