@@ -23,7 +23,7 @@ public class VirtualConstraintTest extends AbstractTest {
 		vehicle.enableVirtualConstraint();
 		Type car = vehicle.addSubType("Car");
 		Type superCar = car.addSubType("SuperCar");
-		superCar.disableVirtualConstraint();
+		// superCar.disableVirtualConstraint();
 		assert !superCar.isVirtualConstraintEnabled();
 		superCar.addInstance("mySuperCar");
 	}
