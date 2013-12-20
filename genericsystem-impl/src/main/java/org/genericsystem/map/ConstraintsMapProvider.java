@@ -13,6 +13,7 @@ import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.constraints.AliveConstraintImpl;
 import org.genericsystem.constraints.AloneAutomaticsConstraintImpl;
 import org.genericsystem.constraints.InstanceClassConstraintImpl;
+import org.genericsystem.constraints.MetaLevelConstraintImpl;
 import org.genericsystem.constraints.OptimisticLockConstraintImpl;
 import org.genericsystem.constraints.PropertyConstraintImpl;
 import org.genericsystem.constraints.RequiredConstraintImpl;
@@ -37,8 +38,9 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
  */
 @SystemGeneric
 @Components(EngineImpl.class)
-@Dependencies({ MapInstance.class, RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, InstanceClassConstraintImpl.class, OptimisticLockConstraintImpl.class,
-		PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueValueConstraintImpl.class, VirtualConstraintImpl.class, StructuralNamingConstraintImpl.class })
+@Dependencies({ MapInstance.class, MetaLevelConstraintImpl.class, RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, InstanceClassConstraintImpl.class,
+		OptimisticLockConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueValueConstraintImpl.class, VirtualConstraintImpl.class,
+		StructuralNamingConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Serializable> {
 
 	@Override
