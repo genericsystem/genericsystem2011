@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -1410,14 +1409,15 @@ public class RelationTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type person = cache.addType("Person");
 		Attribute age = person.setProperty("Age");
-		person.setValue(age, "25");
+		person.setValue(age, 25);
 
 		Type student = person.addSubType("Student");
-		student.setValue(age, "30");
+		student.setValue(age, 30).log();
 
 		Type teacher = person.addSubType("Teacher");
-
-		assert "30" == cache.addType("doctoral", student, teacher).getValue(age);
+		Type doctor = cache.addType("doctor", student, teacher);
+		assert age.isPropertyConstraintEnabled();
+		assert doctor.getValue(age).equals(30);
 	}
 
 }

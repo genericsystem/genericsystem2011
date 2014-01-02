@@ -7,10 +7,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -756,6 +756,68 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	public <T extends Generic> Iterator<T> inheritanceIterator2(final int level, final Generic origin, final int pos) {
+		return new AbstractFilterIterator<T>(this.<T> getInternalInheritings(level, origin, pos).iterator()) {
+
+			@Override
+			public boolean isSelected() {
+				return level == next.getMetaLevel() && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) next).isAttributeOf(GenericImpl.this));
+			}
+
+		};
+	}
+
+	private class Inheritings<T extends Generic> extends LinkedHashSet<T> {
+
+		private static final long serialVersionUID = 6333116882294134638L;
+
+		private int pos;
+		private int maxLevel;
+
+		private Inheritings(int maxLevel, Generic origin, int pos) {
+			this.pos = pos;
+			this.maxLevel = maxLevel;
+			for (Generic superGeneric : supers)
+				if (!superGeneric.equals(GenericImpl.this))
+					// if (((GenericImpl) origin).isAttributeOf(superGeneric))
+					for (T inheriting : (((GenericImpl) superGeneric).<T> getInternalInheritings(maxLevel, origin, pos)))
+						add(inheriting);
+			for (T composite : (GenericImpl.this.<T> getComposites()))
+				if (composite.getMetaLevel() <= maxLevel && composite.inheritsFrom(origin))
+					add(composite);
+		}
+
+		@Override
+		public boolean add(T candidate) {
+			Iterator<T> iterator = iterator();
+			while (iterator.hasNext()) {
+				Generic next = iterator.next();
+				if (candidate.inheritsFrom(next) && !candidate.equals(next))
+					iterator.remove();
+				else if (next.inheritsFrom(candidate))
+					return false;
+			}
+			if (pos != Statics.MULTIDIRECTIONAL) {
+				if (((GenericImpl) candidate).isPseudoStructural(pos)) {
+					((GenericImpl) candidate).project(pos);
+				}
+				// if (maxLevel == candidate.getMetaLevel() && !equals(((GenericImpl) candidate).components[pos])) {
+				// GenericBuilder gb = new GenericBuilder(getCurrentCache(), candidate.getMeta(), ((GenericImpl) candidate).getHomeTreeNode(), new Generic[] { candidate.getMeta() }, Statics.replace(pos, ((GenericImpl) candidate).components,
+				// GenericImpl.this), Statics.MULTIDIRECTIONAL, true);
+				// if (gb.containsSuperInMultipleInheritanceValue(candidate)) {
+				// gb.bindDependency(candidate.getClass(), false, true);
+				// }
+				// }
+			}
+			return super.add(candidate);
+
+		}
+	}
+
+	private <T extends Generic> Set<T> getInternalInheritings(int level, Generic origin, int pos) {
+		return new Inheritings<>(level, origin, pos);
+	}
+
 	public <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(origin) {
 
@@ -893,6 +955,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public boolean isSuperOf(HomeTreeNode subHomeTreeNode, Generic[] subSupers, Generic[] subComponents) {
+		if (isEngine())
+			return true;
 		if (equiv(subHomeTreeNode, subSupers, subComponents))
 			return true;
 		if (homeTreeNode.getMetaLevel() > subHomeTreeNode.getMetaLevel())
