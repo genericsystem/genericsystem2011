@@ -1372,7 +1372,7 @@ public class RelationTest extends AbstractTest {
 		Relation carColor = car.setRelation("carColor", color).enableSingularConstraint();
 		Link carRed = car.setLink(carColor, "carRed", red);
 		myBmw.bind(carColor, red);
-		// myAudi.setLink(carRed, null, red);
+		myAudi.setLink(carRed, null, red);
 		Link myAudiRed = myAudi.bind(carRed, red);// myAudi.bind(carColor, red);
 
 		Link myAudiBlue = myAudi.bind(carColor, blue);
@@ -1381,7 +1381,7 @@ public class RelationTest extends AbstractTest {
 		assert !myAudiRed.isAlive();
 
 		assert red.getLinks(carColor, 1).size() == 2 : red.getLinks(carColor);
-		assert red.getTargets(carColor, 1, 0).containsAll(Arrays.asList(new Generic[] { myMercedes, myBmw }));
+		assert red.getTargets(carColor, 1, 0).containsAll(Arrays.asList(new Generic[] { myMercedes, myBmw })) : red.getLinks(carColor);
 	}
 
 	public void testDiamantKO() {
@@ -1414,7 +1414,7 @@ public class RelationTest extends AbstractTest {
 
 		Type student = person.addSubType("Student");
 		student.setValue(age, 30);
-		
+
 		Type teacher = person.addSubType("Teacher");
 		Type doctor = cache.addType("doctor", student, teacher);
 		assert age.isPropertyConstraintEnabled();

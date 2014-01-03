@@ -198,6 +198,7 @@ public abstract class AbstractSnapshot<T> extends AbstractSet<T> implements Snap
 			hashCode = 31 * hashCode + (e == null ? 0 : e.hashCode());
 		return hashCode;
 	}
+
 }
 
 // package org.genericsystem.snapshot;
