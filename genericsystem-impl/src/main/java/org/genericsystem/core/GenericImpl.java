@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
@@ -31,7 +32,6 @@ import org.genericsystem.constraints.UniqueValueConstraintImpl;
 import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
-import org.genericsystem.core.Statics.Supers;
 import org.genericsystem.exception.AmbiguousSelectionException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
@@ -194,35 +194,33 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getMeta() throws RollbackException {
-		Supers metas = new Supers();
-		HomeTreeNode metaNode = homeTreeNode.metaNode;
-		internalMeta(metaNode, metas);
-		assert metas.toArray().length == 1 : Arrays.toString(metas.toArray());
-		return (T) metas.toArray()[0];
-		// HomeTreeNode metaNode = homeTreeNode.metaNode;
-		// Supers metas = new Supers();
-		// for (Generic superGeneric : supers)
-		// if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
-		// metas.add(superGeneric);
-		// for (Generic superGeneric : supers)
-		// if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
-		// metas.add(superGeneric.getMeta());
-		// // return
-		// getCurrentCache().rollback(new IllegalStateException("Unable to find a meta for : " + this));
-		// return null;// Unreachable
+		return new Metas<T>(homeTreeNode.metaNode).getMeta(this);
 	}
 
-	private void internalMeta(HomeTreeNode metaNode, Supers metas) {
-		if (isEngine()) {
-			metas.add(this);
-			return;
+	private class Metas<T extends Generic> extends TreeSet<Generic> {
+
+		private static final long serialVersionUID = 783352418448187992L;
+
+		private HomeTreeNode metaNode;
+
+		public Metas(HomeTreeNode metaNode) {
+			this.metaNode = metaNode;
 		}
-		for (Generic superGeneric : supers)
-			if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
-				metas.add(superGeneric);
-		for (Generic superGeneric : supers)
-			if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode) && !((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
-				((GenericImpl) superGeneric).internalMeta(metaNode, metas);
+
+		public T getMeta(Generic generic) {
+			if (generic.isEngine()) {
+				add(generic);
+				return (T) generic;
+			}
+			for (Generic superGeneric : ((GenericImpl) generic).supers)
+				if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
+					add(superGeneric);
+			for (Generic superGeneric : ((GenericImpl) generic).supers)
+				if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode) && !((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
+					return getMeta(superGeneric);
+			return (T) unambigousFirst(iterator());
+		}
+
 	}
 
 	@Override
