@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.genericsystem.core.Statics.Supers;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
@@ -13,15 +14,13 @@ import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.genericsystem.iterator.ArrayIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
 class GenericBuilder {
-	protected static Logger log = LoggerFactory.getLogger(GenericBuilder.class);
+	// protected static Logger log = LoggerFactory.getLogger(GenericBuilder.class);
 
 	private final CacheImpl cache;
 	private HomeTreeNode homeTreeNode;
@@ -42,12 +41,13 @@ class GenericBuilder {
 		isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		supers = new Supers(aliveSupers).toArray();
 		supers = getExtendedDirectSupers(respectSupers);
+		// assert supers.length == 1 : Arrays.toString(supers);
 	}
 
 	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {
 		if (supers.length <= 1 || !containsSuper(candidate))
 			return false;
-		log.info("" + candidate + " " + sameHomeTreeNode());
+		// log.info("" + candidate + " " + sameHomeTreeNode());
 		return (sameHomeTreeNode());
 	}
 

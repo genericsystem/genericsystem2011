@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -30,6 +31,7 @@ import org.genericsystem.constraints.UniqueValueConstraintImpl;
 import org.genericsystem.constraints.VirtualConstraintImpl;
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.genericsystem.core.Snapshot.Projector;
+import org.genericsystem.core.Statics.Supers;
 import org.genericsystem.exception.AmbiguousSelectionException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
@@ -192,15 +194,35 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getMeta() throws RollbackException {
+		Supers metas = new Supers();
 		HomeTreeNode metaNode = homeTreeNode.metaNode;
+		internalMeta(metaNode, metas);
+		assert metas.toArray().length == 1 : Arrays.toString(metas.toArray());
+		return (T) metas.toArray()[0];
+		// HomeTreeNode metaNode = homeTreeNode.metaNode;
+		// Supers metas = new Supers();
+		// for (Generic superGeneric : supers)
+		// if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
+		// metas.add(superGeneric);
+		// for (Generic superGeneric : supers)
+		// if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
+		// metas.add(superGeneric.getMeta());
+		// // return
+		// getCurrentCache().rollback(new IllegalStateException("Unable to find a meta for : " + this));
+		// return null;// Unreachable
+	}
+
+	private void internalMeta(HomeTreeNode metaNode, Supers metas) {
+		if (isEngine()) {
+			metas.add(this);
+			return;
+		}
 		for (Generic superGeneric : supers)
 			if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
-				return (T) superGeneric;
+				metas.add(superGeneric);
 		for (Generic superGeneric : supers)
-			if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
-				return superGeneric.getMeta();
-		getCurrentCache().rollback(new IllegalStateException("Unable to find a meta for : " + this));
-		return null;// Unreachable
+			if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode) && !((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
+				((GenericImpl) superGeneric).internalMeta(metaNode, metas);
 	}
 
 	@Override
@@ -1254,7 +1276,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> allInstancesIterator() {
+	public <T extends Generic> Iterator<T> allInstancesIterator() {
 		return Statics.levelFilter(this.<T> allInheritingsAboveIterator(getMetaLevel() + 1), getMetaLevel() + 1);
 	}
 
