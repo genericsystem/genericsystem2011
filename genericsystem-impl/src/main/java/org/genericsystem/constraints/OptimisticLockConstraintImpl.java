@@ -45,10 +45,10 @@ public class OptimisticLockConstraintImpl extends AbstractBooleanNoAxedConstrain
 	}
 
 	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
-		Cache cache = ((EngineImpl) constraintBase.getEngine()).getCurrentCache();
-		if (cache instanceof CacheImpl && ((CacheImpl) cache).isScheduledToRemove(constraintBase) && (!((CacheImpl) cache).getSubContext().isAlive(constraintBase) || ((GenericImpl) constraintBase).getLifeManager().willDie()))
-			throw new OptimisticLockConstraintViolationException("Generic : " + constraintBase + " has already been removed by another thread");
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
+		Cache cache = ((EngineImpl) modified.getEngine()).getCurrentCache();
+		if (cache instanceof CacheImpl && ((CacheImpl) cache).isScheduledToRemove(modified) && (!((CacheImpl) cache).getSubContext().isAlive(modified) || ((GenericImpl) modified).getLifeManager().willDie()))
+			throw new OptimisticLockConstraintViolationException("Generic : " + modified + " has already been removed by another thread");
 	}
 
 	@Override

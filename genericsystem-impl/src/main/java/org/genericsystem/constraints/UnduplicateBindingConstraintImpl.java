@@ -46,18 +46,18 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	}
 
 	@Override
-	public void check(Generic instanceToCheck, final Generic baseConstraint) throws ConstraintViolationException {
-		final Generic[] supers = ((GenericImpl) baseConstraint).getSupersArray();
-		final Generic[] components = ((GenericImpl) baseConstraint).getComponentsArray();
+	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
+		final Generic[] supers = ((GenericImpl) modified).getSupersArray();
+		final Generic[] components = ((GenericImpl) modified).getComponentsArray();
 
-		final HomeTreeNode homeTreeNode = ((GenericImpl) baseConstraint).getHomeTreeNode();
+		final HomeTreeNode homeTreeNode = ((GenericImpl) modified).getHomeTreeNode();
 
 		Iterator<Generic> iterator = components.length == 0 || components[0] == null ? supers[0].getInheritings().iterator() : components[0].getComposites().iterator();
 		iterator = new AbstractFilterIterator<Generic>(iterator) {
 
 			@Override
 			public boolean isSelected() {
-				return !next.equals(baseConstraint) && ((GenericImpl) next).equiv(homeTreeNode, supers, components);
+				return !next.equals(modified) && ((GenericImpl) next).equiv(homeTreeNode, supers, components);
 			}
 		};
 

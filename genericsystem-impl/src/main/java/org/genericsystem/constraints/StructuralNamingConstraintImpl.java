@@ -43,18 +43,26 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 	}
 
 	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
-		if (!constraintBase.isStructural() && constraintBase.getComponentsSize() == 0)
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
+		if (!modified.isStructural())
 			return;
-		for (int i = 0; i < constraintBase.getComponentsSize(); i++)
-			for (Generic inherited : ((GenericImpl) ((GenericImpl) constraintBase).getComponent(i)).getAllInheritings()) {
-				Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL), constraintBase.getValue());
-				if (iterator.hasNext()) {
-					Generic next = iterator.next();
-					if (iterator.hasNext())
-						throw new UniqueStructuralValueConstraintViolationException(next.info() + iterator.next().info());
-				}
+		if (modified.getComponentsSize() == 0) {
+			Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) modified.getEngine()).allInstancesIterator(), modified.getValue());
+			if (iterator.hasNext()) {
+				Generic next = iterator.next();
+				if (iterator.hasNext())
+					throw new UniqueStructuralValueConstraintViolationException(next.info() + iterator.next().info());
 			}
+		} else
+			for (int i = 0; i < modified.getComponentsSize(); i++)
+				for (Generic inherited : ((GenericImpl) ((GenericImpl) modified).getComponent(i)).getAllInheritings()) {
+					Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL), modified.getValue());
+					if (iterator.hasNext()) {
+						Generic next = iterator.next();
+						if (iterator.hasNext())
+							throw new UniqueStructuralValueConstraintViolationException(next.info() + iterator.next().info());
+					}
+				}
 	}
 
 }

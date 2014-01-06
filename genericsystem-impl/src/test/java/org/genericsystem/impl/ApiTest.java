@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
@@ -14,6 +15,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
+import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -293,17 +295,15 @@ public class ApiTest extends AbstractTest {
 
 	public void testCyclicInherits() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type a = cache.addType("A");
-		// a.newSubType("B");
+		cache.addType("A");
 		final Type b = cache.addType("B");
-		// new RollbackCatcher() {
-		//
-		// @Override
-		// public void intercept() {
-		Type aOnb = b.addSubType("A");
-		// aOnb.log();
-		assert !a.inheritsFrom(aOnb);
-		// }.assertIsCausedBy(FunctionalConsistencyViolationException.class);
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				b.addSubType("A");
+			}
+		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
 	}
 
 	public void testGetReferentialAndIsRemovable() {

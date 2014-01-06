@@ -46,7 +46,6 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Type color = cache.addType("Color");
 
 		Relation carColor = car.setRelation("carColor", color);
-		carColor.log();
 		Generic audi = car.addInstance("audi");
 		Generic red = color.addInstance("red");
 		Link audiIsRed = audi.setLink(carColor, "audiRed", red);
@@ -101,7 +100,6 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Type human = cache.addType("Human");
 		Generic myck = human.addInstance("myck");
 		Relation possessVehicle = human.setRelation("HumanPossessVehicle", vehicle);
-		possessVehicle.log();
 		// assert !possessVehicle.isMultiDirectional();
 		// possessVehicle.enableMultiDirectional();
 		// assert possessVehicle.isMultiDirectional();

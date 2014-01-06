@@ -24,8 +24,8 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 public class SingletonConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@Override
-	public void check(Generic instanceToCheck, Generic constraintBase) throws ConstraintViolationException {
-		if (((Type) instanceToCheck).getAllInstances().size() > 1)
-			throw new SingletonConstraintViolationException("Singleton constraint violation : type " + constraintBase + " has " + ((Type) constraintBase).getAllInstances().size() + " instances.");
+	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
+		if (((Type) constraintBase).getAllInstances().size() > 1)
+			throw new SingletonConstraintViolationException("Singleton constraint violation : type " + modified + " has " + ((Type) modified).getAllInstances().size() + " instances.");
 	}
 }

@@ -202,9 +202,14 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	public void testTwoTypesWithSameNameHeritingFromDifferentSupertypes() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type plant = cache.addType("Plant");
-		Type collection = cache.addType("Collection");
-		Type tree1 = plant.addSubType("Tree");
-		Type tree2 = collection.addSubType("Tree");
-		assert !Objects.equals(tree1, tree2);
+		final Type collection = cache.addType("Collection");
+		plant.addSubType("Tree");
+		new RollbackCatcher() {
+
+			@Override
+			public void intercept() {
+				collection.addSubType("Tree");
+			}
+		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
 	}
 }

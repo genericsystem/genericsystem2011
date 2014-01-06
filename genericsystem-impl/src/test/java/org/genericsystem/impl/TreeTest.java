@@ -174,7 +174,6 @@ public class TreeTest extends AbstractTest {
 
 		Link bind = header.bind(graphicComponentColor, blue);
 		assert bind.inheritsFrom(webPageRed);
-		log.info("-----------------------------");
 		Link bind2 = header.bind(graphicComponentColor, blue);
 		assert bind2.inheritsFrom(webPageRed);
 		assert bind.isAlive();
