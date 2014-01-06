@@ -2,6 +2,7 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.core.Generic;
@@ -50,7 +51,7 @@ public class TreeImpl extends GenericImpl implements Tree {
 
 	@Override
 	public <T extends Node> T setRoot(Serializable value) {
-		return setRoot(value);
+		return setRoot(value, 1);
 	}
 
 	@Override
