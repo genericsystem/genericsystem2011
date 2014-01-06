@@ -11,6 +11,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -192,15 +194,33 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T getMeta() throws RollbackException {
-		HomeTreeNode metaNode = homeTreeNode.metaNode;
-		for (Generic superGeneric : supers)
-			if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
-				return (T) superGeneric;
-		for (Generic superGeneric : supers)
-			if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode))
-				return superGeneric.getMeta();
-		getCurrentCache().rollback(new IllegalStateException("Unable to find a meta for : " + this));
-		return null;// Unreachable
+		return new Metas<T>(homeTreeNode.metaNode).getMeta(this);
+	}
+
+	private class Metas<T extends Generic> extends TreeSet<Generic> {
+
+		private static final long serialVersionUID = 783352418448187992L;
+
+		private HomeTreeNode metaNode;
+
+		public Metas(HomeTreeNode metaNode) {
+			this.metaNode = metaNode;
+		}
+
+		public T getMeta(Generic generic) {
+			if (generic.isEngine()) {
+				add(generic);
+				return (T) generic;
+			}
+			for (Generic superGeneric : ((GenericImpl) generic).supers)
+				if (((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
+					add(superGeneric);
+			for (Generic superGeneric : ((GenericImpl) generic).supers)
+				if (((GenericImpl) superGeneric).homeTreeNode.inheritsFrom(metaNode) && !((GenericImpl) superGeneric).homeTreeNode.equals(metaNode))
+					return getMeta(superGeneric);
+			return (T) unambigousFirst(iterator());
+		}
+
 	}
 
 	@Override
@@ -741,10 +761,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return result;
 	}
 
-	public <T extends Generic> Iterator<T> holdersIterator(final int level, Holder origin, int basePos) {
+	public <T extends Generic> Iterator<T> holdersIterator(int level, Holder origin, int basePos) {
 		if (Statics.STRUCTURAL == level)
 			basePos = Statics.MULTIDIRECTIONAL;
-		return ((Attribute) origin).isInheritanceEnabled() ? this.<T> inheritanceIterator(level, origin, basePos) : this.<T> noInheritanceIterator(level, basePos, origin);
+		return ((Attribute) origin).isInheritanceEnabled() ? this.<T> inheritanceIterator2(level, origin, basePos) : this.<T> noInheritanceIterator(level, basePos, origin);
 	}
 
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final int metaLevel, int pos, final Generic origin) {
@@ -756,14 +776,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	public <T extends Generic> Iterator<T> inheritanceIterator2(final int level, final Generic origin, final int pos) {
+	private <T extends Generic> Iterator<T> inheritanceIterator2(final int level, final Generic origin, final int pos) {
 		return new AbstractFilterIterator<T>(this.<T> getInternalInheritings(level, origin, pos).iterator()) {
 
 			@Override
 			public boolean isSelected() {
 				return level == next.getMetaLevel() && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) next).isAttributeOf(GenericImpl.this));
 			}
-
 		};
 	}
 
@@ -779,7 +798,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			this.maxLevel = maxLevel;
 			for (Generic superGeneric : supers)
 				if (!superGeneric.equals(GenericImpl.this))
-					// if (((GenericImpl) origin).isAttributeOf(superGeneric))
 					for (T inheriting : (((GenericImpl) superGeneric).<T> getInternalInheritings(maxLevel, origin, pos)))
 						add(inheriting);
 			for (T composite : (GenericImpl.this.<T> getComposites()))
@@ -798,16 +816,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					return false;
 			}
 			if (pos != Statics.MULTIDIRECTIONAL) {
-				if (((GenericImpl) candidate).isPseudoStructural(pos)) {
+				if (((GenericImpl) candidate).isPseudoStructural(pos))
 					((GenericImpl) candidate).project(pos);
+				if (maxLevel == candidate.getMetaLevel() && !equals(((GenericImpl) candidate).components[pos])) {
+					iterator = iterator();
+					while (iterator.hasNext()) {
+						Generic next = iterator.next();
+						Generic[] candidateComponents = Statics.replace(pos, ((GenericImpl) candidate).components, GenericImpl.this);
+						Generic candidateMeta = candidate.getMeta();
+						if (((GenericImpl) next).getHomeTreeNode().equals(((GenericImpl) candidate).getHomeTreeNode()) && next.getMeta().equals(candidateMeta)
+								&& Arrays.equals(candidateComponents, Statics.replace(pos, ((GenericImpl) next).components, GenericImpl.this)))
+							new GenericBuilder(getCurrentCache(), candidateMeta, ((GenericImpl) candidate).getHomeTreeNode(), new Generic[] { candidateMeta }, candidateComponents, Statics.MULTIDIRECTIONAL, true).bindDependency(candidate.getClass(), false,
+									true);
+					}
 				}
-				// if (maxLevel == candidate.getMetaLevel() && !equals(((GenericImpl) candidate).components[pos])) {
-				// GenericBuilder gb = new GenericBuilder(getCurrentCache(), candidate.getMeta(), ((GenericImpl) candidate).getHomeTreeNode(), new Generic[] { candidate.getMeta() }, Statics.replace(pos, ((GenericImpl) candidate).components,
-				// GenericImpl.this), Statics.MULTIDIRECTIONAL, true);
-				// if (gb.containsSuperInMultipleInheritanceValue(candidate)) {
-				// gb.bindDependency(candidate.getClass(), false, true);
-				// }
-				// }
 			}
 			return super.add(candidate);
 
@@ -818,17 +840,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new Inheritings<>(level, origin, pos);
 	}
 
-	public <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
+	private <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
 		return (Iterator<T>) new AbstractSelectableLeafIterator(origin) {
 
 			@Override
 			public boolean isSelectable() {
-				return level == next.getMetaLevel();
+				return next.getMetaLevel() == level && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) next).isAttributeOf(GenericImpl.this));
 			}
 
 			@Override
 			public final boolean isSelected(Generic candidate) {
-				boolean selected = candidate.getMetaLevel() <= level && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) candidate).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) candidate).isAttributeOf(GenericImpl.this));
+				boolean selected = candidate.getMetaLevel() <= level;
 				if (selected && pos != Statics.MULTIDIRECTIONAL) {
 					if (((GenericImpl) candidate).isPseudoStructural(pos))
 						((GenericImpl) candidate).project(pos);
@@ -842,6 +864,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				}
 				return selected;
 			}
+
 		};
 	}
 
@@ -865,17 +888,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	static <T extends Generic> Iterator<T> componentsFilter(Iterator<T> iterator, final Generic... components) {
-		return new AbstractFilterIterator<T>(iterator) {
-			@Override
-			public boolean isSelected() {
-				for (int i = 0; i < components.length; i++)
-					if (!components[i].equals(((Holder) next).getComponent(i)))
-						return false;
-				return true;
-			}
-		};
-	}
+	// TODO clean
+	// static <T extends Generic> Iterator<T> componentsFilter(Iterator<T> iterator, final Generic... components) {
+	// return new AbstractFilterIterator<T>(iterator) {
+	// @Override
+	// public boolean isSelected() {
+	// for (int i = 0; i < components.length; i++)
+	// if (!components[i].equals(((Holder) next).getComponent(i)))
+	// return false;
+	// return true;
+	// }
+	// };
+	// }
 
 	private Iterable<Generic>[] projections(final int pos) {
 		final Iterable<Generic>[] projections = new Iterable[components.length];
@@ -1254,7 +1278,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> allInstancesIterator() {
+	public <T extends Generic> Iterator<T> allInstancesIterator() {
 		return Statics.levelFilter(this.<T> allInheritingsAboveIterator(getMetaLevel() + 1), getMetaLevel() + 1);
 	}
 
