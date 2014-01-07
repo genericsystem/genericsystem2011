@@ -1,4 +1,4 @@
-package org.genericsystem.myadmin.util;
+package org.genericsystem.jsf.util;
 
 import javax.faces.application.ViewExpiredException;
 import javax.inject.Inject;

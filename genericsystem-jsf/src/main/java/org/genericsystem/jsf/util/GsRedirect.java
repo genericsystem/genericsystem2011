@@ -1,4 +1,4 @@
-package org.genericsystem.myadmin.util;
+package org.genericsystem.jsf.util;
 
 import java.io.IOException;
 

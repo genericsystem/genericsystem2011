@@ -42,6 +42,9 @@
 		<module>genericsystem-impl</module>
 		<module>genericsystem-myadmin</module>
 		<module>genericsystem-example</module>
+		<module>genericsystem-jsf</module>
+		<module>genericsystem-jsf-resolver</module>
+		<module>genericsystem-example-jsf</module>
 	</modules>
 
 	<distributionManagement>
