@@ -30,8 +30,8 @@ public class AddComponentSuperTest extends AbstractTest {
 		assert vehicle.getRelation("VehicleColor").getComponent(0).equals(vehicle);
 		assert vehicle.getRelation("VehicleColor").getComponent(1).equals(color);
 		assert vehicle.getRelation("VehicleColor").inheritsFrom(cache.getMetaRelation());
-		assert vehicleColor.getComponents().contains(vehicle) : vehicleColor.getComponents();
-		assert vehicleColor.getComponents().contains(color) : vehicleColor.getComponents();
+		assert vehicleColor.components().contains(vehicle) : vehicleColor.components();
+		assert vehicleColor.components().contains(color) : vehicleColor.components();
 	}
 
 	public void removeComponentOnAttribute() {

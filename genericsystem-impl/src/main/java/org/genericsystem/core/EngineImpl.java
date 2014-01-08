@@ -15,6 +15,7 @@ import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
+import org.genericsystem.core.Vertex.GList;
 import org.genericsystem.exception.CacheAwareException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -51,13 +52,13 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	void restoreEngine() {
-		restore(new RootTreeNode(), pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
+		restore(new RootTreeNode(), pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE, new GList(this), new GList());
 	}
 
 	final void restoreEngine(long homeTreeNodeTs, long designTs, long birthTs, long lastReadTs, long deathTs) {
 		assert homeTreeNodeTs != 0;
-		restore(new RootTreeNode(homeTreeNodeTs), designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
-		assert components.length == 0;
+		restore(new RootTreeNode(homeTreeNodeTs), designTs, birthTs, lastReadTs, deathTs, new GList(this), new GList());
+		assert components().isEmpty();
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T buildComplex(HomeTreeNode homeTreeNode, Class<?> clazz, Generic[] supers, Generic[] components) {
+	<T extends Generic> T buildComplex(HomeTreeNode homeTreeNode, Class<?> clazz, GList supers, GList components) {
 		return (T) ((GenericImpl) getFactory().newGeneric(clazz)).initialize(homeTreeNode, supers, components);
 	}
 

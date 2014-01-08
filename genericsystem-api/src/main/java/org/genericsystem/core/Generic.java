@@ -1,8 +1,8 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
-
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -633,29 +633,22 @@ public interface Generic extends Comparable<Generic> {
 	boolean isReferentialIntegrity(int componentPos);
 
 	/**
-	 * Returns the collection of meta generics which this generic directly inherits from.
+	 * Returns an unmodifiable list of generics which this generic directly inherits from.
 	 * 
-	 * @return the supers.
-	 * 
-	 * @see Snapshot
-	 */
-	<T extends Generic> Snapshot<T> getSupers();
-
-	/**
-	 * Returns the components of this generic.
-	 * 
-	 * @return the collection of components components.
+	 * @return the list of supers.
 	 * 
 	 * @see Snapshot
 	 */
-	<T extends Generic> Snapshot<T> getComponents();
+	<T extends Generic> List<T> supers();
 
 	/**
-	 * Return the number of components.
+	 * Returns an unmodifiable list of components of this generic.
 	 * 
-	 * @return the number of components.
+	 * @return the list of components.
+	 * 
+	 * @see Snapshot
 	 */
-	int getComponentsSize();
+	<T extends Generic> List<T> components();
 
 	/**
 	 * Returns the base position of an attribute.
@@ -666,13 +659,6 @@ public interface Generic extends Comparable<Generic> {
 	 * @return the base position of the attribute.
 	 */
 	int getBasePos(Holder attribute);
-
-	/**
-	 * Returns the number of supers.
-	 * 
-	 * @return the number of supers.
-	 */
-	int getSupersSize();
 
 	/**
 	 * Return the meta.

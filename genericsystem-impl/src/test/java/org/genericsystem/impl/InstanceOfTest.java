@@ -121,12 +121,12 @@ public class InstanceOfTest extends AbstractTest {
 		Type car1 = cache.addType("Car1", vehicle);
 		Type car2 = vehicle.addSubType("Car2");
 
-		assert car1.getSupers().get(0).equals(car2.getSupers().get(0));
+		assert car1.supers().get(0).equals(car2.supers().get(0));
 	}
 
 	public void testNewSubTypeWithoutSuper() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car1 = cache.addType("Car1");
-		assert car1.getSupers().get(0).equals(cache.getEngine());
+		assert car1.supers().get(0).equals(cache.getEngine());
 	}
 }

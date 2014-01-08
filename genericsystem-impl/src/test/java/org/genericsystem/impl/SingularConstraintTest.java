@@ -50,7 +50,7 @@ public class SingularConstraintTest extends AbstractTest {
 		vehicle.addInstance("myVehicle");
 		vehicle.setHolder(power, 123);
 		Type car = vehicle.addSubType("Car");
-		assert car.getSupers().size() == 1;
+		assert car.supers().size() == 1;
 		car.addInstance("myCar");
 	}
 
@@ -328,7 +328,6 @@ public class SingularConstraintTest extends AbstractTest {
 		assert myCar.getLinks(carColor).get(0) == myCarRed;
 		assert myCar.getLinks(carColor).get(1) == myCarYellow;
 	}
-
 
 	public void singularForTargetAxe() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();

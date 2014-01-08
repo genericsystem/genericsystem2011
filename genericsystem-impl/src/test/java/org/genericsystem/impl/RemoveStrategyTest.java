@@ -81,12 +81,12 @@ public class RemoveStrategyTest extends AbstractTest {
 		Link carRed = car.setLink(carColor, "carRed", red);
 
 		Link myCarRed = myCar.setLink(carColor, "myCarRed", red);
-		assert myCarRed.getSupers().contains(carRed);
+		assert myCarRed.supers().contains(carRed);
 
 		carRed.remove(RemoveStrategy.CONSERVE);
 		myCarRed = myCar.getLink(carColor);
 		assert myCarRed.isAlive();
-		assert myCarRed.getSupers().contains(carColor);
+		assert myCarRed.supers().contains(carColor);
 	}
 
 	public void testRemoveConserve2() {
@@ -101,12 +101,12 @@ public class RemoveStrategyTest extends AbstractTest {
 		Link carRed = car.setLink(carColor, "carRed", red);
 
 		Link myCarRed = myCar.setLink(carRed, "myCarRed", red);
-		assert myCarRed.getSupers().contains(carRed);
+		assert myCarRed.supers().contains(carRed);
 
 		carRed.remove(RemoveStrategy.CONSERVE);
 		myCarRed = myCar.getLink(carColor);
 		assert myCarRed.isAlive();
-		assert myCarRed.getSupers().contains(carColor);
+		assert myCarRed.supers().contains(carColor);
 	}
 
 	public void testRemoveConserveNotSingular() {
@@ -124,7 +124,7 @@ public class RemoveStrategyTest extends AbstractTest {
 		carRed.remove(RemoveStrategy.CONSERVE);
 		myCarRed = myCar.getLink(carColor);
 		assert myCarRed.isAlive();
-		assert myCarRed.getSupers().contains(carColor);
+		assert myCarRed.supers().contains(carColor);
 	}
 
 	public void testRemoveProject() {

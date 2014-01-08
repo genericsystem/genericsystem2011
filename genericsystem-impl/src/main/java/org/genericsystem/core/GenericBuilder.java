@@ -1,19 +1,18 @@
 package org.genericsystem.core;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-
+import java.util.TreeSet;
 import org.genericsystem.core.Statics.Supers;
+import org.genericsystem.core.Vertex.GList;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.genericsystem.iterator.AbstractSelectableLeafIterator;
-import org.genericsystem.iterator.ArrayIterator;
 
 /**
  * @author Nicolas Feybesse
@@ -24,14 +23,14 @@ class GenericBuilder {
 
 	private final CacheImpl cache;
 	private HomeTreeNode homeTreeNode;
-	private Generic[] components;
-	private Generic[] supers;
+	private GList components;
+	private GList supers;
 	private Generic meta;
 	private boolean isSingular;
 	private boolean isProperty;
 	private int basePos;
 
-	GenericBuilder(CacheImpl cache, Generic meta, HomeTreeNode homeTreeNode, Generic[] aliveSupers, Generic[] aliveNullComponents, int basePos, boolean respectSupers) {
+	GenericBuilder(CacheImpl cache, Generic meta, HomeTreeNode homeTreeNode, GList aliveSupers, GList aliveNullComponents, int basePos, boolean respectSupers) {
 		this.cache = cache;
 		this.meta = meta;
 		this.homeTreeNode = homeTreeNode;
@@ -39,13 +38,12 @@ class GenericBuilder {
 		this.basePos = basePos;
 		isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-		supers = new Supers(aliveSupers).toArray();
+		supers = new Supers(aliveSupers).toGList();
 		supers = getExtendedDirectSupers(respectSupers);
-		// assert supers.length == 1 : Arrays.toString(supers);
 	}
 
 	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {
-		if (supers.length <= 1 || !containsSuper(candidate))
+		if (supers.size() <= 1 || !containsSuper(candidate))
 			return false;
 		// log.info("" + candidate + " " + sameHomeTreeNode());
 		return (sameHomeTreeNode());
@@ -60,19 +58,19 @@ class GenericBuilder {
 
 	boolean sameHomeTreeNode() {
 		for (Generic superGenenic : supers)
-			if (!homeTreeNode.equals(((GenericImpl) superGenenic).homeTreeNode))
+			if (!homeTreeNode.equals(((GenericImpl) superGenenic).getHomeTreeNode()))
 				return false;
 		return true;
 	}
 
 	@SuppressWarnings({ "unchecked" })
 	<T extends Generic> T find(boolean existsException) throws RollbackException {
-		if (supers.length == 1)
-			if (((GenericImpl) supers[0]).equiv(homeTreeNode, components))
+		if (supers.size() == 1)
+			if (((GenericImpl) supers.get(0)).equiv(homeTreeNode, components))
 				if (existsException)
-					cache.rollback(new ExistsException(supers[0] + " already exists !"));
+					cache.rollback(new ExistsException(supers.get(0) + " already exists !"));
 				else
-					return (T) supers[0];
+					return (T) supers.get(0);
 		return null;
 	}
 
@@ -93,23 +91,14 @@ class GenericBuilder {
 			return result;
 		Generic old = null;
 		Set<Generic> directDependencies = getDirectDependencies();
-		// log.info("---------------------------------------------------");
-		// for (Generic dependency : directDependencies) {
-		// log.info("dependency : " + dependency.info());
-		// log.info("isExtention " + isExtention(dependency));
-		// log.info("isSuperOf " + GenericImpl.isSuperOf(homeTreeNode, supers, components, dependency));
-		// }
-		// log.info("homeTreeNode : " + homeTreeNode);
-		// log.info("supers : " + Arrays.toString(supers));
-		// log.info("components : " + Arrays.toString(components));
 		for (Generic dependency : directDependencies)
-			if (!existsException && Statics.MULTIDIRECTIONAL != basePos && (((GenericImpl) dependency).getComponent(basePos)).equals(components[basePos])) {
+			if (!existsException && Statics.MULTIDIRECTIONAL != basePos && (((GenericImpl) dependency).getComponent(basePos)).equals(components.get(basePos))) {
 				assert old == null;
 				old = dependency;
 			}
 		for (Generic dependency : directDependencies) {
-			assert !Arrays.asList(supers).contains(dependency) : Arrays.toString(supers);
-			assert !Arrays.asList(components).contains(dependency) : Arrays.toString(components);
+			assert !supers.contains(dependency) : supers;
+			assert !components.contains(dependency) : components;
 		}
 		return cache.new Restructurator() {
 			private static final long serialVersionUID = 1370210509322258062L;
@@ -122,94 +111,82 @@ class GenericBuilder {
 	}
 
 	Set<Generic> getDirectDependencies() {
-		return new HashCache<Generic>() {
-
-			private static final long serialVersionUID = 2372630315599176801L;
+		Iterator<Generic> iterator = new AbstractFilterIterator<Generic>(new AbstractPreTreeIterator<Generic>(meta) {
+			private static final long serialVersionUID = 3038922934693070661L;
+			{
+				next();
+			}
 
 			@Override
-			public Iterator<Generic> cacheSupplier() {
-				return new AbstractFilterIterator<Generic>(new AbstractPreTreeIterator<Generic>(meta) {
-					private static final long serialVersionUID = 3038922934693070661L;
-					{
-						next();
-					}
-
-					@Override
-					public Iterator<Generic> children(Generic node) {
-						return !isAncestorOf(node) ? ((GenericImpl) node).<Generic> dependenciesIterator() : Collections.<Generic> emptyIterator();
-					}
-				}) {
-					@Override
-					public boolean isSelected() {
-						return isAncestorOf((next)) || isExtention(next);
-					}
-				};
+			public Iterator<Generic> children(Generic node) {
+				return !isAncestorOf(node) ? ((GenericImpl) node).<Generic> dependenciesIterator() : Collections.<Generic> emptyIterator();
+			}
+		}) {
+			@Override
+			public boolean isSelected() {
+				return isAncestorOf((next)) || isExtention(next);
 			}
 		};
+
+		Set<Generic> set = new TreeSet<>();
+		while (iterator.hasNext())
+			set.add(iterator.next());
+		return set;
 	}
 
 	private boolean isExtention(Generic candidate) {
 		if (candidate.getMeta().equals(meta)) {
-			if (Statics.MULTIDIRECTIONAL != basePos && basePos < ((GenericImpl) candidate).components.length) {
-				if (isSingular && ((GenericImpl) candidate).components[basePos].inheritsFrom(components[basePos]))
+			if (Statics.MULTIDIRECTIONAL != basePos && basePos < ((GenericImpl) candidate).components().size()) {
+				if (isSingular && ((GenericImpl) candidate).getComponent(basePos).inheritsFrom(components.get(basePos)))
 					return true;
-				if (isProperty && areComponentsInheriting((((GenericImpl) candidate).components), components))
+				if (isProperty && areComponentsInheriting((((GenericImpl) candidate).components()), components))
 					return true;
 			}
 		}
 		return false;
 	}
 
-	private static boolean areComponentsInheriting(Generic[] subComponents, Generic[] components) {
-		for (int i = 0; i < components.length; i++)
-			if (!subComponents[i].inheritsFrom(components[i]))
+	private static boolean areComponentsInheriting(List<Generic> subComponents, List<Generic> components) {
+		for (int i = 0; i < components.size(); i++)
+			if (!subComponents.get(i).inheritsFrom(components.get(i)))
 				return false;
 		return true;
 	}
 
-	protected Generic[] getExtendedDirectSupers(final boolean respectSupers) {
-		return new HashCache<Generic>() {
-			private static final long serialVersionUID = 5910353456286109539L;
+	protected GList getExtendedDirectSupers(final boolean respectSupers) {
+		final Engine engine = cache.getEngine();
+		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
+			{
+				if (respectSupers && !supers.get(0).equals(engine))
+					iterators.put(engine, new SelectableIterator<>(supers.iterator()));
+			}
 
 			@Override
-			public Iterator<Generic> cacheSupplier() {
-				final Engine engine = cache.getEngine();
-				return new AbstractSelectableLeafIterator(engine) {
-					{
-						if (respectSupers && !supers[0].equals(engine))
-							iterators.put(engine, new SelectableIterator<>(new ArrayIterator<>(supers)));
-					}
-
-					@Override
-					public boolean isSelected(Generic candidate) {
-						if (((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components))
-							return true;
-						if (isExtentedBy(candidate)) {
-							supers = new Supers(supers, candidate).toArray();
-							return true;
-						}
-						return false;
-					}
-				};
+			public boolean isSelected(Generic candidate) {
+				if (((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components))
+					return true;
+				if (isExtentedBy(candidate)) {
+					supers = new Supers(supers, candidate).toGList();
+					return true;
+				}
+				return false;
 			}
-
-			public Generic[] toSortedArray() {
-				Generic[] array = toArray(new Generic[size()]);
-				Arrays.sort(array);
-				return array;
-			}
-		}.toSortedArray();
+		};
+		Set<Generic> set = new TreeSet<>();
+		while (iterator.hasNext())
+			set.add(iterator.next());
+		return new GList(set);
 	}
 
 	private boolean isExtentedBy(Generic candidate) {
 		if (Statics.MULTIDIRECTIONAL != basePos)
-			if (basePos < ((GenericImpl) candidate).components.length)
-				if (!components[basePos].equals(((GenericImpl) candidate).components[basePos]))
+			if (basePos < ((GenericImpl) candidate).components().size())
+				if (!components.get(basePos).equals(((GenericImpl) candidate).getComponent(basePos)))
 					if ((((Attribute) meta).isInheritanceEnabled()))
 						if (homeTreeNode.getMetaLevel() == candidate.getMetaLevel()) {
-							if (isSingular && components[basePos].inheritsFrom(((GenericImpl) candidate).components[basePos]))
+							if (isSingular && components.get(basePos).inheritsFrom(((GenericImpl) candidate).getComponent(basePos)))
 								return true;
-							if (isProperty && areComponentsInheriting(components, ((GenericImpl) candidate).components))
+							if (isProperty && areComponentsInheriting(components, ((GenericImpl) candidate).components()))
 								return true;
 						}
 		return false;
@@ -218,22 +195,10 @@ class GenericBuilder {
 	private boolean isAncestorOf(final Generic dependency) {
 		if (((GenericImpl) dependency).inheritsFrom(homeTreeNode, supers, components))
 			return true;
-		for (Generic component : ((GenericImpl) dependency).components)
+		for (Generic component : ((GenericImpl) dependency).components())
 			if (!dependency.equals(component))
 				if (isAncestorOf(component))
 					return true;
 		return false;
 	}
-
-	private static abstract class HashCache<T> extends HashSet<T> {
-		private static final long serialVersionUID = 7083886154614346197L;
-		{
-			Iterator<T> iterator = cacheSupplier();
-			while (iterator.hasNext())
-				add(iterator.next());
-		}
-
-		public abstract Iterator<T> cacheSupplier();
-	}
-
 }

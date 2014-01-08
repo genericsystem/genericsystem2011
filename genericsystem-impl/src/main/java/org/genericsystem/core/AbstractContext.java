@@ -10,7 +10,6 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -41,11 +40,11 @@ public abstract class AbstractContext {
 
 	public <T extends Generic> T plug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
-		for (Generic component : ((GenericImpl) generic).components)
+		for (Generic component : ((GenericImpl) generic).components())
 			if (componentSet.add(component))
 				getCompositeDependencies(component).add(generic);
 		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : ((GenericImpl) generic).supers)
+		for (Generic effectiveSuper : ((GenericImpl) generic).supers())
 			if (effectiveSupersSet.add(effectiveSuper))
 				getDirectInheritingsDependencies(effectiveSuper).add(generic);
 		return generic;
@@ -53,11 +52,11 @@ public abstract class AbstractContext {
 
 	<T extends Generic> T unplug(T generic) {
 		Set<Generic> componentSet = new HashSet<>();
-		for (Generic component : ((GenericImpl) generic).components)
+		for (Generic component : ((GenericImpl) generic).components())
 			if (componentSet.add(component))
 				getCompositeDependencies(component).remove(generic);
 		Set<Generic> effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : ((GenericImpl) generic).supers)
+		for (Generic effectiveSuper : ((GenericImpl) generic).supers())
 			if (effectiveSupersSet.add(effectiveSuper))
 				getDirectInheritingsDependencies(effectiveSuper).remove(generic);
 		return generic;
@@ -110,15 +109,15 @@ public abstract class AbstractContext {
 							throw new ReferentialIntegrityConstraintViolationException(inheritingDependency + " is an inheritance dependency for ancestor " + generic);
 					for (T compositeDependency : generic.<T> getComposites())
 						if (!generic.equals(compositeDependency)) {
-							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components.length; componentPos++)
-								if (!((GenericImpl) compositeDependency).isAutomatic() && ((GenericImpl) compositeDependency).components[componentPos].equals(generic) && !contains(compositeDependency)
+							for (int componentPos = 0; componentPos < ((GenericImpl) compositeDependency).components().size(); componentPos++)
+								if (!((GenericImpl) compositeDependency).isAutomatic() && ((GenericImpl) compositeDependency).getComponent(componentPos).equals(generic) && !contains(compositeDependency)
 										&& compositeDependency.isReferentialIntegrity(componentPos))
 									throw new ReferentialIntegrityConstraintViolationException(compositeDependency + " is Referential Integrity for ancestor " + generic + " by component position : " + componentPos);
 							addDependencies(compositeDependency);
 						}
-					for (int axe = 0; axe < ((GenericImpl) generic).components.length; axe++)
+					for (int axe = 0; axe < generic.components().size(); axe++)
 						if (((GenericImpl) generic).isCascadeRemove(axe))
-							addDependencies(((GenericImpl) generic).components[axe]);
+							addDependencies(((GenericImpl) generic).getComponent(axe));
 				}
 			}
 		};
@@ -164,16 +163,16 @@ public abstract class AbstractContext {
 			private int getInheritingPosition(Generic inheriting, Generic generic, int basePos) {
 				if (Statics.MULTIDIRECTIONAL == basePos)
 					return basePos;
-				if (inheriting.getComponentsSize() == ((GenericImpl) generic).components.length)
+				if (inheriting.components().size() == ((GenericImpl) generic).components().size())
 					return basePos;
-				for (int i = basePos; i < inheriting.getComponentsSize(); i++)
+				for (int i = basePos; i < inheriting.components().size(); i++)
 					if (generic.inheritsFrom(((Holder) inheriting).getComponent(i)))
 						return i;
 				return Statics.MULTIDIRECTIONAL;
 			}
 
 			private int getCompositePosition(Generic generic, Holder composite) {
-				for (int i = 0; i < composite.getComponentsSize(); i++)
+				for (int i = 0; i < composite.components().size(); i++)
 					if (generic.equals(composite.getComponent(i)))
 						return i;
 				throw new IllegalStateException();
