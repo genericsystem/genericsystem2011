@@ -29,20 +29,18 @@ public class SuperRuleConstraintImpl extends AbstractBooleanNoAxedConstraintImpl
 	@Extends(meta = SuperRuleConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(SuperRuleConstraintImpl.class)
-	public static class DefaultKey {
-	}
+	public static class DefaultKey {}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {
-	}
+	public static class DefaultValue {}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
-		for (Generic directSuper : modified.getSupers())
-			if (!((GenericImpl) directSuper).isSuperOf(((GenericImpl) modified).getHomeTreeNode(), ((GenericImpl) modified).getSupersArray(), ((GenericImpl) modified).getComponentsArray()))
+		for (Generic directSuper : modified.supers())
+			if (!((GenericImpl) directSuper).isSuperOf(((GenericImpl) modified).getHomeTreeNode(), ((GenericImpl) modified).supers(), ((GenericImpl) modified).components()))
 				throw new SuperRuleConstraintViolationException(constraintBase.info() + " should inherits from : " + directSuper.info());
 	}
 }

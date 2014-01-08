@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -156,9 +155,9 @@ public class RelationTest extends AbstractTest {
 		myBmw.bind(carDriverTime, you, yourTime);
 
 		assert myBmw.getLinks(carDriverTime).size() == 2 : myBmw.getLinks(carDriverTime);
-		assert carDriverTime.getComponents().get(Statics.BASE_POSITION).equals(car);
-		assert carDriverTime.getComponents().get(Statics.TARGET_POSITION).equals(person);
-		assert carDriverTime.getComponents().get(Statics.SECOND_TARGET_POSITION).equals(time);
+		assert carDriverTime.components().get(Statics.BASE_POSITION).equals(car);
+		assert carDriverTime.components().get(Statics.TARGET_POSITION).equals(person);
+		assert carDriverTime.components().get(Statics.SECOND_TARGET_POSITION).equals(time);
 
 		assert carDriverTime.getBaseComponent().equals(car);
 	}
@@ -1107,7 +1106,7 @@ public class RelationTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type human = cache.addType("Human");
 		Relation relation = vehicle.setRelation("pilot", human);
-		assert relation.getComponents().size() == 2 : relation.getComponents().size();
+		assert relation.components().size() == 2 : relation.components().size();
 	}
 
 	public void testDependency() {

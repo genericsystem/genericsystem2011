@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
@@ -177,20 +176,17 @@ public class FlushTest extends AbstractTest {
 		assert red.getLinks(carColor).size() == 2;
 
 		Snapshot<Link> links = red.getLinks(carColor);
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Link redToBMW = links.filter(new Filter() {
+		Link redToBMW = links.filter(new Filter<Link>() {
 
 			@Override
-			public boolean isSelected(Object element) {
-				return ((Link) element).getComponents().contains(bmw);
+			public boolean isSelected(Link element) {
+				return element.components().contains(bmw);
 			}
 		}).get(0);
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Link redToLada = links.filter(new Filter() {
-
+		Link redToLada = links.filter(new Filter<Link>() {
 			@Override
-			public boolean isSelected(Object element) {
-				return ((Link) element).getComponents().contains(audi);
+			public boolean isSelected(Link element) {
+				return element.components().contains(audi);
 			}
 		}).get(0);
 

@@ -8,7 +8,6 @@ import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.generic.Holder;
@@ -29,22 +28,20 @@ public class AliveConstraintImpl extends AbstractBooleanNoAxedConstraintImpl imp
 	@Extends(meta = AliveConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(AliveConstraintImpl.class)
-	public static class DefaultKey {
-	}
+	public static class DefaultKey {}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {
-	}
+	public static class DefaultValue {}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
-		for (Generic generic : ((GenericImpl) modified).getComponents())
+		for (Generic generic : modified.components())
 			if (!generic.isAlive())
 				throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");
-		for (Generic generic : ((GenericImpl) modified).getSupers())
+		for (Generic generic : modified.supers())
 			if (!generic.isAlive())
 				throw new AliveConstraintViolationException("Super : " + generic + " of added node " + modified + " should be alive.");
 	}

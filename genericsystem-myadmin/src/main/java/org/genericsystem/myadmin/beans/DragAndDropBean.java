@@ -3,8 +3,8 @@ package org.genericsystem.myadmin.beans;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -45,7 +45,7 @@ public class DragAndDropBean {
 		Generic target = ((GuiGenericsTreeNode) dropEvent.getDragValue()).getGeneric();
 		Attribute attribute = ((Structural) dropEvent.getDropValue()).getAttribute();
 		if (target.isStructural()) {
-			attribute.addComponent(target, attribute.getComponentsSize());
+			attribute.addComponent(target, ((GenericImpl) attribute).components().size());
 			messages.info("targetRelation", target, attribute);
 		} else if (target.isConcrete()) {
 			if (attribute.isReallyRelation()) {

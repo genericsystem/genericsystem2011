@@ -23,19 +23,17 @@ public class MetaLevelConstraintImpl extends AbstractBooleanNoAxedConstraintImpl
 	@Extends(meta = MetaLevelConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(MetaLevelConstraintImpl.class)
-	public static class DefaultKey {
-	}
+	public static class DefaultKey {}
 
 	@SystemGeneric
 	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {
-	}
+	public static class DefaultValue {}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
-		for (Generic component : modified.getComponents())
+		for (Generic component : modified.components())
 			if (component.getMetaLevel() > modified.getMetaLevel())
 				throw new MetaLevelConstraintViolationException(component + " must have a meta level lower than " + modified);
 	}

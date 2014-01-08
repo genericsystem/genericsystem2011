@@ -10,7 +10,7 @@ import java.util.ListIterator;
  * @author Nicolas Feybesse
  * 
  */
-class Vertex {
+public class Vertex {
 
 	private HomeTreeNode homeTreeNode;
 
@@ -36,12 +36,13 @@ class Vertex {
 		return components;
 	}
 
-	public static class GList extends ArrayList<Generic> implements List<Generic> {
+	public static class GList extends ArrayList<Generic> {
 
 		private static final long serialVersionUID = 6487730580551161546L;
 
 		public GList(Collection<? extends Generic> list) {
 			super(list);
+			assert !(list instanceof GList);
 		}
 
 		public GList(Generic... array) {
