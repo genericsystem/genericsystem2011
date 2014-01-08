@@ -7,8 +7,8 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>genericsystem-example-jsf</artifactId>
-	<name>Generic System Example JSF</name>
+	<artifactId>genericsystem-jsf-example</artifactId>
+	<name>Generic System JSF Example</name>
 	<packaging>war</packaging>
 
 	<dependencies>
@@ -104,7 +104,7 @@
 		</dependencies>
 	</dependencyManagement>
 	<build>
-		<finalName>jsftest</finalName>
+		<finalName>genericsystem-jsf-example</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.jboss.as.plugins</groupId>
