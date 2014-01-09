@@ -170,7 +170,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	void remove(final Generic generic, final RemoveStrategy removeStrategy) throws RollbackException {
 		switch (removeStrategy) {
-		case NORMAl:
+		case NORMAL:
 			orderAndRemoveDependenciesForRemove(generic);
 			break;
 		case CONSERVE:

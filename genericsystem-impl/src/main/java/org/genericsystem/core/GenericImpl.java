@@ -1014,7 +1014,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void remove() {
-		remove(RemoveStrategy.NORMAl);
+		remove(RemoveStrategy.NORMAL);
 	}
 
 	@Override
