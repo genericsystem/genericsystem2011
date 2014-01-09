@@ -22,7 +22,8 @@ import org.genericsystem.constraints.AbstractConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractAxedConstraintImpl;
 import org.genericsystem.constraints.AbstractConstraintImpl.CheckingType;
 import org.genericsystem.constraints.PropertyConstraintImpl;
-import org.genericsystem.core.Vertex.GList;
+import org.genericsystem.core.UnsafeGList.Supers;
+import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.exception.AliveConstraintViolationException;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
@@ -209,8 +210,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 			@Override
 			Generic rebuild() {
-				return bindDependency(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers(), Statics.insertIntoList(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.getClass(), Statics.MULTIDIRECTIONAL,
-						false, isAutomatic(old));
+				return bindDependency(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), ((GenericImpl) old).supers(), Statics.insertIntoComponents(newComponent, ((GenericImpl) old).selfToNullComponents(), pos), old.getClass(),
+						Statics.MULTIDIRECTIONAL, false, isAutomatic(old));
 			}
 		}.rebuildAll(old, Statics.MULTIDIRECTIONAL);
 	}
@@ -232,7 +233,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 			@Override
 			Generic rebuild() {
-				return bindDependency(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), Statics.insertIntoList(newSuper, old.supers(), 0), ((GenericImpl) old).selfToNullComponents(), old.getClass(), Statics.MULTIDIRECTIONAL, true, isAutomatic(old));
+				return bindDependency(old.getMeta(), ((GenericImpl) old).getHomeTreeNode(), Statics.insertIntoSupers(newSuper, old.supers(), 0), ((GenericImpl) old).selfToNullComponents(), old.getClass(), Statics.MULTIDIRECTIONAL, true, isAutomatic(old));
 			}
 		}.rebuildAll(old, Statics.MULTIDIRECTIONAL);
 	}
@@ -334,7 +335,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T addType(Serializable name, Type[] supers, Generic... components) {
-		return internalSetType(name, true, new GList(supers), new GList(components));
+		return internalSetType(name, true, new Supers(supers), new UnsafeComponents(components));
 	}
 
 	@Override
@@ -344,11 +345,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T setType(Serializable name, Type[] supers, Generic... components) {
-		return internalSetType(name, false, new GList(supers), new GList(components));
+		return internalSetType(name, false, new Supers(supers), new UnsafeComponents(components));
 	}
 
-	private <T extends Type> T internalSetType(Serializable name, boolean existsException, GList supers, GList components) {
-		return internalBind(getEngine(), name, supers, components, null, Statics.MULTIDIRECTIONAL, false, existsException);
+	private <T extends Type> T internalSetType(Serializable name, boolean existsException, Supers supers, UnsafeComponents uComponents) {
+		return internalBind(getEngine(), name, supers, uComponents, null, Statics.MULTIDIRECTIONAL, false, existsException);
 	}
 
 	@Override
@@ -372,10 +373,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private <T extends Tree> T internalSetTree(Serializable name, int dim, boolean existsException) {
-		return this.<Type> bind(name, TreeImpl.class, existsException, new GList(getEngine()), new GList(new Generic[dim])).disableInheritance();
+		return this.<Type> bind(name, TreeImpl.class, existsException, new Supers(getEngine()), new UnsafeComponents(new Generic[dim])).disableInheritance();
 	}
 
-	private <T extends Generic> T bind(Serializable name, Class<?> specializationClass, boolean existsException, GList supers, GList components) {
+	private <T extends Generic> T bind(Serializable name, Class<?> specializationClass, boolean existsException, Supers supers, UnsafeComponents components) {
 		return this.<T> internalBind(getEngine(), name, supers, components, specializationClass, Statics.MULTIDIRECTIONAL, false, existsException);
 	}
 
@@ -401,15 +402,15 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz, components);
 		Serializable value = findImplictValue(clazz);
-		return this.<T> internalBind(meta, value, new GList(Statics.insertFirst(meta, userSupers)), new GList(components), clazz, Statics.MULTIDIRECTIONAL, false, false);
+		return this.<T> internalBind(meta, value, new Supers(Statics.insertFirst(meta, userSupers)), new UnsafeComponents(components), clazz, Statics.MULTIDIRECTIONAL, false, false);
 	}
 
 	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, boolean existsException, int axe, Generic... components) {
-		GList sortAndCheck = ((GenericImpl) directSuper).sortAndCheck(components);
-		return internalBind(meta, value, new GList(directSuper), sortAndCheck, specializationClass, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe, false, existsException);
+		UnsafeComponents sortAndCheck = ((GenericImpl) directSuper).sortAndCheck(components);
+		return internalBind(meta, value, new Supers(directSuper), sortAndCheck, specializationClass, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe, false, existsException);
 	}
 
-	int findAxe(GList sorts, Generic baseComponent) throws RollbackException {
+	int findAxe(UnsafeGList sorts, Generic baseComponent) throws RollbackException {
 		for (int i = 0; i < sorts.size(); i++)
 			if (baseComponent.equals(sorts.get(i)))
 				return i;
@@ -458,15 +459,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		private void reBindDependency(Generic dependency, int basePos) {
 			HomeTreeNode newHomeTreeNode = ((GenericImpl) dependency).getHomeTreeNode();
-			GList supers = adjust(((GenericImpl) dependency).supers());
-			GList components = adjust(((GenericImpl) dependency).selfToNullComponents());
-			Generic meta = adjust(Arrays.asList(dependency.getMeta())).get(0);
+			Supers supers = new Supers(new AdjustList(((GenericImpl) dependency).supers()));
+			UnsafeComponents components = new UnsafeComponents(new AdjustList(((GenericImpl) dependency).selfToNullComponents()));
+			Generic meta = new AdjustList(Arrays.asList(dependency.getMeta())).get(0);
 			// should we rebind automatic dependencies ?
 			put(dependency, bindDependency(meta, newHomeTreeNode, supers, components, dependency.getClass(), basePos, false, isAutomatic(dependency)));
-		}
-
-		private GList adjust(List<Generic> oldComponents) {
-			return new GList(new AdjustList(oldComponents));
 		}
 
 		private class AdjustList extends ArrayList<Generic> {
@@ -496,16 +493,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 				reBindDependency(dependencyEntry.getKey(), dependencyEntry.getValue());
 		}
 
-		<T extends Generic> T bindDependency(Generic meta, HomeTreeNode homeTreeNode, GList supers, GList components, Class<?> specializationClass, int basePos, boolean existsException, boolean automatic) throws RollbackException {
-			return new GenericBuilder(CacheImpl.this, meta, homeTreeNode, supers, components, basePos, false).bindDependency(specializationClass, existsException, automatic);
+		<T extends Generic> T bindDependency(Generic meta, HomeTreeNode homeTreeNode, Supers supers, UnsafeComponents uComponents, Class<?> specializationClass, int basePos, boolean existsException, boolean automatic) throws RollbackException {
+			return new GenericBuilder(CacheImpl.this, meta, homeTreeNode, supers, uComponents, basePos, false).bindDependency(specializationClass, existsException, automatic);
 		}
 
 		abstract Generic rebuild();
 	}
 
 	// TODO KK supers should not be empty here !
-	<T extends Generic> T internalBind(Generic meta, Serializable value, GList supers, GList components, final Class<?> specializationClass, int basePos, final boolean automatic, boolean existsException) throws RollbackException {
-		return new GenericBuilder(this, meta, ((GenericImpl) meta).bindInstanceNode(value), !supers.isEmpty() ? supers : new GList(getEngine()), components, basePos, true).internalBind(specializationClass, basePos, existsException, automatic);
+	<T extends Generic> T internalBind(Generic meta, Serializable value, Supers supers, UnsafeComponents uComponents, final Class<?> specializationClass, int basePos, final boolean automatic, boolean existsException) throws RollbackException {
+		return new GenericBuilder(this, meta, ((GenericImpl) meta).bindInstanceNode(value), !supers.isEmpty() ? supers : new Supers(getEngine()), uComponents, basePos, true).internalBind(specializationClass, basePos, existsException, automatic);
 	}
 
 	private class AllDependencies extends TreeMap<Generic, Integer> {
@@ -737,15 +734,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isEngine() || generic.isAlive())
 			return (T) generic;
-		return new GenericBuilder(this, reFind(generic.getMeta()), ((GenericImpl) generic).getHomeTreeNode(), reFind(((GenericImpl) generic).supers()), reFind(((GenericImpl) generic).selfToNullComponents()), Statics.MULTIDIRECTIONAL, false).find(false);
+		return new GenericBuilder(this, reFind(generic.getMeta()), ((GenericImpl) generic).getHomeTreeNode(), new Supers(reFind(((GenericImpl) generic).supers())), new UnsafeComponents(reFind(((GenericImpl) generic).selfToNullComponents())),
+				Statics.MULTIDIRECTIONAL, false).find(false);
 	}
 
-	private GList reFind(GList generics) {
+	private List<Generic> reFind(UnsafeGList generics) {
 		List<Generic> reFounds = new ArrayList<>(generics);
 		for (int i = 0; i < generics.size(); i++)
 			reFounds.set(i, reFind(generics.get(i)));
 		// TODO KK : if refind is null => exit caller method with null
-		return new GList(reFounds);
+		return reFounds;
 	}
 
 	public Generic findByDesignTs(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {

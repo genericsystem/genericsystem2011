@@ -6,7 +6,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import org.genericsystem.core.Vertex.GList;
+import org.genericsystem.core.UnsafeGList.Supers;
+import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 
 public abstract class AbstractWriter {
 
@@ -62,10 +63,10 @@ public abstract class AbstractWriter {
 				homeTreeNode = ((GenericImpl) engine).getHomeTreeNode().ts == metaTs ? ((GenericImpl) engine).getHomeTreeNode() : homeTreeMap.get(metaTs);
 				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, (Serializable) getContentInputStream().readObject());
 			}
-			GList supers = loadAncestors(engine, genericMap);
-			GList components = loadAncestors(engine, genericMap);
+			Supers supers = new Supers(loadAncestors(engine, genericMap));
+			UnsafeComponents uComponents = new UnsafeComponents(loadAncestors(engine, genericMap));
 			Generic generic = engine.getFactory().newGeneric((Class<?>) getFormalInputStream().readObject());
-			plug(((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components));
+			plug(((GenericImpl) generic).restore(new UnsafeVertex(homeTreeNode, supers, uComponents), ts[0], ts[1], ts[2], ts[3]));
 			if (!homeTreeMap.containsKey(homeTreeNodeTs))
 				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).getHomeTreeNode());
 			genericMap.put(ts[0], generic);
@@ -81,12 +82,12 @@ public abstract class AbstractWriter {
 			return ts;
 		}
 
-		private GList loadAncestors(Engine engine, Map<Long, Generic> genericMap) throws IOException {
+		private Generic[] loadAncestors(Engine engine, Map<Long, Generic> genericMap) throws IOException {
 			int length = getFormalInputStream().readInt();
 			Generic[] ancestors = new Generic[length];
 			for (int index = 0; index < length; index++)
 				ancestors[index] = loadAncestor(engine, genericMap);
-			return new GList(ancestors);
+			return ancestors;
 		}
 
 	}

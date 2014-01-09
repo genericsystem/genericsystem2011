@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
-import org.genericsystem.core.Vertex.GList;
+import org.genericsystem.core.UnsafeGList.Supers;
+import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,12 +76,20 @@ public class Statics {
 		return result;
 	}
 
-	public static GList insertIntoList(Generic generic, List<Generic> targets, int basePos) {
+	public static UnsafeComponents insertIntoComponents(Generic generic, List<Generic> targets, int basePos) {
 		if (basePos < 0 || basePos > targets.size())
 			throw new IllegalStateException("Unable to find a valid base position");
 		List<Generic> result = new ArrayList<>(targets);
 		result.add(basePos, generic);
-		return new GList(result);
+		return new UnsafeComponents(result);
+	}
+
+	public static Supers insertIntoSupers(Generic generic, List<Generic> targets, int basePos) {
+		if (basePos < 0 || basePos > targets.size())
+			throw new IllegalStateException("Unable to find a valid base position");
+		List<Generic> result = new ArrayList<>(targets);
+		result.add(basePos, generic);
+		return new Supers(result);
 	}
 
 	static Generic[] insertFirst(Generic first, Generic... others) {
@@ -104,10 +113,16 @@ public class Statics {
 	// return result;
 	// }
 
-	static GList truncate(int i, List<Generic> generics) {
-		List<Generic> result = new ArrayList<>(generics);
+	static Supers truncate(int i, Supers supers) {
+		List<Generic> result = new ArrayList<>(supers);
 		result.remove(i);
-		return new GList(result);
+		return new Supers(result);
+	}
+
+	static UnsafeComponents truncate(int i, UnsafeComponents uComponents) {
+		List<Generic> result = new ArrayList<>(uComponents);
+		result.remove(i);
+		return new UnsafeComponents(result);
 	}
 
 	// static HomeTreeNode[] truncate(int i, HomeTreeNode[] nodes) {
@@ -141,10 +156,16 @@ public class Statics {
 		return copy;
 	}
 
-	static GList replace(int i, GList generics, Generic generic) {
-		List<Generic> copy = new ArrayList<>(generics);
+	static UnsafeComponents replace(int i, UnsafeComponents uComponents, Generic generic) {
+		List<Generic> copy = new ArrayList<>(uComponents);
 		copy.set(i, generic);
-		return new GList(copy);
+		return new UnsafeComponents(copy);
+	}
+
+	static Supers replace(int i, Supers supers, Generic generic) {
+		List<Generic> copy = new ArrayList<>(supers);
+		copy.set(i, generic);
+		return new Supers(copy);
 	}
 
 	public static void debugCurrentThread() {
@@ -238,36 +259,20 @@ public class Statics {
 		return result.toArray(new Generic[result.size()]);
 	}
 
-	// public static class Components extends ArrayList<Generic> {
-	// private static final long serialVersionUID = -3285243912802228927L;
-	//
-	// public Components(Generic[] components, Generic... adds) {
-	// super(Arrays.asList(components));
-	// for (int i = 0; i < adds.length; i++)
-	// if (i >= components.length || (components[i] != null && !components[i].inheritsFrom(adds[i])))
-	// add(adds[i]);
-	// }
-	//
-	// @Override
-	// public Generic[] toArray() {
-	// return toArray(new Generic[size()]);
-	// }
-	// }
-
-	public static class Supers extends TreeSet<Generic> {
+	public static class OrderedSupers extends TreeSet<Generic> {
 		private static final long serialVersionUID = 4756135385933890439L;
 
-		public Supers(GList supers) {
+		public OrderedSupers(UnsafeGList supers) {
 			for (Generic superGeneric : supers)
 				add(superGeneric);
 		}
 
-		public Supers(GList supers, Generic add) {
+		public OrderedSupers(UnsafeGList supers, Generic add) {
 			this(supers);
 			add(add);
 		}
 
-		public Supers(GList supers, Generic[] adds) {
+		public OrderedSupers(UnsafeGList supers, Generic[] adds) {
 			this(supers);
 			for (Generic add : adds)
 				add(add);
@@ -278,8 +283,8 @@ public class Statics {
 			return toArray(new Generic[size()]);
 		}
 
-		public GList toGList() {
-			return new GList(this);
+		public Supers toSupers() {
+			return new Supers(this);
 		}
 
 		@Override
