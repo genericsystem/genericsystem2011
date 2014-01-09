@@ -15,13 +15,6 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface Extends {
 
-	// /**
-	// * The meta class
-	// *
-	// * @return meta class
-	// */
-	// Class<?> meta() default Engine.class;
-
 	/**
 	 * Returns the supers classes.
 	 * 
