@@ -3,7 +3,6 @@ package org.genericsystem.myadmin.gui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
@@ -57,10 +56,10 @@ public class GuiGenericsTreeNode {
 	}
 
 	/**
-	 * Returns the GUI tree node of generic from children of current node. Can return null if node
-	 * with generic was not found.
+	 * Returns the GUI tree node of generic from children of current node. Can return null if node with generic was not found.
 	 * 
-	 * @param generic - generic to look for.
+	 * @param generic
+	 *            - generic to look for.
 	 * 
 	 * @return the GUI tree node of generic.
 	 */
@@ -73,10 +72,10 @@ public class GuiGenericsTreeNode {
 	}
 
 	/**
-	 * Returns the GUI tree node of generic in the sub tree of current node. Can return null if node
-	 * with generic was not found.
+	 * Returns the GUI tree node of generic in the sub tree of current node. Can return null if node with generic was not found.
 	 * 
-	 * @param generic - generic to look for.
+	 * @param generic
+	 *            - generic to look for.
 	 * 
 	 * @return the GUI tree node of generic.
 	 */
@@ -100,9 +99,8 @@ public class GuiGenericsTreeNode {
 	}
 
 	/**
-	 * Update current list of children. If node of child is already present in the list of children
-	 * it's state is not changes. If the new child of generic found it's node will be added in the
-	 * list. If child not more exists it's node will be removed from the list.
+	 * Update current list of children. If node of child is already present in the list of children it's state is not changes. If the new child of generic found it's node will be added in the list. If child not more exists it's node will be removed from
+	 * the list.
 	 */
 	public void updateChildren() {
 		if (children != null) {
@@ -137,24 +135,24 @@ public class GuiGenericsTreeNode {
 	private <T extends Generic> List<T> getChildrenGenerics(GuiTreeChildrenType childrenType) {
 		switch (childrenType) {
 		case SUPERS:
-			return generic.getSupers();
+			return generic.supers();
 		case INSTANCES:
 			return ((Type) generic).getInstances();
 		case INHERITINGS:
 			return generic.getInheritings();
 		case COMPONENTS:
-			return generic.getComponents();
+			return generic.components();
 		case COMPOSITES:
 			return generic.getComposites();
 		case ATTRIBUTES:
 			return (List<T>) ((Type) generic).getAttributes();
 		case VALUES:
-			return (List<T>) generic.getComponents().get(0).getHolders((Attribute) generic);
+			return (List<T>) generic.components().get(0).getHolders((Attribute) generic);
 		default:
-			break;
+		break;
 		}
 		return new ArrayList<>();
-		//throw new IllegalStateException();
+		// throw new IllegalStateException();
 	}
 
 	public void expand() {
@@ -189,7 +187,7 @@ public class GuiGenericsTreeNode {
 
 	public void setChildrenType(GuiTreeChildrenType childrenType) {
 		if (this.childrenType != childrenType)
-			children = null;						// abandon precedent children
+			children = null; // abandon precedent children
 		this.childrenType = childrenType;
 	}
 
