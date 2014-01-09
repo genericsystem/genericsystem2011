@@ -843,6 +843,37 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new Inheritings<>(level, origin, pos);
 	}
 
+<<<<<<< HEAD
+=======
+	private <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
+		return (Iterator<T>) new AbstractSelectableLeafIterator(origin) {
+
+			@Override
+			public boolean isSelectable() {
+				return next.getMetaLevel() == level && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) next).isAttributeOf(GenericImpl.this));
+			}
+
+			@Override
+			public final boolean isSelected(Generic candidate) {
+				boolean selected = candidate.getMetaLevel() <= level;
+				if (selected && pos != Statics.MULTIDIRECTIONAL) {
+					if (((GenericImpl) candidate).isPseudoStructural(pos))
+						((GenericImpl) candidate).project(pos);
+					if (level == candidate.getMetaLevel() && !equals(((GenericImpl) candidate).components().get(pos))) {
+						GenericBuilder gb = new GenericBuilder(getCurrentCache(), candidate.getMeta(), ((GenericImpl) candidate).getHomeTreeNode(), new Supers(candidate.getMeta()), Statics.replace(pos, ((GenericImpl) candidate).components(),
+								GenericImpl.this), Statics.MULTIDIRECTIONAL, true);
+						if (gb.containsSuperInMultipleInheritanceValue(candidate)) {
+							gb.bindDependency(candidate.getClass(), false, true);
+						}
+					}
+				}
+				return selected;
+			}
+
+		};
+	}
+
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 	public void project() {
 		project(Statics.MULTIDIRECTIONAL);
 	}
@@ -1010,6 +1041,23 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			} else if (!((GenericImpl) subComponents.get(i)).inheritsFrom(homeTreeNode, supers, components))
 				return false;
 		return true;
+<<<<<<< HEAD
+=======
+	}
+
+	@Deprecated
+	private boolean inheritsFrom2(HomeTreeNode homeTreeNode, UnsafeGList supers, UnsafeGList components) {
+		if (equiv(homeTreeNode, supers, components))
+			return true;
+		if (getEngine().equiv(homeTreeNode, supers, components))
+			return true;
+		if (isEngine())
+			return false;
+		for (Generic directSuper : supers())
+			if (((GenericImpl) directSuper).inheritsFrom2(homeTreeNode, supers, components))
+				return true;
+		return false;
+>>>>>>> branch 'master' of https://github.com/genericsystem/genericsystem2011.git
 	}
 
 	@Override

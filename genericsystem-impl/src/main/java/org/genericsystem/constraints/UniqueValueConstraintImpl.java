@@ -3,7 +3,6 @@ package org.genericsystem.constraints;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;

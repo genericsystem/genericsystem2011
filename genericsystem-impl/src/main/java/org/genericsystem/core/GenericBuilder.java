@@ -5,8 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import org.genericsystem.core.Statics.Supers;
-import org.genericsystem.core.Vertex.GList;
+import org.genericsystem.core.Statics.OrderedSupers;
+import org.genericsystem.core.UnsafeGList.Supers;
+import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Attribute;
@@ -23,22 +24,22 @@ class GenericBuilder {
 
 	private final CacheImpl cache;
 	private HomeTreeNode homeTreeNode;
-	private GList components;
-	private GList supers;
+	private UnsafeComponents components;
+	private Supers supers;
 	private Generic meta;
 	private boolean isSingular;
 	private boolean isProperty;
 	private int basePos;
 
-	GenericBuilder(CacheImpl cache, Generic meta, HomeTreeNode homeTreeNode, GList aliveSupers, GList aliveNullComponents, int basePos, boolean respectSupers) {
+	GenericBuilder(CacheImpl cache, Generic meta, HomeTreeNode homeTreeNode, Supers aliveSupers, UnsafeComponents components, int basePos, boolean respectSupers) {
 		this.cache = cache;
 		this.meta = meta;
 		this.homeTreeNode = homeTreeNode;
-		components = aliveNullComponents;
+		this.components = components;
 		this.basePos = basePos;
 		isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-		supers = new Supers(aliveSupers).toGList();
+		supers = new OrderedSupers(aliveSupers).toSupers();
 		supers = getExtendedDirectSupers(respectSupers);
 	}
 
@@ -82,7 +83,7 @@ class GenericBuilder {
 	}
 
 	private <T extends Generic> T buildDependency(Class<?> specializationClass, boolean automatic) {
-		return cache.<T> insert(cache.<EngineImpl> getEngine().buildComplex(homeTreeNode, ((GenericImpl) meta).specializeInstanceClass(specializationClass), supers, components), automatic);
+		return cache.<T> insert(cache.<EngineImpl> getEngine().buildComplex(((GenericImpl) meta).specializeInstanceClass(specializationClass), new UnsafeVertex(homeTreeNode, supers, components)), automatic);
 	}
 
 	<T extends Generic> T internalBind(final Class<?> specializationClass, int basePos, boolean existsException, final boolean automatic) throws RollbackException {
@@ -153,7 +154,7 @@ class GenericBuilder {
 		return true;
 	}
 
-	protected GList getExtendedDirectSupers(final boolean respectSupers) {
+	protected Supers getExtendedDirectSupers(final boolean respectSupers) {
 		final Engine engine = cache.getEngine();
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
 			{
@@ -166,7 +167,7 @@ class GenericBuilder {
 				if (((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components))
 					return true;
 				if (isExtentedBy(candidate)) {
-					supers = new Supers(supers, candidate).toGList();
+					supers = new OrderedSupers(supers, candidate).toSupers();
 					return true;
 				}
 				return false;
@@ -175,7 +176,7 @@ class GenericBuilder {
 		Set<Generic> set = new TreeSet<>();
 		while (iterator.hasNext())
 			set.add(iterator.next());
-		return new GList(set);
+		return new Supers(set);
 	}
 
 	private boolean isExtentedBy(Generic candidate) {
