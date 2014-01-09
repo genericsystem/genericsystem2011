@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.genericsystem.core.Engine;
+
 /**
  * Used to declare the Extends of generic. A generic inherits directly of the supers.
  * 
@@ -13,19 +15,12 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-public @interface Extends {
-
-	// /**
-	// * The meta class
-	// *
-	// * @return meta class
-	// */
-	// Class<?> meta() default Engine.class;
+public @interface Meta {
 
 	/**
-	 * Returns the supers classes.
+	 * The meta class
 	 * 
-	 * @return An array of supers classes.
+	 * @return meta class
 	 */
-	Class<?>[] value() default {};
+	Class<?> value() default Engine.class;
 }

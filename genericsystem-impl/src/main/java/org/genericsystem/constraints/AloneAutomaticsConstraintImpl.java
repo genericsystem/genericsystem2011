@@ -3,6 +3,7 @@ package org.genericsystem.constraints;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
@@ -25,14 +26,14 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 public class AloneAutomaticsConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
-	@Extends(meta = AloneAutomaticsConstraintImpl.class)
+	@Meta(AloneAutomaticsConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(AloneAutomaticsConstraintImpl.class)
 	public static class DefaultKey {
 	}
 
 	@SystemGeneric
-	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
+	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
 	public static class DefaultValue {

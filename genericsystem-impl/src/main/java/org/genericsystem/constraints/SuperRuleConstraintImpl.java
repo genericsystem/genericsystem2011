@@ -3,6 +3,7 @@ package org.genericsystem.constraints;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
@@ -26,16 +27,18 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 public class SuperRuleConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
-	@Extends(meta = SuperRuleConstraintImpl.class)
+	@Meta(SuperRuleConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(SuperRuleConstraintImpl.class)
-	public static class DefaultKey {}
+	public static class DefaultKey {
+	}
 
 	@SystemGeneric
-	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
+	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {}
+	public static class DefaultValue {
+	}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
