@@ -876,11 +876,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		project(Statics.MULTIDIRECTIONAL);
 	}
 
-	// TODO KK cartesian iterator shoulb be templated (with an internal arrayList ?)
 	public void project(final int pos) {
-		Iterator<Object[]> cartesianIterator = new CartesianIterator(projections(pos));
+		Iterator<Generic[]> cartesianIterator = new CartesianIterator<>(projections(pos));
 		while (cartesianIterator.hasNext()) {
-			final UnsafeComponents components = new UnsafeComponents((Generic[]) cartesianIterator.next());
+			final UnsafeComponents components = new UnsafeComponents(cartesianIterator.next());
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 				@Override
 				public boolean isSelected() {
