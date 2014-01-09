@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Random;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -176,7 +175,9 @@ public class TreeTest extends AbstractTest {
 		assert bind.inheritsFrom(webPageRed);
 		Link bind2 = header.bind(graphicComponentColor, blue);
 		assert bind2.inheritsFrom(webPageRed);
-		assert bind.isAlive();
+
+		assert bind.isAlive() : bind.info() + bind2.info();
+
 		assert bind == bind2 : bind.info() + " " + bind2.info();
 		footer.bind(graphicComponentColor, yellow);
 
@@ -194,14 +195,12 @@ public class TreeTest extends AbstractTest {
 
 		root.traverse(new Visitor() {
 			@Override
-			public void before(Node node) {
-			}
+			public void before(Node node) {}
 		});
 
 		root.traverse(new Visitor() {
 			@Override
-			public void after(Node node) {
-			}
+			public void after(Node node) {}
 		});
 	}
 

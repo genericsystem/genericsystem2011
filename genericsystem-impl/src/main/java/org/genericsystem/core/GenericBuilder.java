@@ -39,24 +39,23 @@ class GenericBuilder {
 		this.basePos = basePos;
 		isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-		supers = new OrderedSupers(aliveSupers).toSupers();
-		supers = getExtendedDirectSupers(respectSupers);
+		supers = getExtendedDirectSupers(new OrderedSupers(aliveSupers), respectSupers);
 	}
 
-	protected Supers getExtendedDirectSupers(final boolean respectSupers) {
+	protected Supers getExtendedDirectSupers(final OrderedSupers orderedSupers, final boolean respectSupers) {
 		final Engine engine = cache.getEngine();
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
 			{
-				if (respectSupers && !supers.get(0).equals(engine))
-					iterators.put(engine, new SelectableIterator<>(supers.iterator()));
+				if (respectSupers && !orderedSupers.iterator().next().equals(engine))
+					iterators.put(engine, new SelectableIterator<>(orderedSupers.iterator()));
 			}
 
 			@Override
 			public boolean isSelected(Generic candidate) {
-				if (((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components))
+				if (((GenericImpl) candidate).isSuperOf(homeTreeNode, orderedSupers.toSupers(), components))
 					return true;
 				if (isExtentedBy(candidate)) {
-					supers = new OrderedSupers(supers, candidate).toSupers();
+					// orderedSupers.add(candidate);
 					return true;
 				}
 				return false;

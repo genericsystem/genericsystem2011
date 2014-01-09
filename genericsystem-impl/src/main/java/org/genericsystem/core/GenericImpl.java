@@ -1586,12 +1586,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return isConstraintEnabled(SingletonConstraintImpl.class, Statics.MULTIDIRECTIONAL);
 	}
 
-	UnsafeGList nullToSelfComponent(UnsafeGList components) {
-		List<Generic> result = new ArrayList<>(components);
-		for (int i = 0; i < result.size(); i++)
-			if (result.get(i) == null)
-				result.set(i, this);
-		return new UnsafeGList(result);
+	Components nullToSelfComponent(UnsafeComponents components) {
+		return new Components(this, components);
 	}
 
 	UnsafeComponents selfToNullComponents() {
@@ -1602,11 +1598,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new UnsafeComponents(result);
 	}
 
-	public boolean equiv(HomeTreeNode homeTreeNode, UnsafeGList supers, UnsafeGList components) {
+	public boolean equiv(HomeTreeNode homeTreeNode, Supers supers, UnsafeComponents components) {
 		return getHomeTreeNode().equals(homeTreeNode) && supers().equals(supers) && components().equals(nullToSelfComponent(components));
 	}
 
-	public boolean equiv(HomeTreeNode homeTreeNode, UnsafeGList components) {
+	public boolean equiv(HomeTreeNode homeTreeNode, UnsafeComponents components) {
 		return getHomeTreeNode().equals(homeTreeNode) && components().equals(nullToSelfComponent(components));
 	}
 

@@ -1,7 +1,6 @@
 package org.genericsystem.constraints;
 
 import java.util.Iterator;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -11,10 +10,10 @@ import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
-import org.genericsystem.core.UnsafeGList;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.HomeTreeNode;
+import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UnduplicateBindingConstraintViolationException;
 import org.genericsystem.generic.Holder;
@@ -37,26 +36,22 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	@Meta(UnduplicateBindingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
-	public static class DefaultKey {
-	}
+	public static class DefaultKey {}
 
 	@SystemGeneric
 	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {
-	}
+	public static class DefaultValue {}
 
 	@Override
 	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
-		final UnsafeGList supers = ((GenericImpl) modified).supers();
-		final UnsafeGList components = ((GenericImpl) modified).components();
+		final Supers supers = ((GenericImpl) modified).supers();
+		final org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).components();
 
 		final HomeTreeNode homeTreeNode = ((GenericImpl) modified).getHomeTreeNode();
-
-		Iterator<Generic> iterator = components.size() == 0 || components.get(0) == null ? supers.get(0).getInheritings().iterator() : components.get(0).getComposites().iterator();
+		Iterator<Generic> iterator = components.isEmpty() || components.get(0) == null ? supers.get(0).getInheritings().iterator() : components.get(0).getComposites().iterator();
 		iterator = new AbstractFilterIterator<Generic>(iterator) {
-
 			@Override
 			public boolean isSelected() {
 				return !next.equals(modified) && ((GenericImpl) next).equiv(homeTreeNode, supers, components);
