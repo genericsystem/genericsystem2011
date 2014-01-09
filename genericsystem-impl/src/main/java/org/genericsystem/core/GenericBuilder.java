@@ -43,6 +43,31 @@ class GenericBuilder {
 		supers = getExtendedDirectSupers(respectSupers);
 	}
 
+	protected Supers getExtendedDirectSupers(final boolean respectSupers) {
+		final Engine engine = cache.getEngine();
+		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
+			{
+				if (respectSupers && !supers.get(0).equals(engine))
+					iterators.put(engine, new SelectableIterator<>(supers.iterator()));
+			}
+
+			@Override
+			public boolean isSelected(Generic candidate) {
+				if (((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components))
+					return true;
+				if (isExtentedBy(candidate)) {
+					supers = new OrderedSupers(supers, candidate).toSupers();
+					return true;
+				}
+				return false;
+			}
+		};
+		Set<Generic> set = new TreeSet<>();
+		while (iterator.hasNext())
+			set.add(iterator.next());
+		return new Supers(set);
+	}
+
 	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {
 		if (supers.size() <= 1 || !containsSuper(candidate))
 			return false;
@@ -152,31 +177,6 @@ class GenericBuilder {
 			if (!subComponents.get(i).inheritsFrom(components.get(i)))
 				return false;
 		return true;
-	}
-
-	protected Supers getExtendedDirectSupers(final boolean respectSupers) {
-		final Engine engine = cache.getEngine();
-		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
-			{
-				if (respectSupers && !supers.get(0).equals(engine))
-					iterators.put(engine, new SelectableIterator<>(supers.iterator()));
-			}
-
-			@Override
-			public boolean isSelected(Generic candidate) {
-				if (((GenericImpl) candidate).isSuperOf(homeTreeNode, supers, components))
-					return true;
-				if (isExtentedBy(candidate)) {
-					supers = new OrderedSupers(supers, candidate).toSupers();
-					return true;
-				}
-				return false;
-			}
-		};
-		Set<Generic> set = new TreeSet<>();
-		while (iterator.hasNext())
-			set.add(iterator.next());
-		return new Supers(set);
 	}
 
 	private boolean isExtentedBy(Generic candidate) {
