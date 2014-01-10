@@ -16,7 +16,6 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -172,7 +171,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAL:
 			orderAndRemoveDependenciesForRemove(generic);
-			break;
+		break;
 		case CONSERVE:
 			new Restructurator() {
 				private static final long serialVersionUID = 7326023526567814490L;
@@ -184,11 +183,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(generic, Statics.MULTIDIRECTIONAL);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-			break;
+		break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-			break;
+		break;
 		}
 	}
 
@@ -495,7 +494,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		<T extends Generic> T bindDependency(Generic meta, HomeTreeNode homeTreeNode, Supers supers, UnsafeComponents uComponents, Class<?> specializationClass, int basePos, boolean existsException, boolean automatic) throws RollbackException {
-			return new GenericBuilder(CacheImpl.this, meta, homeTreeNode, supers, uComponents, basePos, false).bindDependency(specializationClass, existsException, automatic);
+			return new GenericBuilder(CacheImpl.this, meta, new UnsafeVertex(homeTreeNode, supers, uComponents), basePos, false).bindDependency(specializationClass, existsException, automatic);
 		}
 
 		abstract Generic rebuild();
@@ -503,7 +502,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	// TODO KK supers should not be empty here !
 	<T extends Generic> T internalBind(Generic meta, Serializable value, Supers supers, UnsafeComponents uComponents, final Class<?> specializationClass, int basePos, final boolean automatic, boolean existsException) throws RollbackException {
-		return new GenericBuilder(this, meta, ((GenericImpl) meta).bindInstanceNode(value), !supers.isEmpty() ? supers : new Supers(getEngine()), uComponents, basePos, true).internalBind(specializationClass, basePos, existsException, automatic);
+		return new GenericBuilder(this, meta, new UnsafeVertex(((GenericImpl) meta).bindInstanceNode(value), !supers.isEmpty() ? supers : new Supers(getEngine()), uComponents), basePos, true).internalBind(specializationClass, basePos, existsException,
+				automatic);
 	}
 
 	private class AllDependencies extends TreeMap<Generic, Integer> {
@@ -735,8 +735,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isEngine() || generic.isAlive())
 			return (T) generic;
-		return new GenericBuilder(this, reFind(generic.getMeta()), ((GenericImpl) generic).getHomeTreeNode(), new Supers(reFind(((GenericImpl) generic).supers())), new UnsafeComponents(reFind(((GenericImpl) generic).selfToNullComponents())),
-				Statics.MULTIDIRECTIONAL, false).find(false);
+		return new GenericBuilder(this, reFind(generic.getMeta()), new UnsafeVertex(((GenericImpl) generic).getHomeTreeNode(), new Supers(reFind(((GenericImpl) generic).supers())), new UnsafeComponents(
+				reFind(((GenericImpl) generic).selfToNullComponents()))), Statics.MULTIDIRECTIONAL, false).find(false);
 	}
 
 	private List<Generic> reFind(UnsafeGList generics) {
