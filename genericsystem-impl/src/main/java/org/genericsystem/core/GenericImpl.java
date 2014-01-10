@@ -1822,6 +1822,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return specializationClass;
 	}
 
+	@Override
 	public boolean isSystem() {
 		return getClass().isAnnotationPresent(SystemGeneric.class);
 	}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<td><h:outputText value="#{component.value}" /></td>
+	<td><h:commandButton value="View Instances"
+			action="#{component.viewInstances()}" rendered="#{component.isType()}"/></td>
+	<td>
+		<table>
+			<c:forEach items="#{component.children}" var="child">
+				<tr>
+					<ui:include src="#{child.src}">
+						<ui:param name="component" value="#{child}" />
+					</ui:include>
+				</tr>
+			</c:forEach>
+		</table>
+		<h:commandButton value="Clear Instances"
+			action="#{component.clearInstances()}" rendered="#{component.isConcrete()}"/>
+	</td>
+</ui:composition>
