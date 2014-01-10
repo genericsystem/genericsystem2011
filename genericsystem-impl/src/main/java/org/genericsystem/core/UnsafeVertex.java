@@ -37,6 +37,10 @@ class UnsafeVertex {
 		return components;
 	}
 
+	public int getMetaLevel() {
+		return homeTreeNode.getMetaLevel();
+	}
+
 	static class Vertex extends UnsafeVertex {
 
 		public Vertex(Generic generic, UnsafeVertex uVertex) {
