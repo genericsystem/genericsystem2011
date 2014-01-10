@@ -189,22 +189,21 @@ public class RelationTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 
-		Type passenger = cache.addType("Passenger");
-
-		final Relation carPassenger = car.setRelation("CarPassenger", passenger);
-		carPassenger.enableSingularConstraint(Statics.TARGET_POSITION);
-		assert carPassenger.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		final Relation carColor = car.setRelation("carColor", color);
+		carColor.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
 		final Generic myBmw = car.addInstance("myBmw");
 
-		final Generic michael = passenger.addInstance("michael");
-		Generic nicolas = passenger.addInstance("nicolas");
+		final Generic red = color.addInstance("red");
+		Generic yellow = color.addInstance("yellow");
 
-		Link link30 = michael.setLink(carPassenger, "30%", myBmw);
-		Link link40 = nicolas.setLink(carPassenger, "40%", myBmw);
+		Link link30 = red.setLink(carColor, "30%", myBmw);
+		Link link40 = yellow.setLink(carColor, "40%", myBmw);
 		assert link30.isAlive();
-		michael.setLink(carPassenger, "60%", myBmw);
+		red.setLink(carColor, "60%", myBmw);
 		assert !link30.isAlive();
 		assert link40.isAlive();
 	}
@@ -1346,6 +1345,20 @@ public class RelationTest extends AbstractTest {
 
 		assert red.getLinks(carColor, 1).size() == 3 : red.getLinks(carColor);
 		assert red.getTargets(carColor, 1, 0).containsAll(Arrays.asList(new Generic[] { myBmw, myAudi, myMercedes }));
+	}
+
+	public void testLinkageSingulaOk() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic red = color.addInstance("red");
+
+		Relation carColor = car.setRelation("carColor", color).enableSingularConstraint();
+		Link link1 = myBmw.bind(carColor, red);
+		Link link2 = myBmw.bind(carColor, red);
+
+		assert link1 == link2;
 	}
 
 	public void mytest() {

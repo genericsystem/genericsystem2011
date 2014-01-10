@@ -172,13 +172,14 @@ public class TreeTest extends AbstractTest {
 		Generic webPageRed = webPage.bind(graphicComponentColor, red);
 
 		Link bind = header.bind(graphicComponentColor, blue);
-		assert bind.inheritsFrom(webPageRed);
 		Link bind2 = header.bind(graphicComponentColor, blue);
-		assert bind2.inheritsFrom(webPageRed);
 
 		assert bind.isAlive() : bind.info() + bind2.info();
-
 		assert bind == bind2 : bind.info() + " " + bind2.info();
+
+		assert bind.inheritsFrom(webPageRed);
+		assert bind2.inheritsFrom(webPageRed);
+
 		footer.bind(graphicComponentColor, yellow);
 
 		assert red.equals(body.getLink(graphicComponentColor).getTargetComponent()) : body.getLinks(graphicComponentColor);
