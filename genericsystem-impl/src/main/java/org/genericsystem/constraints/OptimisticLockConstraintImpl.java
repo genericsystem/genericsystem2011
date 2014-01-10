@@ -3,6 +3,7 @@ package org.genericsystem.constraints;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.Priority;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.AxedConstraintValue;
@@ -31,14 +32,14 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 public class OptimisticLockConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
-	@Extends(meta = OptimisticLockConstraintImpl.class)
+	@Meta(OptimisticLockConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(OptimisticLockConstraintImpl.class)
 	public static class DefaultKey {
 	}
 
 	@SystemGeneric
-	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
+	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
 	public static class DefaultValue {

@@ -17,7 +17,7 @@ public class AttributeTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.setAttribute("power");
 		assert vehiclePower.isStructural();
-		assert vehiclePower.getSupers().size() == 1 : vehiclePower.getSupers();
+		assert vehiclePower.supers().size() == 1 : vehiclePower.supers();
 		assert vehiclePower.inheritsFrom(cache.getEngine());
 	}
 
@@ -27,7 +27,7 @@ public class AttributeTest extends AbstractTest {
 		Attribute vehiclePower = vehicle.setProperty("power");
 
 		assert vehiclePower.isStructural();
-		assert vehiclePower.getSupers().size() == 1 : vehiclePower.getSupers();
+		assert vehiclePower.supers().size() == 1 : vehiclePower.supers();
 		assert vehiclePower.inheritsFrom(cache.getEngine());
 	}
 
@@ -277,7 +277,7 @@ public class AttributeTest extends AbstractTest {
 		Holder vHP = v235.setValue(vehiclePowerUnit, "HP");
 
 		assert v235.getMeta().equals(vehiclePower);
-		assert vHP.getMeta().equals(vehiclePowerUnit) : vHP.getSupers();
+		assert vHP.getMeta().equals(vehiclePowerUnit) : vHP.supers();
 	}
 
 	public void testAttributeOnAttributeWithGetAttribute() {

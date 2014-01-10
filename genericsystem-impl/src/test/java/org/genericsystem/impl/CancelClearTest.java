@@ -122,7 +122,7 @@ public class CancelClearTest extends AbstractTest {
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancelAll(vehiclePower, Statics.STRUCTURAL);
 		car.clearAll(vehiclePower, Statics.STRUCTURAL);
-		assert car.getHolder(vehiclePower) == vehicle233 : car.getHolder(vehiclePower);
+		assert car.getValue(vehiclePower) == null : car.getHolder(vehiclePower);
 	}
 
 }

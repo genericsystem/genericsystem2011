@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
+import org.genericsystem.core.UnsafeGList.Supers;
+import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,22 @@ public class Statics {
 		return result;
 	}
 
+	public static UnsafeComponents insertIntoComponents(Generic generic, List<Generic> targets, int basePos) {
+		if (basePos < 0 || basePos > targets.size())
+			throw new IllegalStateException("Unable to find a valid base position");
+		List<Generic> result = new ArrayList<>(targets);
+		result.add(basePos, generic);
+		return new UnsafeComponents(result);
+	}
+
+	public static Supers insertIntoSupers(Generic generic, List<Generic> targets, int basePos) {
+		if (basePos < 0 || basePos > targets.size())
+			throw new IllegalStateException("Unable to find a valid base position");
+		List<Generic> result = new ArrayList<>(targets);
+		result.add(basePos, generic);
+		return new Supers(result);
+	}
+
 	static Generic[] insertFirst(Generic first, Generic... others) {
 		Generic[] result = new Generic[others.length + 1];
 		result[0] = first;
@@ -81,56 +99,73 @@ public class Statics {
 		return result;
 	}
 
-	static HomeTreeNode[] insertFirst(HomeTreeNode first, HomeTreeNode... others) {
-		HomeTreeNode[] result = new HomeTreeNode[others.length + 1];
-		result[0] = first;
-		System.arraycopy(others, 0, result, 1, others.length);
-		return result;
+	// static HomeTreeNode[] insertFirst(HomeTreeNode first, HomeTreeNode... others) {
+	// HomeTreeNode[] result = new HomeTreeNode[others.length + 1];
+	// result[0] = first;
+	// System.arraycopy(others, 0, result, 1, others.length);
+	// return result;
+	// }
+
+	// public static Generic[] insertLastIntoArray(Generic last, Generic... others) {
+	// Generic[] result = new Generic[others.length + 1];
+	// result[result.length - 1] = last;
+	// System.arraycopy(others, 0, result, 0, others.length);
+	// return result;
+	// }
+
+	static Supers truncate(int i, Supers supers) {
+		List<Generic> result = new ArrayList<>(supers);
+		result.remove(i);
+		return new Supers(result);
 	}
 
-	public static Generic[] insertLastIntoArray(Generic last, Generic... others) {
-		Generic[] result = new Generic[others.length + 1];
-		result[result.length - 1] = last;
-		System.arraycopy(others, 0, result, 0, others.length);
-		return result;
+	static UnsafeComponents truncate(int i, UnsafeComponents uComponents) {
+		List<Generic> result = new ArrayList<>(uComponents);
+		result.remove(i);
+		return new UnsafeComponents(result);
 	}
 
-	static Generic[] truncate(int i, Generic[] generics) {
-		Generic[] result = new Generic[generics.length - 1];
-		System.arraycopy(generics, 0, result, 0, i);
-		System.arraycopy(generics, i + 1, result, i, generics.length - 1 - i);
-		return result;
-	}
+	// static HomeTreeNode[] truncate(int i, HomeTreeNode[] nodes) {
+	// HomeTreeNode[] result = new HomeTreeNode[nodes.length - 1];
+	// System.arraycopy(nodes, 0, result, 0, i);
+	// System.arraycopy(nodes, i + 1, result, i, nodes.length - 1 - i);
+	// return result;
+	// }
 
-	static HomeTreeNode[] truncate(int i, HomeTreeNode[] nodes) {
-		HomeTreeNode[] result = new HomeTreeNode[nodes.length - 1];
-		System.arraycopy(nodes, 0, result, 0, i);
-		System.arraycopy(nodes, i + 1, result, i, nodes.length - 1 - i);
-		return result;
-	}
+	// static HomeTreeNode[] truncate(HomeTreeNode[] nodes, HomeTreeNode node) {
+	// for (int i = 0; i < nodes.length; i++) {
+	// if (nodes[i].equals(node))
+	// return truncate(i, nodes);
+	// }
+	// return nodes;
+	// }
 
-	static HomeTreeNode[] truncate(HomeTreeNode[] nodes, HomeTreeNode node) {
-		for (int i = 0; i < nodes.length; i++) {
-			if (nodes[i].equals(node))
-				return truncate(i, nodes);
-		}
-		return nodes;
-	}
-
-	static HomeTreeNode[] replace(HomeTreeNode[] homeTreeNodes, HomeTreeNode old, HomeTreeNode newNode) {
-		HomeTreeNode[] copy = homeTreeNodes.clone();
-		for (int i = 0; i < copy.length; i++)
-			if (copy[i].equals(old)) {
-				copy[i] = newNode;
-				return copy;
-			}
-		return copy;
-	}
+	// static HomeTreeNode[] replace(HomeTreeNode[] homeTreeNodes, HomeTreeNode old, HomeTreeNode newNode) {
+	// HomeTreeNode[] copy = homeTreeNodes.clone();
+	// for (int i = 0; i < copy.length; i++)
+	// if (copy[i].equals(old)) {
+	// copy[i] = newNode;
+	// return copy;
+	// }
+	// return copy;
+	// }
 
 	static Generic[] replace(int i, Generic[] generics, Generic generic) {
 		Generic[] copy = generics.clone();
 		copy[i] = generic;
 		return copy;
+	}
+
+	static UnsafeComponents replace(int i, UnsafeComponents uComponents, Generic generic) {
+		List<Generic> copy = new ArrayList<>(uComponents);
+		copy.set(i, generic);
+		return new UnsafeComponents(copy);
+	}
+
+	static Supers replace(int i, Supers supers, Generic generic) {
+		List<Generic> copy = new ArrayList<>(supers);
+		copy.set(i, generic);
+		return new Supers(copy);
 	}
 
 	public static void debugCurrentThread() {
@@ -224,36 +259,20 @@ public class Statics {
 		return result.toArray(new Generic[result.size()]);
 	}
 
-	// public static class Components extends ArrayList<Generic> {
-	// private static final long serialVersionUID = -3285243912802228927L;
-	//
-	// public Components(Generic[] components, Generic... adds) {
-	// super(Arrays.asList(components));
-	// for (int i = 0; i < adds.length; i++)
-	// if (i >= components.length || (components[i] != null && !components[i].inheritsFrom(adds[i])))
-	// add(adds[i]);
-	// }
-	//
-	// @Override
-	// public Generic[] toArray() {
-	// return toArray(new Generic[size()]);
-	// }
-	// }
-
-	public static class Supers extends TreeSet<Generic> {
+	public static class OrderedSupers extends TreeSet<Generic> {
 		private static final long serialVersionUID = 4756135385933890439L;
 
-		public Supers(Generic... supers) {
+		public OrderedSupers(UnsafeGList supers) {
 			for (Generic superGeneric : supers)
 				add(superGeneric);
 		}
 
-		public Supers(Generic[] supers, Generic add) {
+		public OrderedSupers(UnsafeGList supers, Generic add) {
 			this(supers);
 			add(add);
 		}
 
-		public Supers(Generic[] supers, Generic[] adds) {
+		public OrderedSupers(UnsafeGList supers, Generic[] adds) {
 			this(supers);
 			for (Generic add : adds)
 				add(add);
@@ -262,6 +281,10 @@ public class Statics {
 		@Override
 		public Generic[] toArray() {
 			return toArray(new Generic[size()]);
+		}
+
+		public Supers toSupers() {
+			return new Supers(this);
 		}
 
 		@Override
@@ -276,53 +299,6 @@ public class Statics {
 			return super.add(candidate);
 		}
 	}
-
-	// public static class Primaries extends TreeSet<HomeTreeNode> {
-	// private static final long serialVersionUID = 7222889429002770779L;
-	//
-	// public Primaries(HomeTreeNode homeTreeNode, Generic... supers) {
-	// add(homeTreeNode);
-	// for (Generic superGeneric : supers)
-	// for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
-	// add(primary);
-	// }
-	//
-	// public Primaries(Generic... supers) {
-	// // add(homeTreeNode);
-	// for (Generic superGeneric : supers)
-	// for (HomeTreeNode primary : ((GenericImpl) superGeneric).primaries)
-	// add(primary);
-	// }
-	//
-	// public Primaries(HomeTreeNode... primaries) {
-	// for (HomeTreeNode primary : primaries)
-	// add(primary);
-	// }
-	//
-	// public Primaries(Generic generic, HomeTreeNode... primaries) {
-	// for (HomeTreeNode primary : primaries)
-	// add(primary);
-	// for (HomeTreeNode primary : ((GenericImpl) generic).primaries)
-	// add(primary);
-	// }
-	//
-	// @Override
-	// public boolean add(HomeTreeNode candidate) {
-	// for (HomeTreeNode homeTreeNode : this)
-	// if (homeTreeNode.inheritsFrom(candidate))
-	// return false;
-	// Iterator<HomeTreeNode> it = this.iterator();
-	// while (it.hasNext())
-	// if (candidate.inheritsFrom(it.next()))
-	// it.remove();
-	// return super.add(candidate);
-	// }
-	//
-	// @Override
-	// public HomeTreeNode[] toArray() {
-	// return toArray(new HomeTreeNode[size()]);
-	// }
-	// }
 
 	public static <T extends Generic> Iterator<T> levelFilter(Iterator<T> iterator, final int instanciationLevel) {
 		return new AbstractFilterIterator<T>(iterator) {

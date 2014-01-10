@@ -5,6 +5,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.genericsystem.core.EngineImpl.RootTreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 		this.metaNode = metaNode == null ? this : metaNode;
 		this.value = value;
 		ts = getHomeTree().pickNewTs();
-		assert getMetaLevel() <= 2;
+		assert getMetaLevel() <= 2 : getMetaLevel();
 	}
 
 	protected HomeTreeNode(long ts, HomeTreeNode metaNode, Serializable value) {
@@ -46,7 +47,8 @@ public class HomeTreeNode implements Comparable<HomeTreeNode> {
 	private static final String NULL_VALUE = "NULL_VALUE";
 
 	public HomeTreeNode bindInstanceNode(Serializable value) {
-		assert getMetaLevel() <= 1 : this + " " + value;
+		// TODO ???
+		// assert getMetaLevel() <= 1 : this + " " + value;
 		if (value == null)
 			value = NULL_VALUE;
 		HomeTreeNode result = findInstanceNode(value);

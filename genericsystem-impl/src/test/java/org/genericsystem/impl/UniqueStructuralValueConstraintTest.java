@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -31,7 +30,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type power = cache.addType("Power");
 		Attribute carPower = car.setAttribute("Power");
-		assert carPower.getSupers().contains(power);
+		assert carPower.supers().contains(power);
 	}
 
 	public void testRelationWithSameNameAsTypeOK() {
@@ -115,7 +114,7 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 		final Type car = cache.addType("Car");
 		car.setAttribute("Power");
 		Generic power = cache.addType("Power");
-		assert car.getAttribute("Power").getSupers().contains(power);
+		assert car.getAttribute("Power").supers().contains(power);
 	}
 
 	public void testTwoTypesWithSameRelationKO() {

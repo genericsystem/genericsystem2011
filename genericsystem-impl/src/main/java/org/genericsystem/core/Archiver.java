@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
 import org.genericsystem.core.AbstractWriter.AbstractLoader;
 
 /**
@@ -133,10 +132,12 @@ public class Archiver {
 			fileName = Statics.getFilename(engine.pickNewTs());
 		}
 
+		@Override
 		public ObjectOutputStream getFormalOutputStream() {
 			return formalOutputStream;
 		}
 
+		@Override
 		public ObjectOutputStream getContentOutputStream() {
 			return contentOutputStream;
 		}
@@ -200,10 +201,12 @@ public class Archiver {
 		private ObjectInputStream contentInputStream;
 		private ObjectInputStream formalInputStream;
 
+		@Override
 		public ObjectInputStream getContentInputStream() {
 			return contentInputStream;
 		}
 
+		@Override
 		public ObjectInputStream getFormalInputStream() {
 			return formalInputStream;
 		}
@@ -217,8 +220,7 @@ public class Archiver {
 				engine = restoreEngine(homeTreeMap, genericMap);
 				for (;;)
 					loadGeneric(engine, homeTreeMap, genericMap);
-			} catch (EOFException ignore) {
-			} catch (Exception e) {
+			} catch (EOFException ignore) {} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
@@ -243,7 +245,7 @@ public class Archiver {
 			getContentInputStream().readObject();
 			((EngineImpl) engine).restoreEngine(homeTreeNodeTs, ts[0], ts[1], ts[2], ts[3]);
 			genericMap.put(ts[0], engine);
-			homeTreeMap.put(homeTreeNodeTs, ((EngineImpl) engine).homeTreeNode);
+			homeTreeMap.put(homeTreeNodeTs, ((EngineImpl) engine).getHomeTreeNode());
 			return engine;
 		}
 

@@ -1,8 +1,8 @@
 package org.genericsystem.core;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
-
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -306,6 +306,28 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T setLink(Link metalink, Serializable value, int basePos, Generic... targets);
 
 	/**
+	 * Creates a new link between this generic and targets. If the same link is already exists it will be returned.<br />
+	 * 
+	 * Parameter metalink can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter metalink.<br />
+	 * 
+	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
+	 * 
+	 * @param metalink
+	 *            <tt>Relation</tt> or <tt>Link</tt> a new link inherits from.
+	 * @param value
+	 *            the value of the new link.
+	 * @param basePos
+	 *            the position of the based generic in relation.
+	 * @param metaLevel
+	 *            meta level.
+	 * @param targets
+	 *            targets of the new link.
+	 * 
+	 * @return the link.
+	 */
+	<T extends Link> T setLink(Link metalink, Serializable value, int basePos, int metaLevel, Generic... targets);
+
+	/**
 	 * Creates a new holder on this generic. A new holder inherits from metaholder supplied in parameters.<br />
 	 * 
 	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
@@ -398,6 +420,28 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param metaholder
 	 *            the holder which the new holder inherits from.
+	 * @param value
+	 *            the value of holder.
+	 * @param metaLevel
+	 *            meta level.
+	 * @param targets
+	 *            the optinal targets for link.
+	 * 
+	 * @return the holder.
+	 */
+	<T extends Holder> T setHolder(Holder metaholder, Serializable value, int metaLevel, Generic... targets);
+
+	/**
+	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from metaholder supplied in parameters.<br />
+	 * 
+	 * Parameter metaholder is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
+	 * 
+	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
+	 * 
+	 * @param metaholder
+	 *            the holder which the new holder inherits from.
+	 * @param metaLevel
+	 *            meta level.
 	 * @param basePos
 	 *            the position of the based generic in relation.
 	 * @param value
@@ -407,7 +451,7 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @return the holder.
 	 */
-	<T extends Holder> T setHolder(Holder metaholder, Serializable value, int basePos, Generic... targets);
+	<T extends Holder> T setHolder(Holder metaholder, Serializable value, int metaLevel, int basePos, Generic... targets);
 
 	/**
 	 * Returns all targets of the relation.
@@ -633,29 +677,22 @@ public interface Generic extends Comparable<Generic> {
 	boolean isReferentialIntegrity(int componentPos);
 
 	/**
-	 * Returns the collection of meta generics which this generic directly inherits from.
+	 * Returns an unmodifiable list of generics which this generic directly inherits from.
 	 * 
-	 * @return the supers.
-	 * 
-	 * @see Snapshot
-	 */
-	<T extends Generic> Snapshot<T> getSupers();
-
-	/**
-	 * Returns the components of this generic.
-	 * 
-	 * @return the collection of components components.
+	 * @return the list of supers.
 	 * 
 	 * @see Snapshot
 	 */
-	<T extends Generic> Snapshot<T> getComponents();
+	<T extends Generic> List<T> supers();
 
 	/**
-	 * Return the number of components.
+	 * Returns an unmodifiable list of components of this generic.
 	 * 
-	 * @return the number of components.
+	 * @return the list of components.
+	 * 
+	 * @see Snapshot
 	 */
-	int getComponentsSize();
+	<T extends Generic> List<T> components();
 
 	/**
 	 * Returns the base position of an attribute.
@@ -666,13 +703,6 @@ public interface Generic extends Comparable<Generic> {
 	 * @return the base position of the attribute.
 	 */
 	int getBasePos(Holder attribute);
-
-	/**
-	 * Returns the number of supers.
-	 * 
-	 * @return the number of supers.
-	 */
-	int getSupersSize();
 
 	/**
 	 * Return the meta.

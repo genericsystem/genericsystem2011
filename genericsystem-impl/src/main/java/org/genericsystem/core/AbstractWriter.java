@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
+import org.genericsystem.core.UnsafeGList.Supers;
+import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 
 public abstract class AbstractWriter {
 
@@ -14,16 +17,17 @@ public abstract class AbstractWriter {
 
 	public void writeGeneric(GenericImpl generic, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
 		writeTs(generic);
-		getContentOutputStream().writeLong(generic.homeTreeNode.ts);
-		if (!homeTreeMap.containsKey(generic.homeTreeNode.ts)) {
-			getContentOutputStream().writeLong(generic.homeTreeNode.metaNode.ts);
-			getContentOutputStream().writeObject(generic.homeTreeNode.getValue());
-			homeTreeMap.put(generic.homeTreeNode.ts, generic.homeTreeNode);
+		HomeTreeNode homeTreeNode = generic.getHomeTreeNode();
+		getContentOutputStream().writeLong(homeTreeNode.ts);
+		if (!homeTreeMap.containsKey(homeTreeNode.ts)) {
+			getContentOutputStream().writeLong(homeTreeNode.metaNode.ts);
+			getContentOutputStream().writeObject(homeTreeNode.getValue());
+			homeTreeMap.put(homeTreeNode.ts, homeTreeNode);
 		}
 		if (generic.isEngine())
 			return;
-		writeAncestors(generic.getSupers());
-		writeAncestors(generic.getComponents());
+		writeAncestors(generic.supers());
+		writeAncestors(generic.components());
 		getFormalOutputStream().writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
 	}
 
@@ -34,10 +38,10 @@ public abstract class AbstractWriter {
 		getFormalOutputStream().writeLong(((GenericImpl) generic).getDeathTs());
 	}
 
-	private void writeAncestors(Snapshot<Generic> dependencies) throws IOException {
-		getFormalOutputStream().writeInt(dependencies.size());
-		for (Generic dependency : dependencies)
-			getFormalOutputStream().writeLong(((GenericImpl) dependency).getDesignTs());
+	private void writeAncestors(List<Generic> ancestors) throws IOException {
+		getFormalOutputStream().writeInt(ancestors.size());
+		for (Generic ancestor : ancestors)
+			getFormalOutputStream().writeLong(((GenericImpl) ancestor).getDesignTs());
 	}
 
 	public abstract static class AbstractLoader {
@@ -59,12 +63,12 @@ public abstract class AbstractWriter {
 				homeTreeNode = ((GenericImpl) engine).getHomeTreeNode().ts == metaTs ? ((GenericImpl) engine).getHomeTreeNode() : homeTreeMap.get(metaTs);
 				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, (Serializable) getContentInputStream().readObject());
 			}
-			Generic[] supers = loadAncestors(engine, genericMap);
-			Generic[] components = loadAncestors(engine, genericMap);
+			Supers supers = new Supers(loadAncestors(engine, genericMap));
+			UnsafeComponents uComponents = new UnsafeComponents(loadAncestors(engine, genericMap));
 			Generic generic = engine.getFactory().newGeneric((Class<?>) getFormalInputStream().readObject());
-			plug(((GenericImpl) generic).restore(homeTreeNode, ts[0], ts[1], ts[2], ts[3], supers, components));
+			plug(((GenericImpl) generic).restore(new UnsafeVertex(homeTreeNode, supers, uComponents), ts[0], ts[1], ts[2], ts[3]));
 			if (!homeTreeMap.containsKey(homeTreeNodeTs))
-				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode);
+				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).getHomeTreeNode());
 			genericMap.put(ts[0], generic);
 			return generic;
 		}

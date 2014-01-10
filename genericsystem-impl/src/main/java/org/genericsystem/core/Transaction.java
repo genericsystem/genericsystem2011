@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.util.HashSet;
-
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -96,9 +95,9 @@ public class Transaction extends AbstractContext {
 			for (Generic generic : removes)
 				writeLockAndCheckMvcc(((GenericImpl) generic).getLifeManager());
 			for (Generic generic : adds) {
-				for (Generic effectiveSuper : ((GenericImpl) generic).supers)
+				for (Generic effectiveSuper : ((GenericImpl) generic).supers())
 					writeLockAndCheckMvcc(((GenericImpl) effectiveSuper).getLifeManager());
-				for (Generic component : ((GenericImpl) generic).components)
+				for (Generic component : ((GenericImpl) generic).components())
 					writeLockAndCheckMvcc(((GenericImpl) component).getLifeManager());
 				writeLockAndCheckMvcc(((GenericImpl) generic).getLifeManager());
 			}
