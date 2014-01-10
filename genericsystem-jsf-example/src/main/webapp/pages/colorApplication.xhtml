@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/pages/layouts/commonLayout.xhtml">
+	<ui:define name="content">
+		<h:head>
+			<title>JSF Example 1</title>
+		</h:head>
+
+		<h:body>
+			<h:panelGrid>				
+				<h:outputText value="Color Application" />
+			
+<!-- 			<h:panelGrid columns="3"> -->
+<!-- 				<h:outputText value="Add a #{colorManagerBean.color}:  " /> -->
+<!-- 				<h:inputText value="#{colorManagerBean.colorInstance}"></h:inputText> -->
+<!-- 				<h:commandButton value="add" action="#{colorManagerBean.addInstance}" /> -->
+<!-- 			</h:panelGrid>  -->
+
+<!-- 			<h:dataTable value="#{colorType.color.instances}" var="colorInstances"> -->
+<!-- 				<h:column> -->
+<!-- 					<h:outputText value="#{colorInstances}" /> -->
+<!-- 				</h:column> -->
+<!-- 			</h:dataTable> -->
+			<h:link value="Return to the beginning" outcome="index"/>
+
+		</h:body>
+
+	</ui:define>
+</ui:composition>
