@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -988,5 +989,12 @@ public interface Generic extends Comparable<Generic> {
 	 * @return true if values of this generic and generic supplied in parameters are equal.
 	 */
 	boolean fastValueEquals(Generic generic);
+
+	/**
+	 * Returns true if this generic is used by the system. System generics are not removable.
+	 * 
+	 * @return true if class of this generic is SystemGeneric annotated.
+	 */
+	boolean isSystem();
 
 }

@@ -1,6 +1,7 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 
@@ -278,6 +279,9 @@ public interface Type extends Generic {
 	 * 
 	 * @return Return this.
 	 */
+	@Override
+	boolean isSystem();
+
 	<T extends Relation> T enableInheritance();
 
 	/**
