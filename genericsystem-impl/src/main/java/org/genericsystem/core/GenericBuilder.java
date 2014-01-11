@@ -25,18 +25,15 @@ class GenericBuilder {
 	private final CacheImpl cache;
 	private UnsafeVertex uVertex;
 	private Generic meta;
+	private int basePos;
 	private boolean isSingular;
 	private boolean isProperty;
-	private int basePos;
 
 	GenericBuilder(CacheImpl cache, Generic meta, UnsafeVertex uVertex, int basePos, boolean respectSupers) {
 		this.cache = cache;
 		this.meta = meta;
 		this.uVertex = uVertex;
-		// this.homeTreeNode = homeTreeNode;
-		// this.components = components;
 		this.basePos = basePos;
-		// this.supers = new OrderedSupers(aliveSupers).toSupers()
 		isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
 		this.uVertex = new UnsafeVertex(uVertex.getHomeTreeNode(), getExtendedDirectSupers(respectSupers), uVertex.getComponents());
@@ -52,11 +49,7 @@ class GenericBuilder {
 
 			@Override
 			public boolean isSelected(Generic candidate) {
-				if (((GenericImpl) candidate).isSuperOf(uVertex))
-					return true;
-				if (isExtentedBy(candidate))
-					return true;
-				return false;
+				return ((GenericImpl) candidate).isSuperOf(uVertex) || isExtentedBy(candidate);
 			}
 		};
 		Set<Generic> set = new TreeSet<>();
@@ -110,7 +103,7 @@ class GenericBuilder {
 	<T extends Generic> T internalBind(final Class<?> specializationClass, int basePos, boolean existsException, final boolean automatic) throws RollbackException {
 		T result = find(existsException);
 		if (result != null)
-			return result; // log.info("" + candidate + " " + sameHomeTreeNode());
+			return result;
 
 		Generic old = null;
 		Set<Generic> directDependencies = getDirectDependencies();
