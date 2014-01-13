@@ -131,6 +131,7 @@ public class UnsafeGList extends ArrayList<Generic> {
 			super(toGList(generic, uComponents));
 			for (Generic g : this)
 				assert g != null;
+			assert !(uComponents instanceof Components);
 		}
 
 		static List<Generic> toGList(Generic generic, UnsafeComponents uComponents) {

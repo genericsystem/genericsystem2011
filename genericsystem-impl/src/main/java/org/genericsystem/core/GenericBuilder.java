@@ -36,15 +36,15 @@ class GenericBuilder {
 		this.basePos = basePos;
 		isSingular = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isSingularConstraintEnabled(basePos);
 		isProperty = Statics.MULTIDIRECTIONAL != basePos && ((GenericImpl) meta).isPropertyConstraintEnabled();
-		this.uVertex = new UnsafeVertex(uVertex.getHomeTreeNode(), getExtendedDirectSupers(respectSupers), uVertex.getComponents());
+		this.uVertex = new UnsafeVertex(uVertex.homeTreeNode(), getExtendedDirectSupers(respectSupers), uVertex.components());
 	}
 
 	protected Supers getExtendedDirectSupers(final boolean respectSupers) {
 		final Engine engine = cache.getEngine();
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
 			{
-				if (respectSupers && !uVertex.getSupers().iterator().next().equals(engine))
-					iterators.put(engine, new SelectableIterator<>(uVertex.getSupers().iterator()));
+				if (respectSupers && !uVertex.supers().iterator().next().equals(engine))
+					iterators.put(engine, new SelectableIterator<>(uVertex.supers().iterator()));
 			}
 
 			@Override
@@ -59,33 +59,33 @@ class GenericBuilder {
 	}
 
 	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {
-		if (uVertex.getSupers().size() <= 1 || !containsSuper(candidate))
+		if (uVertex.supers().size() <= 1 || !containsSuper(candidate))
 			return false;
 		return (sameHomeTreeNode());
 	}
 
 	boolean containsSuper(Generic candidate) {
-		for (Generic superGenenic : uVertex.getSupers())
+		for (Generic superGenenic : uVertex.supers())
 			if (candidate.equals(superGenenic))
 				return true;
 		return false;
 	}
 
 	boolean sameHomeTreeNode() {
-		for (Generic superGenenic : uVertex.getSupers())
-			if (!uVertex.getHomeTreeNode().equals(((GenericImpl) superGenenic).getHomeTreeNode()))
+		for (Generic superGenenic : uVertex.supers())
+			if (!uVertex.homeTreeNode().equals(((GenericImpl) superGenenic).homeTreeNode()))
 				return false;
 		return true;
 	}
 
 	@SuppressWarnings({ "unchecked" })
 	<T extends Generic> T find(boolean existsException) throws RollbackException {
-		if (uVertex.getSupers().size() == 1)
-			if (((GenericImpl) uVertex.getSupers().get(0)).equiv(uVertex.getHomeTreeNode(), uVertex.getComponents()))
+		if (uVertex.supers().size() == 1)
+			if (((GenericImpl) uVertex.supers().get(0)).equiv(uVertex.homeTreeNode(), uVertex.components()))
 				if (existsException)
-					cache.rollback(new ExistsException(uVertex.getSupers().get(0) + " already exists !"));
+					cache.rollback(new ExistsException(uVertex.supers().get(0) + " already exists !"));
 				else
-					return (T) uVertex.getSupers().get(0);
+					return (T) uVertex.supers().get(0);
 		return null;
 	}
 
@@ -108,13 +108,13 @@ class GenericBuilder {
 		Generic old = null;
 		Set<Generic> directDependencies = getDirectDependencies();
 		for (Generic dependency : directDependencies)
-			if (!existsException && Statics.MULTIDIRECTIONAL != basePos && (((GenericImpl) dependency).getComponent(basePos)).equals(uVertex.getComponents().get(basePos))) {
+			if (!existsException && Statics.MULTIDIRECTIONAL != basePos && (((GenericImpl) dependency).getComponent(basePos)).equals(uVertex.components().get(basePos))) {
 				assert old == null;
 				old = dependency;
 			}
 		for (Generic dependency : directDependencies) {
-			assert !uVertex.getSupers().contains(dependency) : uVertex.getSupers();
-			assert !uVertex.getComponents().contains(dependency) : uVertex.getComponents();
+			assert !uVertex.supers().contains(dependency) : uVertex.supers();
+			assert !uVertex.components().contains(dependency) : uVertex.components();
 			assert !((GenericImpl) dependency).equiv(uVertex);
 		}
 		return cache.new Restructurator() {
@@ -153,10 +153,10 @@ class GenericBuilder {
 
 	private boolean isExtention(Generic candidate) {
 		if (candidate.getMeta().equals(meta)) {
-			if (Statics.MULTIDIRECTIONAL != basePos && basePos < ((GenericImpl) candidate).components().size()) {
-				if (isSingular && ((GenericImpl) candidate).getComponent(basePos).inheritsFrom(uVertex.getComponents().get(basePos)))
+			if (Statics.MULTIDIRECTIONAL != basePos && basePos < ((GenericImpl) candidate).getComponents().size()) {
+				if (isSingular && ((GenericImpl) candidate).getComponent(basePos).inheritsFrom(uVertex.components().get(basePos)))
 					return true;
-				if ((isProperty) && areComponentsInheriting((((GenericImpl) candidate).components()), uVertex.getComponents()))
+				if ((isProperty) && areComponentsInheriting((((GenericImpl) candidate).getComponents()), uVertex.components()))
 					return true;
 			}
 		}
@@ -164,13 +164,13 @@ class GenericBuilder {
 	}
 
 	private boolean isExtentedBy(Generic candidate) {
-		if (Statics.MULTIDIRECTIONAL != basePos && basePos < ((GenericImpl) candidate).components().size())
-			if (((GenericImpl) candidate).getHomeTreeNode().equals(uVertex.getHomeTreeNode()) || !uVertex.getComponents().get(basePos).equals(((GenericImpl) candidate).getComponent(basePos)))
+		if (Statics.MULTIDIRECTIONAL != basePos && basePos < ((GenericImpl) candidate).getComponents().size())
+			if (((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode()) || !uVertex.components().get(basePos).equals(((GenericImpl) candidate).getComponent(basePos)))
 				if ((((Attribute) meta).isInheritanceEnabled()))
-					if (uVertex.getHomeTreeNode().getMetaLevel() == candidate.getMetaLevel()) {
-						if (isSingular && uVertex.getComponents().get(basePos).inheritsFrom(((GenericImpl) candidate).getComponent(basePos)) && (!uVertex.getComponents().get(basePos).equals(((GenericImpl) candidate).getComponent(basePos))))
+					if (uVertex.homeTreeNode().getMetaLevel() == candidate.getMetaLevel()) {
+						if (isSingular && uVertex.components().get(basePos).inheritsFrom(((GenericImpl) candidate).getComponent(basePos)) && (!uVertex.components().get(basePos).equals(((GenericImpl) candidate).getComponent(basePos))))
 							return true;
-						if ((isSingular || isProperty) && areComponentsInheriting(uVertex.getComponents(), ((GenericImpl) candidate).components()))
+						if ((isSingular || isProperty) && areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents()))
 							return true;
 					}
 		return false;
@@ -186,7 +186,7 @@ class GenericBuilder {
 	private boolean isAncestorOf(final Generic dependency) {
 		if (((GenericImpl) dependency).inheritsFrom(uVertex))
 			return true;
-		for (Generic component : ((GenericImpl) dependency).components())
+		for (Generic component : ((GenericImpl) dependency).getComponents())
 			if (!dependency.equals(component))
 				if (isAncestorOf(component))
 					return true;

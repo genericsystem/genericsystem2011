@@ -684,7 +684,7 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @see Snapshot
 	 */
-	<T extends Generic> List<T> supers();
+	<T extends Generic> List<T> getSupers();
 
 	/**
 	 * Returns an unmodifiable list of components of this generic.
@@ -693,7 +693,7 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @see Snapshot
 	 */
-	<T extends Generic> List<T> components();
+	<T extends Generic> List<T> getComponents();
 
 	/**
 	 * Returns the base position of an attribute.

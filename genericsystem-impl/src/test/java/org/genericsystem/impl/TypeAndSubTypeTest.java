@@ -16,9 +16,9 @@ public class TypeAndSubTypeTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		assert car.isAlive();
 		assert car.isStructural();
-		assert ((GenericImpl) car).components().size() == 0;
-		assert ((GenericImpl) car).supers().get(0).equals(car.getEngine()) : ((GenericImpl) car).supers().get(0);
-		assert ((GenericImpl) car).supers().get(0).equals(cache.getEngine());
+		assert ((GenericImpl) car).getComponents().size() == 0;
+		assert ((GenericImpl) car).getSupers().get(0).equals(car.getEngine()) : ((GenericImpl) car).getSupers().get(0);
+		assert ((GenericImpl) car).getSupers().get(0).equals(cache.getEngine());
 	}
 
 	public void testExplicitAndStructuralForSubType() {
@@ -32,8 +32,8 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	public void testAncestorOfType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		assert car.supers().size() == 1;
-		assert car.supers().contains(cache.getEngine());
+		assert car.getSupers().size() == 1;
+		assert car.getSupers().contains(cache.getEngine());
 	}
 
 	public void testAncestorOfSubType() {
@@ -41,7 +41,7 @@ public class TypeAndSubTypeTest extends AbstractTest {
 		Type vehicule = cache.addType("Vehicule");
 		Type car = vehicule.addSubType("Car");
 		// assert car.getSupers().size() == 1;
-		assert car.supers().contains(vehicule);
+		assert car.getSupers().contains(vehicule);
 	}
 
 	public void testDependencyForType() {

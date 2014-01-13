@@ -24,7 +24,7 @@ public class InterfacesTest extends AbstractTest {
 		Type car = vehicle.addSubType("Car");
 		Type electric = cache.addType("Electric");
 		Type carElectric = cache.addType("CarElectric", car, vehicle, electric);
-		assert !carElectric.supers().contains(vehicle);
+		assert !carElectric.getSupers().contains(vehicle);
 	}
 
 }

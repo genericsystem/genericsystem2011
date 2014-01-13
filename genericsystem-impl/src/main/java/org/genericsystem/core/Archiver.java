@@ -245,7 +245,7 @@ public class Archiver {
 			getContentInputStream().readObject();
 			((EngineImpl) engine).restoreEngine(homeTreeNodeTs, ts[0], ts[1], ts[2], ts[3]);
 			genericMap.put(ts[0], engine);
-			homeTreeMap.put(homeTreeNodeTs, ((EngineImpl) engine).getHomeTreeNode());
+			homeTreeMap.put(homeTreeNodeTs, ((EngineImpl) engine).homeTreeNode());
 			return engine;
 		}
 

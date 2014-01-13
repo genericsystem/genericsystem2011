@@ -1,7 +1,6 @@
 package org.genericsystem.constraints;
 
 import java.util.Iterator;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -33,21 +32,19 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 	@Meta(StructuralNamingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(StructuralNamingConstraintImpl.class)
-	public static class DefaultKey {
-	}
+	public static class DefaultKey {}
 
 	@SystemGeneric
 	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {
-	}
+	public static class DefaultValue {}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
 		if (!modified.isStructural())
 			return;
-		if (modified.components().isEmpty()) {
+		if (modified.getComponents().isEmpty()) {
 			Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) modified.getEngine()).allInstancesIterator(), modified.getValue());
 			if (iterator.hasNext()) {
 				Generic next = iterator.next();
@@ -55,8 +52,8 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 					throw new UniqueStructuralValueConstraintViolationException(next.info() + iterator.next().info());
 			}
 		} else
-			for (int i = 0; i < modified.components().size(); i++)
-				for (Generic inherited : ((GenericImpl) ((GenericImpl) modified).getComponent(i)).getAllInheritings()) {
+			for (int i = 0; i < modified.getComponents().size(); i++)
+				for (Generic inherited : ((GenericImpl) ((GenericImpl) modified).getComponents().get(i)).getAllInheritings()) {
 					Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL), modified.getValue());
 					if (iterator.hasNext()) {
 						Generic next = iterator.next();

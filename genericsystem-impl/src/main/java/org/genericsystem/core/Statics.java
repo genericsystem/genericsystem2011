@@ -320,6 +320,7 @@ public class Statics {
 		};
 	}
 
+	// TODO create a homeTreeNode filter for better performance
 	public static <T extends Generic> Iterator<T> valueFilter(Iterator<T> iterator, final Serializable value) {
 		return new AbstractFilterIterator<T>(iterator) {
 

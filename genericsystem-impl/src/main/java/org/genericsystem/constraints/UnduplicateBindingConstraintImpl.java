@@ -12,7 +12,6 @@ import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.HomeTreeNode;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UnduplicateBindingConstraintViolationException;
@@ -46,15 +45,13 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 
 	@Override
 	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
-		final Supers supers = ((GenericImpl) modified).supers();
-		final org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).components();
-
-		final HomeTreeNode homeTreeNode = ((GenericImpl) modified).getHomeTreeNode();
-		Iterator<Generic> iterator = components.isEmpty() || components.get(0) == null ? supers.get(0).getInheritings().iterator() : components.get(0).getComposites().iterator();
+		final Supers supers = ((GenericImpl) modified).getSupers();
+		final org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
+		Iterator<Generic> iterator = components.isEmpty() ? supers.get(0).getInheritings().iterator() : components.get(0).getComposites().iterator();
 		iterator = new AbstractFilterIterator<Generic>(iterator) {
 			@Override
 			public boolean isSelected() {
-				return !next.equals(modified) && ((GenericImpl) next).equiv(homeTreeNode, supers, components);
+				return !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex());
 			}
 		};
 		if (iterator.hasNext())

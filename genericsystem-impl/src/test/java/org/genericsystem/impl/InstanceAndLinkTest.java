@@ -24,7 +24,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
 		Generic audi = car.addInstance("audi");
-		List<Generic> supers = audi.supers();
+		List<Generic> supers = audi.getSupers();
 		assert supers.size() == 1;
 		assert supers.contains(car);
 	}
@@ -49,7 +49,7 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Generic audi = car.addInstance("audi");
 		Generic red = color.addInstance("red");
 		Link audiIsRed = audi.setLink(carColor, "audiRed", red);
-		assert audiIsRed.components().size() == 2;
+		assert audiIsRed.getComponents().size() == 2;
 	}
 
 	public void testTargetsAncestor() {

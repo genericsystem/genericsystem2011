@@ -180,13 +180,13 @@ public class FlushTest extends AbstractTest {
 
 			@Override
 			public boolean isSelected(Link element) {
-				return element.components().contains(bmw);
+				return element.getComponents().contains(bmw);
 			}
 		}).get(0);
 		Link redToLada = links.filter(new Filter<Link>() {
 			@Override
 			public boolean isSelected(Link element) {
-				return element.components().contains(audi);
+				return element.getComponents().contains(audi);
 			}
 		}).get(0);
 

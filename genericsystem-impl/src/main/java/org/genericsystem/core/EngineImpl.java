@@ -59,7 +59,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 	final void restoreEngine(long homeTreeNodeTs, long designTs, long birthTs, long lastReadTs, long deathTs) {
 		assert homeTreeNodeTs != 0;
 		restore(new UnsafeVertex(new RootTreeNode(homeTreeNodeTs), new Supers(this), new UnsafeComponents()), designTs, birthTs, lastReadTs, deathTs);
-		assert components().isEmpty();
+		assert getComponents().isEmpty();
 	}
 
 	@Override

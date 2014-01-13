@@ -30,7 +30,7 @@ public class PropertyConstraintImpl extends AbstractBooleanNoAxedConstraintImpl 
 				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders((Attribute) constraintBase).iterator()) {
 					@Override
 					public boolean isSelected() {
-						for (int componentPos = 1; componentPos < next.components().size(); componentPos++)
+						for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
 							if (!Objects.equals(((Holder) next).getComponent(componentPos), ((Holder) constraintBase).getComponent(componentPos)))
 								return false;
 						return true;

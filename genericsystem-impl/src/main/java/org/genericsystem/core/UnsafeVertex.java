@@ -25,31 +25,35 @@ class UnsafeVertex {
 		this.components = components;
 	}
 
-	public HomeTreeNode getHomeTreeNode() {
+	public HomeTreeNode homeTreeNode() {
 		return homeTreeNode;
 	}
 
-	public Supers getSupers() {
+	public Supers supers() {
 		return supers;
 	}
 
-	public UnsafeComponents getComponents() {
+	public UnsafeComponents components() {
 		return components;
 	}
 
-	public int getMetaLevel() {
+	public int metaLevel() {
 		return homeTreeNode.getMetaLevel();
 	}
 
 	static class Vertex extends UnsafeVertex {
 
 		public Vertex(Generic generic, UnsafeVertex uVertex) {
-			super(uVertex.getHomeTreeNode(), uVertex.getSupers(), new Components(generic, uVertex.getComponents()));
+			super(uVertex.homeTreeNode(), uVertex.supers(), new Components(generic, uVertex.components()));
 		}
 
 		@Override
-		public Components getComponents() {
-			return (Components) super.getComponents();
+		public Components components() {
+			return (Components) super.components();
+		}
+
+		public boolean equiv(Vertex vertex) {
+			return homeTreeNode().equals(vertex.homeTreeNode()) && supers().equals(vertex.supers()) && components().equals(vertex.components());
 		}
 
 	}

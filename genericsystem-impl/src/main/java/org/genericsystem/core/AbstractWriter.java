@@ -17,7 +17,7 @@ public abstract class AbstractWriter {
 
 	public void writeGeneric(GenericImpl generic, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
 		writeTs(generic);
-		HomeTreeNode homeTreeNode = generic.getHomeTreeNode();
+		HomeTreeNode homeTreeNode = generic.homeTreeNode();
 		getContentOutputStream().writeLong(homeTreeNode.ts);
 		if (!homeTreeMap.containsKey(homeTreeNode.ts)) {
 			getContentOutputStream().writeLong(homeTreeNode.metaNode.ts);
@@ -26,8 +26,8 @@ public abstract class AbstractWriter {
 		}
 		if (generic.isEngine())
 			return;
-		writeAncestors(generic.supers());
-		writeAncestors(generic.components());
+		writeAncestors(generic.getSupers());
+		writeAncestors(generic.getComponents());
 		getFormalOutputStream().writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
 	}
 
@@ -60,7 +60,7 @@ public abstract class AbstractWriter {
 			HomeTreeNode homeTreeNode = homeTreeMap.get(homeTreeNodeTs);
 			if (null == homeTreeNode) {
 				long metaTs = getContentInputStream().readLong();
-				homeTreeNode = ((GenericImpl) engine).getHomeTreeNode().ts == metaTs ? ((GenericImpl) engine).getHomeTreeNode() : homeTreeMap.get(metaTs);
+				homeTreeNode = ((GenericImpl) engine).homeTreeNode().ts == metaTs ? ((GenericImpl) engine).homeTreeNode() : homeTreeMap.get(metaTs);
 				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, (Serializable) getContentInputStream().readObject());
 			}
 			Supers supers = new Supers(loadAncestors(engine, genericMap));
@@ -68,7 +68,7 @@ public abstract class AbstractWriter {
 			Generic generic = engine.getFactory().newGeneric((Class<?>) getFormalInputStream().readObject());
 			plug(((GenericImpl) generic).restore(new UnsafeVertex(homeTreeNode, supers, uComponents), ts[0], ts[1], ts[2], ts[3]));
 			if (!homeTreeMap.containsKey(homeTreeNodeTs))
-				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).getHomeTreeNode());
+				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode());
 			genericMap.put(ts[0], generic);
 			return generic;
 		}

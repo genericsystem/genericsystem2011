@@ -41,10 +41,10 @@ public class AliveConstraintImpl extends AbstractBooleanNoAxedConstraintImpl imp
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
-		for (Generic generic : modified.components())
+		for (Generic generic : modified.getComponents())
 			if (!generic.isAlive())
 				throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");
-		for (Generic generic : modified.supers())
+		for (Generic generic : modified.getSupers())
 			if (!generic.isAlive())
 				throw new AliveConstraintViolationException("Super : " + generic + " of added node " + modified + " should be alive.");
 	}

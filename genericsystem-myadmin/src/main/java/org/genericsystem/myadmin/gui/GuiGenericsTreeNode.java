@@ -135,19 +135,19 @@ public class GuiGenericsTreeNode {
 	private <T extends Generic> List<T> getChildrenGenerics(GuiTreeChildrenType childrenType) {
 		switch (childrenType) {
 		case SUPERS:
-			return generic.supers();
+			return generic.getSupers();
 		case INSTANCES:
 			return ((Type) generic).getInstances();
 		case INHERITINGS:
 			return generic.getInheritings();
 		case COMPONENTS:
-			return generic.components();
+			return generic.getComponents();
 		case COMPOSITES:
 			return generic.getComposites();
 		case ATTRIBUTES:
 			return (List<T>) ((Type) generic).getAttributes();
 		case VALUES:
-			return (List<T>) generic.components().get(0).getHolders((Attribute) generic);
+			return (List<T>) generic.getComponents().get(0).getHolders((Attribute) generic);
 		default:
 		break;
 		}

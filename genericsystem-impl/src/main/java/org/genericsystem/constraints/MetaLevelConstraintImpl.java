@@ -36,7 +36,7 @@ public class MetaLevelConstraintImpl extends AbstractBooleanNoAxedConstraintImpl
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
-		for (Generic component : modified.components())
+		for (Generic component : modified.getComponents())
 			if (component.getMetaLevel() > modified.getMetaLevel())
 				throw new MetaLevelConstraintViolationException(component + " must have a meta level lower than " + modified);
 	}
