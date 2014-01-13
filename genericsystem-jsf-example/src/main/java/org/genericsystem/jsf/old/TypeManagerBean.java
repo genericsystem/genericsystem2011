@@ -1,4 +1,4 @@
-package org.genericsystem.jsf.example;
+package org.genericsystem.jsf.old;
 
 import java.io.Serializable;
 import java.util.ArrayList;
