@@ -41,6 +41,10 @@ class UnsafeVertex {
 		return homeTreeNode.getMetaLevel();
 	}
 
+	UnsafeVertex truncateComponent(int pos) {
+		return new UnsafeVertex(homeTreeNode(), supers(), Statics.truncate(pos, components()));
+	}
+
 	static class Vertex extends UnsafeVertex {
 
 		public Vertex(Generic generic, UnsafeVertex uVertex) {

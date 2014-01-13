@@ -853,10 +853,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		project(Statics.MULTIDIRECTIONAL);
 	}
 
+	// TODO KK
 	public void project(final int pos) {
 		Iterator<Generic[]> cartesianIterator = new CartesianIterator<>(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final UnsafeComponents components = new UnsafeComponents(cartesianIterator.next());
+			// getReplacedComponentVertex
+			// UnsafeVertex unsafeVertex = new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(Statics.FLAG), new Supers(GenericImpl.this), Statics.replace(pos, components, ((GenericImpl) next).getComponent(pos));
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 				@Override
 				public boolean isSelected() {
@@ -958,7 +961,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return true;
 		if (equiv(subUVertex))
 			return true;
-		if (homeTreeNode().getMetaLevel() > subUVertex.homeTreeNode().getMetaLevel())
+		if (getMetaLevel() > subUVertex.metaLevel())
 			return false;
 		if (subUVertex.components().size() < getComponents().size())
 			return false;
@@ -972,7 +975,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return false;
 		if (subUVertex.components().size() > getComponents().size()) {
 			for (int i = 0; i < subUVertex.components().size(); i++)
-				if (isSuperOf(new UnsafeVertex(subUVertex.homeTreeNode(), subUVertex.supers(), Statics.truncate(i, subUVertex.components()))))
+				if (isSuperOf(subUVertex.truncateComponent(i)))
 					return true;
 			return false;
 		}
@@ -991,7 +994,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	private static boolean isSuperOf(UnsafeVertex superUVertex, UnsafeVertex subUVertex) {
 		if (superUVertex.homeTreeNode().equals(subUVertex.homeTreeNode()) && superUVertex.supers().equals(subUVertex.supers()) && superUVertex.components().equals(subUVertex.components()))
 			return true;
-		if (superUVertex.homeTreeNode().getMetaLevel() > subUVertex.homeTreeNode().getMetaLevel())
+		if (superUVertex.metaLevel() > subUVertex.metaLevel())
 			return false;
 		if (subUVertex.components().size() < superUVertex.components().size())
 			return false;
@@ -1005,7 +1008,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return false;
 		if (subUVertex.components().size() > superUVertex.components().size()) {
 			for (int i = 0; i < subUVertex.components().size(); i++)
-				if (isSuperOf(superUVertex, new UnsafeVertex(subUVertex.homeTreeNode(), subUVertex.supers(), Statics.truncate(i, subUVertex.components()))))
+				if (isSuperOf(superUVertex, subUVertex.truncateComponent(i)))
 					return true;
 			return false;
 		}
@@ -1834,6 +1837,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	UnsafeVertex getTruncatedComponentVertex(int pos) {
 		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.truncate(pos, selfToNullComponents()));
+	}
+
+	UnsafeVertex getReplacedComponentVertex(int pos, Generic newComponent) {
+		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, selfToNullComponents(), newComponent));
 	}
 
 	UnsafeVertex getInsertedSuperVertex(Generic newSuper) {

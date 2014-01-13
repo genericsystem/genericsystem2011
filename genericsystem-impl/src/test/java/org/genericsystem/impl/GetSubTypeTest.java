@@ -158,7 +158,7 @@ public class GetSubTypeTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.addType("Percent"));
+				((GenericImpl) car).setSubAttribute(vehicleColor, "CarOutsideColor", cache.addType("Percent")).log();
 			}
 		}.assertIsCausedBy(IllegalStateException.class);
 	}

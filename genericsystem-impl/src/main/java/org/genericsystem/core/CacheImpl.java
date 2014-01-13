@@ -327,26 +327,22 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T addType(Serializable name, Type... supers) {
-		return addType(name, supers.length != 0 ? supers : new Type[] { getEngine() }, Statics.EMPTY_GENERIC_ARRAY);
+		return addType(name, supers, Statics.EMPTY_GENERIC_ARRAY);
 	}
 
 	@Override
 	public <T extends Type> T addType(Serializable name, Type[] supers, Generic... components) {
-		return internalSetType(name, true, new Supers(supers), new UnsafeComponents(components));
+		return internalBind(getEngine(), name, new Supers(supers.length != 0 ? supers : new Type[] { getEngine() }), new UnsafeComponents(components), null, Statics.MULTIDIRECTIONAL, false, true);
 	}
 
 	@Override
 	public <T extends Type> T setType(Serializable name, Type... supers) {
-		return setType(name, supers.length != 0 ? supers : new Type[] { getEngine() }, Statics.EMPTY_GENERIC_ARRAY);
+		return setType(name, supers, Statics.EMPTY_GENERIC_ARRAY);
 	}
 
 	@Override
 	public <T extends Type> T setType(Serializable name, Type[] supers, Generic... components) {
-		return internalSetType(name, false, new Supers(supers), new UnsafeComponents(components));
-	}
-
-	private <T extends Type> T internalSetType(Serializable name, boolean existsException, Supers supers, UnsafeComponents uComponents) {
-		return internalBind(getEngine(), name, supers, uComponents, null, Statics.MULTIDIRECTIONAL, false, existsException);
+		return internalBind(getEngine(), name, new Supers(supers.length != 0 ? supers : new Type[] { getEngine() }), new UnsafeComponents(components), null, Statics.MULTIDIRECTIONAL, false, false);
 	}
 
 	@Override
@@ -370,11 +366,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private <T extends Tree> T internalSetTree(Serializable name, int dim, boolean existsException) {
-		return this.<Type> bind(name, TreeImpl.class, existsException, new Supers(getEngine()), new UnsafeComponents(new Generic[dim])).disableInheritance();
-	}
-
-	private <T extends Generic> T bind(Serializable name, Class<?> specializationClass, boolean existsException, Supers supers, UnsafeComponents components) {
-		return this.<T> internalBind(getEngine(), name, supers, components, specializationClass, Statics.MULTIDIRECTIONAL, false, existsException);
+		return this.<T> internalBind(getEngine(), name, new Supers(getEngine()), new UnsafeComponents(new Generic[dim]), TreeImpl.class, Statics.MULTIDIRECTIONAL, false, existsException).disableInheritance();
 	}
 
 	@Override
@@ -457,35 +449,39 @@ public class CacheImpl extends AbstractContext implements Cache {
 		private void reBindDependency(Generic dependency, int basePos) {
 			Generic meta = new AdjustList(Arrays.asList(dependency.getMeta())).get(0);
 			// should we rebind automatic dependencies ?
-			put(dependency, bindDependency(meta, getAdjustedVertex(dependency), dependency.getClass(), basePos, false, isAutomatic(dependency)));
+			put(dependency, bindDependency(meta, adjustVertex(dependency), dependency.getClass(), basePos, false, isAutomatic(dependency)));
 		}
 
 		// TODO move this method in GenericImpl ?
-		private UnsafeVertex getAdjustedVertex(Generic dependency) {
+		private UnsafeVertex adjustVertex(Generic dependency) {
 			return new UnsafeVertex(((GenericImpl) dependency).homeTreeNode(), new Supers(new AdjustList(((GenericImpl) dependency).getSupers())), new UnsafeComponents(new AdjustList(((GenericImpl) dependency).selfToNullComponents())));
 		}
 
 		private class AdjustList extends ArrayList<Generic> {
 			private static final long serialVersionUID = -478017222010761379L;
 
-			// TODO should override add and not do the work in constructor
-			private AdjustList(List<Generic> oldComponents) {
-				for (Generic oldComponent : oldComponents) {
-					Generic newComponent = Restructurator.this.get(oldComponent);
-					if (newComponent != null)
-						add(newComponent);
-					else if (isAlive(oldComponent))
-						add(oldComponent);
-					else
-						addAll(new AdjustList(((GenericImpl) oldComponent).getSupers()));
+			private AdjustList(List<Generic> olds) {
+				for (Generic add : olds)
+					adjust(add);
+			}
+
+			private void adjust(Generic old) {
+				if (isAlive(old)) {
+					super.add(old);
+					return;
 				}
+				Generic newGeneric = Restructurator.this.get(old);
+				if (newGeneric != null)
+					super.add(newGeneric);
+				else
+					for (Generic add : (((GenericImpl) old).getSupers()))
+						adjust(add);
 			}
 		}
 
 		private void removeAll(NavigableMap<Generic, Integer> dependenciesMap) {
-			for (Generic dependency : dependenciesMap.descendingMap().keySet()) {
+			for (Generic dependency : dependenciesMap.descendingMap().keySet())
 				simpleRemove(dependency);
-			}
 		}
 
 		private void reBind(Map<Generic, Integer> orderedDependenciesMap) {
