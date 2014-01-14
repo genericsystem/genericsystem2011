@@ -5,7 +5,7 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 	
 	<h:messages/>
-	<h:dataTable value="#{component.rows}" var="row"
+	<h:dataTable value="#{component.instanceRows}" var="row"
 		styleClass="order-table" headerClass="order-table-header"
 		rowClasses="order-table-odd-row,order-table-even-row">
 		<f:facet name="header">
@@ -14,7 +14,6 @@
 		<h:column>
 			<h:outputText value="#{row.editInstance}" />
 		</h:column>
-		
 		<h:column>
 			<h:commandLink value="#{component.removeMsg}"
 				action="#{component.remove(row)}" />

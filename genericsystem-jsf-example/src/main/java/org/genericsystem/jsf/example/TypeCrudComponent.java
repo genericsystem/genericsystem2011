@@ -21,11 +21,11 @@ public class TypeCrudComponent implements CrudComponentInterface {
 	}
 
 	@Override
-	public List<? extends Row> getRows() {
-		return type.getAllInstances().<Row> project(new Projector<Row, Generic>() {
+	public List<? extends InstanceRow> getInstanceRows() {
+		return type.getAllInstances().<InstanceRow> project(new Projector<InstanceRow, Generic>() {
 			@Override
-			public Row project(final Generic instance) {
-				return new Row() {
+			public InstanceRow project(final Generic instance) {
+				return new InstanceRow() {
 					@Override
 					public String getEditInstance() {
 						return Objects.toString(instance.getValue());
@@ -35,7 +35,6 @@ public class TypeCrudComponent implements CrudComponentInterface {
 					public Generic getInstance() {
 						return instance;
 					}
-
 				};
 			}
 		});
@@ -62,8 +61,8 @@ public class TypeCrudComponent implements CrudComponentInterface {
 	}
 
 	@Override
-	public void remove(Row row) {
-		row.getInstance().remove();
+	public void remove(InstanceRow instanceRow) {
+		instanceRow.getInstance().remove();
 	}
 
 	@Override
