@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
@@ -550,7 +551,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Link> T getLink(Link relation, Generic... targets) {
-		return this.unambigousFirst(this.<T> linksIterator(relation, getBasePos(relation), targets));
+		return getLink(relation, getBasePos(relation), targets);
 	}
 
 	public <T extends Generic> Iterator<T> directInheritingsIterator() {
