@@ -859,17 +859,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Generic[]> cartesianIterator = new CartesianIterator<>(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final UnsafeComponents components = new UnsafeComponents(cartesianIterator.next());
-			// getReplacedComponentVertex
-			// UnsafeVertex unsafeVertex = new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(Statics.FLAG), new Supers(GenericImpl.this), Statics.replace(pos, components, ((GenericImpl) next).getComponent(pos));
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 				@Override
 				public boolean isSelected() {
-					return ((GenericImpl) next).inheritsFrom(new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(Statics.FLAG), new Supers(GenericImpl.this), Statics.replace(pos, components, ((GenericImpl) next).getComponent(pos))));
+					return ((GenericImpl) next).inheritsFrom(((GenericImpl) next).filterToProjectVertex(components, pos));
 				}
 			});
 
 			if (projection == null)
-				getCurrentCache().internalBind(getMeta(), Statics.FLAG, new Supers(this), components, null, Statics.MULTIDIRECTIONAL, true, false);
+				getCurrentCache().internalBind(getMeta(), projectVertex(components), null, Statics.MULTIDIRECTIONAL, true, false);
 		}
 	}
 
@@ -1842,6 +1840,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	UnsafeVertex getReplacedComponentVertex(int pos, Generic newComponent) {
 		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, selfToNullComponents(), newComponent));
+	}
+
+	// TODO kk ?
+	UnsafeVertex filterToProjectVertex(UnsafeComponents components, int pos) {
+		return new UnsafeVertex(((GenericImpl) getMeta()).homeTreeNode(), getSupers(), Statics.replace(pos, components, getComponent(pos)));
+	}
+
+	UnsafeVertex projectVertex(UnsafeComponents components) {
+		return new UnsafeVertex(homeTreeNode(), getSupers(), components);
 	}
 
 	UnsafeVertex getInsertedSuperVertex(Generic newSuper) {

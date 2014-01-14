@@ -16,6 +16,7 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -171,7 +172,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAL:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			new Restructurator() {
 				private static final long serialVersionUID = 7326023526567814490L;
@@ -183,11 +184,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(generic, Statics.MULTIDIRECTIONAL);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -497,8 +498,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	<T extends Generic> T internalBind(Generic meta, Serializable value, Supers supers, UnsafeComponents uComponents, final Class<?> specializationClass, int basePos, final boolean automatic, boolean existsException) throws RollbackException {
-		assert !supers.isEmpty();
 		return new GenericBuilder(this, meta, new UnsafeVertex(((GenericImpl) meta).bindInstanceNode(value), supers, uComponents), basePos, true).internalBind(specializationClass, basePos, existsException, automatic);
+	}
+
+	<T extends Generic> T internalBind(Generic meta, UnsafeVertex uVertex, final Class<?> specializationClass, int basePos, final boolean automatic, boolean existsException) throws RollbackException {
+		return new GenericBuilder(this, meta, uVertex, basePos, true).internalBind(specializationClass, basePos, existsException, automatic);
 	}
 
 	private class AllDependencies extends TreeMap<Generic, Integer> {
