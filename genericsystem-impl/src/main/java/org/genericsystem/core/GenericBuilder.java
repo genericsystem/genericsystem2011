@@ -55,6 +55,15 @@ class GenericBuilder {
 		Set<Generic> set = new TreeSet<>();
 		while (iterator.hasNext())
 			set.add(iterator.next());
+		if (respectSupers) {
+			LOOP: for (Generic generic : uVertex.supers()) {
+				for (Generic newSuper : set)
+					if (newSuper.inheritsFrom(generic))
+						continue LOOP;
+				throw new IllegalStateException("Invalid super : " + generic);
+			}
+		}
+
 		return new Supers(set);
 	}
 
