@@ -763,12 +763,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	// TODO KK result should be an arrayList and elements should be added on demand
-	UnsafeComponents sortAndCheck(Generic... components) {
+	Generic[] sortAndCheck(Generic... components) {
 		TakenPositions takenPositions = new TakenPositions(components.length);
 		Generic[] result = new Generic[components.length];
 		for (Generic component : components)
 			result[takenPositions.getFreePosition(component == null ? GenericImpl.this : component)] = component;
-		return new UnsafeComponents(result);
+		return result;
 	}
 
 	public <T extends Generic> Iterator<T> holdersIterator(int level, Holder origin, int basePos) {
@@ -1828,6 +1828,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	UnsafeVertex getUpdatedValueVertex(Serializable value) {
 		return new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(value), getSupers(), selfToNullComponents());
+	}
+
+	UnsafeVertex createNewVertex(Serializable value, Generic[] supers, Generic... components) {
+		return new UnsafeVertex(bindInstanceNode(value), new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components));
 	}
 
 	UnsafeVertex getInsertedComponentVertex(Generic newComponent, int pos) {

@@ -333,7 +333,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T addType(Serializable name, Type[] supers, Generic... components) {
-		return internalBind(getEngine(), name, new Supers(supers.length != 0 ? supers : new Type[] { getEngine() }), new UnsafeComponents(components), null, Statics.MULTIDIRECTIONAL, false, true);
+		return internalBind(getEngine(), ((GenericImpl) getEngine()).createNewVertex(name, supers, components), null, Statics.MULTIDIRECTIONAL, false, true);
 	}
 
 	@Override
@@ -343,7 +343,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T setType(Serializable name, Type[] supers, Generic... components) {
-		return internalBind(getEngine(), name, new Supers(supers.length != 0 ? supers : new Type[] { getEngine() }), new UnsafeComponents(components), null, Statics.MULTIDIRECTIONAL, false, false);
+		return internalBind(getEngine(), ((GenericImpl) getEngine()).createNewVertex(name, supers, components), null, Statics.MULTIDIRECTIONAL, false, false);
 	}
 
 	@Override
@@ -367,7 +367,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private <T extends Tree> T internalSetTree(Serializable name, int dim, boolean existsException) {
-		return this.<T> internalBind(getEngine(), name, new Supers(getEngine()), new UnsafeComponents(new Generic[dim]), TreeImpl.class, Statics.MULTIDIRECTIONAL, false, existsException).disableInheritance();
+		return this.<T> internalBind(getEngine(), ((GenericImpl) getEngine()).createNewVertex(name, new Generic[] { getEngine() }, new Generic[dim]), TreeImpl.class, Statics.MULTIDIRECTIONAL, false, existsException).disableInheritance();
 	}
 
 	@Override
@@ -392,17 +392,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz, components);
 		Serializable value = findImplictValue(clazz);
-		return this.<T> internalBind(meta, value, new Supers(Statics.insertFirst(meta, userSupers)), new UnsafeComponents(components), clazz, Statics.MULTIDIRECTIONAL, false, false);
+		return this.<T> internalBind(meta, meta.createNewVertex(value, Statics.insertFirst(meta, userSupers), components), clazz, Statics.MULTIDIRECTIONAL, false, false);
 	}
 
 	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, boolean existsException, int axe, Generic... components) {
-		UnsafeComponents sortAndCheck = ((GenericImpl) directSuper).sortAndCheck(components);
-		return internalBind(meta, value, new Supers(directSuper), sortAndCheck, specializationClass, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe, false, existsException);
+		Generic[] sortAndCheck = ((GenericImpl) directSuper).sortAndCheck(components);
+		return internalBind(meta, ((GenericImpl) meta).createNewVertex(value, new Generic[] { directSuper }, sortAndCheck), specializationClass, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe, false, existsException);
 	}
 
-	int findAxe(UnsafeGList sorts, Generic baseComponent) throws RollbackException {
-		for (int i = 0; i < sorts.size(); i++)
-			if (baseComponent.equals(sorts.get(i)))
+	int findAxe(Generic[] sorts, Generic baseComponent) throws RollbackException {
+		for (int i = 0; i < sorts.length; i++)
+			if (baseComponent.equals(sorts[i]))
 				return i;
 		rollback(new IllegalStateException());
 		return -1;// Unreachable
@@ -495,10 +495,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		abstract Generic rebuild();
-	}
-
-	<T extends Generic> T internalBind(Generic meta, Serializable value, Supers supers, UnsafeComponents uComponents, final Class<?> specializationClass, int basePos, final boolean automatic, boolean existsException) throws RollbackException {
-		return new GenericBuilder(this, meta, new UnsafeVertex(((GenericImpl) meta).bindInstanceNode(value), supers, uComponents), basePos, true).internalBind(specializationClass, basePos, existsException, automatic);
 	}
 
 	<T extends Generic> T internalBind(Generic meta, UnsafeVertex uVertex, final Class<?> specializationClass, int basePos, final boolean automatic, boolean existsException) throws RollbackException {
