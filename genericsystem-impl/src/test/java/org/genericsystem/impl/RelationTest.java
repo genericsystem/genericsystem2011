@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -709,37 +708,39 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManyInheritanceReverse2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Type person = cache.addType("person");
-		Relation carPerson = car.setRelation("CarPersons", person);
+		Type pilot = cache.addType("Pilot");
+		Relation carPilots = car.setRelation("CarPilots", pilot);
 
-		carPerson.enableSingularConstraint(Statics.TARGET_POSITION);
-		assert carPerson.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		carPilots.enableSingularConstraint(Statics.TARGET_POSITION);
+		carPilots.disableReferentialIntegrity(Statics.TARGET_POSITION);
+		assert carPilots.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
 		Generic myBmw = car.addInstance("myBmw");
-		Generic michael = person.addInstance("michael");
-		Generic nicolas = person.addInstance("nicolas");
-		Generic sven = person.addInstance("sven");
-		Generic sofiane = person.addInstance("sofiane");
-		Generic pierre = person.addInstance("pierre");
 
-		Link carPierre = pierre.setLink(carPerson, "defaultPerson", car);
-		assert myBmw.getLink(carPerson).getBaseComponent().equals(myBmw) : myBmw.getLink(carPerson);
+		Generic michael = pilot.addInstance("michael");
+		Generic nicolas = pilot.addInstance("nicolas");
+		Generic sven = pilot.addInstance("sven");
+		Generic sofiane = pilot.addInstance("sofiane");
+		Generic pierre = pilot.addInstance("pierre");
 
-		Link myBmwMichael = michael.bind(carPerson, myBmw);
-		Link myBmwNicolas = nicolas.bind(carPerson, myBmw);
-		Link myBmwSven = sven.bind(carPerson, myBmw);
-		Link myBmwSofiane = sofiane.bind(carPerson, myBmw);
+		Link carPierre = pierre.setLink(carPilots, "defaultPerson", car);
+		assert myBmw.getLink(carPilots).getBaseComponent().equals(myBmw) : myBmw.getLink(carPilots);
 
-		assert michael.getLinks(carPerson).size() == 1 : michael.getLinks(carPerson);
-		assert nicolas.getLinks(carPerson).size() == 1 : nicolas.getLinks(carPerson);
-		assert sven.getLinks(carPerson).size() == 1 : sven.getLinks(carPerson);
-		assert sofiane.getLinks(carPerson).size() == 1 : sofiane.getLinks(carPerson);
+		Link myBmwMichael = michael.bind(carPilots, myBmw);
+		Link myBmwNicolas = nicolas.bind(carPilots, myBmw);
+		Link myBmwSven = sven.bind(carPilots, myBmw);
+		Link myBmwSofiane = sofiane.bind(carPilots, myBmw);
 
-		assert !myBmw.getLinks(carPerson).contains(carPierre) : myBmw.getLinks(carPerson);
-		assert myBmw.getLinks(carPerson).contains(myBmwMichael) : myBmw.getLinks(carPerson);
-		assert myBmw.getLinks(carPerson).contains(myBmwNicolas) : myBmw.getLinks(carPerson);
-		assert myBmw.getLinks(carPerson).contains(myBmwSven) : myBmw.getLinks(carPerson);
-		assert myBmw.getLinks(carPerson).contains(myBmwSofiane) : myBmw.getLinks(carPerson);
+		assert michael.getLinks(carPilots).size() == 1 : michael.getLinks(carPilots);
+		assert nicolas.getLinks(carPilots).size() == 1 : nicolas.getLinks(carPilots);
+		assert sven.getLinks(carPilots).size() == 1 : sven.getLinks(carPilots);
+		assert sofiane.getLinks(carPilots).size() == 1 : sofiane.getLinks(carPilots);
+
+		assert !myBmw.getLinks(carPilots).contains(carPierre) : myBmw.getLinks(carPilots);
+		assert myBmw.getLinks(carPilots).contains(myBmwMichael) : myBmw.getLinks(carPilots);
+		assert myBmw.getLinks(carPilots).contains(myBmwNicolas) : myBmw.getLinks(carPilots);
+		assert myBmw.getLinks(carPilots).contains(myBmwSven) : myBmw.getLinks(carPilots);
+		assert myBmw.getLinks(carPilots).contains(myBmwSofiane) : myBmw.getLinks(carPilots);
 	}
 
 	public void testOneToManyDifferentValue() {
