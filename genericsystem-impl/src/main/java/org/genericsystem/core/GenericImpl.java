@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
@@ -550,7 +551,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Link> T getLink(Link relation, Generic... targets) {
-		return this.unambigousFirst(this.<T> linksIterator(relation, getBasePos(relation), targets));
+		return getLink(relation, getBasePos(relation), targets);
 	}
 
 	public <T extends Generic> Iterator<T> directInheritingsIterator() {
@@ -762,12 +763,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	// TODO KK result should be an arrayList and elements should be added on demand
-	UnsafeComponents sortAndCheck(Generic... components) {
+	Generic[] sortAndCheck(Generic... components) {
 		TakenPositions takenPositions = new TakenPositions(components.length);
 		Generic[] result = new Generic[components.length];
 		for (Generic component : components)
 			result[takenPositions.getFreePosition(component == null ? GenericImpl.this : component)] = component;
-		return new UnsafeComponents(result);
+		return result;
 	}
 
 	public <T extends Generic> Iterator<T> holdersIterator(int level, Holder origin, int basePos) {
@@ -858,17 +859,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Generic[]> cartesianIterator = new CartesianIterator<>(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final UnsafeComponents components = new UnsafeComponents(cartesianIterator.next());
-			// getReplacedComponentVertex
-			// UnsafeVertex unsafeVertex = new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(Statics.FLAG), new Supers(GenericImpl.this), Statics.replace(pos, components, ((GenericImpl) next).getComponent(pos));
 			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
 				@Override
 				public boolean isSelected() {
-					return ((GenericImpl) next).inheritsFrom(new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(Statics.FLAG), new Supers(GenericImpl.this), Statics.replace(pos, components, ((GenericImpl) next).getComponent(pos))));
+					return ((GenericImpl) next).inheritsFrom(((GenericImpl) next).filterToProjectVertex(components, pos));
 				}
 			});
 
 			if (projection == null)
-				getCurrentCache().internalBind(getMeta(), Statics.FLAG, new Supers(this), components, null, Statics.MULTIDIRECTIONAL, true, false);
+				getCurrentCache().internalBind(getMeta(), projectVertex(components), null, Statics.MULTIDIRECTIONAL, true, false);
 		}
 	}
 
@@ -1831,6 +1830,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(value), getSupers(), selfToNullComponents());
 	}
 
+	UnsafeVertex createNewVertex(Serializable value, Generic[] supers, Generic... components) {
+		return new UnsafeVertex(bindInstanceNode(value), new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components));
+	}
+
 	UnsafeVertex getInsertedComponentVertex(Generic newComponent, int pos) {
 		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.insertIntoComponents(newComponent, selfToNullComponents(), pos));
 	}
@@ -1841,6 +1844,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	UnsafeVertex getReplacedComponentVertex(int pos, Generic newComponent) {
 		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, selfToNullComponents(), newComponent));
+	}
+
+	// TODO kk ?
+	UnsafeVertex filterToProjectVertex(UnsafeComponents components, int pos) {
+		return new UnsafeVertex(((GenericImpl) getMeta()).homeTreeNode(), getSupers(), Statics.replace(pos, components, getComponent(pos)));
+	}
+
+	UnsafeVertex projectVertex(UnsafeComponents components) {
+		return new UnsafeVertex(homeTreeNode(), getSupers(), components);
 	}
 
 	UnsafeVertex getInsertedSuperVertex(Generic newSuper) {

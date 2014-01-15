@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
@@ -136,11 +137,11 @@ public class FlushTest extends AbstractTest {
 		Generic grey = color.addInstance("Grey");
 		assert car.setLink(carColor, "CarRed", red).isSingularConstraintEnabled(0); // default color of car
 
-		final Generic bmw = car.addInstance("Bmw");
+		// final Generic bmw = car.addInstance("Bmw");
 		Generic mercedes = car.addInstance("Mercedes");
 		mercedes.bind(carColor, grey);
 		assert red.getLinks(carColor).size() == 1;
-		assert red.getLink(carColor).getBaseComponent().equals(bmw);
+		// assert red.getLink(carColor).getBaseComponent().equals(bmw);
 	}
 
 	public void testAutomaticsNotFlushedOK() {

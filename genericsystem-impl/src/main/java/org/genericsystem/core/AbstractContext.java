@@ -142,7 +142,7 @@ public abstract class AbstractContext {
 		};
 	}
 
-	NavigableMap<Generic, Integer> orderDependencyMap(final Generic generic, final int basePos) {
+	static NavigableMap<Generic, Integer> orderDependencyMap(final Generic generic, final int basePos) {
 		return new TreeMap<Generic, Integer>() {
 			private static final long serialVersionUID = 1053909994506452123L;
 			{

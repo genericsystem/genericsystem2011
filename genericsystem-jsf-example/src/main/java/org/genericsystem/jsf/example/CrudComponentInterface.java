@@ -8,7 +8,7 @@ public interface CrudComponentInterface {
 
 	String getXhtmlPath();
 
-	List<? extends Row> getRows();
+	List<? extends InstanceRow> getInstanceRows();
 
 	String getTitleMsg();
 
@@ -22,11 +22,12 @@ public interface CrudComponentInterface {
 
 	void setAddInstanceValue(String instanceValue);
 
-	void remove(Row row);
+	void remove(InstanceRow instanceRow);
 
-	public static interface Row {
+	public static interface InstanceRow {
 		String getEditInstance();
 
 		Generic getInstance();
 	}
+
 }
