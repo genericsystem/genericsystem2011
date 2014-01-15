@@ -2,10 +2,8 @@ package org.genericsystem.jsf.example;
 
 import java.util.List;
 import java.util.Objects;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Projector;
-import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -21,8 +19,6 @@ public class CarCrudComponent extends TypeCrudComponent {
 		super(type);
 		this.attribute = attribute;
 		this.relation = relation;
-		this.relation.enableCascadeRemove(Statics.BASE_POSITION);
-		this.relation.disableReferentialIntegrity(Statics.TARGET_POSITION);
 	}
 
 	public String getAddAttributeValue() {
