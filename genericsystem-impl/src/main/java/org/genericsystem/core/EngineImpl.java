@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
@@ -53,12 +54,12 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	void restoreEngine() {
-		restore(new UnsafeVertex(new RootTreeNode(), new Supers(this), new UnsafeComponents()), pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE);
+		restore(new UnsafeVertex(new RootTreeNode(), this, new Supers(this), new UnsafeComponents()), pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE);
 	}
 
 	final void restoreEngine(long homeTreeNodeTs, long designTs, long birthTs, long lastReadTs, long deathTs) {
 		assert homeTreeNodeTs != 0;
-		restore(new UnsafeVertex(new RootTreeNode(homeTreeNodeTs), new Supers(this), new UnsafeComponents()), designTs, birthTs, lastReadTs, deathTs);
+		restore(new UnsafeVertex(new RootTreeNode(homeTreeNodeTs), this, new Supers(this), new UnsafeComponents()), designTs, birthTs, lastReadTs, deathTs);
 		assert getComponents().isEmpty();
 	}
 

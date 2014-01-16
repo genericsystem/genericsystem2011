@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
@@ -40,7 +41,7 @@ class GenericBuilder2 {
 			isReferentialIntegrity[i] = ((GenericImpl) meta).isReferentialIntegrity(i);
 		}
 		isProperty = ((GenericImpl) meta).isPropertyConstraintEnabled();
-		this.uVertex = new UnsafeVertex(uVertex.homeTreeNode(), getExtendedDirectSupers(respectSupers), uVertex.components());
+		this.uVertex = new UnsafeVertex(uVertex.homeTreeNode(), meta, getExtendedDirectSupers(respectSupers), uVertex.components());
 	}
 
 	protected Supers getExtendedDirectSupers(final boolean respectSupers) {
