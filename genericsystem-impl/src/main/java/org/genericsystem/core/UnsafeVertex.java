@@ -29,7 +29,7 @@ class UnsafeVertex {
 
 	public UnsafeVertex(HomeTreeNode homeTreeNode, Generic meta, Supers supers, UnsafeComponents components) {
 		assert homeTreeNode != null;
-		assert meta != null;
+		// assert meta != null;
 		assert supers != null;
 		assert components != null;
 		this.homeTreeNode = homeTreeNode;
@@ -59,7 +59,7 @@ class UnsafeVertex {
 	}
 
 	UnsafeVertex truncateComponent(int pos) {
-		return new UnsafeVertex(homeTreeNode(), supers(), Statics.truncate(pos, components()));
+		return new UnsafeVertex(homeTreeNode(), getMeta(), supers(), Statics.truncate(pos, components()));
 	}
 
 	static class Vertex extends UnsafeVertex {
