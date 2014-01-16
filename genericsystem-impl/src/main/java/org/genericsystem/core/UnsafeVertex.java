@@ -12,6 +12,8 @@ class UnsafeVertex {
 
 	private HomeTreeNode homeTreeNode;
 
+	private Generic meta;
+
 	private Supers supers;
 
 	private UnsafeComponents components;
@@ -25,8 +27,23 @@ class UnsafeVertex {
 		this.components = components;
 	}
 
+	public UnsafeVertex(HomeTreeNode homeTreeNode, Generic meta, Supers supers, UnsafeComponents components) {
+		assert homeTreeNode != null;
+		assert meta != null;
+		assert supers != null;
+		assert components != null;
+		this.homeTreeNode = homeTreeNode;
+		this.meta = meta;
+		this.supers = supers;
+		this.components = components;
+	}
+
 	public HomeTreeNode homeTreeNode() {
 		return homeTreeNode;
+	}
+
+	public Generic getMeta() {
+		return meta;
 	}
 
 	public Supers supers() {
@@ -48,7 +65,7 @@ class UnsafeVertex {
 	static class Vertex extends UnsafeVertex {
 
 		public Vertex(Generic generic, UnsafeVertex uVertex) {
-			super(uVertex.homeTreeNode(), uVertex.supers(), new Components(generic, uVertex.components()));
+			super(uVertex.homeTreeNode(), uVertex.getMeta(), uVertex.supers(), new Components(generic, uVertex.components()));
 		}
 
 		@Override

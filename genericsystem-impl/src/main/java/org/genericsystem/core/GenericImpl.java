@@ -836,7 +836,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 						Generic candidateMeta = candidate.getMeta();
 						if (((GenericImpl) next).homeTreeNode().equals(((GenericImpl) candidate).homeTreeNode()) && next.getMeta().equals(candidateMeta)
 								&& candidateComponents.equals(Statics.replace(pos, ((GenericImpl) next).getComponents(), GenericImpl.this)))
-							new GenericBuilder(getCurrentCache(), candidateMeta, new UnsafeVertex(((GenericImpl) candidate).homeTreeNode(), new Supers(candidateMeta), candidateComponents), Statics.MULTIDIRECTIONAL, true).bindDependency(
+							new GenericBuilder(getCurrentCache(), new UnsafeVertex(((GenericImpl) candidate).homeTreeNode(), candidateMeta, new Supers(candidateMeta), candidateComponents), Statics.MULTIDIRECTIONAL, true).bindDependency(
 									candidate.getClass(), false, true);
 					}
 				}
@@ -867,7 +867,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			});
 
 			if (projection == null)
-				getCurrentCache().internalBind(getMeta(), projectVertex(components), null, Statics.MULTIDIRECTIONAL, true, false);
+				getCurrentCache().internalBind(projectVertex(components), null, Statics.MULTIDIRECTIONAL, true, false);
 		}
 	}
 
@@ -1827,40 +1827,41 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	UnsafeVertex getUpdatedValueVertex(Serializable value) {
-		return new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(value), getSupers(), selfToNullComponents());
+		return new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(value), getMeta(), getSupers(), selfToNullComponents());
 	}
 
 	UnsafeVertex createNewVertex(Serializable value, Generic[] supers, Generic... components) {
-		return new UnsafeVertex(bindInstanceNode(value), new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components));
+		return new UnsafeVertex(bindInstanceNode(value), this, new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components));
 	}
 
 	UnsafeVertex getInsertedComponentVertex(Generic newComponent, int pos) {
-		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.insertIntoComponents(newComponent, selfToNullComponents(), pos));
+		return new UnsafeVertex(homeTreeNode(), getMeta(), getSupers(), Statics.insertIntoComponents(newComponent, selfToNullComponents(), pos));
 	}
 
 	UnsafeVertex getTruncatedComponentVertex(int pos) {
-		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.truncate(pos, selfToNullComponents()));
+		return new UnsafeVertex(homeTreeNode(), getMeta(), getSupers(), Statics.truncate(pos, selfToNullComponents()));
 	}
 
+	// TODO not called => remove ?
 	UnsafeVertex getReplacedComponentVertex(int pos, Generic newComponent) {
 		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, selfToNullComponents(), newComponent));
 	}
 
 	// TODO kk ?
 	UnsafeVertex filterToProjectVertex(UnsafeComponents components, int pos) {
-		return new UnsafeVertex(((GenericImpl) getMeta()).homeTreeNode(), getSupers(), Statics.replace(pos, components, getComponent(pos)));
+		return new UnsafeVertex(((GenericImpl) getMeta()).homeTreeNode(), getMeta(), getSupers(), Statics.replace(pos, components, getComponent(pos)));
 	}
 
 	UnsafeVertex projectVertex(UnsafeComponents components) {
-		return new UnsafeVertex(homeTreeNode(), getSupers(), components);
+		return new UnsafeVertex(homeTreeNode(), getMeta(), getSupers(), components);
 	}
 
 	UnsafeVertex getInsertedSuperVertex(Generic newSuper) {
-		return new UnsafeVertex(homeTreeNode(), Statics.insertIntoSupers(newSuper, getSupers(), 0), selfToNullComponents());
+		return new UnsafeVertex(homeTreeNode(), getMeta(), Statics.insertIntoSupers(newSuper, getSupers(), 0), selfToNullComponents());
 	}
 
 	UnsafeVertex getTruncatedSuperVertex(int pos) {
-		return new UnsafeVertex(homeTreeNode(), Statics.truncate(pos, getSupers()), selfToNullComponents());
+		return new UnsafeVertex(homeTreeNode(), getMeta(), Statics.truncate(pos, getSupers()), selfToNullComponents());
 	}
 
 }
