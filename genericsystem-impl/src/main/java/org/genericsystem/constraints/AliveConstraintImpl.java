@@ -29,18 +29,17 @@ public class AliveConstraintImpl extends AbstractBooleanNoAxedConstraintImpl imp
 	@Meta(AliveConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(AliveConstraintImpl.class)
-	public static class DefaultKey {
-	}
+	public static class DefaultKey {}
 
 	@SystemGeneric
 	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {
-	}
+	public static class DefaultValue {}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
+		assert modified.isAlive();
 		for (Generic generic : modified.getComponents())
 			if (!generic.isAlive())
 				throw new AliveConstraintViolationException("Component : " + generic + " of added node " + modified + " should be alive.");

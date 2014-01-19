@@ -85,6 +85,7 @@ public class RelationTest extends AbstractTest {
 
 		final Relation carPassengerTime = car.setRelation("CarPassengerTime", passenger, time);
 		carPassengerTime.enableSingularConstraint(Statics.TARGET_POSITION);
+		carPassengerTime.disableReferentialIntegrity(Statics.TARGET_POSITION);
 		assert carPassengerTime.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
 		final Generic myBmw = car.addInstance("myBmw");
@@ -104,7 +105,7 @@ public class RelationTest extends AbstractTest {
 			@Override
 			public void intercept() {
 				yesterday.bind(carPassengerTime, myBmw, passenger);
-				assert yesterday.getLinks(carPassengerTime).size() == 1;
+				assert yesterday.getLinks(carPassengerTime).size() == 1 : yesterday.getLinks(carPassengerTime).get(0).info() + yesterday.getLinks(carPassengerTime).get(1).info();
 
 			}
 		}.assertIsCausedBy(SingularConstraintViolationException.class);
@@ -194,6 +195,7 @@ public class RelationTest extends AbstractTest {
 		final Relation carColor = car.setRelation("carColor", color);
 		carColor.enableSingularConstraint(Statics.TARGET_POSITION);
 		assert carColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		carColor.disableReferentialIntegrity(Statics.TARGET_POSITION);
 
 		final Generic myBmw = car.addInstance("myBmw");
 
@@ -341,15 +343,8 @@ public class RelationTest extends AbstractTest {
 
 		red.setLink(carColor, "defaultColor", car);
 		assert myBmw.getLink(carColor).getBaseComponent().equals(car);
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				yellow.bind(carColor, myBmw);
-			}
-
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
+		yellow.bind(carColor, myBmw);
+		assert myBmw.getLink(carColor).getBaseComponent().equals(myBmw);
 	}
 
 	public void testToOneInheritanceTernary() {
@@ -411,14 +406,7 @@ public class RelationTest extends AbstractTest {
 
 		Link myBmwMe = me.bind(carOwner, myBmw);
 		assert me.getLinks(carOwner).contains(myBmwMe);
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				you.bind(carOwner, myBmw);
-			}
-
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
+		you.bind(carOwner, myBmw);
 	}
 
 	public void testToOneNewTargetTernary() {
@@ -546,6 +534,7 @@ public class RelationTest extends AbstractTest {
 		final Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
+		carOwner.enableReferentialIntegrity();
 
 		final Generic myBmw = car.addInstance("myBmw");
 		final Generic me = owner.addInstance("me");
@@ -792,6 +781,7 @@ public class RelationTest extends AbstractTest {
 		final Relation carTyres = car.setRelation("CarTyres", tyre);
 
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
+		carTyres.disableReferentialIntegrity(Statics.TARGET_POSITION);
 		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 		carTyres.enablePropertyConstraint();
 		assert carTyres.isPropertyConstraintEnabled();
@@ -1387,7 +1377,8 @@ public class RelationTest extends AbstractTest {
 		Link carRed = car.setLink(carColor, "carRed", red);
 		myBmw.bind(carColor, red);
 		myAudi.setLink(carRed, null, red);
-		Link myAudiRed = myAudi.bind(carRed, red);// myAudi.bind(carColor, red);
+		// Link myAudiRed = myAudi.bind(carRed, red);
+		Link myAudiRed = myAudi.bind(carColor, red);
 
 		Link myAudiBlue = myAudi.bind(carColor, blue);
 		assert myAudiBlue.inheritsFrom(carRed);

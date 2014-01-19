@@ -3,7 +3,6 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -648,6 +647,22 @@ public interface Generic extends Comparable<Generic> {
 	boolean isAlive();
 
 	/**
+	 * Enable referential integrity for component's base position.
+	 * 
+	 * 
+	 * @return this.
+	 */
+	<T extends Generic> T enableReferentialIntegrity();
+
+	/**
+	 * Disable referential integrity for component's base position.
+	 * 
+	 * 
+	 * @return this.
+	 */
+	<T extends Generic> T disableReferentialIntegrity();
+
+	/**
 	 * Enable referential integrity for component's position.
 	 * 
 	 * @param componentPos
@@ -666,6 +681,14 @@ public interface Generic extends Comparable<Generic> {
 	 * @return this.
 	 */
 	<T extends Generic> T disableReferentialIntegrity(int componentPos);
+
+	/**
+	 * Returns true if the referential integrity is enabled for component's base position.
+	 * 
+	 * 
+	 * @return true if the referential integrity is enabled on base position.
+	 */
+	boolean isReferentialIntegrity();
 
 	/**
 	 * Returns true if the referential integrity is enabled for component's position.

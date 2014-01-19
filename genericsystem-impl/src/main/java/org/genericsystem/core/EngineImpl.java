@@ -274,7 +274,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			scheduler.scheduleAtFixedRate(new Runnable() {
 				@Override
 				public void run() {
-					runGarbage(Statics.LIFE_TIME_OUT);
+					runGarbage(Statics.LIFE_TIMEOUT);
 				}
 			}, Statics.GARBAGE_INITIAL_DELAY, Statics.GARBAGE_PERIOD, TimeUnit.MILLISECONDS);
 		}
