@@ -64,7 +64,7 @@ public class Statics {
 	public static final long SNAPSHOTS_INITIAL_DELAY = 1000L;
 	public static final long GARBAGE_PERIOD = 1000L;
 	public static final long GARBAGE_INITIAL_DELAY = 1000L;
-	public static final long LIFE_TIME_OUT = 1386174608777L;// 30 minutes
+	public static final long LIFE_TIMEOUT = 1386174608777L;// 30 minutes
 
 	public static Generic[] insertIntoArray(Generic generic, Generic[] targets, int basePos) {
 		if (basePos < 0 || basePos > targets.length)
@@ -340,4 +340,18 @@ public class Statics {
 			}
 		};
 	}
+
+	public static class OrderedDependencies extends TreeSet<Generic> {
+		private static final long serialVersionUID = 1053909994506452123L;
+
+		public void addDependencies(Generic dependency) {
+			if (super.add(dependency)) {// protect from loop
+				for (Generic inheritingDependency : dependency.<Generic> getInheritings())
+					addDependencies(inheritingDependency);
+				for (Generic compositeDependency : dependency.<Generic> getComposites())
+					addDependencies(compositeDependency);
+			}
+		}
+	}
+
 }

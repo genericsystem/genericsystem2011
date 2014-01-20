@@ -1,12 +1,10 @@
 package org.genericsystem.impl;
 
 import java.lang.reflect.Method;
-
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
-
 import org.testng.annotations.Test;
 
 @Test

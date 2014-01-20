@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
@@ -838,8 +837,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 						Generic candidateMeta = candidate.getMeta();
 						if (((GenericImpl) next).homeTreeNode().equals(((GenericImpl) candidate).homeTreeNode()) && next.getMeta().equals(candidateMeta)
 								&& candidateComponents.equals(Statics.replace(pos, ((GenericImpl) next).getComponents(), GenericImpl.this)))
-							new GenericBuilder(getCurrentCache(), new UnsafeVertex(((GenericImpl) candidate).homeTreeNode(), candidateMeta, new Supers(candidateMeta), candidateComponents), Statics.MULTIDIRECTIONAL, true).bindDependency(
-									candidate.getClass(), false, true);
+							new GenericBuilder(new UnsafeVertex(((GenericImpl) candidate).homeTreeNode(), candidateMeta, new Supers(candidateMeta), candidateComponents), true).bindDependency(candidate.getClass(), false, true);
 					}
 				}
 			}
@@ -1414,6 +1412,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (!GenericImpl.class.equals(getClass()))
 			return !getClass().isAnnotationPresent(NoInheritance.class);
 		return !isSystemPropertyEnabled(NoInheritanceProperty.class, Statics.BASE_POSITION);
+	}
+
+	@Override
+	public <T extends Generic> T enableReferentialIntegrity() {
+		return enableReferentialIntegrity(Statics.BASE_POSITION);
+	}
+
+	@Override
+	public <T extends Generic> T disableReferentialIntegrity() {
+		return disableReferentialIntegrity(Statics.BASE_POSITION);
+	}
+
+	@Override
+	public boolean isReferentialIntegrity() {
+		return isReferentialIntegrity(Statics.BASE_POSITION);
 	}
 
 	@Override
