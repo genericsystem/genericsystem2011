@@ -52,14 +52,16 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 
 		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 		out.writeInt(adds.size());
+		SerializableWriter writer = new SerializableWriter(out);
 		for (Generic add : adds)
-			new SerializableWriter(out).writeGeneric((GenericImpl) add, homeTreeMap);
+			writer.writeGeneric((GenericImpl) add, homeTreeMap);
 		out.writeInt(automatics.size());
 		for (Generic automatic : automatics)
-			new SerializableWriter(out).writeGeneric((GenericImpl) automatic, homeTreeMap);
+			writer.writeGeneric((GenericImpl) automatic, homeTreeMap);
 		out.writeInt(removes.size());
 		for (Generic remove : removes)
 			out.writeLong(((GenericImpl) remove).getDesignTs());
+		out.flush();
 	}
 
 	private static class SerializableWriter extends AbstractWriter {
@@ -88,7 +90,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		Cache currentCache = engine.getCurrentCache();
 		try {
 			subContext = in.readBoolean() ? (AbstractContext) in.readObject() : new Transaction(in.readLong(), engine);
-			this.start();
+			start();
 			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 			Map<Long, Generic> genericMap = new HashMap<>();
 			int addSize = in.readInt();

@@ -144,24 +144,23 @@ public class Archiver {
 		}
 
 		public void doSnapshot() {
-			ByteArrayOutputStream formalOutputStream = new ByteArrayOutputStream();
+			ByteArrayOutputStream bufferTemp = new ByteArrayOutputStream();
 			try (FileOutputStream fileOutputStream = new FileOutputStream(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION);) {
 				ZipOutputStream zipOutput = new ZipOutputStream(fileOutputStream);
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.CONTENT_EXTENSION));
-				this.formalOutputStream = new ObjectOutputStream(formalOutputStream);
+				this.formalOutputStream = new ObjectOutputStream(bufferTemp);
 				this.contentOutputStream = new ObjectOutputStream(zipOutput);
 
 				writeGenerics();
-				contentOutputStream.flush();
-				formalOutputStream.flush();
 				zipOutput.closeEntry();
 
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.FORMAL_EXTENSION));
-				zipOutput.write(formalOutputStream.toByteArray());
+				zipOutput.write(bufferTemp.toByteArray());
 				zipOutput.closeEntry();
 
-				formalOutputStream.close();
 				zipOutput.flush();
+				contentOutputStream.close();
+				formalOutputStream.close();
 				zipOutput.close();
 
 				new File(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(path + fileName + Statics.ZIP_EXTENSION));
@@ -175,6 +174,8 @@ public class Archiver {
 			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 			for (Generic orderGeneric : Transaction.orderDependencies(engine))
 				writeGeneric(((GenericImpl) orderGeneric), homeTreeMap);
+			contentOutputStream.flush();
+			formalOutputStream.flush();
 		}
 
 		private void manageOldSnapshots() {
