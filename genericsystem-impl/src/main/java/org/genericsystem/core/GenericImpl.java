@@ -129,6 +129,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			assert superGeneric.equals(getMeta()) || superGeneric.getMetaLevel() == getMetaLevel() : "superGeneric " + superGeneric.info() + " getMeta() " + getMeta().info();
 			assert superGeneric.equals(getMeta()) || getMeta().inheritsFrom(superGeneric.getMeta()) : getSupers();
 		}
+		// assert getMeta().equals(uVertex.getMeta());
 		return this;
 	}
 

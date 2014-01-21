@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -27,7 +26,7 @@ class GenericBuilder {
 
 	private UnsafeVertex uVertex;
 	private Boolean isStrongSingular[];
-	private Boolean isProperty;
+	private Boolean isProperty;// TODO KK change for strongProperty ?
 
 	GenericBuilder(UnsafeVertex uVertex, boolean respectSupers) {
 		int dim = uVertex.components().size();
@@ -44,7 +43,6 @@ class GenericBuilder {
 
 	private boolean isProperty() {
 		return isProperty != null ? isProperty : (isProperty = ((GenericImpl) uVertex.getMeta()).isPropertyConstraintEnabled());
-
 	}
 
 	protected Supers getExtendedDirectSupers(final boolean respectSupers) {
@@ -57,6 +55,7 @@ class GenericBuilder {
 
 			@Override
 			public boolean isSelected(Generic candidate) {
+				// log.info("zzzzzzzzzz" + ((GenericImpl) candidate).isSuperOf(uVertex) + " " + candidate.info() + " " + uVertex.homeTreeNode() + " " + uVertex.components() + " " + uVertex.supers());
 				return ((GenericImpl) candidate).isSuperOf(uVertex) || isExtentedBy(candidate);
 			}
 		};
@@ -165,6 +164,7 @@ class GenericBuilder {
 			if (!existsException)
 				if (Statics.CONCRETE == uVertex.metaLevel())
 					for (int pos = 0; pos < uVertex.components().size(); pos++)
+						// TODO KK do not work for properties when dim > 1 !
 						if ((isProperty() || isStrongSingular(pos)) && (((GenericImpl) dependency).getComponent(pos)).equals(uVertex.components().get(pos))) {
 							assert old == null || old == dependency;
 							old = dependency;
@@ -172,7 +172,7 @@ class GenericBuilder {
 		for (Generic dependency : directDependencies) {
 			assert !uVertex.supers().contains(dependency) : uVertex.supers().get(0).info() + " " + uVertex.components();
 			assert !uVertex.components().contains(dependency) : uVertex.components();
-			assert !((GenericImpl) dependency).equiv(uVertex);
+			assert !((GenericImpl) dependency).equiv(uVertex) : dependency.info() + ((GenericImpl) dependency).isSuperOf(uVertex);
 		}
 		return getCurrentCache().new Restructurator() {
 			private static final long serialVersionUID = 1370210509322258062L;
@@ -228,20 +228,22 @@ class GenericBuilder {
 	}
 
 	private boolean isExtentedBy(Generic candidate) {
-		if (Statics.CONCRETE == uVertex.metaLevel() && ((GenericImpl) uVertex.getMeta()).isInheritanceEnabled() && candidate.getMeta().equals((uVertex.getMeta())))
-			for (int pos = 0; pos < uVertex.components().size(); pos++)
-				if (((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode()) || !Objects.equals(uVertex.components().get(pos), (((GenericImpl) candidate).getComponent(pos)))) {
-					if (isProperty() && areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents()))
-						return true;
-					if ((isStrongSingular(pos))) {
+		if (Statics.CONCRETE == uVertex.metaLevel() && ((GenericImpl) uVertex.getMeta()).isInheritanceEnabled() && candidate.getMeta().equals((uVertex.getMeta()))) {
+			if (((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode()) || !uVertex.components().equals(((GenericImpl) candidate).getComponents()))
+				if (isProperty() && areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents()))
+					return true;
+			for (int pos = 0; pos < uVertex.components().size(); pos++) {
+				if ((isStrongSingular(pos))) {
+					if (((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode()) || (!uVertex.components().get(pos).equals(((GenericImpl) candidate).getComponent(pos))))
 						if (uVertex.components().get(pos).inheritsFrom(((GenericImpl) candidate).getComponent(pos))) {
 							if (!uVertex.components().get(pos).equals(((GenericImpl) candidate).getComponent(pos)))
 								return true;
 							if (areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents()))
 								return true;
 						}
-					}
 				}
+			}
+		}
 		return false;
 	}
 
