@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -170,7 +171,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAL:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			new Restructurator() {
 				private static final long serialVersionUID = 7326023526567814490L;
@@ -182,11 +183,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(generic);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 
@@ -395,6 +396,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, boolean existsException, int axe, Generic... components) {
 		Generic[] sortAndCheck = ((GenericImpl) directSuper).sortAndCheck(components);
+		// TODO à factoriser
+		// assert meta.equals(directSuper);
 		return internalBind(((GenericImpl) meta).createNewVertex(value, new Generic[] { directSuper }, sortAndCheck), specializationClass, Statics.MULTIDIRECTIONAL != axe ? findAxe(sortAndCheck, components[axe]) : axe, false, existsException);
 	}
 
@@ -492,6 +495,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return new GenericBuilder(uVertex, true).internalBind(specializationClass, existsException, automatic);
 	}
 
+	// TODO clean
 	// private class AllDependencies extends TreeMap<Generic, Integer> {
 	// private static final long serialVersionUID = -1925554375663814593L;
 	//

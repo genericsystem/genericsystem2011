@@ -12,6 +12,8 @@ import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 
 public abstract class AbstractWriter {
 
+	// protected static Logger log = LoggerFactory.getLogger(AbstractWriter.class);
+
 	public abstract ObjectOutputStream getFormalOutputStream();
 
 	public abstract ObjectOutputStream getContentOutputStream();
@@ -27,6 +29,7 @@ public abstract class AbstractWriter {
 		}
 		if (generic.isEngine())
 			return;
+		getContentOutputStream().writeLong(generic.<GenericImpl> getMeta().getDesignTs());
 		writeAncestors(generic.getSupers());
 		writeAncestors(generic.getComponents());
 		getFormalOutputStream().writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
@@ -64,10 +67,12 @@ public abstract class AbstractWriter {
 				homeTreeNode = ((GenericImpl) engine).homeTreeNode().ts == metaTs ? ((GenericImpl) engine).homeTreeNode() : homeTreeMap.get(metaTs);
 				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, (Serializable) getContentInputStream().readObject());
 			}
+			Generic meta = genericMap.get(getContentInputStream().readLong());
+			assert meta != null;
 			Supers supers = new Supers(loadAncestors(engine, genericMap));
 			UnsafeComponents uComponents = new UnsafeComponents(loadAncestors(engine, genericMap));
 			Generic generic = engine.getFactory().newGeneric((Class<?>) getFormalInputStream().readObject());
-			plug(((GenericImpl) generic).restore(new UnsafeVertex(homeTreeNode, supers, uComponents), ts[0], ts[1], ts[2], ts[3]));
+			plug(((GenericImpl) generic).restore(new UnsafeVertex(homeTreeNode, meta, supers, uComponents), ts[0], ts[1], ts[2], ts[3]));
 			if (!homeTreeMap.containsKey(homeTreeNodeTs))
 				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode());
 			genericMap.put(ts[0], generic);

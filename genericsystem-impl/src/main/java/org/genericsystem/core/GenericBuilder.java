@@ -7,6 +7,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.core.Statics.OrderedDependencies;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.exception.ExistsException;
@@ -109,8 +110,49 @@ class GenericBuilder {
 
 	private <T extends Generic> T buildDependency(Class<?> specializationClass, boolean automatic) {
 		CacheImpl cache = getCurrentCache();
+		// TODO impl
+		// new Metas<T>(homeTreeNode().metaNode).getMeta(this)
+		// return cache.<T> insert(cache.<EngineImpl> getEngine().buildComplex(((GenericImpl) new Metas<T>(uVertex.homeTreeNode().metaNode).getMeta(this)).specializeInstanceClass(specializationClass), uVertex), automatic);
 		return cache.<T> insert(cache.<EngineImpl> getEngine().buildComplex(((GenericImpl) uVertex.getMeta()).specializeInstanceClass(specializationClass), uVertex), automatic);
 	}
+
+	// private class Metas<T extends Generic> extends HashSet<Generic> {
+	//
+	// private static final long serialVersionUID = 783352418448187992L;
+	//
+	// private final HomeTreeNode metaNode;
+	//
+	// public Metas(HomeTreeNode metaNode) {
+	// this.metaNode = metaNode;
+	// }
+	//
+	// @Override
+	// public boolean add(Generic candidate) {
+	// for (Generic generic : this)
+	// if (generic.inheritsFrom(candidate))
+	// return false;
+	// Iterator<Generic> it = iterator();
+	// while (it.hasNext())
+	// if (candidate.inheritsFrom(it.next()))
+	// it.remove();
+	// return super.add(candidate);
+	// }
+	//
+	// public T getMeta(Generic generic) {
+	// if (generic.isEngine())
+	// add(generic);
+	// else {
+	// for (Generic superGeneric : ((GenericImpl) generic).getSupers())
+	// if (((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
+	// add(superGeneric);
+	// for (Generic superGeneric : ((GenericImpl) generic).getSupers())
+	// if (((GenericImpl) superGeneric).homeTreeNode().inheritsFrom(metaNode) && !((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
+	// add(getMeta(superGeneric));
+	// }
+	// return (T) unambigousFirst(iterator());
+	// }
+	//
+	// }
 
 	<T extends Generic> T internalBind(final Class<?> specializationClass, boolean existsException, final boolean automatic) throws RollbackException {
 		T result = find(existsException);
