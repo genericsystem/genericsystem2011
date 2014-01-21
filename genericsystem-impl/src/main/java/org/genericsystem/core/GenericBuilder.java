@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.core.Statics.OrderedDependencies;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.exception.ExistsException;
@@ -229,18 +228,22 @@ class GenericBuilder {
 
 	private boolean isExtentedBy(Generic candidate) {
 		if (Statics.CONCRETE == uVertex.metaLevel() && ((GenericImpl) uVertex.getMeta()).isInheritanceEnabled() && candidate.getMeta().equals((uVertex.getMeta()))) {
-			if (((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode()) || !uVertex.components().equals(((GenericImpl) candidate).getComponents()))
-				if (isProperty() && areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents()))
-					return true;
+			if (isProperty())
+				if (areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents())) {
+					if (!uVertex.components().equals(((GenericImpl) candidate).getComponents()))
+						return true;
+					if (((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode()))
+						return true;
+				}
 			for (int pos = 0; pos < uVertex.components().size(); pos++) {
 				if ((isStrongSingular(pos))) {
-					if (((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode()) || (!uVertex.components().get(pos).equals(((GenericImpl) candidate).getComponent(pos))))
-						if (uVertex.components().get(pos).inheritsFrom(((GenericImpl) candidate).getComponent(pos))) {
-							if (!uVertex.components().get(pos).equals(((GenericImpl) candidate).getComponent(pos)))
-								return true;
+					if (uVertex.components().get(pos).inheritsFrom(((GenericImpl) candidate).getComponent(pos))) {
+						if (!uVertex.components().get(pos).equals(((GenericImpl) candidate).getComponent(pos)))
+							return true;
+						if (((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode()))
 							if (areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents()))
 								return true;
-						}
+					}
 				}
 			}
 		}
