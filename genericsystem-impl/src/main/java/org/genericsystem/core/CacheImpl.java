@@ -1,7 +1,5 @@
 package org.genericsystem.core;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -738,8 +736,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return reFounds;
 	}
 
-	public Generic findByDesignTs(Engine engine, ObjectInputStream in, Map<Long, Generic> genericMap) throws IOException {
-		long ts = in.readLong();
+	public Generic findByDesignTs(Engine engine, long ts, Map<Long, Generic> genericMap) {
 		Generic superGeneric = genericMap.get(ts);
 		return superGeneric != null ? superGeneric : ((GenericImpl) engine).getDesignTs() == ts ? engine : searchByDesignTs(ts);
 	}

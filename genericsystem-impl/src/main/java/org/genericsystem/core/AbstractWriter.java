@@ -18,7 +18,15 @@ public abstract class AbstractWriter {
 
 	public abstract ObjectOutputStream getContentOutputStream();
 
-	public void writeGeneric(GenericImpl generic, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
+	public void writeGenericsAndFlush() throws IOException {
+		writeGenerics();
+		getFormalOutputStream().flush();
+		getContentOutputStream().flush();
+	}
+
+	public abstract void writeGenerics() throws IOException;
+
+	protected void writeGeneric(GenericImpl generic, Map<Long, HomeTreeNode> homeTreeMap) throws IOException {
 		writeTs(generic);
 		HomeTreeNode homeTreeNode = generic.homeTreeNode();
 		getContentOutputStream().writeLong(homeTreeNode.ts);
@@ -56,7 +64,7 @@ public abstract class AbstractWriter {
 
 		protected abstract void plug(GenericImpl generic);
 
-		protected abstract Generic loadAncestor(Engine engine, Map<Long, Generic> genericMap) throws IOException;
+		protected abstract Generic loadAncestor(Engine engine, long ts, Map<Long, Generic> genericMap);
 
 		public Generic loadGeneric(Engine engine, Map<Long, HomeTreeNode> homeTreeMap, Map<Long, Generic> genericMap) throws IOException, ClassNotFoundException {
 			long[] ts = loadTs();
@@ -67,7 +75,7 @@ public abstract class AbstractWriter {
 				homeTreeNode = ((GenericImpl) engine).homeTreeNode().ts == metaTs ? ((GenericImpl) engine).homeTreeNode() : homeTreeMap.get(metaTs);
 				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, (Serializable) getContentInputStream().readObject());
 			}
-			Generic meta = genericMap.get(getContentInputStream().readLong());
+			Generic meta = loadAncestor(engine, getContentInputStream().readLong(), genericMap);
 			assert meta != null;
 			Supers supers = new Supers(loadAncestors(engine, genericMap));
 			UnsafeComponents uComponents = new UnsafeComponents(loadAncestors(engine, genericMap));
@@ -92,7 +100,7 @@ public abstract class AbstractWriter {
 			int length = getFormalInputStream().readInt();
 			Generic[] ancestors = new Generic[length];
 			for (int index = 0; index < length; index++)
-				ancestors[index] = loadAncestor(engine, genericMap);
+				ancestors[index] = loadAncestor(engine, getFormalInputStream().readLong(), genericMap);
 			return ancestors;
 		}
 

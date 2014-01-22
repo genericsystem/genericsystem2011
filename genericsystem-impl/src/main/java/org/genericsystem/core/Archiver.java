@@ -151,7 +151,7 @@ public class Archiver {
 				this.formalOutputStream = new ObjectOutputStream(bufferTemp);
 				this.contentOutputStream = new ObjectOutputStream(zipOutput);
 
-				writeGenerics();
+				writeGenericsAndFlush();
 				zipOutput.closeEntry();
 
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.FORMAL_EXTENSION));
@@ -170,12 +170,11 @@ public class Archiver {
 			}
 		}
 
-		private void writeGenerics() throws IOException {
+		@Override
+		public void writeGenerics() throws IOException {
 			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 			for (Generic orderGeneric : Transaction.orderDependencies(engine))
 				writeGeneric(((GenericImpl) orderGeneric), homeTreeMap);
-			contentOutputStream.flush();
-			formalOutputStream.flush();
 		}
 
 		private void manageOldSnapshots() {
@@ -261,8 +260,8 @@ public class Archiver {
 		}
 
 		@Override
-		protected Generic loadAncestor(Engine engine, Map<Long, Generic> genericMap) throws IOException {
-			return genericMap.get(getFormalInputStream().readLong());
+		protected Generic loadAncestor(Engine engine, long ts, Map<Long, Generic> genericMap) {
+			return genericMap.get(ts);
 		}
 	}
 
