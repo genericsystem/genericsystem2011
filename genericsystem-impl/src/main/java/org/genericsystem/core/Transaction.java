@@ -1,6 +1,7 @@
 package org.genericsystem.core;
 
 import java.util.HashSet;
+
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -128,6 +129,7 @@ public class Transaction extends AbstractContext {
 	}
 
 	@Override
+	// TODO KK
 	Generic searchByDesignTs(final long ts) {
 		return ((EngineImpl) engine).unambigousFirst(new AbstractFilterIterator<Generic>(new ConcateIterator<Generic>(getDirectInheritingsDependencies(engine).iterator(getTs()), getCompositeDependencies(engine).iterator(getTs()))) {
 			@Override
