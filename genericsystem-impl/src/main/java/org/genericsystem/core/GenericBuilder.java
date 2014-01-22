@@ -108,49 +108,8 @@ class GenericBuilder {
 
 	private <T extends Generic> T buildDependency(Class<?> specializationClass, boolean automatic) {
 		CacheImpl cache = getCurrentCache();
-		// TODO impl
-		// new Metas<T>(homeTreeNode().metaNode).getMeta(this)
-		// return cache.<T> insert(cache.<EngineImpl> getEngine().buildComplex(((GenericImpl) new Metas<T>(uVertex.homeTreeNode().metaNode).getMeta(this)).specializeInstanceClass(specializationClass), uVertex), automatic);
 		return cache.<T> insert(cache.<EngineImpl> getEngine().buildComplex(((GenericImpl) uVertex.getMeta()).specializeInstanceClass(specializationClass), uVertex), automatic);
 	}
-
-	// private class Metas<T extends Generic> extends HashSet<Generic> {
-	//
-	// private static final long serialVersionUID = 783352418448187992L;
-	//
-	// private final HomeTreeNode metaNode;
-	//
-	// public Metas(HomeTreeNode metaNode) {
-	// this.metaNode = metaNode;
-	// }
-	//
-	// @Override
-	// public boolean add(Generic candidate) {
-	// for (Generic generic : this)
-	// if (generic.inheritsFrom(candidate))
-	// return false;
-	// Iterator<Generic> it = iterator();
-	// while (it.hasNext())
-	// if (candidate.inheritsFrom(it.next()))
-	// it.remove();
-	// return super.add(candidate);
-	// }
-	//
-	// public T getMeta(Generic generic) {
-	// if (generic.isEngine())
-	// add(generic);
-	// else {
-	// for (Generic superGeneric : ((GenericImpl) generic).getSupers())
-	// if (((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
-	// add(superGeneric);
-	// for (Generic superGeneric : ((GenericImpl) generic).getSupers())
-	// if (((GenericImpl) superGeneric).homeTreeNode().inheritsFrom(metaNode) && !((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
-	// add(getMeta(superGeneric));
-	// }
-	// return (T) unambigousFirst(iterator());
-	// }
-	//
-	// }
 
 	<T extends Generic> T internalBind(final Class<?> specializationClass, boolean existsException, final boolean automatic) throws RollbackException {
 		T result = find(existsException);
@@ -209,16 +168,15 @@ class GenericBuilder {
 
 	private boolean isExtention(Generic candidate) {
 		if (Statics.CONCRETE == uVertex.metaLevel() && candidate.getMeta().equals((uVertex.getMeta()))) {
-			if (isProperty() && areComponentsInheriting((((GenericImpl) candidate).getComponents()), uVertex.components()))
-				return true;
+			if (isProperty())
+				if (areComponentsInheriting((((GenericImpl) candidate).getComponents()), uVertex.components()))
+					return true;
 			for (int pos = 0; pos < ((GenericImpl) candidate).getComponents().size(); pos++)
 				if (isStrongSingular(pos))
 					if (((GenericImpl) candidate).getComponent(pos).inheritsFrom(uVertex.components().get(pos))) {
 						if (!((GenericImpl) candidate).getComponent(pos).equals(uVertex.components().get(pos)))
 							return true;
-						if (uVertex.components().equals(((GenericImpl) candidate).getComponents()))
-							return true;
-						if (!areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents()))
+						if (!(((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode())) || !areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents()))
 							return true;
 					}
 		}
