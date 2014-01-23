@@ -2,38 +2,11 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:ui="http://java.sun.com/jsf/facelets">
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:hendrik="http://java.sun.com/jsf/composite/composites">
 
-	<h:messages />
-	<h:dataTable value="#{component.instanceRows}" var="instanceRow"
-		styleClass="order-table" headerClass="order-table-header"
-		rowClasses="order-table-odd-row,order-table-even-row">
-		<f:facet name="header">
-			<h:outputText value="#{component.titleMsg}" />
-		</f:facet>
-		<h:column>
-			<h:outputText value="#{instanceRow.editInstance}" />
-		</h:column>
-		<h:column>
-			<h:outputText value="#{instanceRow.editAttributeValue}" />
-		</h:column>
-		<h:column>
-			<h:outputText value="#{instanceRow.editRelationValue}" />
-		</h:column>
-		<h:column>
-			<h:commandLink value="#{component.removeMsg}"
-				action="#{component.remove(instanceRow)}" />
-		</h:column>
-		<f:facet name="footer">
-			<h:inputText value="#{component.addInstanceValue}" />
-			<h:inputText value="#{component.addAttributeValue}" />
-			<h:selectOneMenu value="#{component.addLinkTargetValue}">
-				<f:selectItems value="#{component.targetRows}" var="targetRow"
-					itemLabel="#{targetRow.editLabel}" itemValue="#{targetRow.editValue}" />
-			</h:selectOneMenu>
-			<h:commandButton value="#{component.addMsg}"
-				action="#{component.add}" />
-		</f:facet>
-
-	</h:dataTable>
+	<hendrik:crudComposite 
+		component="#{component}"
+		renderCarCrud="#{component.isChildComponent}"
+	/>
 </ui:composition>

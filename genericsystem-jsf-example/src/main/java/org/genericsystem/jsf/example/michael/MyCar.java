@@ -4,10 +4,10 @@
 //import org.genericsystem.annotation.SystemGeneric;
 //import org.genericsystem.annotation.value.StringValue;
 //import org.genericsystem.core.GenericImpl;
-//import org.genericsystem.jsf.example.structure.CarType;
+//import org.genericsystem.jsf.example.structure.Types.Cars;
 //
 //@SystemGeneric
-//@Meta(CarType.class)
+//@Meta(Cars.class)
 //@StringValue("myCar")
 //public class MyCar extends GenericImpl {
 //
