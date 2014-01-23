@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -40,11 +41,13 @@ public abstract class AbstractContext {
 		Set<Generic> componentSet = new HashSet<>();
 		for (Generic component : ((GenericImpl) generic).getComponents())
 			if (componentSet.add(component))
-				getCompositeDependencies(component).add(generic);
+				getComposites(component).add(generic);
 		Set<Generic> effectiveSupersSet = new HashSet<>();
 		for (Generic effectiveSuper : ((GenericImpl) generic).getSupers())
 			if (effectiveSupersSet.add(effectiveSuper))
-				getDirectInheritingsDependencies(effectiveSuper).add(generic);
+				getInheritingsAndInstances(effectiveSuper).add(generic);
+
+		getInstances(generic.getMeta()).add(generic);
 		return generic;
 	}
 
@@ -52,26 +55,37 @@ public abstract class AbstractContext {
 		Set<Generic> componentSet = new HashSet<>();
 		for (Generic component : ((GenericImpl) generic).getComponents())
 			if (componentSet.add(component))
-				getCompositeDependencies(component).remove(generic);
+				getComposites(component).remove(generic);
 		Set<Generic> effectiveSupersSet = new HashSet<>();
 		for (Generic effectiveSuper : ((GenericImpl) generic).getSupers())
 			if (effectiveSupersSet.add(effectiveSuper))
-				getDirectInheritingsDependencies(effectiveSuper).remove(generic);
+				getInheritingsAndInstances(effectiveSuper).remove(generic);
+
+		getInstances(generic.getMeta()).remove(generic);
 		return generic;
 	}
 
-	abstract TimestampedDependencies getDirectInheritingsDependencies(Generic effectiveSuper);
+	@Deprecated
+	abstract TimestampedDependencies getInheritingsAndInstances(Generic effectiveSuper);
 
-	abstract TimestampedDependencies getCompositeDependencies(Generic component);
+	abstract TimestampedDependencies getInstances(Generic meta);
+
+	abstract TimestampedDependencies getComposites(Generic component);
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> Iterator<T> compositesIterator(Generic component) {
-		return (Iterator<T>) getCompositeDependencies(component).iterator(getTs());
+	@Deprecated
+	public <T extends Generic> Iterator<T> inheritingsAndInstancesIterator(Generic effectiveSuper) {
+		return (Iterator<T>) getInheritingsAndInstances(effectiveSuper).iterator(getTs());
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Generic> Iterator<T> directInheritingsIterator(Generic component) {
-		return (Iterator<T>) getDirectInheritingsDependencies(component).iterator(getTs());
+	public <T extends Generic> Iterator<T> instancesIterator(Generic meta) {
+		return (Iterator<T>) getInstances(meta).iterator(getTs());
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Generic> Iterator<T> compositesIterator(Generic component) {
+		return (Iterator<T>) getComposites(component).iterator(getTs());
 	}
 
 	public abstract long getTs();
