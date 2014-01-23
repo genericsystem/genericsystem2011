@@ -1,6 +1,5 @@
 package org.genericsystem.constraints;
 
-import java.util.Iterator;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -12,7 +11,6 @@ import org.genericsystem.annotation.value.BooleanValue;
 import org.genericsystem.constraints.AbstractConstraintImpl.AbstractBooleanNoAxedConstraintImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UnduplicateBindingConstraintViolationException;
 import org.genericsystem.generic.Holder;
@@ -35,26 +33,25 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	@Meta(UnduplicateBindingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
-	public static class DefaultKey {}
+	public static class DefaultKey {
+	}
 
 	@SystemGeneric
 	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {}
+	public static class DefaultValue {
+	}
 
 	@Override
 	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
-		final Supers supers = ((GenericImpl) modified).getSupers();
-		final org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
-		Iterator<Generic> iterator = components.isEmpty() ? supers.get(0).getInheritings().iterator() : components.get(0).getComposites().iterator();
-		iterator = new AbstractFilterIterator<Generic>(iterator) {
+		org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
+		if (new AbstractFilterIterator<Generic>(components.isEmpty() ? modified.<GenericImpl> getMeta().instancesIterator() : ((GenericImpl) components.get(0)).compositesIterator()) {
 			@Override
 			public boolean isSelected() {
 				return !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex());
 			}
-		};
-		if (iterator.hasNext())
+		}.hasNext())
 			throw new UnduplicateBindingConstraintViolationException();
 	}
 
