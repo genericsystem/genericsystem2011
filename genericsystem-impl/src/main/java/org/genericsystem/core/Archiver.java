@@ -104,6 +104,7 @@ public class Archiver {
 	public void startScheduler() {
 		if (lockFile != null)
 			if (Statics.SNAPSHOTS_PERIOD > 0L) {
+				engine.newCache().start();
 				scheduler.scheduleAtFixedRate(new Runnable() {
 					@Override
 					public void run() {
@@ -116,6 +117,7 @@ public class Archiver {
 	public void close() {
 		if (lockFile != null) {
 			scheduler.shutdown();
+			engine.newCache().start();
 			new ZipWriter(directory).doSnapshot();
 			try {
 				lockFile.close();
@@ -149,7 +151,6 @@ public class Archiver {
 		}
 
 		public void doSnapshot() {
-			engine.newCache().start();
 			ByteArrayOutputStream bufferTemp = new ByteArrayOutputStream();
 			try (FileOutputStream fileOutputStream = new FileOutputStream(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION);) {
 				ZipOutputStream zipOutput = new ZipOutputStream(fileOutputStream);

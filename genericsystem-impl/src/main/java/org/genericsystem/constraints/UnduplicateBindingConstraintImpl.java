@@ -47,8 +47,8 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 		if (new AbstractFilterIterator<Generic>(components.isEmpty() ? modified.<GenericImpl> getMeta().instancesIterator() : ((GenericImpl) components.get(0)).compositesIterator()) {
 			@Override
 			public boolean isSelected() {
-				return !next.equals(modified) && ((GenericImpl) next).equivByMeta(((GenericImpl) modified).vertex());
-				// return !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex());
+				// return !next.equals(modified) && ((GenericImpl) next).equivByMeta(((GenericImpl) modified).vertex());
+				return !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex());
 			}
 		}.hasNext())
 			throw new UnduplicateBindingConstraintViolationException();
