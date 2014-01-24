@@ -23,12 +23,16 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.genericsystem.core.AbstractWriter.AbstractLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
 public class Archiver {
+
+	private static final Logger log = LoggerFactory.getLogger(Archiver.class);
 
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -110,15 +114,16 @@ public class Archiver {
 	}
 
 	public void close() {
-		if (lockFile != null)
+		if (lockFile != null) {
+			scheduler.shutdown();
+			new ZipWriter(directory).doSnapshot();
 			try {
-				scheduler.shutdown();
-				new ZipWriter(directory).doSnapshot();
 				lockFile.close();
 				lockFile = null;
 			} catch (IOException e) {
-				throw new IllegalStateException(e);
+				log.error(e.getMessage(), e);
 			}
+		}
 	}
 
 	public class ZipWriter extends AbstractWriter {
@@ -144,6 +149,7 @@ public class Archiver {
 		}
 
 		public void doSnapshot() {
+			engine.newCache().start();
 			ByteArrayOutputStream bufferTemp = new ByteArrayOutputStream();
 			try (FileOutputStream fileOutputStream = new FileOutputStream(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION);) {
 				ZipOutputStream zipOutput = new ZipOutputStream(fileOutputStream);
@@ -165,8 +171,8 @@ public class Archiver {
 
 				new File(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(path + fileName + Statics.ZIP_EXTENSION));
 				manageOldSnapshots();
-			} catch (IOException ioe) {
-				throw new IllegalStateException(ioe);
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
 			}
 		}
 

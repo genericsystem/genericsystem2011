@@ -100,7 +100,7 @@ public class AnnotationTest extends AbstractTest {
 		Type vehicle = cache.find(Vehicle.class);
 		Attribute power = cache.find(Power.class);
 		assert power.isStructural();
-		assert vehicle.getAttributes().contains(power);
+		assert vehicle.getAttributes().contains(power) : vehicle.getAttributes();
 	}
 
 	public void testAttributeValue() {
