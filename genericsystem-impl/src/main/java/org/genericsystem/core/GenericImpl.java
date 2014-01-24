@@ -142,7 +142,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Set<Generic> supersSet = new HashSet<>();
 		for (Generic superGeneric : getSupers())
 			if (supersSet.add(superGeneric))
-				((GenericImpl) superGeneric).lifeManager.engineDirectInheritings.add(this);
+				((GenericImpl) superGeneric).lifeManager.engineInheritingsAndInstances.add(this);
+
+		((GenericImpl) getMeta()).lifeManager.engineInstances.add(this);
 		return (T) this;
 	}
 
@@ -155,7 +157,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Set<Generic> supersSet = new HashSet<>();
 		for (Generic superGeneric : getSupers())
 			if (supersSet.add(superGeneric))
-				((GenericImpl) superGeneric).lifeManager.engineDirectInheritings.remove(this);
+				((GenericImpl) superGeneric).lifeManager.engineInheritingsAndInstances.remove(this);
+
+		((GenericImpl) getMeta()).lifeManager.engineInstances.remove(this);
 		return (T) this;
 	}
 
@@ -560,12 +564,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getLink(relation, getBasePos(relation), targets);
 	}
 
-	public <T extends Generic> Iterator<T> directInheritingsIterator() {
-		return getCurrentCache().directInheritingsIterator(this);
+	@Deprecated
+	public <T extends Generic> Iterator<T> InheritingsAndInstancesIterator() {
+		return getCurrentCache().inheritingsAndInstancesIterator(this);
+	}
+
+	public <T extends Generic> Iterator<T> instancesIterator() {
+		return getCurrentCache().instancesIterator(this);
 	}
 
 	public <T extends Generic> Iterator<T> dependenciesIterator() {
-		return new ConcateIterator<T>(this.<T> directInheritingsIterator(), this.<T> compositesIterator());
+		return new ConcateIterator<T>(this.<T> InheritingsAndInstancesIterator(), this.<T> compositesIterator());
 	}
 
 	@Override
@@ -573,7 +582,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return directInheritingsIterator();
+				return InheritingsAndInstancesIterator();
 			}
 		};
 	}
@@ -1176,13 +1185,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	protected <T extends Generic> Iterator<T> instancesIterator() {
-		return Statics.<T> levelFilter(GenericImpl.this.<T> directInheritingsIterator(), getMetaLevel() + 1);
+	// TODO kk ?
+	protected <T extends Generic> Iterator<T> instancesIterator2() {
+		// return Statics.<T> levelFilter(GenericImpl.this.<T> InheritingsAndInstancesIterator(), getMetaLevel() + 1);
+		return InheritingsAndInstancesIterator();
 	}
 
 	@Override
-	public <T extends Generic> T getInstance(final Serializable value) {
-		return this.unambigousFirst(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(), value));
+	public <T extends Generic> T getInstance(Serializable value, Generic... targets) {
+		return this.unambigousFirst(targetsFilter(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(), value), this, targets));
 	}
 
 	@Override
@@ -1206,7 +1217,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public Iterator<Generic> children(Generic node) {
-				return new AbstractFilterIterator<Generic>(((GenericImpl) node).directInheritingsIterator()) {
+				return new AbstractFilterIterator<Generic>(((GenericImpl) node).InheritingsAndInstancesIterator()) {
 					@Override
 					public boolean isSelected() {
 						return next.getMetaLevel() <= metaLevel;
@@ -1232,7 +1243,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> subTypesIterator() {
-		return Statics.levelFilter(GenericImpl.this.<T> directInheritingsIterator(), getMetaLevel());
+		return Statics.levelFilter(GenericImpl.this.<T> InheritingsAndInstancesIterator(), getMetaLevel());
 	}
 
 	@Override
@@ -1291,7 +1302,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public Iterator<Generic> children(Generic node) {
-				return (((GenericImpl) node).directInheritingsIterator());
+				return (((GenericImpl) node).InheritingsAndInstancesIterator());
 			}
 		};
 	}
@@ -1307,7 +1318,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public Iterator<Generic> children(Generic node) {
-				return (((GenericImpl) node).directInheritingsIterator());
+				return (((GenericImpl) node).InheritingsAndInstancesIterator());
 			}
 		};
 	}

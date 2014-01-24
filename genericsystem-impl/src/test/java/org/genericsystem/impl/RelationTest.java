@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -101,15 +100,7 @@ public class RelationTest extends AbstractTest {
 		assert michael.getLinks(carPassengerTime).size() == 1;
 		michael.bind(carPassengerTime, yourAudi, today);
 		assert michael.getLinks(carPassengerTime).size() == 1;
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				yesterday.bind(carPassengerTime, myBmw, passenger);
-				assert yesterday.getLinks(carPassengerTime).size() == 1 : yesterday.getLinks(carPassengerTime);
-			}
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
-
+		yesterday.bind(carPassengerTime, myBmw, passenger);// No exception
 	}
 
 	public void testSimple() {

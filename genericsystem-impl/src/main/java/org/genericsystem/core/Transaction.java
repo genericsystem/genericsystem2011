@@ -39,12 +39,17 @@ public class Transaction extends AbstractContext {
 	}
 
 	@Override
-	TimestampedDependencies getDirectInheritingsDependencies(Generic effectiveSuper) {
-		return ((GenericImpl) effectiveSuper).getLifeManager().engineDirectInheritings;
+	TimestampedDependencies getInheritingsAndInstances(Generic effectiveSuper) {
+		return ((GenericImpl) effectiveSuper).getLifeManager().engineInheritingsAndInstances;
 	}
 
 	@Override
-	TimestampedDependencies getCompositeDependencies(Generic component) {
+	TimestampedDependencies getInstances(Generic meta) {
+		return ((GenericImpl) meta).getLifeManager().engineInstances;
+	}
+
+	@Override
+	TimestampedDependencies getComposites(Generic component) {
 		return ((GenericImpl) component).getLifeManager().engineComposites;
 	}
 
@@ -131,7 +136,7 @@ public class Transaction extends AbstractContext {
 	@Override
 	// TODO KK
 	Generic searchByDesignTs(final long ts) {
-		return ((EngineImpl) engine).unambigousFirst(new AbstractFilterIterator<Generic>(new ConcateIterator<Generic>(getDirectInheritingsDependencies(engine).iterator(getTs()), getCompositeDependencies(engine).iterator(getTs()))) {
+		return ((EngineImpl) engine).unambigousFirst(new AbstractFilterIterator<Generic>(new ConcateIterator<Generic>(getInheritingsAndInstances(engine).iterator(getTs()), getComposites(engine).iterator(getTs()))) {
 			@Override
 			public boolean isSelected() {
 				return ((GenericImpl) next).getDesignTs() == ts;

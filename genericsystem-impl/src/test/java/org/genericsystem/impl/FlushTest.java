@@ -146,10 +146,8 @@ public class FlushTest extends AbstractTest {
 
 	public void testAutomaticsNotFlushedOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-
 		Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
-
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
@@ -216,14 +214,28 @@ public class FlushTest extends AbstractTest {
 		assert cache2.getAllTypes().contains(color);
 
 		Relation carColor2 = cache2.getType("Car").getRelation("CarColor");
-		Link defColor = carColor2.getInstance("carRed");
+		car = cache2.getType("Car");
+		Snapshot<Link> links2 = car.getInstance("audi").getLinks(carColor2);
+		assert links2.size() == 1;
+		assert links2.contains(carColor2.getInstance("carRed", audi));
 
-		/* Automatic link between audi and red was restored from cache */
-		assert cache2.getType("Car").getInstance("audi").getLinks(carColor2).size() == 1;
-		assert !cache2.getType("Car").getInstance("audi").getLinks(carColor2).contains(defColor);
+		links2 = car.getInstance("bmw").getLinks(carColor2);
+		assert links2.size() == 1;
+		assert links2.contains(carColor2.getInstance("carRed", car)) : links2;
+	}
 
-		/* Automatic link between bmw and red color was not restored from cache */
-		assert cache2.getType("Car").getInstance("bmw").getLinks(carColor2).size() == 1;
-		assert cache2.getType("Car").getInstance("bmw").getLinks(carColor2).contains(defColor);
+	public void testAutomaticsNotFlushedOK2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
+		Relation carColor = car.setRelation("CarColor", color).enableSingularConstraint();
+
+		Generic audi = car.addInstance("audi");
+		Generic red = color.addInstance("red");
+
+		Link carRed = car.setLink(carColor, "carRed", red);
+		audi.setLink(carRed, "carRed", red);
+
+		carColor.getInstance("carRed", audi).log();
 	}
 }
