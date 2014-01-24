@@ -39,6 +39,7 @@ public class Transaction extends AbstractContext {
 	}
 
 	@Override
+	@Deprecated
 	TimestampedDependencies getInheritingsAndInstances(Generic effectiveSuper) {
 		return ((GenericImpl) effectiveSuper).getLifeManager().engineInheritingsAndInstances;
 	}

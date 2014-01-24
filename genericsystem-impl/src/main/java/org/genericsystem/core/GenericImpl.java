@@ -482,6 +482,21 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	@Override
+	public <T extends Generic> Snapshot<T> getInstances() {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return instancesIterator();
+			}
+		};
+	}
+
+	@Override
+	public <T extends Generic> T getInstance(Serializable value, Generic... targets) {
+		return this.unambigousFirst(targetsFilter(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(), value), this, targets));
+	}
+
 	private <T extends Link> Iterator<T> linksIterator(final Link relation, final int basePos, final Generic... targets) {
 		return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(relation, Statics.CONCRETE, basePos, targets)) {
 			@Override
@@ -1176,27 +1191,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> Snapshot<T> getInstances() {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return instancesIterator();
-			}
-		};
-	}
-
-	// TODO kk ?
-	protected <T extends Generic> Iterator<T> instancesIterator2() {
-		// return Statics.<T> levelFilter(GenericImpl.this.<T> InheritingsAndInstancesIterator(), getMetaLevel() + 1);
-		return InheritingsAndInstancesIterator();
-	}
-
-	@Override
-	public <T extends Generic> T getInstance(Serializable value, Generic... targets) {
-		return this.unambigousFirst(targetsFilter(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(), value), this, targets));
-	}
-
-	@Override
 	public <T extends Generic> Snapshot<T> getAllInstances() {
 		return new AbstractSnapshot<T>() {
 			@Override
@@ -1638,6 +1632,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	public boolean equiv(Vertex vertex) {
 		return vertex().equiv(vertex);
+	}
+
+	public boolean equivByMeta(Vertex vertex) {
+		return vertex().equivByMeta(vertex);
 	}
 
 	public boolean equiv(UnsafeVertex uVertex) {

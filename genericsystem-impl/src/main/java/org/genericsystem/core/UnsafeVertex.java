@@ -114,6 +114,10 @@ class UnsafeVertex {
 			return homeTreeNode().equals(vertex.homeTreeNode()) && supers().equals(vertex.supers()) && components().equals(vertex.components());
 		}
 
+		public boolean equivByMeta(Vertex vertex) {
+			return homeTreeNode().equals(vertex.homeTreeNode()) && getMeta().equals(vertex.getMeta()) && components().equals(vertex.components());
+		}
+
 	}
 
 }
