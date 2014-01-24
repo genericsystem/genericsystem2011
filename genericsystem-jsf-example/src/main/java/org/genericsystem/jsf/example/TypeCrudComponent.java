@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class TypeCrudComponent implements CrudComponentInterface {
 	protected static Logger log = LoggerFactory.getLogger(TypeCrudComponent.class);
-
 	protected final Type type;
-
 	protected String addInstanceValue;
 
 	public TypeCrudComponent(Type type) {
@@ -80,4 +78,7 @@ public class TypeCrudComponent implements CrudComponentInterface {
 		return "/pages/crud.xhtml";
 	}
 
+	public boolean isChildComponent() {
+		return false;
+	}
 }

@@ -16,10 +16,14 @@ import org.genericsystem.jsf.example.structure.Attributes.Power;
 import org.genericsystem.jsf.example.structure.Relations.CarColorRelation;
 import org.genericsystem.jsf.example.structure.Types.Cars;
 import org.genericsystem.jsf.example.structure.Types.Colors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @SessionScoped
 public class ComponentsManager implements Serializable {
+
+	protected static Logger log = LoggerFactory.getLogger(ComponentsManager.class);
 
 	private static final long serialVersionUID = 5181144829797170813L;
 

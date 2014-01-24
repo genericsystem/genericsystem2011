@@ -2,6 +2,7 @@ package org.genericsystem.jsf.example;
 
 import java.util.List;
 import java.util.Objects;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
@@ -108,6 +109,11 @@ public class CarCrudComponent extends TypeCrudComponent {
 		String getEditLabel();
 
 		String getEditValue();
+	}
+
+	@Override
+	public boolean isChildComponent() {
+		return true;
 	}
 
 }
