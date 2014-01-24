@@ -12,13 +12,17 @@ import org.genericsystem.generic.Type;
 public class CarCrudComponent extends TypeCrudComponent {
 
 	private final Attribute attribute;
+	private final Attribute attribute2;
 	private final Relation relation;
 	private String addAttributeValue;
+	private String addAttributeValue2;
+
 	private String addLinkTargetValue;
 
-	public CarCrudComponent(Type type, Attribute attribute, Relation relation) {
+	public CarCrudComponent(Type type, Attribute attribute, Attribute attribute2, Relation relation) {
 		super(type);
 		this.attribute = attribute;
+		this.attribute2 = attribute2;
 		this.relation = relation;
 	}
 
@@ -34,6 +38,7 @@ public class CarCrudComponent extends TypeCrudComponent {
 	public void add() {
 		Generic instance = type.setInstance(addInstanceValue);
 		instance.setValue(attribute, Integer.parseInt(addAttributeValue));
+		instance.setValue(attribute, Integer.parseInt(addAttributeValue2));
 		instance.bind(relation, relation.<Type> getTargetComponent().getInstance(addLinkTargetValue));
 	}
 
@@ -61,6 +66,11 @@ public class CarCrudComponent extends TypeCrudComponent {
 					@Override
 					public String getEditAttributeValue() {
 						return Objects.toString(instance.getValue(attribute));
+					}
+
+					@Override
+					public String getEditAttributeValue2() {
+						return Objects.toString(instance.getValue(attribute2));
 					}
 
 					@Override
@@ -102,6 +112,8 @@ public class CarCrudComponent extends TypeCrudComponent {
 	public static interface CarRow extends InstanceRow {
 		String getEditAttributeValue();
 
+		String getEditAttributeValue2();
+
 		String getEditRelationValue();
 	}
 
@@ -109,11 +121,20 @@ public class CarCrudComponent extends TypeCrudComponent {
 		String getEditLabel();
 
 		String getEditValue();
+
 	}
 
 	@Override
 	public boolean isChildComponent() {
 		return true;
+	}
+
+	public String getAddAttributeValue2() {
+		return addAttributeValue2;
+	}
+
+	public void setAddAttributeValue2(String addAttributeValue2) {
+		this.addAttributeValue2 = addAttributeValue2;
 	}
 
 }

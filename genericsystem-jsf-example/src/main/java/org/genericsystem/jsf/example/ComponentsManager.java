@@ -13,6 +13,7 @@ import org.genericsystem.core.Cache;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.jsf.example.structure.Attributes.Power;
+import org.genericsystem.jsf.example.structure.Attributes.Power2;
 import org.genericsystem.jsf.example.structure.Relations.CarColorRelation;
 import org.genericsystem.jsf.example.structure.Types.Cars;
 import org.genericsystem.jsf.example.structure.Types.Colors;
@@ -34,7 +35,8 @@ public class ComponentsManager implements Serializable {
 
 	@PostConstruct
 	public void init() {
-		components = Arrays.asList(new CarCrudComponent(cache.<Cars> find(Cars.class), cache.<Attribute> find(Power.class), cache.<Relation> find(CarColorRelation.class)), new TypeCrudComponent(cache.<Colors> find(Colors.class)));
+		components = Arrays.asList(new CarCrudComponent(cache.<Cars> find(Cars.class), cache.<Attribute> find(Power.class), cache.<Attribute> find(Power2.class), cache.<Relation> find(CarColorRelation.class)),
+				new TypeCrudComponent(cache.<Colors> find(Colors.class)));
 	}
 
 	List<TypeCrudComponent> getComponents() {

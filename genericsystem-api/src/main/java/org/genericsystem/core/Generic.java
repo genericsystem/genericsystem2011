@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -270,11 +271,11 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Creates a new link between this generic and targets. If the same link is already exists it will be returned.<br />
 	 * 
-	 * Parameters metalink can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter metalink.<br />
+	 * Parameters relation can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter relation.<br />
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
-	 * @param metalink
+	 * @param relation
 	 *            <tt>Relation</tt> or <tt>Link</tt> a new link inherits from.
 	 * @param value
 	 *            the value of the new link.
@@ -283,7 +284,7 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @return the link.
 	 */
-	<T extends Link> T setLink(Link metalink, Serializable value, Generic... targets);
+	<T extends Link> T setLink(Link relation, Serializable value, Generic... targets);
 
 	/**
 	 * Creates a new link between this generic and targets. If the same link is already exists it will be returned.<br />

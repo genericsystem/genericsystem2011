@@ -24,7 +24,7 @@ public class EngineProvider {
 	private UserClassesProvider userClassesProvider;
 
 	@Inject
-	PersitentDirectoryProvider persistentDirectoryProvider;
+	private PersistentDirectoryProvider persistentDirectoryProvider;
 
 	@Inject
 	CdiFactory factory;
@@ -62,8 +62,8 @@ public class EngineProvider {
 		log.info("-  directory path : " + persistentDirectoryProvider.getDirectoryPath());
 		log.info("-  userClasses : " + Arrays.toString(userClassesProvider.getUserClassesArray()));
 		log.info("-----------------------------------------------------------------------------------------------");
-		// engine = GenericSystem.newPersistentEngine(factory, persistentDirectoryProvider.getDirectoryPath(), userClassesProvider.getUserClassesArray());
-		engine = GenericSystem.newInMemoryEngine(factory, userClassesProvider.getUserClassesArray());
+		engine = GenericSystem.newPersistentEngine(factory, persistentDirectoryProvider.getDirectoryPath(), userClassesProvider.getUserClassesArray());
+		// engine = GenericSystem.newInMemoryEngine(factory, userClassesProvider.getUserClassesArray());
 	}
 
 	@Produces

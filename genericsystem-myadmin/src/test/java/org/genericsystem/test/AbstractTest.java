@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.cdi.CdiFactory;
 import org.genericsystem.cdi.EngineProvider;
-import org.genericsystem.cdi.PersitentDirectoryProvider;
+import org.genericsystem.cdi.PersistentDirectoryProvider;
 import org.genericsystem.cdi.UserClassesProvider;
 import org.genericsystem.example.Example.MyVehicle;
 import org.genericsystem.example.Example.Vehicle;
@@ -36,7 +36,7 @@ public abstract class AbstractTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createTestArchive() {
-		return new Archiver(GenericBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersitentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class,
+		return new Archiver(GenericBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersistentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class,
 				MessageFactory.class, CdiFactory.class, GuiGenericsTreeBean.class, WrapperBean.class, MyVehicle.class, Vehicle.class).archive();
 	}
 

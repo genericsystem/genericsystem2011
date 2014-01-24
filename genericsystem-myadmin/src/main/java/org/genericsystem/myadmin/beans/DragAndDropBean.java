@@ -3,6 +3,7 @@ package org.genericsystem.myadmin.beans;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
@@ -23,6 +24,7 @@ public class DragAndDropBean {
 	private GsMessages messages;
 
 	public void addAttribute(DropEvent dropEvent) {
+
 		String dragValue = (String) dropEvent.getDragValue();
 		Type type = (Type) genericTreeBean.getSelectedTreeNode().getGeneric();
 		Attribute attribute = type.setAttribute("new_attribute");

@@ -49,6 +49,17 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.jboss.solder</groupId>
+			<artifactId>solder-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.solder</groupId>
+			<artifactId>solder-impl</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
 
 		<dependency>
 			<groupId>javax.enterprise</groupId>

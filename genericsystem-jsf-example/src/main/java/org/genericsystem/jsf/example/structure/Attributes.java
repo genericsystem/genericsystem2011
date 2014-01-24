@@ -10,4 +10,10 @@ public class Attributes {
 	@Components(Cars.class)
 	public static class Power {
 	}
+
+	@SystemGeneric
+	@Components(Cars.class)
+	public static class Power2 {
+	}
+
 }

@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Objects;
 
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Projector;
+import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,5 +82,9 @@ public class TypeCrudComponent implements CrudComponentInterface {
 
 	public boolean isChildComponent() {
 		return false;
+	}
+
+	public Snapshot<Attribute> getAllAttributes() {
+		return type.getAttributes();
 	}
 }

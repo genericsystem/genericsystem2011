@@ -22,7 +22,7 @@ public class CacheProvider implements Serializable {
 
 	@PostConstruct
 	public void init() {
-		currentCache = engine.newCache();
+		currentCache = engine.newCache().start();
 	}
 
 	public void mountNewCache() {
