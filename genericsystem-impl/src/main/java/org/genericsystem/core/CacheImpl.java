@@ -49,7 +49,9 @@ public class CacheImpl extends AbstractContext implements Cache {
 	protected AbstractContext subContext;
 
 	private transient Map<Generic, TimestampedDependencies> compositeDependenciesMap;
-	private transient Map<Generic, TimestampedDependencies> inheritingDependenciesMap;
+	@Deprecated
+	private transient Map<Generic, TimestampedDependencies> inheritingAndInstancesDependenciesMap;
+	private transient Map<Generic, TimestampedDependencies> instancesDependenciesMap;
 
 	protected Set<Generic> adds;
 	protected Set<Generic> removes;
@@ -68,7 +70,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	@Override
 	public void clear() {
 		compositeDependenciesMap = new HashMap<>();
-		inheritingDependenciesMap = new HashMap<>();
+		inheritingAndInstancesDependenciesMap = new HashMap<>();
+		instancesDependenciesMap = new HashMap<>();
 		adds = new LinkedHashSet<>();
 		removes = new LinkedHashSet<>();
 		automatics = new LinkedHashSet<>();
@@ -96,20 +99,30 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	TimestampedDependencies getDirectInheritingsDependencies(Generic directSuper) {
-		TimestampedDependencies dependencies = inheritingDependenciesMap.get(directSuper);
+	TimestampedDependencies getInheritingsAndInstances(Generic directSuper) {
+		TimestampedDependencies dependencies = inheritingAndInstancesDependenciesMap.get(directSuper);
 		if (dependencies == null) {
-			TimestampedDependencies result = inheritingDependenciesMap.put(directSuper, dependencies = new CacheDependencies(subContext.getDirectInheritingsDependencies(directSuper)));
+			TimestampedDependencies result = inheritingAndInstancesDependenciesMap.put(directSuper, dependencies = new CacheDependencies(subContext.getInheritingsAndInstances(directSuper)));
 			assert result == null;
 		}
 		return dependencies;
 	}
 
 	@Override
-	TimestampedDependencies getCompositeDependencies(Generic component) {
+	TimestampedDependencies getInstances(Generic meta) {
+		TimestampedDependencies dependencies = instancesDependenciesMap.get(meta);
+		if (dependencies == null) {
+			TimestampedDependencies result = instancesDependenciesMap.put(meta, dependencies = new CacheDependencies(subContext.getInstances(meta)));
+			assert result == null;
+		}
+		return dependencies;
+	}
+
+	@Override
+	TimestampedDependencies getComposites(Generic component) {
 		TimestampedDependencies dependencies = compositeDependenciesMap.get(component);
 		if (dependencies == null) {
-			TimestampedDependencies result = compositeDependenciesMap.put(component, dependencies = new CacheDependencies(subContext.getCompositeDependencies(component)));
+			TimestampedDependencies result = compositeDependenciesMap.put(component, dependencies = new CacheDependencies(subContext.getComposites(component)));
 			assert result == null;
 		}
 		return dependencies;
