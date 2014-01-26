@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
 import org.genericsystem.core.AbstractWriter.AbstractLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,10 +103,10 @@ public class Archiver {
 	public void startScheduler() {
 		if (lockFile != null)
 			if (Statics.SNAPSHOTS_PERIOD > 0L) {
-				engine.newCache().start();
 				scheduler.scheduleAtFixedRate(new Runnable() {
 					@Override
 					public void run() {
+						engine.newCache().start();
 						new ZipWriter(directory).doSnapshot();
 					}
 				}, Statics.SNAPSHOTS_INITIAL_DELAY, Statics.SNAPSHOTS_PERIOD, TimeUnit.MILLISECONDS);
@@ -155,8 +154,8 @@ public class Archiver {
 			try (FileOutputStream fileOutputStream = new FileOutputStream(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION);) {
 				ZipOutputStream zipOutput = new ZipOutputStream(fileOutputStream);
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.CONTENT_EXTENSION));
-				this.formalOutputStream = new ObjectOutputStream(bufferTemp);
-				this.contentOutputStream = new ObjectOutputStream(zipOutput);
+				formalOutputStream = new ObjectOutputStream(bufferTemp);
+				contentOutputStream = new ObjectOutputStream(zipOutput);
 
 				writeGenericsAndFlush();
 				zipOutput.closeEntry();
@@ -231,8 +230,7 @@ public class Archiver {
 				engine = restoreEngine(homeTreeMap, genericMap);
 				for (;;)
 					loadGeneric(engine, homeTreeMap, genericMap);
-			} catch (EOFException ignore) {
-			} catch (Exception e) {
+			} catch (EOFException ignore) {} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}

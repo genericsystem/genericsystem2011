@@ -22,7 +22,7 @@ public class ConcurrentTest extends AbstractTest {
 		cache.mountNewCache();
 
 		assert cache.isAlive(car);
-		assert engine.getInheritings().contains(car);
+		assert engine.getInheritingsAndInstances().contains(car);
 	}
 
 	public void testFlushedModificationsAvailableInNewCacheOk() {
@@ -32,12 +32,12 @@ public class ConcurrentTest extends AbstractTest {
 		cache.flush();
 
 		assert cache.isAlive(car);
-		assert engine.getInheritings().contains(car);
+		assert engine.getInheritingsAndInstances().contains(car);
 
 		Cache cache2 = engine.newCache().start();
 
 		assert cache2.isAlive(car);
-		assert engine.getInheritings().contains(car);
+		assert engine.getInheritingsAndInstances().contains(car);
 	}
 
 	public void testNonFlushedModificationsAreNotAvailableInNewCacheOk() {
@@ -46,12 +46,12 @@ public class ConcurrentTest extends AbstractTest {
 		Generic car = cache.addType("Car");
 
 		assert cache.isAlive(car);
-		assert engine.getInheritings().contains(car);
+		assert engine.getInheritingsAndInstances().contains(car);
 
 		Cache cache2 = engine.newCache().start();
 
 		assert !cache2.isAlive(car);
-		assert !engine.getInheritings().contains(car);
+		assert !engine.getInheritingsAndInstances().contains(car);
 	}
 
 	// TODO: to CacheTest
@@ -79,16 +79,16 @@ public class ConcurrentTest extends AbstractTest {
 
 		Cache cache2 = engine.newCache().start();
 		assert cache2.isAlive(car);
-		assert engine.getInheritings().contains(car);
+		assert engine.getInheritingsAndInstances().contains(car);
 
 		cache.start();
 		car.remove();
 		assert !cache.isAlive(car);
-		assert !engine.getInheritings().contains(car);
+		assert !engine.getInheritingsAndInstances().contains(car);
 
 		cache2.start();
 		assert cache2.isAlive(car);
-		assert engine.getInheritings().contains(car);
+		assert engine.getInheritingsAndInstances().contains(car);
 
 		cache.start();
 		cache.flush();
@@ -142,14 +142,14 @@ public class ConcurrentTest extends AbstractTest {
 		cache.flush();
 
 		assert cache.isAlive(car);
-		assert engine.getInheritings().contains(car);
+		assert engine.getInheritingsAndInstances().contains(car);
 
 		Cache cache2 = engine.newCache().start();
 		car.remove();
 		cache2.flush();
 
 		assert !cache2.isAlive(car);
-		assert !engine.getInheritings().contains(car);
+		assert !engine.getInheritingsAndInstances().contains(car);
 
 		cache.start();
 
@@ -170,24 +170,24 @@ public class ConcurrentTest extends AbstractTest {
 		cache.flush();
 
 		assert cache.isAlive(car);
-		assert engine.getInheritings().contains(car);
+		assert engine.getInheritingsAndInstances().contains(car);
 
 		CacheImpl cache2 = (CacheImpl) engine.newCache().start();
 
 		assert cache2.getTs() > cache.getTs();
 		assert cache2.isAlive(car);
-		assert engine.getInheritings().contains(car);
+		assert engine.getInheritingsAndInstances().contains(car);
 
 		car.remove();
 
 		assert !cache2.isAlive(car);
-		assert !engine.getInheritings().contains(car);
+		assert !engine.getInheritingsAndInstances().contains(car);
 
 		cache2.flush();
 
 		assert cache2.getTs() > cache.getTs();
 		assert !cache2.isAlive(car);
-		assert !engine.getInheritings().contains(car);
+		assert !engine.getInheritingsAndInstances().contains(car);
 
 		cache.start();
 

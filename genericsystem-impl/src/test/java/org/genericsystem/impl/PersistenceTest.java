@@ -132,10 +132,10 @@ public class PersistenceTest {
 
 	private void readByInheritings(Generic persistedNode, Generic readNode) {
 		int indexInherintings = 0;
-		assert (persistedNode.getInheritings().size() == readNode.getInheritings().size()) : persistedNode.getInheritings() + " / " + readNode.getInheritings();
-		for (Generic persistedGeneric : persistedNode.getInheritings()) {
-			compareGeneric(persistedGeneric, readNode.getInheritings().get(indexInherintings));
-			readByInheritings(persistedGeneric, readNode.getInheritings().get(indexInherintings));
+		assert (persistedNode.getInheritingsAndInstances().size() == readNode.getInheritingsAndInstances().size()) : persistedNode.getInheritingsAndInstances() + " / " + readNode.getInheritingsAndInstances();
+		for (Generic persistedGeneric : persistedNode.getInheritingsAndInstances()) {
+			compareGeneric(persistedGeneric, readNode.getInheritingsAndInstances().get(indexInherintings));
+			readByInheritings(persistedGeneric, readNode.getInheritingsAndInstances().get(indexInherintings));
 			indexInherintings++;
 		}
 	}

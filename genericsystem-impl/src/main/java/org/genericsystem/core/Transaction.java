@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.util.HashSet;
-
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -42,6 +41,11 @@ public class Transaction extends AbstractContext {
 	@Deprecated
 	TimestampedDependencies getInheritingsAndInstances(Generic effectiveSuper) {
 		return ((GenericImpl) effectiveSuper).getLifeManager().engineInheritingsAndInstances;
+	}
+
+	@Override
+	TimestampedDependencies getInheritings(Generic superGeneric) {
+		return ((GenericImpl) superGeneric).getLifeManager().engineInheritings;
 	}
 
 	@Override
@@ -102,9 +106,12 @@ public class Transaction extends AbstractContext {
 			for (Generic generic : removes)
 				writeLockAndCheckMvcc(((GenericImpl) generic).getLifeManager());
 			for (Generic generic : adds) {
-				for (Generic effectiveSuper : ((GenericImpl) generic).getSupers())
+				writeLockAndCheckMvcc(((GenericImpl) generic.getMeta()).getLifeManager());
+				for (Generic effectiveSuper : generic.getSupers())
 					writeLockAndCheckMvcc(((GenericImpl) effectiveSuper).getLifeManager());
-				for (Generic component : ((GenericImpl) generic).getComponents())
+				for (Generic effectiveSuper : generic.getStrictSupers())
+					writeLockAndCheckMvcc(((GenericImpl) effectiveSuper).getLifeManager());
+				for (Generic component : generic.getComponents())
 					writeLockAndCheckMvcc(((GenericImpl) component).getLifeManager());
 				writeLockAndCheckMvcc(((GenericImpl) generic).getLifeManager());
 			}
