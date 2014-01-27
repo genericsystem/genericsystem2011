@@ -413,7 +413,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private void internalCancel(Holder attribute, int metaLevel, int basePos) {
 		if (attribute != null)
-			bind(Statics.CONCRETE == metaLevel ? attribute.getMeta() : attribute, null, null, attribute, metaLevel == attribute.getMetaLevel() ? new Generic[] { attribute } : Statics.EMPTY_GENERIC_ARRAY, basePos, false);
+			bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, null, null, attribute, metaLevel == attribute.getMetaLevel() ? new Generic[] { attribute } : Statics.EMPTY_GENERIC_ARRAY, basePos, false);
 	}
 
 	@Override
