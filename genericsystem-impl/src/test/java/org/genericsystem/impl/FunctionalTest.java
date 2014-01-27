@@ -35,7 +35,7 @@ public class FunctionalTest extends AbstractTest {
 		Generic red = color.addInstance("red");
 		Generic green = color.addInstance("green");
 
-		final Relation carColor = car.setRelation("Power", color).enableSingularConstraint();
+		final Relation carColor = car.setRelation("CarColor", color).enableSingularConstraint();
 
 		myBmw.bind(carColor, red);
 		car.bind(carColor, green);
