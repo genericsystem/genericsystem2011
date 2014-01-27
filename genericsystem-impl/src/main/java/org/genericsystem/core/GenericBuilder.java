@@ -28,10 +28,12 @@ class GenericBuilder {
 	private Boolean isProperty;// TODO KK change for strongProperty ?
 
 	GenericBuilder(UnsafeVertex uVertex, boolean respectSupers) {
+		assert uVertex.getMeta().isMeta() || uVertex.getMeta().isStructural();
 		int dim = uVertex.components().size();
 		this.uVertex = uVertex;
 		isStrongSingular = new Boolean[dim];
-		this.uVertex = new UnsafeVertex(uVertex.homeTreeNode(), uVertex.getMeta(), getExtendedDirectSupers(respectSupers), uVertex.components());
+		this.uVertex = new UnsafeVertex(uVertex.homeTreeNode(), getExtendedMeta(respectSupers), getExtendedDirectSupers(respectSupers), getExtendedStrictSupers(respectSupers), uVertex.components());
+		assert uVertex.getMeta().isMeta() || uVertex.getMeta().isStructural();
 	}
 
 	private boolean isStrongSingular(int i) {
@@ -42,6 +44,28 @@ class GenericBuilder {
 
 	private boolean isProperty() {
 		return isProperty != null ? isProperty : (isProperty = ((GenericImpl) uVertex.getMeta()).isPropertyConstraintEnabled());
+	}
+
+	protected Generic getExtendedMeta(final boolean respectSupers) {
+		final Generic root = respectSupers ? ((GenericImpl) uVertex.getMeta()) : ((GenericImpl) uVertex.getMeta()).getEngine();
+		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(root) {
+			@Override
+			protected Iterator<Generic> children(final Generic father) {
+				return new AbstractFilterIterator<Generic>(((GenericImpl) father).inheritingsIterator()) {
+					@Override
+					public boolean isSelected() {
+						// log.info(next.info() + " : " + (((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next)));
+						return ((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next);
+					}
+				};
+			}
+
+			@Override
+			public boolean isSelected(Generic candidate) {
+				return false;
+			}
+		};
+		return iterator.next();
 	}
 
 	protected Supers getExtendedDirectSupers(final boolean respectSupers) {
@@ -63,6 +87,76 @@ class GenericBuilder {
 			set.add(iterator.next());
 		return new Supers(set);
 	}
+
+	protected Supers getExtendedStrictSupers(final boolean respectSupers) {
+		final Engine engine = ((GenericImpl) uVertex.getMeta()).getEngine();
+		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
+			{
+				if (respectSupers && !uVertex.supers().iterator().next().equals(engine))
+					iterators.put(engine, new SelectableIterator<>(uVertex.supers().iterator()));
+			}
+
+			@Override
+			protected Iterator<Generic> children(final Generic father) {
+				return new AbstractFilterIterator<Generic>(((GenericImpl) father).inheritingsIterator()) {
+					@Override
+					public boolean isSelected() {
+						return ((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next);
+					}
+				};
+			}
+
+			@Override
+			public boolean isSelected(Generic candidate) {
+				return false;
+			}
+
+			@Override
+			protected boolean isSelectable() {
+				return next.getMetaLevel() == uVertex.metaLevel();
+			}
+		};
+		Set<Generic> set = new TreeSet<>();
+		while (iterator.hasNext())
+			set.add(iterator.next());
+		return new Supers(set);
+	}
+
+	// protected Supers getExtendedStrictSupers(final boolean respectSupers) {
+	// final Engine engine = ((GenericImpl) uVertex.getMeta()).getEngine();
+	// Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
+	// {
+	// if (respectSupers)
+	// iterators.put(engine, new SelectableIterator<>(uVertex.strictSupers().iterator()));
+	// else
+	// assert false;
+	// }
+	//
+	// @Override
+	// protected Iterator<Generic> children(final Generic father) {
+	// return new AbstractFilterIterator<Generic>(((GenericImpl) father).inheritingsIterator()) {
+	// @Override
+	// public boolean isSelected() {
+	// return ((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next);
+	// }
+	// };
+	// }
+	//
+	// @Override
+	// public boolean isSelected(Generic candidate) {
+	// return false;
+	// }
+	//
+	// @Override
+	// protected boolean isSelectable() {
+	// return next.getMetaLevel() == uVertex.metaLevel();
+	// }
+	// };
+	// Set<Generic> set = new TreeSet<>();
+	// while (iterator.hasNext())
+	// set.add(iterator.next());
+	// return new Supers(set);
+	// }
 
 	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {
 		if (uVertex.supers().size() <= 1 || !containsSuper(candidate))

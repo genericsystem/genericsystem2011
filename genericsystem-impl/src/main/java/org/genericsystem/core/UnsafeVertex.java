@@ -14,24 +14,18 @@ class UnsafeVertex {
 
 	protected static Logger log = LoggerFactory.getLogger(UnsafeVertex.class);
 
-	private HomeTreeNode homeTreeNode;
+	private final HomeTreeNode homeTreeNode;
 
-	private Generic meta;
+	private final Generic meta;
 
-	private Supers supers;
+	@Deprecated
+	private final Supers supers;
 
-	private UnsafeComponents components;
+	private final Supers strictSupers;
 
-	public UnsafeVertex(HomeTreeNode homeTreeNode, Supers supers, UnsafeComponents components) {
-		assert homeTreeNode != null;
-		assert supers != null;
-		assert components != null;
-		this.homeTreeNode = homeTreeNode;
-		this.supers = supers;
-		this.components = components;
-	}
+	private final UnsafeComponents components;
 
-	public UnsafeVertex(HomeTreeNode homeTreeNode, Generic meta, Supers supers, UnsafeComponents components) {
+	public UnsafeVertex(HomeTreeNode homeTreeNode, Generic meta, @Deprecated Supers supers, Supers strictSupers, UnsafeComponents components) {
 		assert homeTreeNode != null;
 		// assert meta != null;
 		assert supers != null;
@@ -39,6 +33,10 @@ class UnsafeVertex {
 		this.homeTreeNode = homeTreeNode;
 		this.meta = meta;
 		this.supers = supers;
+		this.strictSupers = strictSupers;
+		for (Generic strictSuper : strictSupers) {
+			assert strictSuper.getMetaLevel() == homeTreeNode.getMetaLevel() : " zzzzzzzzz " + homeTreeNode.toString() + strictSuper.info();
+		}
 		this.components = components;
 	}
 
@@ -50,8 +48,13 @@ class UnsafeVertex {
 		return meta;
 	}
 
+	@Deprecated
 	public Supers supers() {
 		return supers;
+	}
+
+	public Supers strictSupers() {
+		return strictSupers;
 	}
 
 	public UnsafeComponents components() {
@@ -63,7 +66,7 @@ class UnsafeVertex {
 	}
 
 	UnsafeVertex truncateComponent(int pos) {
-		return new UnsafeVertex(homeTreeNode(), getMeta(), supers(), Statics.truncate(pos, components()));
+		return new UnsafeVertex(homeTreeNode(), getMeta(), supers(), strictSupers(), Statics.truncate(pos, components()));
 	}
 
 	public void log() {
@@ -79,6 +82,8 @@ class UnsafeVertex {
 		s += " Class       : " + getClass().getSimpleName() + "\n";
 		s += "**********************************************************************\n";
 		for (Generic superGeneric : supers())
+			s += " Super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
+		for (Generic superGeneric : strictSupers())
 			s += " Super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
 		for (Generic component : components())
 			s += " Component   : " + component + " (" + System.identityHashCode(component) + ")\n";
@@ -102,7 +107,7 @@ class UnsafeVertex {
 	static class Vertex extends UnsafeVertex {
 
 		public Vertex(Generic generic, UnsafeVertex uVertex) {
-			super(uVertex.homeTreeNode(), uVertex.getMeta(), uVertex.supers(), new Components(generic, uVertex.components()));
+			super(uVertex.homeTreeNode(), uVertex.getMeta(), uVertex.supers(), uVertex.strictSupers(), new Components(generic, uVertex.components()));
 		}
 
 		@Override
@@ -114,9 +119,9 @@ class UnsafeVertex {
 			return homeTreeNode().equals(vertex.homeTreeNode()) && supers().equals(vertex.supers()) && components().equals(vertex.components());
 		}
 
-		public boolean equivByMeta(Vertex vertex) {
-			return homeTreeNode().equals(vertex.homeTreeNode()) && getMeta().equals(vertex.getMeta()) && components().equals(vertex.components());
-		}
+		// public boolean equivByMeta(Vertex vertex) {
+		// return homeTreeNode().equals(vertex.homeTreeNode()) && getMeta().equals(vertex.getMeta()) && components().equals(vertex.components());
+		// }
 
 	}
 

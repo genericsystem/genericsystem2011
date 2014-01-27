@@ -139,7 +139,7 @@ public class GuiGenericsTreeNode {
 		case INSTANCES:
 			return ((Type) generic).getInstances();
 		case INHERITINGS:
-			return generic.getInheritings();
+			return generic.getInheritingsAndInstances();
 		case COMPONENTS:
 			return generic.getComponents();
 		case COMPOSITES:
