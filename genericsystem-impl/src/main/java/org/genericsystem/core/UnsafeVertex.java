@@ -35,7 +35,7 @@ class UnsafeVertex {
 		this.supers = supers;
 		this.strictSupers = strictSupers;
 		for (Generic strictSuper : strictSupers) {
-			assert strictSuper.getMetaLevel() == homeTreeNode.getMetaLevel() : " zzzzzzzzz " + homeTreeNode.toString() + strictSuper.info();
+			assert strictSuper.getMetaLevel() == homeTreeNode.getMetaLevel() : homeTreeNode.toString() + strictSuper.info();
 		}
 		this.components = components;
 	}

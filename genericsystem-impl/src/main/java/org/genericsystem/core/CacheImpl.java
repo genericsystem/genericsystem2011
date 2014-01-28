@@ -476,14 +476,16 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		// TODO move this method in GenericImpl ?
 		private UnsafeVertex adjustVertex(Generic dependency) {
-			return new UnsafeVertex(((GenericImpl) dependency).homeTreeNode(), new AdjustList(Arrays.asList(dependency.getMeta())).get(0), new Supers(new AdjustList(((GenericImpl) dependency).getSupers())), new Supers(new AdjustList(
-					((GenericImpl) dependency).getStrictSupers())), new UnsafeComponents(new AdjustList(((GenericImpl) dependency).selfToNullComponents())));
+			return new UnsafeVertex(((GenericImpl) dependency).homeTreeNode(), new AdjustList(Arrays.asList(dependency.getMeta()), true).get(0), new Supers(new AdjustList(((GenericImpl) dependency).getSupers(), false)), new Supers(new AdjustList(
+					((GenericImpl) dependency).getStrictSupers(), true)), new UnsafeComponents(new AdjustList(((GenericImpl) dependency).selfToNullComponents(), false)));
 		}
 
 		private class AdjustList extends ArrayList<Generic> {
 			private static final long serialVersionUID = -478017222010761379L;
+			private final boolean strict;// provisoire
 
-			private AdjustList(List<Generic> olds) {
+			private AdjustList(List<Generic> olds, boolean strict) {
+				this.strict = strict;
 				for (Generic add : olds)
 					adjust(add);
 			}
@@ -497,7 +499,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				if (newGeneric != null)
 					super.add(newGeneric);
 				else
-					for (Generic add : (((GenericImpl) old).getSupers()))
+					for (Generic add : strict ? (((GenericImpl) old).getStrictSupers()) : (((GenericImpl) old).getSupers()))
 						adjust(add);
 			}
 		}

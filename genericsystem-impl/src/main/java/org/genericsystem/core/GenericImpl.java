@@ -790,11 +790,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T addSubType(Serializable value, Generic... components) {
+		if (isMeta())
+			getCurrentCache().rollback(new UnsupportedOperationException("Derive a meta is not allowed"));
 		return getCurrentCache().bind(getMeta(), value, null, this, new Generic[] { this }, true, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
 	public <T extends Type> T setSubType(Serializable value, Generic... components) {
+		if (isMeta())
+			getCurrentCache().rollback(new UnsupportedOperationException("Derive a meta is not allowed"));
 		return getCurrentCache().bind(getMeta(), value, null, this, new Generic[] { this }, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
@@ -1125,7 +1129,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
 		s += " Name        : " + toString() + "\n";
 		s += " Meta        : " + getMeta() + " (" + System.identityHashCode(getMeta()) + ")\n";
-		s += " MetaLevel   : " + getMetaLevel() + "\n";
+		s += " MetaLevel   : " + Statics.getMetaLevelString(getMetaLevel()) + "\n";
 		s += " Category    : " + getCategoryString() + "\n";
 		s += " Class       : " + getClass().getSimpleName() + "\n";
 		s += "**********************************************************************\n";
