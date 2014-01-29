@@ -46,29 +46,53 @@ class GenericBuilder {
 		return isProperty != null ? isProperty : (isProperty = ((GenericImpl) uVertex.getMeta()).isPropertyConstraintEnabled());
 	}
 
-	protected Generic getExtendedMeta(final boolean respectSupers) {
-		final Generic root = respectSupers ? ((GenericImpl) uVertex.getMeta()) : ((GenericImpl) uVertex.getMeta()).getEngine();
-		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(root) {
-			@Override
-			protected Iterator<Generic> children(final Generic father) {
-				return new AbstractFilterIterator<Generic>(((GenericImpl) father).inheritingsIterator()) {
-					@Override
-					public boolean isSelected() {
-						// log.info(next.info() + " : " + (((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next)));
-						return ((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next);
-					}
-				};
-			}
-
-			@Override
-			public boolean isSelected(Generic candidate) {
-				return false;
-			}
-		};
-		return iterator.next();
+	private Generic getExtendedMeta(final boolean respectSupers) {
+		Generic meta = respectSupers ? uVertex.getMeta() : findMetaInSupers(uVertex.getMeta(), new Generic[] { uVertex.getMeta().getEngine() });
+		return getExtendedMeta(meta);
 	}
 
-	protected Supers getExtendedDirectSupers(final boolean respectSupers) {
+	private Generic findMetaInSupers(Generic meta, Generic[] result) {
+		for (Generic strictSuper : meta.getStrictSupers())
+			if (((GenericImpl) strictSuper).isSuperOf(uVertex) || isExtentedBy(strictSuper))
+				if (strictSuper.inheritsFrom(result[0]))
+					result[0] = strictSuper;
+				else
+					assert result[0] == null || result[0].inheritsFrom(strictSuper);
+			else
+				findMetaInSupers(strictSuper, result);
+		return result[0];
+	}
+
+	private Generic getExtendedMeta(Generic meta) {
+		for (Generic candidate : ((GenericImpl) meta).getInheritings())
+			if (((GenericImpl) candidate).isSuperOf(uVertex) || isExtentedBy(candidate))
+				return getExtendedMeta(candidate);
+		return meta;
+	}
+
+	// private Generic getExtendedMeta(final boolean respectSupers) {
+	// final Generic root = respectSupers ? ((GenericImpl) uVertex.getMeta()) : ((GenericImpl) uVertex.getMeta()).getEngine();
+	// Iterator<Generic> iterator = new AbstractSelectableLeafIterator(root) {
+	// @Override
+	// protected Iterator<Generic> children(final Generic father) {
+	// return new AbstractFilterIterator<Generic>(((GenericImpl) father).inheritingsIterator()) {
+	// @Override
+	// public boolean isSelected() {
+	// // log.info(next.info() + " : " + (((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next)));
+	// return ((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next);
+	// }
+	// };
+	// }
+	//
+	// @Override
+	// public boolean isSelected(Generic candidate) {
+	// return false;
+	// }
+	// };
+	// return iterator.next();
+	// }
+
+	private Supers getExtendedDirectSupers(final boolean respectSupers) {
 		final Engine engine = ((GenericImpl) uVertex.getMeta()).getEngine();
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
 			{
@@ -88,7 +112,7 @@ class GenericBuilder {
 		return new Supers(set);
 	}
 
-	protected Supers getExtendedStrictSupers(final boolean respectSupers) {
+	private Supers getExtendedStrictSupers(final boolean respectSupers) {
 		final Engine engine = ((GenericImpl) uVertex.getMeta()).getEngine();
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
 			{
@@ -121,42 +145,6 @@ class GenericBuilder {
 			set.add(iterator.next());
 		return new Supers(set);
 	}
-
-	// protected Supers getExtendedStrictSupers(final boolean respectSupers) {
-	// final Engine engine = ((GenericImpl) uVertex.getMeta()).getEngine();
-	// Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
-	// {
-	// if (respectSupers)
-	// iterators.put(engine, new SelectableIterator<>(uVertex.strictSupers().iterator()));
-	// else
-	// assert false;
-	// }
-	//
-	// @Override
-	// protected Iterator<Generic> children(final Generic father) {
-	// return new AbstractFilterIterator<Generic>(((GenericImpl) father).inheritingsIterator()) {
-	// @Override
-	// public boolean isSelected() {
-	// return ((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next);
-	// }
-	// };
-	// }
-	//
-	// @Override
-	// public boolean isSelected(Generic candidate) {
-	// return false;
-	// }
-	//
-	// @Override
-	// protected boolean isSelectable() {
-	// return next.getMetaLevel() == uVertex.metaLevel();
-	// }
-	// };
-	// Set<Generic> set = new TreeSet<>();
-	// while (iterator.hasNext())
-	// set.add(iterator.next());
-	// return new Supers(set);
-	// }
 
 	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {
 		if (uVertex.supers().size() <= 1 || !containsSuper(candidate))
