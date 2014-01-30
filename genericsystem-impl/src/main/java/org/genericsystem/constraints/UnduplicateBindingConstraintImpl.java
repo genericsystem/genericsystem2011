@@ -33,24 +33,22 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	@Meta(UnduplicateBindingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
-	public static class DefaultKey {
-	}
+	public static class DefaultKey {}
 
 	@SystemGeneric
 	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {
-	}
+	public static class DefaultValue {}
 
 	@Override
 	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
 		org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
-		if (new AbstractFilterIterator<Generic>(components.isEmpty() ? modified.getSupers().iterator() : ((GenericImpl) components.get(0)).compositesIterator()) {
+		if (new AbstractFilterIterator<Generic>(components.isEmpty() ? modified.<GenericImpl> getMeta().instancesIterator() : ((GenericImpl) components.get(0)).compositesIterator()) {
 			@Override
 			public boolean isSelected() {
-				return !next.equals(modified) && ((GenericImpl) next).equivByMeta(((GenericImpl) modified).vertex());
-				// return !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex());
+				// return !next.equals(modified) && ((GenericImpl) next).equivByMeta(((GenericImpl) modified).vertex());
+				return !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex());
 			}
 		}.hasNext())
 			throw new UnduplicateBindingConstraintViolationException();

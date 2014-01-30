@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -46,7 +45,10 @@ public abstract class AbstractContext {
 		for (Generic effectiveSuper : ((GenericImpl) generic).getSupers())
 			if (effectiveSupersSet.add(effectiveSuper))
 				getInheritingsAndInstances(effectiveSuper).add(generic);
-
+		effectiveSupersSet = new HashSet<>();
+		for (Generic effectiveSuper : ((GenericImpl) generic).getStrictSupers())
+			if (effectiveSupersSet.add(effectiveSuper))
+				getInheritings(effectiveSuper).add(generic);
 		getInstances(generic.getMeta()).add(generic);
 		return generic;
 	}
@@ -60,6 +62,10 @@ public abstract class AbstractContext {
 		for (Generic effectiveSuper : ((GenericImpl) generic).getSupers())
 			if (effectiveSupersSet.add(effectiveSuper))
 				getInheritingsAndInstances(effectiveSuper).remove(generic);
+		effectiveSupersSet = new HashSet<>();
+		for (Generic effectiveSuper : ((GenericImpl) generic).getStrictSupers())
+			if (effectiveSupersSet.add(effectiveSuper))
+				getInheritings(effectiveSuper).remove(generic);
 
 		getInstances(generic.getMeta()).remove(generic);
 		return generic;
@@ -70,12 +76,19 @@ public abstract class AbstractContext {
 
 	abstract TimestampedDependencies getInstances(Generic meta);
 
+	abstract TimestampedDependencies getInheritings(Generic strictSuper);
+
 	abstract TimestampedDependencies getComposites(Generic component);
 
 	@SuppressWarnings("unchecked")
 	@Deprecated
 	public <T extends Generic> Iterator<T> inheritingsAndInstancesIterator(Generic effectiveSuper) {
 		return (Iterator<T>) getInheritingsAndInstances(effectiveSuper).iterator(getTs());
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Generic> Iterator<T> inheritingsIterator(Generic meta) {
+		return (Iterator<T>) getInheritings(meta).iterator(getTs());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -104,7 +117,7 @@ public abstract class AbstractContext {
 
 	public abstract boolean isAutomatic(Generic generic);
 
-	// TODO move this in GenericImpl ?
+	// TODO move this in GenericImpl
 	<T extends Generic> NavigableSet<T> orderDependenciesForRemove(final Generic generic) throws ReferentialIntegrityConstraintViolationException {
 		return new TreeSet<T>() {
 			private static final long serialVersionUID = -6526972335865898198L;
@@ -115,7 +128,7 @@ public abstract class AbstractContext {
 			@SuppressWarnings("unchecked")
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
-					for (T inheritingDependency : generic.<T> getInheritings())
+					for (T inheritingDependency : generic.<T> getInheritingsAndInstances())
 						if (((GenericImpl) inheritingDependency).isAutomatic())
 							addDependencies(inheritingDependency);
 						else if (!contains(inheritingDependency))
@@ -136,51 +149,13 @@ public abstract class AbstractContext {
 		};
 	}
 
-	// TODO move this in GenericImpl ?
+	// TODO move this in GenericImpl
 	static NavigableSet<Generic> orderDependencies(final Generic generic) {
 		OrderedDependencies dependencies = new OrderedDependencies();
 		if (generic.isAlive()) // KK ?
 			dependencies.addDependencies(generic);
 		return dependencies;
 	}
-
-	// static NavigableMap<Generic, Integer> orderDependencyMap(final Generic generic, final int basePos) {
-	// return new TreeMap<Generic, Integer>() {
-	// private static final long serialVersionUID = 1053909994506452123L;
-	// {
-	// if (generic.isAlive())
-	// addDependencies(generic, basePos);
-	// }
-	//
-	// public void addDependencies(Generic generic, int basePos) {
-	// if (!super.containsKey(generic)) {// protect from loop
-	// put(generic, basePos);
-	// for (Generic inheriting : generic.getInheritings())
-	// addDependencies(inheriting, getInheritingPosition(inheriting, generic, basePos));
-	// for (Generic composite : generic.getComposites())
-	// addDependencies(composite, getCompositePosition(generic, (Holder) composite));
-	// }
-	// }
-	//
-	// private int getInheritingPosition(Generic inheriting, Generic generic, int basePos) {
-	// if (Statics.MULTIDIRECTIONAL == basePos)
-	// return basePos;
-	// if (inheriting.getComponents().size() == ((GenericImpl) generic).getComponents().size())
-	// return basePos;
-	// for (int i = basePos; i < inheriting.getComponents().size(); i++)
-	// if (generic.inheritsFrom(((Holder) inheriting).getComponent(i)))
-	// return i;
-	// return Statics.MULTIDIRECTIONAL;
-	// }
-	//
-	// private int getCompositePosition(Generic generic, Holder composite) {
-	// for (int i = 0; i < composite.getComponents().size(); i++)
-	// if (generic.equals(composite.getComponent(i)))
-	// return i;
-	// throw new IllegalStateException();
-	// }
-	// };
-	// }
 
 	public abstract boolean isAlive(Generic generic);
 
@@ -238,17 +213,6 @@ public abstract class AbstractContext {
 			return new AxedPropertyClass((Class<GenericImpl>) axedConstraintValue.value(), axedConstraintValue.axe());
 		return clazz;
 	}
-
-	// @SuppressWarnings("unchecked")
-	// public <T extends Generic> T findPrimaryByValue(Generic meta, Serializable value) {
-	// Iterator<Generic> it = directInheritingsIterator(meta);
-	// while (it.hasNext()) {
-	// Generic candidate = it.next();
-	// if (((GenericImpl) candidate).isPrimary() && (Objects.hashCode(value) == Objects.hashCode(candidate.getValue())) && Objects.equals(value, candidate.getValue()))
-	// return (T) candidate;
-	// }
-	// return null;
-	// }
 
 	void apply(Iterable<Generic> adds, Iterable<Generic> removes) throws ConcurrencyControlException, ConstraintViolationException {
 		removeAll(removes);

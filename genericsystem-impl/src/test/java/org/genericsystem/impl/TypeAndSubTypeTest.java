@@ -47,16 +47,16 @@ public class TypeAndSubTypeTest extends AbstractTest {
 	public void testDependencyForType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		assert cache.getEngine().getInheritings().contains(car);
-		assert car.getInheritings().isEmpty();
+		assert cache.getEngine().getInheritingsAndInstances().contains(car);
+		assert car.getInheritingsAndInstances().isEmpty();
 	}
 
 	public void testDependencyForSubType() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicule = cache.addType("Vehicule");
 		Type car = vehicule.addSubType("Car");
-		assert vehicule.getInheritings().size() == 1;
-		assert vehicule.getInheritings().contains(car);
+		assert vehicule.getInheritingsAndInstances().size() == 1;
+		assert vehicule.getInheritingsAndInstances().contains(car);
 	}
 
 	public void testgetDirectSubTypes() {
@@ -106,16 +106,16 @@ public class TypeAndSubTypeTest extends AbstractTest {
 		Type audi = car.addSubType("Audi");
 		Type mercedes = car.addSubType("Mercedes");
 
-		assert vehicule.getInheritings().size() == 1;
-		assert vehicule.getInheritings().contains(car);
+		assert vehicule.getInheritingsAndInstances().size() == 1;
+		assert vehicule.getInheritingsAndInstances().contains(car);
 
-		Snapshot<Generic> subTypes = car.getInheritings();
+		Snapshot<Generic> subTypes = car.getInheritingsAndInstances();
 		assert subTypes.size() == 2;
 		assert subTypes.contains(audi);
 		assert subTypes.contains(mercedes);
 
-		assert audi.getInheritings().size() == 0;
-		assert mercedes.getInheritings().size() == 0;
+		assert audi.getInheritingsAndInstances().size() == 0;
+		assert mercedes.getInheritingsAndInstances().size() == 0;
 	}
 
 }

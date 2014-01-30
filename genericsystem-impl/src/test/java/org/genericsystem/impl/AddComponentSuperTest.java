@@ -38,8 +38,9 @@ public class AddComponentSuperTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Attribute power = vehicle.addAttribute("power");
-		power.removeComponent(vehicle, 0);
+		Type newPower = power.removeComponent(vehicle, 0);
 		assert vehicle.getAttribute("power") == null;
+		assert newPower.getMeta().equals(cache.getEngine());
 	}
 
 	public void removeComponentOnRelation() {

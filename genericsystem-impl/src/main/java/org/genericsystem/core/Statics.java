@@ -35,6 +35,21 @@ public class Statics {
 	public static final int CONCRETE = 2;
 	public static final int SENSOR = 3;
 
+	public static String getMetaLevelString(int metaLevel) {
+		switch (metaLevel) {
+		case META:
+			return "META";
+		case STRUCTURAL:
+			return "STRUCTURAL";
+		case CONCRETE:
+			return "CONCRETE";
+		case SENSOR:
+			return "SENSOR";
+		default:
+			return "UNKNOWN";
+		}
+	}
+
 	public static final int MULTIDIRECTIONAL = -1;
 	public static final int BASE_POSITION = 0;
 	public static final int TARGET_POSITION = 1;
@@ -346,7 +361,7 @@ public class Statics {
 
 		public void addDependencies(Generic dependency) {
 			if (super.add(dependency)) {// protect from loop
-				for (Generic inheritingDependency : dependency.<Generic> getInheritings())
+				for (Generic inheritingDependency : dependency.<Generic> getInheritingsAndInstances())
 					addDependencies(inheritingDependency);
 				for (Generic compositeDependency : dependency.<Generic> getComposites())
 					addDependencies(compositeDependency);
