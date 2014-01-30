@@ -33,16 +33,20 @@
 				<f:facet name="header">
 					<h:outputText value="#{att.columnTitleAttribute}" />
 				</f:facet>
-				<h:outputText value="#{row.getAttributeValue(att.attribute)}" />
+				<h:dataTable value="#{row.getAttributeValues(att.attribute)}"
+					var="value">
+					<h:column>
+						<h:outputText value="#{value}" />
+					</h:column>
+				</h:dataTable>
 				<f:facet name="footer">
 					<h:panelGroup>
 						<h:inputText rendered="#{!att.relation}"
 							value="#{att.newAttributeValue}" />
 						<h:selectOneMenu rendered="#{att.relation}"
 							value="#{att.newTargetValue}">
-							<f:selectItems value="#{att.targetInstanceRows}"
-								var="targetRow" itemValue="#{targetRow.value}"
-								itemLabel="#{targetRow.value}" />
+							<f:selectItems value="#{att.targetInstanceRows}" var="targetRow"
+								itemValue="#{targetRow.value}" itemLabel="#{targetRow.value}" />
 						</h:selectOneMenu>
 					</h:panelGroup>
 				</f:facet>

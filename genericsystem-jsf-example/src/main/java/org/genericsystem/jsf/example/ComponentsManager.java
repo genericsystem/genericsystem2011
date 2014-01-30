@@ -12,6 +12,7 @@ import javax.inject.Named;
 import org.genericsystem.core.Cache;
 import org.genericsystem.jsf.example.structure.Types.Cars;
 import org.genericsystem.jsf.example.structure.Types.Colors;
+import org.genericsystem.jsf.example.structure.Types.Times;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class ComponentsManager implements Serializable {
 
 	@PostConstruct
 	public void init() {
-		components = Arrays.asList(new TypeCrudComponent(cache.<Cars> find(Cars.class)), new TypeCrudComponent(cache.<Colors> find(Colors.class)));
+		components = Arrays.asList(new TypeCrudComponent(cache.<Cars> find(Cars.class)), new TypeCrudComponent(cache.<Colors> find(Colors.class)), new TypeCrudComponent(cache.<Times> find(Times.class)));
 	}
 
 	public List<TypeCrudComponent> getComponents() {

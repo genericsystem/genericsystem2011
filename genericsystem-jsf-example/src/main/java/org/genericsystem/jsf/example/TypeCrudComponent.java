@@ -9,6 +9,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.jsf.example.structure.Attributes;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TypeCrudComponent {
+
 	private static Logger log = LoggerFactory.getLogger(TypeCrudComponent.class);
 
 	private final Type type;
@@ -123,10 +125,7 @@ public class TypeCrudComponent {
 		}
 
 		public String getColumnTitleAttribute() {
-			if (!this.attribute.isRelation())
-				return Objects.toString(this.attribute);
-			else
-				return Objects.toString(type.<Type> getOtherTargets(attribute).get(0).<Class<?>> getValue().getSimpleName());
+			return Objects.toString(attribute);
 		}
 
 		public String getNewAttributeValue() {
@@ -173,11 +172,17 @@ public class TypeCrudComponent {
 			return Objects.toString(instance.getValue());
 		}
 
-		public String getAttributeValue(final Attribute attribute) {
-			if (attribute.isRelation() && instance.getHolder(attribute) != null)
-				return Objects.toString(instance.<Generic> getOtherTargets(instance.getHolder(attribute)).get(0).getValue());
-			else
-				return Objects.toString(instance.getValue(attribute));
+		public List<String> getAttributeValues(final Attribute attribute) {
+			if (attribute.isRelation()) {
+				return instance.getHolders(attribute).project(new Projector<String, Holder>() {
+					@Override
+					public String project(Holder link) {
+						// TODO KK relation ternary !!!!
+						return instance.getOtherTargets(link).get(0).getValue();
+					}
+				});
+			} else
+				return instance.getValues((Holder) attribute);
 		}
 	}
 

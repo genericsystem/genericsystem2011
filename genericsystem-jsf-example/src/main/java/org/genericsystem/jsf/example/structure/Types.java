@@ -6,10 +6,14 @@ import org.genericsystem.core.GenericImpl;
 public class Types {
 	@SystemGeneric
 	public static class Cars extends GenericImpl {
-
 	}
 
 	@SystemGeneric
 	public static class Colors extends GenericImpl {
 	}
+
+	@SystemGeneric
+	public static class Times extends GenericImpl {
+	}
+
 }
