@@ -60,7 +60,6 @@ public class InitializationScript implements Extension {
 		myBemo.setValue(fuelTank, 400);
 		myBemo.bind(carColorRelation, green);
 
-		log.info("testCommit");
 		cache.flush();
 	}
 }
