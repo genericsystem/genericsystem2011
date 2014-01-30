@@ -62,7 +62,8 @@ public class CancelClearTest extends AbstractTest {
 		Type car = vehicle.addSubType("Car");
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancelAll(vehiclePower, Statics.STRUCTURAL);
-		assert car.getHolder(vehiclePower) == null : car.getValue(vehiclePower);
+		assert car.getHolder(vehiclePower) == vehicle233 : car.getValue(vehiclePower);
+		assert car.getAttributes(vehiclePower).get(0).getValue() == null : car.getValue(vehiclePower);
 	}
 
 	public void testClearAttribute() {
