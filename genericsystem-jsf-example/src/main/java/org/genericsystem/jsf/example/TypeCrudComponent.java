@@ -125,7 +125,10 @@ public class TypeCrudComponent {
 		}
 
 		public String getColumnTitleAttribute() {
-			return Objects.toString(attribute);
+			if (!this.attribute.isRelation())
+				return Objects.toString(this.attribute);
+			else
+				return Objects.toString(type.<Type> getOtherTargets(attribute).get(0).<Class<?>> getValue().getSimpleName());
 		}
 
 		public String getNewAttributeValue() {
@@ -177,7 +180,6 @@ public class TypeCrudComponent {
 				return instance.getHolders(attribute).project(new Projector<String, Holder>() {
 					@Override
 					public String project(Holder link) {
-						// TODO KK relation ternary !!!!
 						return instance.getOtherTargets(link).get(0).getValue();
 					}
 				});

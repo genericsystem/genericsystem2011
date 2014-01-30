@@ -12,8 +12,4 @@ public class Types {
 	public static class Colors extends GenericImpl {
 	}
 
-	@SystemGeneric
-	public static class Times extends GenericImpl {
-	}
-
 }
