@@ -11,8 +11,9 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.jsf.example.structure.Attributes.FuelTank;
 import org.genericsystem.jsf.example.structure.Attributes.Power;
-import org.genericsystem.jsf.example.structure.Attributes.Power2;
+import org.genericsystem.jsf.example.structure.Attributes.Price;
 import org.genericsystem.jsf.example.structure.Relations.CarColorRelation;
 import org.genericsystem.jsf.example.structure.Types.Cars;
 import org.genericsystem.jsf.example.structure.Types.Colors;
@@ -36,18 +37,28 @@ public class InitializationScript implements Extension {
 
 		Type cars = cache.find(Cars.class);
 		Attribute power = cache.find(Power.class);
-		Attribute power2 = cache.find(Power2.class);
+		Attribute price = cache.find(Price.class);
+		Attribute fuelTank = cache.find(FuelTank.class);
 		Generic myBmw = cars.setInstance("myBmw");
 		Generic myAudi = cars.setInstance("myAudi");
+		Generic myBemo = cars.setInstance("myBemo");
 
 		Relation carColorRelation = cache.find(CarColorRelation.class);
 
 		myBmw.setValue(power, 123);
-		myBmw.setValue(power2, 1234);
-		myBmw.setLink(carColorRelation, "myBmwRed", red);
+		myBmw.setValue(price, 12345);
+		myBmw.setValue(fuelTank, 500);
+		myBmw.bind(carColorRelation, red);
+
 		myAudi.setValue(power, 321);
-		myAudi.setValue(power2, 4321);
-		myAudi.setLink(carColorRelation, "myAudiBlue", blue);
+		myAudi.setValue(price, 43212);
+		myAudi.setValue(fuelTank, 700);
+		myAudi.bind(carColorRelation, blue);
+
+		myBemo.setValue(power, 288);
+		myBemo.setValue(price, 30654);
+		myBemo.setValue(fuelTank, 400);
+		myBemo.bind(carColorRelation, green);
 
 		cache.flush();
 	}

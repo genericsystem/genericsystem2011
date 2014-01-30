@@ -10,11 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
-import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Relation;
-import org.genericsystem.jsf.example.structure.Attributes.Power;
-import org.genericsystem.jsf.example.structure.Attributes.Power2;
-import org.genericsystem.jsf.example.structure.Relations.CarColorRelation;
 import org.genericsystem.jsf.example.structure.Types.Cars;
 import org.genericsystem.jsf.example.structure.Types.Colors;
 import org.slf4j.Logger;
@@ -35,11 +30,10 @@ public class ComponentsManager implements Serializable {
 
 	@PostConstruct
 	public void init() {
-		components = Arrays.asList(new CarCrudComponent(cache.<Cars> find(Cars.class), cache.<Attribute> find(Power.class), cache.<Attribute> find(Power2.class), cache.<Relation> find(CarColorRelation.class)),
-				new TypeCrudComponent(cache.<Colors> find(Colors.class)));
+		components = Arrays.asList(new TypeCrudComponent(cache.<Cars> find(Cars.class)), new TypeCrudComponent(cache.<Colors> find(Colors.class)));
 	}
 
-	List<TypeCrudComponent> getComponents() {
+	public List<TypeCrudComponent> getComponents() {
 		return components;
 	}
 }

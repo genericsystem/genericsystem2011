@@ -24,7 +24,7 @@ public class EngineProvider {
 	private UserClassesProvider userClassesProvider;
 
 	@Inject
-	private PersistentDirectoryProvider persistentDirectoryProvider;
+	PersitentDirectoryProvider persistentDirectoryProvider;
 
 	@Inject
 	CdiFactory factory;
