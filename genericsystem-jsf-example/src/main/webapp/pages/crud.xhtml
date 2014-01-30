@@ -2,10 +2,58 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:hendrik="http://java.sun.com/jsf/composite/composites">
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
 
-	<hendrik:crudComposite 
-		component="#{component}"
-	/>	
+	<h:messages />
+	<h:dataTable value="#{component.instanceRows}" var="row"
+		styleClass="order-table" headerClass="order-table-header"
+		rowClasses="order-table-odd-row,order-table-even-row">
+		<f:facet name="header">
+			<h:outputText value="#{component.nameManagement}" />
+		</f:facet>
+		<h:column>
+			<f:facet name="header">
+				<h:outputText value="#{component.value}" />
+			</f:facet>
+			<h:outputText value="#{row.value}" />
+			<f:facet name="footer">
+				<h:inputText value="#{component.addInstanceValue}" />
+			</f:facet>
+		</h:column>
+		<c:forEach items="#{component.attributeWrappers}" var="att">
+			<h:column>
+				<f:facet name="header">
+					<h:outputText value="#{att.columnTitleAttribute}" />
+				</f:facet>
+				<h:dataTable value="#{row.getAttributeValues(att.attribute)}"
+					var="value">
+					<h:column>
+						<h:outputText value="#{value}" />
+					</h:column>
+				</h:dataTable>
+				<f:facet name="footer">
+					<h:panelGroup>
+						<h:inputText rendered="#{!att.relation}"
+							value="#{att.newAttributeValue}" />
+						<h:selectOneMenu rendered="#{att.relation}"
+							value="#{att.newTargetValue}">
+							<f:selectItems value="#{att.targetInstanceRows}" var="targetRow"
+								itemValue="#{targetRow.value}" itemLabel="#{targetRow.value}" />
+						</h:selectOneMenu>
+					</h:panelGroup>
+				</f:facet>
+			</h:column>
+		</c:forEach>
+		<h:column>
+			<h:commandLink value="#{component.removeMsg}"
+				action="#{component.remove(row)}" />
+			<f:facet name="footer">
+				<h:commandButton value="#{component.addMsg}"
+					action="#{component.add}" />
+			</f:facet>
+		</h:column>
+	</h:dataTable>
+
+
 </ui:composition>
