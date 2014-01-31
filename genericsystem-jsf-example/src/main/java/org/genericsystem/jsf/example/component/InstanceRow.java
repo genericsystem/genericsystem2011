@@ -1,4 +1,4 @@
-package org.genericsystem.jsf.example;
+package org.genericsystem.jsf.example.component;
 
 import java.util.List;
 import java.util.Objects;

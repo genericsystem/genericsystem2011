@@ -8,7 +8,6 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
-import org.genericsystem.jsf.example.InstanceRow;
 
 public class AttributeComponent extends AbstractComponent {
 	private final Attribute attribute;
