@@ -1,4 +1,4 @@
-package org.genericsystem.jsf.example;
+package org.genericsystem.jsf.example.component;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +8,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
-import org.genericsystem.jsf.AbstractComponent;
+import org.genericsystem.jsf.example.InstanceRow;
 
 public class AttributeComponent extends AbstractComponent {
 	private final Attribute attribute;

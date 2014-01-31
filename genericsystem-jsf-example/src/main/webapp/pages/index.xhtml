@@ -12,7 +12,7 @@
 
 	<ui:define name="content">
 		<h:messages />
-		<c:forEach items="#{componentsManager.components}" var="component">
+		<c:forEach items="#{rootComponent.children}" var="component">
 			<ui:include src="#{component.xhtmlPath}"/>
 		</c:forEach>
 	</ui:define>

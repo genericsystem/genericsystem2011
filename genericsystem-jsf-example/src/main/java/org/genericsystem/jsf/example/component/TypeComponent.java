@@ -1,4 +1,4 @@
-package org.genericsystem.jsf.example;
+package org.genericsystem.jsf.example.component;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.jsf.AbstractComponent;
+import org.genericsystem.jsf.example.InstanceRow;
 import org.genericsystem.jsf.example.structure.Attributes;
 import org.genericsystem.jsf.example.structure.Relations;
 
