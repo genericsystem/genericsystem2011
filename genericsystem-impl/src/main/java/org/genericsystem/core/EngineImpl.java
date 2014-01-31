@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
@@ -72,8 +73,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T buildComplex(Class<?> clazz, UnsafeVertex uVertex) {
-		return (T) ((GenericImpl) getFactory().newGeneric(clazz)).initialize(uVertex);
+	<T extends Generic> T build(Class<?> specializationClass, UnsafeVertex uVertex) {
+		return (T) ((GenericImpl) getFactory().newGeneric(((GenericImpl) uVertex.getMeta()).specializeInstanceClass(specializationClass))).initialize(uVertex);
 	}
 
 	@Override

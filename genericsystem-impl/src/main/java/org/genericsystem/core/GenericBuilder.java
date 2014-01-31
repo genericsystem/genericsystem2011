@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.core.Statics.OrderedDependencies;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.exception.ExistsException;
@@ -190,7 +191,7 @@ class GenericBuilder {
 
 	private <T extends Generic> T buildDependency(Class<?> specializationClass, boolean automatic) {
 		CacheImpl cache = getCurrentCache();
-		return cache.<T> insert(cache.<EngineImpl> getEngine().buildComplex(((GenericImpl) uVertex.getMeta()).specializeInstanceClass(specializationClass), uVertex), automatic);
+		return cache.<T> insert(cache.<EngineImpl> getEngine().build(((GenericImpl) uVertex.getMeta()).specializeInstanceClass(specializationClass), uVertex), automatic);
 	}
 
 	<T extends Generic> T internalBind(final Class<?> specializationClass, boolean existsException, final boolean automatic) throws RollbackException {
