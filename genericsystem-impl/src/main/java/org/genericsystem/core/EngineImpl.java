@@ -224,8 +224,12 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		private boolean startupTime = true;
 
+		public SystemCache() {
+			put(EngineImpl.class, EngineImpl.this);
+		}
+
 		SystemCache init(Class<?>... userClasses) {
-			List<Class<?>> classes = Arrays.<Class<?>> asList(EngineImpl.class, MetaAttribute.class, MetaRelation.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
+			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
 			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				get(clazz);

@@ -6,12 +6,15 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.core.UnsafeGList.UnsafeComponents;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractWriter {
 
-	// protected static Logger log = LoggerFactory.getLogger(AbstractWriter.class);
+	protected static Logger log = LoggerFactory.getLogger(AbstractWriter.class);
 
 	public abstract ObjectOutputStream getFormalOutputStream();
 
@@ -73,7 +76,7 @@ public abstract class AbstractWriter {
 			if (null == homeTreeNode) {
 				long metaTs = getContentInputStream().readLong();
 				homeTreeNode = ((GenericImpl) engine).homeTreeNode().ts == metaTs ? ((GenericImpl) engine).homeTreeNode() : homeTreeMap.get(metaTs);
-				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, (Serializable) getContentInputStream().readObject());
+				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, getClassValue());
 			}
 			Generic meta = loadAncestor(engine, getContentInputStream().readLong(), genericMap);
 			assert meta != null;
@@ -86,6 +89,15 @@ public abstract class AbstractWriter {
 				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode());
 			genericMap.put(ts[0], generic);
 			return generic;
+		}
+
+		private Serializable getClassValue() throws IOException {
+			try {
+				return (Serializable) getContentInputStream().readObject();
+			} catch (ClassNotFoundException e) {
+				log.warn("ClassNotFoundException " + e.getMessage(), e.getException());
+			}
+			return null;
 		}
 
 		protected long[] loadTs() throws IOException {

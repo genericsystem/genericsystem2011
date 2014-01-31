@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.genericsystem.core.Statics.OrderedDependencies;
+import org.genericsystem.core.Statics.OrderedSupers;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
@@ -45,30 +46,6 @@ class GenericBuilder {
 
 	private boolean isProperty() {
 		return isProperty != null ? isProperty : (isProperty = ((GenericImpl) uVertex.getMeta()).isPropertyConstraintEnabled());
-	}
-
-	private Generic getExtendedMeta(final boolean respectSupers) {
-		Generic meta = respectSupers ? uVertex.getMeta() : findMetaInSupers(uVertex.getMeta(), new Generic[] { uVertex.getMeta().getEngine() });
-		return getExtendedMeta(meta);
-	}
-
-	private Generic findMetaInSupers(Generic meta, Generic[] result) {
-		for (Generic strictSuper : meta.getStrictSupers())
-			if (((GenericImpl) strictSuper).isSuperOf(uVertex) || isExtentedBy(strictSuper))
-				if (strictSuper.inheritsFrom(result[0]))
-					result[0] = strictSuper;
-				else
-					assert result[0] == null || result[0].inheritsFrom(strictSuper);
-			else
-				findMetaInSupers(strictSuper, result);
-		return result[0];
-	}
-
-	private Generic getExtendedMeta(Generic meta) {
-		for (Generic candidate : ((GenericImpl) meta).getInheritings())
-			if (((GenericImpl) candidate).isSuperOf(uVertex) || isExtentedBy(candidate))
-				return getExtendedMeta(candidate);
-		return meta;
 	}
 
 	// private Generic getExtendedMeta(final boolean respectSupers) {
@@ -144,7 +121,63 @@ class GenericBuilder {
 		Set<Generic> set = new TreeSet<>();
 		while (iterator.hasNext())
 			set.add(iterator.next());
-		return new Supers(set);
+		Supers supers = new Supers(set);
+		Supers supers2 = getExtendedStrictSupers2(respectSupers).toSupers();
+		// assert supers.equals(supers2) : respectSupers + " " + uVertex.strictSupers() + " : " + supers + " / " + supers2;// + " " + supers2.get(0).info();
+		return supers2;
+	}
+
+	private Generic getExtendedMeta(final boolean respectSupers) {
+		Generic meta = respectSupers ? uVertex.getMeta() : findMetaInSupers(uVertex.getMeta(), new Generic[] { uVertex.getMeta().getEngine() });
+		return getExtendedMeta(meta);
+	}
+
+	private Generic findMetaInSupers(Generic meta, Generic[] result) {
+		for (Generic strictSuper : meta.getStrictSupers())
+			if (((GenericImpl) strictSuper).isSuperOf(uVertex) || isExtentedBy(strictSuper))
+				if (strictSuper.inheritsFrom(result[0]))
+					result[0] = strictSuper;
+				else
+					assert result[0] == null || result[0].inheritsFrom(strictSuper);
+			else
+				findMetaInSupers(strictSuper, result);
+		return result[0];
+	}
+
+	private Generic getExtendedMeta(Generic meta) {
+		for (Generic candidate : ((GenericImpl) meta).getInheritings())
+			if (((GenericImpl) candidate).isSuperOf(uVertex) || isExtentedBy(candidate))
+				return getExtendedMeta(candidate);
+		return meta;
+	}
+
+	private OrderedSupers getExtendedStrictSupers2(final boolean respectSupers) {
+		OrderedSupers orderedSupers = respectSupers ? new OrderedSupers(uVertex.strictSupers()/* uVertex.getMeta().getEngine() */) : findExtendedStrictSupers(uVertex.strictSupers(), new OrderedSupers());
+		return getExtendedStrictSupers(orderedSupers);
+	}
+
+	private OrderedSupers findExtendedStrictSupers(Supers strictSupers, OrderedSupers result) {
+		for (Generic strictSuper : strictSupers)
+			if (((GenericImpl) strictSuper).isSuperOf(uVertex) || isExtentedBy(strictSuper))
+				result.add(strictSuper);
+			else
+				findExtendedStrictSupers(((GenericImpl) strictSuper).getStrictSupers(), result);
+		return result;
+	}
+
+	private OrderedSupers getExtendedStrictSupers(OrderedSupers orderedSupers) {
+		for (Generic orderedSuper : orderedSupers)
+			getExtendedStrictSupers(orderedSuper, orderedSupers);
+		return orderedSupers;
+	}
+
+	private OrderedSupers getExtendedStrictSupers(Generic orderedSuper, OrderedSupers orderedSupers) {
+		for (Generic inheriting : orderedSuper.getInheritings())
+			if (((GenericImpl) inheriting).isSuperOf(uVertex) || isExtentedBy(inheriting)) {
+				orderedSupers.add(inheriting);
+				return getExtendedStrictSupers(inheriting, orderedSupers);
+			}
+		return orderedSupers;
 	}
 
 	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {

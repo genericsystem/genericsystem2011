@@ -39,14 +39,15 @@ public class PersistenceTest2 extends AbstractTest {
 	}
 
 	public void testType() {
-		String path = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
-		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path, Vehicle.class).start();
-		GenericImpl vehicle = ((EngineImpl) cache.getEngine()).find(Vehicle.class);
-		cache.getEngine().close();
-		Cache cache2 = GenericSystem.newCacheOnANewPersistentEngine(path, Vehicle.class).start();
-		GenericImpl vehicle2 = cache2.getType(Vehicle.class);
-		assert vehicle.getEngine() != vehicle2.getEngine();
-		assert vehicle.getDesignTs() == vehicle2.getDesignTs() : vehicle.info() + vehicle2.info();
+		String path = System.getenv("HOME") + "/test/snapshot_save";// + new Random().nextInt();
+		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path).start();
+		log.info("" + cache.getAllTypes());
+		// GenericImpl vehicle = ((EngineImpl) cache.getEngine()).find(Vehicle.class);
+		// cache.getEngine().close();
+		// Cache cache2 = GenericSystem.newCacheOnANewPersistentEngine(path, Vehicle.class).start();
+		// GenericImpl vehicle2 = cache2.getType(Vehicle.class);
+		// assert vehicle.getEngine() != vehicle2.getEngine();
+		// assert vehicle.getDesignTs() == vehicle2.getDesignTs() : vehicle.info() + vehicle2.info();
 	}
 
 	public void testTypeWithValue() {
@@ -59,10 +60,10 @@ public class PersistenceTest2 extends AbstractTest {
 		assert car.getDesignTs() == car2.getDesignTs() : car.info() + car2.info();
 	}
 
-	@SystemGeneric
-	public static class Vehicle {
-
-	}
+	// @SystemGeneric
+	// public static class Vehicle {
+	//
+	// }
 
 	@SystemGeneric
 	@StringValue("Car")

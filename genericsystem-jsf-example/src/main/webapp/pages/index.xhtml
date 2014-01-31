@@ -12,6 +12,8 @@
 
 	<ui:define name="content">
 		<h:messages />
-		<ui:include src="#{rootComponent.child.xhtmlPath}" />
+		<c:forEach items="#{rootComponent.children}" var="component">
+			<ui:include src="#{component.xhtmlPath}"/>
+		</c:forEach>
 	</ui:define>
 </ui:composition>
