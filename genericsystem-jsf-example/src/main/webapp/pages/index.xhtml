@@ -10,12 +10,10 @@
 		<title>JSF Example Use Case</title>
 	</ui:define>
 
-	<ui:define name="content">	
-		<c:forEach items="#{componentsManager.components}" var="child">
-			<ui:include src="#{child.xhtmlPath}">
-				<ui:param name="component" value="#{child}" />
-			</ui:include>
+	<ui:define name="content">
+		<h:messages />
+		<c:forEach items="#{componentsManager.components}" var="component">
+			<ui:include src="#{component.xhtmlPath}"/>
 		</c:forEach>
-
 	</ui:define>
 </ui:composition>

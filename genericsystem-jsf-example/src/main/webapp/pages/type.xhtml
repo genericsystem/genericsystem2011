@@ -5,7 +5,6 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
-	<h:messages />
 	<h:dataTable value="#{component.instanceRows}" var="row"
 		styleClass="order-table" headerClass="order-table-header"
 		rowClasses="order-table-odd-row,order-table-even-row">
@@ -21,30 +20,11 @@
 				<h:inputText value="#{component.addInstanceValue}" />
 			</f:facet>
 		</h:column>
-		<c:forEach items="#{component.attributeWrappers}" var="att">
-			<h:column>
-				<f:facet name="header">
-					<h:outputText value="#{att.columnTitleAttribute}" />
-				</f:facet>
-				<h:dataTable value="#{row.getAttributeValues(att.attribute)}"
-					var="value">
-					<h:column>
-						<h:outputText value="#{value}" />
-					</h:column>
-				</h:dataTable>
-				<f:facet name="footer">
-					<h:panelGroup>
-						<h:inputText rendered="#{!att.relation}"
-							value="#{att.newAttributeValue}" />
-						<h:selectOneMenu rendered="#{att.relation}"
-							value="#{att.newTargetValue}">
-							<f:selectItems value="#{att.targetInstanceRows}" var="targetRow"
-								itemValue="#{targetRow.value}" itemLabel="#{targetRow.value}" />
-						</h:selectOneMenu>
-					</h:panelGroup>
-				</f:facet>
-			</h:column>
+
+		<c:forEach items="#{component.children}" var="component">
+			<ui:include src="#{component.xhtmlPath}"/>
 		</c:forEach>
+
 		<h:column>
 			<h:commandLink value="#{component.removeMsg}"
 				action="#{component.remove(row)}" />
@@ -54,6 +34,5 @@
 			</f:facet>
 		</h:column>
 	</h:dataTable>
-
 
 </ui:composition>

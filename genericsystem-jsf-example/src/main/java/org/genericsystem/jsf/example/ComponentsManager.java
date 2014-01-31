@@ -26,14 +26,14 @@ public class ComponentsManager implements Serializable {
 	@Inject
 	private Cache cache;
 
-	private List<TypeCrudComponent> components;
+	private List<TypeComponent> components;
 
 	@PostConstruct
 	public void init() {
-		components = Arrays.asList(new TypeCrudComponent(cache.<Cars> find(Cars.class)), new TypeCrudComponent(cache.<Colors> find(Colors.class)));
+		components = Arrays.asList(new TypeComponent(cache.<Cars> find(Cars.class)), new TypeComponent(cache.<Colors> find(Colors.class)));
 	}
 
-	public List<TypeCrudComponent> getComponents() {
+	public List<TypeComponent> getComponents() {
 		return components;
 	}
 }
