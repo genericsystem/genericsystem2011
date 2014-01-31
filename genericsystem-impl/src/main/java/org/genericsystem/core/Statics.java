@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.iterator.AbstractFilterIterator;
@@ -204,7 +205,8 @@ public class Statics {
 
 		private static final long serialVersionUID = 5132361685064649558L;
 
-		private Flag() {}
+		private Flag() {
+		}
 
 		@Override
 		public String toString() {
@@ -276,6 +278,13 @@ public class Statics {
 
 	public static class OrderedSupers extends TreeSet<Generic> {
 		private static final long serialVersionUID = 4756135385933890439L;
+
+		public OrderedSupers() {
+		}
+
+		public OrderedSupers(Generic add) {
+			add(add);
+		}
 
 		public OrderedSupers(UnsafeGList supers) {
 			for (Generic superGeneric : supers)

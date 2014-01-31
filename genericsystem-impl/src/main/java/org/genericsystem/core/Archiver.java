@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
 import org.genericsystem.core.AbstractWriter.AbstractLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,7 +231,8 @@ public class Archiver {
 				engine = restoreEngine(homeTreeMap, genericMap);
 				for (;;)
 					loadGeneric(engine, homeTreeMap, genericMap);
-			} catch (EOFException ignore) {} catch (Exception e) {
+			} catch (EOFException ignore) {
+			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
