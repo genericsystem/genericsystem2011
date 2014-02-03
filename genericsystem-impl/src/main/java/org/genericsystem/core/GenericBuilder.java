@@ -95,19 +95,22 @@ class GenericBuilder {
 	}
 
 	private Supers findStrictSupersBeyond(final boolean respectSupers) {
-		OrderedSupers orderedSupers = respectSupers ? new OrderedSupers(uVertex.strictSupers()) : findStrictSupersAbove(uVertex.strictSupers(), new OrderedSupers());
-		for (Generic orderedSuper : orderedSupers)
+		Supers supers = uVertex.strictSupers();
+		OrderedSupers orderedSupers = new OrderedSupers(supers);
+		if (!respectSupers)
+			findStrictSupersAbove(supers, orderedSupers);
+		supers = orderedSupers.toSupers();
+		for (Generic orderedSuper : supers)
 			findStrictSupersBeyond(orderedSuper, orderedSupers);
 		return orderedSupers.toSupers();
 	}
 
-	private OrderedSupers findStrictSupersAbove(Supers strictSupers, OrderedSupers result) {
+	private void findStrictSupersAbove(Supers strictSupers, OrderedSupers result) {
 		for (Generic strictSuper : strictSupers)
 			if (((GenericImpl) strictSuper).isSuperOf(uVertex) || isExtentedBy(strictSuper))
 				result.add(strictSuper);
 			else
 				findStrictSupersAbove(((GenericImpl) strictSuper).getStrictSupers(), result);
-		return result;
 	}
 
 	private void findStrictSupersBeyond(Generic orderedSuper, OrderedSupers orderedSupers) {
