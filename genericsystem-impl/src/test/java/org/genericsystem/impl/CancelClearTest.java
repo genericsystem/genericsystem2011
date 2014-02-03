@@ -99,7 +99,7 @@ public class CancelClearTest extends AbstractTest {
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancel(vehiclePower, Statics.STRUCTURAL);
 		car.clear(vehiclePower, Statics.STRUCTURAL);
-		assert car.getValue(vehiclePower) == null : car.getHolder(vehiclePower);
+		assert car.getHolder(vehiclePower) == vehicle233 : car.getHolder(vehiclePower);
 	}
 
 	public void testClearAllValue() {
@@ -123,7 +123,7 @@ public class CancelClearTest extends AbstractTest {
 		assert car.getHolder(vehiclePower).equals(vehicle233) : car.getHolder(vehiclePower);
 		car.cancelAll(vehiclePower, Statics.STRUCTURAL);
 		car.clearAll(vehiclePower, Statics.STRUCTURAL);
-		assert car.getValue(vehiclePower) == null : car.getHolder(vehiclePower);
+		assert car.getHolder(vehiclePower) == vehicle233 : car.getHolder(vehiclePower);
 	}
 
 }
