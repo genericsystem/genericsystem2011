@@ -11,7 +11,6 @@ import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.jsf.example.InstanceRow;
 import org.genericsystem.jsf.example.structure.Attributes;
 import org.genericsystem.jsf.example.structure.Relations;
 
@@ -65,12 +64,12 @@ public class TypeComponent extends AbstractComponent {
 		return null;
 	}
 
-	public List<InstanceRow> getInstanceRows() {
-		return type.getAllInstances().<InstanceRow> project(new Projector<InstanceRow, Generic>() {
+	public List<InstanceRowComponent> getInstanceRows() {
+		return type.getAllInstances().<InstanceRowComponent> project(new Projector<InstanceRowComponent, Generic>() {
 
 			@Override
-			public InstanceRow project(Generic instance) {
-				return new InstanceRow(instance);
+			public InstanceRowComponent project(Generic instance) {
+				return new InstanceRowComponent(instance);
 			}
 		});
 
@@ -84,7 +83,7 @@ public class TypeComponent extends AbstractComponent {
 		return Objects.toString(type.<Class<?>> getValue().getSimpleName());
 	}
 
-	public void remove(InstanceRow instanceRow) {
+	public void remove(InstanceRowComponent instanceRow) {
 		instanceRow.getInstance().remove();
 	}
 

@@ -8,7 +8,6 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
-import org.genericsystem.jsf.example.InstanceRow;
 
 public class AttributeComponent extends AbstractComponent {
 	private final Attribute attribute;
@@ -26,12 +25,12 @@ public class AttributeComponent extends AbstractComponent {
 		return Collections.emptyList();
 	}
 
-	public List<InstanceRow> getTargetInstanceRows() {
-		return (this.<TypeComponent> getParent()).getType().<Type> getOtherTargets(attribute).get(0).getAllInstances().<InstanceRow> project(new Projector<InstanceRow, Generic>() {
+	public List<InstanceRowComponent> getTargetInstanceRows() {
+		return (this.<TypeComponent> getParent()).getType().<Type> getOtherTargets(attribute).get(0).getAllInstances().<InstanceRowComponent> project(new Projector<InstanceRowComponent, Generic>() {
 
 			@Override
-			public InstanceRow project(Generic instance) {
-				return new InstanceRow(instance);
+			public InstanceRowComponent project(Generic instance) {
+				return new InstanceRowComponent(instance);
 			}
 
 		});
