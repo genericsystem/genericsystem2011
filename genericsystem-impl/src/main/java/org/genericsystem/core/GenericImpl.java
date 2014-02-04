@@ -994,9 +994,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return true;
 		if (!subUVertex.homeTreeNode().inheritsFrom(homeTreeNode()))
 			return false;
-		for (Generic superGeneric : getSupers())
-			if (!((GenericImpl) superGeneric).isSuperOf(subUVertex))
-				return false;
+		// for (Generic superGeneric : getSupers())
+		// if (!((GenericImpl) superGeneric).isSuperOf(subUVertex))
+		// return false;
 		if (subUVertex.components().size() > getComponents().size()) {
 			for (int i = 0; i < subUVertex.components().size(); i++)
 				if (isSuperOf(subUVertex.truncateComponent(i)))
@@ -1027,9 +1027,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return true;
 		if (!subUVertex.homeTreeNode().inheritsFrom(superUVertex.homeTreeNode()))
 			return false;
-		for (Generic superGeneric : superUVertex.supers())
-			if (!((GenericImpl) superGeneric).isSuperOf(subUVertex))
-				return false;
+		// for (Generic superGeneric : superUVertex.supers())
+		// if (!((GenericImpl) superGeneric).isSuperOf(subUVertex))
+		// return false;
 		if (subUVertex.components().size() > superUVertex.components().size()) {
 			for (int i = 0; i < subUVertex.components().size(); i++)
 				if (isSuperOf(superUVertex, subUVertex.truncateComponent(i)))
