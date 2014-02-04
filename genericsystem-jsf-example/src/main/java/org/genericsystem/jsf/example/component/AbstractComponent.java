@@ -9,11 +9,12 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractComponent {
 	protected static Logger log = LoggerFactory.getLogger(AbstractComponent.class);
 
-	private final AbstractComponent parent;
+	protected AbstractComponent parent;
 	protected List<? extends AbstractComponent> children;
+	protected AbstractComponent child;
 
 	public AbstractComponent() {
-		this.parent = null;
+		this(null);
 	}
 
 	public AbstractComponent(AbstractComponent parent) {
@@ -41,4 +42,9 @@ public abstract class AbstractComponent {
 	public Cache getCache() {
 		return getRoot().getCache();
 	}
+
+	public AbstractComponent getChild() {
+		return child;
+	}
+
 }

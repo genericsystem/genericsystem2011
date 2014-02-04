@@ -1,4 +1,4 @@
-package org.genericsystem.jsf.example;
+package org.genericsystem.jsf.example.component;
 
 import java.util.List;
 import java.util.Objects;
@@ -8,10 +8,10 @@ import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 
-public class InstanceRow {
+public class InstanceRowComponent {
 	private final Generic instance;
 
-	public InstanceRow(Generic instance) {
+	public InstanceRowComponent(Generic instance) {
 		this.instance = instance;
 	}
 
