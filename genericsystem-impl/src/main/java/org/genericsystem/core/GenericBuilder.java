@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.genericsystem.core.Statics.OrderedDependencies;
 import org.genericsystem.core.Statics.OrderedSupers;
 import org.genericsystem.core.UnsafeGList.Supers;
@@ -26,49 +25,30 @@ class GenericBuilder {
 	protected static Logger log = LoggerFactory.getLogger(GenericBuilder.class);
 
 	private UnsafeVertex uVertex;
-	private Boolean isStrongSingular[];
-	private Boolean isProperty;// TODO KK change for strongProperty ?
+	private HardProperties hardProperties;
 
 	GenericBuilder(UnsafeVertex uVertex, boolean respectSupers) {
 		assert uVertex.getMeta().isMeta() || uVertex.getMeta().isStructural();
-		int dim = uVertex.components().size();
 		this.uVertex = uVertex;
-		isStrongSingular = new Boolean[dim];
-		this.uVertex = new UnsafeVertex(uVertex.homeTreeNode(), getExtendedMeta(respectSupers), getExtendedDirectSupers(respectSupers), getExtendedStrictSupers(respectSupers), uVertex.components());
+		hardProperties = new HardProperties();
+		this.uVertex = new UnsafeVertex(uVertex.homeTreeNode(), getExtendedMeta(respectSupers), getExtendedDirectSupers(respectSupers), findStrictSupersBeyond(respectSupers), uVertex.components());
 		assert uVertex.getMeta().isMeta() || uVertex.getMeta().isStructural();
 	}
 
-	private boolean isStrongSingular(int i) {
-		if (isStrongSingular[i] == null)
-			isStrongSingular[i] = ((GenericImpl) uVertex.getMeta()).isSingularConstraintEnabled(i) && !((GenericImpl) uVertex.getMeta()).isReferentialIntegrity(i);
-		return isStrongSingular[i];
-	}
+	private class HardProperties {
+		private Boolean isStrongSingular[] = new Boolean[uVertex.components().size()];
+		private Boolean isProperty;// TODO KK change for strongProperty ?
 
-	private boolean isProperty() {
-		return isProperty != null ? isProperty : (isProperty = ((GenericImpl) uVertex.getMeta()).isPropertyConstraintEnabled());
-	}
+		private boolean isStrongSingular(int i) {
+			if (isStrongSingular[i] == null)
+				isStrongSingular[i] = ((GenericImpl) uVertex.getMeta()).isSingularConstraintEnabled(i) && !((GenericImpl) uVertex.getMeta()).isReferentialIntegrity(i);
+			return isStrongSingular[i];
+		}
 
-	// private Generic getExtendedMeta(final boolean respectSupers) {
-	// final Generic root = respectSupers ? ((GenericImpl) uVertex.getMeta()) : ((GenericImpl) uVertex.getMeta()).getEngine();
-	// Iterator<Generic> iterator = new AbstractSelectableLeafIterator(root) {
-	// @Override
-	// protected Iterator<Generic> children(final Generic father) {
-	// return new AbstractFilterIterator<Generic>(((GenericImpl) father).inheritingsIterator()) {
-	// @Override
-	// public boolean isSelected() {
-	// // log.info(next.info() + " : " + (((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next)));
-	// return ((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next);
-	// }
-	// };
-	// }
-	//
-	// @Override
-	// public boolean isSelected(Generic candidate) {
-	// return false;
-	// }
-	// };
-	// return iterator.next();
-	// }
+		private boolean isProperty() {
+			return isProperty != null ? isProperty : (isProperty = ((GenericImpl) uVertex.getMeta()).isPropertyConstraintEnabled());
+		}
+	}
 
 	private Supers getExtendedDirectSupers(final boolean respectSupers) {
 		final Engine engine = ((GenericImpl) uVertex.getMeta()).getEngine();
@@ -90,49 +70,12 @@ class GenericBuilder {
 		return new Supers(set);
 	}
 
-	private Supers getExtendedStrictSupers(final boolean respectSupers) {
-		final Engine engine = ((GenericImpl) uVertex.getMeta()).getEngine();
-		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
-			{
-				if (respectSupers && !uVertex.supers().iterator().next().equals(engine))
-					iterators.put(engine, new SelectableIterator<>(uVertex.supers().iterator()));
-			}
-
-			@Override
-			protected Iterator<Generic> children(final Generic father) {
-				return new AbstractFilterIterator<Generic>(((GenericImpl) father).inheritingsIterator()) {
-					@Override
-					public boolean isSelected() {
-						return ((GenericImpl) next).isSuperOf(uVertex) || isExtentedBy(next);
-					}
-				};
-			}
-
-			@Override
-			public boolean isSelected(Generic candidate) {
-				return false;
-			}
-
-			@Override
-			protected boolean isSelectable() {
-				return next.getMetaLevel() == uVertex.metaLevel();
-			}
-		};
-		Set<Generic> set = new TreeSet<>();
-		while (iterator.hasNext())
-			set.add(iterator.next());
-		Supers supers = new Supers(set);
-		Supers supers2 = getExtendedStrictSupers2(respectSupers).toSupers();
-		// assert supers.equals(supers2) : respectSupers + " " + uVertex.strictSupers() + " : " + supers + " / " + supers2;// + " " + supers2.get(0).info();
-		return supers2;
-	}
-
 	private Generic getExtendedMeta(final boolean respectSupers) {
-		Generic meta = respectSupers ? uVertex.getMeta() : findMetaInSupers(uVertex.getMeta(), new Generic[] { uVertex.getMeta().getEngine() });
+		Generic meta = respectSupers ? uVertex.getMeta() : findMetaAbove(uVertex.getMeta(), new Generic[] { uVertex.getMeta().getEngine() });
 		return getExtendedMeta(meta);
 	}
 
-	private Generic findMetaInSupers(Generic meta, Generic[] result) {
+	private Generic findMetaAbove(Generic meta, Generic[] result) {
 		for (Generic strictSuper : meta.getStrictSupers())
 			if (((GenericImpl) strictSuper).isSuperOf(uVertex) || isExtentedBy(strictSuper))
 				if (strictSuper.inheritsFrom(result[0]))
@@ -140,7 +83,7 @@ class GenericBuilder {
 				else
 					assert result[0] == null || result[0].inheritsFrom(strictSuper);
 			else
-				findMetaInSupers(strictSuper, result);
+				findMetaAbove(strictSuper, result);
 		return result[0];
 	}
 
@@ -151,33 +94,32 @@ class GenericBuilder {
 		return meta;
 	}
 
-	private OrderedSupers getExtendedStrictSupers2(final boolean respectSupers) {
-		OrderedSupers orderedSupers = respectSupers ? new OrderedSupers(uVertex.strictSupers()/* uVertex.getMeta().getEngine() */) : findExtendedStrictSupers(uVertex.strictSupers(), new OrderedSupers());
-		return getExtendedStrictSupers(orderedSupers);
+	private Supers findStrictSupersBeyond(final boolean respectSupers) {
+		Supers supers = uVertex.strictSupers();
+		OrderedSupers orderedSupers = new OrderedSupers(supers);
+		if (!respectSupers)
+			findStrictSupersAbove(supers, orderedSupers);
+		supers = orderedSupers.toSupers();
+		for (Generic orderedSuper : supers)
+			findStrictSupersBeyond(orderedSuper, orderedSupers);
+		return orderedSupers.toSupers();
 	}
 
-	private OrderedSupers findExtendedStrictSupers(Supers strictSupers, OrderedSupers result) {
+	private void findStrictSupersAbove(Supers strictSupers, OrderedSupers result) {
 		for (Generic strictSuper : strictSupers)
 			if (((GenericImpl) strictSuper).isSuperOf(uVertex) || isExtentedBy(strictSuper))
 				result.add(strictSuper);
 			else
-				findExtendedStrictSupers(((GenericImpl) strictSuper).getStrictSupers(), result);
-		return result;
+				findStrictSupersAbove(((GenericImpl) strictSuper).getStrictSupers(), result);
 	}
 
-	private OrderedSupers getExtendedStrictSupers(OrderedSupers orderedSupers) {
-		for (Generic orderedSuper : orderedSupers)
-			getExtendedStrictSupers(orderedSuper, orderedSupers);
-		return orderedSupers;
-	}
-
-	private OrderedSupers getExtendedStrictSupers(Generic orderedSuper, OrderedSupers orderedSupers) {
+	private void findStrictSupersBeyond(Generic orderedSuper, OrderedSupers orderedSupers) {
 		for (Generic inheriting : orderedSuper.getInheritings())
 			if (((GenericImpl) inheriting).isSuperOf(uVertex) || isExtentedBy(inheriting)) {
 				orderedSupers.add(inheriting);
-				return getExtendedStrictSupers(inheriting, orderedSupers);
+				findStrictSupersBeyond(inheriting, orderedSupers);
+				return;
 			}
-		return orderedSupers;
 	}
 
 	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {
@@ -239,7 +181,7 @@ class GenericBuilder {
 				if (Statics.CONCRETE == uVertex.metaLevel())
 					for (int pos = 0; pos < uVertex.components().size(); pos++)
 						// TODO KK do not work for properties when dim > 1 !
-						if ((isProperty() || isStrongSingular(pos)) && (((GenericImpl) dependency).getComponent(pos)).equals(uVertex.components().get(pos))) {
+						if ((hardProperties.isProperty() || hardProperties.isStrongSingular(pos)) && (((GenericImpl) dependency).getComponent(pos)).equals(uVertex.components().get(pos))) {
 							assert old == null || old == dependency;
 							old = dependency;
 						}
@@ -284,11 +226,11 @@ class GenericBuilder {
 
 	private boolean isExtention(Generic candidate) {
 		if (Statics.CONCRETE == uVertex.metaLevel() && candidate.getMeta().equals((uVertex.getMeta()))) {
-			if (isProperty())
+			if (hardProperties.isProperty())
 				if (areComponentsInheriting((((GenericImpl) candidate).getComponents()), uVertex.components()))
 					return true;
 			for (int pos = 0; pos < ((GenericImpl) candidate).getComponents().size(); pos++)
-				if (isStrongSingular(pos))
+				if (hardProperties.isStrongSingular(pos))
 					if (((GenericImpl) candidate).getComponent(pos).inheritsFrom(uVertex.components().get(pos))) {
 						if (!((GenericImpl) candidate).getComponent(pos).equals(uVertex.components().get(pos)))
 							return true;
@@ -302,7 +244,7 @@ class GenericBuilder {
 
 	private boolean isExtentedBy(Generic candidate) {
 		if (Statics.CONCRETE == uVertex.metaLevel() && ((GenericImpl) uVertex.getMeta()).isInheritanceEnabled() && candidate.getMeta().equals((uVertex.getMeta()))) {
-			if (isProperty())
+			if (hardProperties.isProperty())
 				if (areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents())) {
 					if (!uVertex.components().equals(((GenericImpl) candidate).getComponents()))
 						return true;
@@ -310,7 +252,7 @@ class GenericBuilder {
 						return true;
 				}
 			for (int pos = 0; pos < uVertex.components().size(); pos++) {
-				if ((isStrongSingular(pos))) {
+				if ((hardProperties.isStrongSingular(pos))) {
 					if (uVertex.components().get(pos).inheritsFrom(((GenericImpl) candidate).getComponent(pos))) {
 						if (!uVertex.components().get(pos).equals(((GenericImpl) candidate).getComponent(pos)))
 							return true;
