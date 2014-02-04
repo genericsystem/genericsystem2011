@@ -44,12 +44,7 @@ public abstract class AbstractContext {
 		Set<Generic> effectiveSupersSet = new HashSet<>();
 		for (Generic effectiveSuper : ((GenericImpl) generic).getSupers())
 			if (effectiveSupersSet.add(effectiveSuper))
-				getInheritingsAndInstances(effectiveSuper).add(generic);
-		effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : ((GenericImpl) generic).getStrictSupers())
-			if (effectiveSupersSet.add(effectiveSuper))
 				getInheritings(effectiveSuper).add(generic);
-		getInstances(generic.getMeta()).add(generic);
 		return generic;
 	}
 
@@ -61,39 +56,17 @@ public abstract class AbstractContext {
 		Set<Generic> effectiveSupersSet = new HashSet<>();
 		for (Generic effectiveSuper : ((GenericImpl) generic).getSupers())
 			if (effectiveSupersSet.add(effectiveSuper))
-				getInheritingsAndInstances(effectiveSuper).remove(generic);
-		effectiveSupersSet = new HashSet<>();
-		for (Generic effectiveSuper : ((GenericImpl) generic).getStrictSupers())
-			if (effectiveSupersSet.add(effectiveSuper))
 				getInheritings(effectiveSuper).remove(generic);
-
-		getInstances(generic.getMeta()).remove(generic);
 		return generic;
 	}
 
-	@Deprecated
-	abstract TimestampedDependencies getInheritingsAndInstances(Generic effectiveSuper);
-
-	abstract TimestampedDependencies getInstances(Generic meta);
-
-	abstract TimestampedDependencies getInheritings(Generic strictSuper);
+	abstract TimestampedDependencies getInheritings(Generic effectiveSuper);
 
 	abstract TimestampedDependencies getComposites(Generic component);
 
 	@SuppressWarnings("unchecked")
-	@Deprecated
-	public <T extends Generic> Iterator<T> inheritingsAndInstancesIterator(Generic effectiveSuper) {
-		return (Iterator<T>) getInheritingsAndInstances(effectiveSuper).iterator(getTs());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T extends Generic> Iterator<T> inheritingsIterator(Generic meta) {
-		return (Iterator<T>) getInheritings(meta).iterator(getTs());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T extends Generic> Iterator<T> instancesIterator(Generic meta) {
-		return (Iterator<T>) getInstances(meta).iterator(getTs());
+	public <T extends Generic> Iterator<T> inheritingsIterator(Generic effectiveSuper) {
+		return (Iterator<T>) getInheritings(effectiveSuper).iterator(getTs());
 	}
 
 	@SuppressWarnings("unchecked")

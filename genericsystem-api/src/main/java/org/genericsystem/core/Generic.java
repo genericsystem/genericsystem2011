@@ -707,17 +707,7 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @see Snapshot
 	 */
-	@Deprecated
 	<T extends Generic> List<T> getSupers();
-
-	/**
-	 * Returns an unmodifiable list of generics which this generic directly inherits from.
-	 * 
-	 * @return the list of supers.
-	 * 
-	 * @see Snapshot
-	 */
-	<T extends Generic> List<T> getStrictSupers();
 
 	/**
 	 * Returns an unmodifiable list of components of this generic.
@@ -754,15 +744,6 @@ public interface Generic extends Comparable<Generic> {
 	 */
 	@Deprecated
 	<T extends Generic> Snapshot<T> getInheritingsAndInstances();
-
-	/**
-	 * Returns inheriting.
-	 * 
-	 * @return the inheriting Generic.
-	 * 
-	 * @see Snapshot
-	 */
-	<T extends Generic> Snapshot<T> getInheritings();
 
 	/**
 	 * Returns the composites.

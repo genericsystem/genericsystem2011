@@ -28,11 +28,10 @@ class GenericBuilder {
 	private HardProperties hardProperties;
 
 	GenericBuilder(UnsafeVertex uVertex, boolean respectSupers) {
-		assert uVertex.getMeta().isMeta() || uVertex.getMeta().isStructural();
 		this.uVertex = uVertex;
 		hardProperties = new HardProperties();
-		this.uVertex = new UnsafeVertex(uVertex.homeTreeNode(), getExtendedMeta(respectSupers), getExtendedDirectSupers(respectSupers), findStrictSupersBeyond(respectSupers), uVertex.components());
-		assert uVertex.getMeta().isMeta() || uVertex.getMeta().isStructural();
+		this.uVertex = uVertex;
+		this.uVertex = new UnsafeVertex(uVertex.homeTreeNode(), getExtendedDirectSupers(respectSupers), uVertex.components());
 	}
 
 	private class HardProperties {
@@ -53,10 +52,10 @@ class GenericBuilder {
 	private Supers getExtendedDirectSupers(final boolean respectSupers) {
 		final Engine engine = ((GenericImpl) uVertex.getMeta()).getEngine();
 		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
-			{
-				if (respectSupers && !uVertex.supers().iterator().next().equals(engine))
-					iterators.put(engine, new SelectableIterator<>(uVertex.supers().iterator()));
-			}
+			// {
+			// if (respectSupers && !uVertex.supers().iterator().next().equals(engine))
+			// iterators.put(engine, new SelectableIterator<>(uVertex.supers().iterator()));
+			// }
 
 			@Override
 			public boolean isSelected(Generic candidate) {
@@ -67,59 +66,13 @@ class GenericBuilder {
 		Set<Generic> set = new TreeSet<>();
 		while (iterator.hasNext())
 			set.add(iterator.next());
+
+		if (respectSupers) {
+			OrderedSupers supers = new OrderedSupers(new Supers(set), uVertex.supers().toArray());
+			return supers.toSupers();
+		}
+
 		return new Supers(set);
-	}
-
-	private Generic getExtendedMeta(final boolean respectSupers) {
-		Generic meta = respectSupers ? uVertex.getMeta() : findMetaAbove(uVertex.getMeta(), new Generic[] { uVertex.getMeta().getEngine() });
-		return getExtendedMeta(meta);
-	}
-
-	private Generic findMetaAbove(Generic meta, Generic[] result) {
-		for (Generic strictSuper : meta.getStrictSupers())
-			if (((GenericImpl) strictSuper).isSuperOf(uVertex) || isExtentedBy(strictSuper))
-				if (strictSuper.inheritsFrom(result[0]))
-					result[0] = strictSuper;
-				else
-					assert result[0] == null || result[0].inheritsFrom(strictSuper);
-			else
-				findMetaAbove(strictSuper, result);
-		return result[0];
-	}
-
-	private Generic getExtendedMeta(Generic meta) {
-		for (Generic candidate : ((GenericImpl) meta).getInheritings())
-			if (((GenericImpl) candidate).isSuperOf(uVertex) || isExtentedBy(candidate))
-				return getExtendedMeta(candidate);
-		return meta;
-	}
-
-	private Supers findStrictSupersBeyond(final boolean respectSupers) {
-		Supers supers = uVertex.strictSupers();
-		OrderedSupers orderedSupers = new OrderedSupers(supers);
-		if (!respectSupers)
-			findStrictSupersAbove(supers, orderedSupers);
-		supers = orderedSupers.toSupers();
-		for (Generic orderedSuper : supers)
-			findStrictSupersBeyond(orderedSuper, orderedSupers);
-		return orderedSupers.toSupers();
-	}
-
-	private void findStrictSupersAbove(Supers strictSupers, OrderedSupers result) {
-		for (Generic strictSuper : strictSupers)
-			if (((GenericImpl) strictSuper).isSuperOf(uVertex) || isExtentedBy(strictSuper))
-				result.add(strictSuper);
-			else
-				findStrictSupersAbove(((GenericImpl) strictSuper).getStrictSupers(), result);
-	}
-
-	private void findStrictSupersBeyond(Generic orderedSuper, OrderedSupers orderedSupers) {
-		for (Generic inheriting : orderedSuper.getInheritings())
-			if (((GenericImpl) inheriting).isSuperOf(uVertex) || isExtentedBy(inheriting)) {
-				orderedSupers.add(inheriting);
-				findStrictSupersBeyond(inheriting, orderedSupers);
-				return;
-			}
 	}
 
 	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {

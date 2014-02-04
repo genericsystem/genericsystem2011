@@ -156,9 +156,11 @@ public class PropertyConstraintTest extends AbstractTest {
 		Type car = vehicle.addSubType("Car");
 
 		final Attribute equipment = vehicle.setAttribute("Equipment");
+		assert equipment.getMeta().equals(cache.getMetaAttribute());
 		equipment.enablePropertyConstraint();
 
 		final Attribute equipment2 = car.setAttribute("Equipment");
+		assert equipment2.getMeta().equals(cache.getMetaAttribute());
 		equipment2.disablePropertyConstraint();
 
 		Generic myVehicle = vehicle.addInstance("myVehicle");
@@ -166,8 +168,8 @@ public class PropertyConstraintTest extends AbstractTest {
 		myVehicle.setValue(equipment, "CLIM");
 
 		final Generic myCar = car.addInstance("myCar");
-		myCar.setValue(equipment, "ABS");
-		myCar.setValue(equipment, "GPS");
+		myCar.setValue(equipment2, "ABS");
+		myCar.setValue(equipment2, "GPS");
 
 		assert myVehicle.getValues(equipment).get(0).equals("CLIM");
 		assert myVehicle.getValues(equipment).size() == 1;
