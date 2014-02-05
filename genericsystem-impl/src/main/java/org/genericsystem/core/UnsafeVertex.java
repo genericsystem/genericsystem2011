@@ -104,7 +104,7 @@ class UnsafeVertex {
 		return s;
 	}
 
-	static class Vertex extends UnsafeVertex {
+	public static class Vertex extends UnsafeVertex {
 
 		public Vertex(Generic generic, UnsafeVertex uVertex) {
 			super(uVertex.homeTreeNode(), uVertex.getMeta(), uVertex.supers(), uVertex.strictSupers(), new Components(generic, uVertex.components()));
