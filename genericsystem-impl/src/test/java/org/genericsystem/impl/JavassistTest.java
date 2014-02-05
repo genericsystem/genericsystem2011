@@ -77,9 +77,9 @@ public class JavassistTest {
 		assert Entity2.class.isAssignableFrom(entity2.getClass());
 		assert !entity2.getClass().isAssignableFrom(Entity2.class);
 		entity.test();
-		// entity.test2();
-		// entity2.test();
-		// entity2.test2();
+		entity.test2();
+		entity2.test();
+		entity2.test2();
 
 	}
 }

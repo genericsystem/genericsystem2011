@@ -33,6 +33,7 @@ public class MethodDecorationTest extends AbstractTest {
 			@Override
 			public boolean isHandled(Method m) {
 				return !m.getName().equals("power");
+				// return !m.getName().equals("test");
 			}
 		});
 		return f;
@@ -42,9 +43,11 @@ public class MethodDecorationTest extends AbstractTest {
 		return new MethodHandler() {
 			@Override
 			public Object invoke(Object self, Method m, Method proceed, Object[] args) throws Throwable {
-				// log.info("Before method : " + m.getName());
+				log.info("Before method : " + m.getName());
 				Object o = proceed.invoke(self, args);
-				// log.info("After method : " + m.getName());
+				log.info("After method : " + m.getName());
+				// log.info("Object returned by invoke : " + o);
+
 				// return ((GenericImpl) self).getValue(((GenericImpl) self).getCurrentCache().<Holder> find(m.getAnnotation(Attribute.class).value()));
 				return o;
 			}
@@ -95,7 +98,7 @@ public class MethodDecorationTest extends AbstractTest {
 		}
 
 		public void setPower(Integer power) {
-
+			setValue(getCurrentCache().<Attribute> find(Power.class), power);
 		}
 
 	}
@@ -121,6 +124,7 @@ public class MethodDecorationTest extends AbstractTest {
 
 		Type cars = cache.find(Cars.class);
 		Car myBmw = cars.setInstance("myBmw");
+		myBmw.setPower(new Integer(123));
 		log.info("myBmw.getPower(): " + myBmw.getPower());
 
 	}
