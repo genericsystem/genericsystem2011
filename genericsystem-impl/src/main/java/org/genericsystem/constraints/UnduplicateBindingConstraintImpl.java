@@ -44,7 +44,7 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	@Override
 	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
 		org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
-		if (new AbstractFilterIterator<Generic>(components.isEmpty() ? modified.<GenericImpl> getMeta().instancesIterator() : ((GenericImpl) components.get(0)).compositesIterator()) {
+		if (new AbstractFilterIterator<Generic>(components.isEmpty() ? modified.<GenericImpl> getMeta().inheritingsIterator() : ((GenericImpl) components.get(0)).compositesIterator()) {
 			@Override
 			public boolean isSelected() {
 				// return !next.equals(modified) && ((GenericImpl) next).equivByMeta(((GenericImpl) modified).vertex());

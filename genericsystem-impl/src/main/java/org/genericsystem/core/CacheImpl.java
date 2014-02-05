@@ -2,7 +2,6 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,7 +12,6 @@ import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -49,10 +47,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	protected AbstractContext subContext;
 
-	@Deprecated
 	private transient Map<Generic, TimestampedDependencies> inheritingAndInstancesDependenciesMap;
-	private transient Map<Generic, TimestampedDependencies> instancesDependenciesMap;
-	private transient Map<Generic, TimestampedDependencies> inheritingsDependenciesMap;
 	private transient Map<Generic, TimestampedDependencies> compositeDependenciesMap;
 
 	protected Set<Generic> adds;
@@ -73,8 +68,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public void clear() {
 		compositeDependenciesMap = new HashMap<>();
 		inheritingAndInstancesDependenciesMap = new HashMap<>();
-		instancesDependenciesMap = new HashMap<>();
-		inheritingsDependenciesMap = new HashMap<>();
 		adds = new LinkedHashSet<>();
 		removes = new LinkedHashSet<>();
 		automatics = new LinkedHashSet<>();
@@ -102,30 +95,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	TimestampedDependencies getInheritingsAndInstances(Generic directSuper) {
+	TimestampedDependencies getInheritings(Generic directSuper) {
 		TimestampedDependencies dependencies = inheritingAndInstancesDependenciesMap.get(directSuper);
 		if (dependencies == null) {
-			TimestampedDependencies result = inheritingAndInstancesDependenciesMap.put(directSuper, dependencies = new CacheDependencies(subContext.getInheritingsAndInstances(directSuper)));
-			assert result == null;
-		}
-		return dependencies;
-	}
-
-	@Override
-	TimestampedDependencies getInstances(Generic meta) {
-		TimestampedDependencies dependencies = instancesDependenciesMap.get(meta);
-		if (dependencies == null) {
-			TimestampedDependencies result = instancesDependenciesMap.put(meta, dependencies = new CacheDependencies(subContext.getInstances(meta)));
-			assert result == null;
-		}
-		return dependencies;
-	}
-
-	@Override
-	TimestampedDependencies getInheritings(Generic strictSuper) {
-		TimestampedDependencies dependencies = inheritingsDependenciesMap.get(strictSuper);
-		if (dependencies == null) {
-			TimestampedDependencies result = inheritingsDependenciesMap.put(strictSuper, dependencies = new CacheDependencies(subContext.getInheritings(strictSuper)));
+			TimestampedDependencies result = inheritingAndInstancesDependenciesMap.put(directSuper, dependencies = new CacheDependencies(subContext.getInheritings(directSuper)));
 			assert result == null;
 		}
 		return dependencies;
@@ -194,7 +167,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAL:
 			orderAndRemoveDependenciesForRemove(generic);
-			break;
+		break;
 		case CONSERVE:
 			new Restructurator() {
 				private static final long serialVersionUID = 7326023526567814490L;
@@ -206,11 +179,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(generic);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-			break;
+		break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-			break;
+		break;
 		}
 	}
 
@@ -220,7 +193,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 			@Override
 			Generic rebuild() {
-				return bindDependency(((GenericImpl) old).getUpdatedValueVertex(value), old.getClass(), false, isAutomatic(old));
+				return bindDependency(((GenericImpl) old).getUpdatedValueVertex(old.<GenericImpl> getMeta().bindInstanceNode(value)), old.getClass(), false, isAutomatic(old));
 			}
 		}.rebuildAll(old);
 	}
@@ -418,10 +391,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : userSupers)
 			assert generic.isMeta() || (meta.getMetaLevel() + 1 == generic.getMetaLevel()) : clazz + generic.info();
 
-		T result = this.<T> internalBind(meta.createNewVertex(value, Statics.insertFirst(meta, userSupers), userSupers, components), clazz, Statics.MULTIDIRECTIONAL, false, false);
-		for (Generic strictSuper : result.getStrictSupers())
-			assert EngineImpl.class.equals(clazz) || strictSuper.getInheritings().contains(result) : result.info() + strictSuper.info();
-		return result;
+		return this.<T> internalBind(meta.createNewVertex(value, Statics.insertFirst(meta, userSupers), userSupers, components), clazz, Statics.MULTIDIRECTIONAL, false, false);
 	}
 
 	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, Generic[] strictSupers, boolean existsException, int axe, Generic... components) {
@@ -477,16 +447,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		// TODO move this method in GenericImpl ?
 		private UnsafeVertex adjustVertex(Generic dependency) {
-			return new UnsafeVertex(((GenericImpl) dependency).homeTreeNode(), new AdjustList(Arrays.asList(dependency.getMeta()), true).get(0), new Supers(new AdjustList(((GenericImpl) dependency).getSupers(), false)), new Supers(new AdjustList(
-					((GenericImpl) dependency).getStrictSupers(), true)), new UnsafeComponents(new AdjustList(((GenericImpl) dependency).selfToNullComponents(), false)));
+			return new UnsafeVertex(((GenericImpl) dependency).homeTreeNode(), new Supers(new AdjustList(((GenericImpl) dependency).getSupers())), new UnsafeComponents(new AdjustList(((GenericImpl) dependency).selfToNullComponents())));
 		}
 
 		private class AdjustList extends ArrayList<Generic> {
 			private static final long serialVersionUID = -478017222010761379L;
-			private final boolean strict;// provisoire
 
-			private AdjustList(List<Generic> olds, boolean strict) {
-				this.strict = strict;
+			private AdjustList(List<Generic> olds) {
 				for (Generic add : olds)
 					adjust(add);
 			}
@@ -500,7 +467,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 				if (newGeneric != null)
 					super.add(newGeneric);
 				else
-					for (Generic add : strict ? (((GenericImpl) old).getStrictSupers()) : (((GenericImpl) old).getSupers()))
+					for (Generic add : (((GenericImpl) old).getSupers()))
 						adjust(add);
 			}
 		}
@@ -757,8 +724,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	public <T extends Generic> T reFind(Generic generic) {
 		if (generic.isEngine() || generic.isAlive())
 			return (T) generic;
-		return new GenericBuilder(new UnsafeVertex(((GenericImpl) generic).homeTreeNode(), reFind(generic.getMeta()), new Supers(reFind(((GenericImpl) generic).getSupers())), new Supers(reFind(((GenericImpl) generic).getStrictSupers())),
-				new UnsafeComponents(reFind(((GenericImpl) generic).selfToNullComponents()))), false).find(false);
+		return new GenericBuilder(new UnsafeVertex(((GenericImpl) generic).homeTreeNode(), new Supers(reFind(((GenericImpl) generic).getSupers())), new UnsafeComponents(reFind(((GenericImpl) generic).selfToNullComponents()))), false).find(false);
 	}
 
 	private List<Generic> reFind(UnsafeGList generics) {
