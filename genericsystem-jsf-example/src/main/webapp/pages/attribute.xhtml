@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<h:column>
+		<f:facet name="header">
+			<h:outputText value="#{component.columnTitleAttribute}" />
+		</f:facet>
+		<h:dataTable value="#{row.getAttributeValues(component.attribute)}"
+			var="value">
+			<h:column>
+				<h:outputText value="#{value}" />
+			</h:column>
+		</h:dataTable>
+		<f:facet name="footer">
+			<h:panelGroup>
+				<h:inputText rendered="#{!component.relation}"
+					value="#{component.newAttributeValue}" />
+				<h:selectOneMenu rendered="#{component.relation}"
+					value="#{component.newTargetValue}">
+					<f:selectItems value="#{component.targetInstanceRows}" var="targetRow"
+						itemValue="#{targetRow.value}" itemLabel="#{targetRow.value}" />
+				</h:selectOneMenu>
+			</h:panelGroup>
+		</f:facet>
+	</h:column>
+</ui:composition>

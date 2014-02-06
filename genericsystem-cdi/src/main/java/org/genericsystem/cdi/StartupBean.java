@@ -23,11 +23,6 @@ public class StartupBean implements Extension {
 	private Logger log = LoggerFactory.getLogger(StartupBean.class);
 
 	public void onStartup(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
-		// BoundSessionContext ctx = Container.instance().deploymentManager().instance().select(BoundSessionContext.class).get();
-		// MapInstance<String, Object> map = new HashMap<>();
-		// ctx.associate(map);
-		// ctx.activate();
-
 		log.info("------------------start initialization-----------------------");
 		UserClassesProvider userClasses = BeanManagerUtils.getContextualInstance(beanManager, UserClassesProvider.class);
 		@SuppressWarnings("serial")
@@ -35,7 +30,6 @@ public class StartupBean implements Extension {
 		});
 		for (Bean<?> bean : beans) {
 			Type clazz = bean.getBeanClass();
-			// (bean instanceof ProducerMethod) ? ((ProducerMethod<?, ?>) bean).getWeldAnnotated().getBaseType() : bean.getBeanClass();
 			if (clazz instanceof Class) {
 				Class<?> classToProvide = (Class<?>) clazz;
 				if (classToProvide.getAnnotation(SystemGeneric.class) != null) {
@@ -45,7 +39,5 @@ public class StartupBean implements Extension {
 			}
 		}
 		log.info("-------------------end initialization------------------------");
-		// ctx.deactivate();
-		// ctx.dissociate(map);
 	}
 }

@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import org.genericsystem.core.Generic;
 
-public class CartesianIterator implements Iterator<Object[]> {
+public class CartesianIterator<T> implements Iterator<T[]> {
 
 	private final Iterable<Object>[] iterables;
 	private int iterablesSize;
@@ -45,8 +45,9 @@ public class CartesianIterator implements Iterator<Object[]> {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object[] next() {
+	public T[] next() {
 		int cursor;
 		for (cursor = iterablesSize - 1; cursor >= 0; cursor--)
 			if (iterators[cursor].hasNext())
@@ -58,7 +59,7 @@ public class CartesianIterator implements Iterator<Object[]> {
 		for (int i = cursor; i < iterablesSize; i++)
 			setNextValue(i);
 
-		return values.clone();
+		return (T[]) values.clone();
 	}
 
 	private void setNextValue(int index) {

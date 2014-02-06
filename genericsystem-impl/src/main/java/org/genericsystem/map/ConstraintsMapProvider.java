@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
-import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -69,7 +69,7 @@ public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClas
 	}
 
 	@SystemGeneric
-	@Extends(meta = ConstraintsMapProvider.class)
+	@Meta(ConstraintsMapProvider.class)
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
 	public static class MapInstance extends GenericImpl {

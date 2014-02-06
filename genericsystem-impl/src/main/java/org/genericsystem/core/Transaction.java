@@ -1,7 +1,6 @@
 package org.genericsystem.core;
 
 import java.util.HashSet;
-
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -39,12 +38,13 @@ public class Transaction extends AbstractContext {
 	}
 
 	@Override
-	TimestampedDependencies getDirectInheritingsDependencies(Generic effectiveSuper) {
-		return ((GenericImpl) effectiveSuper).getLifeManager().engineDirectInheritings;
+	@Deprecated
+	TimestampedDependencies getInheritings(Generic effectiveSuper) {
+		return ((GenericImpl) effectiveSuper).getLifeManager().engineInheritings;
 	}
 
 	@Override
-	TimestampedDependencies getCompositeDependencies(Generic component) {
+	TimestampedDependencies getComposites(Generic component) {
 		return ((GenericImpl) component).getLifeManager().engineComposites;
 	}
 
@@ -96,9 +96,10 @@ public class Transaction extends AbstractContext {
 			for (Generic generic : removes)
 				writeLockAndCheckMvcc(((GenericImpl) generic).getLifeManager());
 			for (Generic generic : adds) {
-				for (Generic effectiveSuper : ((GenericImpl) generic).supers)
+				writeLockAndCheckMvcc(((GenericImpl) generic.getMeta()).getLifeManager());
+				for (Generic effectiveSuper : generic.getSupers())
 					writeLockAndCheckMvcc(((GenericImpl) effectiveSuper).getLifeManager());
-				for (Generic component : ((GenericImpl) generic).components)
+				for (Generic component : generic.getComponents())
 					writeLockAndCheckMvcc(((GenericImpl) component).getLifeManager());
 				writeLockAndCheckMvcc(((GenericImpl) generic).getLifeManager());
 			}
@@ -129,8 +130,9 @@ public class Transaction extends AbstractContext {
 	}
 
 	@Override
+	// TODO KK
 	Generic searchByDesignTs(final long ts) {
-		return ((EngineImpl) engine).unambigousFirst(new AbstractFilterIterator<Generic>(new ConcateIterator<Generic>(getDirectInheritingsDependencies(engine).iterator(getTs()), getCompositeDependencies(engine).iterator(getTs()))) {
+		return ((EngineImpl) engine).unambigousFirst(new AbstractFilterIterator<Generic>(new ConcateIterator<Generic>(getInheritings(engine).iterator(getTs()), getComposites(engine).iterator(getTs()))) {
 			@Override
 			public boolean isSelected() {
 				return ((GenericImpl) next).getDesignTs() == ts;

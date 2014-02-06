@@ -11,8 +11,10 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
+import org.genericsystem.core.Statics;
 import org.genericsystem.exception.PropertyConstraintViolationException;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.impl.FunctionalTest.VehicleType.PowerAttribute;
 import org.genericsystem.impl.FunctionalTest.VehicleType.PowerAttribute.UnitAttribute;
@@ -23,53 +25,60 @@ import org.testng.annotations.Test;
 @Test
 public class FunctionalTest extends AbstractTest {
 
-	// @Test
-	// public void testMainSnapshot() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-	// Type vehicle = cache.newType("Vehicle");
-	// Type car = vehicle.newSubType("Car");
-	//
-	// final Attribute vehiculePower = vehicle.setProperty("Power");
-	// car.setValue(vehiculePower, 80);
-	// Generic myCar = car.newInstance("myCar");
-	// myCar.setValue(vehiculePower, 233);
-	// ((GenericImpl) myCar).mainSnaphot(vehiculePower, Statics.CONCRETE, Statics.BASE_POSITION, true).log();
-	// ((GenericImpl) myCar).getHolders(vehiculePower).log();
-	// ((GenericImpl) car).mainSnaphot(vehiculePower, Statics.CONCRETE, Statics.BASE_POSITION, false).log();
-	// ((GenericImpl) car).getHolders(vehiculePower).log();
-	// }
+	@Test
+	public void testBuilder() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.setType("Car");
+		Type color = cache.setType("Color");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic myAudi = car.addInstance("myAudi");
+		Generic red = color.addInstance("red");
+		Generic green = color.addInstance("green");
 
-	// @Test
-	// public void testMainSnapshot2() {
-	// final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-	// Type vehicle = cache.newType("Vehicle");
-	// Type car = vehicle.newSubType("Car");
-	//
-	// Generic myCar = car.newInstance("myCar");
-	// Generic yourCar = car.newInstance("yourCar");
-	// Relation larger = car.addRelation("larger", car);
-	// myCar.bind(larger, yourCar);
-	//
-	// long time = System.currentTimeMillis();
-	// for (int i = 0; i < 10000; i++)
-	// for (Generic generic : ((GenericImpl) myCar).mainSnaphot(larger, Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false));
-	// log.info("time : " + (System.currentTimeMillis() - time));
-	// time = System.currentTimeMillis();
-	// for (int i = 0; i < 10000; i++)
-	// for (Generic generic : ((GenericImpl) yourCar).getAttributes());
-	// log.info("time : " + (System.currentTimeMillis() - time));
-	//
-	// assert ((GenericImpl) myCar).mainSnaphot(larger, Statics.CONCRETE, Statics.BASE_POSITION, false).equals(((GenericImpl) myCar).getHolders(larger)) : ((GenericImpl) myCar).mainSnaphot(larger, Statics.CONCRETE, Statics.BASE_POSITION,
-	// false);
-	// assert ((GenericImpl) yourCar).mainSnaphot(larger, Statics.CONCRETE, Statics.BASE_POSITION, false).equals(((GenericImpl) yourCar).getHolders(larger));
-	// assert ((GenericImpl) car).mainSnaphot(larger, Statics.CONCRETE, Statics.BASE_POSITION, false).equals(((GenericImpl) car).getHolders(larger));
-	//
-	// assert ((GenericImpl) myCar).mainSnaphot(cache.getMetaAttribute(), Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false).equals(((GenericImpl) myCar).getAttributes()) : ((GenericImpl) myCar).mainSnaphot(cache.getMetaAttribute(),
-	// Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false) + " " + ((GenericImpl) myCar).getAttributes();
-	// assert ((GenericImpl) yourCar).mainSnaphot(cache.getMetaAttribute(), Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false).equals(((GenericImpl) yourCar).getAttributes());
-	// assert ((GenericImpl) car).mainSnaphot(cache.getMetaAttribute(), Statics.STRUCTURAL, Statics.MULTIDIRECTIONAL, false).equals(((GenericImpl) car).getAttributes());
-	//
-	// }
+		final Relation carColor = car.setRelation("CarColor", color).enableSingularConstraint();
+
+		myBmw.bind(carColor, red);
+		car.bind(carColor, green);
+		assert myBmw.getTargets(carColor).size() == 1;
+		assert myBmw.getTargets(carColor).get(0).equals(red);
+		assert myAudi.getTargets(carColor).size() == 1;
+		assert myAudi.getTargets(carColor).get(0).equals(green);
+	}
+
+	@Test
+	public void testBuilder2() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.setType("Car");
+		Type color = cache.setType("Color");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic red = color.addInstance("red");
+		Generic green = color.addInstance("green");
+
+		final Relation carColor = car.setRelation("Power", color).enableSingularConstraint();
+
+		red.bind(carColor, myBmw).log();
+		green.bind(carColor, car).log();
+		assert myBmw.getLinks(carColor).size() == 1;
+		assert myBmw.getTargets(carColor).get(0).equals(red);
+	}
+
+	@Test
+	public void testBuilder3() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.setType("Car");
+		Type color = cache.setType("Color");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic red = color.addInstance("red");
+		Generic green = color.addInstance("green");
+
+		final Relation carColor = car.setRelation("Power", color).enableSingularConstraint();
+		assert !carColor.isReferentialIntegrity(Statics.BASE_POSITION);
+		assert carColor.isSingularConstraintEnabled();
+		red.bind(carColor, myBmw).log();
+		green.bind(carColor, myBmw).log();
+		assert myBmw.getTargets(carColor).size() == 1;
+		assert myBmw.getTargets(carColor).get(0).equals(green);
+	}
 
 	@Test
 	public void getCarInstancesWithPowerHigherThan90HP() {

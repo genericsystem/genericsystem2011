@@ -29,7 +29,7 @@ public class IteratorTest extends AbstractTest {
 				return new AbstractPostTreeIterator<Generic>(cache.getEngine()) {
 					@Override
 					protected Iterator<Generic> children(Generic node) {
-						return ((GenericImpl) node).directInheritingsIterator();
+						return ((GenericImpl) node).inheritingsIterator();
 					}
 				};
 				
@@ -50,7 +50,7 @@ public class IteratorTest extends AbstractTest {
 				return new AbstractPreTreeIterator<Generic>(cache.getEngine()) {
 					@Override
 					public Iterator<Generic> children(Generic node) {
-						return ((GenericImpl) node).directInheritingsIterator();
+						return ((GenericImpl) node).inheritingsIterator();
 					}
 				};
 			}
@@ -73,7 +73,7 @@ public class IteratorTest extends AbstractTest {
 				return new AbstractPreTreeIterator<Generic>(cache.getEngine()) {
 					@Override
 					public Iterator<Generic> children(Generic node) {
-						return ((GenericImpl) node).directInheritingsIterator();
+						return ((GenericImpl) node).inheritingsIterator();
 					}
 				};
 			}

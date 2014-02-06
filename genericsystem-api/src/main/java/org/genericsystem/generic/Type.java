@@ -1,6 +1,7 @@
 package org.genericsystem.generic;
 
 import java.io.Serializable;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 
@@ -126,7 +127,7 @@ public interface Type extends Generic {
 	 *            The value of the requested instance.
 	 * @return The requested instance if it exists, null otherwise.
 	 */
-	<T extends Generic> T getInstance(Serializable value);
+	<T extends Generic> T getInstance(Serializable value, Generic... targets);
 
 	/**
 	 * Returns the direct sub types of Generic.
@@ -278,6 +279,9 @@ public interface Type extends Generic {
 	 * 
 	 * @return Return this.
 	 */
+	@Override
+	boolean isSystem();
+
 	<T extends Relation> T enableInheritance();
 
 	/**

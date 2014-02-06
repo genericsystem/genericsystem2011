@@ -23,12 +23,16 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.genericsystem.core.AbstractWriter.AbstractLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
  * @author Michael Ory
  */
 public class Archiver {
+
+	private static final Logger log = LoggerFactory.getLogger(Archiver.class);
 
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -103,6 +107,7 @@ public class Archiver {
 				scheduler.scheduleAtFixedRate(new Runnable() {
 					@Override
 					public void run() {
+						engine.newCache().start();
 						new ZipWriter(directory).doSnapshot();
 					}
 				}, Statics.SNAPSHOTS_INITIAL_DELAY, Statics.SNAPSHOTS_PERIOD, TimeUnit.MILLISECONDS);
@@ -110,15 +115,17 @@ public class Archiver {
 	}
 
 	public void close() {
-		if (lockFile != null)
+		if (lockFile != null) {
+			scheduler.shutdown();
+			engine.newCache().start();
+			new ZipWriter(directory).doSnapshot();
 			try {
-				scheduler.shutdown();
-				new ZipWriter(directory).doSnapshot();
 				lockFile.close();
 				lockFile = null;
 			} catch (IOException e) {
-				throw new IllegalStateException(e);
+				log.error(e.getMessage(), e);
 			}
+		}
 	}
 
 	public class ZipWriter extends AbstractWriter {
@@ -133,42 +140,47 @@ public class Archiver {
 			fileName = Statics.getFilename(engine.pickNewTs());
 		}
 
+		@Override
 		public ObjectOutputStream getFormalOutputStream() {
 			return formalOutputStream;
 		}
 
+		@Override
 		public ObjectOutputStream getContentOutputStream() {
 			return contentOutputStream;
 		}
 
 		public void doSnapshot() {
-			try (ByteArrayOutputStream formalOutputStream = new ByteArrayOutputStream(); ZipOutputStream zipOutput = new ZipOutputStream(new FileOutputStream(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION));) {
-
+			ByteArrayOutputStream bufferTemp = new ByteArrayOutputStream();
+			try (FileOutputStream fileOutputStream = new FileOutputStream(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION);) {
+				ZipOutputStream zipOutput = new ZipOutputStream(fileOutputStream);
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.CONTENT_EXTENSION));
-				this.formalOutputStream = new ObjectOutputStream(formalOutputStream);
-				this.contentOutputStream = new ObjectOutputStream(zipOutput);
+				formalOutputStream = new ObjectOutputStream(bufferTemp);
+				contentOutputStream = new ObjectOutputStream(zipOutput);
 
-				writeGenerics();
+				writeGenericsAndFlush();
 				zipOutput.closeEntry();
 
 				zipOutput.putNextEntry(new ZipEntry(fileName + Statics.FORMAL_EXTENSION));
-				zipOutput.write(formalOutputStream.toByteArray());
+				zipOutput.write(bufferTemp.toByteArray());
 				zipOutput.closeEntry();
 
-				formalOutputStream.close();
 				zipOutput.flush();
+				contentOutputStream.close();
+				formalOutputStream.close();
 				zipOutput.close();
 
 				new File(path + fileName + Statics.ZIP_EXTENSION + Statics.PART_EXTENSION).renameTo(new File(path + fileName + Statics.ZIP_EXTENSION));
 				manageOldSnapshots();
-			} catch (IOException ioe) {
-				throw new IllegalStateException(ioe);
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
 			}
 		}
 
-		private void writeGenerics() throws IOException {
+		@Override
+		public void writeGenerics() throws IOException {
 			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
-			for (Generic orderGeneric : new Transaction(engine).orderDependencies(engine))
+			for (Generic orderGeneric : Transaction.orderDependencies(engine))
 				writeGeneric(((GenericImpl) orderGeneric), homeTreeMap);
 		}
 
@@ -200,10 +212,12 @@ public class Archiver {
 		private ObjectInputStream contentInputStream;
 		private ObjectInputStream formalInputStream;
 
+		@Override
 		public ObjectInputStream getContentInputStream() {
 			return contentInputStream;
 		}
 
+		@Override
 		public ObjectInputStream getFormalInputStream() {
 			return formalInputStream;
 		}
@@ -243,7 +257,7 @@ public class Archiver {
 			getContentInputStream().readObject();
 			((EngineImpl) engine).restoreEngine(homeTreeNodeTs, ts[0], ts[1], ts[2], ts[3]);
 			genericMap.put(ts[0], engine);
-			homeTreeMap.put(homeTreeNodeTs, ((EngineImpl) engine).homeTreeNode);
+			homeTreeMap.put(homeTreeNodeTs, ((EngineImpl) engine).homeTreeNode());
 			return engine;
 		}
 
@@ -253,8 +267,8 @@ public class Archiver {
 		}
 
 		@Override
-		protected Generic loadAncestor(Engine engine, Map<Long, Generic> genericMap) throws IOException {
-			return genericMap.get(getFormalInputStream().readLong());
+		protected Generic loadAncestor(Engine engine, long ts, Map<Long, Generic> genericMap) {
+			return genericMap.get(ts);
 		}
 	}
 

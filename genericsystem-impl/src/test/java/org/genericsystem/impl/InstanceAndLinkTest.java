@@ -1,9 +1,9 @@
 package org.genericsystem.impl;
 
+import java.util.List;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
@@ -24,9 +24,9 @@ public class InstanceAndLinkTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
 		Generic audi = car.addInstance("audi");
-		Snapshot<Generic> snapshot = audi.getSupers();
-		assert snapshot.size() == 1;
-		assert snapshot.contains(car);
+		List<Generic> supers = audi.getSupers();
+		assert supers.size() == 1;
+		assert supers.contains(car);
 	}
 
 	public void testInstanceIsConcreteWithValue() {

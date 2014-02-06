@@ -42,31 +42,35 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		if (subContext instanceof CacheImpl) {
-			out.writeBoolean(true);
-			out.writeObject(subContext);
-		} else {
-			out.writeBoolean(false);
-			out.writeLong(((Transaction) subContext).getTs());
-		}
-
-		Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
-		out.writeInt(adds.size());
-		for (Generic add : adds)
-			new SerializableWriter(out).writeGeneric((GenericImpl) add, homeTreeMap);
-		out.writeInt(automatics.size());
-		for (Generic automatic : automatics)
-			new SerializableWriter(out).writeGeneric((GenericImpl) automatic, homeTreeMap);
-		out.writeInt(removes.size());
-		for (Generic remove : removes)
-			out.writeLong(((GenericImpl) remove).getDesignTs());
+		new SerializableWriter(out).writeGenericsAndFlush();
 	}
 
-	private static class SerializableWriter extends AbstractWriter {
+	private class SerializableWriter extends AbstractWriter {
 		private ObjectOutput out;
 
 		public SerializableWriter(ObjectOutput out) {
 			this.out = out;
+		}
+
+		@Override
+		public void writeGenerics() throws IOException {
+			if (subContext instanceof CacheImpl) {
+				out.writeBoolean(true);
+				out.writeObject(subContext);
+			} else {
+				out.writeBoolean(false);
+				out.writeLong(((Transaction) subContext).getTs());
+			}
+			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
+			out.writeInt(adds.size());
+			for (Generic add : adds)
+				writeGeneric((GenericImpl) add, homeTreeMap);
+			out.writeInt(automatics.size());
+			for (Generic automatic : automatics)
+				writeGeneric((GenericImpl) automatic, homeTreeMap);
+			out.writeInt(removes.size());
+			for (Generic remove : removes)
+				out.writeLong(((GenericImpl) remove).getDesignTs());
 		}
 
 		@Override
@@ -88,7 +92,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		Cache currentCache = engine.getCurrentCache();
 		try {
 			subContext = in.readBoolean() ? (AbstractContext) in.readObject() : new Transaction(in.readLong(), engine);
-			this.start();
+			start();
 			Map<Long, HomeTreeNode> homeTreeMap = new HashMap<>();
 			Map<Long, Generic> genericMap = new HashMap<>();
 			int addSize = in.readInt();
@@ -100,7 +104,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 				automatics.add(loader.loadGeneric(engine, homeTreeMap, genericMap));
 			int removeSize = in.readInt();
 			for (int i = 0; i < removeSize; i++)
-				removes.add(findByDesignTs(engine, (ObjectInputStream) in, genericMap));
+				removes.add(findByDesignTs(engine, in.readLong(), genericMap));
 		} finally {
 			currentCache.start();
 		}
@@ -141,8 +145,8 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 		}
 
 		@Override
-		protected Generic loadAncestor(Engine engine, Map<Long, Generic> genericMap) throws IOException {
-			return ((CacheImpl) engine.getCurrentCache()).findByDesignTs(engine, getFormalInputStream(), genericMap);
+		protected Generic loadAncestor(Engine engine, long ts, Map<Long, Generic> genericMap) {
+			return ((CacheImpl) engine.getCurrentCache()).findByDesignTs(engine, ts, genericMap);
 		}
 	}
 

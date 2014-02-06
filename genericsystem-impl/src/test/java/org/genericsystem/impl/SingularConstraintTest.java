@@ -329,7 +329,6 @@ public class SingularConstraintTest extends AbstractTest {
 		assert myCar.getLinks(carColor).get(1) == myCarYellow;
 	}
 
-
 	public void singularForTargetAxe() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("car");

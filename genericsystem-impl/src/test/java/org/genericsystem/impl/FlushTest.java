@@ -28,7 +28,7 @@ public class FlushTest extends AbstractTest {
 		engine.close();
 
 		cache = engine.newCache();
-		assert engine.getInheritings().contains(human);
+		assert engine.getInheritingsAndInstances().contains(human);
 	}
 
 	@Test
@@ -36,7 +36,7 @@ public class FlushTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
 		Type animal = cache.addType("Animal");
-		Snapshot<Generic> snapshot = animal.getInheritings();
+		Snapshot<Generic> snapshot = animal.getInheritingsAndInstances();
 		assert snapshot.isEmpty();
 		Type human = animal.addSubType("Human");
 		assert snapshot.size() == 1;
@@ -45,7 +45,7 @@ public class FlushTest extends AbstractTest {
 		engine.close();
 
 		cache = engine.newCache().start();
-		assert engine.getInheritings().filter(new Filter<Generic>() {
+		assert engine.getInheritingsAndInstances().filter(new Filter<Generic>() {
 
 			@Override
 			public boolean isSelected(Generic element) {
@@ -64,7 +64,7 @@ public class FlushTest extends AbstractTest {
 		engine.close();
 
 		cache = engine.newCache().start();
-		Snapshot<Generic> snapshot = engine.getInheritings();
+		Snapshot<Generic> snapshot = engine.getInheritingsAndInstances();
 		assert snapshot.contains(human) : snapshot;
 		assert !snapshot.contains(car) : snapshot;
 	}
@@ -75,7 +75,7 @@ public class FlushTest extends AbstractTest {
 		Engine engine = cache.getEngine();
 		Type human = cache.addType("Human");
 		cache.flush();
-		Snapshot<Generic> snapshot = engine.getInheritings();
+		Snapshot<Generic> snapshot = engine.getInheritingsAndInstances();
 		assert snapshot.contains(human) : snapshot;
 		// cache.deactivate();
 
@@ -85,7 +85,7 @@ public class FlushTest extends AbstractTest {
 		engine.close();
 
 		cache = engine.newCache().start();
-		snapshot = engine.getInheritings();
+		snapshot = engine.getInheritingsAndInstances();
 		assert snapshot.containsAll(Arrays.asList(human, car)) : snapshot;
 	}
 
@@ -95,7 +95,7 @@ public class FlushTest extends AbstractTest {
 		Engine engine = cache.getEngine();
 		Type human = cache.addType("Human");
 		cache.flush();
-		Snapshot<Generic> snapshot = engine.getInheritings();
+		Snapshot<Generic> snapshot = engine.getInheritingsAndInstances();
 		assert snapshot.contains(human) : snapshot;
 
 		cache = engine.newCache().start();
@@ -103,7 +103,7 @@ public class FlushTest extends AbstractTest {
 		cache.flush();
 
 		cache = engine.newCache();
-		snapshot = engine.getInheritings();
+		snapshot = engine.getInheritingsAndInstances();
 		assert snapshot.containsAll(Arrays.asList(human, car)) : snapshot;
 
 		engine.close();
@@ -137,19 +137,17 @@ public class FlushTest extends AbstractTest {
 		Generic grey = color.addInstance("Grey");
 		assert car.setLink(carColor, "CarRed", red).isSingularConstraintEnabled(0); // default color of car
 
-		final Generic bmw = car.addInstance("Bmw");
+		// final Generic bmw = car.addInstance("Bmw");
 		Generic mercedes = car.addInstance("Mercedes");
 		mercedes.bind(carColor, grey);
 		assert red.getLinks(carColor).size() == 1;
-		assert red.getLink(carColor).getBaseComponent().equals(bmw);
+		// assert red.getLink(carColor).getBaseComponent().equals(bmw);
 	}
 
 	public void testAutomaticsNotFlushedOK() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-
 		Type car = cache.addType("Car");
 		Type color = cache.addType("Color");
-
 		Relation carColor = car.setRelation("CarColor", color);
 		carColor.enableSingularConstraint();
 
@@ -177,20 +175,17 @@ public class FlushTest extends AbstractTest {
 		assert red.getLinks(carColor).size() == 2;
 
 		Snapshot<Link> links = red.getLinks(carColor);
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Link redToBMW = links.filter(new Filter() {
+		Link redToBMW = links.filter(new Filter<Link>() {
 
 			@Override
-			public boolean isSelected(Object element) {
-				return ((Link) element).getComponents().contains(bmw);
+			public boolean isSelected(Link element) {
+				return element.getComponents().contains(bmw);
 			}
 		}).get(0);
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Link redToLada = links.filter(new Filter() {
-
+		Link redToLada = links.filter(new Filter<Link>() {
 			@Override
-			public boolean isSelected(Object element) {
-				return ((Link) element).getComponents().contains(audi);
+			public boolean isSelected(Link element) {
+				return element.getComponents().contains(audi);
 			}
 		}).get(0);
 
@@ -219,14 +214,28 @@ public class FlushTest extends AbstractTest {
 		assert cache2.getAllTypes().contains(color);
 
 		Relation carColor2 = cache2.getType("Car").getRelation("CarColor");
-		Link defColor = carColor2.getInstance("carRed");
+		car = cache2.getType("Car");
+		Snapshot<Link> links2 = car.getInstance("audi").getLinks(carColor2);
+		assert links2.size() == 1;
+		assert links2.contains(carColor2.getInstance("carRed", audi));
 
-		/* Automatic link between audi and red was restored from cache */
-		assert cache2.getType("Car").getInstance("audi").getLinks(carColor2).size() == 1;
-		assert !cache2.getType("Car").getInstance("audi").getLinks(carColor2).contains(defColor);
+		links2 = car.getInstance("bmw").getLinks(carColor2);
+		assert links2.size() == 1;
+		assert links2.contains(carColor2.getInstance("carRed", car)) : links2;
+	}
 
-		/* Automatic link between bmw and red color was not restored from cache */
-		assert cache2.getType("Car").getInstance("bmw").getLinks(carColor2).size() == 1;
-		assert cache2.getType("Car").getInstance("bmw").getLinks(carColor2).contains(defColor);
+	public void testAutomaticsNotFlushedOK2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
+		Relation carColor = car.setRelation("CarColor", color).enableSingularConstraint();
+
+		Generic audi = car.addInstance("audi");
+		Generic red = color.addInstance("red");
+
+		Link carRed = car.setLink(carColor, "carRed", red);
+		audi.setLink(carRed, "carRed", red);
+
+		carColor.getInstance("carRed", audi).log();
 	}
 }

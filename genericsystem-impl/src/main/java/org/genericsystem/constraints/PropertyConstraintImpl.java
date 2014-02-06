@@ -2,7 +2,6 @@ package org.genericsystem.constraints;
 
 import java.util.Iterator;
 import java.util.Objects;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;

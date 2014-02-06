@@ -1,10 +1,10 @@
 package org.genericsystem.constraints;
 
 import java.util.Iterator;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
@@ -29,24 +29,22 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstraintImpl implements Holder {
 
 	@SystemGeneric
-	@Extends(meta = StructuralNamingConstraintImpl.class)
+	@Meta(StructuralNamingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(StructuralNamingConstraintImpl.class)
-	public static class DefaultKey {
-	}
+	public static class DefaultKey {}
 
 	@SystemGeneric
-	@Extends(meta = ConstraintsMapProvider.ConstraintValue.class)
+	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {
-	}
+	public static class DefaultValue {}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
 		if (!modified.isStructural())
 			return;
-		if (modified.getComponentsSize() == 0) {
+		if (modified.getComponents().isEmpty()) {
 			Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) modified.getEngine()).allInstancesIterator(), modified.getValue());
 			if (iterator.hasNext()) {
 				Generic next = iterator.next();
@@ -54,8 +52,8 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 					throw new UniqueStructuralValueConstraintViolationException(next.info() + iterator.next().info());
 			}
 		} else
-			for (int i = 0; i < modified.getComponentsSize(); i++)
-				for (Generic inherited : ((GenericImpl) ((GenericImpl) modified).getComponent(i)).getAllInheritings()) {
+			for (int i = 0; i < modified.getComponents().size(); i++)
+				for (Generic inherited : ((GenericImpl) ((GenericImpl) modified).getComponents().get(i)).getAllInheritings()) {
 					Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL), modified.getValue());
 					if (iterator.hasNext()) {
 						Generic next = iterator.next();

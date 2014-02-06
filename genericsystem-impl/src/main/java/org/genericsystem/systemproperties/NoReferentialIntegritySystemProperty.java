@@ -3,6 +3,7 @@ package org.genericsystem.systemproperties;
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.AxedConstraintValue;
 import org.genericsystem.annotation.value.BooleanValue;
@@ -22,14 +23,14 @@ import org.genericsystem.map.SystemPropertiesMapProvider.SystemPropertyValue;
 public class NoReferentialIntegritySystemProperty extends GenericImpl {
 
 	@SystemGeneric
-	@Extends(meta = NoReferentialIntegritySystemProperty.class)
+	@Meta(NoReferentialIntegritySystemProperty.class)
 	@Components(SystemPropertiesMapProvider.class)
 	@AxedConstraintValue(value = NoReferentialIntegritySystemProperty.class, axe = 0)
 	public static class DefaultKey {
 	}
 
 	@SystemGeneric
-	@Extends(meta = SystemPropertyValue.class)
+	@Meta(SystemPropertyValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
 	public static class DefaultValue {

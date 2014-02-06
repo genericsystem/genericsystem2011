@@ -3,7 +3,6 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -86,6 +85,7 @@ public class RelationTest extends AbstractTest {
 
 		final Relation carPassengerTime = car.setRelation("CarPassengerTime", passenger, time);
 		carPassengerTime.enableSingularConstraint(Statics.TARGET_POSITION);
+		carPassengerTime.disableReferentialIntegrity(Statics.TARGET_POSITION);
 		assert carPassengerTime.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
 		final Generic myBmw = car.addInstance("myBmw");
@@ -100,16 +100,7 @@ public class RelationTest extends AbstractTest {
 		assert michael.getLinks(carPassengerTime).size() == 1;
 		michael.bind(carPassengerTime, yourAudi, today);
 		assert michael.getLinks(carPassengerTime).size() == 1;
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				yesterday.bind(carPassengerTime, myBmw, passenger);
-				assert yesterday.getLinks(carPassengerTime).size() == 1;
-
-			}
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
-
+		yesterday.bind(carPassengerTime, myBmw, passenger);// No exception
 	}
 
 	public void testSimple() {
@@ -190,22 +181,22 @@ public class RelationTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 
 		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
 
-		Type passenger = cache.addType("Passenger");
-
-		final Relation carPassenger = car.setRelation("CarPassenger", passenger);
-		carPassenger.enableSingularConstraint(Statics.TARGET_POSITION);
-		assert carPassenger.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		final Relation carColor = car.setRelation("carColor", color);
+		carColor.enableSingularConstraint(Statics.TARGET_POSITION);
+		assert carColor.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		carColor.disableReferentialIntegrity(Statics.TARGET_POSITION);
 
 		final Generic myBmw = car.addInstance("myBmw");
 
-		final Generic michael = passenger.addInstance("michael");
-		Generic nicolas = passenger.addInstance("nicolas");
+		final Generic red = color.addInstance("red");
+		Generic yellow = color.addInstance("yellow");
 
-		Link link30 = michael.setLink(carPassenger, "30%", myBmw);
-		Link link40 = nicolas.setLink(carPassenger, "40%", myBmw);
+		Link link30 = red.setLink(carColor, "30%", myBmw);
+		Link link40 = yellow.setLink(carColor, "40%", myBmw);
 		assert link30.isAlive();
-		michael.setLink(carPassenger, "60%", myBmw);
+		red.setLink(carColor, "60%", myBmw);
 		assert !link30.isAlive();
 		assert link40.isAlive();
 	}
@@ -343,15 +334,8 @@ public class RelationTest extends AbstractTest {
 
 		red.setLink(carColor, "defaultColor", car);
 		assert myBmw.getLink(carColor).getBaseComponent().equals(car);
-
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				yellow.bind(carColor, myBmw);
-			}
-
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
+		yellow.bind(carColor, myBmw);
+		assert myBmw.getLink(carColor).getBaseComponent().equals(myBmw);
 	}
 
 	public void testToOneInheritanceTernary() {
@@ -413,14 +397,7 @@ public class RelationTest extends AbstractTest {
 
 		Link myBmwMe = me.bind(carOwner, myBmw);
 		assert me.getLinks(carOwner).contains(myBmwMe);
-		new RollbackCatcher() {
-
-			@Override
-			public void intercept() {
-				you.bind(carOwner, myBmw);
-			}
-
-		}.assertIsCausedBy(SingularConstraintViolationException.class);
+		you.bind(carOwner, myBmw);
 	}
 
 	public void testToOneNewTargetTernary() {
@@ -548,6 +525,7 @@ public class RelationTest extends AbstractTest {
 		final Relation carOwner = car.setRelation("CarOwner", owner);
 		carOwner.enableSingularConstraint(Statics.BASE_POSITION);
 		assert carOwner.isSingularConstraintEnabled(Statics.BASE_POSITION);
+		carOwner.enableReferentialIntegrity();
 
 		final Generic myBmw = car.addInstance("myBmw");
 		final Generic me = owner.addInstance("me");
@@ -710,37 +688,39 @@ public class RelationTest extends AbstractTest {
 	public void testOneToManyInheritanceReverse2() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Type person = cache.addType("person");
-		Relation carPerson = car.setRelation("CarPersons", person);
+		Type pilot = cache.addType("Pilot");
+		Relation carPilots = car.setRelation("CarPilots", pilot);
 
-		carPerson.enableSingularConstraint(Statics.TARGET_POSITION);
-		assert carPerson.isSingularConstraintEnabled(Statics.TARGET_POSITION);
+		carPilots.enableSingularConstraint(Statics.TARGET_POSITION);
+		carPilots.disableReferentialIntegrity(Statics.TARGET_POSITION);
+		assert carPilots.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 
 		Generic myBmw = car.addInstance("myBmw");
-		Generic michael = person.addInstance("michael");
-		Generic nicolas = person.addInstance("nicolas");
-		Generic sven = person.addInstance("sven");
-		Generic sofiane = person.addInstance("sofiane");
-		Generic pierre = person.addInstance("pierre");
 
-		Link carPierre = pierre.setLink(carPerson, "defaultPerson", car);
-		assert myBmw.getLink(carPerson).getBaseComponent().equals(myBmw) : myBmw.getLink(carPerson);
+		Generic michael = pilot.addInstance("michael");
+		Generic nicolas = pilot.addInstance("nicolas");
+		Generic sven = pilot.addInstance("sven");
+		Generic sofiane = pilot.addInstance("sofiane");
+		Generic pierre = pilot.addInstance("pierre");
 
-		Link myBmwMichael = michael.bind(carPerson, myBmw);
-		Link myBmwNicolas = nicolas.bind(carPerson, myBmw);
-		Link myBmwSven = sven.bind(carPerson, myBmw);
-		Link myBmwSofiane = sofiane.bind(carPerson, myBmw);
+		Link carPierre = pierre.setLink(carPilots, "defaultPerson", car);
+		assert myBmw.getLink(carPilots).getBaseComponent().equals(myBmw) : myBmw.getLink(carPilots);
 
-		assert michael.getLinks(carPerson).size() == 1 : michael.getLinks(carPerson);
-		assert nicolas.getLinks(carPerson).size() == 1 : nicolas.getLinks(carPerson);
-		assert sven.getLinks(carPerson).size() == 1 : sven.getLinks(carPerson);
-		assert sofiane.getLinks(carPerson).size() == 1 : sofiane.getLinks(carPerson);
+		Link myBmwMichael = michael.bind(carPilots, myBmw);
+		Link myBmwNicolas = nicolas.bind(carPilots, myBmw);
+		Link myBmwSven = sven.bind(carPilots, myBmw);
+		Link myBmwSofiane = sofiane.bind(carPilots, myBmw);
 
-		assert !myBmw.getLinks(carPerson).contains(carPierre) : myBmw.getLinks(carPerson);
-		assert myBmw.getLinks(carPerson).contains(myBmwMichael) : myBmw.getLinks(carPerson);
-		assert myBmw.getLinks(carPerson).contains(myBmwNicolas) : myBmw.getLinks(carPerson);
-		assert myBmw.getLinks(carPerson).contains(myBmwSven) : myBmw.getLinks(carPerson);
-		assert myBmw.getLinks(carPerson).contains(myBmwSofiane) : myBmw.getLinks(carPerson);
+		assert michael.getLinks(carPilots).size() == 1 : michael.getLinks(carPilots);
+		assert nicolas.getLinks(carPilots).size() == 1 : nicolas.getLinks(carPilots);
+		assert sven.getLinks(carPilots).size() == 1 : sven.getLinks(carPilots);
+		assert sofiane.getLinks(carPilots).size() == 1 : sofiane.getLinks(carPilots);
+
+		assert !myBmw.getLinks(carPilots).contains(carPierre) : myBmw.getLinks(carPilots);
+		assert myBmw.getLinks(carPilots).contains(myBmwMichael) : myBmw.getLinks(carPilots);
+		assert myBmw.getLinks(carPilots).contains(myBmwNicolas) : myBmw.getLinks(carPilots);
+		assert myBmw.getLinks(carPilots).contains(myBmwSven) : myBmw.getLinks(carPilots);
+		assert myBmw.getLinks(carPilots).contains(myBmwSofiane) : myBmw.getLinks(carPilots);
 	}
 
 	public void testOneToManyDifferentValue() {
@@ -792,6 +772,7 @@ public class RelationTest extends AbstractTest {
 		final Relation carTyres = car.setRelation("CarTyres", tyre);
 
 		carTyres.enableSingularConstraint(Statics.TARGET_POSITION);
+		carTyres.disableReferentialIntegrity(Statics.TARGET_POSITION);
 		assert carTyres.isSingularConstraintEnabled(Statics.TARGET_POSITION);
 		carTyres.enablePropertyConstraint();
 		assert carTyres.isPropertyConstraintEnabled();
@@ -1115,7 +1096,7 @@ public class RelationTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type human = cache.addType("Human");
 		Relation relationPilot = vehicle.setRelation("pilot", human);
-		assert cache.getMetaRelation().getInheritings().contains(relationPilot);
+		assert cache.getMetaRelation().getInheritingsAndInstances().contains(relationPilot);
 	}
 
 	public void testIsRelation() {
@@ -1349,6 +1330,20 @@ public class RelationTest extends AbstractTest {
 		assert red.getTargets(carColor, 1, 0).containsAll(Arrays.asList(new Generic[] { myBmw, myAudi, myMercedes }));
 	}
 
+	public void testLinkageSingulaOk() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.addType("Car");
+		Type color = cache.addType("Color");
+		Generic myBmw = car.addInstance("myBmw");
+		Generic red = color.addInstance("red");
+
+		Relation carColor = car.setRelation("carColor", color).enableSingularConstraint();
+		Link link1 = myBmw.bind(carColor, red);
+		Link link2 = myBmw.bind(carColor, red);
+
+		assert link1 == link2;
+	}
+
 	public void mytest() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
@@ -1373,7 +1368,8 @@ public class RelationTest extends AbstractTest {
 		Link carRed = car.setLink(carColor, "carRed", red);
 		myBmw.bind(carColor, red);
 		myAudi.setLink(carRed, null, red);
-		Link myAudiRed = myAudi.bind(carRed, red);// myAudi.bind(carColor, red);
+		// Link myAudiRed = myAudi.bind(carRed, red);
+		Link myAudiRed = myAudi.bind(carColor, red);
 
 		Link myAudiBlue = myAudi.bind(carColor, blue);
 		assert myAudiBlue.inheritsFrom(carRed);

@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.genericsystem.core.AbstractContext.TimestampedDependencies;
 import org.genericsystem.exception.ConcurrencyControlException;
 import org.genericsystem.exception.OptimisticLockConstraintViolationException;
@@ -24,8 +23,8 @@ public class LifeManager {
 	private AtomicLong lastReadTs;
 	private long deathTs;
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	EngineDependencies engineDirectInheritings = new EngineDependencies();
-	EngineDependencies engineComposites = new EngineDependencies();
+	final EngineDependencies engineInheritings = new EngineDependencies();
+	final EngineDependencies engineComposites = new EngineDependencies();
 
 	public LifeManager(long designTs, long birthTs, long lastReadTs, long deathTs) {
 		this.designTs = designTs;

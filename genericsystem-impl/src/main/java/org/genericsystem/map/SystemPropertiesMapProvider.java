@@ -2,7 +2,7 @@ package org.genericsystem.map;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
-import org.genericsystem.annotation.Extends;
+import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.InstanceValueClassConstraint;
@@ -52,7 +52,7 @@ public class SystemPropertiesMapProvider extends AbstractMapProvider<AxedPropert
 	}
 
 	@SystemGeneric
-	@Extends(meta = SystemPropertiesMapProvider.class)
+	@Meta(SystemPropertiesMapProvider.class)
 	@Components(EngineImpl.class)
 	@StringValue(AbstractMapProvider.MAP_VALUE)
 	public static class MapInstance extends GenericImpl {

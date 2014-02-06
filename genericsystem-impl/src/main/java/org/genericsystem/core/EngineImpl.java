@@ -15,6 +15,8 @@ import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.core.CacheImpl.UnsafeCache;
 import org.genericsystem.core.Statics.AnonymousReference;
 import org.genericsystem.core.Statics.TsGenerator;
+import org.genericsystem.core.UnsafeGList.Supers;
+import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.exception.CacheAwareException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -51,13 +53,13 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	void restoreEngine() {
-		restore(new RootTreeNode(), pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
+		restore(new UnsafeVertex(new RootTreeNode(), new Supers(this), new UnsafeComponents()), pickNewTs(), pickNewTs(), 0L, Long.MAX_VALUE);
 	}
 
 	final void restoreEngine(long homeTreeNodeTs, long designTs, long birthTs, long lastReadTs, long deathTs) {
 		assert homeTreeNodeTs != 0;
-		restore(new RootTreeNode(homeTreeNodeTs), designTs, birthTs, lastReadTs, deathTs, new Generic[] { this }, Statics.EMPTY_GENERIC_ARRAY);
-		assert components.length == 0;
+		restore(new UnsafeVertex(new RootTreeNode(homeTreeNodeTs), new Supers(this), new UnsafeComponents()), designTs, birthTs, lastReadTs, deathTs);
+		assert getComponents().isEmpty();
 	}
 
 	@Override
@@ -70,8 +72,8 @@ public class EngineImpl extends GenericImpl implements Engine {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Generic> T buildComplex(HomeTreeNode homeTreeNode, Class<?> clazz, Generic[] supers, Generic[] components) {
-		return (T) ((GenericImpl) getFactory().newGeneric(clazz)).initialize(homeTreeNode, supers, components);
+	<T extends Generic> T build(Class<?> specializationClass, UnsafeVertex uVertex) {
+		return (T) ((GenericImpl) getFactory().newGeneric(uVertex.<GenericImpl> getMeta().specializeInstanceClass(specializationClass))).initialize(uVertex);
 	}
 
 	@Override
@@ -221,8 +223,12 @@ public class EngineImpl extends GenericImpl implements Engine {
 
 		private boolean startupTime = true;
 
+		public SystemCache() {
+			put(EngineImpl.class, EngineImpl.this);
+		}
+
 		SystemCache init(Class<?>... userClasses) {
-			List<Class<?>> classes = Arrays.<Class<?>> asList(EngineImpl.class, MetaAttribute.class, MetaRelation.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
+			List<Class<?>> classes = Arrays.<Class<?>> asList(MetaAttribute.class, MetaRelation.class, SystemPropertiesMapProvider.class, PropertiesMapProvider.class, ConstraintsMapProvider.class);
 			CacheImpl cache = (CacheImpl) start(new UnsafeCache(EngineImpl.this));
 			for (Class<?> clazz : classes)
 				get(clazz);
@@ -271,7 +277,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 			scheduler.scheduleAtFixedRate(new Runnable() {
 				@Override
 				public void run() {
-					runGarbage(Statics.LIFE_TIME_OUT);
+					runGarbage(Statics.LIFE_TIMEOUT);
 				}
 			}, Statics.GARBAGE_INITIAL_DELAY, Statics.GARBAGE_PERIOD, TimeUnit.MILLISECONDS);
 		}
