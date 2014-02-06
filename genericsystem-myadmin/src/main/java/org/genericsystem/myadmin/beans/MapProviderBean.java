@@ -47,8 +47,6 @@ public class MapProviderBean implements Serializable {
 	@Inject
 	private GuiGenericsTreeBean genericTreeBean; // generic tree bean
 	@Inject
-	private PopupPanelBean popupPanelBean; // Popup Panel bean
-	@Inject
 	private GsMessages messages; // messages bean
 
 	private String key;
