@@ -85,14 +85,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	@Deprecated
 	public Supers getSupers() {
 		return vertex.supers();
-	}
-
-	@Override
-	public Supers getStrictSupers() {
-		return vertex.strictSupers();
 	}
 
 	@Override
@@ -119,8 +113,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	final GenericImpl restore(UnsafeVertex uVertex, Long designTs, long birthTs, long lastReadTs, long deathTs) {
 		vertex = new Vertex(this, uVertex);
-		assert vertex.getMeta() != null;
-		// assert getMeta().equals(uVertex.getMeta()) : getMeta().info() + " / " + uVertex.getMeta().info();
 
 		lifeManager = new LifeManager(designTs == null ? getEngine().pickNewTs() : designTs, birthTs, lastReadTs, deathTs);
 
@@ -134,7 +126,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			assert superGeneric.equals(getMeta()) || superGeneric.getMetaLevel() == getMetaLevel() : "superGeneric " + superGeneric.info() + " getMeta() " + getMeta().info();
 			assert superGeneric.equals(getMeta()) || getMeta().inheritsFrom(superGeneric.getMeta()) : getSupers();
 		}
-		// assert getMeta().equals(uVertex.getMeta()) : getMeta().info() + uVertex.getMeta().info();
 		return this;
 	}
 
@@ -147,14 +138,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Set<Generic> supersSet = new HashSet<>();
 		for (Generic superGeneric : getSupers())
 			if (supersSet.add(superGeneric))
-				((GenericImpl) superGeneric).lifeManager.engineInheritingsAndInstances.add(this);
-
-		supersSet = new HashSet<>();
-		for (Generic superGeneric : getStrictSupers())
-			if (supersSet.add(superGeneric))
 				((GenericImpl) superGeneric).lifeManager.engineInheritings.add(this);
-
-		((GenericImpl) getMeta()).lifeManager.engineInstances.add(this);
 		return (T) this;
 	}
 
@@ -167,14 +151,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Set<Generic> supersSet = new HashSet<>();
 		for (Generic superGeneric : getSupers())
 			if (supersSet.add(superGeneric))
-				((GenericImpl) superGeneric).lifeManager.engineInheritingsAndInstances.remove(this);
-
-		supersSet = new HashSet<>();
-		for (Generic superGeneric : getStrictSupers())
-			if (supersSet.add(superGeneric))
 				((GenericImpl) superGeneric).lifeManager.engineInheritings.remove(this);
-
-		((GenericImpl) getMeta()).lifeManager.engineInstances.remove(this);
 		return (T) this;
 	}
 
@@ -213,47 +190,46 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	// TODO clean
 	public <T extends Generic> T getMeta() throws RollbackException {
-		// return (T) vertex.getMeta();
-		return new Metas<T>(homeTreeNode().metaNode).getMeta(this);
+		return vertex.getMeta();
 	}
 
-	private class Metas<T extends Generic> extends HashSet<Generic> {
-
-		private static final long serialVersionUID = 783352418448187992L;
-
-		private final HomeTreeNode metaNode;
-
-		public Metas(HomeTreeNode metaNode) {
-			this.metaNode = metaNode;
-		}
-
-		@Override
-		public boolean add(Generic candidate) {
-			for (Generic generic : this)
-				if (generic.inheritsFrom(candidate))
-					return false;
-			Iterator<Generic> it = iterator();
-			while (it.hasNext())
-				if (candidate.inheritsFrom(it.next()))
-					it.remove();
-			return super.add(candidate);
-		}
-
-		public T getMeta(Generic generic) {
-			if (generic.isEngine())
-				add(generic);
-			else {
-				for (Generic superGeneric : ((GenericImpl) generic).getSupers())
-					if (((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
-						add(superGeneric);
-				for (Generic superGeneric : ((GenericImpl) generic).getSupers())
-					if (((GenericImpl) superGeneric).homeTreeNode().inheritsFrom(metaNode) && !((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
-						add(getMeta(superGeneric));
-			}
-			return (T) unambigousFirst(iterator());
-		}
-
-	}
+	// private class Metas<T extends Generic> extends HashSet<Generic> {
+	//
+	// private static final long serialVersionUID = 783352418448187992L;
+	//
+	// private final HomeTreeNode metaNode;
+	//
+	// public Metas(HomeTreeNode metaNode) {
+	// this.metaNode = metaNode;
+	// }
+	//
+	// @Override
+	// public boolean add(Generic candidate) {
+	// for (Generic generic : this)
+	// if (generic.inheritsFrom(candidate))
+	// return false;
+	// Iterator<Generic> it = iterator();
+	// while (it.hasNext())
+	// if (candidate.inheritsFrom(it.next()))
+	// it.remove();
+	// return super.add(candidate);
+	// }
+	//
+	// public T getMeta(Generic generic) {
+	// if (generic.isEngine())
+	// add(generic);
+	// else {
+	// for (Generic superGeneric : ((GenericImpl) generic).getSupers())
+	// if (((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
+	// add(superGeneric);
+	// for (Generic superGeneric : ((GenericImpl) generic).getSupers())
+	// if (((GenericImpl) superGeneric).homeTreeNode().inheritsFrom(metaNode) && !((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
+	// add(getMeta(superGeneric));
+	// }
+	// return (T) unambigousFirst(iterator());
+	// }
+	//
+	// }
 
 	@Override
 	public int getMetaLevel() {
@@ -507,10 +483,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	public <T extends Generic> Iterator<T> instancesIterator() {
+		return Statics.<T> levelFilter(GenericImpl.this.<T> inheritingsIterator(), getMetaLevel() + 1);
+	}
+
 	// TODO KK supers are necessary for get instance from meta !!!
 	@Override
 	public <T extends Generic> T getInstance(Serializable value, Generic... targets) {
-		return this.unambigousFirst(targetsFilter(Statics.<T> valueFilter(GenericImpl.this.<T> instancesIterator(), value), this, targets));
+		return this.unambigousFirst(targetsFilter(Statics.<T> valueFilter(GenericImpl.this.<T> allInstancesIterator(), value), this, targets));
 	}
 
 	private <T extends Link> Iterator<T> linksIterator(final Link relation, final int basePos, final Generic... targets) {
@@ -599,31 +579,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().inheritingsIterator(this);
 	}
 
-	@Deprecated
-	public <T extends Generic> Iterator<T> inheritingsAndInstancesIterator() {
-		return getCurrentCache().inheritingsAndInstancesIterator(this);
-	}
-
-	public <T extends Generic> Iterator<T> instancesIterator() {
-		return getCurrentCache().instancesIterator(this);
-	}
-
 	public <T extends Generic> Iterator<T> dependenciesIterator() {
-		return new ConcateIterator<T>(this.<T> inheritingsAndInstancesIterator(), this.<T> compositesIterator());
+		return new ConcateIterator<T>(this.<T> inheritingsIterator(), this.<T> compositesIterator());
 	}
 
 	@Override
 	public <T extends Generic> Snapshot<T> getInheritingsAndInstances() {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return inheritingsAndInstancesIterator();
-			}
-		};
-	}
-
-	@Override
-	public <T extends Generic> Snapshot<T> getInheritings() {
 		return new AbstractSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
@@ -997,11 +958,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		if (getComponents().size() < superUVertex.components().size())
 			return false;
 		for (Generic subSuper : getSupers())
-			if (isSuperOf(((GenericImpl) subSuper).vertex()))
+			if (subSuper.inheritsFrom(this))
 				return true;
 		if (!homeTreeNode().inheritsFrom(superUVertex.homeTreeNode()))
-			return false;
-		if (!inheritsFromAll(superUVertex.supers()))
 			return false;
 		if (getComponents().size() > superUVertex.components().size()) {
 			for (int i = 0; i < getComponents().size(); i++)
@@ -1015,6 +974,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					return false;
 			} else if (!((GenericImpl) getComponents().get(i)).inheritsFrom(superUVertex))
 				return false;
+		if (!inheritsFromAll(superUVertex.supers()))
+			return false;
 		return true;
 
 	}
@@ -1033,9 +994,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return true;
 		if (!subUVertex.homeTreeNode().inheritsFrom(homeTreeNode()))
 			return false;
-		for (Generic superGeneric : getSupers())
-			if (!((GenericImpl) superGeneric).isSuperOf(subUVertex))
-				return false;
+		// for (Generic superGeneric : getSupers())
+		// if (!((GenericImpl) superGeneric).isSuperOf(subUVertex))
+		// return false;
 		if (subUVertex.components().size() > getComponents().size()) {
 			for (int i = 0; i < subUVertex.components().size(); i++)
 				if (isSuperOf(subUVertex.truncateComponent(i)))
@@ -1066,9 +1027,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return true;
 		if (!subUVertex.homeTreeNode().inheritsFrom(superUVertex.homeTreeNode()))
 			return false;
-		for (Generic superGeneric : superUVertex.supers())
-			if (!((GenericImpl) superGeneric).isSuperOf(subUVertex))
-				return false;
+		// for (Generic superGeneric : superUVertex.supers())
+		// if (!((GenericImpl) superGeneric).isSuperOf(subUVertex))
+		// return false;
 		if (subUVertex.components().size() > superUVertex.components().size()) {
 			for (int i = 0; i < subUVertex.components().size(); i++)
 				if (isSuperOf(superUVertex, subUVertex.truncateComponent(i)))
@@ -1135,8 +1096,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		s += "**********************************************************************\n";
 		for (Generic superGeneric : getSupers())
 			s += " Super       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
-		for (Generic superGeneric : getStrictSupers())
-			s += " StrictSuper       : " + superGeneric + " (" + System.identityHashCode(superGeneric) + ")\n";
 		for (Generic component : getComponents())
 			s += " Component   : " + component + " (" + System.identityHashCode(component) + ")\n";
 		s += "**********************************************************************\n";
@@ -1248,7 +1207,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public Iterator<Generic> children(Generic node) {
-				return new AbstractFilterIterator<Generic>(((GenericImpl) node).inheritingsAndInstancesIterator()) {
+				return new AbstractFilterIterator<Generic>(((GenericImpl) node).inheritingsIterator()) {
 					@Override
 					public boolean isSelected() {
 						return next.getMetaLevel() <= metaLevel;
@@ -1274,7 +1233,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> subTypesIterator() {
-		return Statics.levelFilter(GenericImpl.this.<T> inheritingsAndInstancesIterator(), getMetaLevel());
+		return Statics.levelFilter(GenericImpl.this.<T> inheritingsIterator(), getMetaLevel());
 	}
 
 	@Override
@@ -1334,7 +1293,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public Iterator<Generic> children(Generic node) {
-				return (((GenericImpl) node).inheritingsAndInstancesIterator());
+				return (((GenericImpl) node).inheritingsIterator());
 			}
 		};
 	}
@@ -1350,7 +1309,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			@Override
 			public Iterator<Generic> children(Generic node) {
-				return (((GenericImpl) node).inheritingsAndInstancesIterator());
+				return (((GenericImpl) node).inheritingsIterator());
 			}
 		};
 	}
@@ -1893,41 +1852,41 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getClass().isAnnotationPresent(SystemGeneric.class);
 	}
 
-	UnsafeVertex getUpdatedValueVertex(Serializable value) {
-		return new UnsafeVertex(((GenericImpl) getMeta()).bindInstanceNode(value), getMeta(), getSupers(), getStrictSupers(), selfToNullComponents());
+	UnsafeVertex getUpdatedValueVertex(HomeTreeNode newHomeTreeNode) {
+		return new UnsafeVertex(newHomeTreeNode, getSupers(), selfToNullComponents());
 	}
 
 	UnsafeVertex createNewVertex(Serializable value, Generic[] supers, Generic[] strictSupers, Generic[] components) {
-		return new UnsafeVertex(bindInstanceNode(value), this, new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new Supers(strictSupers), new UnsafeComponents(components));
+		return new UnsafeVertex(bindInstanceNode(value), new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components));
 	}
 
 	UnsafeVertex getInsertedComponentVertex(Generic newComponent, int pos) {
-		return new UnsafeVertex(homeTreeNode(), getMeta(), getSupers(), getStrictSupers(), Statics.insertIntoComponents(newComponent, selfToNullComponents(), pos));
+		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.insertIntoComponents(newComponent, selfToNullComponents(), pos));
 	}
 
 	UnsafeVertex getTruncatedComponentVertex(int pos) {
-		return new UnsafeVertex(homeTreeNode(), getMeta(), getSupers(), getStrictSupers(), Statics.truncate(pos, selfToNullComponents()));
+		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.truncate(pos, selfToNullComponents()));
 	}
 
 	UnsafeVertex getReplacedComponentVertex(int pos, Generic newComponent) {
-		return new UnsafeVertex(homeTreeNode(), getMeta(), getSupers(), getStrictSupers(), Statics.replace(pos, selfToNullComponents(), newComponent));
+		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, selfToNullComponents(), newComponent));
 	}
 
 	// TODO kk ?
 	UnsafeVertex filterToProjectVertex(UnsafeComponents components, int pos) {
-		return new UnsafeVertex(homeTreeNode(), getMeta(), getSupers(), getStrictSupers(), Statics.replace(pos, components, getComponent(pos)));
+		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, components, getComponent(pos)));
 	}
 
 	UnsafeVertex projectVertex(UnsafeComponents components) {
-		return new UnsafeVertex(homeTreeNode(), getMeta(), getSupers(), getStrictSupers(), components);
+		return new UnsafeVertex(homeTreeNode(), getSupers(), components);
 	}
 
 	UnsafeVertex getInsertedSuperVertex(Generic newSuper) {
-		return new UnsafeVertex(homeTreeNode(), getMeta(), Statics.insertIntoSupers(newSuper, getSupers(), 0), Statics.insertIntoSupers(newSuper, getSupers(), 0), selfToNullComponents());
+		return new UnsafeVertex(homeTreeNode(), Statics.insertIntoSupers(newSuper, getSupers(), 0), selfToNullComponents());
 	}
 
 	UnsafeVertex getTruncatedSuperVertex(int pos) {
-		return new UnsafeVertex(homeTreeNode(), getMeta(), Statics.truncate(pos, getSupers()), Statics.truncate(pos, getSupers()), selfToNullComponents());
+		return new UnsafeVertex(homeTreeNode(), Statics.truncate(pos, getSupers()), selfToNullComponents());
 	}
 
 }

@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
 import org.genericsystem.exception.CacheAwareException;
 
 /**
@@ -59,7 +60,8 @@ public interface Factory extends Serializable {
 
 		private static final long serialVersionUID = 374055825050083792L;
 
-		private Class<? extends Generic> genericClass;
+		// Changed to Protected
+		protected Class<? extends Generic> genericClass;
 		private Constructor<? extends Engine> engineConstructor;
 		private Constructor<? extends Cache> cacheConstructorOnCache;
 		private Constructor<? extends Cache> cacheConstructorOnEngine;

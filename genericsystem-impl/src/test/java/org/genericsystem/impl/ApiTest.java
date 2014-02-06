@@ -564,54 +564,40 @@ public class ApiTest extends AbstractTest {
 
 		Holder myVehicle20 = myVehicle.setValue(vehicle30, 20);
 		assert myVehicle20.inheritsFrom(vehicle30);
-		assert !myVehicle20.inheritsFrom(vehicle20);
+		assert myVehicle20.inheritsFrom(vehicle20);
 
 		Holder myVehicle30 = myVehicle.setValue(vehicle20, 30);
 		assert myVehicle30.inheritsFrom(vehicle20);
-		assert !myVehicle30.inheritsFrom(vehicle30);
+		assert myVehicle30.inheritsFrom(vehicle30);
+	}
+
+	public void testInheritance() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		Attribute vehiclePower = vehicle.addAttribute("power");
+		Type car = vehicle.addSubType("Car");
+		Holder defaultVehiclePower235 = vehicle.setValue(vehiclePower, 235);
+		Holder defaultVehiclePower237 = vehicle.setValue(vehiclePower, 237);
+		Holder defaultCarPower235 = car.setValue(vehiclePower, 235);
+		Holder defaultCarPower236 = car.setValue(vehiclePower, 236);
+		assert defaultCarPower235.inheritsFrom(defaultVehiclePower235);
+		assert !defaultCarPower236.inheritsFrom(defaultVehiclePower235);
+		Holder defaultCarPower237 = car.setValue(defaultVehiclePower235, 237);
+		assert defaultCarPower237.inheritsFrom(defaultVehiclePower235);
+		assert defaultCarPower237.inheritsFrom(defaultVehiclePower237);
 	}
 
 	public void testTreeDefault() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Attribute vehiclePower = vehicle.addAttribute("power");
-		Holder vehicle10 = vehicle.setValue(vehiclePower, 10);
-		Holder vehicle20 = vehicle.setValue(vehiclePower, 20);
-		Holder vehicle30 = vehicle.setValue(vehiclePower, 30);
-
-		Type car = vehicle.addSubType("Car");
-		Holder car20 = car.setValue(vehicle10, 20);
-		Holder car30 = car.setValue(vehicle20, 30);
-		Holder car10 = car.setValue(vehicle30, 10);
-
-		Generic superCar = car.addSubType("superCar");
-		Holder superCar30 = car.setValue(car20, 30);
-		Holder superCar10 = car.setValue(car30, 10);
-		Holder superCar20 = car.setValue(car10, 20);
-
-		assert superCar30.inheritsFrom(car20);
-		assert !superCar30.inheritsFrom(car30);
-		assert !superCar30.inheritsFrom(car10);
-
-		assert !superCar10.inheritsFrom(car20);
-		assert superCar10.inheritsFrom(car30);
-		assert !superCar10.inheritsFrom(car10);
-
-		assert !superCar20.inheritsFrom(car20);
-		assert !superCar20.inheritsFrom(car30);
-		assert superCar20.inheritsFrom(car10);
-
-		assert superCar30.inheritsFrom(vehicle10);
-		assert !superCar30.inheritsFrom(vehicle20);
-		assert !superCar30.inheritsFrom(vehicle30);
-
-		assert !superCar10.inheritsFrom(vehicle10);
-		assert superCar10.inheritsFrom(vehicle20);
-		assert !superCar10.inheritsFrom(vehicle30);
-
-		assert !superCar20.inheritsFrom(vehicle10);
-		assert !superCar20.inheritsFrom(vehicle20);
-		assert superCar20.inheritsFrom(vehicle30);
+		Attribute equipment = vehicle.addAttribute("Equipment");
+		Holder airConditioning = vehicle.setValue(equipment, "air conditioning");
+		Holder metalPaint = vehicle.setValue(equipment, "metal paint");
+		Generic myVehicle = vehicle.setInstance("myVehicle");
+		Generic myVehicleAirConditioning = myVehicle.setHolder(airConditioning, "metal paint");
+		assert myVehicleAirConditioning.inheritsFrom(metalPaint);
+		assert myVehicleAirConditioning.inheritsFrom(equipment);
+		assert myVehicle.getHolders(equipment).size() == 1;
 	}
 
 	public void testOverrideAttribute() {

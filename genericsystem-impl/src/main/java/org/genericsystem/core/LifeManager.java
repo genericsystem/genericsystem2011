@@ -23,9 +23,6 @@ public class LifeManager {
 	private AtomicLong lastReadTs;
 	private long deathTs;
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	@Deprecated
-	final EngineDependencies engineInheritingsAndInstances = new EngineDependencies();
-	final EngineDependencies engineInstances = new EngineDependencies();
 	final EngineDependencies engineInheritings = new EngineDependencies();
 	final EngineDependencies engineComposites = new EngineDependencies();
 
