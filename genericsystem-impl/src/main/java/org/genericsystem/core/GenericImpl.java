@@ -193,44 +193,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return vertex.getMeta();
 	}
 
-	// private class Metas<T extends Generic> extends HashSet<Generic> {
-	//
-	// private static final long serialVersionUID = 783352418448187992L;
-	//
-	// private final HomeTreeNode metaNode;
-	//
-	// public Metas(HomeTreeNode metaNode) {
-	// this.metaNode = metaNode;
-	// }
-	//
-	// @Override
-	// public boolean add(Generic candidate) {
-	// for (Generic generic : this)
-	// if (generic.inheritsFrom(candidate))
-	// return false;
-	// Iterator<Generic> it = iterator();
-	// while (it.hasNext())
-	// if (candidate.inheritsFrom(it.next()))
-	// it.remove();
-	// return super.add(candidate);
-	// }
-	//
-	// public T getMeta(Generic generic) {
-	// if (generic.isEngine())
-	// add(generic);
-	// else {
-	// for (Generic superGeneric : ((GenericImpl) generic).getSupers())
-	// if (((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
-	// add(superGeneric);
-	// for (Generic superGeneric : ((GenericImpl) generic).getSupers())
-	// if (((GenericImpl) superGeneric).homeTreeNode().inheritsFrom(metaNode) && !((GenericImpl) superGeneric).homeTreeNode().equals(metaNode))
-	// add(getMeta(superGeneric));
-	// }
-	// return (T) unambigousFirst(iterator());
-	// }
-	//
-	// }
-
 	@Override
 	public int getMetaLevel() {
 		return homeTreeNode().getMetaLevel();
@@ -980,6 +942,37 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	}
 
+	private static boolean areComponentsInheriting(List<Generic> subComponents, List<Generic> components) {
+		for (int i = 0; i < components.size(); i++)
+			if (!subComponents.get(i).inheritsFrom(components.get(i)))
+				return false;
+		return true;
+	}
+
+	// boolean isExtentedBy(HardProperties hardProperties, UnsafeVertex uVertex) {
+	// if (Statics.CONCRETE == uVertex.metaLevel() && getMeta().equals((uVertex.getMeta()))) {
+	// if (hardProperties.isProperty())
+	// if (areComponentsInheriting(uVertex.components(), getComponents())) {
+	// if (!uVertex.components().equals(getComponents()))
+	// return true;
+	// if (homeTreeNode().equals(uVertex.homeTreeNode()))
+	// return true;
+	// }
+	// for (int pos = 0; pos < uVertex.components().size(); pos++) {
+	// if ((hardProperties.isStrongSingular(pos))) {
+	// if (uVertex.components().get(pos).inheritsFrom(getComponent(pos))) {
+	// if (!uVertex.components().get(pos).equals(getComponent(pos)))
+	// return true;
+	// if (homeTreeNode().equals(uVertex.homeTreeNode()))
+	// if (areComponentsInheriting(uVertex.components(), getComponents()))
+	// return true;
+	// }
+	// }
+	// }
+	// }
+	// return false;
+	// }
+
 	public boolean isSuperOf(UnsafeVertex subUVertex) {
 		if (isEngine())
 			return true;
@@ -992,8 +985,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		for (Generic subSuper : subUVertex.supers())
 			if (subSuper.inheritsFrom(this))
 				return true;
-		if (!subUVertex.homeTreeNode().inheritsFrom(homeTreeNode()))
-			return false;
 		// for (Generic superGeneric : getSupers())
 		// if (!((GenericImpl) superGeneric).isSuperOf(subUVertex))
 		// return false;
@@ -1003,6 +994,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					return true;
 			return false;
 		}
+		if (Statics.CONCRETE == subUVertex.metaLevel() && getMeta().equals((subUVertex.getMeta()))) {
+			if (((GenericImpl) subUVertex.getMeta()).isPropertyConstraintEnabled())
+				if (areComponentsInheriting(subUVertex.components(), getComponents())) {
+					if (!subUVertex.components().equals(getComponents()))
+						return true;
+					if (homeTreeNode().equals(subUVertex.homeTreeNode()))
+						return true;
+				}
+			for (int pos = 0; pos < subUVertex.components().size(); pos++) {
+				if (((GenericImpl) subUVertex.getMeta()).isSingularConstraintEnabled(pos) && !((GenericImpl) subUVertex.getMeta()).isReferentialIntegrity(pos)) {
+					if (subUVertex.components().get(pos).inheritsFrom(getComponent(pos))) {
+						if (!subUVertex.components().get(pos).equals(getComponent(pos)))
+							return true;
+						if (homeTreeNode().equals(subUVertex.homeTreeNode()))
+							if (areComponentsInheriting(subUVertex.components(), getComponents()))
+								return true;
+					}
+				}
+			}
+		}
+
+		if (!subUVertex.homeTreeNode().inheritsFrom(homeTreeNode()))
+			return false;
+
 		for (int i = 0; i < subUVertex.components().size(); i++)
 			if (subUVertex.components().get(i) != null) {
 				if (!subUVertex.components().get(i).inheritsFrom(getComponents().get(i)))
