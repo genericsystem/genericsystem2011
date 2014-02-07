@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
+import org.genericsystem.core.AbstractWriter.AbstractLoader.GSClassNotFound;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.slf4j.Logger;
@@ -40,7 +42,7 @@ public abstract class AbstractWriter {
 			return;
 		writeAncestors(generic.getSupers());
 		writeAncestors(generic.getComponents());
-		getFormalOutputStream().writeObject(GenericImpl.class.equals(generic.getClass()) ? null : generic.getClass());
+		getFormalOutputStream().writeObject(GSClassNotFound.class.isAssignableFrom(generic.getClass()) ? ((GSClassNotFound) generic).getClassName() : generic.getClass().getName());
 	}
 
 	private void writeTs(Generic generic) throws IOException {
@@ -77,7 +79,7 @@ public abstract class AbstractWriter {
 			}
 			Supers supers = new Supers(loadAncestors(engine, genericMap));
 			UnsafeComponents uComponents = new UnsafeComponents(loadAncestors(engine, genericMap));
-			Generic generic = engine.getFactory().newGeneric((Class<?>) getFormalInputStream().readObject());
+			Generic generic = newGeneric(engine);
 			plug(((GenericImpl) generic).restore(new UnsafeVertex(homeTreeNode, supers, uComponents), ts[0], ts[1], ts[2], ts[3]));
 			if (!homeTreeMap.containsKey(homeTreeNodeTs))
 				homeTreeMap.put(homeTreeNodeTs, ((GenericImpl) generic).homeTreeNode());
@@ -87,11 +89,58 @@ public abstract class AbstractWriter {
 
 		private Serializable getClassValue() throws IOException {
 			try {
-				return (Serializable) getContentInputStream().readObject();
+				Serializable serializable = (Serializable) getContentInputStream().readObject();
+				if (serializable.getClass().isAssignableFrom(GSClassNotFound.class))
+					return Class.forName(((GSClassNotFound) serializable).getClassName());
+				return serializable;
 			} catch (ClassNotFoundException e) {
-				log.warn("ClassNotFoundException " + e.getMessage(), e.getException());
+				log.warn("ClassNotFoundException " + e.getMessage());
+				return new GSClassNotFound(e.getMessage());
 			}
-			return null;
+		}
+
+		private Generic newGeneric(Engine engine) throws IOException, ClassNotFoundException {
+			String className = (String) getFormalInputStream().readObject();
+			try {
+				return engine.getFactory().newGeneric(Class.forName(className));
+			} catch (ClassNotFoundException e) {
+				log.warn("ClassNotFoundException " + e.getMessage());
+				GSClassNotFound generic = (GSClassNotFound) engine.getFactory().newGeneric(GSClassNotFound.class);
+				generic.setClassName(className);
+				return generic;
+			}
+		}
+
+		public static class GSClassNotFound extends GenericImpl implements Serializable {
+
+			private static final long serialVersionUID = 8872715326590973682L;
+
+			private String className;
+
+			public GSClassNotFound() {
+			}
+
+			public GSClassNotFound(String className) {
+				this.className = className;
+			}
+
+			private void writeObject(ObjectOutputStream oos) throws IOException {
+				oos.writeObject(className);
+			}
+
+			public String getClassName() {
+				return className;
+			}
+
+			public void setClassName(String className) {
+				this.className = className;
+			}
+
+			@Override
+			public String toString() {
+				return "GSClassNotFound " + className;
+			}
+
 		}
 
 		protected long[] loadTs() throws IOException {

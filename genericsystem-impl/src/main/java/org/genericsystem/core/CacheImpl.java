@@ -387,7 +387,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		Generic[] components = findComponents(clazz);
 		GenericImpl meta = getMeta(clazz, components);
 		Serializable value = findImplictValue(clazz);
-		// log.info("BIND : " + clazz);
 		for (Generic generic : userSupers)
 			assert generic.isMeta() || (meta.getMetaLevel() + 1 == generic.getMetaLevel()) : clazz + generic.info();
 
