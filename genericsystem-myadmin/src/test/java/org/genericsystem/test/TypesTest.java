@@ -32,7 +32,7 @@ public class TypesTest extends AbstractTest {
 		Generic vehicle = cache.find(Vehicle.class);
 		Generic myVehicle = cache.find(MyVehicle.class);
 		assert myVehicle.inheritsFrom(vehicle);
-		assert vehicle.getInheritingsAndInstances().contains(myVehicle);
+		assert vehicle.getInheritings().contains(myVehicle);
 	}
 
 	public void testGetAttributes() {

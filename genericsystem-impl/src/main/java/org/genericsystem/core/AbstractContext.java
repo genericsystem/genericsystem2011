@@ -101,7 +101,7 @@ public abstract class AbstractContext {
 			@SuppressWarnings("unchecked")
 			public void addDependencies(Generic generic) throws ReferentialIntegrityConstraintViolationException {
 				if (super.add((T) generic)) {// protect from loop
-					for (T inheritingDependency : generic.<T> getInheritingsAndInstances())
+					for (T inheritingDependency : generic.<T> getInheritings())
 						if (((GenericImpl) inheritingDependency).isAutomatic())
 							addDependencies(inheritingDependency);
 						else if (!contains(inheritingDependency))

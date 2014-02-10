@@ -45,6 +45,18 @@ class UnsafeVertex {
 		return homeTreeNode.getMetaLevel();
 	}
 
+	public boolean isConcrete() {
+		return Statics.CONCRETE == metaLevel();
+	}
+
+	public boolean isStructural() {
+		return Statics.STRUCTURAL == metaLevel();
+	}
+
+	public boolean isMeta() {
+		return Statics.META == metaLevel();
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T extends Generic> T getMeta() {
 		for (Generic superGeneric : supers())

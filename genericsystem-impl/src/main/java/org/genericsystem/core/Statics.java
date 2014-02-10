@@ -370,7 +370,7 @@ public class Statics {
 
 		public void addDependencies(Generic dependency) {
 			if (super.add(dependency)) {// protect from loop
-				for (Generic inheritingDependency : dependency.<Generic> getInheritingsAndInstances())
+				for (Generic inheritingDependency : dependency.<Generic> getInheritings())
 					addDependencies(inheritingDependency);
 				for (Generic compositeDependency : dependency.<Generic> getComposites())
 					addDependencies(compositeDependency);

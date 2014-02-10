@@ -234,17 +234,17 @@ public class AnnotationTest extends AbstractTest {
 		assert transformerChildrenGames.inheritsFrom(childrenGames);
 		assert transformerChildrenGames.getSupers().contains(childrenGames) : transformerChildrenGames.info();
 		assert transformerChildrenGames.getSupers().contains(transformer);
-		assert transformerChildrenGames.getInheritingsAndInstances().size() == 0;
+		assert transformerChildrenGames.getInheritings().size() == 0;
 		assert transformerChildrenGames.getComposites().size() == 0;
 
 		assert childrenGames.getSupers().contains(games);
 		assert childrenGames.getSupers().contains(children);
-		assert childrenGames.getInheritingsAndInstances().contains(transformerChildrenGames);
+		assert childrenGames.getInheritings().contains(transformerChildrenGames);
 		assert childrenGames.getComposites().size() == 0;
 
 		assert transformer.getSupers().contains(vehicle);
 		assert transformer.getSupers().contains(human);
-		assert transformer.getInheritingsAndInstances().contains(transformerChildrenGames);
+		assert transformer.getInheritings().contains(transformerChildrenGames);
 		assert transformer.getComposites().size() == 0;
 	}
 
@@ -271,28 +271,28 @@ public class AnnotationTest extends AbstractTest {
 		assert !myTransformerChildrenGames.inheritsFrom(myChildrenGames);
 		assert !myTransformerChildrenGames.inheritsFrom(myTransformer);
 		assert myTransformerChildrenGames.getSupers().contains(transformerChildrenGames);
-		assert myTransformerChildrenGames.getInheritingsAndInstances().size() == 0;
+		assert myTransformerChildrenGames.getInheritings().size() == 0;
 		assert myTransformerChildrenGames.getComposites().size() == 0;
 
-		assert transformerChildrenGames.getInheritingsAndInstances().contains(myTransformerChildrenGames);
+		assert transformerChildrenGames.getInheritings().contains(myTransformerChildrenGames);
 		assert myTransformerChildrenGames.isInstanceOf(transformerChildrenGames);
 
 		assert !myChildrenGames.inheritsFrom(myGames);
 		assert !myChildrenGames.inheritsFrom(myChildren);
 		assert myChildrenGames.getSupers().contains(childrenGames);
-		assert myChildrenGames.getInheritingsAndInstances().size() == 0;
+		assert myChildrenGames.getInheritings().size() == 0;
 		assert myChildrenGames.getComposites().size() == 0;
 
-		assert childrenGames.getInheritingsAndInstances().contains(myChildrenGames);
+		assert childrenGames.getInheritings().contains(myChildrenGames);
 		assert myChildrenGames.isInstanceOf(childrenGames);
 
 		assert !myTransformer.inheritsFrom(myVehicle);
 		assert !myTransformer.inheritsFrom(myck);
 		assert myTransformer.getSupers().contains(transformer);
-		assert myTransformer.getInheritingsAndInstances().size() == 0;
+		assert myTransformer.getInheritings().size() == 0;
 		assert myTransformer.getComposites().size() == 0;
 
-		assert transformer.getInheritingsAndInstances().contains(myTransformer);
+		assert transformer.getInheritings().contains(myTransformer);
 		assert myTransformer.isInstanceOf(transformer);
 	}
 

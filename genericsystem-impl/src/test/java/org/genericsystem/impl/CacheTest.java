@@ -20,13 +20,13 @@ public class CacheTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Cache cache2 = cache.mountNewCache();
 		Type vehicle = cache2.addType("Vehicle");
-		assert cache2.getEngine().getInheritingsAndInstances().contains(vehicle);
+		assert cache2.getEngine().getInheritings().contains(vehicle);
 		cache.start();
-		assert !cache.getEngine().getInheritingsAndInstances().contains(vehicle);
+		assert !cache.getEngine().getInheritings().contains(vehicle);
 		cache2.start();
 		cache2.flush();
 		cache.start();
-		assert cache.getEngine().getInheritingsAndInstances().contains(vehicle);
+		assert cache.getEngine().getInheritings().contains(vehicle);
 	}
 
 	public void testCacheLevelOK() {

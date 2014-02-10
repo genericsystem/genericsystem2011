@@ -141,7 +141,7 @@ class GenericBuilder {
 							old = dependency;
 						}
 		for (Generic dependency : directDependencies) {
-			assert !uVertex.supers().contains(dependency) : uVertex.supers().get(0).info() + " " + uVertex.components();
+			assert !uVertex.supers().contains(dependency) : dependency.info() + uVertex.supers().get(0).info() + " " + uVertex.components();
 			assert !uVertex.components().contains(dependency) : uVertex.components();
 			assert !((GenericImpl) dependency).equiv(uVertex) : dependency.info() + ((GenericImpl) dependency).isSuperOf(uVertex);
 		}
@@ -169,7 +169,11 @@ class GenericBuilder {
 		}) {
 			@Override
 			public boolean isSelected() {
-				return isAncestorOf((next)) || isExtention(next);
+				boolean result = isAncestorOf((next));
+				// if (!result && next.isConcrete() && uVertex.getMeta().equals(next.getMeta()))
+				// assert !isExtention(next) : next.info() + uVertex.info();
+				return result || isExtention(next);
+
 			}
 		};
 

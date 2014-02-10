@@ -46,7 +46,7 @@ public class TreeTest extends AbstractTest {
 		assert !child3.inheritsFrom(root);
 		assert child3.isInstanceOf(tree);
 		assert child3.getBaseComponent().equals(child);
-		assert root.getInheritingsAndInstances().isEmpty();
+		assert root.getInheritings().isEmpty();
 		assert tree.getAllInstances().containsAll(Arrays.asList(new Generic[] { root, child, child2, child3 }));
 		assert child.inheritsFrom(tree);
 		assert !child.inheritsFrom(root);

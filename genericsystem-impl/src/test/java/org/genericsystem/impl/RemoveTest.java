@@ -23,7 +23,7 @@ public class RemoveTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		vehicle.remove();
 		assert !vehicle.isAlive();
-		assert !cache.getEngine().getInheritingsAndInstances().contains(vehicle);
+		assert !cache.getEngine().getInheritings().contains(vehicle);
 	}
 
 	public void testRemoveTypeWithSubType() {
@@ -44,8 +44,8 @@ public class RemoveTest extends AbstractTest {
 		Attribute power = vehicle.setAttribute("power");
 		power.remove();
 		assert !power.isAlive();
-		assert !cache.getEngine().getInheritingsAndInstances().contains(power);
-		assert cache.getEngine().getInheritingsAndInstances().contains(vehicle);
+		assert !cache.getEngine().getInheritings().contains(power);
+		assert cache.getEngine().getInheritings().contains(vehicle);
 	}
 
 	// public void testRemoveAttributeWithSubAttribute() {
@@ -73,8 +73,8 @@ public class RemoveTest extends AbstractTest {
 		Generic myWindow = window.addInstance("MyWindow");
 		Holder myHeight1 = ((Attribute) myWindow).setValue(height, 165);
 		myHeight1.remove();
-		assert cache.getEngine().getInheritingsAndInstances().contains(window);
-		assert !cache.getEngine().getInheritingsAndInstances().contains(height);
+		assert cache.getEngine().getInheritings().contains(window);
+		assert !cache.getEngine().getInheritings().contains(height);
 		assert !cache.getEngine().getAllSubTypes().contains(myHeight1);
 	}
 
