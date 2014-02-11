@@ -23,26 +23,6 @@ class GenericBuilder extends UnsafeVertex {
 		super(uVertex, respectSupers);
 	}
 
-	boolean containsSuperInMultipleInheritanceValue(Generic candidate) {
-		if (supers().size() <= 1 || !containsSuper(candidate))
-			return false;
-		return (sameHomeTreeNode());
-	}
-
-	boolean containsSuper(Generic candidate) {
-		for (Generic superGenenic : supers())
-			if (candidate.equals(superGenenic))
-				return true;
-		return false;
-	}
-
-	boolean sameHomeTreeNode() {
-		for (Generic superGenenic : supers())
-			if (!homeTreeNode().equals(((GenericImpl) superGenenic).homeTreeNode()))
-				return false;
-		return true;
-	}
-
 	private CacheImpl getCurrentCache() {
 		return ((GenericImpl) getMeta()).getCurrentCache();
 	}
