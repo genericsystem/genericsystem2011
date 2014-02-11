@@ -429,12 +429,12 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}
 
 		@SuppressWarnings("unchecked")
-		<T extends Generic> T rebuildAll(Generic old, NavigableSet<Generic> dependencies) {
+		<T extends Generic> T rebuildAll(Generic toReplace, NavigableSet<Generic> dependencies) {
 			removeAll(dependencies);
 			Generic build = rebuild();
-			if (old != null) {
-				dependencies.remove(old);
-				put(old, build);
+			if (toReplace != null) {
+				dependencies.remove(toReplace);
+				put(toReplace, build);
 			}
 			reBind(dependencies);
 			return (T) build;
