@@ -1,8 +1,13 @@
 package org.genericsystem.core;
 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+import org.genericsystem.core.Statics.OrderedSupers;
 import org.genericsystem.core.UnsafeGList.Components;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.core.UnsafeGList.UnsafeComponents;
+import org.genericsystem.iterator.AbstractSelectableLeafIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +21,7 @@ class UnsafeVertex {
 
 	private final HomeTreeNode homeTreeNode;
 
-	private final Supers supers;
+	private Supers supers;
 
 	private final UnsafeComponents components;
 
@@ -27,6 +32,11 @@ class UnsafeVertex {
 		this.homeTreeNode = homeTreeNode;
 		this.supers = supers;
 		this.components = components;
+	}
+
+	UnsafeVertex(UnsafeVertex uVertex, boolean respectSupers) {
+		this(uVertex.homeTreeNode, uVertex.supers, uVertex.components);
+		supers = toExtendedSupers(respectSupers);
 	}
 
 	public HomeTreeNode homeTreeNode() {
@@ -89,6 +99,21 @@ class UnsafeVertex {
 			s += " Component   : " + component + " (" + System.identityHashCode(component) + ")\n";
 		s += "**********************************************************************\n";
 		return s;
+	}
+
+	private Supers toExtendedSupers(final boolean respectSupers) {
+		final Engine engine = ((GenericImpl) getMeta()).getEngine();
+		Iterator<Generic> iterator = new AbstractSelectableLeafIterator(engine) {
+			@Override
+			public boolean isSelected(Generic candidate) {
+				return ((GenericImpl) candidate).isSuperOf(UnsafeVertex.this);
+			}
+		};
+		Set<Generic> set = new TreeSet<>();
+		while (iterator.hasNext())
+			set.add(iterator.next());
+		Supers result = new Supers(set);
+		return respectSupers ? new OrderedSupers(result, supers().toArray()).toSupers() : result;
 	}
 
 	public static class Vertex extends UnsafeVertex {

@@ -824,6 +824,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 						Generic candidateMeta = candidate.getMeta();
 						if (((GenericImpl) next).homeTreeNode().equals(((GenericImpl) candidate).homeTreeNode()) && next.getMeta().equals(candidateMeta)
 								&& candidateComponents.equals(Statics.replace(pos, ((GenericImpl) next).getComponents(), GenericImpl.this)))
+							bindDependency(
 							new GenericBuilder(((GenericImpl) candidate).getReplacedComponentVertex(pos, GenericImpl.this), true).bindDependency(candidate.getClass(), false, true);
 					}
 				}
