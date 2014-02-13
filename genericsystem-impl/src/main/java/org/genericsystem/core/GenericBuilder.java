@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 import org.genericsystem.core.Statics.OrderedDependencies;
+import org.genericsystem.core.UnsafeGList.Supers;
+import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.iterator.AbstractFilterIterator;
@@ -19,8 +21,8 @@ import org.slf4j.LoggerFactory;
 class GenericBuilder extends UnsafeVertex {
 	protected static Logger log = LoggerFactory.getLogger(GenericBuilder.class);
 
-	GenericBuilder(UnsafeVertex uVertex, boolean respectSupers) {
-		super(uVertex, respectSupers);
+	GenericBuilder(HomeTreeNode homeTreeNode, Supers supers, UnsafeComponents components, boolean respectSupers) {
+		super(homeTreeNode, supers, components, respectSupers);
 	}
 
 	private CacheImpl getCurrentCache() {
