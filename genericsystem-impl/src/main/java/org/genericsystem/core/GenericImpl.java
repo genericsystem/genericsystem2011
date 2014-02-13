@@ -824,7 +824,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 						Generic candidateMeta = candidate.getMeta();
 						if (((GenericImpl) next).homeTreeNode().equals(((GenericImpl) candidate).homeTreeNode()) && next.getMeta().equals(candidateMeta)
 								&& candidateComponents.equals(Statics.replace(pos, ((GenericImpl) next).getComponents(), GenericImpl.this)))
-							((GenericImpl) candidate).getReplacedComponentBuilder(pos, GenericImpl.this).bindDependency(candidate.getClass(), false, true);
+							((GenericImpl) candidate).getReplacedComponentBuilder(pos, GenericImpl.this).simpleBind(candidate.getClass(), false, true);
 					}
 				}
 			}
@@ -854,7 +854,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			});
 
 			if (projection == null)
-				getReplacedComponentsBuilder(components).internalBind(null, true, true);
+				getReplacedComponentsBuilder(components).bind(null, true, true);
 		}
 	}
 
@@ -1856,6 +1856,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getClass().isAnnotationPresent(SystemGeneric.class);
 	}
 
+	// TODO kk ?
+	UnsafeVertex filterToProjectVertex(UnsafeComponents components, int pos) {
+		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, components, getComponent(pos)));
+	}
+
 	GenericBuilder getUpdatedValueVertex(HomeTreeNode newHomeTreeNode) {
 		return new GenericBuilder(newHomeTreeNode, getSupers(), selfToNullComponents(), false);
 	}
@@ -1874,11 +1879,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	GenericBuilder getReplacedComponentBuilder(int pos, Generic newComponent) {
 		return getReplacedComponentsBuilder(Statics.replace(pos, selfToNullComponents(), newComponent));
-	}
-
-	// TODO kk ?
-	UnsafeVertex filterToProjectVertex(UnsafeComponents components, int pos) {
-		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, components, getComponent(pos)));
 	}
 
 	GenericBuilder getReplacedComponentsBuilder(UnsafeComponents components) {

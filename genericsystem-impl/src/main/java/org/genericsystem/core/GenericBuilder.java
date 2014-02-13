@@ -40,19 +40,15 @@ class GenericBuilder extends UnsafeVertex {
 		return null;
 	}
 
-	<T extends Generic> T bindDependency(Class<?> specializationClass, boolean existsException, boolean automatic) throws RollbackException {
+	<T extends Generic> T simpleBind(Class<?> specializationClass, boolean existsException, boolean automatic) throws RollbackException {
 		T result = find(existsException);
 		if (result != null)
 			return result;
-		return buildDependency(specializationClass, automatic);
-	}
-
-	private <T extends Generic> T buildDependency(Class<?> specializationClass, boolean automatic) {
 		CacheImpl cache = getCurrentCache();
-		return cache.<T> insert(cache.<EngineImpl> getEngine().build(((GenericImpl) getMeta()).specializeInstanceClass(specializationClass), this), automatic);
+		return getCurrentCache().<T> insert(cache.<EngineImpl> getEngine().build(((GenericImpl) getMeta()).specializeInstanceClass(specializationClass), this), automatic);
 	}
 
-	<T extends Generic> T internalBind(final Class<?> specializationClass, boolean existsException, final boolean automatic) throws RollbackException {
+	<T extends Generic> T bind(final Class<?> specializationClass, boolean existsException, final boolean automatic) throws RollbackException {
 		T result = find(existsException);
 		if (result != null)
 			return result;
@@ -69,7 +65,7 @@ class GenericBuilder extends UnsafeVertex {
 
 			@Override
 			Generic rebuild() {
-				return GenericBuilder.this.buildDependency(specializationClass, automatic);
+				return GenericBuilder.this.simpleBind(specializationClass, false, automatic);
 			}
 		}.rebuildAll(toReplace[0], dependencies);
 	}
