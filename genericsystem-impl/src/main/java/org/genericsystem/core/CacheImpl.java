@@ -399,14 +399,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 		return ((GenericImpl) meta).createNewBuilder(value, new Generic[] { directSuper }, strictSupers, sortAndCheck).bind(specializationClass, existsException, false);
 	}
 
-	// int findAxe(Generic[] sorts, Generic baseComponent) throws RollbackException {
-	// for (int i = 0; i < sorts.length; i++)
-	// if (baseComponent.equals(sorts[i]))
-	// return i;
-	// rollback(new IllegalStateException());
-	// return -1;// Unreachable
-	// }
-
 	private GenericImpl getMeta(Class<?> clazz, Generic[] components) {
 		Meta metaAnnotation = clazz.getAnnotation(Meta.class);
 		Class<?> meta = metaAnnotation == null || Engine.class.equals(metaAnnotation.value()) ? EngineImpl.class : metaAnnotation.value();
@@ -436,14 +428,10 @@ public class CacheImpl extends AbstractContext implements Cache {
 				dependencies.remove(toReplace);
 				put(toReplace, build);
 			}
-			reBind(dependencies);
+			for (Generic dependency : dependencies)
+				put(dependency, new GenericBuilder(((GenericImpl) dependency).homeTreeNode(), new Supers(new AdjustList(((GenericImpl) dependency).getSupers())), new UnsafeComponents(new AdjustList(((GenericImpl) dependency).selfToNullComponents())),
+						false).bind(dependency.getClass(), false, isAutomatic(dependency)));
 			return (T) build;
-		}
-
-		private void reBindDependency(Generic dependency) {
-			put(dependency,
-					new GenericBuilder(((GenericImpl) dependency).homeTreeNode(), new Supers(new AdjustList(((GenericImpl) dependency).getSupers())), new UnsafeComponents(new AdjustList(((GenericImpl) dependency).selfToNullComponents())), false)
-							.bind(dependency.getClass(), false, isAutomatic(dependency)));
 		}
 
 		private class AdjustList extends ArrayList<Generic> {
@@ -472,15 +460,6 @@ public class CacheImpl extends AbstractContext implements Cache {
 			for (Generic dependency : dependencies.descendingSet())
 				simpleRemove(dependency);
 		}
-
-		private void reBind(NavigableSet<Generic> orderedDependencies) {
-			for (Generic dependency : orderedDependencies)
-				reBindDependency(dependency);
-		}
-
-		// <T extends Generic> T bindDependency(UnsafeVertex uVertex, Class<?> specializationClass, boolean existsException, boolean automatic) throws RollbackException {
-		// return new GenericBuilder(uVertex, false).bindDependency(specializationClass, existsException, automatic);
-		// }
 
 		abstract Generic rebuild();
 	}
