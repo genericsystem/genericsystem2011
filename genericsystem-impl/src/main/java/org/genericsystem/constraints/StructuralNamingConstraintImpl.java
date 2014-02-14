@@ -58,7 +58,7 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 					if (iterator.hasNext()) {
 						Generic next = iterator.next();
 						if (iterator.hasNext())
-							throw new UniqueStructuralValueConstraintViolationException(next.info() + iterator.next().info());
+							throw new UniqueStructuralValueConstraintViolationException(inherited.info() + next.info() + iterator.next().info());
 					}
 				}
 	}
