@@ -44,10 +44,6 @@ class UnsafeVertex {
 		this.supers = toExtendedSupers(respectSupers);
 	}
 
-	UnsafeVertex(UnsafeVertex uVertex, boolean respectSupers) {
-		this(uVertex.homeTreeNode, uVertex.supers, uVertex.components, respectSupers);
-	}
-
 	public HomeTreeNode homeTreeNode() {
 		return homeTreeNode;
 	}

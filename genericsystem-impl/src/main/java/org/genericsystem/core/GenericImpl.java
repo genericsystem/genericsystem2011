@@ -825,6 +825,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 						if (((GenericImpl) next).homeTreeNode().equals(((GenericImpl) candidate).homeTreeNode()) && next.getMeta().equals(candidateMeta)
 								&& candidateComponents.equals(Statics.replace(pos, ((GenericImpl) next).getComponents(), GenericImpl.this)))
 							((GenericImpl) candidate).getReplacedComponentBuilder(pos, GenericImpl.this).simpleBind(candidate.getClass(), false, true);
+						// TODO KK should not call simplebind!!!
 					}
 				}
 			}
