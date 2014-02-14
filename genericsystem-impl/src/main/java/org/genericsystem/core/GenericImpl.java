@@ -824,7 +824,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 						Generic candidateMeta = candidate.getMeta();
 						if (((GenericImpl) next).homeTreeNode().equals(((GenericImpl) candidate).homeTreeNode()) && next.getMeta().equals(candidateMeta)
 								&& candidateComponents.equals(Statics.replace(pos, ((GenericImpl) next).getComponents(), GenericImpl.this)))
-							new GenericBuilder(((GenericImpl) candidate).getReplacedComponentVertex(pos, GenericImpl.this), true).bindDependency(candidate.getClass(), false, true);
+							((GenericImpl) candidate).getReplacedComponentBuilder(pos, GenericImpl.this).simpleBind(candidate.getClass(), false, true);
 					}
 				}
 			}
@@ -854,7 +854,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			});
 
 			if (projection == null)
-				getCurrentCache().internalBind(projectVertex(components), null, Statics.MULTIDIRECTIONAL, true, false);
+				getReplacedComponentsBuilder(components).bind(null, true, true);
 		}
 	}
 
@@ -924,7 +924,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return true;
 		if (getComponents().size() > superUVertex.components().size()) {
 			for (int i = 0; i < getComponents().size(); i++)
-				if (isSuperOf(superUVertex, getTruncatedComponentVertex(i)))
+				if (isSuperOf(superUVertex, vertex.truncateComponent(i)))
 					return true;
 			return false;
 		}
@@ -1856,41 +1856,41 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getClass().isAnnotationPresent(SystemGeneric.class);
 	}
 
-	UnsafeVertex getUpdatedValueVertex(HomeTreeNode newHomeTreeNode) {
-		return new UnsafeVertex(newHomeTreeNode, getSupers(), selfToNullComponents());
-	}
-
-	UnsafeVertex createNewVertex(Serializable value, Generic[] supers, Generic[] strictSupers, Generic[] components) {
-		return new UnsafeVertex(bindInstanceNode(value), new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components));
-	}
-
-	UnsafeVertex getInsertedComponentVertex(Generic newComponent, int pos) {
-		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.insertIntoComponents(newComponent, selfToNullComponents(), pos));
-	}
-
-	UnsafeVertex getTruncatedComponentVertex(int pos) {
-		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.truncate(pos, selfToNullComponents()));
-	}
-
-	UnsafeVertex getReplacedComponentVertex(int pos, Generic newComponent) {
-		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, selfToNullComponents(), newComponent));
-	}
-
 	// TODO kk ?
 	UnsafeVertex filterToProjectVertex(UnsafeComponents components, int pos) {
 		return new UnsafeVertex(homeTreeNode(), getSupers(), Statics.replace(pos, components, getComponent(pos)));
 	}
 
-	UnsafeVertex projectVertex(UnsafeComponents components) {
-		return new UnsafeVertex(homeTreeNode(), getSupers(), components);
+	GenericBuilder getUpdatedValueVertex(HomeTreeNode newHomeTreeNode) {
+		return new GenericBuilder(newHomeTreeNode, getSupers(), selfToNullComponents(), false);
 	}
 
-	UnsafeVertex getInsertedSuperVertex(Generic newSuper) {
-		return new UnsafeVertex(homeTreeNode(), Statics.insertIntoSupers(newSuper, getSupers(), 0), selfToNullComponents());
+	GenericBuilder createNewBuilder(Serializable value, Generic[] supers, Generic[] strictSupers, Generic[] components) {
+		return new GenericBuilder(bindInstanceNode(value), new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components), true);
 	}
 
-	UnsafeVertex getTruncatedSuperVertex(int pos) {
-		return new UnsafeVertex(homeTreeNode(), Statics.truncate(pos, getSupers()), selfToNullComponents());
+	GenericBuilder getInsertedComponentVertex(Generic newComponent, int pos) {
+		return new GenericBuilder(homeTreeNode(), getSupers(), Statics.insertIntoComponents(newComponent, selfToNullComponents(), pos), true);
+	}
+
+	GenericBuilder getTruncatedComponentVertex(int pos) {
+		return new GenericBuilder(homeTreeNode(), getSupers(), Statics.truncate(pos, selfToNullComponents()), false);
+	}
+
+	GenericBuilder getReplacedComponentBuilder(int pos, Generic newComponent) {
+		return getReplacedComponentsBuilder(Statics.replace(pos, selfToNullComponents(), newComponent));
+	}
+
+	GenericBuilder getReplacedComponentsBuilder(UnsafeComponents components) {
+		return new GenericBuilder(homeTreeNode(), getSupers(), components, true);
+	}
+
+	GenericBuilder getInsertedSuperVertex(Generic newSuper) {
+		return new GenericBuilder(homeTreeNode(), Statics.insertIntoSupers(newSuper, getSupers(), 0), selfToNullComponents(), true);
+	}
+
+	GenericBuilder getTruncatedSuperVertex(int pos) {
+		return new GenericBuilder(homeTreeNode(), Statics.truncate(pos, getSupers()), selfToNullComponents(), false);
 	}
 
 }
