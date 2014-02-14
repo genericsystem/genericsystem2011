@@ -762,7 +762,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public <T extends Generic> Iterator<T> holdersIterator(int level, Holder origin, int basePos) {
 		if (Statics.STRUCTURAL == level)
 			basePos = Statics.MULTIDIRECTIONAL;
-		return ((Attribute) origin).isInheritanceEnabled() ? this.<T> inheritanceIterator2(level, origin, basePos) : this.<T> noInheritanceIterator(level, basePos, origin);
+		return ((Attribute) origin).isInheritanceEnabled() ? this.<T> inheritanceIterator(level, origin, basePos) : this.<T> noInheritanceIterator(level, basePos, origin);
 	}
 
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final int metaLevel, int pos, final Generic origin) {
@@ -774,7 +774,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	private <T extends Generic> Iterator<T> inheritanceIterator2(final int level, final Generic origin, final int pos) {
+	private <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
 		return new AbstractFilterIterator<T>(this.<T> getInternalInheritings(level, origin, pos).iterator()) {
 
 			@Override
@@ -803,6 +803,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					add(composite);
 		}
 
+		boolean isCandidateToProject(int pos, Generic candidate) {
+			if (maxLevel != candidate.getMetaLevel() || GenericImpl.this.equals(((GenericImpl) candidate).getComponents().get(pos)))
+				return false;
+			Iterator<T> iterator = iterator();
+			while (iterator.hasNext()) {
+				Generic next = iterator.next();
+				UnsafeComponents candidateComponents = Statics.replace(pos, ((GenericImpl) candidate).getComponents(), GenericImpl.this);
+				Generic candidateMeta = candidate.getMeta();
+				if (((GenericImpl) next).homeTreeNode().equals(((GenericImpl) candidate).homeTreeNode()) && next.getMeta().equals(candidateMeta) && candidateComponents.equals(Statics.replace(pos, ((GenericImpl) next).getComponents(), GenericImpl.this)))
+					return true;
+			}
+			return false;
+		}
+
 		@Override
 		public boolean add(T candidate) {
 			Iterator<T> iterator = iterator();
@@ -816,18 +830,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			if (pos != Statics.MULTIDIRECTIONAL) {
 				if (((GenericImpl) candidate).isPseudoStructural(pos))
 					((GenericImpl) candidate).project(pos);
-				if (maxLevel == candidate.getMetaLevel() && !equals(((GenericImpl) candidate).getComponents().get(pos))) {
-					iterator = iterator();
-					while (iterator.hasNext()) {
-						Generic next = iterator.next();
-						UnsafeComponents candidateComponents = Statics.replace(pos, ((GenericImpl) candidate).getComponents(), GenericImpl.this);
-						Generic candidateMeta = candidate.getMeta();
-						if (((GenericImpl) next).homeTreeNode().equals(((GenericImpl) candidate).homeTreeNode()) && next.getMeta().equals(candidateMeta)
-								&& candidateComponents.equals(Statics.replace(pos, ((GenericImpl) next).getComponents(), GenericImpl.this)))
-							((GenericImpl) candidate).getReplacedComponentBuilder(pos, GenericImpl.this).simpleBind(candidate.getClass(), false, true);
-						// TODO KK should not call simplebind!!!
-					}
-				}
+				if (isCandidateToProject(pos, candidate))
+					((GenericImpl) candidate).getReplacedComponentBuilder(pos, GenericImpl.this).simpleBind(candidate.getClass(), false, true);
 			}
 			return super.add(candidate);
 
@@ -842,8 +846,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		project(Statics.MULTIDIRECTIONAL);
 	}
 
-	// TODO KK
-	public void project(final int pos) {
+	private void project(final int pos) {
 		Iterator<Generic[]> cartesianIterator = new CartesianIterator<>(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final UnsafeComponents components = new UnsafeComponents(cartesianIterator.next());
@@ -853,7 +856,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					return ((GenericImpl) next).inheritsFrom(((GenericImpl) next).filterToProjectVertex(components, pos));
 				}
 			});
-
 			if (projection == null)
 				getReplacedComponentsBuilder(components).bind(null, true, true);
 		}
