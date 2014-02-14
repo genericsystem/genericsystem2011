@@ -34,9 +34,18 @@ class UnsafeVertex {
 		this.components = components;
 	}
 
+	UnsafeVertex(HomeTreeNode homeTreeNode, Supers supers, UnsafeComponents components, boolean respectSupers) {
+		assert homeTreeNode != null;
+		assert supers != null;
+		assert components != null;
+		this.homeTreeNode = homeTreeNode;
+		this.supers = supers;
+		this.components = components;
+		this.supers = toExtendedSupers(respectSupers);
+	}
+
 	UnsafeVertex(UnsafeVertex uVertex, boolean respectSupers) {
-		this(uVertex.homeTreeNode, uVertex.supers, uVertex.components);
-		supers = toExtendedSupers(respectSupers);
+		this(uVertex.homeTreeNode, uVertex.supers, uVertex.components, respectSupers);
 	}
 
 	public HomeTreeNode homeTreeNode() {

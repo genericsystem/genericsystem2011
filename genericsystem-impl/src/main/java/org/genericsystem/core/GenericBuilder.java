@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 import org.genericsystem.core.Statics.OrderedDependencies;
+import org.genericsystem.core.UnsafeGList.Supers;
+import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.iterator.AbstractFilterIterator;
@@ -19,8 +21,8 @@ import org.slf4j.LoggerFactory;
 class GenericBuilder extends UnsafeVertex {
 	protected static Logger log = LoggerFactory.getLogger(GenericBuilder.class);
 
-	GenericBuilder(UnsafeVertex uVertex, boolean respectSupers) {
-		super(uVertex, respectSupers);
+	GenericBuilder(HomeTreeNode homeTreeNode, Supers supers, UnsafeComponents components, boolean respectSupers) {
+		super(homeTreeNode, supers, components, respectSupers);
 	}
 
 	private CacheImpl getCurrentCache() {
@@ -38,19 +40,15 @@ class GenericBuilder extends UnsafeVertex {
 		return null;
 	}
 
-	<T extends Generic> T bindDependency(Class<?> specializationClass, boolean existsException, boolean automatic) throws RollbackException {
+	<T extends Generic> T simpleBind(Class<?> specializationClass, boolean existsException, boolean automatic) throws RollbackException {
 		T result = find(existsException);
 		if (result != null)
 			return result;
-		return buildDependency(specializationClass, automatic);
-	}
-
-	private <T extends Generic> T buildDependency(Class<?> specializationClass, boolean automatic) {
 		CacheImpl cache = getCurrentCache();
-		return cache.<T> insert(cache.<EngineImpl> getEngine().build(((GenericImpl) getMeta()).specializeInstanceClass(specializationClass), this), automatic);
+		return getCurrentCache().<T> insert(cache.<EngineImpl> getEngine().build(((GenericImpl) getMeta()).specializeInstanceClass(specializationClass), this), automatic);
 	}
 
-	<T extends Generic> T internalBind(final Class<?> specializationClass, boolean existsException, final boolean automatic) throws RollbackException {
+	<T extends Generic> T bind(final Class<?> specializationClass, boolean existsException, final boolean automatic) throws RollbackException {
 		T result = find(existsException);
 		if (result != null)
 			return result;
@@ -67,7 +65,7 @@ class GenericBuilder extends UnsafeVertex {
 
 			@Override
 			Generic rebuild() {
-				return GenericBuilder.this.buildDependency(specializationClass, automatic);
+				return GenericBuilder.this.simpleBind(specializationClass, false, automatic);
 			}
 		}.rebuildAll(toReplace[0], dependencies);
 	}
