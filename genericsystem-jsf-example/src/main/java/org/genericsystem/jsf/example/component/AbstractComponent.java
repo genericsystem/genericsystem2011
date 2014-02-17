@@ -35,16 +35,16 @@ public abstract class AbstractComponent {
 		return (List<T>) children;
 	}
 
+	public AbstractComponent getChild() {
+		return child;
+	}
+
 	public RootComponent getRoot() {
 		return getParent().getRoot();
 	}
 
 	public Cache getCache() {
 		return getRoot().getCache();
-	}
-
-	public AbstractComponent getChild() {
-		return child;
 	}
 
 }

@@ -12,6 +12,8 @@
 
 	<ui:define name="content">
 		<h:messages />
-		<ui:include src="#{rootComponent.child.xhtmlPath}" />
+		<ui:include src="#{rootComponent.child.xhtmlPath}">
+			<ui:param name="component" value="#{rootComponent.child}" />
+		</ui:include>
 	</ui:define>
 </ui:composition>
