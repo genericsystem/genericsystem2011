@@ -19,8 +19,8 @@ public class TypeComponent extends AbstractComponent {
 	private final Type type;
 	private String addInstanceValue;
 
-	public TypeComponent(Type type) {
-		super(null);
+	public TypeComponent(AbstractComponent parent, Type type) {
+		super(parent);
 		this.type = type;
 		this.children = initChildren();
 	}

@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
@@ -23,6 +24,23 @@ public class MultipleInheritanceTest extends AbstractTest {
 		assert selectableWindow.inheritsFrom(selectable);
 		assert selectableWindow.inheritsFrom(window);
 		assert selectableWindow.inheritsFrom(graphicComponent);
+	}
+
+	public void testAttributeProjection() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.addType("Car");
+		Type robot = cache.addType("Robot");
+		Type transformer = cache.addType("Transformer", car, robot);
+		Attribute carPower = car.addAttribute("Power");
+		Attribute robotPower = robot.addAttribute("Power");
+		Attribute transformerPower = transformer.getAttribute("Power");
+
+		assert transformerPower.inheritsFrom(carPower);
+		assert transformerPower.inheritsFrom(robotPower);
+		assert transformerPower.equals(carPower);
+		assert transformerPower.equals(robotPower);
+		assert ((CacheImpl) cache).isAutomatic(transformerPower);
+
 	}
 
 	public void testgetDirectSubTypes() {

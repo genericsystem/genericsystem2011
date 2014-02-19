@@ -28,7 +28,7 @@ public class FlushTest extends AbstractTest {
 		engine.close();
 
 		cache = engine.newCache();
-		assert engine.getInheritingsAndInstances().contains(human);
+		assert engine.getInheritings().contains(human);
 	}
 
 	@Test
@@ -36,7 +36,7 @@ public class FlushTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Engine engine = cache.getEngine();
 		Type animal = cache.addType("Animal");
-		Snapshot<Generic> snapshot = animal.getInheritingsAndInstances();
+		Snapshot<Generic> snapshot = animal.getInheritings();
 		assert snapshot.isEmpty();
 		Type human = animal.addSubType("Human");
 		assert snapshot.size() == 1;
@@ -45,7 +45,7 @@ public class FlushTest extends AbstractTest {
 		engine.close();
 
 		cache = engine.newCache().start();
-		assert engine.getInheritingsAndInstances().filter(new Filter<Generic>() {
+		assert engine.getInheritings().filter(new Filter<Generic>() {
 
 			@Override
 			public boolean isSelected(Generic element) {
@@ -64,7 +64,7 @@ public class FlushTest extends AbstractTest {
 		engine.close();
 
 		cache = engine.newCache().start();
-		Snapshot<Generic> snapshot = engine.getInheritingsAndInstances();
+		Snapshot<Generic> snapshot = engine.getInheritings();
 		assert snapshot.contains(human) : snapshot;
 		assert !snapshot.contains(car) : snapshot;
 	}
@@ -75,7 +75,7 @@ public class FlushTest extends AbstractTest {
 		Engine engine = cache.getEngine();
 		Type human = cache.addType("Human");
 		cache.flush();
-		Snapshot<Generic> snapshot = engine.getInheritingsAndInstances();
+		Snapshot<Generic> snapshot = engine.getInheritings();
 		assert snapshot.contains(human) : snapshot;
 		// cache.deactivate();
 
@@ -85,7 +85,7 @@ public class FlushTest extends AbstractTest {
 		engine.close();
 
 		cache = engine.newCache().start();
-		snapshot = engine.getInheritingsAndInstances();
+		snapshot = engine.getInheritings();
 		assert snapshot.containsAll(Arrays.asList(human, car)) : snapshot;
 	}
 
@@ -95,7 +95,7 @@ public class FlushTest extends AbstractTest {
 		Engine engine = cache.getEngine();
 		Type human = cache.addType("Human");
 		cache.flush();
-		Snapshot<Generic> snapshot = engine.getInheritingsAndInstances();
+		Snapshot<Generic> snapshot = engine.getInheritings();
 		assert snapshot.contains(human) : snapshot;
 
 		cache = engine.newCache().start();
@@ -103,7 +103,7 @@ public class FlushTest extends AbstractTest {
 		cache.flush();
 
 		cache = engine.newCache();
-		snapshot = engine.getInheritingsAndInstances();
+		snapshot = engine.getInheritings();
 		assert snapshot.containsAll(Arrays.asList(human, car)) : snapshot;
 
 		engine.close();

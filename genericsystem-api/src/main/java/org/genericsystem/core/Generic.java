@@ -743,7 +743,7 @@ public interface Generic extends Comparable<Generic> {
 	 * @see Snapshot
 	 */
 	@Deprecated
-	<T extends Generic> Snapshot<T> getInheritingsAndInstances();
+	<T extends Generic> Snapshot<T> getInheritings();
 
 	/**
 	 * Returns the composites.

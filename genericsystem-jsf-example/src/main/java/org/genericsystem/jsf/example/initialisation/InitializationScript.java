@@ -26,7 +26,6 @@ public class InitializationScript implements Extension {
 	protected Logger log = LoggerFactory.getLogger(InitializationScript.class);
 
 	public void init(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
-
 		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
 		Cache cache = engine.newCache().start();
 
