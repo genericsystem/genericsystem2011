@@ -13,7 +13,7 @@ import org.genericsystem.core.Cache;
 
 @Named
 @SessionScoped
-public class RootComponent extends AbstractComponent implements Serializable {
+public class RootComponent extends SelectionComponent implements Serializable {
 
 	private static final long serialVersionUID = -6596418502248220835L;
 
