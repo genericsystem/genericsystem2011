@@ -31,9 +31,11 @@ public abstract class AbstractComponent {
 
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractComponent> List<T> getChildren() {
+		if (children == null)
+			children = initChildren();
 		return (List<T>) children;
 	}
-        
+
 	public RootComponent getRoot() {
 		return getParent().getRoot();
 	}

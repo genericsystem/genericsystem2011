@@ -13,8 +13,12 @@ import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.jsf.example.structure.Attributes;
 import org.genericsystem.jsf.example.structure.Relations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TypeComponent extends AbstractComponent {
+
+	protected static Logger log = LoggerFactory.getLogger(AbstractComponent.class);
 
 	private final Type type;
 	private String addInstanceValue;
@@ -56,10 +60,12 @@ public class TypeComponent extends AbstractComponent {
 	public String add() {
 		Generic instance = type.setInstance(addInstanceValue);
 		for (AttributeComponent attributeComponent : this.<AttributeComponent> getChildren()) {
-			if (!attributeComponent.getAttribute().isRelation())
+			if (!attributeComponent.getAttribute().isRelation()) {
 				instance.setValue(attributeComponent.getAttribute(), attributeComponent.getNewAttributeValue());
-			else
-				instance.bind((Relation) attributeComponent.getAttribute(), attributeComponent.getNewTargetInstance());
+			} else {
+				if (attributeComponent.getNewTargetInstance() != null)
+					instance.bind((Relation) attributeComponent.getAttribute(), attributeComponent.getNewTargetInstance());
+			}
 		}
 		return null;
 	}
