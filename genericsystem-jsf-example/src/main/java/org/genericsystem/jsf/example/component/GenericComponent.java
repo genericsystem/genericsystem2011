@@ -1,6 +1,5 @@
 package org.genericsystem.jsf.example.component;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +9,6 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
-import org.genericsystem.jsf.example.structure.Attributes;
-import org.genericsystem.jsf.example.structure.Instances;
-import org.genericsystem.jsf.example.structure.Relations;
-import org.genericsystem.jsf.example.structure.Types;
 
 public class GenericComponent extends SelectionComponent {
 
@@ -35,12 +30,13 @@ public class GenericComponent extends SelectionComponent {
 		Snapshot<Generic> dependencies = functionSelected.equals(Function.INHERITINGS) ? selected.getInheritings() : selected.getComposites();
 		return dependencies.filter(new Filter<Generic>() {
 			public boolean isSelected(Generic candidate) {
-				Serializable value = candidate.getValue();
-				if (!value.getClass().isAssignableFrom(Class.class))
-					return false;
-				@SuppressWarnings("unchecked")
-				Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
-				return clazz != null && (Types.class.equals(clazz) || Attributes.class.equals(clazz) || Instances.class.equals(clazz) || Relations.class.equals(clazz));
+				return true;
+				// Serializable value = candidate.getValue();
+				// if (!value.getClass().isAssignableFrom(Class.class))
+				// return false;
+				// @SuppressWarnings("unchecked")
+				// Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
+				// return clazz != null && (Types.class.equals(clazz) || Attributes.class.equals(clazz) || Instances.class.equals(clazz) || Relations.class.equals(clazz));
 			}
 		}).project(new Projector<AbstractComponent, Generic>() {
 			private final Map<Generic, AbstractComponent> map = new HashMap<Generic, AbstractComponent>() {
@@ -63,6 +59,11 @@ public class GenericComponent extends SelectionComponent {
 
 		});
 
+	}
+
+	@Override
+	public String getXhtmlPath() {
+		return "/pages/genericComponent.xhtml";
 	}
 
 	public List<String> getFunctions() {
