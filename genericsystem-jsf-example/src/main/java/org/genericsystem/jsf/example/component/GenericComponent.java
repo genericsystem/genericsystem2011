@@ -1,5 +1,6 @@
 package org.genericsystem.jsf.example.component;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
+import org.genericsystem.generic.Type;
 
 public class GenericComponent extends SelectionComponent {
 
@@ -59,6 +61,13 @@ public class GenericComponent extends SelectionComponent {
 
 		});
 
+	}
+
+	public void add(Serializable newValue) {
+		if (selected.isStructural())
+			((Type) selected).setInstance(newValue);
+		if (selected.isMeta())
+			getCache().addType(newValue);
 	}
 
 	public List<String> getFunctions() {

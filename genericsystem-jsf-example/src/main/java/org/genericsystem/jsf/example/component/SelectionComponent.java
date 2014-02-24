@@ -17,11 +17,10 @@ public abstract class SelectionComponent extends AbstractComponent {
 		super(parent);
 	}
 
-	public String changeChild(AbstractComponent component) {
+	public void changeChild(AbstractComponent component) {
 		GenericBean genericBean = BeanManagerUtils.getContextualInstance(beanManager, GenericBean.class);
-		genericBean.setRoot(this);
+		genericBean.setParent(component.getParent());
 		genericBean.setSelected(component);
-		return "#";
 	}
 
 	@Override

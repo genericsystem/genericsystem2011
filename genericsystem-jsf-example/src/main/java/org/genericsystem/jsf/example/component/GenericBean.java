@@ -13,16 +13,37 @@ import org.slf4j.LoggerFactory;
 @SessionScoped
 public class GenericBean implements Serializable {
 
+	private static Logger log = LoggerFactory.getLogger(AbstractComponent.class);
+
 	private static final long serialVersionUID = 984160719232912707L;
 
-	private AbstractComponent root;
+	private AbstractComponent parent;
 
 	private AbstractComponent selected;
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractComponent.class);
+	private String newValue;
 
 	public String changeChild(AbstractComponent component) {
-		return ((SelectionComponent) root).changeChild(component);
+		((SelectionComponent) selected).changeChild(component);
+		return "#";
+	}
+
+	public String add() {
+		((GenericComponent) selected).add(newValue);
+		newValue = "";
+		return "#";
+	}
+
+	public String remove(AbstractComponent component) {
+		((GenericComponent) component).getSelected().remove();
+		return "#";
+	}
+
+	public <T extends AbstractComponent> List<T> children(Object component) {
+		// first call
+		if (AbstractComponent.class.isAssignableFrom(component.getClass()) && selected == null)
+			selected = (AbstractComponent) component;
+		return selected.getChildren();
 	}
 
 	public String editMsg() {
@@ -37,31 +58,12 @@ public class GenericBean implements Serializable {
 		return "+";
 	}
 
-	public String remove(AbstractComponent component) {
-		((GenericComponent) component).getSelected().remove();
-		changeChild(root);
-		return "#";
+	public AbstractComponent getParent() {
+		return parent;
 	}
 
-	public void add() {
-
-	}
-
-	public <T extends AbstractComponent> List<T> children(Object component) {
-		// first call
-		if (AbstractComponent.class.isAssignableFrom(component.getClass()) && selected == null) {
-			selected = (AbstractComponent) component;
-			root = selected;
-		}
-		return selected.getChildren();
-	}
-
-	public AbstractComponent getRoot() {
-		return root;
-	}
-
-	public void setRoot(AbstractComponent root) {
-		this.root = root;
+	public void setParent(AbstractComponent parent) {
+		this.parent = parent;
 	}
 
 	public AbstractComponent getSelected() {
@@ -70,6 +72,14 @@ public class GenericBean implements Serializable {
 
 	public void setSelected(AbstractComponent selected) {
 		this.selected = selected;
+	}
+
+	public String getNewValue() {
+		return newValue;
+	}
+
+	public void setNewValue(String newValue) {
+		this.newValue = newValue;
 	}
 
 	@Override

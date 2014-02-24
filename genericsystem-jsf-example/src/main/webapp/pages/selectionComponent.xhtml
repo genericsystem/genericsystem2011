@@ -7,20 +7,26 @@
 	<h:form>
 		<h:dataTable value="#{genericBean.children(component)}" var="row">
 			<f:facet name="header">
-				<h:outputText value="Managements #{genericBean}" />
+				<h:commandButton value="UP"
+					action="#{genericBean.changeChild(genericBean.parent)}" rendered="#{!genericBean.selected.selected.isEngine()}" />
+				<h:outputText value="Manage #{genericBean}" />
 			</f:facet>
 			<h:column>
 				<h:outputText value="#{row}" />
 			</h:column>
 			<h:column>
-				<h:commandButton value="#{genericBean.editMsg}" action="#{genericBean.changeChild(row)}"/>
+				<h:commandButton value="#{genericBean.editMsg}"
+					action="#{genericBean.changeChild(row)}" />
 			</h:column>
 			<h:column>
-				<h:commandButton value="#{genericBean.removeMsg}" action="#{genericBean.remove(row)}"/>
+				<h:commandButton value="#{genericBean.removeMsg}"
+					action="#{genericBean.remove(row)}" />
 			</h:column>
-			<h:column>
-				<h:commandButton value="#{genericBean.addMsg}" action="#{genericBean.add}"/>
-			</h:column>
+			<f:facet name="footer">
+				<h:inputText value="#{genericBean.newValue}" />
+				<h:commandButton value="#{genericBean.addMsg}"
+					action="#{genericBean.add}" />
+			</f:facet>
 		</h:dataTable>
 	</h:form>
 
