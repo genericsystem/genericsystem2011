@@ -1,7 +1,7 @@
 package org.genericsystem.jsf.example.component;
 
 import java.io.Serializable;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -22,13 +22,14 @@ public class RootComponent extends SelectionComponent implements Serializable {
 
 	@PostConstruct
 	public void init() {
-		this.child = new GridComponent(this);
 		this.children = initChildren();
 	}
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return Collections.emptyList();
+		List<AbstractComponent> components = new ArrayList<>();
+		components.add(new GridComponent(this));
+		return components;
 	}
 
 	@Override

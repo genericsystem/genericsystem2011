@@ -5,15 +5,15 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 	<h:form>
-		<h:dataTable value="#{component.children}" var="row">
+		<h:dataTable value="#{genericBean.children(component)}" var="row">
 			<f:facet name="header">
-				<h:outputText value="Managements #{component}" />
+				<h:outputText value="Managements #{genericBean}" />
 			</f:facet>
 			<h:column>
 				<h:outputText value="#{row}" />
 			</h:column>
 			<h:column>
-				<h:commandButton value="#{row}" action="#{component.changeChild(row)}"/>
+				<h:commandButton value="#{row}" action="#{genericBean.changeChild(row)}"/>
 			</h:column>
 		</h:dataTable>
 	</h:form>

@@ -1,11 +1,16 @@
 package org.genericsystem.jsf.example.component;
 
-import javax.enterprise.context.RequestScoped;
+import java.io.Serializable;
+import java.util.List;
+
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 
 @Named
-@RequestScoped
-public class GenericBean {
+@SessionScoped
+public class GenericBean implements Serializable {
+
+	private static final long serialVersionUID = 984160719232912707L;
 
 	private AbstractComponent root;
 
@@ -13,6 +18,15 @@ public class GenericBean {
 
 	public String changeChild(AbstractComponent component) {
 		return ((SelectionComponent) root).changeChild(component);
+	}
+
+	public <T extends AbstractComponent> List<T> children(Object component) {
+		// first call
+		if (AbstractComponent.class.isAssignableFrom(component.getClass()) && selected == null) {
+			selected = (AbstractComponent) component;
+			root = selected;
+		}
+		return selected.getChildren();
 	}
 
 	public AbstractComponent getRoot() {

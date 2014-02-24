@@ -61,11 +61,6 @@ public class GenericComponent extends SelectionComponent {
 
 	}
 
-	@Override
-	public String getXhtmlPath() {
-		return "/pages/genericComponent.xhtml";
-	}
-
 	public List<String> getFunctions() {
 		return Arrays.asList(Function.COMPOSITES.name(), Function.INHERITINGS.name());
 	}

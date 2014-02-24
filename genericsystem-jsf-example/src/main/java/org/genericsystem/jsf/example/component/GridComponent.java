@@ -15,7 +15,7 @@ public class GridComponent extends AbstractComponent {
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return Arrays.asList(new TypeComponent(this, getCache().<Cars> find(Cars.class)), new TypeComponent(this, getCache().<Colors> find(Colors.class)), new SelectionComponent(this));
+		return Arrays.asList(new TypeComponent(this, getCache().<Cars> find(Cars.class)), new TypeComponent(this, getCache().<Colors> find(Colors.class)), new GenericComponent(this, getCache().getEngine()));
 		// return Arrays.asList(new TypeComponent(this, getCache().<Cars> find(Cars.class)), new TypeComponent(this, getCache().<Colors> find(Colors.class)));
 	}
 
