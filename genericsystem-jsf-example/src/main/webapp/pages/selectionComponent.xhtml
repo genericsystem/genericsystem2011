@@ -13,7 +13,13 @@
 				<h:outputText value="#{row}" />
 			</h:column>
 			<h:column>
-				<h:commandButton value="#{row}" action="#{genericBean.changeChild(row)}"/>
+				<h:commandButton value="#{genericBean.editMsg}" action="#{genericBean.changeChild(row)}"/>
+			</h:column>
+			<h:column>
+				<h:commandButton value="#{genericBean.removeMsg}" action="#{genericBean.remove(row)}"/>
+			</h:column>
+			<h:column>
+				<h:commandButton value="#{genericBean.addMsg}" action="#{genericBean.add}"/>
 			</h:column>
 		</h:dataTable>
 	</h:form>
