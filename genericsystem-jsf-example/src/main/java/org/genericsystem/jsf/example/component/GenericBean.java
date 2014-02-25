@@ -6,6 +6,7 @@ import java.util.List;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 
+import org.genericsystem.core.Generic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +20,12 @@ public class GenericBean implements Serializable {
 
 	private AbstractComponent parent;
 
-	private AbstractComponent selected;
+	private GenericComponent selected;
 
 	private String newValue;
 
-	public String changeChild(AbstractComponent component) {
-		((SelectionComponent) selected).changeChild(component);
+	public String changeComponent(AbstractComponent component) {
+		selected.changeGenericBean((GenericComponent) component);
 		return "#";
 	}
 
@@ -41,9 +42,13 @@ public class GenericBean implements Serializable {
 
 	public <T extends AbstractComponent> List<T> children(Object component) {
 		// first call
-		if (AbstractComponent.class.isAssignableFrom(component.getClass()) && selected == null)
-			selected = (AbstractComponent) component;
+		if (GenericComponent.class.isAssignableFrom(component.getClass()) && selected == null)
+			selected = (GenericComponent) component;
 		return selected.getChildren();
+	}
+
+	public Generic getGenericSelected() {
+		return selected.getSelected();
 	}
 
 	public String editMsg() {
@@ -66,11 +71,11 @@ public class GenericBean implements Serializable {
 		this.parent = parent;
 	}
 
-	public AbstractComponent getSelected() {
+	public GenericComponent getSelected() {
 		return selected;
 	}
 
-	public void setSelected(AbstractComponent selected) {
+	public void setSelected(GenericComponent selected) {
 		this.selected = selected;
 	}
 

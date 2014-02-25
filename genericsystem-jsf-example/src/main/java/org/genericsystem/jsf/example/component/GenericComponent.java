@@ -6,13 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.inject.spi.BeanManager;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Type;
+import org.jboss.solder.beanManager.BeanManagerLocator;
+import org.jboss.solder.beanManager.BeanManagerUtils;
 
-public class GenericComponent extends SelectionComponent {
+public class GenericComponent extends AbstractComponent {
+
+	private BeanManager beanManager = new BeanManagerLocator().getBeanManager();
 
 	private enum Function {
 		COMPOSITES, INHERITINGS;
@@ -25,6 +31,12 @@ public class GenericComponent extends SelectionComponent {
 	public GenericComponent(AbstractComponent parent, Generic generic) {
 		super(parent);
 		selected = generic;
+	}
+
+	public void changeGenericBean(GenericComponent component) {
+		GenericBean genericBean = BeanManagerUtils.getContextualInstance(beanManager, GenericBean.class);
+		genericBean.setParent(component.getParent());
+		genericBean.setSelected(component);
 	}
 
 	@Override
@@ -72,6 +84,11 @@ public class GenericComponent extends SelectionComponent {
 
 	public List<String> getFunctions() {
 		return Arrays.asList(Function.COMPOSITES.name(), Function.INHERITINGS.name());
+	}
+
+	@Override
+	public String getXhtmlPath() {
+		return "/pages/genericComponent.xhtml";
 	}
 
 	public Function getFunctionSelected() {
