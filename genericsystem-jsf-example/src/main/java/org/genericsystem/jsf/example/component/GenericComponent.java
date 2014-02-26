@@ -61,9 +61,7 @@ public class GenericComponent extends AbstractComponent {
 			public GenericComponent project(Attribute element) {
 				return (GenericComponent) map.get(element);
 			}
-
 		});
-
 	}
 
 	public List<GenericComponent> getInstanceRows() {
