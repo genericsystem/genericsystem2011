@@ -3,18 +3,13 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:c="http://java.sun.com/jsp/jstl/core"
-	template="/pages/layouts/commonLayout.xhtml">
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
 
-	<ui:define name="header">
-		<title>JSF Example Use Case</title>
-	</ui:define>
-
-	<ui:define name="content">
-		<c:forEach items="#{rootComponent.children}" var="child">
+	<h:panelGrid columns="2">
+		<c:forEach items="#{component.children}" var="child">
 			<ui:include src="#{child.xhtmlPath}">
 				<ui:param name="component" value="#{child}" />
 			</ui:include>
 		</c:forEach>
-	</ui:define>
+	</h:panelGrid>
 </ui:composition>
