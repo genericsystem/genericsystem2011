@@ -13,14 +13,14 @@ public class Attributes {
 
 	}
 
-	@SystemGeneric
-	@Components(Cars.class)
-	public static class Price extends GenericImpl {
-	}
-
-	@SystemGeneric
-	@Components(Cars.class)
-	public static class FuelTank extends GenericImpl {
-	}
+	// @SystemGeneric
+	// @Components(Cars.class)
+	// public static class Price extends GenericImpl {
+	// }
+	//
+	// @SystemGeneric
+	// @Components(Cars.class)
+	// public static class FuelTank extends GenericImpl {
+	// }
 
 }

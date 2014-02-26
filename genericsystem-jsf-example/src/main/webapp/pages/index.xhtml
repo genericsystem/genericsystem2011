@@ -12,10 +12,10 @@
 
 	<ui:define name="content">
 		<h:messages />
-<!-- 		<c:forEach items="#{rootComponent.children}" var="child"> -->
-			<ui:include src="#{rootComponent.child.xhtmlPath}">
-				<ui:param name="component" value="#{rootComponent.child}" />
+		<c:forEach items="#{rootComponent.children}" var="child">
+			<ui:include src="#{child.xhtmlPath}">
+				<ui:param name="component" value="#{child}" />
 			</ui:include>
-<!-- 		</c:forEach> -->
+		</c:forEach>
 	</ui:define>
 </ui:composition>
