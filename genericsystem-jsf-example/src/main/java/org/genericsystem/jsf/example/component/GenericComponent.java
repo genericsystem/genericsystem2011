@@ -61,9 +61,7 @@ public class GenericComponent extends AbstractComponent {
 			public GenericComponent project(Attribute element) {
 				return (GenericComponent) map.get(element);
 			}
-
 		});
-
 	}
 
 	public List<GenericComponent> getInstanceRows() {
@@ -93,6 +91,12 @@ public class GenericComponent extends AbstractComponent {
 			((Type) selected).setInstance(newValue);
 		if (selected.isMeta())
 			getCache().addType(newValue);
+		return "#";
+	}
+
+	public String addValue(Attribute attribute) {
+		log.info("attribute" + attribute + " " + newValue + " " + selected);
+		selected.addValue(attribute, newValue);
 		return "#";
 	}
 
