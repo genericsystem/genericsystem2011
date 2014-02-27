@@ -10,25 +10,30 @@
 			styleClass="order-table" headerClass="order-table-header"
 			rowClasses="order-table-odd-row,order-table-even-row">
 			<f:facet name="header">
-				<h:outputText value="Manage #{component}" />
+				<h:outputText value="#{component.nameManagement}" />
 			</f:facet>
 			<h:column>
-				<h:outputText value="#{row}" />
+				<f:facet name="header">
+					<h:outputText value="#{component.value}" />
+				</f:facet>
+				<h:outputText value="#{row.value}" />
+				<f:facet name="footer">
+					<h:inputText value="#{component.addInstanceValue}" />
+				</f:facet>
 			</h:column>
-			<c:forEach items="#{component.children}" var="child">
-				<ui:include src="#{child.xhtmlPath}">
-					<ui:param name="component" value="#{child}" />
-				</ui:include>
+
+			<c:forEach items="#{component.children}" var="component">
+				<ui:include src="#{component.xhtmlPath}" />
 			</c:forEach>
+
 			<h:column>
-				<h:commandButton value="#{component.removeMsg}"
-					action="#{row.remove}" />
+				<h:commandLink value="#{component.removeMsg}"
+					action="#{component.remove(row)}" />
+				<f:facet name="footer">
+					<h:commandButton value="#{component.addMsg}"
+						action="#{component.add}" />
+				</f:facet>
 			</h:column>
-			<f:facet name="footer">
-				<h:inputText value="#{component.newValue}" />
-				<h:commandButton value="#{component.addMsg}"
-					action="#{component.add}" />
-			</f:facet>
 		</h:dataTable>
 	</h:form>
 </ui:composition>

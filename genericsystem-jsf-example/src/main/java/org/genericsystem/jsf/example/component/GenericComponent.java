@@ -1,136 +1,115 @@
 package org.genericsystem.jsf.example.component;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Holder;
+import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.jsf.example.structure.Attributes;
-import org.genericsystem.jsf.example.structure.Instances;
 import org.genericsystem.jsf.example.structure.Relations;
-import org.genericsystem.jsf.example.structure.Types;
 
 public class GenericComponent extends AbstractComponent {
 
-	private Generic selected;
+	private final Type type;
+	private String addInstanceValue;
 
-	private String newValue;
-
-	public GenericComponent(AbstractComponent parent, Generic generic) {
+	public GenericComponent(AbstractComponent parent, Type type) {
 		super(parent);
-		selected = generic;
+		this.type = type;
+		this.children = initChildren();
 	}
 
 	@Override
-	public List<? extends AbstractComponent> initChildren() {
-		return ((Type) selected).getAttributes().filter(new Filter<Attribute>() {
+	public List<AttributeComponent> initChildren() {
+		return type.getAttributes().filter(new Filter<Attribute>() {
+			@Override
 			public boolean isSelected(Attribute candidate) {
-				Serializable value = candidate.getValue();
-				if (!value.getClass().isAssignableFrom(Class.class))
-					return false;
-				@SuppressWarnings("unchecked")
-				Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
-				return clazz != null && (Types.class.equals(clazz) || Attributes.class.equals(clazz) || Instances.class.equals(clazz) || Relations.class.equals(clazz));
+				Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
+				return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
 			}
-		}).project(new Projector<AbstractComponent, Attribute>() {
-			private final Map<Generic, AbstractComponent> map = new HashMap<Generic, AbstractComponent>() {
-
-				private static final long serialVersionUID = -7927996818181180784L;
+		}).project(new Projector<AttributeComponent, Attribute>() {
+			private final Map<Attribute, AttributeComponent> map = new HashMap<Attribute, AttributeComponent>() {
+				private static final long serialVersionUID = -1162281462201347017L;
 
 				@Override
-				public GenericComponent get(Object key) {
-					GenericComponent result = (GenericComponent) super.get(key);
+				public AttributeComponent get(Object key) {
+					AttributeComponent result = super.get(key);
 					if (result == null)
-						put((Generic) key, result = new GenericComponent(GenericComponent.this, (Generic) key) {
-							@Override
-							public String getXhtmlPath() {
-								return "/pages/attribute.xhtml";
-							}
-						});
+						put((Attribute) key, result = new AttributeComponent(GenericComponent.this, (Attribute) key));
 					return result;
 				}
 			};
 
 			@Override
-			public GenericComponent project(Attribute element) {
-				return (GenericComponent) map.get(element);
+			public AttributeComponent project(Attribute attribute) {
+				return map.get(attribute);
 			}
 		});
-	}
-
-	public List<GenericComponent> getInstanceRows() {
-		return ((Type) selected).getAllInstances().<GenericComponent> project(new Projector<GenericComponent, Generic>() {
-
-			@Override
-			public GenericComponent project(Generic instance) {
-				return new GenericComponent(GenericComponent.this, instance);
-			}
-		});
-	}
-
-	public List<String> getAttributeValues(final Attribute attribute) {
-		if (attribute.isRelation()) {
-			return selected.getHolders(attribute).project(new Projector<String, Holder>() {
-				@Override
-				public String project(Holder link) {
-					return selected.getOtherTargets(link).get(0).getValue();
-				}
-			});
-		} else
-			return selected.getValues((Holder) attribute);
 	}
 
 	public String add() {
-		if (selected.isStructural())
-			((Type) selected).setInstance(newValue);
-		if (selected.isMeta())
-			getCache().addType(newValue);
-		return "#";
+		Generic instance = type.setInstance(addInstanceValue);
+		for (AttributeComponent attributeComponent : this.<AttributeComponent> getChildren()) {
+			if (!attributeComponent.getAttribute().isRelation())
+				instance.setValue(attributeComponent.getAttribute(), attributeComponent.getNewAttributeValue());
+			else
+				instance.bind((Relation) attributeComponent.getAttribute(), attributeComponent.getNewTargetInstance());
+		}
+		return null;
 	}
 
-	public String remove() {
-		selected.remove();
-		return "#";
+	public List<InstanceRowComponent> getInstanceRows() {
+		return type.getAllInstances().<InstanceRowComponent> project(new Projector<InstanceRowComponent, Generic>() {
+
+			@Override
+			public InstanceRowComponent project(Generic instance) {
+				return new InstanceRowComponent(GenericComponent.this, instance);
+			}
+		});
+
+	}
+
+	public String getNameManagement() {
+		return Objects.toString(getValue().substring(0, getValue().length() - 1) + " Management");
+	}
+
+	public String getValue() {
+		return Objects.toString(type.<Class<?>> getValue().getSimpleName());
+	}
+
+	public void remove(InstanceRowComponent instanceRow) {
+		instanceRow.getInstance().remove();
+	}
+
+	public String getAddMsg() {
+		return "Add instance";
+	}
+
+	public String getRemoveMsg() {
+		return "Remove";
+	}
+
+	public String getAddInstanceValue() {
+		return addInstanceValue;
+	}
+
+	public void setAddInstanceValue(String addInstanceValue) {
+		this.addInstanceValue = addInstanceValue;
+	}
+
+	public Type getType() {
+		return type;
 	}
 
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/genericComponent.xhtml";
-	}
-
-	public String removeMsg() {
-		return "remove";
-	}
-
-	public String addMsg() {
-		return "+";
-	}
-
-	public Generic getSelected() {
-		return selected;
-	}
-
-	public void setSelected(Generic selected) {
-		this.selected = selected;
-	}
-
-	public String getNewValue() {
-		return newValue;
-	}
-
-	public void setNewValue(String newValue) {
-		this.newValue = newValue;
-	}
-
-	@Override
-	public String toString() {
-		return selected.toString();
 	}
 
 }

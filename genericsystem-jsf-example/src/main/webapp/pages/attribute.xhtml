@@ -7,24 +7,24 @@
 
 	<h:column>
 		<f:facet name="header">
-			<h:outputText value="#{component}" />
+			<h:outputText value="#{component.columnTitleAttribute}" />
 		</f:facet>
-		<h:dataTable value="#{row.getAttributeValues(component.selected)}"
+		<h:dataTable value="#{row.getAttributeValues(component.attribute)}"
 			var="value">
 			<h:column>
 				<h:outputText value="#{value}" />
 			</h:column>
 		</h:dataTable>
-<!-- 		<f:facet name="footer"> -->
-<!-- 			<h:panelGroup> -->
-<!-- 				<h:inputText rendered="#{!component.relation}" -->
-<!-- 					value="#{component.newAttributeValue}" /> -->
-<!-- 				<h:selectOneMenu rendered="#{component.relation}" -->
-<!-- 					value="#{component.newTargetValue}"> -->
-<!-- 					<f:selectItems value="#{component.targetInstanceRows}" var="targetRow" -->
-<!-- 						itemValue="#{targetRow.value}" itemLabel="#{targetRow.value}" /> -->
-<!-- 				</h:selectOneMenu> -->
-<!-- 			</h:panelGroup> -->
-<!-- 		</f:facet> -->
+		<f:facet name="footer">
+			<h:panelGroup>
+				<h:inputText rendered="#{!component.relation}"
+					value="#{component.newAttributeValue}" />
+				<h:selectOneMenu rendered="#{component.relation}"
+					value="#{component.newTargetValue}">
+					<f:selectItems value="#{component.targetInstanceRows}" var="targetRow"
+						itemValue="#{targetRow.value}" itemLabel="#{targetRow.value}" />
+				</h:selectOneMenu>
+			</h:panelGroup>
+		</f:facet>
 	</h:column>
 </ui:composition>

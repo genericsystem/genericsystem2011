@@ -40,7 +40,7 @@ public class GridComponent extends AbstractComponent {
 				public GenericComponent get(Object key) {
 					GenericComponent result = (GenericComponent) super.get(key);
 					if (result == null)
-						put((Generic) key, result = new GenericComponent(GridComponent.this, (Generic) key));
+						put((Generic) key, result = new GenericComponent(GridComponent.this, (Type) key));
 					return result;
 				}
 			};
