@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -742,7 +743,6 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @see Snapshot
 	 */
-	@Deprecated
 	<T extends Generic> Snapshot<T> getInheritings();
 
 	/**

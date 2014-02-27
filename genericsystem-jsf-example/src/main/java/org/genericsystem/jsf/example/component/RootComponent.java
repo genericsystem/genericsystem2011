@@ -1,7 +1,7 @@
 package org.genericsystem.jsf.example.component;
 
 import java.io.Serializable;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -16,17 +16,18 @@ import org.genericsystem.core.Cache;
 public class RootComponent extends AbstractComponent implements Serializable {
 
 	private static final long serialVersionUID = -6596418502248220835L;
+
 	@Inject
 	private Cache cache;
 
 	@PostConstruct
 	public void init() {
-		this.child = new GridComponent(this);
+		this.children = initChildren();
 	}
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return Collections.emptyList();
+		return Arrays.asList(new GridComponent(RootComponent.this));
 	}
 
 	@Override

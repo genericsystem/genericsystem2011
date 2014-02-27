@@ -11,7 +11,6 @@ public abstract class AbstractComponent {
 
 	protected AbstractComponent parent;
 	protected List<? extends AbstractComponent> children;
-	protected AbstractComponent child;
 
 	public AbstractComponent() {
 		this(null);
@@ -32,6 +31,8 @@ public abstract class AbstractComponent {
 
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractComponent> List<T> getChildren() {
+		if (children == null)
+			children = initChildren();
 		return (List<T>) children;
 	}
 
@@ -41,10 +42,6 @@ public abstract class AbstractComponent {
 
 	public Cache getCache() {
 		return getRoot().getCache();
-	}
-
-	public AbstractComponent getChild() {
-		return child;
 	}
 
 }

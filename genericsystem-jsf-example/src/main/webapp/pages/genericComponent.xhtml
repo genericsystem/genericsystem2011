@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<h:form>
+		<h:dataTable value="#{component.instanceRows}" var="row"
+			styleClass="order-table" headerClass="order-table-header"
+			rowClasses="order-table-odd-row,order-table-even-row">
+			<f:facet name="header">
+				<h:outputText value="Manage #{component}" />
+			</f:facet>
+			<h:column>
+				<h:outputText value="#{row}" />
+			</h:column>
+			<c:forEach items="#{component.children}" var="child">
+				<ui:include src="#{child.xhtmlPath}">
+					<ui:param name="component" value="#{child}" />
+				</ui:include>
+			</c:forEach>
+			<h:column>
+				<h:commandButton value="#{component.removeMsg}"
+					action="#{row.remove}" />
+			</h:column>
+			<f:facet name="footer">
+				<h:inputText value="#{component.newValue}" />
+				<h:commandButton value="#{component.addMsg}"
+					action="#{component.add}" />
+			</f:facet>
+		</h:dataTable>
+	</h:form>
+</ui:composition>
