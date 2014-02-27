@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
 import org.genericsystem.core.AbstractWriter.AbstractLoader.GSClassNotFound;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.core.UnsafeGList.UnsafeComponents;
@@ -36,14 +37,7 @@ public abstract class AbstractWriter {
 		getContentOutputStream().writeLong(homeTreeNode.ts);
 		if (!homeTreeMap.containsKey(homeTreeNode.ts)) {
 			getContentOutputStream().writeLong(homeTreeNode.metaNode.ts);
-
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-
-			objectOutputStream.writeObject(homeTreeNode.getValue());
-			objectOutputStream.flush();
-
-			getContentOutputStream().writeObject(byteArrayOutputStream.toByteArray());
+			writeGenericValue(homeTreeNode);
 			homeTreeMap.put(homeTreeNode.ts, homeTreeNode);
 		}
 		if (generic.isEngine())
@@ -51,6 +45,18 @@ public abstract class AbstractWriter {
 		writeAncestors(generic.getSupers());
 		writeAncestors(generic.getComponents());
 		getFormalOutputStream().writeObject(GSClassNotFound.class.isAssignableFrom(generic.getClass()) ? ((GSClassNotFound) generic).getClassName() : generic.getClass().getName());
+	}
+
+	private void writeGenericValue(HomeTreeNode homeTreeNode) throws IOException {
+		Serializable value = homeTreeNode.getValue();
+		if (!(value instanceof byte[])) {
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+			objectOutputStream.writeObject(homeTreeNode.getValue());
+			objectOutputStream.flush();
+			getContentOutputStream().writeObject(byteArrayOutputStream.toByteArray());
+		} else
+			getContentOutputStream().writeObject(value);
 	}
 
 	private void writeTs(Generic generic) throws IOException {
@@ -83,7 +89,7 @@ public abstract class AbstractWriter {
 			if (null == homeTreeNode) {
 				long metaTs = getContentInputStream().readLong();
 				homeTreeNode = ((GenericImpl) engine).homeTreeNode().ts == metaTs ? ((GenericImpl) engine).homeTreeNode() : homeTreeMap.get(metaTs);
-				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, getGenericValue());
+				homeTreeNode = homeTreeNode.bindInstanceNode(homeTreeNodeTs, readGenericValue());
 			}
 			Supers supers = new Supers(loadAncestors(engine, genericMap));
 			UnsafeComponents uComponents = new UnsafeComponents(loadAncestors(engine, genericMap));
@@ -95,23 +101,13 @@ public abstract class AbstractWriter {
 			return generic;
 		}
 
-		private Serializable getGenericValue() throws IOException {
+		private Serializable readGenericValue() throws IOException, ClassNotFoundException {
+			byte[] bytes = (byte[]) getContentInputStream().readObject();
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 			try {
-				byte[] bytes = (byte[]) getContentInputStream().readObject();
-				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-				try {
-					return (Serializable) new ObjectInputStream(byteArrayInputStream).readObject();
-				} catch (Exception e) {
-					return bytes;
-				}
-
-				// Serializable serializable = (Serializable) getContentInputStream().readObject();
-				// if (serializable.getClass().isAssignableFrom(GSClassNotFound.class))
-				// return Class.forName(((GSClassNotFound) serializable).getClassName());
-				// return serializable;
-			} catch (ClassNotFoundException e) {
-				log.warn("ClassNotFoundException " + e.getMessage());
-				return new GSClassNotFound(e.getMessage());
+				return (Serializable) new ObjectInputStream(byteArrayInputStream).readObject();
+			} catch (Exception e) {
+				return bytes;
 			}
 		}
 
@@ -132,16 +128,6 @@ public abstract class AbstractWriter {
 			private static final long serialVersionUID = 8872715326590973682L;
 
 			private String className;
-
-			public GSClassNotFound() {}
-
-			public GSClassNotFound(String className) {
-				this.className = className;
-			}
-
-			private void writeObject(ObjectOutputStream oos) throws IOException {
-				oos.writeObject(className);
-			}
 
 			public String getClassName() {
 				return className;
