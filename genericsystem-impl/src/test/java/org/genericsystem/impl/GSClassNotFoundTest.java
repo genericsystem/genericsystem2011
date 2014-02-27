@@ -2,24 +2,24 @@ package org.genericsystem.impl;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Random;
 
-import org.genericsystem.core.AbstractWriter.AbstractLoader.GSClassNotFound;
+import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
 
 @Test
-public class ClassNoGSClassNotFoundTest extends AbstractTest {
+public class GSClassNotFoundTest extends AbstractTest {
 
-	public void testType() {
+	public void testClassValueNotFound() {
 		String path = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
 		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path).start();
-		cache.setType(new Vehicle());
+		cache.setType(new MyValue());
 		cache.flush();
 		cache.getEngine().close();
 		cache = GenericSystem.newCacheOnANewPersistentEngine(path).start();
@@ -27,36 +27,39 @@ public class ClassNoGSClassNotFoundTest extends AbstractTest {
 
 			@Override
 			public boolean isSelected(Type element) {
-				return element.getValue() instanceof GSClassNotFound;
+				return element.getValue() instanceof byte[];
 			}
 		}).get(0);
-		assert ((GSClassNotFound) type.getValue()).getClassName().equals("org.genericsystem.impl.ClassNoGSClassNotFoundTest$Vehicle");
+		assert type != null;
+	}
+
+	public void testClassGenericNotFound() {
+		String path = System.getenv("HOME") + "/test/snapshot_save" + new Random().nextInt();
+		Cache cache = GenericSystem.newCacheOnANewPersistentEngine(path, Vehicle.class).start();
 		cache.flush();
 		cache.getEngine().close();
 		cache = GenericSystem.newCacheOnANewPersistentEngine(path).start();
-		assert cache.getAllTypes().filter(new Filter<Type>() {
+		Type type = cache.getAllTypes().filter(new Filter<Type>() {
 
 			@Override
 			public boolean isSelected(Type element) {
-				return element.getValue() instanceof GSClassNotFound;
+				return element.getValue() instanceof byte[];
 			}
-		}).isEmpty();
+		}).get(0);
+		assert type != null;
 	}
 
-	public static class Vehicle implements Serializable {
+	@SystemGeneric
+	public static class Vehicle extends GenericImpl {
+
+	}
+
+	public static class MyValue implements Serializable {
 
 		private static final long serialVersionUID = 1380365016437512333L;
 
-		private void writeObject(ObjectOutputStream oos) throws IOException {
-		}
-
 		private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-			throw new ClassNotFoundException("org.genericsystem.impl.ClassNoGSClassNotFoundTest$Vehicle");
-		}
-
-		@Override
-		public String toString() {
-			return "Vehicle";
+			throw new ClassNotFoundException();
 		}
 
 	}
