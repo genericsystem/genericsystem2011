@@ -10,15 +10,12 @@
 			styleClass="order-table" headerClass="order-table-header"
 			rowClasses="order-table-odd-row,order-table-even-row">
 			<f:facet name="header">
-				<h:outputText value="#{component.nameManagement}" />
+				<h:outputText value="#{component}" />
 			</f:facet>
 			<h:column>
-				<f:facet name="header">
-					<h:outputText value="#{component.value}" />
-				</f:facet>
-				<h:outputText value="#{row.value}" />
+				<h:outputText value="#{row}" />
 				<f:facet name="footer">
-					<h:inputText value="#{component.addInstanceValue}" />
+					<h:inputText value="#{component.newValue}" />
 				</f:facet>
 			</h:column>
 

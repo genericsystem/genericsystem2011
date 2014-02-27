@@ -9,7 +9,7 @@
 		<f:facet name="header">
 			<h:outputText value="#{component.columnTitleAttribute}" />
 		</f:facet>
-		<h:dataTable value="#{row.getAttributeValues(component.attribute)}"
+		<h:dataTable value="#{row.getAttributeValues(component.selected)}"
 			var="value">
 			<h:column>
 				<h:outputText value="#{value}" />
@@ -18,11 +18,11 @@
 		<f:facet name="footer">
 			<h:panelGroup>
 				<h:inputText rendered="#{!component.relation}"
-					value="#{component.newAttributeValue}" />
+					value="#{component.newValue}" />
 				<h:selectOneMenu rendered="#{component.relation}"
 					value="#{component.newTargetValue}">
-					<f:selectItems value="#{component.targetInstanceRows}" var="targetRow"
-						itemValue="#{targetRow.value}" itemLabel="#{targetRow.value}" />
+					<f:selectItems value="#{component.targets}" var="target"
+						itemValue="#{target.value}" itemLabel="#{target.value}" />
 				</h:selectOneMenu>
 			</h:panelGroup>
 		</f:facet>

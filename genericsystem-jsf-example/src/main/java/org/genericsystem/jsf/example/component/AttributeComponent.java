@@ -1,6 +1,5 @@
 package org.genericsystem.jsf.example.component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,24 +8,15 @@ import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 
-public class AttributeComponent extends AbstractComponent {
-	private final Attribute attribute;
-	private Generic newTargetInstance;
-	private String newAttributeValue;
+public class AttributeComponent extends GenericComponent {
+	private Generic newTarget;
 
-	public AttributeComponent(AbstractComponent parent, Attribute attribute) {
-		super(parent);
-		this.attribute = attribute;
-		this.children = initChildren();
+	public AttributeComponent(AbstractComponent parent, Generic selected) {
+		super(parent, selected);
 	}
 
-	@Override
-	public List<? extends AbstractComponent> initChildren() {
-		return Collections.emptyList();
-	}
-
-	public List<InstanceRowComponent> getTargetInstanceRows() {
-		return (this.<GenericComponent> getParent()).getType().<Type> getOtherTargets(attribute).get(0).getAllInstances().<InstanceRowComponent> project(new Projector<InstanceRowComponent, Generic>() {
+	public List<InstanceRowComponent> getTargets() {
+		return (this.<GenericComponent> getParent()).getSelected().<Type> getOtherTargets((Attribute) selected).get(0).getAllInstances().<InstanceRowComponent> project(new Projector<InstanceRowComponent, Generic>() {
 
 			@Override
 			public InstanceRowComponent project(Generic instance) {
@@ -37,22 +27,22 @@ public class AttributeComponent extends AbstractComponent {
 	}
 
 	public String getColumnTitleAttribute() {
-		if (!this.attribute.isRelation())
-			return Objects.toString(this.attribute);
+		if (!isRelation())
+			return Objects.toString(selected);
 		else
-			return Objects.toString((this.<GenericComponent> getParent()).getType().<Type> getOtherTargets(attribute).get(0).<Class<?>> getValue().getSimpleName());
+			return Objects.toString((this.<GenericComponent> getParent()).getSelected().<Type> getOtherTargets((Attribute) selected).get(0).<Class<?>> getValue().getSimpleName());
 	}
 
 	public boolean isRelation() {
-		return attribute.isRelation();
+		return selected.isRelation();
 	}
 
 	public String getNewTargetValue() {
-		return Objects.toString(newTargetInstance);
+		return Objects.toString(newTarget);
 	}
 
 	public void setNewTargetValue(String newTargetValue) {
-		newTargetInstance = this.<GenericComponent> getParent().getType().<Type> getOtherTargets(attribute).get(0).getInstance(newTargetValue);
+		setNewTarget(this.<GenericComponent> getParent().getSelected().<Type> getOtherTargets((Attribute) selected).get(0).getInstance(newTargetValue));
 	}
 
 	@Override
@@ -60,20 +50,12 @@ public class AttributeComponent extends AbstractComponent {
 		return "/pages/attribute.xhtml";
 	}
 
-	public Attribute getAttribute() {
-		return this.attribute;
+	public Generic getNewTarget() {
+		return newTarget;
 	}
 
-	public String getNewAttributeValue() {
-		return newAttributeValue;
-	}
-
-	public void setNewAttributeValue(String newAttributeValue) {
-		this.newAttributeValue = newAttributeValue;
-	}
-
-	public Generic getNewTargetInstance() {
-		return newTargetInstance;
+	public void setNewTarget(Generic newTarget) {
+		this.newTarget = newTarget;
 	}
 
 }

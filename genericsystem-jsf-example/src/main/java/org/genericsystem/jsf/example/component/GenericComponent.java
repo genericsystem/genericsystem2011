@@ -16,18 +16,18 @@ import org.genericsystem.jsf.example.structure.Relations;
 
 public class GenericComponent extends AbstractComponent {
 
-	private final Type type;
-	private String addInstanceValue;
+	protected final Generic selected;
+	private String newValue;
 
-	public GenericComponent(AbstractComponent parent, Type type) {
+	public GenericComponent(AbstractComponent parent, Generic selected) {
 		super(parent);
-		this.type = type;
+		this.selected = selected;
 		this.children = initChildren();
 	}
 
 	@Override
 	public List<AttributeComponent> initChildren() {
-		return type.getAttributes().filter(new Filter<Attribute>() {
+		return ((Type) selected).getAttributes().filter(new Filter<Attribute>() {
 			@Override
 			public boolean isSelected(Attribute candidate) {
 				Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
@@ -54,18 +54,18 @@ public class GenericComponent extends AbstractComponent {
 	}
 
 	public String add() {
-		Generic instance = type.setInstance(addInstanceValue);
+		Generic instance = ((Type) selected).setInstance(newValue);
 		for (AttributeComponent attributeComponent : this.<AttributeComponent> getChildren()) {
-			if (!attributeComponent.getAttribute().isRelation())
-				instance.setValue(attributeComponent.getAttribute(), attributeComponent.getNewAttributeValue());
+			if (!attributeComponent.getSelected().isRelation())
+				instance.setValue((Attribute) attributeComponent.getSelected(), attributeComponent.getNewValue());
 			else
-				instance.bind((Relation) attributeComponent.getAttribute(), attributeComponent.getNewTargetInstance());
+				instance.bind((Relation) attributeComponent.getSelected(), attributeComponent.getNewTarget());
 		}
 		return null;
 	}
 
 	public List<InstanceRowComponent> getInstanceRows() {
-		return type.getAllInstances().<InstanceRowComponent> project(new Projector<InstanceRowComponent, Generic>() {
+		return ((Type) selected).getAllInstances().<InstanceRowComponent> project(new Projector<InstanceRowComponent, Generic>() {
 
 			@Override
 			public InstanceRowComponent project(Generic instance) {
@@ -75,16 +75,12 @@ public class GenericComponent extends AbstractComponent {
 
 	}
 
-	public String getNameManagement() {
-		return Objects.toString(getValue().substring(0, getValue().length() - 1) + " Management");
+	public void remove(InstanceRowComponent instanceRow) {
+		instanceRow.getSelected().remove();
 	}
 
 	public String getValue() {
-		return Objects.toString(type.<Class<?>> getValue().getSimpleName());
-	}
-
-	public void remove(InstanceRowComponent instanceRow) {
-		instanceRow.getInstance().remove();
+		return Objects.toString(selected);
 	}
 
 	public String getAddMsg() {
@@ -92,24 +88,29 @@ public class GenericComponent extends AbstractComponent {
 	}
 
 	public String getRemoveMsg() {
-		return "Remove";
+		return "Remove instance";
 	}
 
-	public String getAddInstanceValue() {
-		return addInstanceValue;
+	public String getNewValue() {
+		return newValue;
 	}
 
-	public void setAddInstanceValue(String addInstanceValue) {
-		this.addInstanceValue = addInstanceValue;
+	public void setNewValue(String newValue) {
+		this.newValue = newValue;
 	}
 
-	public Type getType() {
-		return type;
+	public Generic getSelected() {
+		return selected;
 	}
 
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/genericComponent.xhtml";
+	}
+
+	@Override
+	public String toString() {
+		return selected.toString();
 	}
 
 }
