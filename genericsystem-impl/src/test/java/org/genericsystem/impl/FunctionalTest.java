@@ -195,4 +195,23 @@ public class FunctionalTest extends AbstractTest {
 			}
 		}.assertIsCausedBy(PropertyConstraintViolationException.class);
 	}
+
+	public void testSimpleHolderInheritance() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.addType("Car");
+		final Attribute carPower = car.setAttribute("Power");
+		final Generic myCar = car.addInstance("myCar");
+		myCar.addHolder(carPower, 233);
+		assert myCar.getHolder(carPower) != null;
+	}
+
+	public void testHolderInheritance() {
+		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		Type car = vehicle.addSubType("Car");
+		final Attribute vehiclePower = vehicle.setAttribute("Power");
+		final Generic myCar = car.addInstance("myCar");
+		myCar.addHolder(vehiclePower, 233);
+		assert myCar.getHolder(vehiclePower) != null;
+	}
 }

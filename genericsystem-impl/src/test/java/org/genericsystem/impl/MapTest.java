@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -56,6 +55,7 @@ public class MapTest extends AbstractTest {
 		vehicle.getPropertiesMap().put("power", 123);
 		assert vehicle.getPropertiesMap().get("power").equals(123) : vehicle.getPropertiesMap();
 		myBmw.getPropertiesMap().put("wheel", 4);
+		assert myBmw.getPropertiesMap().get("wheel").equals(4);
 		assert myBmw.getPropertiesMap().get("power").equals(123) : myBmw.getPropertiesMap();
 		assert myBmw.getPropertiesMap().get("wheel").equals(4);
 		myBmw.getPropertiesMap().remove("power");

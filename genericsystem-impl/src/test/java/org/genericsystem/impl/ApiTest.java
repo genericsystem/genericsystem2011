@@ -596,8 +596,8 @@ public class ApiTest extends AbstractTest {
 		Generic myVehicle = vehicle.setInstance("myVehicle");
 		Generic myVehicleAirConditioning = myVehicle.setHolder(airConditioning, "metal paint");
 		assert myVehicleAirConditioning.inheritsFrom(metalPaint);
-		assert myVehicleAirConditioning.inheritsFrom(equipment);
-		assert myVehicle.getHolders(equipment).size() == 1;
+		assert myVehicleAirConditioning.inheritsFrom(airConditioning);
+		assert myVehicle.getHolders(equipment).size() == 1 : myVehicle.getHolders(equipment);
 	}
 
 	public void testOverrideAttribute() {
