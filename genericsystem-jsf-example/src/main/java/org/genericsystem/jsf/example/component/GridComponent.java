@@ -9,9 +9,6 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Type;
-import org.genericsystem.jsf.example.structure.Attributes;
-import org.genericsystem.jsf.example.structure.Instances;
-import org.genericsystem.jsf.example.structure.Relations;
 import org.genericsystem.jsf.example.structure.Types;
 
 public class GridComponent extends AbstractComponent {
@@ -29,7 +26,7 @@ public class GridComponent extends AbstractComponent {
 					return false;
 				@SuppressWarnings("unchecked")
 				Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
-				return clazz != null && (Types.class.equals(clazz) || Attributes.class.equals(clazz) || Instances.class.equals(clazz) || Relations.class.equals(clazz));
+				return clazz != null && Types.class.equals(clazz);
 			}
 		}).project(new Projector<AbstractComponent, Type>() {
 			private final Map<Generic, AbstractComponent> map = new HashMap<Generic, AbstractComponent>() {
