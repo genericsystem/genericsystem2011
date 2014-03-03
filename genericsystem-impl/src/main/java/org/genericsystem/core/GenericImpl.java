@@ -3,11 +3,14 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
@@ -42,6 +45,7 @@ import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Tree;
 import org.genericsystem.generic.Type;
+import org.genericsystem.iterator.AbstractConcateIterator;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
@@ -776,12 +780,139 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
 		return new AbstractFilterIterator<T>(this.<T> getInternalInheritings(level, origin, pos).iterator()) {
-
 			@Override
 			public boolean isSelected() {
 				return level == next.getMetaLevel() && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) next).isAttributeOf(GenericImpl.this));
 			}
 		};
+	}
+
+	private Iterator<Generic> supersIterator(final Generic origin) {
+		return new AbstractFilterIterator<Generic>(getSupers().iterator()) {
+
+			@Override
+			public boolean isSelected() {
+				return !GenericImpl.this.equals(next) && origin.isAttributeOf(next);
+			}
+		};
+	}
+
+	private <T extends Generic> Iterator<T> inheritanceIterator2(final int level, final Generic origin, final int pos) {
+		return new AbstractFilterIterator<T>(new SpecializedMainInheritance(origin, level).<T> specialize()) {
+			@Override
+			public boolean isSelected() {
+				return level == next.getMetaLevel() && (pos == Statics.MULTIDIRECTIONAL || ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos));
+			}
+		};
+	}
+
+	private class SpecializedMainInheritance extends HashSet<Generic> {
+
+		private static final long serialVersionUID = -8308697833901246495L;
+		private final int level;
+		private final Generic origin;
+		private final CompositesIndex compositesIndex = new CompositesIndex();
+
+		private SpecializedMainInheritance(final Generic origin, final int level) {
+			this.level = level;
+			this.origin = origin;
+		}
+
+		private <T extends Generic> Iterator<T> specialize() {
+			return new AbstractFilterIterator<T>(new MainInheritanceProjector(GenericImpl.this).<T> project()) {
+				@Override
+				public boolean isSelected() {
+					return !contains(next);
+				}
+			};
+		}
+
+		private class CompositesIndex extends HashMap<Generic, Map<Generic, Set<Generic>>> {
+
+			private static final long serialVersionUID = -6404067063383874676L;
+
+			private <T extends Generic> Iterator<T> getIndexedCompositeIterator(Generic base, final Generic index) {
+				Map<Generic, Set<Generic>> indexedCompositeMap = get(base);
+				if (indexedCompositeMap == null) {
+					put(base, indexedCompositeMap = new HashMap<>());
+					Iterator<T> iterator = new AbstractFilterIterator<T>(((GenericImpl) base).<T> compositesIterator()) {
+						@Override
+						public boolean isSelected() {
+							return next.getMetaLevel() <= level;
+						}
+					};
+					while (iterator.hasNext()) {
+						final T next = iterator.next();
+						for (Generic superGeneric : next.getSupers()) {
+							Set<Generic> indexedCompositeSet = indexedCompositeMap.get(superGeneric);
+							if (indexedCompositeSet == null)
+								indexedCompositeMap.put(superGeneric, indexedCompositeSet = new HashSet<Generic>());
+							indexedCompositeSet.add(next);
+						}
+					}
+				}
+
+				Set<Generic> indexedCompositeSet = indexedCompositeMap.get(index);
+				if (indexedCompositeSet == null)
+					return Collections.emptyIterator();
+				return (Iterator<T>) indexedCompositeSet.iterator();
+			}
+		}
+
+		private <T extends Generic> Iterator<T> indexedCompositeIterator(Generic base, final Generic index) {
+			return compositesIndex.getIndexedCompositeIterator(base, index);
+			// return new AbstractFilterIterator<T>(((GenericImpl) base).<T> compositesIterator()) {
+			// @Override
+			// public boolean isSelected() {
+			// return next.getMetaLevel() <= level && next.getSupers().contains(index);
+			// }
+			// };
+		}
+
+		private class MainInheritanceProjector extends HashSet<Generic> {
+
+			private static final long serialVersionUID = 2189650244025973386L;
+			private final Generic base;
+
+			public MainInheritanceProjector(final Generic base) {
+				this.base = base;
+			}
+
+			private <T extends Generic> Iterator<T> project() {
+				return projectIterator(this.<T> projectFromSupersIterator());
+			}
+
+			private <T extends Generic> Iterator<T> projectFromSupersIterator() {
+				if (!origin.isAttributeOf(base))
+					return Collections.emptyIterator();
+				Iterator<Generic> supersIterator = ((GenericImpl) base).supersIterator(origin);
+				if (!supersIterator.hasNext())
+					return new SingletonIterator<T>((T) origin);
+				return new AbstractConcateIterator<Generic, T>(supersIterator) {
+					@Override
+					protected Iterator<T> getIterator(final Generic superGeneric) {
+						return new MainInheritanceProjector((superGeneric)).project();
+					}
+				};
+			}
+
+			private <T extends Generic> Iterator<T> projectIterator(Iterator<T> iteratorToProject) {
+				return new AbstractConcateIterator<T, T>(iteratorToProject) {
+					@Override
+					protected Iterator<T> getIterator(final T index) {
+						Iterator<T> indexIterator = indexedCompositeIterator(base, index);
+						if (indexIterator.hasNext())
+							SpecializedMainInheritance.this.add(index);
+						if (add(index))
+							if (indexIterator.hasNext())
+								return new ConcateIterator<>(new SingletonIterator<T>(index), projectIterator(indexIterator));
+							else
+								return new SingletonIterator<T>(index);
+						return Collections.<T> emptyIterator();
+					}
+				};
+			}
+		}
 	}
 
 	private class Inheritings<T extends Generic> extends LinkedHashSet<T> {
@@ -824,8 +955,9 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				Generic next = iterator.next();
 				if (candidate.inheritsFrom(next) && !candidate.equals(next))
 					iterator.remove();
-				else if (next.inheritsFrom(candidate))
+				else if (next.inheritsFrom(candidate)) {
 					return false;
+				}
 			}
 			if (pos != Statics.MULTIDIRECTIONAL) {
 				if (((GenericImpl) candidate).isPseudoStructural(pos))

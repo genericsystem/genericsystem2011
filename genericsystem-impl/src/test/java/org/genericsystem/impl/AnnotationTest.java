@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.util.List;
-
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.Meta;
@@ -100,6 +99,7 @@ public class AnnotationTest extends AbstractTest {
 		Type vehicle = cache.find(Vehicle.class);
 		Attribute power = cache.find(Power.class);
 		assert power.isStructural();
+		power.log();
 		assert vehicle.getAttributes().contains(power) : vehicle.getAttributes();
 	}
 
@@ -297,52 +297,42 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Games {
-	}
+	public static class Games {}
 
 	@SystemGeneric
 	@Meta(Games.class)
-	public static class MyGames {
-	}
+	public static class MyGames {}
 
 	@SystemGeneric
-	public static class Children {
-	}
+	public static class Children {}
 
 	@SystemGeneric
 	@Meta(Children.class)
-	public static class MyChildren {
-	}
+	public static class MyChildren {}
 
 	@SystemGeneric
 	@Extends({ Games.class, Children.class })
-	public static class ChildrenGames {
-	}
+	public static class ChildrenGames {}
 
 	@SystemGeneric
 	@Meta(ChildrenGames.class)
-	public static class MyChildrenGames {
-	}
+	public static class MyChildrenGames {}
 
 	@SystemGeneric
 	@Extends({ Human.class, Vehicle.class })
-	public static class Transformer {
-	}
+	public static class Transformer {}
 
 	@SystemGeneric
 	@Meta(Transformer.class)
-	public static class MyTransformer {
-	}
+	public static class MyTransformer {}
 
 	@SystemGeneric
 	@Extends({ Transformer.class, ChildrenGames.class })
-	public static class TransformerChildrenGames {
-	}
+	public static class TransformerChildrenGames {}
 
 	@SystemGeneric
 	@Meta(TransformerChildrenGames.class)
-	public static class MyTransformerChildrenGames {
-	}
+	public static class MyTransformerChildrenGames {}
 
 	@SystemGeneric
 	public static class GraphicComponent {
@@ -391,8 +381,7 @@ public class AnnotationTest extends AbstractTest {
 
 	@SystemGeneric
 	@Meta(Vehicle.class)
-	public static class MyVehicle {
-	}
+	public static class MyVehicle {}
 
 	@SystemGeneric
 	@Components(Vehicle.class)
@@ -415,8 +404,7 @@ public class AnnotationTest extends AbstractTest {
 
 	@SystemGeneric
 	@Meta(Car.class)
-	public static class myCar {
-	}
+	public static class myCar {}
 
 	@SystemGeneric
 	@Components(Car.class)
@@ -431,40 +419,32 @@ public class AnnotationTest extends AbstractTest {
 	}
 
 	@SystemGeneric
-	public static class Human {
-	}
+	public static class Human {}
 
 	@SystemGeneric
-	public static class Man extends Human {
-	}
+	public static class Man extends Human {}
 
 	@SystemGeneric
 	@Meta(Human.class)
-	public static class Myck {
-	}
+	public static class Myck {}
 
 	@SystemGeneric
-	public static class Time {
-	}
+	public static class Time {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class })
-	public static class HumanPossessVehicle {
-	}
+	public static class HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Car.class })
-	public static class HumanPossessCar extends HumanPossessVehicle {
-	}
+	public static class HumanPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Man.class, Car.class })
-	public static class ManPossessCar extends HumanPossessVehicle {
-	}
+	public static class ManPossessCar extends HumanPossessVehicle {}
 
 	@SystemGeneric
 	@Components({ Human.class, Vehicle.class, Time.class })
-	public static class HumanPossessVehicleTime {
-	}
+	public static class HumanPossessVehicleTime {}
 
 }
