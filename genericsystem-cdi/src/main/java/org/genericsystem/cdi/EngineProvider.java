@@ -8,7 +8,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
-import org.genericSystem.cdi.event.BeforeGenericSystemStops;
 import org.genericSystem.cdi.event.EventLauncher;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericSystem;
@@ -78,7 +77,7 @@ public class EngineProvider {
 
 	@PreDestroy
 	public void destroy() {
-		eventLauncher.getStopEventLauncher().fire(new BeforeGenericSystemStops());
+		eventLauncher.launchStopEvent();
 		log.info("$$$$$$$$$$$$$$ STOP GS ENGINE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 		engine.close();
 		engine = null;
