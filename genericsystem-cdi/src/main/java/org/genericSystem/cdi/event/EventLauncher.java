@@ -5,11 +5,23 @@ import javax.inject.Inject;
 
 public class EventLauncher {
 
+	public class AfterGenericSystemStarts {
+
+	}
+
+	public class BeforeGenericSystemStops {
+
+	}
+
 	@Inject
 	private Event<BeforeGenericSystemStops> stopEventLauncher;
 
 	@Inject
 	private Event<AfterGenericSystemStarts> startEventLauncher;
+
+	public void launchStopEvent() {
+		stopEventLauncher.fire(new BeforeGenericSystemStops());
+	}
 
 	public void launchStartEvent() {
 		startEventLauncher.fire(new AfterGenericSystemStarts());
