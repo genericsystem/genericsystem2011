@@ -1,10 +1,10 @@
 package org.genericsystem.jsf.example.initialisation;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterDeploymentValidation;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.Extension;
+import javax.inject.Inject;
 
+import org.genericSystem.cdi.event.AfterGenericSystemStarts;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
@@ -15,16 +15,19 @@ import org.genericsystem.jsf.example.structure.Attributes.Power;
 import org.genericsystem.jsf.example.structure.Relations.CarColorRelation;
 import org.genericsystem.jsf.example.structure.Types.Cars;
 import org.genericsystem.jsf.example.structure.Types.Colors;
-import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InitializationScript implements Extension {
+@ApplicationScoped
+public class InitializationScript {
 
-	protected Logger log = LoggerFactory.getLogger(InitializationScript.class);
+	protected static Logger log = LoggerFactory.getLogger(InitializationScript.class);
 
-	public void init(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
-		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
+	@Inject
+	private Engine engine;
+
+	public void init(@Observes AfterGenericSystemStarts event) {
+
 		Cache cache = engine.newCache().start();
 
 		Type colors = cache.find(Colors.class);
