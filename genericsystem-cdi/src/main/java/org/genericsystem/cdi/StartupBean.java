@@ -11,7 +11,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.util.AnnotationLiteral;
-
+import org.genericSystem.cdi.event.EventLauncher;
 import org.genericsystem.annotation.SystemGeneric;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
@@ -38,6 +38,8 @@ public class StartupBean implements Extension {
 				}
 			}
 		}
+		EventLauncher eventLauncher = BeanManagerUtils.getContextualInstance(beanManager, EventLauncher.class);
+		eventLauncher.launchStartEvent();
 		log.info("-------------------end initialization------------------------");
 	}
 }
