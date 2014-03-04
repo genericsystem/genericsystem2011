@@ -8,6 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
+import org.genericSystem.cdi.event.EventLauncher;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericSystem;
 import org.slf4j.Logger;
@@ -24,10 +25,13 @@ public class EngineProvider {
 	private UserClassesProvider userClassesProvider;
 
 	@Inject
-	PersistentDirectoryProvider persistentDirectoryProvider;
+	private PersistentDirectoryProvider persistentDirectoryProvider;
 
 	@Inject
-	CdiFactory factory;
+	private CdiFactory factory;
+
+	@Inject
+	private EventLauncher eventLauncher;
 
 	@PostConstruct
 	public void init() {
@@ -73,6 +77,7 @@ public class EngineProvider {
 
 	@PreDestroy
 	public void destroy() {
+		eventLauncher.launchStopEvent();
 		log.info("$$$$$$$$$$$$$$ STOP GS ENGINE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 		engine.close();
 		engine = null;

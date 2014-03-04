@@ -6,10 +6,9 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 	<h:panelGrid columns="2">
-		<c:forEach items="#{component.children}" var="child">
-			<ui:include src="#{child.xhtmlPath}">
-				<ui:param name="component" value="#{child}" />
-			</ui:include>
-		</c:forEach>
+						<c:forEach items="#{component.children}" var="component">
+							<ui:include src="#{component.xhtmlPath}" />
+						</c:forEach>
+
 	</h:panelGrid>
 </ui:composition>
