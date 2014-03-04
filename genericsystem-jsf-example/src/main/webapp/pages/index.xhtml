@@ -12,10 +12,8 @@
 
 	<ui:define name="content">
 	<h:messages errorStyle="color:red" />
-		<c:forEach items="#{rootComponent.children}" var="child">
-			<ui:include src="#{child.xhtmlPath}">
-				<ui:param name="component" value="#{child}" />
-			</ui:include>
+		<c:forEach items="#{rootComponent.children}" var="component">
+			<ui:include src="#{component.xhtmlPath}" />
 		</c:forEach>
 	</ui:define>
 </ui:composition>
