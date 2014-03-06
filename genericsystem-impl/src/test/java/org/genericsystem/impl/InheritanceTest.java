@@ -5,7 +5,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.exception.ExistsException;
-import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
+import org.genericsystem.exception.GetGenericConstraintVioliationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
@@ -51,7 +51,7 @@ public class InheritanceTest extends AbstractTest {
 			public void intercept() {
 				car.addSubType("Vehicle");
 			}
-		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
+		}.assertIsCausedBy(GetGenericConstraintVioliationException.class);
 	}
 
 	public void testComplexInheritanceIterator4() {

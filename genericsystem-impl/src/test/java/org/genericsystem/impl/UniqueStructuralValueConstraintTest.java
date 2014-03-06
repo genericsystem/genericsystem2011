@@ -1,10 +1,12 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
+import org.genericsystem.exception.GetGenericConstraintVioliationException;
 import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -120,15 +122,16 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 	public void testTwoTypesWithSameRelationKO() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		final Type plane = cache.addType("Plane");
-		final Type color = cache.addType("Color");
+		Type plane = cache.addType("Plane");
+		Type color = cache.addType("Color");
 		car.setRelation("ColorRelation", color);
+		plane.setRelation("ColorRelation", color);
 
 		new RollbackCatcher() {
 
 			@Override
 			public void intercept() {
-				plane.setRelation("ColorRelation", color);
+				cache.flush();
 			}
 		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
 	}
@@ -209,6 +212,6 @@ public class UniqueStructuralValueConstraintTest extends AbstractTest {
 			public void intercept() {
 				collection.addSubType("Tree");
 			}
-		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
+		}.assertIsCausedBy(GetGenericConstraintVioliationException.class);
 	}
 }

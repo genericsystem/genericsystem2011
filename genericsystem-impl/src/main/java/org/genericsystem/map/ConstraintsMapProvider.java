@@ -12,6 +12,7 @@ import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.constraints.AliveConstraintImpl;
 import org.genericsystem.constraints.AloneAutomaticsConstraintImpl;
+import org.genericsystem.constraints.GetGenericConstraintImpl;
 import org.genericsystem.constraints.InstanceClassConstraintImpl;
 import org.genericsystem.constraints.MetaLevelConstraintImpl;
 import org.genericsystem.constraints.OptimisticLockConstraintImpl;
@@ -40,7 +41,7 @@ import org.genericsystem.map.ConstraintsMapProvider.MapInstance;
 @Components(EngineImpl.class)
 @Dependencies({ MapInstance.class, MetaLevelConstraintImpl.class, RequiredConstraintImpl.class, SingularConstraintImpl.class, SizeConstraintImpl.class, AliveConstraintImpl.class, AloneAutomaticsConstraintImpl.class, InstanceClassConstraintImpl.class,
 		OptimisticLockConstraintImpl.class, PropertyConstraintImpl.class, SingletonConstraintImpl.class, SuperRuleConstraintImpl.class, UnduplicateBindingConstraintImpl.class, UniqueValueConstraintImpl.class, VirtualConstraintImpl.class,
-		StructuralNamingConstraintImpl.class })
+		StructuralNamingConstraintImpl.class, GetGenericConstraintImpl.class })
 public class ConstraintsMapProvider extends AbstractMapProvider<AxedPropertyClass, Serializable> {
 
 	@Override
