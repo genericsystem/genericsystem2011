@@ -1,6 +1,7 @@
 package org.genericsystem.constraints;
 
 import java.util.Iterator;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.Extends;
@@ -32,13 +33,20 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 	@Meta(StructuralNamingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(StructuralNamingConstraintImpl.class)
-	public static class DefaultKey {}
+	public static class DefaultKey {
+	}
 
 	@SystemGeneric
 	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {}
+	public static class DefaultValue {
+	}
+
+	@Override
+	public boolean isImmediatelyCheckable() {
+		return false;
+	}
 
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {

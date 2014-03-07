@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.core.Cache;
@@ -14,7 +15,7 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
-import org.genericsystem.exception.UniqueStructuralValueConstraintViolationException;
+import org.genericsystem.exception.GetGenericConstraintVioliationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
@@ -293,7 +294,7 @@ public class ApiTest extends AbstractTest {
 	}
 
 	public void testCyclicInherits() {
-		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		cache.addType("A");
 		final Type b = cache.addType("B");
 		new RollbackCatcher() {
@@ -302,7 +303,17 @@ public class ApiTest extends AbstractTest {
 			public void intercept() {
 				b.addSubType("A");
 			}
-		}.assertIsCausedBy(UniqueStructuralValueConstraintViolationException.class);
+		}.assertIsCausedBy(GetGenericConstraintVioliationException.class);
+	}
+
+	public void testGetAttribute() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.addType("Car");
+		Attribute carPower = car.addAttribute("power");
+		Type bike = cache.addType("Bike");
+		Attribute bikePower = bike.addAttribute("power");
+		assert cache.getGeneric("power", carPower.getMeta(), car) == carPower;
+		assert cache.getGeneric("power", carPower.getMeta(), bike) == bikePower;
 	}
 
 	public void testGetReferentialAndIsRemovable() {

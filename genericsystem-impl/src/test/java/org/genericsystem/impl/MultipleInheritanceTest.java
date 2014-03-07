@@ -28,19 +28,19 @@ public class MultipleInheritanceTest extends AbstractTest {
 
 	public void testAttributeProjection() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		Type car = cache.addType("Car");
-		Type robot = cache.addType("Robot");
+		Type named = cache.addType("Named");
+		named.addAttribute("Power");
+		Type car = named.addSubType("Car");
+		Type robot = named.addSubType("Robot");
 		Type transformer = cache.addType("Transformer", car, robot);
 		Attribute carPower = car.addAttribute("Power");
 		Attribute robotPower = robot.addAttribute("Power");
-		Attribute transformerPower = transformer.getAttribute("Power");
-
+		Attribute transformerPower = transformer.addAttribute("Power");
+		assert transformerPower == transformer.getAttribute("Power");
 		assert transformerPower.inheritsFrom(carPower);
 		assert transformerPower.inheritsFrom(robotPower);
-		assert transformerPower.equals(carPower);
-		assert transformerPower.equals(robotPower);
-		assert ((CacheImpl) cache).isAutomatic(transformerPower);
-
+		assert !((CacheImpl) cache).isAutomatic(transformerPower);
+		cache.flush();
 	}
 
 	public void testgetDirectSubTypes() {
