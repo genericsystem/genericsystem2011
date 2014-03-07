@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -167,7 +168,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAL:
 			orderAndRemoveDependenciesForRemove(generic);
-		break;
+			break;
 		case CONSERVE:
 			new Restructurator() {
 				private static final long serialVersionUID = 7326023526567814490L;
@@ -179,11 +180,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(generic);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-		break;
+			break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-		break;
+			break;
 		}
 	}
 

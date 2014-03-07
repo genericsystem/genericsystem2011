@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;

@@ -1,4 +1,4 @@
-package org.genericsystem.jsf.example.persistent;
+package org.genericsystem.tracker.persistent;
 
 import javax.enterprise.inject.Specializes;
 
@@ -9,6 +9,7 @@ public class MockPersistentDirectoryProvider extends PersistentDirectoryProvider
 
 	@Override
 	public String getDirectoryPath() {
-		return DIRECTORY_PATH;
+		// return DIRECTORY_PATH;
+		return null;
 	}
 }

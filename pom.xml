@@ -45,6 +45,7 @@
 		<module>genericsystem-jsf</module>
 		<module>genericsystem-jsf-resolver</module>
 		<module>genericsystem-jsf-example</module>
+		<module>genericsystem-tracker</module>
 	</modules>
 
 	<distributionManagement>
