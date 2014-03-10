@@ -28,8 +28,9 @@ public class SelectorComponent extends AbstractComponent {
 		return getCache().getAllTypes().filter(new Filter<Type>() {
 			public boolean isSelected(Type candidate) {
 				Serializable value = candidate.getValue();
-				if (!value.getClass().isAssignableFrom(Class.class))
+				if (!value.getClass().isAssignableFrom(Class.class)) {
 					return false;
+				}
 				@SuppressWarnings("unchecked")
 				Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
 				return clazz != null && Types.class.equals(clazz);
@@ -63,7 +64,6 @@ public class SelectorComponent extends AbstractComponent {
 
 	public void select(Generic selected) {
 		this.child = new TypeComponent(this, selected);
-		log.info("child : " + child);
 	}
 
 	public <T extends AbstractComponent> T getSelectedChild() {
