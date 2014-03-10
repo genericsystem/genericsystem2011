@@ -1,4 +1,4 @@
-package org.genericSystem.cdi.event;
+package org.genericsystem.cdi.event;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;

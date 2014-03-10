@@ -8,7 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
-import org.genericSystem.cdi.event.EventLauncher;
+import org.genericsystem.cdi.event.EventLauncher;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.GenericSystem;
 import org.slf4j.Logger;

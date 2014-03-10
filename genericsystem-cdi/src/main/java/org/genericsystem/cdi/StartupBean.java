@@ -11,8 +11,9 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.util.AnnotationLiteral;
-import org.genericSystem.cdi.event.EventLauncher;
+
 import org.genericsystem.annotation.SystemGeneric;
+import org.genericsystem.cdi.event.EventLauncher;
 import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
