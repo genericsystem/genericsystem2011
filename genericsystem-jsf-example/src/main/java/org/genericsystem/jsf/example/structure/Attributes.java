@@ -22,5 +22,4 @@ public class Attributes {
 	// @Components(Cars.class)
 	// public static class FuelTank extends GenericImpl {
 	// }
-
 }

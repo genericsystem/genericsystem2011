@@ -9,7 +9,7 @@
 		<f:facet name="header">
 			<h:outputText value="#{component.columnTitleAttribute}" />
 		</f:facet>
-		<h:dataTable value="#{row.getAttributeValues(component.selected)}"
+		<h:dataTable value="#{row.getAttributeValues(component.generic)}"
 			var="value">
 			<h:column>
 				<h:outputText value="#{value}" />

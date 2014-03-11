@@ -11,8 +11,9 @@
 	</ui:define>
 
 	<ui:define name="content">
-	<h:messages errorStyle="color:red" />
+		<h:messages errorStyle="color:red" />
 		<c:forEach items="#{rootComponent.children}" var="component">
+			<h:outputText value="coucou" />
 			<ui:include src="#{component.xhtmlPath}" />
 		</c:forEach>
 	</ui:define>

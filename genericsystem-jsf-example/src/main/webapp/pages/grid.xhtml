@@ -7,6 +7,7 @@
 
 	<h:panelGrid columns="2">
 		<c:forEach items="#{component.children}" var="component">
+			<h:outputText value="coucou 2" />
 			<ui:include src="#{component.xhtmlPath}" />
 		</c:forEach>
 	</h:panelGrid>
