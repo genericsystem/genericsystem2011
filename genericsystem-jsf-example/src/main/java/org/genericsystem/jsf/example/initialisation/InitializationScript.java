@@ -4,7 +4,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.genericSystem.cdi.event.EventLauncher.AfterGenericSystemStarts;
+import org.genericsystem.cdi.event.EventLauncher.AfterGenericSystemStarts;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
