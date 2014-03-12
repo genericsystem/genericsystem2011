@@ -8,6 +8,7 @@ import org.genericsystem.framework.component.generic.AbstractAttributeComponent;
 import org.genericsystem.framework.component.generic.AbstractTypeComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.jsf.example.structure.Attributes;
+import org.genericsystem.jsf.example.structure.Relations;
 
 public class TypeComponent extends AbstractTypeComponent {
 
@@ -22,7 +23,7 @@ public class TypeComponent extends AbstractTypeComponent {
 			return false;
 		@SuppressWarnings("unchecked")
 		Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
-		return clazz != null && Attributes.class.equals(clazz);
+		return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
 	}
 
 	@Override

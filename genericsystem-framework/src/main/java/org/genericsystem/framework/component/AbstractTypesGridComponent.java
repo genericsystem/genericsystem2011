@@ -10,9 +10,9 @@ import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.component.generic.AbstractTypeComponent;
 import org.genericsystem.generic.Type;
 
-public abstract class AbstractGridComponent extends AbstractComponent {
+public abstract class AbstractTypesGridComponent extends AbstractComponent {
 
-	public AbstractGridComponent(AbstractComponent parent) {
+	public AbstractTypesGridComponent(AbstractComponent parent) {
 		super(parent);
 	}
 
@@ -25,7 +25,7 @@ public abstract class AbstractGridComponent extends AbstractComponent {
 		return getCache().getAllTypes().filter(new Filter<Type>() {
 			@Override
 			public boolean isSelected(Type candidate) {
-				return AbstractGridComponent.this.isSelected(candidate);
+				return AbstractTypesGridComponent.this.isSelected(candidate);
 			}
 		}).project(new Projector<AbstractComponent, Type>() {
 			private final Map<Generic, AbstractComponent> map = new HashMap<Generic, AbstractComponent>() {

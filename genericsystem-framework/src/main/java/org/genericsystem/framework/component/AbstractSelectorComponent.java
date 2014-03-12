@@ -51,22 +51,15 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 
 	public abstract void selectDefaultComponent();
 
-	// private void selectDefaultComponent() {
-	// TODO KK
-	// for (ButtonComponent component : this.<ButtonComponent> getChildren())
-	// if (getCache().find(Issues.class).equals(component.getGeneric()))
-	// select(component.getGeneric());
-	// }
-
 	public abstract void select(Generic selected);
-
-	// public void select(Generic selected) {
-	// this.child = new AbstractTypeComponent(this, selected);
-	// }
 
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractComponent> T getChild() {
 		return (T) child;
+	}
+
+	public void setChild(AbstractComponent child) {
+		this.child = child;
 	}
 
 	@Override
