@@ -90,6 +90,13 @@ public interface Cache {
 	<T extends Engine> T getEngine();
 
 	/**
+	 * Returns the Generic. A Generic is identified by value, meta and components.
+	 * 
+	 * @return the Generic.
+	 */
+	<T extends Generic> T getGeneric(Serializable value, Generic meta, Generic... components);
+
+	/**
 	 * Returns all Types existing in current cache.
 	 * 
 	 * @return collection of Type.

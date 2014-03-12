@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,7 +12,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
@@ -440,35 +443,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> Snapshot<T> getInstances() {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return instancesIterator();
-			}
-		};
-	}
-
-	public <T extends Generic> Iterator<T> instancesIterator() {
-		return Statics.<T> levelFilter(GenericImpl.this.<T> inheritingsIterator(), getMetaLevel() + 1);
-	}
-
-	// TODO KK supers are necessary for get instance from meta !!!
-	@Override
-	public <T extends Generic> T getInstance(Serializable value, Generic... targets) {
-		return this.unambigousFirst(targetsFilter(Statics.<T> valueFilter(GenericImpl.this.<T> allInstancesIterator(), value), this, targets));
-	}
-
-	private <T extends Link> Iterator<T> linksIterator(final Link relation, final int basePos, final Generic... targets) {
-		return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(relation, Statics.CONCRETE, basePos, targets)) {
-			@Override
-			public boolean isSelected() {
-				return next.isRelation();
-			}
-		};
-	}
-
-	@Override
 	public <T extends Generic> Snapshot<T> getTargets(Relation relation) {
 		return getTargets(relation, Statics.BASE_POSITION, Statics.TARGET_POSITION);
 	}
@@ -534,6 +508,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public <T extends Link> T getLink(Link relation, int basePos, Generic... targets) {
 		return this.unambigousFirst(this.<T> linksIterator(relation, basePos, targets));
+	}
+
+	private <T extends Link> Iterator<T> linksIterator(final Link relation, final int basePos, final Generic... targets) {
+		return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(relation, Statics.CONCRETE, basePos, targets)) {
+			@Override
+			public boolean isSelected() {
+				return next.isRelation();
+			}
+		};
 	}
 
 	@Override
@@ -1325,6 +1308,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getComponents().size() <= componentPos || componentPos < 0 ? null : (T) getComponents().get(componentPos);
 	}
 
+	public <T extends Generic> T getGeneric(Serializable value, Generic meta, Generic... components) {
+		return genericIterator(value, meta, components);
+	}
+
+	private <T extends Generic> T genericIterator(final Serializable value, final Generic meta, final Generic... components) {
+		return (T) unambigousFirst(new AbstractFilterIterator<Generic>(components.length > 0 ? ((GenericImpl) components[0]).compositesIterator() : ((GenericImpl) meta).instancesIterator()) {
+			@Override
+			public boolean isSelected() {
+				return next.getMeta().equals(meta) && Objects.equals(next.getValue(), value) && Arrays.equals(next.getComponents().toArray(), components);
+			}
+		});
+	}
+
 	@Override
 	public <T extends Generic> Snapshot<T> getAllInstances() {
 		return new AbstractSnapshot<T>() {
@@ -1354,6 +1350,31 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				};
 			}
 		};
+	}
+
+	@Override
+	public <T extends Generic> Snapshot<T> getInstances() {
+		return new AbstractSnapshot<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return instancesIterator();
+			}
+		};
+	}
+
+	public <T extends Generic> Iterator<T> instancesIterator() {
+		return new AbstractFilterIterator<T>(GenericImpl.this.<T> allInheritingsAboveIterator(getMetaLevel() + 1)) {
+			@Override
+			public boolean isSelected() {
+				return GenericImpl.this.equals(next.getMeta());
+			}
+		};
+	}
+
+	// TODO KK supers are necessary for get instance from meta !!!
+	@Override
+	public <T extends Generic> T getInstance(Serializable value, Generic... targets) {
+		return this.unambigousFirst(targetsFilter(Statics.<T> valueFilter(GenericImpl.this.<T> allInstancesIterator(), value), this, targets));
 	}
 
 	@Override
