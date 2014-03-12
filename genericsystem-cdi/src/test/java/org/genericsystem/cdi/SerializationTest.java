@@ -21,8 +21,8 @@ public class SerializationTest extends AbstractTest {
 		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
 		Cache clone = deSerialize(serialize(cache)).start();
-		assert clone.getType("Vehicle") != vehicle;
-		assert clone.getType("Vehicle").getValue().equals(vehicle.getValue());
+		assert clone.getGeneric("Vehicle", cache.getEngine()) != vehicle;
+		assert clone.getGeneric("Vehicle", cache.getEngine()).getValue().equals(vehicle.getValue());
 	}
 
 	public void testAddsWithFlush() {
@@ -32,9 +32,9 @@ public class SerializationTest extends AbstractTest {
 		cache.flush();
 		Type vehicle = cache.addType("Vehicle");
 		Cache clone = deSerialize(serialize(cache)).start();
-		assert clone.getType("Vehicle") != vehicle;
-		assert clone.getType("Vehicle").getValue().equals(vehicle.getValue());
-		assert clone.getType("Color") == color : clone.getType("Color");
+		assert clone.getGeneric("Vehicle", cache.getEngine()) != vehicle;
+		assert clone.getGeneric("Vehicle", cache.getEngine()).getValue().equals(vehicle.getValue());
+		assert clone.getGeneric("Color", cache.getEngine()) == color : clone.getGeneric("Color", cache.getEngine());
 	}
 
 	public void testSuperCache() {
@@ -44,7 +44,7 @@ public class SerializationTest extends AbstractTest {
 		Cache superCache = cache.mountNewCache();
 		Attribute vehiclePower = vehicle.addAttribute("power");
 		Cache superCacheClone = deSerialize(serialize(superCache)).start();
-		Type vehicle2 = superCacheClone.getType("Vehicle");
+		Type vehicle2 = superCacheClone.getGeneric("Vehicle", cache.getEngine());
 		assert vehicle2 != vehicle;
 		assert vehicle2.getValue().equals(vehicle.getValue());
 		assert vehicle2.getAttribute("power") != null : vehicle2.getAttribute("power");
@@ -58,7 +58,7 @@ public class SerializationTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute("power");
 		deSerialize(serialize(cache)).start();
-		Type vehicle2 = cache.getType("Vehicle");
+		Type vehicle2 = cache.getGeneric("Vehicle", cache.getEngine());
 		assert vehicle2 != vehicle;
 		assert vehicle2.getValue().equals(vehicle.getValue());
 		assert vehicle2.getAttribute("power") != null;
@@ -73,7 +73,7 @@ public class SerializationTest extends AbstractTest {
 		Cache superCache = cache.mountNewCache();
 		myVehicle.remove();
 		Cache superCacheClone = deSerialize(serialize(superCache)).start();
-		Type myVehicle2 = superCacheClone.getType("Vehicle");
+		Type myVehicle2 = superCacheClone.getGeneric("Vehicle", cache.getEngine());
 		assert myVehicle2 != vehicle;
 		assert myVehicle2.getValue().equals(vehicle.getValue());
 		assert ((CacheImpl) superCacheClone).getSubContext() instanceof Cache;

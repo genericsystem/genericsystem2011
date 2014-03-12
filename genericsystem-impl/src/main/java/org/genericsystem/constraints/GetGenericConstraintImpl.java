@@ -43,7 +43,7 @@ public class GetGenericConstraintImpl extends AbstractBooleanNoAxedConstraintImp
 	@Override
 	public void check(Generic constraintBase, Generic modified) throws ConstraintViolationException {
 		try {
-			Generic generic = ((GenericImpl) modified).getGeneric(modified.getValue(), modified.getMeta(), (Generic[]) modified.getComponents().toArray());
+			Generic generic = ((GenericImpl) modified.getMeta()).getGeneric(modified.getValue(), (Generic[]) modified.getComponents().toArray());
 			if (generic != modified)
 				throw new GetGenericConstraintVioliationException("get : " + generic.info() + " for search : " + modified.info());
 		} catch (Exception e) {

@@ -147,17 +147,6 @@ public interface Cache {
 	<T extends Type> T addType(Serializable name, Type[] superTypes, Generic... components);
 
 	/**
-	 * Returns the existing Type or null if it not exists.
-	 * 
-	 * @param name
-	 *            the type's name.
-	 * 
-	 * @return the Type or null if it not exists.
-	 * @see Type
-	 */
-	<T extends Type> T getType(Serializable name);
-
-	/**
 	 * Returns the type. If the type with given name does not exists method creates it.
 	 * 
 	 * @param name

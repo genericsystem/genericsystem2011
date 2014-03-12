@@ -116,13 +116,13 @@ public class FlushTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 
 		Cache cache2 = engine.newCache().start();
-		assert cache2.getType("Vehicle") == null;
+		assert cache2.getGeneric("Vehicle", cache.getEngine()) == null;
 
 		cache.start().flush();
 
 		cache2.start();
 		((CacheImpl) cache2).pickNewTs();
-		assert cache2.getType("Vehicle").equals(vehicle);
+		assert cache2.getGeneric("Vehicle", cache2.getEngine()).equals(vehicle);
 	}
 
 	public void testAutomatics() {
@@ -213,8 +213,8 @@ public class FlushTest extends AbstractTest {
 		/* Cache 2 contains our types */
 		assert cache2.getAllTypes().contains(color);
 
-		Relation carColor2 = cache2.getType("Car").getRelation("CarColor");
-		car = cache2.getType("Car");
+		Relation carColor2 = cache2.<Type> getGeneric("Car", cache.getEngine()).getRelation("CarColor");
+		car = cache2.getGeneric("Car", cache.getEngine());
 		Snapshot<Link> links2 = car.getInstance("audi").getLinks(carColor2);
 		assert links2.size() == 1;
 		assert links2.contains(carColor2.getInstance("carRed", audi));
