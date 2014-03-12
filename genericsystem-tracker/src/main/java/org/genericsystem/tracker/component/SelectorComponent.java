@@ -63,7 +63,6 @@ public class SelectorComponent extends AbstractComponent {
 
 	public void select(Generic selected) {
 		this.child = new TypeComponent(this, selected);
-		log.info("child : " + child);
 	}
 
 	public <T extends AbstractComponent> T getSelectedChild() {

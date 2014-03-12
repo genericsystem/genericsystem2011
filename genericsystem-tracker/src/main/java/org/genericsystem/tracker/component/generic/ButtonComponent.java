@@ -24,7 +24,7 @@ public class ButtonComponent extends AbstractGenericComponent {
 
 	@Override
 	public String getXhtmlPath() {
-		return "button.xhtml";
+		return "/pages/button.xhtml";
 	}
 
 }
