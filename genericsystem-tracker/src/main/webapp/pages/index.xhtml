@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/pages/layouts/commonLayout.xhtml">
+
+	<ui:define name="header">
+		<title>JSF Example Use Case</title>
+	</ui:define>
+
+	<ui:define name="content">
+	<h:messages errorStyle="color:red" />
+		<c:forEach items="#{rootComponent.children}" var="component">
+			<ui:include src="#{component.xhtmlPath}" />
+		</c:forEach>
+	</ui:define>
+</ui:composition>
