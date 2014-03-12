@@ -49,7 +49,6 @@ public abstract class AbstractSnapshot<T> extends AbstractSet<T> implements Snap
 					}
 				};
 			}
-
 		};
 	}
 
