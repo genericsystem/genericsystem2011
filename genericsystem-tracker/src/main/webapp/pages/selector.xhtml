@@ -5,12 +5,14 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 
-		<c:forEach items="#{component.children}" var="component">
-			<ui:include src="#{component.xhtmlPath}" />
-		</c:forEach>
+	<c:forEach items="#{component.children}" var="component">
+		<ui:include src="#{component.xhtmlPath}" />
+	</c:forEach>
 
-		<ui:include src="#{component.selectedChild.xhtmlPath}">
-			<ui:param name="component" value="#{component.selectedChild}" />
-		</ui:include>
+	<ui:include src="#{component.selectedChild.xhtmlPath}">
+		<ui:param name="component" value="#{component.selectedChild}" />
+	</ui:include>
+
+
 
 </ui:composition>
