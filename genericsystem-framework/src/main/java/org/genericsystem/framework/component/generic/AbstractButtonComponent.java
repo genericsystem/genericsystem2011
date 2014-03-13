@@ -11,6 +11,7 @@ public abstract class AbstractButtonComponent extends AbstractGenericComponent {
 	}
 
 	public void select() {
+		// TODO class cast exception
 		((AbstractSelectorComponent) this.getParent()).select(getGeneric());
 	}
 
