@@ -32,18 +32,6 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 		return Arrays.asList(new TypesGridComponent(RootComponent.this));
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
-		// return (T) Arrays.asList(new TypesGridComponent(RootComponent.this));
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public <T extends Generic> boolean isSelected(T candidate) {
-		throw new UnsupportedOperationException();
-	}
-
 	@Override
 	public Cache getCache() {
 		return cache;
@@ -52,5 +40,21 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/index.xhtml";
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends AbstractComponent> T getRoot() {
+		return (T) this;
+	}
+
+	@Override
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
+		return null;
+	}
+
+	@Override
+	public <T extends Generic> boolean isSelected(T candidate) {
+		return false;
 	}
 }
