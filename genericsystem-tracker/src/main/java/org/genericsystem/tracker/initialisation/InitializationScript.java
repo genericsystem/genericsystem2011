@@ -8,9 +8,18 @@ import org.genericsystem.cdi.event.EventLauncher.AfterGenericSystemStarts;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.genericsystem.core.Generic;
+import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.tracker.structure.Attributes.Created;
+import org.genericsystem.tracker.structure.Relations.IssueAssigneeRelation;
+import org.genericsystem.tracker.structure.Relations.IssuePrioriyRelation;
+import org.genericsystem.tracker.structure.Relations.IssueReporterRelation;
+import org.genericsystem.tracker.structure.Relations.IssueStatusesRelation;
 import org.genericsystem.tracker.structure.Types.Issues;
 import org.genericsystem.tracker.structure.Types.Priorities;
+import org.genericsystem.tracker.structure.Types.Statutes;
+import org.genericsystem.tracker.structure.Types.Users;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,35 +34,88 @@ public class InitializationScript {
 	public void init(@Observes AfterGenericSystemStarts event) {
 
 		Cache cache = engine.newCache().start();
-
+		/**
+		 * Issues
+		 */
 		Type issues = cache.find(Issues.class);
 		Generic bug1 = issues.setInstance("bug1");
 		Generic bug2 = issues.setInstance("bug2");
+		Generic bug3 = issues.setInstance("bug3");
+		Generic bug4 = issues.setInstance("bug4");
+		/**
+		 * Status
+		 */
+		Type status = cache.find(Statutes.class);
+		Generic statusOpen = status.setInstance("Open");
+		Generic statusProgress = status.setInstance("Coding in Progress");
+		Generic statusResolved = status.setInstance("Resolved");
+		Generic statusClosed = status.setInstance("Closed");
+		/**
+		 * User
+		 */
+		Type user = cache.find(Users.class);
+		Generic user1 = user.setInstance("Charle");
+		Generic user2 = user.setInstance("Ahmed");
+		Generic user3 = user.setInstance("Mikael");
+		Generic user4 = user.setInstance("Nicolas");
+
+		/**
+		 * Created
+		 */
+		Attribute created = cache.find(Created.class);
+
+		/**
+		 * Priority
+		 */
 
 		Type priority = cache.find(Priorities.class);
+		Generic major = priority.getAllInstances().get(0);
+		Generic minor = priority.getAllInstances().get(1);
 
-		// Type colors = cache.find(Colors.class);
-		// Generic red = colors.setInstance("red");
-		// Generic blue = colors.setInstance("blue");
-		// Generic green = colors.setInstance("green");
+		/**
+		 * Relation
+		 */
 
-		// Type cars = cache.find(Cars.class);
-		// Attribute power = cache.find(Power.class);
+		Relation relationIssueReporter = cache.find(IssueReporterRelation.class);
+		Relation relationIssueAssignee = cache.find(IssueAssigneeRelation.class);
+		Relation relationIssueStatus = cache.find(IssueStatusesRelation.class);
+		Relation relationIssuePriority = cache.find(IssuePrioriyRelation.class);
 
-		// Generic myBmw = cars.setInstance("myBmw");
-		// Generic myAudi = cars.setInstance("myAudi");
-		// Generic myBemo = cars.setInstance("myBemo");
+		/**
+		 * Issue 1
+		 */
+		bug1.setLink(relationIssueAssignee, "relationIssueAssignee", user1);
+		bug1.setLink(relationIssueStatus, "relationIssueStatus", statusOpen);
+		bug1.setLink(relationIssueReporter, "RelationIssueReporter", user2);
+		bug1.setLink(relationIssuePriority, "relationIssuePriority", major);
+		bug1.addValue(created, "19/03/2014");
 
-		// Relation carColorRelation = cache.find(CarColorRelation.class);
-		//
-		// myBmw.setValue(power, 123);
-		// myBmw.bind(carColorRelation, red);
-		//
-		// myAudi.setValue(power, 321);
-		// myAudi.bind(carColorRelation, blue);
-		//
-		// myBemo.setValue(power, 288);
-		// myBemo.bind(carColorRelation, green);
+		/**
+		 * issue 2
+		 */
+		bug2.setLink(relationIssueAssignee, "relationIssueAssignee1", user2);
+		bug2.setLink(relationIssueStatus, "relationIssueStatus1", statusResolved);
+		bug2.setLink(relationIssueReporter, "RelationIssueReporter1", user4);
+		bug2.setLink(relationIssuePriority, "relationIssuePriority1", minor);
+		bug2.addValue(created, "12/03/2014");
+
+		/**
+		 * issue 3
+		 */
+		bug3.setLink(relationIssueAssignee, "relationIssueAssignee2", user1);
+		bug3.setLink(relationIssueStatus, "relationIssueStatus2", statusClosed);
+		bug3.setLink(relationIssueReporter, "RelationIssueReporter2", user2);
+		bug3.setLink(relationIssuePriority, "relationIssuePriority2", minor);
+		bug3.addValue(created, "12/10/2014");
+
+		/**
+		 * issue4
+		 */
+		bug4.setLink(relationIssueAssignee, "relationIssueAssignee3", user3);
+		bug4.setLink(relationIssueStatus, "relationIssueStatus3", statusProgress);
+		bug4.setLink(relationIssueReporter, "RelationIssueReporter3", user1);
+		bug4.setLink(relationIssuePriority, "relationIssuePriority3", minor);
+		bug4.addValue(created, "11/09/2014");
 
 		cache.flush();
 	}

@@ -19,6 +19,8 @@ public class TypeComponent extends AbstractGenericComponent {
 
 	private String newValue;
 
+	private EditComponent Child;
+
 	public TypeComponent(AbstractComponent parent, Generic selected) {
 		super(parent, selected);
 		this.children = initChildren();
@@ -89,10 +91,6 @@ public class TypeComponent extends AbstractGenericComponent {
 		instanceRow.getInstance().remove();
 	}
 
-	// public String getValue() {
-	// return Objects.toString(getSelected());
-	// }
-
 	public String editMsg() {
 		return "Edit instance";
 	}
@@ -105,9 +103,16 @@ public class TypeComponent extends AbstractGenericComponent {
 		return "Remove instance";
 	}
 
+	public AbstractComponent getChild() {
+		return Child;
+	}
+
+	public void setChild(InstanceRow instanceRow) {
+		Child = new EditComponent(this, instanceRow);
+	}
+
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/type.xhtml";
 	}
-
 }
