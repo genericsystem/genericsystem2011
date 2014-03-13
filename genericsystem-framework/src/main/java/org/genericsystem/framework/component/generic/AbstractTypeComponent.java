@@ -1,11 +1,8 @@
 package org.genericsystem.framework.component.generic;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.InstanceRow;
 import org.genericsystem.framework.component.AbstractComponent;
@@ -19,44 +16,9 @@ public abstract class AbstractTypeComponent extends AbstractValueAndGenericCompo
 		super(parent, selected);
 	}
 
-	public abstract boolean isSelected(Attribute attribute);
-
-	public abstract AbstractAttributeComponent buildComponent(Attribute attribute);
-
 	@Override
 	public List<AbstractAttributeComponent> initChildren() {
-		return ((Type) getGeneric()).getAttributes().filter(new AttributeFilter()).project(new AttributeProjector());
-	}
-
-	public class AttributeFilter implements Filter<Attribute> {
-
-		@Override
-		public boolean isSelected(Attribute candidate) {
-			return AbstractTypeComponent.this.isSelected(candidate);
-		}
-	}
-
-	public class AttributeProjector implements Projector<AbstractAttributeComponent, Attribute> {
-		private final Map<Attribute, AbstractAttributeComponent> map = new HashMap<Attribute, AbstractAttributeComponent>() {
-			private static final long serialVersionUID = -1162281462201347017L;
-
-			@Override
-			public AbstractAttributeComponent get(Object key) {
-				AbstractAttributeComponent result = super.get(key);
-				if (result == null)
-					put((Attribute) key, result = buildComponent((Attribute) key));
-				return result;
-			}
-		};
-
-		@Override
-		public AbstractAttributeComponent project(Attribute attribute) {
-			return map.get(attribute);
-		}
-
-		public Map<Attribute, AbstractAttributeComponent> getMap() {
-			return map;
-		}
+		return ((Type) getGeneric()).getAttributes().filter(new FilterGeneric<Attribute>()).project(new ProjectorGeneric<AbstractAttributeComponent, Attribute>());
 	}
 
 	public String add() {
