@@ -20,7 +20,6 @@ public class GridComponent extends AbstractComponent {
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		log.info("Début init children");
 		return getCache().getAllTypes().filter(new Filter<Type>() {
 			public boolean isSelected(Type candidate) {
 				Serializable value = candidate.getValue();
