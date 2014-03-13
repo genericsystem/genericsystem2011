@@ -88,7 +88,7 @@ public class InitializationScript {
 		bug1.setLink(relationIssueStatus, "relationIssueStatus", statusOpen);
 		bug1.setLink(relationIssueReporter, "RelationIssueReporter", user2);
 		bug1.setLink(relationIssuePriority, "relationIssuePriority", major);
-		bug1.addValue(created, "19/03/2014");
+		bug1.setValue(created, "19/03/2014");
 
 		/**
 		 * issue 2
@@ -97,7 +97,7 @@ public class InitializationScript {
 		bug2.setLink(relationIssueStatus, "relationIssueStatus1", statusResolved);
 		bug2.setLink(relationIssueReporter, "RelationIssueReporter1", user4);
 		bug2.setLink(relationIssuePriority, "relationIssuePriority1", minor);
-		bug2.addValue(created, "12/03/2014");
+		bug2.setValue(created, "12/03/2014");
 
 		/**
 		 * issue 3
@@ -106,7 +106,7 @@ public class InitializationScript {
 		bug3.setLink(relationIssueStatus, "relationIssueStatus2", statusClosed);
 		bug3.setLink(relationIssueReporter, "RelationIssueReporter2", user2);
 		bug3.setLink(relationIssuePriority, "relationIssuePriority2", minor);
-		bug3.addValue(created, "12/10/2014");
+		bug3.setValue(created, "12/10/2014");
 
 		/**
 		 * issue4
@@ -115,7 +115,7 @@ public class InitializationScript {
 		bug4.setLink(relationIssueStatus, "relationIssueStatus3", statusProgress);
 		bug4.setLink(relationIssueReporter, "RelationIssueReporter3", user1);
 		bug4.setLink(relationIssuePriority, "relationIssuePriority3", minor);
-		bug4.addValue(created, "11/09/2014");
+		bug4.setValue(created, "11/09/2014");
 
 		cache.flush();
 	}

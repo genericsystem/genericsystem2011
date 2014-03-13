@@ -11,7 +11,6 @@ import org.genericsystem.jsf.example.structure.Types;
 import org.genericsystem.jsf.example.structure.Types.Issues;
 
 public class SelectorComponent extends AbstractSelectorComponent {
-
 	public SelectorComponent(RootComponent rootComponent) {
 		super(rootComponent);
 		selectDefaultComponent();
@@ -21,26 +20,6 @@ public class SelectorComponent extends AbstractSelectorComponent {
 	public List<? extends AbstractComponent> initChildren() {
 		return getCache().getAllTypes().filter(new FilterGeneric<Type>()).project(new ProjectorGeneric<ButtonComponent, Type>());
 	}
-
-	// {
-	// private final Map<Generic, AbstractComponent> map = new HashMap<Generic, AbstractComponent>() {
-	//
-	// private static final long serialVersionUID = -7927996818181180784L;
-	//
-	// @Override
-	// public ButtonComponent get(Object key) {
-	// ButtonComponent result = (ButtonComponent) super.get(key);
-	// if (result == null)
-	// put((Generic) key, result = new ButtonComponent(SelectorComponent.this, (Type) key));
-	// return result;
-	// }
-	// };
-	//
-	// @Override
-	// public ButtonComponent project(Type element) {
-	// return (ButtonComponent) map.get(element);
-	// }
-	// }
 
 	@Override
 	public void selectDefaultComponent() {
