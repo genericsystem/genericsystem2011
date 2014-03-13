@@ -15,6 +15,19 @@ public class AttributeComponent extends AbstractGenericComponent {
 
 	private String newValue;
 
+	public AttributeComponent(AbstractComponent parent, Generic generic) {
+		super(parent, generic);
+	}
+
+	@Override
+	public List<? extends AbstractComponent> initChildren() {
+		return Collections.emptyList();
+	}
+
+	public List<InstanceRow> getTargetRows() {
+		return getTargetRows(this.<TypeComponent> getParent().getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0));
+	}
+
 	public String getNewValue() {
 		return Objects.toString(newValue);
 	}
@@ -23,12 +36,8 @@ public class AttributeComponent extends AbstractGenericComponent {
 		this.newValue = newValue;
 	}
 
-	public AttributeComponent(AbstractComponent parent, Generic generic) {
-		super(parent, generic);
-	}
-
-	public List<InstanceRow> getTargets() {
-		return (this.<TypeComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).getAllInstances().<InstanceRow> project(new Projector<InstanceRow, Generic>() {
+	public static List<InstanceRow> getTargetRows(Type targetType) {
+		return (targetType.getAllInstances()).<InstanceRow> project(new Projector<InstanceRow, Generic>() {
 
 			@Override
 			public InstanceRow project(Generic instance) {
@@ -38,25 +47,9 @@ public class AttributeComponent extends AbstractGenericComponent {
 		});
 	}
 
-	public String getColumnTitleAttribute() {
-		if (!isRelation())
-			return Objects.toString(getGeneric());
-		else
-			return Objects.toString((this.<TypeComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
-	}
-
-	public boolean isRelation() {
-		return getGeneric().isRelation();
-	}
-
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/attribute.xhtml";
-	}
-
-	@Override
-	public List<? extends AbstractComponent> initChildren() {
-		return Collections.emptyList();
 	}
 
 }
