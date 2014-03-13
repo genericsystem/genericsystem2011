@@ -32,6 +32,7 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 		return Arrays.asList(new TypesGridComponent(RootComponent.this));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
 		// return (T) Arrays.asList(new TypesGridComponent(RootComponent.this));
