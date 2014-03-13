@@ -4,9 +4,7 @@ import java.io.Serializable;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.generic.AbstractAttributeComponent;
 import org.genericsystem.framework.component.generic.AbstractTypeComponent;
-import org.genericsystem.generic.Attribute;
 import org.genericsystem.jsf.example.structure.Attributes;
 import org.genericsystem.jsf.example.structure.Relations;
 
@@ -17,8 +15,8 @@ public class TypeComponent extends AbstractTypeComponent {
 	}
 
 	@Override
-	public boolean isSelected(Attribute attribute) {
-		Serializable value = attribute.getValue();
+	public <T extends Generic> boolean isSelected(T type) {
+		Serializable value = type.getValue();
 		if (!value.getClass().isAssignableFrom(Class.class))
 			return false;
 		@SuppressWarnings("unchecked")
@@ -26,13 +24,14 @@ public class TypeComponent extends AbstractTypeComponent {
 		return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public String getXhtmlPath() {
-		return "/pages/type.xhtml";
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U attribute) {
+		return (T) new AttributeComponent(this, attribute);
 	}
 
 	@Override
-	public AbstractAttributeComponent buildComponent(Attribute attribute) {
-		return new AttributeComponent(this, attribute);
+	public String getXhtmlPath() {
+		return "/pages/type.xhtml";
 	}
 }

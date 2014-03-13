@@ -2,10 +2,9 @@ package org.genericsystem.jsf.example.component;
 
 import java.io.Serializable;
 
+import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractTypesGridComponent;
-import org.genericsystem.framework.component.generic.AbstractTypeComponent;
-import org.genericsystem.generic.Type;
 import org.genericsystem.jsf.example.structure.Types;
 
 public class TypesGridComponent extends AbstractTypesGridComponent {
@@ -14,8 +13,14 @@ public class TypesGridComponent extends AbstractTypesGridComponent {
 		super(parent);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public boolean isSelected(Type type) {
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U type) {
+		return (T) new TypeComponent(this, type);
+	}
+
+	@Override
+	public <T extends Generic> boolean isSelected(T type) {
 		Serializable value = type.getValue();
 		if (!value.getClass().isAssignableFrom(Class.class))
 			return false;
@@ -25,12 +30,8 @@ public class TypesGridComponent extends AbstractTypesGridComponent {
 	}
 
 	@Override
-	public AbstractTypeComponent buildComponent(Type type) {
-		return new TypeComponent(this, type);
-	}
-
-	@Override
 	public String getXhtmlPath() {
 		return "/pages/typesgrid.xhtml";
 	}
+
 }

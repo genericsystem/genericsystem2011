@@ -44,4 +44,14 @@ public class AttributeComponent extends AbstractAttributeComponent {
 		return getGeneric().isRelation();
 	}
 
+	@Override
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
+		return null;
+	}
+
+	@Override
+	public <T extends Generic> boolean isSelected(T candidate) {
+		return false;
+	}
+
 }

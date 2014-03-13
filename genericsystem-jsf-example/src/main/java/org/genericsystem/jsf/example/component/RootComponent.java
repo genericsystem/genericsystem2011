@@ -10,11 +10,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.AbstractRootComponent;
 
 @Named
 @SessionScoped
-public class RootComponent extends AbstractComponent implements Serializable {
+public class RootComponent extends AbstractRootComponent implements Serializable {
 	private static final long serialVersionUID = -6596418502248220835L;
 
 	@Inject
@@ -31,6 +33,17 @@ public class RootComponent extends AbstractComponent implements Serializable {
 	}
 
 	@Override
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
+		// return (T) Arrays.asList(new TypesGridComponent(RootComponent.this));
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public <T extends Generic> boolean isSelected(T candidate) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Cache getCache() {
 		return cache;
 	}
@@ -38,11 +51,5 @@ public class RootComponent extends AbstractComponent implements Serializable {
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/index.xhtml";
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends AbstractComponent> T getRoot() {
-		return (T) this;
 	}
 }
