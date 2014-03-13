@@ -3,14 +3,14 @@ package org.genericsystem.jsf.example.component;
 import java.io.Serializable;
 
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.AbstractGridComponent;
+import org.genericsystem.framework.component.AbstractTypesGridComponent;
 import org.genericsystem.framework.component.generic.AbstractTypeComponent;
 import org.genericsystem.generic.Type;
 import org.genericsystem.jsf.example.structure.Types;
 
-public class GridComponent extends AbstractGridComponent {
+public class TypesGridComponent extends AbstractTypesGridComponent {
 
-	public GridComponent(AbstractComponent parent) {
+	public TypesGridComponent(AbstractComponent parent) {
 		super(parent);
 	}
 
@@ -31,6 +31,6 @@ public class GridComponent extends AbstractGridComponent {
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/grid.xhtml";
+		return "/pages/typesgrid.xhtml";
 	}
 }

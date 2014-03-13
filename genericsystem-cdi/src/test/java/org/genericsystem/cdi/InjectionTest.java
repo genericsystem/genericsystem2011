@@ -1,6 +1,7 @@
 package org.genericsystem.cdi;
 
 import javax.inject.Inject;
+
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
 import org.genericsystem.cdi.GenericProvider.InjectClass;
@@ -28,8 +29,7 @@ public class InjectionTest extends AbstractTest {
 	private Generic vehicle;
 
 	public void testAnnotType() {
-		vehicle.info();
-		assert cache.getType("Vehicle") != null;
+		assert cache.getGeneric("Vehicle", cache.getEngine()) != null;
 	}
 
 	@SystemGeneric

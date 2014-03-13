@@ -20,9 +20,9 @@
 				<h:inputText rendered="#{!component.relation}"
 					value="#{component.newValue}" />
 				<h:selectOneMenu rendered="#{component.relation}"
-					value="#{component.newTargetValue}">
+					value="#{component.newValue}">
 					<f:selectItems value="#{component.targets}" var="target"
-						itemValue="#{target.value}" itemLabel="#{target.value}" />
+						itemValue="#{target}" itemLabel="#{target}" />
 				</h:selectOneMenu>
 			</h:panelGroup>
 		</f:facet>

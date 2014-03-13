@@ -6,7 +6,6 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 
 public abstract class AbstractGenericComponent extends AbstractComponent {
-
 	private final Generic generic;
 
 	public AbstractGenericComponent(AbstractComponent parent, Generic generic) {
@@ -22,5 +21,4 @@ public abstract class AbstractGenericComponent extends AbstractComponent {
 	public String toString() {
 		return Objects.toString(generic);
 	}
-
 }

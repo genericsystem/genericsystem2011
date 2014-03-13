@@ -13,9 +13,7 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 
-public abstract class AbstractTypeComponent extends AbstractGenericComponent {
-
-	private String newValue;
+public abstract class AbstractTypeComponent extends AbstractValueAndGenericComponent {
 
 	public AbstractTypeComponent(AbstractComponent parent, Generic selected) {
 		super(parent, selected);
@@ -27,33 +25,42 @@ public abstract class AbstractTypeComponent extends AbstractGenericComponent {
 
 	@Override
 	public List<AbstractAttributeComponent> initChildren() {
-		return ((Type) getGeneric()).getAttributes().filter(new Filter<Attribute>() {
-			@Override
-			public boolean isSelected(Attribute candidate) {
-				return AbstractTypeComponent.this.isSelected(candidate);
-			}
-		}).project(new Projector<AbstractAttributeComponent, Attribute>() {
-			private final Map<Attribute, AbstractAttributeComponent> map = new HashMap<Attribute, AbstractAttributeComponent>() {
-				private static final long serialVersionUID = -1162281462201347017L;
+		return ((Type) getGeneric()).getAttributes().filter(new AttributeFilter()).project(new AttributeProjector());
+	}
 
-				@Override
-				public AbstractAttributeComponent get(Object key) {
-					AbstractAttributeComponent result = super.get(key);
-					if (result == null)
-						put((Attribute) key, result = buildComponent((Attribute) key));
-					return result;
-				}
-			};
+	public class AttributeFilter implements Filter<Attribute> {
+
+		@Override
+		public boolean isSelected(Attribute candidate) {
+			return AbstractTypeComponent.this.isSelected(candidate);
+		}
+	}
+
+	public class AttributeProjector implements Projector<AbstractAttributeComponent, Attribute> {
+		private final Map<Attribute, AbstractAttributeComponent> map = new HashMap<Attribute, AbstractAttributeComponent>() {
+			private static final long serialVersionUID = -1162281462201347017L;
 
 			@Override
-			public AbstractAttributeComponent project(Attribute attribute) {
-				return map.get(attribute);
+			public AbstractAttributeComponent get(Object key) {
+				AbstractAttributeComponent result = super.get(key);
+				if (result == null)
+					put((Attribute) key, result = buildComponent((Attribute) key));
+				return result;
 			}
-		});
+		};
+
+		@Override
+		public AbstractAttributeComponent project(Attribute attribute) {
+			return map.get(attribute);
+		}
+
+		public Map<Attribute, AbstractAttributeComponent> getMap() {
+			return map;
+		}
 	}
 
 	public String add() {
-		Generic instance = ((Type) getGeneric()).setInstance(newValue);
+		Generic instance = ((Type) getGeneric()).setInstance(getNewValue());
 		for (AbstractAttributeComponent attributeComponent : this.<AbstractAttributeComponent> getChildren()) {
 			if (!attributeComponent.getGeneric().isRelation())
 				instance.setValue((Attribute) attributeComponent.getGeneric(), attributeComponent.getNewValue());
@@ -80,10 +87,6 @@ public abstract class AbstractTypeComponent extends AbstractGenericComponent {
 		instanceRow.getInstance().remove();
 	}
 
-	// public String getValue() {
-	// return Objects.toString(getSelected());
-	// }
-
 	public String editMsg() {
 		return "Edit instance";
 	}
@@ -94,13 +97,5 @@ public abstract class AbstractTypeComponent extends AbstractGenericComponent {
 
 	public String getRemoveMsg() {
 		return "Remove instance";
-	}
-
-	public String getNewValue() {
-		return newValue;
-	}
-
-	public void setNewValue(String newValue) {
-		this.newValue = newValue;
 	}
 }
