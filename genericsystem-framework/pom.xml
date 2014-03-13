@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>genericsystem-framework</artifactId>
-	<name>Generic System JSF Example</name>
+	<name>Generic System JSF Framework</name>
 	<packaging>jar</packaging>
 
 	<dependencies>

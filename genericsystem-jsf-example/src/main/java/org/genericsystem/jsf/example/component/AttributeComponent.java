@@ -33,6 +33,7 @@ public class AttributeComponent extends AbstractAttributeComponent {
 		});
 	}
 
+	@Override
 	public String getColumnTitleAttribute() {
 		if (!isRelation())
 			return Objects.toString(getGeneric());
@@ -40,6 +41,7 @@ public class AttributeComponent extends AbstractAttributeComponent {
 			return Objects.toString((this.<AbstractTypeComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
 	}
 
+	@Override
 	public boolean isRelation() {
 		return getGeneric().isRelation();
 	}
