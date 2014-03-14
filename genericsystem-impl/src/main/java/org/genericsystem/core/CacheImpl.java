@@ -318,14 +318,8 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	public <T extends Type> T getType(Serializable value) {
-		return getEngine().getAllSubType(value);
-	}
-
-	@Override
 	public <T extends Generic> T getGeneric(Serializable value, Generic meta, Generic... components) {
-		// TODO KK cast Engine to GenericImpl
-		return ((GenericImpl) getEngine()).getGeneric(value, meta, components);
+		return ((GenericImpl) meta).getGeneric(value, components);
 	}
 
 	@Override

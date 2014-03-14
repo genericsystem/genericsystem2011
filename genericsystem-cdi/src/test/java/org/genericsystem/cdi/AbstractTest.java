@@ -3,6 +3,7 @@ package org.genericsystem.cdi;
 import javax.enterprise.inject.spi.Extension;
 import javax.inject.Inject;
 
+import org.genericsystem.cdi.event.EventLauncher;
 import org.genericsystem.core.Cache;
 import org.genericsystem.exception.RollbackException;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -22,7 +23,7 @@ public abstract class AbstractTest extends Arquillian {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
-		javaArchive.addClasses(CacheProvider.class, SerializableCache.class, MockCdiFactory.class, GenericProvider.class, EngineProvider.class, UserClassesProvider.class, PersistentDirectoryProvider.class, CdiFactory.class);
+		javaArchive.addClasses(CacheProvider.class, SerializableCache.class, MockCdiFactory.class, GenericProvider.class, EngineProvider.class, UserClassesProvider.class, PersistentDirectoryProvider.class, CdiFactory.class,EventLauncher.class);
 		javaArchive.addPackage(Expressions.class.getPackage());
 		createBeansXml(javaArchive);
 		// createArquillianXml(javaArchive);

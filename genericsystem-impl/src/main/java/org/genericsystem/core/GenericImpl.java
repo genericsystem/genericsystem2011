@@ -3,7 +3,6 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.genericsystem.annotation.InstanceGenericClass;
@@ -195,7 +193,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	// TODO clean
 	public <T extends Generic> T getMeta() throws RollbackException {
 		return vertex.getMeta();
 	}
@@ -455,19 +452,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return element.getComponent(targetPos);
 			}
 		});
-	}
-
-	<T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, final Generic... targets) {
-		final List<Integer> positions = ((GenericImpl) attribute).getComponentsPositions(Statics.insertFirst(this, targets));
-		return new AbstractFilterIterator<T>(iterator) {
-			@Override
-			public boolean isSelected() {
-				for (int i = 0; i < targets.length; i++)
-					if (!targets[i].equals(((Holder) next).getComponent(positions.get(i + 1))))
-						return false;
-				return true;
-			}
-		};
 	}
 
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, Generic... targets) {
@@ -938,9 +922,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				Generic next = iterator.next();
 				if (candidate.inheritsFrom(next) && !candidate.equals(next))
 					iterator.remove();
-				else if (next.inheritsFrom(candidate)) {
+				else if (next.inheritsFrom(candidate))
 					return false;
-				}
 			}
 			if (pos != Statics.MULTIDIRECTIONAL) {
 				if (((GenericImpl) candidate).isPseudoStructural(pos))
@@ -949,7 +932,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					((GenericImpl) candidate).getReplacedComponentBuilder(pos, GenericImpl.this).simpleBind(candidate.getClass(), false, true);
 			}
 			return super.add(candidate);
-
 		}
 	}
 
@@ -1308,19 +1290,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getComponents().size() <= componentPos || componentPos < 0 ? null : (T) getComponents().get(componentPos);
 	}
 
-	public <T extends Generic> T getGeneric(Serializable value, Generic meta, Generic... components) {
-		return genericIterator(value, meta, components);
-	}
-
-	private <T extends Generic> T genericIterator(final Serializable value, final Generic meta, final Generic... components) {
-		return (T) unambigousFirst(new AbstractFilterIterator<Generic>(components.length > 0 ? ((GenericImpl) components[0]).compositesIterator() : ((GenericImpl) meta).instancesIterator()) {
-			@Override
-			public boolean isSelected() {
-				return next.getMeta().equals(meta) && Objects.equals(next.getValue(), value) && Arrays.equals(next.getComponents().toArray(), components);
-			}
-		});
-	}
-
 	@Override
 	public <T extends Generic> Snapshot<T> getAllInstances() {
 		return new AbstractSnapshot<T>() {
@@ -1367,6 +1336,36 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			@Override
 			public boolean isSelected() {
 				return GenericImpl.this.equals(next.getMeta());
+			}
+		};
+	}
+
+	public <T extends Generic> T getGeneric(final Serializable value, final Generic... components) {
+		return unambigousFirst(new AbstractFilterIterator<T>(this.<T> componentsFilter(Statics.<T> valueFilter(components.length > 0 ? ((GenericImpl) components[0]).<T> compositesIterator() : this.<T> instancesIterator(), value), this, components)) {
+			@Override
+			public boolean isSelected() {
+				return next.getMeta().equals(GenericImpl.this);
+			}
+		});
+	}
+
+	<T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, Generic... targets) {
+		return internalComponentsFilter(iterator, attribute, true, targets);
+	}
+
+	<T extends Generic> Iterator<T> componentsFilter(Iterator<T> iterator, Holder attribute, Generic... components) {
+		return internalComponentsFilter(iterator, attribute, false, components);
+	}
+
+	private <T extends Generic> Iterator<T> internalComponentsFilter(Iterator<T> iterator, Holder attribute, final boolean targetFilter, final Generic... componentsOrTargets) {
+		final List<Integer> positions = ((GenericImpl) attribute).getComponentsPositions(targetFilter ? Statics.insertFirst(this, componentsOrTargets) : componentsOrTargets);
+		return new AbstractFilterIterator<T>(iterator) {
+			@Override
+			public boolean isSelected() {
+				for (int i = 0; i < componentsOrTargets.length; i++)
+					if (!componentsOrTargets[i].equals(((Holder) next).getComponent(positions.get(targetFilter ? i + 1 : i))))
+						return false;
+				return true;
 			}
 		};
 	}

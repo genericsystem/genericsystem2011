@@ -19,12 +19,14 @@
 				</f:facet>
 			</h:column>
 
+
 			<c:forEach items="#{component.children}" var="component">
 				<ui:include src="#{component.xhtmlPath}" />
 			</c:forEach>
 
 			<h:column>
-				<h:commandLink value="#{component.editMsg}" action="#{component.edit(row)}" />
+				<h:commandLink value="#{component.editMsg}"
+					action="#{component.setChild(row)}" />
 			</h:column>
 
 			<h:column>
@@ -36,5 +38,11 @@
 				</f:facet>
 			</h:column>
 		</h:dataTable>
+
 	</h:form>
+	<ui:include src="#{component.child.xhtmlPath}" rendered="#{! empty component.child}">
+			<ui:param name="component" value="#{component.child}"></ui:param>
+		</ui:include>
+		
+		
 </ui:composition>

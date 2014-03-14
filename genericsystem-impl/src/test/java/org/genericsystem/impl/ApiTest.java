@@ -387,13 +387,13 @@ public class ApiTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type expected = cache.addType("Car");
 
-		Type actual = cache.getType("Car");
+		Type actual = cache.getGeneric("Car", cache.getEngine());
 		assert Objects.equals(actual, expected);
 	}
 
 	public void test_get_non_existing_type() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		assert cache.getType("Moto") == null;
+		assert cache.getGeneric("Car", cache.getEngine()) == null;
 	}
 
 	public void test_get_multiple_existing_types() {
@@ -402,9 +402,9 @@ public class ApiTest extends AbstractTest {
 		Type expectedMoto = cache.addType("Moto");
 		Type expectedBus = cache.addType("Bus");
 
-		Type actualCar = cache.getType("Car");
-		Type actualMoto = cache.getType("Moto");
-		Type actualBus = cache.getType("Bus");
+		Type actualCar = cache.getGeneric("Car", cache.getEngine());
+		Type actualMoto = cache.getGeneric("Moto", cache.getEngine());
+		Type actualBus = cache.getGeneric("Bus", cache.getEngine());
 
 		assert Objects.equals(actualCar, expectedCar);
 		assert Objects.equals(actualMoto, expectedMoto);
@@ -414,7 +414,7 @@ public class ApiTest extends AbstractTest {
 	public void test_get_null_type() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type expected = null;
-		Type actual = cache.getType(null);
+		Type actual = cache.getGeneric(null, cache.getEngine());
 
 		assert Objects.equals(actual, expected);
 	}
@@ -422,7 +422,7 @@ public class ApiTest extends AbstractTest {
 	public void testNewTypeWithNullValue() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type nullType = cache.addType(null);
-		assert nullType.equals(cache.getType(null));
+		assert nullType.equals(cache.getGeneric(null, cache.getEngine()));
 		// nullType.equals(cache.getType(null));
 	}
 
@@ -431,7 +431,7 @@ public class ApiTest extends AbstractTest {
 		Type car = cache.addType("Car");
 		Type superCar = car.addSubType("SuperCar");
 
-		assert cache.getType("SuperCar") == superCar;
+		assert cache.getGeneric("SuperCar", cache.getEngine()) == superCar;
 	}
 
 	// getSubType() tests

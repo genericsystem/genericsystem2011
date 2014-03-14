@@ -12,15 +12,4 @@ public class Attributes {
 	public static class Power extends GenericImpl {
 
 	}
-
-	// @SystemGeneric
-	// @Components(Cars.class)
-	// public static class Price extends GenericImpl {
-	// }
-	//
-	// @SystemGeneric
-	// @Components(Cars.class)
-	// public static class FuelTank extends GenericImpl {
-	// }
-
 }
