@@ -917,6 +917,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 		@Override
 		public boolean add(T candidate) {
+			System.out.println("MASTER");
 			Iterator<T> iterator = iterator();
 			while (iterator.hasNext()) {
 				Generic next = iterator.next();
