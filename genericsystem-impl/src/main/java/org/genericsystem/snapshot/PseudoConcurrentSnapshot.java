@@ -1,16 +1,14 @@
 package org.genericsystem.snapshot;
 
 import java.util.Iterator;
-
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.iterator.AbstractGeneralAwareIterator;
 
 /**
  * @author Nicolas Feybesse
  * 
  */
-public class PseudoConcurrentSnapshot extends AbstractSnapshot<Generic> implements Snapshot<Generic> {
+public class PseudoConcurrentSnapshot extends AbstractSnapshot<Generic> {
 
 	private Node head = null;
 	private Node tail = null;
