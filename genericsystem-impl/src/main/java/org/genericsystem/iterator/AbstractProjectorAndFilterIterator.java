@@ -4,10 +4,11 @@ import java.util.Iterator;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  * @param <D>
  * @param <T>
  */
+
 public abstract class AbstractProjectorAndFilterIterator<D, T> extends AbstractGeneralAwareIterator<D, T> {
 
 	private Iterator<D> iterator;

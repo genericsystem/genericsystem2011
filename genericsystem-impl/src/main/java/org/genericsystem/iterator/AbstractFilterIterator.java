@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  * @param <T>
  */
 public abstract class AbstractFilterIterator<T> extends AbstractProjectorAndFilterIterator<T, T> {
@@ -17,5 +17,4 @@ public abstract class AbstractFilterIterator<T> extends AbstractProjectorAndFilt
 	protected T project() {
 		return next;
 	}
-
 }

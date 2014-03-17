@@ -26,16 +26,24 @@ public class PropertyConstraintImpl extends AbstractBooleanNoAxedConstraintImpl 
 
 		if (modified.isAttribute()) {
 			for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {
-				@SuppressWarnings({ "unchecked", "rawtypes" })
-				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders((Attribute) constraintBase).iterator()) {
-					@Override
-					public boolean isSelected() {
-						for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
-							if (!Objects.equals(((Holder) next).getComponent(componentPos), ((Holder) constraintBase).getComponent(componentPos)))
-								return false;
-						return true;
-					}
-				};
+
+				Iterator<Holder> it = inheriting.getHolders((Attribute) constraintBase).filter(next -> {
+					for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
+						if (!Objects.equals(next.getComponent(componentPos), ((Holder) constraintBase).getComponent(componentPos)))
+							return false;
+					return true;
+				}).iterator();
+
+				// Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders((Attribute) constraintBase).iterator()) {
+				// @Override
+				// public boolean isSelected() {
+				// for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
+				// if (!Objects.equals(((Holder) next).getComponent(componentPos), ((Holder) constraintBase).getComponent(componentPos)))
+				// return false;
+				// return true;
+				// }
+				//
+				// };
 				if (it.hasNext()) {
 					Generic value = it.next();
 					if (it.hasNext())

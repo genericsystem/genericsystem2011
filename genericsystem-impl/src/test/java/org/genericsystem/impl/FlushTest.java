@@ -2,7 +2,6 @@ package org.genericsystem.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Engine;
@@ -45,13 +44,7 @@ public class FlushTest extends AbstractTest {
 		engine.close();
 
 		cache = engine.newCache().start();
-		assert engine.getInheritings().filter(new Filter<Generic>() {
-
-			@Override
-			public boolean isSelected(Generic element) {
-				return Objects.equals(element.getValue(), "Animal");
-			}
-		}).isEmpty();
+		assert engine.getInheritings().filter(element -> Objects.equals(element.getValue(), "Animal")).isEmpty();
 	}
 
 	@Test
@@ -175,13 +168,7 @@ public class FlushTest extends AbstractTest {
 		assert red.getLinks(carColor).size() == 2;
 
 		Snapshot<Link> links = red.getLinks(carColor);
-		Link redToBMW = links.filter(new Filter<Link>() {
-
-			@Override
-			public boolean isSelected(Link element) {
-				return element.getComponents().contains(bmw);
-			}
-		}).get(0);
+		Link redToBMW = links.filter(element -> element.getComponents().contains(bmw)).get(0);
 		Link redToLada = links.filter(new Filter<Link>() {
 			@Override
 			public boolean isSelected(Link element) {

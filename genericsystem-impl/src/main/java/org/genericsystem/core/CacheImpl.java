@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.genericsystem.annotation.Meta;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.constraints.AbstractConstraintImpl;
@@ -168,7 +167,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		switch (removeStrategy) {
 		case NORMAL:
 			orderAndRemoveDependenciesForRemove(generic);
-			break;
+		break;
 		case CONSERVE:
 			new Restructurator() {
 				private static final long serialVersionUID = 7326023526567814490L;
@@ -180,11 +179,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 			}.rebuildAll(generic);
 		case FORCE:
 			orderAndRemoveDependencies(generic);
-			break;
+		break;
 		case PROJECT:
 			((GenericImpl) generic).project();
 			remove(generic, RemoveStrategy.CONSERVE);
-			break;
+		break;
 		}
 	}
 
@@ -391,7 +390,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : userSupers)
 			assert generic.isMeta() || (meta.getMetaLevel() + 1 == generic.getMetaLevel()) : clazz + generic.info();
 
-		return meta.createNewBuilder(value, Statics.insertFirst(meta, userSupers), userSupers, components).bind(clazz, false, false);
+			return meta.createNewBuilder(value, Statics.insertFirst(meta, userSupers), userSupers, components).bind(clazz, false, false);
 	}
 
 	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, Generic[] strictSupers, boolean existsException, int axe, Generic... components) {
@@ -541,16 +540,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 		@Override
 		public Comparator<? super AbstractConstraintImpl> comparator() {
-			return new Comparator<AbstractConstraintImpl>() {
-				@Override
-				public int compare(AbstractConstraintImpl constraint, AbstractConstraintImpl compareConstraint) {
-					if (constraint.getPriority() == compareConstraint.getPriority())
-						return constraint.getClass().getSimpleName().compareTo(compareConstraint.getClass().getSimpleName());
-					return Integer.compare(constraint.getPriority(), compareConstraint.getPriority());
-				}
-			};
+			return (AbstractConstraintImpl constraint, AbstractConstraintImpl compareConstraint) -> constraint.getPriority() == compareConstraint.getPriority() ? constraint.getClass().getSimpleName().compareTo(compareConstraint.getClass().getSimpleName())
+					: Integer.compare(constraint.getPriority(), compareConstraint.getPriority());
+			// return new Comparator<AbstractConstraintImpl>() {
+			// @Override
+			// public int compare(AbstractConstraintImpl constraint, AbstractConstraintImpl compareConstraint) {
+			// if (constraint.getPriority() == compareConstraint.getPriority())
+			// return constraint.getClass().getSimpleName().compareTo(compareConstraint.getClass().getSimpleName());
+			// return Integer.compare(constraint.getPriority(), compareConstraint.getPriority());
+			// }
+			// };
 		}
-
 	}
 
 	private boolean isCheckable(AbstractConstraintImpl constraint, Generic generic, CheckingType checkingType, boolean isFlushTime) {

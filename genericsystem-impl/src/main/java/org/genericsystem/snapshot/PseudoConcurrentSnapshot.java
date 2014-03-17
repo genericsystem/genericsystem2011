@@ -6,9 +6,9 @@ import org.genericsystem.iterator.AbstractGeneralAwareIterator;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  */
-public class PseudoConcurrentSnapshot extends AbstractSnapshot<Generic> {
+public class PseudoConcurrentSnapshot implements AbstractSnapshot<Generic> {
 
 	private Node head = null;
 	private Node tail = null;
