@@ -37,18 +37,23 @@ public class GuiGenericsTreeBean implements Serializable {
 	protected static Logger log = LoggerFactory.getLogger(GenericImpl.class);
 
 	/* Injected beans */
-	@Inject transient CacheProvider cacheProvider;
-	@Inject private GsMessages gsMessages;
+	@Inject
+	transient CacheProvider cacheProvider;
+	@Inject
+	private GsMessages gsMessages;
 
-	private GuiGenericsTreeNode rootTreeNode;					// root node of the tree
-	private GuiGenericsTreeNode selectedTreeNode;				// selected tree node
+	private GuiGenericsTreeNode rootTreeNode; // root node of the tree
+	private GuiGenericsTreeNode selectedTreeNode; // selected tree node
 	private boolean selectionLocked;
 
 	/* Events */
-	@Inject private Event<MenuEvent> menuEvent;
-	@Inject private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
+	@Inject
+	private Event<MenuEvent> menuEvent;
+	@Inject
+	private Event<PanelTitleChangeEvent> panelTitleChangeEvent;
 	private TreeSelectionEvent event;
-	@Inject private Event<TreeSelectionEvent> launcher;
+	@Inject
+	private Event<TreeSelectionEvent> launcher;
 
 	/**
 	 * Creates the root tree node and selects it.
@@ -72,7 +77,8 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Changes the type of subtree elements of selected node.
 	 * 
-	 * @param childrenType - the type of subtree elements.
+	 * @param childrenType
+	 *            - the type of subtree elements.
 	 */
 	public void changeChildrenType(GuiTreeChildrenType childrenType) {
 		selectedTreeNode.setChildrenType(childrenType);
@@ -100,19 +106,21 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Selects the node of generic supplied in parameters.
 	 * 
-	 * @param generic - the generic to look for.
+	 * @param generic
+	 *            - the generic to look for.
 	 */
-	//	public void selectNodeOfGeneric(Generic generic) {
-	//		selectedTreeNode = rootTreeNode.findSubTreeNodeByGeneric(generic);
-	//		internalChangeType();
+	// public void selectNodeOfGeneric(Generic generic) {
+	// selectedTreeNode = rootTreeNode.findSubTreeNodeByGeneric(generic);
+	// internalChangeType();
 	//
-	//		gsMessages.info("typeselectionchanged", selectedTreeNode.getGeneric());
-	//	}
+	// gsMessages.info("typeselectionchanged", selectedTreeNode.getGeneric());
+	// }
 
 	/**
 	 * Selects one node already available in the tree.
 	 * 
-	 * @param node - node of the tree.
+	 * @param node
+	 *            - node of the tree.
 	 */
 	public void selectNode(GuiGenericsTreeNode node) {
 		selectedTreeNode = node;
@@ -123,18 +131,17 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Select one attribute of generic in the tree.
 	 * 
-	 * @param index - index of attribute.
+	 * @param index
+	 *            - index of attribute.
 	 */
 	public void changeAttributeSelected(int index) {
 		selectedTreeNode = selectedTreeNode.getChildren(GuiTreeChildrenType.ATTRIBUTES).get(index);
 		selectedTreeNode.setChildrenType(GuiTreeChildrenType.VALUES);
 		selectedTreeNode.expand();
 
-
-
-		//		Attribute attribute = (Attribute) selectedTreeNode.getChildrens(TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
-		//		selectedTreeNode.setAttribute(attribute);
-		//		selectedTreeNode.setTreeType(TreeType.VALUES);
+		// Attribute attribute = (Attribute) selectedTreeNode.getChildrens(TreeType.ATTRIBUTES, implicitShow).get(attributeIndex).getGeneric();
+		// selectedTreeNode.setAttribute(attribute);
+		// selectedTreeNode.setTreeType(TreeType.VALUES);
 		gsMessages.info("showvalues", selectedTreeNode.getGeneric());
 	}
 
@@ -145,10 +152,10 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Returns true if tree type of selected tree node is equal to type in parameters. False if not.
 	 * 
-	 * @param treeType - tree type.
+	 * @param treeType
+	 *            - tree type.
 	 * 
-	 * @return true - if tree type of selected tree node is equal to type in parameters,
-	 * false - if not.
+	 * @return true - if tree type of selected tree node is equal to type in parameters, false - if not.
 	 */
 	public boolean isTreeTypeSelected(GuiTreeChildrenType treeType) {
 		return selectedTreeNode != null && selectedTreeNode.getChildrenType() == treeType;
@@ -157,7 +164,8 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Returns icon's name of tree node.
 	 * 
-	 * @param genericTreeNode - generic tree node.
+	 * @param genericTreeNode
+	 *            - generic tree node.
 	 * 
 	 * @return name of icon.
 	 */
@@ -166,21 +174,21 @@ public class GuiGenericsTreeBean implements Serializable {
 		if (generic.isMeta()) {
 			if (generic.isType())
 				return gsMessages.getInfos("bullet_square_red");
-			if (generic.isReallyAttribute())
+			if (!generic.isRelation())
 				return gsMessages.getInfos("bullet_triangle_red");
 			if (generic.isRelation())
 				return gsMessages.getInfos("bullet_ball_red");
 		} else if (generic.isStructural()) {
 			if (generic.isType())
 				return gsMessages.getInfos("bullet_square_yellow");
-			if (generic.isReallyAttribute())
+			if (!generic.isRelation())
 				return gsMessages.getInfos("bullet_triangle_yellow");
 			if (generic.isRelation())
 				return gsMessages.getInfos("bullet_ball_yellow");
 		} else if (generic.isConcrete()) {
 			if (generic.isType())
 				return gsMessages.getInfos("bullet_square_green");
-			if (generic.isReallyAttribute())
+			if (!generic.isRelation())
 				return gsMessages.getInfos("bullet_triangle_green");
 			if (generic.isRelation())
 				return gsMessages.getInfos("bullet_ball_green");
@@ -191,7 +199,8 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Returns the title of icone.
 	 * 
-	 * @param genericTreeNode - generic tree node.
+	 * @param genericTreeNode
+	 *            - generic tree node.
 	 * 
 	 * @return title of icon.
 	 */
@@ -199,19 +208,19 @@ public class GuiGenericsTreeBean implements Serializable {
 		Generic generic = genericTreeNode.getGeneric();
 		if (generic.isMeta() && generic.isType())
 			return gsMessages.getMessage("meta") + " " + gsMessages.getMessage("type");
-		else if (generic.isMeta() && generic.isReallyAttribute())
+		else if (generic.isMeta() && !generic.isRelation())
 			return gsMessages.getMessage("meta") + " " + gsMessages.getMessage("attribute");
 		else if (generic.isMeta() && generic.isRelation())
 			return gsMessages.getMessage("meta") + " " + gsMessages.getMessage("relation");
 		else if (generic.isStructural() && generic.isType())
 			return gsMessages.getMessage("type");
-		else if (generic.isStructural() && generic.isReallyAttribute())
+		else if (generic.isStructural() && !generic.isRelation())
 			return gsMessages.getMessage("attribute");
 		else if (generic.isStructural() && generic.isRelation())
 			return gsMessages.getMessage("relation");
 		else if (generic.isConcrete() && generic.isType())
 			return gsMessages.getMessage("instance");
-		else if (generic.isConcrete() && generic.isReallyAttribute())
+		else if (generic.isConcrete() && !generic.isRelation())
 			return gsMessages.getMessage("value");
 		else if (generic.isConcrete() && generic.isRelation())
 			return gsMessages.getMessage("link");
@@ -221,7 +230,8 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Change the selected node in the tree of generics.
 	 * 
-	 * @param selectionChangeEvent - JSF event of selection change.
+	 * @param selectionChangeEvent
+	 *            - JSF event of selection change.
 	 */
 	public void changeSelectedNode(TreeSelectionChangeEvent treeSelectionChangeEvent) {
 		if (!selectionLocked) {
@@ -262,7 +272,8 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Fires event of tree selection after phase INVOKE_APPLICATION.
 	 * 
-	 * @param phaseEvent - event of phase changing.
+	 * @param phaseEvent
+	 *            - event of phase changing.
 	 */
 	public void fireEvent(@Observes @InvokeApplication @After PhaseEvent phaseEvent) {
 		if (event != null) {
@@ -283,7 +294,8 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Sets selected tree node.
 	 * 
-	 * @param selectedTreeNode - selected tree node.
+	 * @param selectedTreeNode
+	 *            - selected tree node.
 	 */
 	void setSelectedTreeNode(GuiGenericsTreeNode selectedTreeNode) {
 		this.selectedTreeNode = selectedTreeNode;
@@ -301,7 +313,8 @@ public class GuiGenericsTreeBean implements Serializable {
 	/**
 	 * Sets flag selection locked.
 	 * 
-	 * @param selectionLocked - flag selection locked.
+	 * @param selectionLocked
+	 *            - flag selection locked.
 	 */
 	public void setSelectionLocked(boolean selectionLocked) {
 		this.selectionLocked = selectionLocked;
@@ -314,8 +327,8 @@ public class GuiGenericsTreeBean implements Serializable {
 	 */
 	public static class TreeSelectionEvent {
 
-		private final String id;						// id of event
-		private final Object object;					// concerned object
+		private final String id; // id of event
+		private final Object object; // concerned object
 
 		public TreeSelectionEvent(String id, Object object) {
 			this.id = id;
