@@ -8,6 +8,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.core.Snapshot;
+import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.AmbiguousSelectionException;
 import org.genericsystem.exception.SingularConstraintViolationException;
@@ -16,7 +17,6 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Link;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.snapshot.AbstractSnapshot;
 import org.testng.annotations.Test;
 
 @Test
@@ -502,13 +502,19 @@ public class RelationTest extends AbstractTest {
 		assert myBmwMe1 != myBmwMe2;
 
 		assert myBmw.getLinks(carOwner).size() == 1 : myBmw.getLinks(carOwner);
-		assert equals((AbstractSnapshot) myBmw.getLinks(carOwner), "value1") == null;
-		assert equals((AbstractSnapshot) myBmw.getLinks(carOwner), "value2") != null;
+		assert equals((Snapshot) myBmw.getLinks(carOwner), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carOwner), "value2") != null;
 
 	}
 
-	private Generic equals(AbstractSnapshot<Generic> snapshot, final Serializable value) {
-		return snapshot.filter(element -> Objects.equals(element.getValue(), value)).get(0);
+	private Generic equals(Snapshot<Generic> snapshot, final Serializable value) {
+		return snapshot.filter(new Filter<Generic>() {
+
+			@Override
+			public boolean isSelected(Generic element) {
+				return Objects.equals(element.getValue(), value);
+			}
+		}).get(0);
 	}
 
 	public void testToOneDifferentValueReverse() {
@@ -537,8 +543,8 @@ public class RelationTest extends AbstractTest {
 
 		cache.start();
 		assert me.getLinks(carOwner).size() == 1 : me.getLinks(carOwner);
-		assert equals((AbstractSnapshot) myBmw.getLinks(carOwner), "value1") != null;
-		assert equals((AbstractSnapshot) myBmw.getLinks(carOwner), "value2") == null;
+		assert equals((Snapshot) myBmw.getLinks(carOwner), "value1") != null;
+		assert equals((Snapshot) myBmw.getLinks(carOwner), "value2") == null;
 		cache.flush();
 	}
 
@@ -746,8 +752,8 @@ public class RelationTest extends AbstractTest {
 		assert myBmwRearRight2.isAlive();
 
 		assert myBmw.getLinks(carTyres).size() == 4 : myBmw.getLinks(carTyres);
-		assert equals((AbstractSnapshot) myBmw.getLinks(carTyres), "value1") == null;
-		assert equals((AbstractSnapshot) myBmw.getLinks(carTyres), "value2") != null;
+		assert equals((Snapshot) myBmw.getLinks(carTyres), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carTyres), "value2") != null;
 
 		carTyres.disablePropertyConstraint();
 		new RollbackCatcher() {
@@ -788,8 +794,8 @@ public class RelationTest extends AbstractTest {
 		assert myBmwRearRight2.isAlive();
 
 		assert myBmw.getLinks(carTyres).size() == 4 : myBmw.getLinks(carTyres);
-		assert equals((AbstractSnapshot) myBmw.getLinks(carTyres), "value1") == null;
-		assert equals((AbstractSnapshot) myBmw.getLinks(carTyres), "value2") != null;
+		assert equals((Snapshot) myBmw.getLinks(carTyres), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carTyres), "value2") != null;
 
 		carTyres.disablePropertyConstraint();
 
@@ -953,8 +959,8 @@ public class RelationTest extends AbstractTest {
 		yourAudi.bind(carColor, red);
 
 		assert myBmw.getLinks(carColor).size() == 1 : myBmw.getLinks(carColor);
-		assert equals((AbstractSnapshot) myBmw.getLinks(carColor), "value1") == null;
-		assert equals((AbstractSnapshot) myBmw.getLinks(carColor), "value2") == bmwRed2;
+		assert equals((Snapshot) myBmw.getLinks(carColor), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carColor), "value2") == bmwRed2;
 		assert yourAudi.getLinks(carColor).size() == 2 : yourAudi.getLinks(carColor);
 	}
 
@@ -979,11 +985,11 @@ public class RelationTest extends AbstractTest {
 		red.bind(carColor, yourAudi);
 
 		assert myBmw.getLinks(carColor).size() == 1 : myBmw.getLinks(carColor);
-		assert equals((AbstractSnapshot) myBmw.getLinks(carColor), "value1") == null;
-		assert equals((AbstractSnapshot) myBmw.getLinks(carColor), "value2") == bmwRed2;
+		assert equals((Snapshot) myBmw.getLinks(carColor), "value1") == null;
+		assert equals((Snapshot) myBmw.getLinks(carColor), "value2") == bmwRed2;
 		assert yourAudi.getLinks(carColor).size() == 2 : yourAudi.getLinks(carColor);
 
-		assert equals((AbstractSnapshot) red.getLinks(carColor), "value2") == bmwRed2;
+		assert equals((Snapshot) red.getLinks(carColor), "value2") == bmwRed2;
 		assert blue.getLinks(carColor).size() == 1 : blue.getLinks(carColor);
 	}
 
