@@ -50,7 +50,7 @@ public class DragAndDropBean {
 			attribute.addComponent(target, ((GenericImpl) attribute).getComponents().size());
 			messages.info("targetRelation", target, attribute);
 		} else if (target.isConcrete()) {
-			if (attribute.isReallyRelation()) {
+			if (!attribute.isRelation()) {
 				genericTreeBean.getSelectedTreeNode().getGeneric().bind((Relation) attribute, target);
 				messages.info("targetLink", target, attribute);
 			} else

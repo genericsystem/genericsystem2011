@@ -114,25 +114,11 @@ public interface Generic extends Comparable<Generic> {
 	boolean isAttribute();
 
 	/**
-	 * Return true if this generic is an <tt>Attribute</tt> but not <tt>Relation</tt>.
-	 * 
-	 * @return true if this generic is an <tt>Attribute</tt> but not <tt>Relation</tt>.
-	 */
-	boolean isReallyAttribute();
-
-	/**
 	 * Returns true if this generic has at least two components.
 	 * 
 	 * @return true if this generic has at least two components.
 	 */
 	boolean isRelation();
-
-	/**
-	 * Returns true if this generic has exactly two components.
-	 * 
-	 * @return true if this generic has exactly two components.
-	 */
-	boolean isReallyRelation();
 
 	/**
 	 * Returns true if this generic is an <tt>Attribute</tt> of the generic.

@@ -226,11 +226,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public boolean isReallyAttribute() {
-		return getComponents().size() == 1;
-	}
-
-	@Override
 	public boolean isAttributeOf(Generic generic) {
 		for (Generic component : getComponents())
 			if (generic.inheritsFrom(component))
@@ -248,11 +243,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	@Override
 	public boolean isRelation() {
 		return getComponents().size() > 1;
-	}
-
-	@Override
-	public boolean isReallyRelation() {
-		return getComponents().size() == 2;
 	}
 
 	@Override
