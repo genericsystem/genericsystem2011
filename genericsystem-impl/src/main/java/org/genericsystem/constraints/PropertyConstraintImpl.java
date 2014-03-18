@@ -15,6 +15,7 @@ import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
+import org.genericsystem.snapshot.AbstractSnapshot;
 
 @SystemGeneric
 @Extends(ConstraintKey.class)
@@ -27,7 +28,7 @@ public class PropertyConstraintImpl extends AbstractBooleanNoAxedConstraintImpl 
 		if (modified.isAttribute()) {
 			for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {
 
-				Iterator<Holder> it = inheriting.getHolders((Attribute) constraintBase).filter(next -> {
+				Iterator<Holder> it = ((AbstractSnapshot<Holder>) inheriting.getHolders((Attribute) constraintBase)).filter(next -> {
 					for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
 						if (!Objects.equals(next.getComponent(componentPos), ((Holder) constraintBase).getComponent(componentPos)))
 							return false;
