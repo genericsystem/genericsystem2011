@@ -152,7 +152,7 @@ public class AttributeTest extends AbstractTest {
 		assert vehicleColor.isAttribute();
 		assert vehiclePower.isAttributeOf(vehicle);
 		assert vehiclePower.isAttributeOf(car);
-		assert !vehicleColor.isReallyAttribute();
+		assert vehicleColor.isRelation();
 	}
 
 	// public void testOverrideAttribute() {

@@ -19,12 +19,16 @@ public class AttributeComponent extends AbstractAttributeComponent {
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return "/pages/attribute.xhtml";
+	public String getColumnTitleAttribute() {
+		if (!isRelation())
+			return Objects.toString(getGeneric());
+		else
+			return Objects.toString((this.<AbstractTypeComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
 	}
 
-	public List<InstanceRow> getTargets() {
-		return (this.<AbstractTypeComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).getAllInstances().<InstanceRow> project(new Projector<InstanceRow, Generic>() {
+	@Override
+	public List<InstanceRow> getTargetRows() {
+		return this.<AbstractTypeComponent> getParent().getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).getAllInstances().<InstanceRow> project(new Projector<InstanceRow, Generic>() {
 
 			@Override
 			public InstanceRow project(Generic instance) {
@@ -33,13 +37,7 @@ public class AttributeComponent extends AbstractAttributeComponent {
 		});
 	}
 
-	public String getColumnTitleAttribute() {
-		if (!isRelation())
-			return Objects.toString(getGeneric());
-		else
-			return Objects.toString((this.<AbstractTypeComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
-	}
-
+	@Override
 	public boolean isRelation() {
 		return getGeneric().isRelation();
 	}
@@ -52,6 +50,11 @@ public class AttributeComponent extends AbstractAttributeComponent {
 	@Override
 	public <T extends Generic> boolean isSelected(T candidate) {
 		return false;
+	}
+
+	@Override
+	public String getXhtmlPath() {
+		return "/pages/attribute.xhtml";
 	}
 
 }
