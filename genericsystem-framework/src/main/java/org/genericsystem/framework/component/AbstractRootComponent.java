@@ -1,6 +1,5 @@
 package org.genericsystem.framework.component;
 
-
 public abstract class AbstractRootComponent extends AbstractComponent {
 
 	@SuppressWarnings("unchecked")

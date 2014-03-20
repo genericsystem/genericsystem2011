@@ -54,7 +54,7 @@ public class InitializationScript {
 		 * User
 		 */
 		Type user = cache.find(Users.class);
-		Generic user1 = user.setInstance("Charle");
+		Generic user1 = user.setInstance("Charles");
 		Generic user2 = user.setInstance("Ahmed");
 		Generic user3 = user.setInstance("Mikael");
 		Generic user4 = user.setInstance("Nicolas");

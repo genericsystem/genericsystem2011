@@ -9,16 +9,16 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Type;
-import org.genericsystem.tracker.component.generic.ButtonComponent;
+import org.genericsystem.tracker.component.generic.CommandButtonComponent;
 import org.genericsystem.tracker.component.generic.TypeComponent;
 import org.genericsystem.tracker.structure.Types;
 import org.genericsystem.tracker.structure.Types.Issues;
 
-public class SelectorComponent extends AbstractComponent {
+public class PanelGridComponent extends AbstractComponent {
 
 	private AbstractComponent child;
 
-	public SelectorComponent(RootComponent rootComponent) {
+	public PanelGridComponent(RootComponent rootComponent) {
 		super(rootComponent);
 		selectDefaultComponent();
 	}
@@ -40,23 +40,23 @@ public class SelectorComponent extends AbstractComponent {
 				private static final long serialVersionUID = -7927996818181180784L;
 
 				@Override
-				public ButtonComponent get(Object key) {
-					ButtonComponent result = (ButtonComponent) super.get(key);
+				public CommandButtonComponent get(Object key) {
+					CommandButtonComponent result = (CommandButtonComponent) super.get(key);
 					if (result == null)
-						put((Generic) key, result = new ButtonComponent(SelectorComponent.this, (Type) key));
+						put((Generic) key, result = new CommandButtonComponent(PanelGridComponent.this, (Type) key));
 					return result;
 				}
 			};
 
 			@Override
-			public ButtonComponent project(Type element) {
-				return (ButtonComponent) map.get(element);
+			public CommandButtonComponent project(Type element) {
+				return (CommandButtonComponent) map.get(element);
 			}
 		});
 	}
 
 	private void selectDefaultComponent() {
-		for (ButtonComponent component : this.<ButtonComponent> getChildren())
+		for (CommandButtonComponent component : this.<CommandButtonComponent> getChildren())
 			if (getCache().find(Issues.class).equals(component.getGeneric()))
 				select(component.getGeneric());
 	}
@@ -71,7 +71,7 @@ public class SelectorComponent extends AbstractComponent {
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/selector.xhtml";
+		return "/pages/panelGrid.xhtml";
 	}
 
 }

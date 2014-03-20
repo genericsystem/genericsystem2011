@@ -11,14 +11,12 @@
 			rowClasses="order-table-odd-row,order-table-even-row">
 			<f:facet name="header">
 				<h:outputText value="#{component}" />
+				<h:commandButton value="#{component.createMsg}"
+					action="#{component.setCreate()}" />
 			</f:facet>
 			<h:column>
 				<h:outputText value="#{row}" />
-				<f:facet name="footer">
-					<h:inputText value="#{component.newValue}" />
-				</f:facet>
 			</h:column>
-
 
 			<c:forEach items="#{component.children}" var="component">
 				<ui:include src="#{component.xhtmlPath}" />
@@ -26,23 +24,19 @@
 
 			<h:column>
 				<h:commandLink value="#{component.editMsg}"
-					action="#{component.setChild(row)}" />
+					action="#{component.setEdit(row)}" />
 			</h:column>
 
 			<h:column>
 				<h:commandLink value="#{component.removeMsg}"
 					action="#{component.remove(row)}" />
-				<f:facet name="footer">
-					<h:commandButton value="#{component.addMsg}"
-						action="#{component.add}" />
-				</f:facet>
 			</h:column>
 		</h:dataTable>
 
 	</h:form>
-	<ui:include src="#{component.child.xhtmlPath}" rendered="#{! empty component.child}">
-			<ui:param name="component" value="#{component.child}"></ui:param>
-		</ui:include>
-		
-		
+	<ui:include src="#{component.child.xhtmlPath}"
+		rendered="#{! empty component.child}">
+		<ui:param name="component" value="#{component.child}"></ui:param>
+	</ui:include>
+
 </ui:composition>

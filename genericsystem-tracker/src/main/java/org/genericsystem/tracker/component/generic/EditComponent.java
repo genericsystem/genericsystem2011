@@ -77,7 +77,7 @@ public class EditComponent extends AbstractGenericComponent {
 			List<AbstractComponent> listSelectItem = row.<AbstractComponent> getChildren();
 			for (AbstractComponent selectItem : listSelectItem) {
 				if (selectItem instanceof SelectItemComponent) {
-					Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) selectItem).getGeneric()).get(0)).getInstance(((SelectItemComponent) selectItem).getStringSelected());
+					Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) selectItem).getGeneric()).get(0)).getInstance(((SelectItemComponent) selectItem).getValue());
 					getGeneric().bind((Relation) ((SelectItemComponent) selectItem).getGeneric(), instance);
 				} else if (selectItem instanceof InputTextComponent) {
 					getGeneric().setValue((Attribute) ((InputTextComponent) selectItem).getGeneric(), (((InputTextComponent) selectItem).getValue()).toString());
@@ -88,6 +88,10 @@ public class EditComponent extends AbstractGenericComponent {
 
 	public boolean isRelation() {
 		return getGeneric().isRelation();
+	}
+
+	public String updateMsg() {
+		return "update";
 	}
 
 	@Override

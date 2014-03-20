@@ -19,7 +19,7 @@ public class TypeComponent extends AbstractGenericComponent {
 
 	private String newValue;
 
-	private EditComponent child;
+	private AbstractGenericComponent child;
 
 	public TypeComponent(AbstractComponent parent, Generic selected) {
 		super(parent, selected);
@@ -95,6 +95,10 @@ public class TypeComponent extends AbstractGenericComponent {
 		return "Edit instance";
 	}
 
+	public String createMsg() {
+		return "+";
+	}
+
 	public String getAddMsg() {
 		return "Set instance";
 	}
@@ -107,8 +111,12 @@ public class TypeComponent extends AbstractGenericComponent {
 		return child;
 	}
 
-	public void setChild(InstanceRow instanceRow) {
+	public void setEdit(InstanceRow instanceRow) {
 		child = new EditComponent(this, instanceRow);
+	}
+
+	public void setCreate() {
+		child = new CreateComponent(this, generic);
 	}
 
 	@Override

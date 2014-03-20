@@ -2,8 +2,7 @@ package org.genericsystem.framework.component;
 
 import java.util.List;
 
-import org.genericsystem.framework.component.generic.AbstractTypeComponent;
-import org.genericsystem.generic.Type;
+import org.genericsystem.core.Generic;
 
 public abstract class AbstractTypesGridComponent extends AbstractComponent {
 
@@ -13,7 +12,7 @@ public abstract class AbstractTypesGridComponent extends AbstractComponent {
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return getCache().getAllTypes().filter(new FilterGeneric<Type>()).project(new ProjectorGeneric<AbstractTypeComponent, Type>());
+		return getGenerics().filter(new FilterGeneric<Generic>()).project(new ProjectorGeneric<AbstractComponent, Generic>());
 	}
 
 }

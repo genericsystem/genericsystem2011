@@ -5,8 +5,6 @@ import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Type;
 
 public abstract class AbstractEditComponent extends AbstractValueAndGenericComponent {
 
@@ -16,8 +14,8 @@ public abstract class AbstractEditComponent extends AbstractValueAndGenericCompo
 	}
 
 	@Override
-	public List<AbstractRowComponent> initChildren() {
-		return ((Type) getGeneric()).getAttributes().filter(new FilterGeneric<Attribute>()).project(new ProjectorGeneric<AbstractRowComponent, Attribute>());
+	public List<? extends AbstractComponent> initChildren() {
+		return getGenerics().filter(new FilterGeneric<Generic>()).project(new ProjectorGeneric<AbstractComponent, Generic>());
 	}
 
 	public String getInstanceName() {

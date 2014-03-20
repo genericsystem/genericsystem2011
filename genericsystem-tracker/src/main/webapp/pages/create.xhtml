@@ -10,15 +10,15 @@
 			headerClass="order-table-header"
 			rowClasses="order-table-odd-row,order-table-even-row">
 			<h:outputText value="#{component.parent}" />
-			<h:inputText value="#{component.instanceName}" />
+			<h:inputText value="#{component.newValue}" />
 		</h:panelGrid>
-		<h:panelGrid columns="2" styleClass="order-table"
+		<h:panelGrid columns="3" styleClass="order-table"
 			headerClass="order-table-header"
 			rowClasses="order-table-odd-row,order-table-even-row">
 			<c:forEach items="#{component.children}" var="component">
 				<ui:include src="#{component.xhtmlPath}" />
 			</c:forEach>
 		</h:panelGrid>
-		<h:commandButton value="#{component.updateMsg}" action="#{component.modify()}" />
+		<h:commandButton value="#{component.addMsg}" action="#{component.create()}" />
 	</h:form>
 </ui:composition>
