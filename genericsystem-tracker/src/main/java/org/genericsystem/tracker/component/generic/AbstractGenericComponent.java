@@ -9,7 +9,7 @@ import org.genericsystem.tracker.component.AbstractComponent;
 
 public abstract class AbstractGenericComponent extends AbstractComponent {
 
-	private Generic generic;
+	protected Generic generic;
 
 	public AbstractGenericComponent(AbstractComponent parent, Generic generic) {
 		super(parent);

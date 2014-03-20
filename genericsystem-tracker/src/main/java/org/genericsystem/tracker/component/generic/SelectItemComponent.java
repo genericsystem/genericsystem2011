@@ -14,7 +14,7 @@ public class SelectItemComponent extends AbstractGenericComponent {
 
 	private List<String> listInstances = new ArrayList<String>();
 
-	private String stringSelected;
+	private String value;
 
 	public SelectItemComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
@@ -29,7 +29,7 @@ public class SelectItemComponent extends AbstractGenericComponent {
 
 	public void editSelectedItem() {
 
-		TypeComponent typeSelected = this.<EditComponent> getParent().getParent();
+		TypeComponent typeSelected = this.<AbstractGenericComponent> getParent().getParent();
 		Type targetType = typeSelected.getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0);
 		List<InstanceRow> list = AttributeComponent.getTargetRows(targetType);
 		for (InstanceRow instance : list) {
@@ -45,12 +45,12 @@ public class SelectItemComponent extends AbstractGenericComponent {
 		this.listInstances = listInstances;
 	}
 
-	public String getStringSelected() {
-		return stringSelected;
+	public String getValue() {
+		return value;
 	}
 
-	public void setStringSelected(String stringSelected) {
-		this.stringSelected = stringSelected;
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 	@Override

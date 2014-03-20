@@ -6,11 +6,11 @@ import java.util.List;
 import org.genericsystem.core.Generic;
 import org.genericsystem.tracker.component.AbstractComponent;
 
-public class StringComponent extends AbstractGenericComponent {
+public class OutputTextComponent extends AbstractGenericComponent {
 
 	private String value;
 
-	public StringComponent(AbstractComponent parent, Generic generic) {
+	public OutputTextComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
 		this.value = generic.toString();
 	}
@@ -30,6 +30,6 @@ public class StringComponent extends AbstractGenericComponent {
 
 	@Override
 	public String getXhtmlPath() {
-		return "string.xhtml";
+		return "outputText.xhtml";
 	}
 }

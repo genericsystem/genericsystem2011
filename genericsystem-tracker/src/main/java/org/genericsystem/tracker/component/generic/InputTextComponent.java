@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.tracker.annotation.DateFormat;
 import org.genericsystem.tracker.component.AbstractComponent;
 
 public class InputTextComponent extends AbstractGenericComponent {
@@ -18,7 +19,17 @@ public class InputTextComponent extends AbstractGenericComponent {
 	}
 
 	public void editInputText() {
-		setValue(Objects.toString(this.<EditComponent> getParent().getGeneric().getValue((Attribute) getGeneric())));
+		setValue(Objects.toString(this.<AbstractGenericComponent> getParent().getGeneric().getValue((Attribute) getGeneric())));
+	}
+
+	public String getValidatorId() {
+		log.info("**-->" + getGeneric().getClass().getAnnotation(DateFormat.class));
+		return getGeneric().getClass().getAnnotation(DateFormat.class) != null ? "dateValidator" : "";
+	}
+
+	public boolean isValidator() {
+		log.info("-->" + getGeneric().getClass().getAnnotation(DateFormat.class));
+		return getGeneric().getClass().getAnnotation(DateFormat.class) != null;
 	}
 
 	@Override

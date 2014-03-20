@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.tracker.component.AbstractComponent;
-import org.genericsystem.tracker.component.SelectorComponent;
+import org.genericsystem.tracker.component.PanelGridComponent;
 
-public class ButtonComponent extends AbstractGenericComponent {
+public class CommandButtonComponent extends AbstractGenericComponent {
 
-	public ButtonComponent(AbstractComponent parent, Generic generic) {
+	public CommandButtonComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
 	}
 
@@ -19,12 +19,12 @@ public class ButtonComponent extends AbstractGenericComponent {
 	}
 
 	public void select() {
-		((SelectorComponent) this.getParent()).select(getGeneric());
+		((PanelGridComponent) this.getParent()).select(getGeneric());
 	}
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/button.xhtml";
+		return "/pages/commandbutton.xhtml";
 	}
 
 }

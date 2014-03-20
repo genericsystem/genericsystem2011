@@ -14,7 +14,7 @@ public class RowComponent extends AbstractGenericComponent {
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return Arrays.asList(new StringComponent(parent, getGeneric()), getGeneric().isRelation() ? new SelectItemComponent(parent, getGeneric()) : new InputTextComponent(parent, getGeneric()));
+		return Arrays.asList(new OutputTextComponent(parent, getGeneric()), getGeneric().isRelation() ? new SelectItemComponent(parent, getGeneric()) : new InputTextComponent(parent, getGeneric()));
 	}
 
 	@Override

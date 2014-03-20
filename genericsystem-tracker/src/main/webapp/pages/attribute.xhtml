@@ -15,16 +15,5 @@
 				<h:outputText value="#{value}" />
 			</h:column>
 		</h:dataTable>
-		<f:facet name="footer">
-			<h:panelGroup>
-				<h:inputText rendered="#{!component.relation}"
-					value="#{component.newValue}" />
-				<h:selectOneMenu rendered="#{component.relation}"
-					value="#{component.newValue}">
-					<f:selectItems value="#{component.targetRows}" var="target"
-						itemValue="#{target}" itemLabel="#{target}" />
-				</h:selectOneMenu>
-			</h:panelGroup>
-		</f:facet>
 	</h:column>
 </ui:composition>

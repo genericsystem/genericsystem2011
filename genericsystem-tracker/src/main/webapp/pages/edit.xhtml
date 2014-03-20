@@ -19,6 +19,6 @@
 				<ui:include src="#{component.xhtmlPath}" />
 			</c:forEach>
 		</h:panelGrid>
-		<h:commandButton value="valider" action="#{component.modify()}" />
+		<h:commandButton value="#{component.updateMsg}" action="#{component.modify()}" />
 	</h:form>
 </ui:composition>
