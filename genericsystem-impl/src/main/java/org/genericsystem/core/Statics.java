@@ -108,6 +108,12 @@ public class Statics {
 		return new Supers(result);
 	}
 
+	public static Supers insertsFristSupers(List<Generic> generics, List<Generic> targets) {
+		List<Generic> result = new ArrayList<>(targets);
+		result.addAll(generics);
+		return new Supers(result);
+	}
+
 	static Generic[] insertFirst(Generic first, Generic... others) {
 		Generic[] result = new Generic[others.length + 1];
 		result[0] = first;
@@ -132,6 +138,12 @@ public class Statics {
 	static Supers truncate(int i, Supers supers) {
 		List<Generic> result = new ArrayList<>(supers);
 		result.remove(i);
+		return new Supers(result);
+	}
+
+	static Supers truncate(Generic remove, Supers supers) {
+		List<Generic> result = new ArrayList<>(supers);
+		result.remove(remove);
 		return new Supers(result);
 	}
 

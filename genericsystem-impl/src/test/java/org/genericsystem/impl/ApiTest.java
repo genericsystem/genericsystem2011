@@ -295,8 +295,34 @@ public class ApiTest extends AbstractTest {
 
 	public void testCyclicInherits() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-		cache.addType("A");
-		final Type b = cache.addType("B");
+		Type a = cache.addType("A");
+		Type b = cache.addType("B");
+		b.addSubType("A");
+		assert !a.isAlive();
+	}
+
+	public void testCyclicInherits2() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type car = cache.addType("Car");
+		Attribute carPower = car.addAttribute("power");
+		Generic myCar = car.setInstance("myCar");
+		Holder myCar123 = myCar.setValue(carPower, 123);
+		Type vehicle = cache.addType("Vehicle");
+		Type newCar = vehicle.addSubType("Car");
+		Attribute newCarPower = newCar.getAttribute("power");
+		assert newCarPower != null;
+		Generic newMyCar = newCar.getInstance("myCar");
+		assert newMyCar.getValue(newCarPower).equals(123);
+		assert !car.isAlive();
+		assert !carPower.isAlive();
+		assert !myCar.isAlive();
+		assert !myCar123.isAlive();
+	}
+
+	public void testCyclicInherits3() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type a = cache.addType("A");
+		final Type b = a.addSubType("B");
 		new RollbackCatcher() {
 
 			@Override

@@ -1,9 +1,11 @@
 package org.genericsystem.core;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
+
 import org.genericsystem.core.Statics.OrderedDependencies;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.core.UnsafeGList.UnsafeComponents;
@@ -40,12 +42,17 @@ class GenericBuilder extends UnsafeVertex {
 		return null;
 	}
 
+	private boolean isSameSignature(Generic compare) {
+		// TODO order equals components ?
+		return ((GenericImpl) compare).homeTreeNode().equals(homeTreeNode()) && getMeta().equals(compare.getMeta()) && Arrays.equals(compare.getComponents().toArray(), components().toArray());
+	}
+
 	<T extends Generic> T simpleBind(Class<?> specializationClass, boolean existsException, boolean automatic) throws RollbackException {
 		T result = find(existsException);
 		if (result != null)
 			return result;
 		CacheImpl cache = getCurrentCache();
-		return getCurrentCache().<T> insert(cache.<EngineImpl> getEngine().build(((GenericImpl) getMeta()).specializeInstanceClass(specializationClass), this), automatic);
+		return cache.<T> insert(cache.<EngineImpl> getEngine().build(((GenericImpl) getMeta()).specializeInstanceClass(specializationClass), this), automatic);
 	}
 
 	<T extends Generic> T bind(final Class<?> specializationClass, boolean existsException, final boolean automatic) throws RollbackException {
@@ -53,11 +60,16 @@ class GenericBuilder extends UnsafeVertex {
 		if (result != null)
 			return result;
 
+		if (supers().size() > 1)
+			for (Generic superGeneric : supers())
+				if (isSameSignature(superGeneric))
+					return ((GenericImpl) superGeneric).addSupers(Statics.truncate(superGeneric, supers()).toArray());
+
 		Generic[] toReplace = new Generic[1];
 		NavigableSet<Generic> dependencies = getDependencies(toReplace, existsException);
 		for (Generic dependency : dependencies) {
-			assert !supers().contains(dependency) : dependency.info() + supers().get(0).info() + " " + components();
-			assert !components().contains(dependency) : components();
+			assert !supers().contains(dependency) : dependency.info() + " / " + supers();
+			assert !components().contains(dependency) : dependency.info() + " / " + components();
 			assert !((GenericImpl) dependency).equiv(this) : dependency.info() + ((GenericImpl) dependency).isSuperOf(this);
 		}
 		return getCurrentCache().new Restructurator() {
@@ -108,12 +120,9 @@ class GenericBuilder extends UnsafeVertex {
 					return true;
 			for (int pos = 0; pos < ((GenericImpl) candidate).getComponents().size(); pos++)
 				if (((GenericImpl) getMeta()).isSingularConstraintEnabled(pos) && !((GenericImpl) getMeta()).isReferentialIntegrity(pos))
-					if (((GenericImpl) candidate).getComponent(pos).equals(components().get(pos))) {
+					if (((GenericImpl) candidate).getComponent(pos).equals(components().get(pos)))
 						if (!((GenericImpl) candidate).isSuperOf(this))
 							return true;
-						// if (!(((GenericImpl) candidate).homeTreeNode().equals(uVertex.homeTreeNode())) || !areComponentsInheriting(uVertex.components(), ((GenericImpl) candidate).getComponents()))
-						// return true;
-					}
 		}
 		return false;
 

@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1881,6 +1882,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().addSuper(this, newSuper);
 	}
 
+	public <T extends Generic> T addSupers(Generic... newSupers) {
+		return getCurrentCache().addSupers(this, newSupers);
+	}
+
 	@Override
 	public <T extends Generic> T removeSuper(int pos) {
 		return getCurrentCache().removeSuper(this, pos);
@@ -2030,8 +2035,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new GenericBuilder(homeTreeNode(), getSupers(), components, true);
 	}
 
-	GenericBuilder getInsertedSuperVertex(Generic newSuper) {
-		return new GenericBuilder(homeTreeNode(), Statics.insertIntoSupers(newSuper, getSupers(), 0), selfToNullComponents(), true);
+	GenericBuilder getInsertedSuperVertex(Generic... newSupers) {
+		return new GenericBuilder(homeTreeNode(), Statics.insertsFristSupers(Arrays.asList(newSupers), getSupers()), selfToNullComponents(), true);
 	}
 
 	GenericBuilder getTruncatedSuperVertex(int pos) {
