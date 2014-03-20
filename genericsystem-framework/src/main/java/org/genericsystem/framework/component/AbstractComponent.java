@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
 import org.slf4j.Logger;
@@ -26,6 +27,8 @@ public abstract class AbstractComponent {
 	}
 
 	public abstract List<? extends AbstractComponent> initChildren();
+
+	public abstract <T extends Generic> Snapshot<T> getGenerics();
 
 	public abstract String getXhtmlPath();
 

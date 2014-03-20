@@ -10,7 +10,6 @@ import org.genericsystem.framework.component.AbstractComponent;
 public abstract class AbstractSelectItemComponent extends AbstractGenericComponent {
 
 	private List<String> listInstances = new ArrayList<String>();
-
 	private String stringSelected;
 
 	public AbstractSelectItemComponent(AbstractComponent parent, Generic generic) {
@@ -25,16 +24,6 @@ public abstract class AbstractSelectItemComponent extends AbstractGenericCompone
 	}
 
 	public abstract void editSelectedItem();
-
-	// public void editSelectedItem() {
-	//
-	// TypeComponent typeSelected = this.<EditComponent> getParent().getParent();
-	// Type targetType = typeSelected.getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0);
-	// List<InstanceRow> list = AttributeComponent.getTargetRows(targetType);
-	// for (InstanceRow instance : list) {
-	// getListInstances().add(instance.toString());
-	// }
-	// }
 
 	public List<String> getListInstances() {
 		return listInstances;
@@ -51,5 +40,4 @@ public abstract class AbstractSelectItemComponent extends AbstractGenericCompone
 	public void setStringSelected(String stringSelected) {
 		this.stringSelected = stringSelected;
 	}
-
 }

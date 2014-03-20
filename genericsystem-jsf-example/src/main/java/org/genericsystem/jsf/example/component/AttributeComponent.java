@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.InstanceRow;
 import org.genericsystem.framework.component.AbstractComponent;
@@ -55,6 +56,12 @@ public class AttributeComponent extends AbstractAttributeComponent {
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/attribute.xhtml";
+	}
+
+	@Override
+	public <T extends Generic> Snapshot<T> getGenerics() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
