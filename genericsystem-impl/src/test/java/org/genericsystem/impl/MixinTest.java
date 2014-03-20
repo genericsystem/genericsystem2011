@@ -2,6 +2,7 @@ package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
@@ -133,17 +134,66 @@ public class MixinTest extends AbstractTest {
 
 	public void testMixin6() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
-
 		Type vehicle = cache.addType("Vehicle");
 		Attribute vehiclePower = vehicle.addAttribute("Power");
 		Holder defaultVehiclePower = vehicle.addValue(vehiclePower, 235);
 		Type car = vehicle.addSubType("Car");
-		Attribute carPower = car.addAttribute("Power");
+		Attribute carPower = ((GenericImpl) car).addSubAttribute(vehiclePower, "Power");
+
 		assert car.getValue(vehiclePower).equals(235);
-		assert car.getValue(carPower).equals(235);
+
+		Holder defaultCarPower = car.addValue(carPower, 235);
+		assert defaultCarPower.inheritsFrom(defaultVehiclePower);
+
 		Generic myCar = car.addInstance("myCar");
 		assert myCar.getValue(vehiclePower).equals(235);
-		assert myCar.getValue(carPower).equals(235);
 
+		assert car.getValue(vehiclePower).equals(235);
+		assert car.getValue(carPower).equals(235);
+		assert myCar.getValue(carPower).equals(235);
 	}
+
+	public void testMixin7() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		Attribute vehiclePower = vehicle.addAttribute("Power");
+		Holder defaultVehiclePower = vehicle.addValue(vehiclePower, 235);
+		Type car = vehicle.addSubType("Car");
+		Attribute carPower = ((GenericImpl) car).addSubAttribute(vehiclePower, "Power2");
+		assert carPower.inheritsFrom(vehiclePower);
+
+		Holder defaultCarPower = car.addValue(carPower, 235);
+
+		assert ((GenericImpl) defaultCarPower).inheritsFrom(((GenericImpl) defaultVehiclePower).vertex());
+		assert defaultCarPower.inheritsFrom(defaultVehiclePower) : defaultCarPower.info() + defaultVehiclePower.info();
+
+		Generic myCar = car.addInstance("myCar");
+		// assert myCar.getValue(vehiclePower).equals(235);
+
+		assert car.getValue(vehiclePower).equals(235);
+		assert car.getValue(carPower).equals(235);
+		assert myCar.getValue(carPower).equals(235);
+	}
+
+	public void testMixin8() {
+		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
+		Type vehicle = cache.addType("Vehicle");
+		Attribute vehiclePower = vehicle.addAttribute("Power");
+		Holder defaultVehiclePower = vehicle.addValue(vehiclePower, 235);
+		Type car = vehicle.addSubType("Car");
+		Attribute carPower = ((GenericImpl) car).addSubAttribute(vehiclePower, "Power");
+
+		assert car.getValue(vehiclePower).equals(235);
+
+		Holder defaultCarPower = car.addValue(carPower, 235);// automatic
+		assert defaultCarPower.inheritsFrom(defaultVehiclePower);
+
+		Generic myCar = car.addInstance("myCar");
+		assert myCar.getValue(vehiclePower).equals(235);
+
+		assert car.getValue(vehiclePower).equals(235);
+		assert car.getValue(carPower).equals(235);
+		assert myCar.getValue(carPower).equals(235);
+	}
+
 }
