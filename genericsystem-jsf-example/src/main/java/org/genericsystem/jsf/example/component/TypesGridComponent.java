@@ -3,6 +3,7 @@ package org.genericsystem.jsf.example.component;
 import java.io.Serializable;
 
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractTypesGridComponent;
 import org.genericsystem.jsf.example.structure.Types;
@@ -13,15 +14,10 @@ public class TypesGridComponent extends AbstractTypesGridComponent {
 		super(parent);
 	}
 
-	@Override
-	public String getXhtmlPath() {
-		return "/pages/typesgrid.xhtml";
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
-		return (T) new TypeComponent(this, generic);
+	public <T extends Generic> Snapshot<T> getGenerics() {
+		return (Snapshot<T>) getCache().getAllTypes();
 	}
 
 	@Override
@@ -33,4 +29,16 @@ public class TypesGridComponent extends AbstractTypesGridComponent {
 		Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
 		return clazz != null && Types.class.equals(clazz);
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
+		return (T) new TypeComponent(this, generic);
+	}
+
+	@Override
+	public String getXhtmlPath() {
+		return "/pages/typesgrid.xhtml";
+	}
+
 }
