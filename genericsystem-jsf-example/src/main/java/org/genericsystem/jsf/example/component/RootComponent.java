@@ -6,10 +6,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.SessionScoped;
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
@@ -20,9 +18,6 @@ import org.genericsystem.framework.component.AbstractRootComponent;
 public class RootComponent extends AbstractRootComponent implements Serializable {
 	private static final long serialVersionUID = -6596418502248220835L;
 
-	@Inject
-	private Cache cache;
-
 	@PostConstruct
 	public void init() {
 		this.children = initChildren();
@@ -31,22 +26,6 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
 		return Arrays.asList(new TypesGridComponent(RootComponent.this));
-	}
-
-	@Override
-	public Cache getCache() {
-		return cache;
-	}
-
-	@Override
-	public String getXhtmlPath() {
-		return "/pages/index.xhtml";
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends AbstractComponent> T getRoot() {
-		return (T) this;
 	}
 
 	@Override
@@ -62,5 +41,10 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	@Override
 	public <T extends Generic> Snapshot<T> getGenerics() {
 		return null;
+	}
+
+	@Override
+	public String getXhtmlPath() {
+		return "/pages/index.xhtml";
 	}
 }
