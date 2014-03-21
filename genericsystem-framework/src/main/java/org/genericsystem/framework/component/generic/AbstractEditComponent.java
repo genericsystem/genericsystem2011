@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 
-public abstract class AbstractEditComponent extends AbstractValueAndGenericComponent {
+public abstract class AbstractEditComponent extends AbstractCollectableChildrenComponent {
 
 	public AbstractEditComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
