@@ -23,12 +23,10 @@ public class InputTextComponent extends AbstractGenericComponent {
 	}
 
 	public String getValidatorId() {
-		log.info("**-->" + getGeneric().getClass().getAnnotation(DateFormat.class));
 		return getGeneric().getClass().getAnnotation(DateFormat.class) != null ? "dateValidator" : "";
 	}
 
 	public boolean isValidator() {
-		log.info("-->" + getGeneric().getClass().getAnnotation(DateFormat.class));
 		return getGeneric().getClass().getAnnotation(DateFormat.class) != null;
 	}
 
