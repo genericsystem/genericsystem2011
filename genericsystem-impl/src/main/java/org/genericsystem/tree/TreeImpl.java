@@ -2,7 +2,6 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.core.Generic;

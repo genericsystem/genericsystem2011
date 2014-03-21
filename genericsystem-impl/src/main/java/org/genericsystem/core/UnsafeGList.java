@@ -156,4 +156,12 @@ public class UnsafeGList extends ArrayList<Generic> {
 			super(array);
 		}
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Generic g : this)
+			stringBuilder.append(g.info());
+		return stringBuilder.toString();
+	}
 }

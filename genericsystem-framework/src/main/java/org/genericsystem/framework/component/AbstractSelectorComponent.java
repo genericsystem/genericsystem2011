@@ -3,8 +3,6 @@ package org.genericsystem.framework.component;
 import java.util.List;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.framework.component.generic.AbstractButtonComponent;
-import org.genericsystem.generic.Type;
 
 public abstract class AbstractSelectorComponent extends AbstractComponent {
 
@@ -17,7 +15,7 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return getCache().getAllTypes().filter(new FilterGeneric<Type>()).project(new ProjectorGeneric<AbstractButtonComponent, Type>());
+		return getGenerics().filter(new FilterGeneric<Generic>()).project(new ProjectorGeneric<AbstractComponent, Generic>());
 	}
 
 	public abstract void selectDefaultComponent();

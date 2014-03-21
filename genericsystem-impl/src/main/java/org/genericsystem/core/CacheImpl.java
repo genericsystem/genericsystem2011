@@ -232,6 +232,17 @@ public class CacheImpl extends AbstractContext implements Cache {
 		}.rebuildAll(old);
 	}
 
+	<T extends Generic> T addSupers(final Generic old, final Generic... newSupers) {
+		return new Restructurator() {
+			private static final long serialVersionUID = -8032263893165253991L;
+
+			@Override
+			Generic rebuild() {
+				return ((GenericImpl) old).getInsertedSuperVertex(newSupers).bind(old.getClass(), false, isAutomatic(old));
+			}
+		}.rebuildAll(old);
+	}
+
 	<T extends Generic> T removeSuper(final Generic old, final int pos) {
 		if (pos == 0 && ((GenericImpl) old).getSupers().size() == 1)
 			rollback(new UnsupportedOperationException());

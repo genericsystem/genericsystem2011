@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,8 +12,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
@@ -70,7 +71,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Nicolas Feybesse
  * @author Michael Ory
- * 
+ *
  */
 @SuppressWarnings("unchecked")
 public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute {
@@ -1018,13 +1019,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					return true;
 			return false;
 		}
+		// Statics.logTimeIfCurrentThreadDebugged("AAA");
 		Generic subVertexMeta = getMeta();
-		if (isConcrete() && superUVertex.getMeta().equals(subVertexMeta))
+		if (isConcrete() && subVertexMeta.equals(superUVertex.getMeta()))
 			for (int pos = 0; pos < getComponents().size(); pos++)
 				if (((GenericImpl) subVertexMeta).isSingularConstraintEnabled(pos) /* && !subVertexMeta.isReferentialIntegrity(pos) */)
 					if (getComponent(pos).inheritsFrom(superUVertex.components().get(pos)))
 						if (!getComponent(pos).equals(superUVertex.components().get(pos)))
 							return true;
+		// Statics.logTimeIfCurrentThreadDebugged("BBB");
 		for (int i = 0; i < getComponents().size(); i++)
 			if (superUVertex.components().get(i) != null) {
 				if (!getComponents().get(i).inheritsFrom(superUVertex.components().get(i)))
@@ -1034,12 +1037,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					if (!((GenericImpl) getComponents().get(i)).inheritsFrom(superUVertex))
 						return false;
 			}
-		if (isConcrete() && superUVertex.getMeta().equals(subVertexMeta))
+		// Statics.logTimeIfCurrentThreadDebugged("CCC");
+		if (isConcrete() && subVertexMeta.equals(superUVertex.getMeta()))
 			if (((GenericImpl) subVertexMeta).isPropertyConstraintEnabled())
 				if (!getComponents().equals(superUVertex.components()))
 					return true;
-		if (!homeTreeNode().inheritsFrom(superUVertex.homeTreeNode()))
+		// Statics.logTimeIfCurrentThreadDebugged("DDD");
+
+		if (!(homeTreeNode().inheritsFrom(superUVertex.homeTreeNode()) || (getMetaLevel() == superUVertex.metaLevel() && subVertexMeta.inheritsFrom(superUVertex.getMeta()) && Objects
+				.equals(homeTreeNode().getValue(), superUVertex.homeTreeNode().getValue()))))
+			// if (!homeTreeNode().inheritsFrom(superUVertex.homeTreeNode()))
 			return false;
+		// Statics.logTimeIfCurrentThreadDebugged("EEE");
 		if (!inheritsFromAll(superUVertex.supers()))
 			return false;
 		return true;
@@ -1065,7 +1074,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return false;
 		}
 		Generic subVertexMeta = subUVertex.getMeta();
-		if (subUVertex.isConcrete() && superUVertex.getMeta().equals(subVertexMeta))
+		if (subUVertex.isConcrete() && subVertexMeta.equals(superUVertex.getMeta()))
 			for (int pos = 0; pos < subUVertex.components().size(); pos++)
 				if (((GenericImpl) subVertexMeta).isSingularConstraintEnabled(pos) /* && !subVertexMeta.isReferentialIntegrity(pos) */)
 					if (subUVertex.components().get(pos).inheritsFrom(superUVertex.components().get(pos)))
@@ -1078,11 +1087,14 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			} else if (!((GenericImpl) subUVertex.components().get(i)).inheritsFrom(superUVertex))
 				if (!((GenericImpl) subUVertex.components().get(i)).inheritsFrom(superUVertex))
 					return false;
-		if (subUVertex.isConcrete() && superUVertex.getMeta().equals(subVertexMeta))
+		if (subUVertex.isConcrete() && subVertexMeta.equals(superUVertex.getMeta()))
 			if (((GenericImpl) subVertexMeta).isPropertyConstraintEnabled())
 				if (!subUVertex.components().equals(superUVertex.components()))
 					return true;
-		if (!subUVertex.homeTreeNode().inheritsFrom(superUVertex.homeTreeNode()))
+		if (!(subUVertex.homeTreeNode().inheritsFrom(superUVertex.homeTreeNode()) || (subUVertex.metaLevel() == superUVertex.metaLevel() && subVertexMeta.inheritsFrom(superUVertex.getMeta()) && Objects.equals(subUVertex.homeTreeNode().getValue(),
+				superUVertex.homeTreeNode().getValue()))))
+
+			// if (!subUVertex.homeTreeNode().inheritsFrom(superUVertex.homeTreeNode()))
 			return false;
 		for (Generic superUVertexSuper : superUVertex.supers())
 			if (!((GenericImpl) superUVertexSuper).isSuperOf(subUVertex))
@@ -1112,7 +1124,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return false;
 		}
 		Generic subVertexMeta = subUVertex.getMeta();
-		if (subUVertex.isConcrete() && getMeta().equals(subVertexMeta))
+		if (subUVertex.isConcrete() && subVertexMeta.equals(getMeta()))
 			for (int pos = 0; pos < subUVertex.components().size(); pos++)
 				if (((GenericImpl) subVertexMeta).isSingularConstraintEnabled(pos) /* && !subVertexMeta.isReferentialIntegrity(pos) */)
 					if (subUVertex.components().get(pos).inheritsFrom(getComponent(pos)))
@@ -1128,12 +1140,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 					if (!(((GenericImpl) getComponents().get(i)).isSuperOf(subUVertex)))
 						return false;
 			}
-		if (subUVertex.isConcrete() && getMeta().equals(subVertexMeta))
+		if (subUVertex.isConcrete() && subVertexMeta.equals(getMeta()))
 			if (((GenericImpl) subVertexMeta).isPropertyConstraintEnabled())
 				if (!subUVertex.components().equals(getComponents()))
 					return true;
+		if (!(subUVertex.homeTreeNode().inheritsFrom(homeTreeNode()) || (subUVertex.metaLevel() == getMetaLevel() && subVertexMeta.inheritsFrom(getMeta()) && Objects.equals(subUVertex.homeTreeNode().getValue(), homeTreeNode().getValue()))))
 
-		if (!subUVertex.homeTreeNode().inheritsFrom(homeTreeNode()))
+			// if (!subUVertex.homeTreeNode().inheritsFrom(homeTreeNode()))
 			return false;
 
 		return true;
@@ -1881,6 +1894,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().addSuper(this, newSuper);
 	}
 
+	public <T extends Generic> T addSupers(Generic... newSupers) {
+		return getCurrentCache().addSupers(this, newSupers);
+	}
+
 	@Override
 	public <T extends Generic> T removeSuper(int pos) {
 		return getCurrentCache().removeSuper(this, pos);
@@ -2030,8 +2047,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new GenericBuilder(homeTreeNode(), getSupers(), components, true);
 	}
 
-	GenericBuilder getInsertedSuperVertex(Generic newSuper) {
-		return new GenericBuilder(homeTreeNode(), Statics.insertIntoSupers(newSuper, getSupers(), 0), selfToNullComponents(), true);
+	GenericBuilder getInsertedSuperVertex(Generic... newSupers) {
+		return new GenericBuilder(homeTreeNode(), Statics.insertsFristSupers(Arrays.asList(newSupers), getSupers()), selfToNullComponents(), true);
 	}
 
 	GenericBuilder getTruncatedSuperVertex(int pos) {

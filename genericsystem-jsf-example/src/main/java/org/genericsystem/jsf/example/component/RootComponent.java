@@ -11,6 +11,7 @@ import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractRootComponent;
 
@@ -56,5 +57,10 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	@Override
 	public <T extends Generic> boolean isSelected(T candidate) {
 		return false;
+	}
+
+	@Override
+	public <T extends Generic> Snapshot<T> getGenerics() {
+		return null;
 	}
 }
