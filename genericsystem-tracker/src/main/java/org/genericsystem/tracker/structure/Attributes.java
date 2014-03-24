@@ -17,4 +17,11 @@ public class Attributes {
 
 	}
 
+	@SystemGeneric
+	@Components(Issues.class)
+	@SingularConstraint
+	public static class Description extends GenericImpl {
+
+	}
+
 }
