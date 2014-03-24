@@ -8,8 +8,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.SessionScoped;
 import javax.inject.Named;
 
-import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractRootComponent;
 
@@ -26,21 +24,6 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
 		return Arrays.asList(new TypesGridComponent(RootComponent.this));
-	}
-
-	@Override
-	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
-		return null;
-	}
-
-	@Override
-	public <T extends Generic> boolean isSelected(T candidate) {
-		return false;
-	}
-
-	@Override
-	public <T extends Generic> Snapshot<T> getGenerics() {
-		return null;
 	}
 
 	@Override
