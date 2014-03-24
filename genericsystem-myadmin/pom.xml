@@ -7,6 +7,10 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
+	<artifactId>genericsystem-myadmin</artifactId>
+	<name>Generic System MyAdmin</name>
+	<packaging>war</packaging>
+
 	<profiles>
 		<profile>
 			<id>development</id>
@@ -42,7 +46,7 @@
 
 			</build>
 		</profile>
-		
+
 		<profile>
 			<id>integration</id>
 			<activation>
@@ -54,10 +58,6 @@
 			</activation>
 		</profile>
 	</profiles>
-
-	<artifactId>genericsystem-myadmin</artifactId>
-	<name>Generic System MyAdmin</name>
-	<packaging>war</packaging>
 
 	<dependencies>
 		<dependency>
