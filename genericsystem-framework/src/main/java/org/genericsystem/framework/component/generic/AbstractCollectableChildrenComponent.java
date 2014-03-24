@@ -8,16 +8,16 @@ import org.genericsystem.framework.component.AbstractComponent;
 public abstract class AbstractCollectableChildrenComponent extends AbstractGenericComponent {
 	protected String newValue;
 
+	public AbstractCollectableChildrenComponent(AbstractComponent parent, Generic generic) {
+		super(parent, generic);
+	}
+
 	public String getNewValue() {
 		return newValue;
 	}
 
 	public void setNewValue(String newValue) {
 		this.newValue = newValue;
-	}
-
-	public AbstractCollectableChildrenComponent(AbstractComponent parent, Generic generic) {
-		super(parent, generic);
 	}
 
 	@Override
