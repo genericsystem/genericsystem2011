@@ -5,7 +5,7 @@ import java.util.List;
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 
-public abstract class AbstractTypeComponent extends AbstractValueAndGenericComponent {
+public abstract class AbstractTypeComponent extends AbstractCollectableChildrenComponent {
 
 	public AbstractTypeComponent(AbstractComponent parent, Generic selected) {
 		super(parent, selected);

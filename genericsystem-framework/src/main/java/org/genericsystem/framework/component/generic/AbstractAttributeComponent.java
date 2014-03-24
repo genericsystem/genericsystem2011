@@ -7,7 +7,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.framework.InstanceRow;
 import org.genericsystem.framework.component.AbstractComponent;
 
-public abstract class AbstractAttributeComponent extends AbstractValueAndGenericComponent {
+public abstract class AbstractAttributeComponent extends AbstractCollectableChildrenComponent {
 
 	public AbstractAttributeComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);

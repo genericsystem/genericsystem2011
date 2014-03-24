@@ -24,4 +24,9 @@ public class Types {
 	public static class Users extends GenericImpl {
 
 	}
+
+	@SystemGeneric
+	public static class Description extends GenericImpl {
+
+	}
 }
