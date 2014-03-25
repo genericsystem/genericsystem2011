@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Objects;
 
 import org.genericsystem.core.Generic;
+import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.tracker.annotation.DateFormat;
-import org.genericsystem.tracker.component.AbstractComponent;
 
 public class InputTextComponent extends AbstractGenericComponent {
 

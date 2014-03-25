@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.framework.component.AbstractComponent;
 
 @Named
 @SessionScoped

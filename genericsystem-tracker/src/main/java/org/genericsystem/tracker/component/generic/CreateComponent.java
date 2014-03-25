@@ -9,10 +9,10 @@ import java.util.regex.Pattern;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
+import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.tracker.component.AbstractComponent;
 import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
@@ -44,7 +44,7 @@ public class CreateComponent extends AbstractGenericComponent {
 
 				@Override
 				public RowComponent get(Object key) {
-					RowComponent result = (RowComponent) super.get(key);
+					RowComponent result = super.get(key);
 					if (result == null)
 						put((Attribute) key, result = new RowComponent(CreateComponent.this, (Attribute) key));
 					return result;
@@ -53,7 +53,7 @@ public class CreateComponent extends AbstractGenericComponent {
 
 			@Override
 			public RowComponent project(Attribute attribute) {
-				return (RowComponent) map.get(attribute);
+				return map.get(attribute);
 			}
 		});
 
@@ -92,6 +92,7 @@ public class CreateComponent extends AbstractGenericComponent {
 		return (m.matches());
 	}
 
+	@Override
 	public boolean isRelation() {
 		return getGeneric().isRelation();
 	}

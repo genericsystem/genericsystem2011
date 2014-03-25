@@ -8,6 +8,7 @@ import java.util.Map;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
+import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.generic.Type;
 import org.genericsystem.tracker.component.generic.TypeComponent;
 import org.genericsystem.tracker.structure.Types;
@@ -21,6 +22,7 @@ public class GridComponent extends AbstractComponent {
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
 		return getCache().getAllTypes().filter(new Filter<Type>() {
+			@Override
 			public boolean isSelected(Type candidate) {
 				Serializable value = candidate.getValue();
 				if (!value.getClass().isAssignableFrom(Class.class))

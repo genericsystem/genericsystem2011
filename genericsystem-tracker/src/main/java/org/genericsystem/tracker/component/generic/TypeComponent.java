@@ -7,11 +7,11 @@ import java.util.Map;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Filter;
 import org.genericsystem.core.Snapshot.Projector;
+import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.tracker.InstanceRow;
-import org.genericsystem.tracker.component.AbstractComponent;
 import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 

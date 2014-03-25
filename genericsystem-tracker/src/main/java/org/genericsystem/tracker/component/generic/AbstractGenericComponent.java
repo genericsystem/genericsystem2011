@@ -3,9 +3,9 @@ package org.genericsystem.tracker.component.generic;
 import java.util.Objects;
 
 import org.genericsystem.core.Generic;
+import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
-import org.genericsystem.tracker.component.AbstractComponent;
 
 public abstract class AbstractGenericComponent extends AbstractComponent {
 
