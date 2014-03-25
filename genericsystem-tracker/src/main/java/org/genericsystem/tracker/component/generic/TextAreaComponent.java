@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 
 public class TextAreaComponent extends AbstractGenericComponent {
 
