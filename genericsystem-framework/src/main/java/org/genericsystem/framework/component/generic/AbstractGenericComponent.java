@@ -9,7 +9,7 @@ import org.genericsystem.generic.Type;
 
 public abstract class AbstractGenericComponent extends AbstractComponent implements GenericComponent {
 
-	private Generic generic;
+	protected Generic generic;
 
 	public AbstractGenericComponent(AbstractComponent parent, Generic generic) {
 		super(parent);
