@@ -22,6 +22,17 @@ public abstract class AbstractCollectableChildrenComponent extends AbstractCompo
 
 	public abstract <T extends Generic> Snapshot<T> getGenerics();
 
+	public abstract <T extends Generic> boolean isSelected(T candidate);
+
+	public class FilterGeneric<T extends Generic> implements Filter<T> {
+
+		@Override
+		public boolean isSelected(T candidate) {
+			return AbstractCollectableChildrenComponent.this.isSelected(candidate);
+		}
+
+	}
+
 	public abstract <T extends AbstractComponent, U extends Generic> T buildComponent(U generic);
 
 	public class ProjectorGeneric<T extends AbstractComponent, U extends Generic> implements Projector<T, U> {
@@ -44,15 +55,4 @@ public abstract class AbstractCollectableChildrenComponent extends AbstractCompo
 			return map.get(element);
 		}
 	};
-
-	public abstract <T extends Generic> boolean isSelected(T candidate);
-
-	public class FilterGeneric<T extends Generic> implements Filter<T> {
-
-		@Override
-		public boolean isSelected(T candidate) {
-			return AbstractCollectableChildrenComponent.this.isSelected(candidate);
-		}
-
-	}
 }
