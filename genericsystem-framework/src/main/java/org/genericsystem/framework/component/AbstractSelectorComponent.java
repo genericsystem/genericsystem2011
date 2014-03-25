@@ -3,6 +3,7 @@ package org.genericsystem.framework.component;
 import org.genericsystem.core.Generic;
 
 public abstract class AbstractSelectorComponent extends AbstractCollectableChildrenComponent {
+	private AbstractComponent child;
 
 	public AbstractSelectorComponent(AbstractComponent rootComponent) {
 		super(rootComponent);
@@ -12,8 +13,6 @@ public abstract class AbstractSelectorComponent extends AbstractCollectableChild
 	public abstract void selectDefaultComponent();
 
 	public abstract void select(Generic selected);
-
-	private AbstractComponent child;
 
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractComponent> T getChild() {
