@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 
-public abstract class AbstractGenericComponent extends AbstractComponent implements GenericComponent {
+public abstract class AbstractGenericComponent extends AbstractComponent {
 
 	protected Generic generic;
 
@@ -15,7 +15,6 @@ public abstract class AbstractGenericComponent extends AbstractComponent impleme
 		this.children = initChildren();
 	}
 
-	@Override
 	public Generic getGeneric() {
 		return generic;
 	}
@@ -30,13 +29,6 @@ public abstract class AbstractGenericComponent extends AbstractComponent impleme
 	}
 
 	public abstract String getColumnTitleAttribute();
-
-	// public String getColumnTitleAttribute() {
-	// if (!isRelation())
-	// return Objects.toString(getGeneric());
-	// else
-	// return Objects.toString((this.<AbstractGenericComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
-	// }
 
 	public boolean isRelation() {
 		return getGeneric().isRelation();
