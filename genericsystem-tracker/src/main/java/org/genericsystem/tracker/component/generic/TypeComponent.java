@@ -7,9 +7,9 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.ValuedComponent;
 import org.genericsystem.framework.component.generic.AbstractCollectableGenericChildrenComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericComponent;
+import org.genericsystem.framework.component.interfaces.IValuedComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -17,7 +17,7 @@ import org.genericsystem.tracker.InstanceRow;
 import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
-public class TypeComponent extends AbstractCollectableGenericChildrenComponent implements ValuedComponent {
+public class TypeComponent extends AbstractCollectableGenericChildrenComponent implements IValuedComponent {
 	private String newValue;
 	private AbstractGenericComponent child;
 
