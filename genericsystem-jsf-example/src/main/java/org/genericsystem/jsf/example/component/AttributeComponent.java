@@ -23,6 +23,7 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		return Collections.emptyList();
 	}
 
+	@Override
 	public String getColumnTitleAttribute() {
 		if (!isRelation())
 			return Objects.toString(getGeneric());

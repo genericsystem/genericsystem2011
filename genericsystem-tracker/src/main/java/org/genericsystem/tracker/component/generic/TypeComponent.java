@@ -1,6 +1,7 @@
 package org.genericsystem.tracker.component.generic;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
@@ -24,15 +25,6 @@ public class TypeComponent extends AbstractCollectableGenericChildrenComponent i
 		super(parent, selected);
 		this.children = initChildren();
 
-	}
-
-	@Override
-	public String getNewValue() {
-		return newValue;
-	}
-
-	public void setNewValue(String newValue) {
-		this.newValue = newValue;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -78,6 +70,14 @@ public class TypeComponent extends AbstractCollectableGenericChildrenComponent i
 
 	}
 
+	public void setEdit(InstanceRow instanceRow) {
+		child = new EditComponent(this, instanceRow);
+	}
+
+	public void setCreate() {
+		child = new CreateComponent(this, generic);
+	}
+
 	public void remove(InstanceRow instanceRow) {
 		instanceRow.getInstance().remove();
 	}
@@ -98,16 +98,25 @@ public class TypeComponent extends AbstractCollectableGenericChildrenComponent i
 		return "Remove instance";
 	}
 
+	@Override
+	public String getNewValue() {
+		return newValue;
+	}
+
+	public void setNewValue(String newValue) {
+		this.newValue = newValue;
+	}
+
 	public AbstractComponent getChild() {
 		return child;
 	}
 
-	public void setEdit(InstanceRow instanceRow) {
-		child = new EditComponent(this, instanceRow);
-	}
-
-	public void setCreate() {
-		child = new CreateComponent(this, generic);
+	@Override
+	public String getColumnTitleAttribute() {
+		if (!isRelation())
+			return Objects.toString(getGeneric());
+		else
+			return Objects.toString((this.<AbstractGenericComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
 	}
 
 	@Override
