@@ -7,8 +7,8 @@ import java.util.Objects;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.framework.component.generic.AbstractValuedGenericComponent;
+import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 import org.genericsystem.tracker.InstanceRow;
@@ -44,7 +44,7 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		if (!isRelation())
 			return Objects.toString(getGeneric());
 		else
-			return Objects.toString((this.<AbstractGenericComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
+			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
 	}
 
 	@Override
