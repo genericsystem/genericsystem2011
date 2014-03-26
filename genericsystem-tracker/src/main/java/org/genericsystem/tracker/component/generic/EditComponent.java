@@ -1,14 +1,12 @@
 package org.genericsystem.tracker.component.generic;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot.Filter;
-import org.genericsystem.core.Snapshot.Projector;
+import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.generic.AbstractCollectableGenericChildrenComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -17,7 +15,7 @@ import org.genericsystem.tracker.InstanceRow;
 import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
-public class EditComponent extends AbstractGenericComponent {
+public class EditComponent extends AbstractCollectableGenericChildrenComponent {
 
 	private String newValue;
 
@@ -30,34 +28,22 @@ public class EditComponent extends AbstractGenericComponent {
 		initChildren();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<RowComponent> initChildren() {
+	public <T extends Generic> Snapshot<T> getGenerics() {
+		return (Snapshot<T>) ((Type) getGeneric()).getAttributes();
+	}
 
-		return ((Type) getGeneric()).getAttributes().filter(new Filter<Attribute>() {
-			@Override
-			public boolean isSelected(Attribute candidate) {
-				Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
-				return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
-			}
-		}).project(new Projector<RowComponent, Attribute>() {
-			private final Map<Attribute, RowComponent> map = new HashMap<Attribute, RowComponent>() {
-				private static final long serialVersionUID = -1162281462201347017L;
+	@Override
+	public <T extends Generic> boolean isSelected(T candidate) {
+		Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
+		return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
+	}
 
-				@Override
-				public RowComponent get(Object key) {
-					RowComponent result = super.get(key);
-					if (result == null)
-						put((Attribute) key, result = new RowComponent(EditComponent.this, (Attribute) key));
-					return result;
-				}
-			};
-
-			@Override
-			public RowComponent project(Attribute attribute) {
-				return map.get(attribute);
-			}
-		});
-
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
+		return (T) new RowComponent(EditComponent.this, generic);
 	}
 
 	public String getInstanceName() {
@@ -94,6 +80,14 @@ public class EditComponent extends AbstractGenericComponent {
 
 	public String updateMsg() {
 		return "update";
+	}
+
+	@Override
+	public String getColumnTitleAttribute() {
+		if (!isRelation())
+			return Objects.toString(getGeneric());
+		else
+			return Objects.toString((this.<AbstractGenericComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
 	}
 
 	@Override
