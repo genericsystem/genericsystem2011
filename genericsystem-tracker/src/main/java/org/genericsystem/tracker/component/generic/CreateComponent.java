@@ -15,12 +15,9 @@ import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
 public class CreateComponent extends AbstractCollectableGenericChildrenComponent {
-	// extends AbstractGenericComponent
 	private static final String DATE_PATTERN = "(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)";
 
 	private String newValue;
-
-	private String error;
 
 	public CreateComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
@@ -44,36 +41,6 @@ public class CreateComponent extends AbstractCollectableGenericChildrenComponent
 	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
 		return (T) new RowComponent(CreateComponent.this, generic);
 	}
-
-	// @Override
-	// public List<RowComponent> initChildren() {
-	//
-	// return ((Type) getGeneric()).getAttributes().filter(new Filter<Attribute>() {
-	// @Override
-	// public boolean isSelected(Attribute candidate) {
-	// Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
-	// return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
-	// }
-	// }).project(new Projector<RowComponent, Attribute>() {
-	// private final Map<Attribute, RowComponent> map = new HashMap<Attribute, RowComponent>() {
-	// private static final long serialVersionUID = -1162281462201347017L;
-	//
-	// @Override
-	// public RowComponent get(Object key) {
-	// RowComponent result = super.get(key);
-	// if (result == null)
-	// put((Attribute) key, result = new RowComponent(CreateComponent.this, (Attribute) key));
-	// return result;
-	// }
-	// };
-	//
-	// @Override
-	// public RowComponent project(Attribute attribute) {
-	// return map.get(attribute);
-	// }
-	// });
-	//
-	// }
 
 	public void create() {
 		Generic newInstance = ((Type) generic).setInstance(newValue);

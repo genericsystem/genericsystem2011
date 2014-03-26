@@ -6,6 +6,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.ValuedComponent;
 import org.genericsystem.framework.component.generic.AbstractCollectableGenericChildrenComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.generic.Attribute;
@@ -15,8 +16,7 @@ import org.genericsystem.tracker.InstanceRow;
 import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
-public class TypeComponent extends AbstractCollectableGenericChildrenComponent {
-	// extends AbstractGenericComponent
+public class TypeComponent extends AbstractCollectableGenericChildrenComponent implements ValuedComponent {
 	private String newValue;
 	private AbstractGenericComponent child;
 
@@ -26,6 +26,7 @@ public class TypeComponent extends AbstractCollectableGenericChildrenComponent {
 
 	}
 
+	@Override
 	public String getNewValue() {
 		return newValue;
 	}
@@ -51,34 +52,6 @@ public class TypeComponent extends AbstractCollectableGenericChildrenComponent {
 	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
 		return (T) new AttributeComponent(TypeComponent.this, generic);
 	}
-
-	// @Override
-	// public List<AttributeComponent> initChildren() {
-	// return ((Type) getGeneric()).getAttributes().filter(new Filter<Attribute>() {
-	// @Override
-	// public boolean isSelected(Attribute candidate) {
-	// Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
-	// return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
-	// }
-	// }).project(new Projector<AttributeComponent, Attribute>() {
-	// private final Map<Attribute, AttributeComponent> map = new HashMap<Attribute, AttributeComponent>() {
-	// private static final long serialVersionUID = -1162281462201347017L;
-	//
-	// @Override
-	// public AttributeComponent get(Object key) {
-	// AttributeComponent result = super.get(key);
-	// if (result == null)
-	// put((Attribute) key, result = new AttributeComponent(TypeComponent.this, (Attribute) key));
-	// return result;
-	// }
-	// };
-	//
-	// @Override
-	// public AttributeComponent project(Attribute attribute) {
-	// return map.get(attribute);
-	// }
-	// });
-	// }
 
 	public String add() {
 		Generic instance = ((Type) getGeneric()).setInstance(newValue);

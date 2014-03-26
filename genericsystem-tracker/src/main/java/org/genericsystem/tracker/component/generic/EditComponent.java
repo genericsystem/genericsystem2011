@@ -45,36 +45,6 @@ public class EditComponent extends AbstractCollectableGenericChildrenComponent {
 		return (T) new RowComponent(EditComponent.this, generic);
 	}
 
-	// @Override
-	// public List<RowComponent> initChildren() {
-	//
-	// return ((Type) getGeneric()).getAttributes().filter(new Filter<Attribute>() {
-	// @Override
-	// public boolean isSelected(Attribute candidate) {
-	// Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
-	// return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
-	// }
-	// }).project(new Projector<RowComponent, Attribute>() {
-	// private final Map<Attribute, RowComponent> map = new HashMap<Attribute, RowComponent>() {
-	// private static final long serialVersionUID = -1162281462201347017L;
-	//
-	// @Override
-	// public RowComponent get(Object key) {
-	// RowComponent result = super.get(key);
-	// if (result == null)
-	// put((Attribute) key, result = new RowComponent(EditComponent.this, (Attribute) key));
-	// return result;
-	// }
-	// };
-	//
-	// @Override
-	// public RowComponent project(Attribute attribute) {
-	// return map.get(attribute);
-	// }
-	// });
-	//
-	// }
-
 	public String getInstanceName() {
 		return Objects.toString(getGeneric().toString());
 	}
