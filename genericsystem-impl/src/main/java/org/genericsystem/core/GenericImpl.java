@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.annotation.SystemGeneric;
@@ -71,7 +72,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Nicolas Feybesse
  * @author Michael Ory
- *
+ * 
  */
 @SuppressWarnings("unchecked")
 public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute {
@@ -934,7 +935,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		project(Statics.MULTIDIRECTIONAL);
 	}
 
-	private void project(final int pos) {
+	public void project(final int pos) {
 		Iterator<Generic[]> cartesianIterator = new CartesianIterator<>(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final UnsafeComponents components = new UnsafeComponents(cartesianIterator.next());
@@ -945,7 +946,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				}
 			});
 			if (projection == null)
-				getReplacedComponentsBuilder(components).bind(null, true, true);
+				getReplacedComponentsBuilder(components).bind(null, false, true);
 		}
 	}
 
@@ -1196,6 +1197,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public String info() {
 		String s = "\n******************************" + System.identityHashCode(this) + "******************************\n";
 		s += " Name        : " + toString() + "\n";
+		s += " HomeTreeNode: " + homeTreeNode() + "\n";
 		s += " Meta        : " + getMeta() + " (" + System.identityHashCode(getMeta()) + ")\n";
 		s += " MetaLevel   : " + Statics.getMetaLevelString(getMetaLevel()) + "\n";
 		s += " Category    : " + getCategoryString() + "\n";
@@ -2027,8 +2029,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new GenericBuilder(newHomeTreeNode, getSupers(), selfToNullComponents(), false);
 	}
 
+	// TODO remove strictSupers
 	GenericBuilder createNewBuilder(Serializable value, Generic[] supers, Generic[] strictSupers, Generic[] components) {
 		return new GenericBuilder(bindInstanceNode(value), new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components), true);
+	}
+
+	GenericBuilder createNewBuilder(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
+		return new GenericBuilder(homeTreeNode, new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components), true);
 	}
 
 	GenericBuilder getInsertedComponentVertex(Generic newComponent, int pos) {
