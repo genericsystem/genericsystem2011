@@ -1,20 +1,17 @@
 package org.genericsystem.tracker.component;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot.Filter;
-import org.genericsystem.core.Snapshot.Projector;
-import org.genericsystem.generic.Type;
+import org.genericsystem.core.Snapshot;
+import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
+import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.tracker.component.generic.CommandButtonComponent;
 import org.genericsystem.tracker.component.generic.TypeComponent;
 import org.genericsystem.tracker.structure.Types;
 import org.genericsystem.tracker.structure.Types.Issues;
 
-public class PanelGridComponent extends AbstractComponent {
+public class PanelGridComponent extends AbstractCollectableChildrenComponent {
 
 	private AbstractComponent child;
 
@@ -23,36 +20,26 @@ public class PanelGridComponent extends AbstractComponent {
 		selectDefaultComponent();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<? extends AbstractComponent> initChildren() {
-		return getCache().getAllTypes().filter(new Filter<Type>() {
-			public boolean isSelected(Type candidate) {
-				Serializable value = candidate.getValue();
-				if (!value.getClass().isAssignableFrom(Class.class))
-					return false;
-				@SuppressWarnings("unchecked")
-				Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
-				return clazz != null && Types.class.equals(clazz);
-			}
-		}).project(new Projector<AbstractComponent, Type>() {
-			private final Map<Generic, AbstractComponent> map = new HashMap<Generic, AbstractComponent>() {
+	public <T extends Generic> Snapshot<T> getGenerics() {
+		return (Snapshot<T>) getCache().getAllTypes();
+	}
 
-				private static final long serialVersionUID = -7927996818181180784L;
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U key) {
+		return (T) new CommandButtonComponent(PanelGridComponent.this, key);
+	}
 
-				@Override
-				public CommandButtonComponent get(Object key) {
-					CommandButtonComponent result = (CommandButtonComponent) super.get(key);
-					if (result == null)
-						put((Generic) key, result = new CommandButtonComponent(PanelGridComponent.this, (Type) key));
-					return result;
-				}
-			};
-
-			@Override
-			public CommandButtonComponent project(Type element) {
-				return (CommandButtonComponent) map.get(element);
-			}
-		});
+	@Override
+	public <T extends Generic> boolean isSelected(T candidate) {
+		Serializable value = candidate.getValue();
+		if (!value.getClass().isAssignableFrom(Class.class))
+			return false;
+		@SuppressWarnings("unchecked")
+		Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
+		return clazz != null && Types.class.equals(clazz);
 	}
 
 	private void selectDefaultComponent() {
@@ -73,5 +60,4 @@ public class PanelGridComponent extends AbstractComponent {
 	public String getXhtmlPath() {
 		return "/pages/panelGrid.xhtml";
 	}
-
 }

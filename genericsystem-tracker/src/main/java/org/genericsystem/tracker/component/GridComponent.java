@@ -1,58 +1,44 @@
 package org.genericsystem.tracker.component;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot.Filter;
-import org.genericsystem.core.Snapshot.Projector;
-import org.genericsystem.generic.Type;
+import org.genericsystem.core.Snapshot;
+import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
+import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.tracker.component.generic.TypeComponent;
 import org.genericsystem.tracker.structure.Types;
 
-public class GridComponent extends AbstractComponent {
+public class GridComponent extends AbstractCollectableChildrenComponent {
 
 	public GridComponent(AbstractComponent parent) {
 		super(parent);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<? extends AbstractComponent> initChildren() {
-		return getCache().getAllTypes().filter(new Filter<Type>() {
-			public boolean isSelected(Type candidate) {
-				Serializable value = candidate.getValue();
-				if (!value.getClass().isAssignableFrom(Class.class))
-					return false;
-				@SuppressWarnings("unchecked")
-				Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
-				return clazz != null && Types.class.equals(clazz);
-			}
-		}).project(new Projector<AbstractComponent, Type>() {
-			private final Map<Generic, AbstractComponent> map = new HashMap<Generic, AbstractComponent>() {
+	public <T extends Generic> Snapshot<T> getGenerics() {
+		return (Snapshot<T>) getCache().getAllTypes();
+	}
 
-				private static final long serialVersionUID = -7927996818181180784L;
+	@Override
+	public <T extends Generic> boolean isSelected(T candidate) {
+		Serializable value = candidate.getValue();
+		if (!value.getClass().isAssignableFrom(Class.class))
+			return false;
+		@SuppressWarnings("unchecked")
+		Class<?> clazz = ((Class<? extends Serializable>) value).getEnclosingClass();
+		return clazz != null && Types.class.equals(clazz);
+	}
 
-				@Override
-				public TypeComponent get(Object key) {
-					TypeComponent result = (TypeComponent) super.get(key);
-					if (result == null)
-						put((Generic) key, result = new TypeComponent(GridComponent.this, (Type) key));
-					return result;
-				}
-			};
-
-			@Override
-			public TypeComponent project(Type element) {
-				return (TypeComponent) map.get(element);
-			}
-		});
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U key) {
+		return (T) new TypeComponent(GridComponent.this, key);
 	}
 
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/grid.xhtml";
 	}
-
 }

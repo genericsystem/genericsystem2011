@@ -1,21 +1,13 @@
 package org.genericsystem.framework.component;
 
-import java.util.List;
-
 import org.genericsystem.core.Generic;
 
-public abstract class AbstractSelectorComponent extends AbstractComponent {
-
+public abstract class AbstractSelectorComponent extends AbstractCollectableChildrenComponent {
 	private AbstractComponent child;
 
 	public AbstractSelectorComponent(AbstractComponent rootComponent) {
 		super(rootComponent);
 		selectDefaultComponent();
-	}
-
-	@Override
-	public List<? extends AbstractComponent> initChildren() {
-		return getGenerics().filter(new FilterGeneric<Generic>()).project(new ProjectorGeneric<AbstractComponent, Generic>());
 	}
 
 	public abstract void selectDefaultComponent();

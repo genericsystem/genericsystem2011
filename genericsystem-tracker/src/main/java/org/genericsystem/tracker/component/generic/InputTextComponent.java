@@ -5,9 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 import org.genericsystem.core.Generic;
+import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.tracker.annotation.DateFormat;
-import org.genericsystem.tracker.component.AbstractComponent;
 
 public class InputTextComponent extends AbstractGenericComponent {
 
@@ -22,6 +23,7 @@ public class InputTextComponent extends AbstractGenericComponent {
 		setValue(Objects.toString(this.<AbstractGenericComponent> getParent().getGeneric().getValue((Attribute) getGeneric())));
 	}
 
+	// TODO validator removed because of static generalized validator for all fields - bad implementation
 	public String getValidatorId() {
 		return getGeneric().getClass().getAnnotation(DateFormat.class) != null ? "dateValidator" : "";
 	}
@@ -30,14 +32,11 @@ public class InputTextComponent extends AbstractGenericComponent {
 		return getGeneric().getClass().getAnnotation(DateFormat.class) != null;
 	}
 
+	// ENDTODO
+
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
 		return Collections.emptyList();
-	}
-
-	@Override
-	public String getXhtmlPath() {
-		return "inputText.xhtml";
 	}
 
 	public String getValue() {
@@ -48,4 +47,8 @@ public class InputTextComponent extends AbstractGenericComponent {
 		this.value = value;
 	}
 
+	@Override
+	public String getXhtmlPath() {
+		return "inputText.xhtml";
+	}
 }

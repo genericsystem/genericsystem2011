@@ -4,7 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.tracker.component.AbstractComponent;
+import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.tracker.component.PanelGridComponent;
 
 public class CommandButtonComponent extends AbstractGenericComponent {

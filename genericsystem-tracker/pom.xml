@@ -116,7 +116,7 @@
 	</dependencyManagement>
 
 	<build>
-		<finalName>gstracker</finalName>
+		<finalName>genericsystem-tracker</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.jboss.as.plugins</groupId>
