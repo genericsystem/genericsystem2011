@@ -1,87 +1,67 @@
 package org.genericsystem.tracker.component.generic;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot;
-import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
+import org.genericsystem.core.Snapshot.Filter;
+import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.ValuedComponent;
-import org.genericsystem.framework.component.generic.GenericComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
-public class CreateComponent extends AbstractCollectableChildrenComponent implements GenericComponent, ValuedComponent {
-	// AbstractGenericComponent
+public class CreateComponent extends AbstractGenericComponent {
+
 	private static final String DATE_PATTERN = "(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)";
 
 	private String newValue;
-	private final Generic generic;
 
 	private String error;
 
 	public CreateComponent(AbstractComponent parent, Generic generic) {
-		super(parent);
-		this.generic = generic;
+		super(parent, generic);
 		initChildren();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Generic> Snapshot<T> getGenerics() {
-		return (Snapshot<T>) ((Type) getGeneric()).getAttributes();
+	public List<RowComponent> initChildren() {
+
+		return ((Type) getGeneric()).getAttributes().filter(new Filter<Attribute>() {
+			@Override
+			public boolean isSelected(Attribute candidate) {
+				Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
+				return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
+			}
+		}).project(new Projector<RowComponent, Attribute>() {
+			private final Map<Attribute, RowComponent> map = new HashMap<Attribute, RowComponent>() {
+				private static final long serialVersionUID = -1162281462201347017L;
+
+				@Override
+				public RowComponent get(Object key) {
+					RowComponent result = super.get(key);
+					if (result == null)
+						put((Attribute) key, result = new RowComponent(CreateComponent.this, (Attribute) key));
+					return result;
+				}
+			};
+
+			@Override
+			public RowComponent project(Attribute attribute) {
+				return map.get(attribute);
+			}
+		});
+
 	}
 
-	@Override
-	public <T extends Generic> boolean isSelected(T candidate) {
-		Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
-		return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
-		return (T) new RowComponent(CreateComponent.this, generic);
-	}
-
-	// @Override
-	// public List<RowComponent> initChildren() {
-	//
-	// return ((Type) getGeneric()).getAttributes().filter(new Filter<Attribute>() {
-	// @Override
-	// public boolean isSelected(Attribute candidate) {
-	// Class<?> clazz = candidate.<Class<?>> getValue().getEnclosingClass();
-	// return clazz != null && (Attributes.class.equals(clazz) || Relations.class.equals(clazz));
-	// }
-	// }).project(new Projector<RowComponent, Attribute>() {
-	// private final Map<Attribute, RowComponent> map = new HashMap<Attribute, RowComponent>() {
-	// private static final long serialVersionUID = -1162281462201347017L;
-	//
-	// @Override
-	// public RowComponent get(Object key) {
-	// RowComponent result = super.get(key);
-	// if (result == null)
-	// put((Attribute) key, result = new RowComponent(CreateComponent.this, (Attribute) key));
-	// return result;
-	// }
-	// };
-	//
-	// @Override
-	// public RowComponent project(Attribute attribute) {
-	// return map.get(attribute);
-	// }
-	// });
-	//
-	// }
-
-	@Override
 	public String getNewValue() {
-		return this.newValue;
+		return newValue;
 	}
 
 	public void setNewValue(String newValue) {
@@ -113,6 +93,7 @@ public class CreateComponent extends AbstractCollectableChildrenComponent implem
 		return (m.matches());
 	}
 
+	@Override
 	public boolean isRelation() {
 		return getGeneric().isRelation();
 	}
@@ -124,10 +105,5 @@ public class CreateComponent extends AbstractCollectableChildrenComponent implem
 	@Override
 	public String getXhtmlPath() {
 		return "create.xhtml";
-	}
-
-	@Override
-	public Generic getGeneric() {
-		return generic;
 	}
 }
