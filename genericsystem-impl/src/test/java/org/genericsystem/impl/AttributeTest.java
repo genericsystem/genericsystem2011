@@ -194,10 +194,10 @@ public class AttributeTest extends AbstractTest {
 		assert p333.inheritsFrom(p213) : p333.info();
 		assert !p333.inheritsFrom(p214) : p333.info();
 
-		assert vehiclePower.getAllInstances().size() == 3 : vehiclePower.getAllInstances();
-		assert vehiclePower.getAllInstances().contains(p213);
-		assert vehiclePower.getAllInstances().contains(p214);
-		assert vehiclePower.getAllInstances().contains(p333);
+		assert vehiclePower.getInstances().size() == 3 : vehiclePower.getInstances();
+		assert vehiclePower.getInstances().contains(p213);
+		assert vehiclePower.getInstances().contains(p214);
+		assert vehiclePower.getInstances().contains(p333);
 
 		assert vehicle.getHolders(vehiclePower).size() == 2;
 		assert vehicle.getHolders(vehiclePower).contains(p213);
