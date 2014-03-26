@@ -2,9 +2,9 @@ package org.genericsystem.framework.component.generic;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.interfaces.IValuedComponent;
+import org.genericsystem.framework.component.ValuedComponent;
 
-public abstract class AbstractValuedGenericComponent extends AbstractGenericComponent implements IValuedComponent {
+public abstract class AbstractValuedGenericComponent extends AbstractGenericComponent implements ValuedComponent {
 	protected String newValue;
 
 	public AbstractValuedGenericComponent(AbstractComponent parent, Generic generic) {

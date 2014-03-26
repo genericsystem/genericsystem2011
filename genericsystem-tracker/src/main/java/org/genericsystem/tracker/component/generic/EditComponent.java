@@ -6,8 +6,8 @@ import java.util.Objects;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.generic.AbstractCollectableGenericChildrenComponent;
-import org.genericsystem.framework.component.generic.AbstractGenericComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericCollectableChildrenComponent;
+import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -15,7 +15,7 @@ import org.genericsystem.tracker.InstanceRow;
 import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
-public class EditComponent extends AbstractCollectableGenericChildrenComponent {
+public class EditComponent extends AbstractGenericCollectableChildrenComponent {
 
 	private String newValue;
 
@@ -73,7 +73,6 @@ public class EditComponent extends AbstractCollectableGenericChildrenComponent {
 		}
 	}
 
-	@Override
 	public boolean isRelation() {
 		return getGeneric().isRelation();
 	}
@@ -82,12 +81,11 @@ public class EditComponent extends AbstractCollectableGenericChildrenComponent {
 		return "update";
 	}
 
-	@Override
 	public String getColumnTitleAttribute() {
 		if (!isRelation())
 			return Objects.toString(getGeneric());
 		else
-			return Objects.toString((this.<AbstractGenericComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
+			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
 	}
 
 	@Override

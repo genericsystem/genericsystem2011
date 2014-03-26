@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.generic.AbstractCollectableGenericChildrenComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericCollectableChildrenComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -16,7 +16,7 @@ import org.genericsystem.generic.Type;
 import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
-public class CreateComponent extends AbstractCollectableGenericChildrenComponent {
+public class CreateComponent extends AbstractGenericCollectableChildrenComponent {
 	private static final String DATE_PATTERN = "(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)";
 
 	private String newValue;
@@ -69,7 +69,6 @@ public class CreateComponent extends AbstractCollectableGenericChildrenComponent
 		return (m.matches());
 	}
 
-	@Override
 	public boolean isRelation() {
 		return getGeneric().isRelation();
 	}
@@ -86,7 +85,6 @@ public class CreateComponent extends AbstractCollectableGenericChildrenComponent
 		this.newValue = newValue;
 	}
 
-	@Override
 	public String getColumnTitleAttribute() {
 		if (!isRelation())
 			return Objects.toString(getGeneric());

@@ -9,15 +9,15 @@ import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.InstanceRow;
 import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.interfaces.IGenericComponent;
-import org.genericsystem.framework.component.interfaces.IValuedComponent;
+import org.genericsystem.framework.component.ValuedComponent;
+import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.jsf.example.structure.Attributes;
 import org.genericsystem.jsf.example.structure.Relations;
 
-public class TypeComponent extends AbstractCollectableChildrenComponent implements IGenericComponent, IValuedComponent {
+public class TypeComponent extends AbstractCollectableChildrenComponent implements GenericComponent, ValuedComponent {
 
 	private String newValue;
 	private final Generic generic;
