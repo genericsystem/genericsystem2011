@@ -28,18 +28,4 @@ public abstract class AbstractGenericComponent extends AbstractComponent impleme
 	public String toString() {
 		return Objects.toString(generic);
 	}
-
-	public abstract String getColumnTitleAttribute();
-
-	// public String getColumnTitleAttribute() {
-	// if (!isRelation())
-	// return Objects.toString(getGeneric());
-	// else
-	// return Objects.toString((this.<AbstractGenericComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
-	// }
-
-	public boolean isRelation() {
-		return getGeneric().isRelation();
-	}
-
 }

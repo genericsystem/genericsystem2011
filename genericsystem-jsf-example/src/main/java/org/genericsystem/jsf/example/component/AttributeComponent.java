@@ -23,9 +23,8 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		return Collections.emptyList();
 	}
 
-	@Override
 	public String getColumnTitleAttribute() {
-		if (!isRelation())
+		if (!getGeneric().isRelation())
 			return Objects.toString(getGeneric());
 		else
 			return Objects.toString((this.<TypeComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
@@ -39,11 +38,6 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 				return new InstanceRow(instance);
 			}
 		});
-	}
-
-	@Override
-	public boolean isRelation() {
-		return getGeneric().isRelation();
 	}
 
 	@Override

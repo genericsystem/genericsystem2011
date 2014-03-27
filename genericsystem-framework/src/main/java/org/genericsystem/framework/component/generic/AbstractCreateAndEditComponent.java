@@ -4,9 +4,10 @@ import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.ValuedComponent;
 import org.genericsystem.generic.Attribute;
 
-public abstract class AbstractCreateAndEditComponent extends AbstractGenericCollectableChildrenComponent {
+public abstract class AbstractCreateAndEditComponent extends AbstractGenericCollectableChildrenComponent implements ValuedComponent {
 	protected MODE mode = MODE.CREATION;
 	protected String newValue;
 
@@ -25,6 +26,7 @@ public abstract class AbstractCreateAndEditComponent extends AbstractGenericColl
 
 	public abstract void execute();
 
+	@Override
 	public String getNewValue() {
 		switch (mode) {
 		case EDITION:
