@@ -71,11 +71,11 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 	}
 
 	public void setEdit(InstanceRow instanceRow) {
-		child = new EditComponent(this, instanceRow);
+		child = new CreateAndEditComponent(this, instanceRow);
 	}
 
 	public void setCreate() {
-		child = new CreateComponent(this, generic);
+		child = new CreateAndEditComponent(this, generic);
 	}
 
 	public void remove(InstanceRow instanceRow) {
