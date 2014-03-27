@@ -7,6 +7,7 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.generic.AbstractCreateAndEditComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -19,8 +20,7 @@ public class CreateAndEditComponent extends AbstractCreateAndEditComponent {
 	private String title;
 
 	public CreateAndEditComponent(AbstractComponent parent, Generic generic, MODE mode) {
-		super(parent, generic);
-		setMode(mode);
+		super(parent, generic, mode);
 		if (mode.equals(MODE.CREATION))
 			title = "add";
 		else {
@@ -46,64 +46,55 @@ public class CreateAndEditComponent extends AbstractCreateAndEditComponent {
 	}
 
 	@Override
-	public void create() {
-		Generic newInstance = ((Type) generic).setInstance(newValue);
-		for (RowComponent row : this.<RowComponent> getChildren()) {
-			List<AbstractComponent> rows = row.getChildren();
-			for (int i = 0; i < rows.size(); i++) {
-				Attribute attribute = (Attribute) ((OutputTextComponent) rows.get(i)).getGeneric();
-				AbstractComponent abstractComponent = rows.get(++i);
-				if (abstractComponent instanceof InputTextComponent) {
-					String value = ((InputTextComponent) abstractComponent).getValue();
-					newInstance.setValue(attribute, value);
-				} else if (abstractComponent instanceof SelectItemComponent) {
-					String value = ((SelectItemComponent) abstractComponent).getValue();
-					Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) abstractComponent).getGeneric()).get(0)).getInstance(value);
-					newInstance.bind((Relation) attribute, instance);
+	public void execute() {
+		List<RowComponent> list = getChildren();
+		if (this.mode.equals(MODE.CREATION)) {
+			Generic newInstance = ((Type) generic).setInstance(newValue);
+			for (RowComponent row : list) {
+				List<AbstractComponent> rows = row.getChildren();
+				for (int i = 0; i < rows.size(); i++) {
+					Attribute attribute = (Attribute) ((OutputTextComponent) rows.get(i)).getGeneric();
+					AbstractComponent abstractComponent = rows.get(++i);
+					create(newInstance, abstractComponent, attribute);
 				}
+				setNewValue(newValue);
 			}
+		} else {
+			setGeneric(getGeneric().setValue(newValue));
+			for (RowComponent row : list) {
+				edit(row);
+			}
+			setNewValue(Objects.toString(getGeneric().toString()));
 		}
-		setNewValue(newValue);
 	}
 
 	@Override
-	public void modify() {
-		if (!getInstanceName().equals(newValue))
-			setGeneric(getGeneric().setValue(newValue));
-
-		List<RowComponent> list = getChildren();
-
-		for (RowComponent row : list) {
-			List<AbstractComponent> listSelectItem = row.<AbstractComponent> getChildren();
-			for (AbstractComponent selectItem : listSelectItem) {
-				if (selectItem instanceof SelectItemComponent) {
-					Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) selectItem).getGeneric()).get(0)).getInstance(((SelectItemComponent) selectItem).getValue());
-					getGeneric().bind((Relation) ((SelectItemComponent) selectItem).getGeneric(), instance);
-				} else if (selectItem instanceof InputTextComponent) {
-					getGeneric().setValue((Attribute) ((InputTextComponent) selectItem).getGeneric(), (((InputTextComponent) selectItem).getValue()).toString());
-				}
-			}
+	public void create(Generic newInstance, AbstractComponent abstractComponent, Attribute attribute) {
+		if (abstractComponent instanceof InputTextComponent) {
+			String value = ((InputTextComponent) abstractComponent).getValue();
+			newInstance.setValue(attribute, value);
+		} else if (abstractComponent instanceof SelectItemComponent) {
+			String value = ((SelectItemComponent) abstractComponent).getValue();
+			Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) abstractComponent).getGeneric()).get(0)).getInstance(value);
+			newInstance.bind((Relation) attribute, instance);
 		}
-		setNewValue(Objects.toString(getGeneric().toString()));
 	}
 
-	public void exec() {
-		if (getMode().equals(MODE.CREATION))
-			create();
-		else
-			modify();
+	@Override
+	public void edit(AbstractGenericComponent listItem) {
+		for (AbstractComponent selectItem : listItem.getChildren()) {
+			if (selectItem instanceof SelectItemComponent) {
+				Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) selectItem).getGeneric()).get(0)).getInstance(((SelectItemComponent) selectItem).getValue());
+				getGeneric().bind((Relation) ((SelectItemComponent) selectItem).getGeneric(), instance);
+			} else if (selectItem instanceof InputTextComponent) {
+				getGeneric().setValue((Attribute) ((InputTextComponent) selectItem).getGeneric(), (((InputTextComponent) selectItem).getValue()).toString());
+			}
+		}
 	}
 
 	public boolean isRelation() {
 		return getGeneric().isRelation();
 	}
-
-	// DATE
-	// public boolean validateDate(String date) {
-	// Pattern p = Pattern.compile(DATE_PATTERN);
-	// Matcher m = p.matcher(date);
-	// return (m.matches());
-	// }
 
 	public String getColumnTitleAttribute() {
 		if (!isRelation())

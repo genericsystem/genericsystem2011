@@ -4,49 +4,39 @@ import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.generic.Attribute;
 
 public abstract class AbstractCreateAndEditComponent extends AbstractGenericCollectableChildrenComponent {
-	private MODE mode = MODE.CREATION;
+	protected MODE mode = MODE.CREATION;
 	protected String newValue;
 
 	public static enum MODE {
 		CREATION, EDITION
 	};
 
-	public AbstractCreateAndEditComponent(AbstractComponent parent, Generic generic) {
-		super(parent, generic);
-	}
-
 	public AbstractCreateAndEditComponent(AbstractComponent parent, Generic generic, MODE mode) {
 		super(parent, generic);
 		this.mode = mode;
 	}
 
-	public abstract void create();
+	public abstract void create(Generic generic, AbstractComponent abstractComponent, Attribute attribute);
 
-	public abstract void modify();
+	public abstract void edit(AbstractGenericComponent listItem);
 
-	public MODE getMode() {
-		return mode;
-	}
-
-	public void setMode(MODE mode) {
-		this.mode = mode;
-	}
+	public abstract void execute();
 
 	public String getNewValue() {
-		return getMode().equals(MODE.CREATION) ? newValue : Objects.toString(getGeneric().toString());
+		switch (mode) {
+		case EDITION:
+			return Objects.toString(getGeneric());
+		case CREATION:
+			return newValue;
+		default:
+			throw new IllegalStateException();
+		}
 	}
 
 	public void setNewValue(String newValue) {
 		this.newValue = newValue;
-	}
-
-	public String getInstanceName() {
-		return Objects.toString(getGeneric().toString());
-	}
-
-	public void setInstanceName(String name) {
-		newValue = name;
 	}
 }
