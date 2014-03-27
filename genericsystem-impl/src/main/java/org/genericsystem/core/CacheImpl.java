@@ -340,7 +340,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T addType(Serializable name, Type[] supers, Generic... components) {
-		return ((GenericImpl) getEngine()).createNewBuilder(name, supers, supers, components).bind(null, true, false);
+		return ((GenericImpl) getEngine()).createNewBuilder(name, supers, components).bind(null, true, false);
 	}
 
 	@Override
@@ -350,7 +350,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 
 	@Override
 	public <T extends Type> T setType(Serializable name, Type[] supers, Generic... components) {
-		return ((GenericImpl) getEngine()).createNewBuilder(name, supers, supers, components).bind(null, false, false);
+		return ((GenericImpl) getEngine()).createNewBuilder(name, supers, components).bind(null, false, false);
 	}
 
 	@Override
@@ -374,7 +374,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private <T extends Tree> T internalSetTree(Serializable name, int dim, boolean existsException) {
-		return ((GenericImpl) getEngine()).createNewBuilder(name, new Generic[] { getEngine() }, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).<GenericImpl> bind(TreeImpl.class, existsException, false).disableInheritance();
+		return ((GenericImpl) getEngine()).createNewBuilder(name, new Generic[] { getEngine() }, new Generic[dim]).<GenericImpl> bind(TreeImpl.class, existsException, false).disableInheritance();
 	}
 
 	@Override
@@ -402,13 +402,13 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : userSupers)
 			assert generic.isMeta() || (meta.getMetaLevel() + 1 == generic.getMetaLevel()) : clazz + generic.info();
 
-		return meta.createNewBuilder(value, Statics.insertFirst(meta, userSupers), userSupers, components).bind(clazz, false, false);
+		return meta.createNewBuilder(value, Statics.insertFirst(meta, userSupers), components).bind(clazz, false, false);
 	}
 
-	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, Generic[] strictSupers, boolean existsException, int axe, Generic... components) {
+	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, boolean existsException, int axe, Generic... components) {
 		Generic[] sortAndCheck = ((GenericImpl) directSuper).sortAndCheck(components);
 		// TODO te refactor ?
-		return ((GenericImpl) meta).createNewBuilder(value, new Generic[] { directSuper }, strictSupers, sortAndCheck).bind(specializationClass, existsException, false);
+		return ((GenericImpl) meta).createNewBuilder(value, new Generic[] { directSuper }, sortAndCheck).bind(specializationClass, existsException, false);
 	}
 
 	private GenericImpl getMeta(Class<?> clazz, Generic[] components) {
