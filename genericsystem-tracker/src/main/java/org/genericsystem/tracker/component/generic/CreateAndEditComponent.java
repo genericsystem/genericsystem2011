@@ -11,7 +11,6 @@ import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
-import org.genericsystem.tracker.InstanceRow;
 import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
@@ -19,17 +18,15 @@ import org.genericsystem.tracker.structure.Relations;
 public class CreateAndEditComponent extends AbstractCreateAndEditComponent {
 	private String title;
 
-	public CreateAndEditComponent(AbstractComponent parent, Generic generic) {
+	public CreateAndEditComponent(AbstractComponent parent, Generic generic, MODE mode) {
 		super(parent, generic);
-		initChildren();
-		setTitle("add");
-	}
-
-	public CreateAndEditComponent(TypeComponent typeComponent, InstanceRow instanceRow) {
-		this(typeComponent, instanceRow.getInstance());
-		setMode(MODE.EDITION);
-		setTitle("update");
-		setNewValue(Objects.toString(getGeneric().toString()));
+		setMode(mode);
+		if (mode.equals(MODE.CREATION))
+			title = "add";
+		else {
+			title = "update";
+			setNewValue(Objects.toString(getGeneric()));
+		}
 	}
 
 	@Override

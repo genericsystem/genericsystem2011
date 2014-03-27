@@ -9,7 +9,7 @@ public abstract class AbstractCreateAndEditComponent extends AbstractGenericColl
 	private MODE mode = MODE.CREATION;
 	protected String newValue;
 
-	protected static enum MODE {
+	public static enum MODE {
 		CREATION, EDITION
 	};
 
