@@ -6,7 +6,8 @@ import java.util.Objects;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.generic.AbstractCreateAndEditComponent;
+import org.genericsystem.framework.component.ValuedComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericCollectableChildrenComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
@@ -16,16 +17,23 @@ import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
 @SuppressWarnings("unchecked")
-public class CreateAndEditComponent extends AbstractCreateAndEditComponent {
+public class CreateAndEditComponent extends AbstractGenericCollectableChildrenComponent implements ValuedComponent {
 	private String title;
+	private final MODE mode;
+	private String newValue;
+
+	public static enum MODE {
+		CREATION, EDITION
+	};
 
 	public CreateAndEditComponent(AbstractComponent parent, Generic generic, MODE mode) {
-		super(parent, generic, mode);
+		super(parent, generic);
+		this.mode = mode;
 		if (mode.equals(MODE.CREATION))
 			title = "add";
 		else {
 			title = "update";
-			setNewValue(Objects.toString(getGeneric()));
+			newValue = Objects.toString(getGeneric());
 		}
 	}
 
@@ -45,7 +53,6 @@ public class CreateAndEditComponent extends AbstractCreateAndEditComponent {
 		return (T) new RowComponent(CreateAndEditComponent.this, generic);
 	}
 
-	@Override
 	public void execute() {
 		List<RowComponent> list = getChildren();
 		if (this.mode.equals(MODE.CREATION)) {
@@ -57,18 +64,16 @@ public class CreateAndEditComponent extends AbstractCreateAndEditComponent {
 					AbstractComponent abstractComponent = rows.get(++i);
 					create(newInstance, abstractComponent, attribute);
 				}
-				setNewValue(newValue);
 			}
 		} else {
 			setGeneric(getGeneric().setValue(newValue));
 			for (RowComponent row : list) {
 				edit(row);
 			}
-			setNewValue(Objects.toString(getGeneric().toString()));
+			newValue = Objects.toString(getGeneric().toString());
 		}
 	}
 
-	@Override
 	public void create(Generic newInstance, AbstractComponent abstractComponent, Attribute attribute) {
 		if (abstractComponent instanceof InputTextComponent) {
 			String value = ((InputTextComponent) abstractComponent).getValue();
@@ -80,7 +85,6 @@ public class CreateAndEditComponent extends AbstractCreateAndEditComponent {
 		}
 	}
 
-	@Override
 	public void edit(AbstractGenericComponent listItem) {
 		for (AbstractComponent selectItem : listItem.getChildren()) {
 			if (selectItem instanceof SelectItemComponent) {
@@ -105,6 +109,22 @@ public class CreateAndEditComponent extends AbstractCreateAndEditComponent {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	@Override
+	public String getNewValue() {
+		switch (mode) {
+		case EDITION:
+			return Objects.toString(getGeneric());
+		case CREATION:
+			return newValue;
+		default:
+			throw new IllegalStateException();
+		}
+	}
+
+	public void setNewValue(String newValue) {
+		this.newValue = newValue;
 	}
 
 	@Override

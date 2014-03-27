@@ -8,7 +8,6 @@ import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.ValuedComponent;
-import org.genericsystem.framework.component.generic.AbstractCreateAndEditComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericCollectableChildrenComponent;
 import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
@@ -72,11 +71,11 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 	}
 
 	public void setEdit(InstanceRow instanceRow) {
-		child = new CreateAndEditComponent(this, instanceRow.getInstance(), AbstractCreateAndEditComponent.MODE.EDITION);
+		child = new CreateAndEditComponent(this, instanceRow.getInstance(), CreateAndEditComponent.MODE.EDITION);
 	}
 
 	public void setCreate() {
-		child = new CreateAndEditComponent(TypeComponent.this, generic, AbstractCreateAndEditComponent.MODE.CREATION);
+		child = new CreateAndEditComponent(TypeComponent.this, generic, CreateAndEditComponent.MODE.CREATION);
 	}
 
 	public void remove(InstanceRow instanceRow) {
