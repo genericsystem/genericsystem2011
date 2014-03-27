@@ -7,17 +7,17 @@ import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.ValuedComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 import org.genericsystem.tracker.InstanceRow;
 
-public class SelectItemComponent extends AbstractGenericComponent {
+public class SelectItemComponent extends AbstractGenericComponent implements ValuedComponent {
 
 	private List<String> listInstances = new ArrayList<String>();
-
-	private String value;
+	private String newValue;
 
 	public SelectItemComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
@@ -48,25 +48,24 @@ public class SelectItemComponent extends AbstractGenericComponent {
 		this.listInstances = listInstances;
 	}
 
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	@Override
 	public String getColumnTitleAttribute() {
-		if (!isRelation())
+		if (!getGeneric().isRelation())
 			return Objects.toString(getGeneric());
 		else
 			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
+	}
+
+	public void setNewValue(String newValue) {
+		this.newValue = newValue;
+	}
+
+	@Override
+	public String getNewValue() {
+		return newValue;
 	}
 
 	@Override
 	public String getXhtmlPath() {
 		return "selectItem.xhtml";
 	}
-
 }

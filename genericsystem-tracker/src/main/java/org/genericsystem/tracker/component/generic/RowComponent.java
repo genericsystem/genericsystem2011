@@ -21,9 +21,8 @@ public class RowComponent extends AbstractGenericComponent {
 		return Arrays.asList(new OutputTextComponent(parent, getGeneric()), getGeneric().isRelation() ? new SelectItemComponent(parent, getGeneric()) : new InputTextComponent(parent, getGeneric()));
 	}
 
-	@Override
 	public String getColumnTitleAttribute() {
-		if (!isRelation())
+		if (!getGeneric().isRelation())
 			return Objects.toString(getGeneric());
 		else
 			return Objects.toString((this.<AbstractGenericComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());

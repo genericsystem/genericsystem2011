@@ -39,9 +39,8 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		});
 	}
 
-	@Override
 	public String getColumnTitleAttribute() {
-		if (!isRelation())
+		if (!getGeneric().isRelation())
 			return Objects.toString(getGeneric());
 		else
 			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());

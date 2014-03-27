@@ -71,11 +71,11 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 	}
 
 	public void setEdit(InstanceRow instanceRow) {
-		child = new CreateAndEditComponent(this, instanceRow);
+		child = new CreateAndEditComponent(this, instanceRow.getInstance(), CreateAndEditComponent.MODE.EDITION);
 	}
 
 	public void setCreate() {
-		child = new CreateAndEditComponent(this, generic);
+		child = new CreateAndEditComponent(TypeComponent.this, generic, CreateAndEditComponent.MODE.CREATION);
 	}
 
 	public void remove(InstanceRow instanceRow) {
@@ -111,12 +111,8 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 		return child;
 	}
 
-	public boolean isRelation() {
-		return getGeneric().isRelation();
-	}
-
 	public String getColumnTitleAttribute() {
-		if (!isRelation())
+		if (!getGeneric().isRelation())
 			return Objects.toString(getGeneric());
 		else
 			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
