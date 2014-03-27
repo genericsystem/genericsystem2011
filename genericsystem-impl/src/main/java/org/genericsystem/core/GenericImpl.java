@@ -309,11 +309,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Holder> T addHolder(Holder attribute, Serializable value, int basePos, int metaLevel, Generic... targets) {
-		return bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, value, null, attribute, metaLevel == attribute.getMetaLevel() ? new Generic[] { attribute } : Statics.EMPTY_GENERIC_ARRAY, basePos, true, targets);
+		return bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, value, null, attribute, basePos, true, targets);
 	}
 
-	public <T extends Holder> T bind(Generic meta, Serializable value, Class<?> specializationClass, Holder directSuper, Generic[] strictSupers, int basePos, boolean existsException, Generic... targets) {
-		return getCurrentCache().bind(meta, value, specializationClass, directSuper, strictSupers, existsException, basePos, Statics.insertIntoArray(this, targets, basePos));
+	public <T extends Holder> T bind(Generic meta, Serializable value, Class<?> specializationClass, Holder directSuper, int basePos, boolean existsException, Generic... targets) {
+		return getCurrentCache().bind(meta, value, specializationClass, directSuper, existsException, basePos, Statics.insertIntoArray(this, targets, basePos));
 	}
 
 	@Override
@@ -347,7 +347,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private void internalCancel(Holder attribute, int metaLevel, int basePos) {
 		if (attribute != null)
-			bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, null, null, attribute, metaLevel == attribute.getMetaLevel() ? new Generic[] { attribute } : Statics.EMPTY_GENERIC_ARRAY, basePos, false);
+			bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, null, null, attribute, basePos, false);
 	}
 
 	@Override
@@ -640,8 +640,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> T setHolder(Class<?> specializationClass, Holder attribute, Serializable value, int metaLevel, int basePos, Generic... targets) {
-		return this.<T> bind(attribute.getMetaLevel() >= metaLevel ? attribute.getMeta() : attribute, value, specializationClass, attribute, metaLevel == attribute.getMetaLevel() ? new Generic[] { attribute } : Statics.EMPTY_GENERIC_ARRAY, basePos, false,
-				targets);
+		return this.<T> bind(attribute.getMetaLevel() >= metaLevel ? attribute.getMeta() : attribute, value, specializationClass, attribute, basePos, false, targets);
 	}
 
 	@Override
@@ -666,26 +665,26 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> T addInstance(Serializable value, Generic... components) {
-		return getCurrentCache().bind(this, value, null, this, Statics.EMPTY_GENERIC_ARRAY, true, Statics.MULTIDIRECTIONAL, components);
+		return getCurrentCache().bind(this, value, null, this, true, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
 	public <T extends Generic> T setInstance(Serializable value, Generic... components) {
-		return getCurrentCache().bind(this, value, null, this, Statics.EMPTY_GENERIC_ARRAY, false, Statics.MULTIDIRECTIONAL, components);
+		return getCurrentCache().bind(this, value, null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
 	public <T extends Type> T addSubType(Serializable value, Generic... components) {
 		if (isMeta())
 			getCurrentCache().rollback(new UnsupportedOperationException("Derive a meta is not allowed"));
-		return getCurrentCache().bind(getMeta(), value, null, this, new Generic[] { this }, true, Statics.MULTIDIRECTIONAL, components);
+		return getCurrentCache().bind(getMeta(), value, null, this, true, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
 	public <T extends Type> T setSubType(Serializable value, Generic... components) {
 		if (isMeta())
 			getCurrentCache().rollback(new UnsupportedOperationException("Derive a meta is not allowed"));
-		return getCurrentCache().bind(getMeta(), value, null, this, new Generic[] { this }, false, Statics.MULTIDIRECTIONAL, components);
+		return getCurrentCache().bind(getMeta(), value, null, this, false, Statics.MULTIDIRECTIONAL, components);
 	}
 
 	@Override
@@ -2029,9 +2028,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new GenericBuilder(newHomeTreeNode, getSupers(), selfToNullComponents(), false);
 	}
 
-	// TODO remove strictSupers
-	GenericBuilder createNewBuilder(Serializable value, Generic[] supers, Generic[] strictSupers, Generic[] components) {
-		return new GenericBuilder(bindInstanceNode(value), new Supers(supers.length == 0 ? new Generic[] { getEngine() } : supers), new UnsafeComponents(components), true);
+	GenericBuilder createNewBuilder(Serializable value, Generic[] supers, Generic[] components) {
+		return createNewBuilder(bindInstanceNode(value), supers, components);
 	}
 
 	GenericBuilder createNewBuilder(HomeTreeNode homeTreeNode, Generic[] supers, Generic[] components) {
