@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
@@ -56,7 +57,7 @@ public class GetSubTypeTest extends AbstractTest {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type plane = cache.addType("Plane");
 		Type car = cache.addType("Car");
-		cache.addType("FlyingCar", car, plane);
+		car.addSubType("FlyingCar", new Generic[] { plane });
 		Generic subTypeFromPlane = plane.getAllSubType("FlyingCar");
 		Generic subTypeFromCar = car.getAllSubType("FlyingCar");
 		assert Objects.equals(subTypeFromPlane, subTypeFromCar);
@@ -116,7 +117,7 @@ public class GetSubTypeTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				cache.addType("WheelsPower", power, wheels).log();
+				power.addSubType("WheelsPower", new Generic[] { wheels }).log();
 			}
 		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}
@@ -182,7 +183,7 @@ public class GetSubTypeTest extends AbstractTest {
 		new RollbackCatcher() {
 			@Override
 			public void intercept() {
-				cache.addType("CarColorPilot", carColor, pilot);
+				carColor.addSubType("CarColorPilot", new Generic[] { pilot });
 			}
 		}.assertIsCausedBy(SuperRuleConstraintViolationException.class);
 	}

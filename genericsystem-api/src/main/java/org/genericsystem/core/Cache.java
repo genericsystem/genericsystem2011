@@ -123,56 +123,48 @@ public interface Cache {
 	 * 
 	 * @param name
 	 *            the type's name.
-	 * @param superTypes
-	 *            the array of super types.
 	 * 
 	 * @return the Type.
 	 * @see Type
 	 */
-	<T extends Type> T addType(Serializable name, Type... superTypes);
+	<T extends Type> T addType(Serializable name);
 
 	/**
 	 * Creates a new type. Throws an exception if the type with the same name already exists.
 	 * 
 	 * @param name
 	 *            the type's name.
-	 * @param superTypes
-	 *            the array of super types.
 	 * @param components
 	 *            the array of components.
 	 * 
 	 * @return the Type.
 	 * @see Type
 	 */
-	<T extends Type> T addType(Serializable name, Type[] superTypes, Generic... components);
+	<T extends Type> T addType(Serializable name, Generic[] components);
 
 	/**
 	 * Returns the type. If the type with given name does not exists method creates it.
 	 * 
 	 * @param name
 	 *            the type's name.
-	 * @param superTypes
-	 *            the array of super types.
 	 * 
 	 * @return the Type.
 	 * @see Type
 	 */
-	<T extends Type> T setType(Serializable name, Type... superTypes);
+	<T extends Type> T setType(Serializable name);
 
 	/**
 	 * Returns the type. If the type with given name does not exists method creates it.
 	 * 
 	 * @param name
 	 *            the type's name.
-	 * @param superTypes
-	 *            the array of super types.
 	 * @param components
 	 *            the array of components.
 	 * 
 	 * @return the Type.
 	 * @see Type
 	 */
-	<T extends Type> T setType(Serializable name, Type[] superTypes, Generic... components);
+	<T extends Type> T setType(Serializable name, Generic[] components);
 
 	/**
 	 * Creates a new Tree. Throws an exception if the tree with the same name already exists.

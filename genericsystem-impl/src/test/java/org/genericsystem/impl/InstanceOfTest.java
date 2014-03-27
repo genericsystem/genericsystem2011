@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import java.util.Objects;
+
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
@@ -99,10 +100,10 @@ public class InstanceOfTest extends AbstractTest {
 		Type animal = cache.addType("Animal");
 		Type mammal = cache.addType("Mammal");
 
-		Type human = cache.addType("Human", animal, mammal);
+		Type human = animal.addSubType("Human", new Generic[] { mammal });
 		Generic michael = human.addInstance("Michael");
 
-		Type canid = cache.addType("Canid", animal, mammal);
+		Type canid = animal.addSubType("Canid", new Generic[] { mammal });
 		Generic milou = canid.addInstance("Milou");
 		assert michael.isInstanceOf(human);
 		assert !michael.isInstanceOf(canid);
@@ -118,7 +119,7 @@ public class InstanceOfTest extends AbstractTest {
 	public void testNewSubTypeWithJustOneSuper() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car1 = cache.addType("Car1", vehicle);
+		Type car1 = vehicle.addSubType("Car1");
 		Type car2 = vehicle.addSubType("Car2");
 
 		assert car1.getSupers().get(0).equals(car2.getSupers().get(0));

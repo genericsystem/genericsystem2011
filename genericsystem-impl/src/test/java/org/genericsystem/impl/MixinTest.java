@@ -24,7 +24,7 @@ public class MixinTest extends AbstractTest {
 
 		/* -------------------------------------------------------------------------------------- */
 
-		Type resizableWindow = cache.addType("resizableWindow", new Type[] { window, resizable });
+		Type resizableWindow = window.addSubType("resizableWindow", new Generic[] { resizable });
 		// Attribute resizableWindowSize = resizableWindow.addAttribute("Size");
 
 		// assert resizableWindow.getAttribute("Size").equals(windowSize);//ISSUE
@@ -47,7 +47,7 @@ public class MixinTest extends AbstractTest {
 
 		/* -------------------------------------------------------------------------------------- */
 
-		Type resizableWindow = cache.addType("resizableWindow", new Type[] { window, resizable });
+		Type resizableWindow = window.addSubType("resizableWindow", new Generic[] { resizable });
 		// Attribute resizableWindowSize = resizableWindow.addAttribute("Size");
 
 		// assert resizableWindow.getAttribute("Size").equals(windowSize); ISSUE
@@ -70,7 +70,7 @@ public class MixinTest extends AbstractTest {
 
 		/* -------------------------------------------------------------------------------------- */
 
-		Type resizableWindow = cache.addType("resizableWindow", new Type[] { window, resizable });
+		Type resizableWindow = window.addSubType("resizableWindow", new Generic[] { resizable });
 		// Attribute resizableWindowSize = resizableWindow.addAttribute("Size");
 
 		// assert resizableWindow.getAttribute("Size").equals(windowSize);
@@ -93,7 +93,7 @@ public class MixinTest extends AbstractTest {
 
 		/* -------------------------------------------------------------------------------------- */
 
-		final Type resizableWindow = cache.addType("resizableWindow", new Type[] { window, resizable });
+		final Type resizableWindow = window.addSubType("resizableWindow", new Generic[] { resizable });
 		// Attribute resizableWindowSize = resizableWindow.addAttribute("Size");
 
 		new RollbackCatcher() {
@@ -122,7 +122,7 @@ public class MixinTest extends AbstractTest {
 
 		/* -------------------------------------------------------------------------------------- */
 
-		Type resizableWindow = cache.addType("resizableWindow", new Type[] { window, resizable });
+		Type resizableWindow = window.addSubType("resizableWindow", new Generic[] { resizable });
 		Attribute resizableWindowSize = resizableWindow.addAttribute("Size");
 
 		assert resizableWindow.getAttribute("Size").equals(resizableWindowSize);
