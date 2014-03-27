@@ -6,14 +6,15 @@ import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.ValuedComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 
-public class TextAreaComponent extends AbstractGenericComponent {
+public class TextAreaComponent extends AbstractGenericComponent implements ValuedComponent {
 
-	private String value;
+	private String newValue;
 
 	public TextAreaComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
@@ -25,11 +26,11 @@ public class TextAreaComponent extends AbstractGenericComponent {
 	}
 
 	public String getValue() {
-		return value;
+		return newValue;
 	}
 
 	public void setValue(String value) {
-		this.value = value;
+		this.newValue = value;
 	}
 
 	public String getColumnTitleAttribute() {
@@ -40,8 +41,12 @@ public class TextAreaComponent extends AbstractGenericComponent {
 	}
 
 	@Override
+	public String getNewValue() {
+		return newValue;
+	}
+
+	@Override
 	public String getXhtmlPath() {
 		return "textArea.xhtml";
 	}
-
 }

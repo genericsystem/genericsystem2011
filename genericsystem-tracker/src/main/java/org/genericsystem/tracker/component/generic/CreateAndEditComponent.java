@@ -76,10 +76,10 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 
 	public void create(Generic newInstance, AbstractComponent abstractComponent, Attribute attribute) {
 		if (abstractComponent instanceof InputTextComponent) {
-			String value = ((InputTextComponent) abstractComponent).getValue();
+			String value = ((InputTextComponent) abstractComponent).getNewValue();
 			newInstance.setValue(attribute, value);
 		} else if (abstractComponent instanceof SelectItemComponent) {
-			String value = ((SelectItemComponent) abstractComponent).getValue();
+			String value = ((SelectItemComponent) abstractComponent).getNewValue();
 			Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) abstractComponent).getGeneric()).get(0)).getInstance(value);
 			newInstance.bind((Relation) attribute, instance);
 		}
@@ -88,10 +88,10 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 	public void edit(AbstractGenericComponent listItem) {
 		for (AbstractComponent selectItem : listItem.getChildren()) {
 			if (selectItem instanceof SelectItemComponent) {
-				Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) selectItem).getGeneric()).get(0)).getInstance(((SelectItemComponent) selectItem).getValue());
+				Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) selectItem).getGeneric()).get(0)).getInstance(((SelectItemComponent) selectItem).getNewValue());
 				getGeneric().bind((Relation) ((SelectItemComponent) selectItem).getGeneric(), instance);
 			} else if (selectItem instanceof InputTextComponent) {
-				getGeneric().setValue((Attribute) ((InputTextComponent) selectItem).getGeneric(), (((InputTextComponent) selectItem).getValue()).toString());
+				getGeneric().setValue((Attribute) ((InputTextComponent) selectItem).getGeneric(), (((InputTextComponent) selectItem).getNewValue()).toString());
 			}
 		}
 	}
