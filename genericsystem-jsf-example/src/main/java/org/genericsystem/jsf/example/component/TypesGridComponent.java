@@ -4,12 +4,11 @@ import java.io.Serializable;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
+import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.AbstractTypesGridComponent;
 import org.genericsystem.jsf.example.structure.Types;
 
-public class TypesGridComponent extends AbstractTypesGridComponent {
-
+public class TypesGridComponent extends AbstractCollectableChildrenComponent {
 	public TypesGridComponent(AbstractComponent parent) {
 		super(parent);
 	}

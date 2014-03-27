@@ -5,17 +5,18 @@ import java.util.List;
 import java.util.Objects;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.generic.AbstractValuedGenericComponent;
+import org.genericsystem.framework.component.ValuedComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
-import org.genericsystem.tracker.InstanceRow;
 
-public class AttributeComponent extends AbstractValuedGenericComponent {
+public class TextAreaComponent extends AbstractGenericComponent implements ValuedComponent {
 
-	public AttributeComponent(AbstractComponent parent, Generic generic) {
+	private String newValue;
+
+	public TextAreaComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
 	}
 
@@ -24,19 +25,12 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		return Collections.emptyList();
 	}
 
-	public List<InstanceRow> getTargetRows() {
-		return getTargetRows(this.<TypeComponent> getParent().getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0));
+	public String getValue() {
+		return newValue;
 	}
 
-	public static List<InstanceRow> getTargetRows(Type targetType) {
-		return (targetType.getAllInstances()).<InstanceRow> project(new Projector<InstanceRow, Generic>() {
-
-			@Override
-			public InstanceRow project(Generic instance) {
-				return new InstanceRow(instance);
-			}
-
-		});
+	public void setValue(String value) {
+		this.newValue = value;
 	}
 
 	public String getColumnTitleAttribute() {
@@ -47,8 +41,12 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return "/pages/attribute.xhtml";
+	public String getNewValue() {
+		return newValue;
 	}
 
+	@Override
+	public String getXhtmlPath() {
+		return "textArea.xhtml";
+	}
 }

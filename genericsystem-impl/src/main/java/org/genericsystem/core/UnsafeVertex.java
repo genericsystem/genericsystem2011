@@ -3,6 +3,7 @@ package org.genericsystem.core;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.genericsystem.core.Statics.OrderedSupers;
 import org.genericsystem.core.UnsafeGList.Components;
 import org.genericsystem.core.UnsafeGList.Supers;
@@ -80,6 +81,7 @@ class UnsafeVertex {
 		for (Generic superGeneric : supers())
 			if (((GenericImpl) superGeneric).homeTreeNode().inheritsFrom(homeTreeNode.metaNode))
 				return superGeneric.getMeta();
+		log.info(" supers() " + supers() + " / " + homeTreeNode + " # " + homeTreeNode.metaNode);
 		throw new IllegalStateException();
 	}
 

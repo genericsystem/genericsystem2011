@@ -10,10 +10,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.AbstractRootComponent;
 
 @Named
 @SessionScoped
-public class RootComponent extends AbstractComponent implements Serializable {
+public class RootComponent extends AbstractRootComponent implements Serializable {
 
 	private static final long serialVersionUID = -6596418502248220835L;
 
@@ -31,18 +33,7 @@ public class RootComponent extends AbstractComponent implements Serializable {
 	}
 
 	@Override
-	public RootComponent getRoot() {
-		return this;
-	}
-
-	@Override
-	public Cache getCache() {
-		return cache;
-	}
-
-	@Override
 	public String getXhtmlPath() {
 		return "/pages/index.xhtml";
 	}
-
 }

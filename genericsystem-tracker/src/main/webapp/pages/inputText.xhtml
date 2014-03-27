@@ -5,9 +5,6 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 
-	<h:inputText id="#{component}" value="#{component.value}">
-		<f:validator validatorId="#{component.getValidatorId}"/>
-	</h:inputText>
-	<h:message for="#{component}" style="color:red" />
+	<h:inputText id="#{component}" value="#{component.newValue}"/>
 
 </ui:composition>
