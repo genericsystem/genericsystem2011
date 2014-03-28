@@ -29,7 +29,7 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return Arrays.asList(new PanelGridComponent(this));
+		return Arrays.asList(new SelectorComponent(this));
 	}
 
 	@Override

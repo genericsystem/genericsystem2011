@@ -20,6 +20,10 @@ public abstract class AbstractComponent {
 		this.parent = parent;
 	}
 
+	public AbstractSelectorComponent getParentSelector() {
+		return getParent().getParentSelector();
+	}
+
 	public abstract List<? extends AbstractComponent> initChildren();
 
 	public abstract String getXhtmlPath();

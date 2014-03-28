@@ -11,4 +11,8 @@
 		</c:forEach>
 	</h:panelGrid>
 
+	<ui:include src="#{component.child.xhtmlPath}">
+		<ui:param name="component" value="#{component.child}" />
+	</ui:include>
+
 </ui:composition>
