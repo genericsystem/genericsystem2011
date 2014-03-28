@@ -10,7 +10,6 @@ import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
-import org.genericsystem.tracker.component.PanelGridComponent;
 
 public class CommandButtonComponent extends AbstractGenericComponent {
 
@@ -24,7 +23,7 @@ public class CommandButtonComponent extends AbstractGenericComponent {
 	}
 
 	public void select() {
-		((PanelGridComponent) this.getParent()).select(getGeneric());
+		getParentSelector().select(getGeneric());
 	}
 
 	public String getColumnTitleAttribute() {

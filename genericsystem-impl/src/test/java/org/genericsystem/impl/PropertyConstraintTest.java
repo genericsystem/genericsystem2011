@@ -195,7 +195,7 @@ public class PropertyConstraintTest extends AbstractTest {
 	public void testMultipleValuesAttributeForSubtypeOtherWay() {
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
-		Type car = cache.addType("Car", vehicle);
+		Type car = vehicle.addSubType("Car");
 		final Attribute equipment = vehicle.setAttribute("Equipment");
 		equipment.enablePropertyConstraint();
 		final Generic myCar = car.addInstance("myCar");

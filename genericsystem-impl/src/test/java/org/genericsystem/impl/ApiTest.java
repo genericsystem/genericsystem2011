@@ -45,7 +45,7 @@ public class ApiTest extends AbstractTest {
 		car.setValue(vehiclePower, 233);
 		Type robot = vehicle.setSubType("Robot");
 		robot.setValue(vehiclePower, 233);
-		cache.setType("Transformer", car, robot);
+		car.setSubType("Transformer", new Generic[] { robot });
 	}
 
 	public void testSingularWithMultiInheritance2() {
@@ -55,7 +55,7 @@ public class ApiTest extends AbstractTest {
 		Type car = vehicle.setSubType("Car");
 		car.setValue(vehiclePower, 233);
 		Type robot = vehicle.setSubType("Robot");
-		cache.setType("Transformer", car, robot);
+		car.setSubType("Transformer", new Generic[] { robot });
 		robot.setValue(vehiclePower, 233);
 	}
 
@@ -67,7 +67,7 @@ public class ApiTest extends AbstractTest {
 		car.setValue(vehiclePower, 233);
 		Type robot = vehicle.setSubType("Robot");
 		robot.setValue(vehiclePower, 233);
-		Type transformer = cache.setType("Transformer", car, robot);
+		Type transformer = car.setSubType("Transformer", new Generic[] { robot });
 		transformer.setInstance("myTransformer");
 	}
 
@@ -79,7 +79,7 @@ public class ApiTest extends AbstractTest {
 		car.setValue(vehiclePower, 233);
 		Type robot = vehicle.setSubType("Robot");
 		robot.setValue(vehiclePower, 233);
-		cache.setType("Transformer", car, robot);
+		car.setSubType("Transformer", new Generic[] { robot });
 	}
 
 	public void testPropertyWithMultiInheritance2() {
@@ -89,7 +89,7 @@ public class ApiTest extends AbstractTest {
 		Type car = vehicle.setSubType("Car");
 		car.setValue(vehiclePower, 233);
 		Type robot = vehicle.setSubType("Robot");
-		cache.setType("Transformer", car, robot);
+		car.setSubType("Transformer", new Generic[] { robot });
 		robot.setValue(vehiclePower, 233);
 	}
 
@@ -101,7 +101,7 @@ public class ApiTest extends AbstractTest {
 		car.setValue(vehiclePower, 233);
 		Type robot = vehicle.setSubType("Robot");
 		robot.setValue(vehiclePower, 233);
-		Type transformer = cache.setType("Transformer", car, robot);
+		Type transformer = car.setSubType("Transformer", new Generic[] { robot });
 		transformer.setInstance("myTransformer");
 	}
 
@@ -688,7 +688,7 @@ public class ApiTest extends AbstractTest {
 		vehiclePower.enableVirtualConstraint();
 		Type robot = cache.addType("Robot");
 		Attribute robotPower = robot.addProperty("Power");
-		Type transformer = cache.addType("Transformer", vehicle, robot);
+		Type transformer = vehicle.addSubType("Transformer", new Generic[] { robot });
 		assert transformer.inheritsFrom(robot);
 		assert transformer.inheritsFrom(vehicle);
 		assert cache.getMetaAttribute().inheritsFrom(cache.getEngine());
@@ -707,7 +707,7 @@ public class ApiTest extends AbstractTest {
 		Attribute carPower = car.addProperty("power");
 		Type robot = vehicle.addSubType("Robot");
 		Attribute robotPower = robot.addProperty("power");
-		Type transformer = cache.addType("Transformer", car, robot);
+		Type transformer = car.addSubType("Transformer", new Generic[] { robot });
 		Relation transformerPower = ((GenericImpl) transformer).addProperty("power");
 		assert transformerPower.inheritsFrom(carPower);
 		assert transformerPower.inheritsFrom(robotPower);

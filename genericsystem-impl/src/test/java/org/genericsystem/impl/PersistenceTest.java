@@ -85,7 +85,7 @@ public class PersistenceTest {
 		Cache cache = initWorkingSpace();
 		Type vehicle = cache.addType("Vehicle");
 		Type human = cache.addType("Human");
-		cache.addType("Transformer", vehicle, human);
+		vehicle.addSubType("Transformer", new Generic[] { human });
 		closingWorkingSpace(cache);
 	}
 
@@ -94,7 +94,7 @@ public class PersistenceTest {
 		Type movable = cache.addType("Movable");
 		Type vehicle = movable.addSubType("Vehicle");
 		Type human = movable.addSubType("Human");
-		cache.addType("Transformer", vehicle, human);
+		vehicle.addSubType("Transformer", new Generic[] { human });
 		closingWorkingSpace(cache);
 	}
 

@@ -104,7 +104,7 @@ class GenericBuilder extends UnsafeVertex {
 		});
 		if (projection == null) {
 			Generic[] components = Statics.replace(pos, (Generic[]) defaultHolder.getComponents().toArray(), ((GenericImpl) bind).getComponent(pos));
-			((GenericImpl) defaultHolder.getMeta()).createNewBuilder(((GenericImpl) defaultHolder).homeTreeNode(), new Generic[] { defaultHolder }, components).bind(defaultHolder.getClass(), false, true);
+			((GenericImpl) defaultHolder.getMeta()).createNewBuilder(((GenericImpl) defaultHolder).homeTreeNode(), defaultHolder, Statics.EMPTY_GENERIC_ARRAY, components).bind(defaultHolder.getClass(), false, true);
 		}
 	}
 
