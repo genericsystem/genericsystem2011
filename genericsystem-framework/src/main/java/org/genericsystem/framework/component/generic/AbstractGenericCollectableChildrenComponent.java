@@ -3,16 +3,20 @@ package org.genericsystem.framework.component.generic;
 import java.util.Objects;
 
 import org.genericsystem.core.Generic;
+import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
 import org.genericsystem.framework.component.AbstractComponent;
 
-public abstract class AbstractGenericComponent extends AbstractComponent implements GenericComponent {
+public abstract class AbstractGenericCollectableChildrenComponent extends AbstractCollectableChildrenComponent implements GenericComponent {
 
 	protected Generic generic;
 
-	public AbstractGenericComponent(AbstractComponent parent, Generic generic) {
+	public AbstractGenericCollectableChildrenComponent(AbstractComponent parent) {
 		super(parent);
-		this.generic = generic;
-		this.children = initChildren();
+	}
+
+	public AbstractGenericCollectableChildrenComponent(AbstractComponent parent, Generic current) {
+		super(parent);
+		this.generic = current;
 	}
 
 	@Override

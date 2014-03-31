@@ -334,23 +334,23 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	@Override
-	public <T extends Type> T addType(Serializable name, Type... supers) {
-		return addType(name, supers, Statics.EMPTY_GENERIC_ARRAY);
+	public <T extends Type> T addType(Serializable name) {
+		return addType(name, Statics.EMPTY_GENERIC_ARRAY);
 	}
 
 	@Override
-	public <T extends Type> T addType(Serializable name, Type[] supers, Generic... components) {
-		return ((GenericImpl) getEngine()).createNewBuilder(name, supers, supers, components).bind(null, true, false);
+	public <T extends Type> T addType(Serializable name, Generic[] components) {
+		return bind(getEngine(), name, null, getEngine(), Statics.EMPTY_GENERIC_ARRAY, true, components);
 	}
 
 	@Override
-	public <T extends Type> T setType(Serializable name, Type... supers) {
-		return setType(name, supers, Statics.EMPTY_GENERIC_ARRAY);
+	public <T extends Type> T setType(Serializable name) {
+		return setType(name, Statics.EMPTY_GENERIC_ARRAY);
 	}
 
 	@Override
-	public <T extends Type> T setType(Serializable name, Type[] supers, Generic... components) {
-		return ((GenericImpl) getEngine()).createNewBuilder(name, supers, supers, components).bind(null, false, false);
+	public <T extends Type> T setType(Serializable name, Generic[] components) {
+		return bind(getEngine(), name, null, getEngine(), Statics.EMPTY_GENERIC_ARRAY, false, components);
 	}
 
 	@Override
@@ -374,7 +374,7 @@ public class CacheImpl extends AbstractContext implements Cache {
 	}
 
 	private <T extends Tree> T internalSetTree(Serializable name, int dim, boolean existsException) {
-		return ((GenericImpl) getEngine()).createNewBuilder(name, new Generic[] { getEngine() }, Statics.EMPTY_GENERIC_ARRAY, new Generic[dim]).<GenericImpl> bind(TreeImpl.class, existsException, false).disableInheritance();
+		return this.<GenericImpl> bind(getEngine(), name, TreeImpl.class, getEngine(), Statics.EMPTY_GENERIC_ARRAY, existsException, new Generic[dim]).disableInheritance();
 	}
 
 	@Override
@@ -402,13 +402,11 @@ public class CacheImpl extends AbstractContext implements Cache {
 		for (Generic generic : userSupers)
 			assert generic.isMeta() || (meta.getMetaLevel() + 1 == generic.getMetaLevel()) : clazz + generic.info();
 
-		return meta.createNewBuilder(value, Statics.insertFirst(meta, userSupers), userSupers, components).bind(clazz, false, false);
+		return bind(meta, value, clazz, meta, userSupers, false, components);
 	}
 
-	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, Generic[] strictSupers, boolean existsException, int axe, Generic... components) {
-		Generic[] sortAndCheck = ((GenericImpl) directSuper).sortAndCheck(components);
-		// TODO te refactor ?
-		return ((GenericImpl) meta).createNewBuilder(value, new Generic[] { directSuper }, strictSupers, sortAndCheck).bind(specializationClass, existsException, false);
+	<T extends Generic> T bind(Generic meta, Serializable value, Class<?> specializationClass, Generic directSuper, Generic[] satifies, boolean existsException, Generic... components) {
+		return ((GenericImpl) meta).createNewBuilder(value, directSuper, satifies, components).bind(specializationClass, existsException, false);
 	}
 
 	private GenericImpl getMeta(Class<?> clazz, Generic[] components) {

@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.core.Cache;
+import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
@@ -69,7 +70,7 @@ public class AddComponentSuperTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.addSubType("Car");
 		Type robot = cache.addType("Robot");
-		Type transformer = cache.addType("Transformer", robot, car);
+		Type transformer = car.addSubType("Transformer", new Generic[] { robot });
 		transformer = transformer.removeSuper(1);
 		assert !transformer.inheritsFrom(robot);
 		assert transformer.inheritsFrom(car);
@@ -81,9 +82,9 @@ public class AddComponentSuperTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.addSubType("Car");
 		Type robot = cache.addType("Robot");
-		Type transformer = cache.addType("Transformer", robot, car);
+		Type transformer = car.addSubType("Transformer", new Generic[] { robot });
 		Type clonable = cache.addType("Clonable");
-		Type transformerClonable = cache.addType("TransformerClonable", transformer, clonable);
+		Type transformerClonable = transformer.addSubType("TransformerClonable", new Generic[] { clonable });
 		transformerClonable = transformerClonable.removeSuper(0);
 		assert transformerClonable.inheritsFrom(clonable);
 		assert !transformerClonable.inheritsFrom(robot);

@@ -1,6 +1,7 @@
 package org.genericsystem.impl;
 
 import org.genericsystem.core.CacheImpl;
+import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Type;
 import org.testng.annotations.Test;
@@ -12,8 +13,8 @@ public class InterfacesTest extends AbstractTest {
 		CacheImpl cache = (CacheImpl) GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Type robot = cache.addType("Robot");
-		Type transformer = cache.setType("Transformer", vehicle, robot);
-		Type reverseTransformer = cache.setType("Transformer", robot, vehicle);
+		Type transformer = vehicle.setSubType("Transformer", new Generic[] { robot });
+		Type reverseTransformer = robot.setSubType("Transformer", new Generic[] { vehicle });
 
 		assert transformer == reverseTransformer : transformer.info() + reverseTransformer.info();
 	}
@@ -23,7 +24,7 @@ public class InterfacesTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type car = vehicle.addSubType("Car");
 		Type electric = cache.addType("Electric");
-		Type carElectric = cache.addType("CarElectric", car, vehicle, electric);
+		Type carElectric = car.addSubType("CarElectric", new Generic[] { vehicle, electric });
 		assert !carElectric.getSupers().contains(vehicle);
 	}
 

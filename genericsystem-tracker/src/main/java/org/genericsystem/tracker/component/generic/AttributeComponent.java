@@ -6,14 +6,14 @@ import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Projector;
+import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.generic.AbstractValuedGenericComponent;
+import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 import org.genericsystem.tracker.InstanceRow;
-import org.genericsystem.tracker.component.AbstractComponent;
 
-public class AttributeComponent extends AbstractGenericComponent {
-
-	private String newValue;
+public class AttributeComponent extends AbstractValuedGenericComponent {
 
 	public AttributeComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
@@ -28,14 +28,6 @@ public class AttributeComponent extends AbstractGenericComponent {
 		return getTargetRows(this.<TypeComponent> getParent().getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0));
 	}
 
-	public String getNewValue() {
-		return Objects.toString(newValue);
-	}
-
-	public void setNewValue(String newValue) {
-		this.newValue = newValue;
-	}
-
 	public static List<InstanceRow> getTargetRows(Type targetType) {
 		return (targetType.getAllInstances()).<InstanceRow> project(new Projector<InstanceRow, Generic>() {
 
@@ -45,6 +37,13 @@ public class AttributeComponent extends AbstractGenericComponent {
 			}
 
 		});
+	}
+
+	public String getColumnTitleAttribute() {
+		if (!getGeneric().isRelation())
+			return Objects.toString(getGeneric());
+		else
+			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
 	}
 
 	@Override

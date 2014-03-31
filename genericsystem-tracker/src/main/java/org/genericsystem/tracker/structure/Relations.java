@@ -4,7 +4,6 @@ import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.constraints.SingularConstraint;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.tracker.structure.Types.Description;
 import org.genericsystem.tracker.structure.Types.Issues;
 import org.genericsystem.tracker.structure.Types.Priorities;
 import org.genericsystem.tracker.structure.Types.Statutes;
@@ -43,13 +42,6 @@ public class Relations {
 	@Components({ Issues.class, Users.class })
 	@SingularConstraint
 	public static class IssueReporterRelation extends GenericImpl {
-
-	}
-
-	@SystemGeneric
-	@Components({ Issues.class, Description.class })
-	@SingularConstraint
-	public static class IssueDescriptionRelation extends GenericImpl {
 
 	}
 }

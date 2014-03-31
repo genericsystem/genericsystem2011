@@ -11,6 +11,7 @@ import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.exception.ExistsException;
 import org.genericsystem.exception.RollbackException;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ class GenericBuilder extends UnsafeVertex {
 	}
 
 	private boolean isSameSignature(Generic compare) {
-		// TODO order equals components ?
+		// TODO factories with getGeneric
 		return ((GenericImpl) compare).homeTreeNode().equals(homeTreeNode()) && getMeta().equals(compare.getMeta()) && Arrays.equals(compare.getComponents().toArray(), components().toArray());
 	}
 
@@ -72,14 +73,39 @@ class GenericBuilder extends UnsafeVertex {
 			assert !components().contains(dependency) : dependency.info() + " / " + components();
 			assert !((GenericImpl) dependency).equiv(this) : dependency.info() + ((GenericImpl) dependency).isSuperOf(this);
 		}
-		return getCurrentCache().new Restructurator() {
+		return projectDefaultValues(getCurrentCache().new Restructurator() {
 			private static final long serialVersionUID = 1370210509322258062L;
 
 			@Override
 			Generic rebuild() {
 				return GenericBuilder.this.simpleBind(specializationClass, false, automatic);
 			}
-		}.rebuildAll(toReplace[0], dependencies);
+		}.<T> rebuildAll(toReplace[0], dependencies));
+	}
+
+	private <T extends Generic> T projectDefaultValues(T bind) {
+		if (bind.isAttribute())
+			for (Generic superGeneric : supers())
+				if (superGeneric.isStructural() && superGeneric.getMetaLevel() == metaLevel()) {
+					List<Generic> components = superGeneric.getComponents();
+					for (int pos = 0; pos < components.size(); pos++)
+						for (Generic defaultHolder : components.get(pos).getHolders((Holder) superGeneric, pos))
+							internalProject(bind, pos, defaultHolder);
+				}
+		return bind;
+	}
+
+	public void internalProject(Generic bind, final int pos, final Generic defaultHolder) {
+		Generic projection = ((GenericImpl) bind).unambigousFirst(new AbstractFilterIterator<Generic>(((GenericImpl) defaultHolder).allInheritingsIteratorWithoutRoot()) {
+			@Override
+			public boolean isSelected() {
+				return ((GenericImpl) next).inheritsFrom(((GenericImpl) next).filterToProjectVertex(new UnsafeComponents(defaultHolder.getComponents()), pos));
+			}
+		});
+		if (projection == null) {
+			Generic[] components = Statics.replace(pos, (Generic[]) defaultHolder.getComponents().toArray(), ((GenericImpl) bind).getComponent(pos));
+			((GenericImpl) defaultHolder.getMeta()).createNewBuilder(((GenericImpl) defaultHolder).homeTreeNode(), defaultHolder, Statics.EMPTY_GENERIC_ARRAY, components).bind(defaultHolder.getClass(), false, true);
+		}
 	}
 
 	NavigableSet<Generic> getDependencies(final Generic[] toReplace, final boolean existException) {

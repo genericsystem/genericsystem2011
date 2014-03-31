@@ -18,11 +18,22 @@ public interface Type extends Generic {
 	 * 
 	 * @param value
 	 *            The type value.
+	 * @return Return the subtype.
+	 */
+	<T extends Type> T addSubType(Serializable value);
+
+	/**
+	 * Create a subtype. Throws an exception if already exists.
+	 * 
+	 * @param value
+	 *            The type value.
+	 * @param satifies
+	 *            The satifies.
 	 * @param components
 	 *            The components.
 	 * @return Return the subtype.
 	 */
-	<T extends Type> T addSubType(Serializable value, Generic... components);
+	<T extends Type> T addSubType(Serializable value, Generic[] satifies, Generic... components);
 
 	/**
 	 * Creates an attribute for the type. Throws an exception if already exists.
@@ -210,11 +221,22 @@ public interface Type extends Generic {
 	 * 
 	 * @param value
 	 *            The type value.
+	 * @return Return the subtype.
+	 */
+	<T extends Type> T setSubType(Serializable value);
+
+	/**
+	 * Create a subtype or returns this type if already exists.
+	 * 
+	 * @param value
+	 *            The type value.
+	 * @param satifies
+	 *            The satifies.
 	 * @param components
 	 *            The components.
 	 * @return Return the subtype.
 	 */
-	<T extends Type> T setSubType(Serializable value, Generic... components);
+	<T extends Type> T setSubType(Serializable value, Generic[] satifies, Generic... components);
 
 	/**
 	 * Creates an attribute for the type or returns this attribute if already exists.

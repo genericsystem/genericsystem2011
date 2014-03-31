@@ -3,18 +3,21 @@ package org.genericsystem.tracker.component.generic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.genericsystem.core.Generic;
+import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.ValuedComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericComponent;
+import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Type;
 import org.genericsystem.tracker.InstanceRow;
-import org.genericsystem.tracker.component.AbstractComponent;
 
-public class SelectItemComponent extends AbstractGenericComponent {
+public class SelectItemComponent extends AbstractGenericComponent implements ValuedComponent {
 
 	private List<String> listInstances = new ArrayList<String>();
-
-	private String value;
+	private String newValue;
 
 	public SelectItemComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
@@ -29,7 +32,7 @@ public class SelectItemComponent extends AbstractGenericComponent {
 
 	public void editSelectedItem() {
 
-		TypeComponent typeSelected = this.<AbstractGenericComponent> getParent().getParent();
+		TypeComponent typeSelected = this.getParent().getParent();
 		Type targetType = typeSelected.getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0);
 		List<InstanceRow> list = AttributeComponent.getTargetRows(targetType);
 		for (InstanceRow instance : list) {
@@ -45,17 +48,24 @@ public class SelectItemComponent extends AbstractGenericComponent {
 		this.listInstances = listInstances;
 	}
 
-	public String getValue() {
-		return value;
+	public String getColumnTitleAttribute() {
+		if (!getGeneric().isRelation())
+			return Objects.toString(getGeneric());
+		else
+			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setNewValue(String newValue) {
+		this.newValue = newValue;
+	}
+
+	@Override
+	public String getNewValue() {
+		return newValue;
 	}
 
 	@Override
 	public String getXhtmlPath() {
 		return "selectItem.xhtml";
 	}
-
 }
