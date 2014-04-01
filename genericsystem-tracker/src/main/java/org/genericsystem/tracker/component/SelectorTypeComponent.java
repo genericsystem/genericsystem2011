@@ -6,7 +6,7 @@ import java.util.List;
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractSelectorComponent;
-import org.genericsystem.tracker.component.generic.SelectorEditComponent;
+import org.genericsystem.tracker.component.generic.CreateAndEditComponent;
 import org.genericsystem.tracker.component.generic.TypeComponent;
 import org.genericsystem.tracker.structure.Types.Issues;
 
@@ -27,14 +27,30 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 
 	@Override
 	public void select(Generic selected) {
-		// TODO KK
-		SelectorEditComponent selectorTypeComponent = new SelectorEditComponent(this);
-		selectorTypeComponent.getChildren().add(new TypeComponent(selectorTypeComponent, selected));
-		this.child = selectorTypeComponent;
+		this.child = new SelectorEditComponent(this, selected);
+	}
+
+	public static class SelectorEditComponent extends SelectorTypeComponent {
+
+		public SelectorEditComponent(AbstractComponent parent, Generic selected) {
+			super(parent);
+			children = Arrays.asList(new TypeComponent(this, selected));
+		}
+
+		@Override
+		public void selectDefaultComponent() {
+			child = null;
+		}
+
+		@Override
+		public void select(Generic selected) {
+			child = new CreateAndEditComponent(this, selected);
+		}
+
 	}
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/selectorType.xhtml";
+		return "/pages/selector.xhtml";
 	}
 }
