@@ -6,12 +6,13 @@ import java.util.List;
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractSelectorComponent;
+import org.genericsystem.tracker.component.generic.SelectorEditComponent;
 import org.genericsystem.tracker.component.generic.TypeComponent;
 import org.genericsystem.tracker.structure.Types.Issues;
 
-public class SelectorComponent extends AbstractSelectorComponent {
+public class SelectorTypeComponent extends AbstractSelectorComponent {
 
-	public SelectorComponent(AbstractComponent parent) {
+	public SelectorTypeComponent(AbstractComponent parent) {
 		super(parent);
 	}
 
@@ -26,11 +27,14 @@ public class SelectorComponent extends AbstractSelectorComponent {
 
 	@Override
 	public void select(Generic selected) {
-		this.child = new TypeComponent(this, selected);
+		// TODO KK
+		SelectorEditComponent selectorTypeComponent = new SelectorEditComponent(this);
+		selectorTypeComponent.getChildren().add(new TypeComponent(selectorTypeComponent, selected));
+		this.child = selectorTypeComponent;
 	}
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/selector.xhtml";
+		return "/pages/selectorType.xhtml";
 	}
 }

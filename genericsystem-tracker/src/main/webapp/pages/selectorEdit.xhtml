@@ -8,4 +8,10 @@
 	<c:forEach items="#{component.children}" var="component">
 		<ui:include src="#{component.xhtmlPath}" />
 	</c:forEach>
+
+	<ui:include src="#{component.child.xhtmlPath}"
+		rendered="#{! empty component.child}">
+		<ui:param name="component" value="#{component.child}"></ui:param>
+	</ui:include>
+
 </ui:composition>
