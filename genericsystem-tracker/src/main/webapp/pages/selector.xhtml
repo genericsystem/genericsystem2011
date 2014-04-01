@@ -9,7 +9,8 @@
 		<ui:include src="#{component.xhtmlPath}" />
 	</c:forEach>
 
-	<ui:include src="#{component.child.xhtmlPath}">
+	<ui:include src="#{component.child.xhtmlPath}"
+		rendered="#{! empty component.child}">
 		<ui:param name="component" value="#{component.child}" />
 	</ui:include>
 

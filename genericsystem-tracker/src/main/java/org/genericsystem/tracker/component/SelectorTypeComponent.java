@@ -6,12 +6,13 @@ import java.util.List;
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractSelectorComponent;
+import org.genericsystem.tracker.component.generic.CreateAndEditComponent;
 import org.genericsystem.tracker.component.generic.TypeComponent;
 import org.genericsystem.tracker.structure.Types.Issues;
 
-public class SelectorComponent extends AbstractSelectorComponent {
+public class SelectorTypeComponent extends AbstractSelectorComponent {
 
-	public SelectorComponent(AbstractComponent parent) {
+	public SelectorTypeComponent(AbstractComponent parent) {
 		super(parent);
 	}
 
@@ -26,7 +27,26 @@ public class SelectorComponent extends AbstractSelectorComponent {
 
 	@Override
 	public void select(Generic selected) {
-		this.child = new TypeComponent(this, selected);
+		this.child = new SelectorEditComponent(this, selected);
+	}
+
+	public static class SelectorEditComponent extends SelectorTypeComponent {
+
+		public SelectorEditComponent(AbstractComponent parent, Generic selected) {
+			super(parent);
+			children = Arrays.asList(new TypeComponent(this, selected));
+		}
+
+		@Override
+		public void selectDefaultComponent() {
+			child = null;
+		}
+
+		@Override
+		public void select(Generic selected) {
+			child = new CreateAndEditComponent(this, selected);
+		}
+
 	}
 
 	@Override

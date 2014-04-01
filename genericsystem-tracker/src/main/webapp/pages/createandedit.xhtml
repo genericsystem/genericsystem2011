@@ -9,16 +9,11 @@
 		<h:panelGrid columns="2" styleClass="order-table"
 			headerClass="order-table-header"
 			rowClasses="order-table-odd-row,order-table-even-row">
-			<h:outputText value="#{component.parent}" />
-			<h:inputText value="#{component.newValue}" />
-		</h:panelGrid>
-		<h:panelGrid columns="2" styleClass="order-table"
-			headerClass="order-table-header"
-			rowClasses="order-table-odd-row,order-table-even-row">
 			<c:forEach items="#{component.children}" var="component">
 				<ui:include src="#{component.xhtmlPath}" />
 			</c:forEach>
 		</h:panelGrid>
-		<h:commandButton value="#{component.title}" action="#{component.execute()}" />
+		<h:commandButton value="#{component.title}"
+			action="#{component.execute()}" />
 	</h:form>
 </ui:composition>
