@@ -51,7 +51,6 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 		};
 	}
 
-	// @Override
 	@Override
 	default public void log() {
 		log.info(toString());
@@ -59,7 +58,6 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 
 	// methods of List
 
-	// @Override
 	@Override
 	default public T get(int pos) {
 		int i = 0;
@@ -77,31 +75,26 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public T set(int index, T element) {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public void add(int index, T element) {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public T remove(int index) {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public int indexOf(Object o) {
 		int i = 0;
@@ -114,31 +107,26 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 		return -1;
 	}
 
-	// @Override
 	@Override
 	default public int lastIndexOf(Object o) {
 		return indexOf(o);
 	}
 
-	// @Override
 	@Override
 	default public boolean addAll(int index, Collection<? extends T> c) {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public ListIterator<T> listIterator() {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public ListIterator<T> listIterator(int index) {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public List<T> subList(int fromIndex, int toIndex) {
 		throw new UnsupportedOperationException();
@@ -146,7 +134,6 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 
 	// methods of Collection
 
-	// @Override
 	@Override
 	default public int size() {
 		int size = 0;
@@ -158,13 +145,11 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 		return size;
 	}
 
-	// @Override
 	@Override
 	default public boolean isEmpty() {
 		return !iterator().hasNext();
 	}
 
-	// @Override
 	@Override
 	default public boolean contains(Object o) {
 		Iterator<T> it = iterator();
@@ -182,25 +167,21 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 		return true;
 	}
 
-	// @Override
 	@Override
 	default public boolean addAll(Collection<? extends T> c) {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public boolean removeAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public boolean retainAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
-	// @Override
 	@Override
 	default public void clear() {
 		throw new UnsupportedOperationException();
