@@ -224,11 +224,12 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 		return (minCapacity > MAX_ARRAY_SIZE) ? Integer.MAX_VALUE : MAX_ARRAY_SIZE;
 	}
 
-	@SuppressWarnings("hiding")
+	@SuppressWarnings("unchecked")
 	@Override
 	default public <F> F[] toArray(F[] a) {
 		// Estimate size of array; be prepared to see more or fewer elements
 		int size = size();
+		@SuppressWarnings("unchecked")
 		F[] r = a.length >= size ? a : (F[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
 		Iterator<T> it = iterator();
 
