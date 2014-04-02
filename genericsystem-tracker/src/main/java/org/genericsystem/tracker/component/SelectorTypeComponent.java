@@ -3,6 +3,12 @@ package org.genericsystem.tracker.component;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.PostAddToViewEvent;
+import javax.faces.event.SystemEvent;
+import javax.faces.event.SystemEventListener;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractSelectorComponent;
@@ -10,10 +16,12 @@ import org.genericsystem.tracker.component.generic.CreateAndEditComponent;
 import org.genericsystem.tracker.component.generic.TypeComponent;
 import org.genericsystem.tracker.structure.Types.Issues;
 
-public class SelectorTypeComponent extends AbstractSelectorComponent {
+public class SelectorTypeComponent extends AbstractSelectorComponent implements SystemEventListener {
 
 	public SelectorTypeComponent(AbstractComponent parent) {
 		super(parent);
+		FacesContext ctx = FacesContext.getCurrentInstance();
+		ctx.getViewRoot().subscribeToViewEvent(PostAddToViewEvent.class, this);
 	}
 
 	@Override
@@ -52,5 +60,17 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/selector.xhtml";
+	}
+
+	@Override
+	public boolean isListenerForSource(Object arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void processEvent(SystemEvent arg0) throws AbortProcessingException {
+		// TODO Auto-generated method stub
+
 	}
 }
