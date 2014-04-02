@@ -6,9 +6,13 @@ import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
+import org.genericsystem.framework.component.generic.AbstractGenericCollectableChildrenComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericComponent;
 import org.genericsystem.generic.Attribute;
+import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.tracker.InstanceRow;
+import org.genericsystem.tracker.component.SelectItemsComponent;
 
 public class RowComponent extends AbstractGenericComponent {
 
@@ -18,14 +22,26 @@ public class RowComponent extends AbstractGenericComponent {
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return Arrays.asList(new OutputTextComponent(parent, getGeneric()), getGeneric().isRelation() ? new SelectItemComponent(parent, getGeneric()) : new InputTextComponent(parent, getGeneric()));
-	}
+		if (generic.getComponents().isEmpty())
+			return Arrays.asList(new OutputTextComponent(this, generic), new InputTextComponent(this, generic));
+		Generic type = ((AbstractGenericCollectableChildrenComponent) getParentSelector().getChild()).getGeneric();
+		Generic value = type.getHolder((Holder) getGeneric());
 
-	public String getColumnTitleAttribute() {
-		if (!getGeneric().isRelation())
-			return Objects.toString(getGeneric());
-		else
-			return Objects.toString((this.<AbstractGenericComponent> getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
+		SelectOneMenuComponent selectOneMenuComponent = null;
+		if (getGeneric().isRelation()) {
+			Type targetType = type.<Type> getOtherTargets((Attribute) getGeneric()).get(0);
+			selectOneMenuComponent = new SelectOneMenuComponent(this, targetType);
+			SelectItemsComponent selectItemsComponent = new SelectItemsComponent(selectOneMenuComponent);
+			for (InstanceRow instance : AttributeComponent.getTargetRows(targetType))
+				selectItemsComponent.getValues().add(instance.toString());
+
+			selectOneMenuComponent.getChildren().add(selectItemsComponent);
+		}
+
+		OutputTextComponent outputTextComponent = new OutputTextComponent(this, getGeneric());
+		if (getGeneric().isRelation())
+			outputTextComponent.setNewValue(Objects.toString(getParentSelector().<AbstractGenericCollectableChildrenComponent> getChild().getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0)));
+		return Arrays.asList(outputTextComponent, getGeneric().isRelation() ? selectOneMenuComponent : new InputTextComponent(this, value));
 	}
 
 	@Override

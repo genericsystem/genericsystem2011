@@ -19,12 +19,9 @@ import org.genericsystem.tracker.structure.Relations;
 
 public class TypeComponent extends AbstractGenericCollectableChildrenComponent implements ValuedComponent {
 	private String newValue;
-	private AbstractComponent child;
 
 	public TypeComponent(AbstractComponent parent, Generic selected) {
 		super(parent, selected);
-		this.children = initChildren();
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -71,11 +68,13 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 	}
 
 	public void setEdit(InstanceRow instanceRow) {
-		child = new CreateAndEditComponent(this, instanceRow.getInstance(), CreateAndEditComponent.MODE.EDITION);
+		getParentSelector().select(instanceRow.getInstance());
+		// child = new CreateAndEditComponent(this, instanceRow.getInstance(), CreateAndEditComponent.MODE.EDITION);
 	}
 
 	public void setCreate() {
-		child = new CreateAndEditComponent(TypeComponent.this, generic, CreateAndEditComponent.MODE.CREATION);
+		getParentSelector().select(generic);
+		// child = new CreateAndEditComponent(TypeComponent.this, generic, CreateAndEditComponent.MODE.CREATION);
 	}
 
 	public void remove(InstanceRow instanceRow) {
@@ -105,10 +104,6 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 
 	public void setNewValue(String newValue) {
 		this.newValue = newValue;
-	}
-
-	public AbstractComponent getChild() {
-		return child;
 	}
 
 	public String getColumnTitleAttribute() {

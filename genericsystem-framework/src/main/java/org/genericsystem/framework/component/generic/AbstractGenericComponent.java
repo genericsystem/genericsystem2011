@@ -12,7 +12,6 @@ public abstract class AbstractGenericComponent extends AbstractComponent impleme
 	public AbstractGenericComponent(AbstractComponent parent, Generic generic) {
 		super(parent);
 		this.generic = generic;
-		this.children = initChildren();
 	}
 
 	@Override

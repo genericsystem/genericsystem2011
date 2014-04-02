@@ -1,15 +1,12 @@
 package org.genericsystem.tracker.component.generic;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.framework.component.ValuedComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericCollectableChildrenComponent;
-import org.genericsystem.framework.component.generic.AbstractGenericComponent;
-import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
@@ -17,24 +14,22 @@ import org.genericsystem.tracker.structure.Attributes;
 import org.genericsystem.tracker.structure.Relations;
 
 @SuppressWarnings("unchecked")
-public class CreateAndEditComponent extends AbstractGenericCollectableChildrenComponent implements ValuedComponent {
+public class CreateAndEditComponent extends AbstractGenericCollectableChildrenComponent {
 	private String title;
-	private final MODE mode;
-	private String newValue;
 
-	public static enum MODE {
-		CREATION, EDITION
-	};
+	private RowComponent instanceRow;
 
-	public CreateAndEditComponent(AbstractComponent parent, Generic generic, MODE mode) {
+	public CreateAndEditComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
-		this.mode = mode;
-		if (mode.equals(MODE.CREATION))
-			title = "add";
-		else {
-			title = "update";
-			newValue = Objects.toString(getGeneric());
-		}
+		title = generic.isStructural() ? "add" : "update";
+		instanceRow = new RowComponent(this, generic);
+	}
+
+	@Override
+	public <T extends AbstractComponent> List<T> getChildren() {
+		ArrayList<T> children = new ArrayList<>(super.<T> getChildren());
+		children.add(0, (T) instanceRow);
+		return children;
 	}
 
 	@Override
@@ -50,57 +45,26 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 
 	@Override
 	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
-		return (T) new RowComponent(CreateAndEditComponent.this, generic);
+		return (T) new RowComponent(this, generic);
 	}
 
 	public void execute() {
-		List<RowComponent> list = getChildren();
-		if (this.mode.equals(MODE.CREATION)) {
-			Generic newInstance = ((Type) generic).setInstance(newValue);
-			for (RowComponent row : list) {
-				List<AbstractComponent> rows = row.getChildren();
-				for (int i = 0; i < rows.size(); i++) {
-					Attribute attribute = (Attribute) ((OutputTextComponent) rows.get(i)).getGeneric();
-					AbstractComponent abstractComponent = rows.get(++i);
-					create(newInstance, abstractComponent, attribute);
-				}
-			}
-		} else {
-			setGeneric(getGeneric().setValue(newValue));
-			for (RowComponent row : list) {
-				edit(row);
-			}
-			newValue = Objects.toString(getGeneric().toString());
-		}
-	}
-
-	public void create(Generic newInstance, AbstractComponent abstractComponent, Attribute attribute) {
-		if (abstractComponent instanceof InputTextComponent) {
-			String value = ((InputTextComponent) abstractComponent).getNewValue();
-			newInstance.setValue(attribute, value);
-		} else if (abstractComponent instanceof SelectItemComponent) {
-			String value = ((SelectItemComponent) abstractComponent).getNewValue();
-			Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) abstractComponent).getGeneric()).get(0)).getInstance(value);
-			newInstance.bind((Relation) attribute, instance);
-		}
-	}
-
-	public void edit(AbstractGenericComponent listItem) {
-		for (AbstractComponent selectItem : listItem.getChildren()) {
-			if (selectItem instanceof SelectItemComponent) {
-				Generic instance = ((Type) getGeneric().getOtherTargets((Attribute) ((SelectItemComponent) selectItem).getGeneric()).get(0)).getInstance(((SelectItemComponent) selectItem).getNewValue());
-				getGeneric().bind((Relation) ((SelectItemComponent) selectItem).getGeneric(), instance);
-			} else if (selectItem instanceof InputTextComponent) {
-				getGeneric().setValue((Attribute) ((InputTextComponent) selectItem).getGeneric(), (((InputTextComponent) selectItem).getNewValue()).toString());
+		List<RowComponent> rows = this.<RowComponent> getChildren();
+		InputTextComponent inputTextComponent = rows.get(0).<InputTextComponent> getChildren().get(1);
+		setGeneric(generic.isStructural() ? ((Type) generic).setInstance(inputTextComponent.getNewValue()) : getGeneric().setValue(inputTextComponent.getNewValue()));
+		for (int i = 1; i < rows.size(); i++) {
+			Generic attribute = null;
+			for (AbstractComponent component : rows.get(i).getChildren()) {
+				if (component instanceof OutputTextComponent)
+					attribute = ((OutputTextComponent) component).getGeneric();
+				else if (component instanceof SelectOneMenuComponent) {
+					Generic instance = ((Type) getGeneric().<Type> getOtherTargets((Attribute) attribute).get(0)).getInstance(((SelectOneMenuComponent) component).getNewValue());
+					getGeneric().bind((Relation) attribute, instance);
+				} else if (component instanceof InputTextComponent)
+					getGeneric().setValue((Attribute) attribute, (((InputTextComponent) component).getNewValue()).toString());
 			}
 		}
-	}
-
-	public String getColumnTitleAttribute() {
-		if (!getGeneric().isRelation())
-			return Objects.toString(getGeneric());
-		else
-			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
+		getParentSelector().selectDefaultComponent();
 	}
 
 	public String getTitle() {
@@ -109,22 +73,6 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	@Override
-	public String getNewValue() {
-		switch (mode) {
-		case EDITION:
-			return Objects.toString(getGeneric());
-		case CREATION:
-			return newValue;
-		default:
-			throw new IllegalStateException();
-		}
-	}
-
-	public void setNewValue(String newValue) {
-		this.newValue = newValue;
 	}
 
 	@Override
