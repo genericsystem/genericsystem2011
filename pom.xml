@@ -47,6 +47,7 @@
 		<module>genericsystem-framework</module>
 		<module>genericsystem-jsf-example</module>
 		<module>genericsystem-tracker</module>
+		<module>genericsystem-security</module>
 	</modules>
 
 	<distributionManagement>
