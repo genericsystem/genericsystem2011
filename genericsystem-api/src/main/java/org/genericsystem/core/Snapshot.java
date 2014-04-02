@@ -42,6 +42,7 @@ public interface Snapshot<T> extends List<T>, Set<T> {
 	 *
 	 * @author Nicolas Feybesse
 	 */
+	@FunctionalInterface
 	static interface Filter<T> {
 		/**
 		 * Returns true if element is selected.
@@ -58,6 +59,7 @@ public interface Snapshot<T> extends List<T>, Set<T> {
 	 *
 	 * @author Nicolas Feybesse
 	 */
+	@FunctionalInterface
 	static interface Projector<T, E> {
 		/**
 		 * Returns project element.
