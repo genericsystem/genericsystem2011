@@ -24,8 +24,6 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 
 	// methods of Snapshot
 
-	// @Override
-
 	@Override
 	default public <E> AbstractSnapshot<E> project(final Projector<E, T> projector) {
 		return () -> new AbstractProjectionIterator<T, E>(AbstractSnapshot.this.iterator()) {
