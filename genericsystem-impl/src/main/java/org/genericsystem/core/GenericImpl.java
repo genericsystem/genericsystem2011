@@ -412,13 +412,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Link> Snapshot<T> getLinks(final Relation relation, final int basePos, final Generic... targets) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return linksIterator(relation, basePos, targets);
-			}
-		};
+	public <T extends Link> AbstractSnapshot<T> getLinks(final Relation relation, final int basePos, final Generic... targets) {
+		return () -> linksIterator(relation, basePos, targets);
 	}
 
 	@Override
