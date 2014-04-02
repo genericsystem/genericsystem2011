@@ -33,7 +33,6 @@ import org.genericsystem.constraints.SingularConstraintImpl;
 import org.genericsystem.constraints.SizeConstraintImpl;
 import org.genericsystem.constraints.UniqueValueConstraintImpl;
 import org.genericsystem.constraints.VirtualConstraintImpl;
-import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.core.UnsafeGList.Components;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.core.UnsafeGList.UnsafeComponents;
@@ -423,13 +422,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> Snapshot<T> getTargets(Relation relation, int basePos, final int targetPos) {
-		return getLinks(relation, basePos).project(new Projector<T, Link>() {
-			@Override
-			public T project(Link element) {
-				return element.getComponent(targetPos);
-			}
-		});
+		return getLinks(relation, basePos).project(element -> element.getComponent(targetPos));
 	}
+
+	// @Override
+	// public <T extends Generic> Snapshot<T> getTargets(Relation relation, int basePos, final int targetPos) {
+	// return getLinks(relation, basePos).project(new Projector<T, Link>() {
+	// @Override
+	// public T project(Link element) {
+	// return element.getComponent(targetPos);
+	// }
+	// });
+	// }
 
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, Generic... targets) {
 		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(Statics.CONCRETE, attribute, getBasePos(attribute)), attribute, targets);
