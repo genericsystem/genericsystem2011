@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Nicolas Feybesse
  * @author Michael Ory
- * 
+ *
  */
 @SuppressWarnings("unchecked")
 public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attribute {
@@ -256,12 +256,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Serializable> Snapshot<T> getValues(final Holder attribute) {
-		return getHolders(attribute).project(new Projector<T, Holder>() {
-			@Override
-			public T project(Holder holder) {
-				return holder.<T> getValue();
-			}
-		});
+		return getHolders(attribute).project(holder -> holder.<T> getValue());
 	}
 
 	@Override
@@ -407,13 +402,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Holder> Snapshot<T> getHolders(final Holder attribute, final int basePos, final Generic... targets) {
-		return new AbstractSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return holdersIterator((Attribute) attribute, Statics.CONCRETE, basePos, targets);
-			}
-		};
+	public <T extends Holder> AbstractSnapshot<T> getHolders(final Holder attribute, final int basePos, final Generic... targets) {
+		return () -> holdersIterator((Attribute) attribute, Statics.CONCRETE, basePos, targets);
 	}
 
 	@Override
