@@ -61,7 +61,7 @@ import org.genericsystem.map.AxedPropertyClass;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
-import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.snapshot.FunctionalSnapshot;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceProperty;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
@@ -401,7 +401,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Holder> AbstractSnapshot<T> getHolders(final Holder attribute, final int basePos, final Generic... targets) {
+	public <T extends Holder> FunctionalSnapshot<T> getHolders(final Holder attribute, final int basePos, final Generic... targets) {
 		return () -> holdersIterator((Attribute) attribute, Statics.CONCRETE, basePos, targets);
 	}
 
@@ -411,7 +411,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Link> AbstractSnapshot<T> getLinks(final Relation relation, final int basePos, final Generic... targets) {
+	public <T extends Link> FunctionalSnapshot<T> getLinks(final Relation relation, final int basePos, final Generic... targets) {
 		return () -> linksIterator(relation, basePos, targets);
 	}
 
@@ -488,7 +488,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> AbstractSnapshot<T> getInheritings() {
+	public <T extends Generic> FunctionalSnapshot<T> getInheritings() {
 		return () -> inheritingsIterator();
 	}
 
@@ -506,7 +506,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> AbstractSnapshot<T> getComposites() {
+	public <T extends Generic> FunctionalSnapshot<T> getComposites() {
 		return () -> compositesIterator();
 	}
 
@@ -515,12 +515,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Attribute> AbstractSnapshot<T> getAttributes() {
+	public <T extends Attribute> FunctionalSnapshot<T> getAttributes() {
 		return () -> attributesIterator();
 	}
 
 	@Override
-	public <T extends Attribute> AbstractSnapshot<T> getAttributes(final Attribute attribute) {
+	public <T extends Attribute> FunctionalSnapshot<T> getAttributes(final Attribute attribute) {
 		return () -> holdersIterator(Statics.STRUCTURAL, attribute, Statics.MULTIDIRECTIONAL);
 	}
 
@@ -724,7 +724,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	@SuppressWarnings("unused")
 	private <T extends Generic> Iterator<T> inheritanceIterator2(final int level, final Generic origin, final int pos) {
 		return new AbstractFilterIterator<T>(new SpecializedMainInheritance(origin, level).<T> specialize()) {
 			@Override
@@ -923,10 +922,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		final Iterable<Generic>[] projections = new Iterable[getComponents().size()];
 		for (int i = 0; i < projections.length; i++) {
 			final int column = i;
-			projections[i] = () -> pos != column && getComponents().get(column).isStructural() ? ((GenericImpl) getComponents().get(column)).allInstancesIterator() : new SingletonIterator<Generic>(getComponents().get(column));
+			projections[i] = new Iterable<Generic>() {
+				@Override
+				public Iterator<Generic> iterator() {
+					return pos != column && getComponents().get(column).isStructural() ? ((GenericImpl) getComponents().get(column)).allInstancesIterator() : new SingletonIterator<Generic>(getComponents().get(column));
+				}
+			};
 		}
 		return projections;
 	}
+
+	// projections(final int pos) {...} - VERSION WITH LAMBDA EXPRESSION --- error with tests
+	// private Iterable<Generic>[] projections(final int pos) {
+	// final Iterable<Generic>[] projections = new Iterable[getComponents().size()];
+	// for (int i = 0; i < projections.length; i++) {
+	// final int column = i;
+	// projections[i] = () -> pos != column && getComponents().get(column).isStructural() ? ((GenericImpl) getComponents().get(column)).allInstancesIterator() : new SingletonIterator<Generic>(getComponents().get(column));
+	// }
+	// return projections;
+	// }
 
 	@Override
 	public boolean inheritsFrom(Generic generic) {
@@ -1260,7 +1274,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> AbstractSnapshot<T> getAllInstances() {
+	public <T extends Generic> FunctionalSnapshot<T> getAllInstances() {
 		return () -> allInstancesIterator();
 	}
 
@@ -1286,7 +1300,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> AbstractSnapshot<T> getInstances() {
+	public <T extends Generic> FunctionalSnapshot<T> getInstances() {
 		return () -> instancesIterator();
 	}
 
@@ -1341,7 +1355,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> AbstractSnapshot<T> getSubTypes() {
+	public <T extends Generic> FunctionalSnapshot<T> getSubTypes() {
 		return () -> subTypesIterator();
 	}
 
@@ -1350,7 +1364,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> AbstractSnapshot<T> getAllSubTypes() {
+	public <T extends Generic> FunctionalSnapshot<T> getAllSubTypes() {
 		return () -> allSubTypesIteratorWithoutRoot();
 	}
 
@@ -1361,7 +1375,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Generic> AbstractSnapshot<T> getAllSubTypes(final String name) {
+	public <T extends Generic> FunctionalSnapshot<T> getAllSubTypes(final String name) {
 		return () -> Statics.valueFilter(GenericImpl.this.<T> allSubTypesIteratorWithoutRoot(), name);
 	}
 
@@ -1369,11 +1383,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
 	}
 
-	public <T extends Generic> AbstractSnapshot<T> getAllInheritings() {
+	public <T extends Generic> FunctionalSnapshot<T> getAllInheritings() {
 		return () -> allInheritingsIterator();
 	}
 
-	public <T extends Generic> AbstractSnapshot<T> getAllInheritingsWithoutRoot() {
+	public <T extends Generic> FunctionalSnapshot<T> getAllInheritingsWithoutRoot() {
 		return () -> allInheritingsIteratorWithoutRoot();
 	}
 
@@ -1860,7 +1874,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	public AbstractSnapshot<Integer> getPositions(final Holder attribute) {
+	public FunctionalSnapshot<Integer> getPositions(final Holder attribute) {
 		return () -> positionsIterator(attribute);
 	}
 
@@ -1875,7 +1889,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public AbstractSnapshot<Generic> getOtherTargets(final Holder holder) {
+	public FunctionalSnapshot<Generic> getOtherTargets(final Holder holder) {
 		return () -> otherTargetsIterator(holder);
 	}
 
