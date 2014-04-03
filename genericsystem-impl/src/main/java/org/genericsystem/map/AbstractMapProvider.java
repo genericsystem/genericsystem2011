@@ -13,11 +13,11 @@ import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.MapProvider;
 import org.genericsystem.iterator.AbstractProjectorAndFilterIterator;
-import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.snapshot.FunctionalSnapshot;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  */
 public abstract class AbstractMapProvider<Key extends Serializable, Value extends Serializable> extends GenericImpl implements MapProvider {
 
@@ -36,7 +36,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Set<Map.Entry<Key, Value>> entrySet() {
-				return new AbstractSnapshot<Entry<Key, Value>>() {
+				return new FunctionalSnapshot<Entry<Key, Value>>() {
 					@Override
 					public Iterator<Entry<Key, Value>> iterator() {
 						return new InternalIterator<Entry<Key, Value>>() {
@@ -48,6 +48,26 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 					}
 				};
 			}
+
+			// @Override
+			// @SuppressWarnings("unchecked")
+			// public AbstractExtendedMap<Key, Value> getExtendedMap(final Generic generic) {
+			// return new AbstractExtendedMap<Key, Value>() {
+			//
+			// @Override
+			// public Set<Map.Entry<Key, Value>> entrySet() {
+			// return new AbstractSnapshot<Entry<Key, Value>>() {
+			// @Override
+			// public Iterator<Entry<Key, Value>> iterator() {
+			// return new InternalIterator<Entry<Key, Value>>() {
+			// @Override
+			// protected Map.Entry<Key, Value> project() {
+			// return new AbstractMap.SimpleImmutableEntry<Key, Value>(next.<Key> getValue(), valueHolder.<Value> getValue());
+			// }
+			// };
+			// }
+			// };
+			// }
 
 			@Override
 			public boolean containsKey(Object key) {
@@ -102,7 +122,7 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Set<Key> keySet() {
-				return new AbstractSnapshot<Key>() {
+				return new FunctionalSnapshot<Key>() {
 					@Override
 					public Iterator<Key> iterator() {
 						return new InternalIterator<Key>();
