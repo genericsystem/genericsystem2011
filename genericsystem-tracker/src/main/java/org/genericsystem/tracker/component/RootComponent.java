@@ -5,16 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
-import javax.faces.component.UIViewRoot;
+import javax.faces.bean.SessionScoped;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
-import javax.faces.event.PostAddToViewEvent;
-import javax.faces.event.SystemEvent;
-import javax.faces.event.SystemEventListener;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -24,16 +19,26 @@ import org.genericsystem.security.manager.SecurityManager;
 
 @Named
 @SessionScoped
-public class RootComponent extends AbstractRootComponent implements SystemEventListener, Serializable {
+public class RootComponent extends AbstractRootComponent implements Serializable {
 
 	private static final long serialVersionUID = -4077220982114605888L;
 
 	@PostConstruct
 	public void init() {
 		this.children = initChildren();
-		log.info("construct");
+	}
+
+	public Object getListener() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
-		ctx.getViewRoot().subscribeToViewEvent(PostAddToViewEvent.class, this);
+		HtmlInputText dynamicallyGenerated = new HtmlInputText();
+		HtmlCommandButton commandButton = new HtmlCommandButton();
+		HtmlOutputText outputText = new HtmlOutputText();
+		outputText.setValue("Yes");
+		commandButton.setValue("Submit");
+		dynamicallyGenerated.setValue("Test");
+		ctx.getViewRoot().addComponentResource(ctx, dynamicallyGenerated);
+		ctx.getViewRoot().addComponentResource(ctx, commandButton);
+		return null;
 	}
 
 	@Inject
@@ -41,26 +46,6 @@ public class RootComponent extends AbstractRootComponent implements SystemEventL
 
 	public SecurityManager getSecurityManager() {
 		return securityManager;
-	}
-
-	@Override
-	public boolean isListenerForSource(Object source) {
-		return (source instanceof UIViewRoot);
-	}
-
-	@Override
-	public void processEvent(SystemEvent arg0) throws AbortProcessingException {
-		FacesContext ctx = FacesContext.getCurrentInstance();
-		HtmlInputText dynamicallyGenerated = new HtmlInputText();
-		HtmlCommandButton commandButton = new HtmlCommandButton();
-		HtmlOutputText outputText = new HtmlOutputText();
-		outputText.setValue("Yes");
-		commandButton.setValue("Submit");
-		// dynamicallyGenerated.setValueExpression("", "value", application.getExpressionFactory().createValueExpression(context.getELContext(), "#{_internal}", Object.class));
-		dynamicallyGenerated.setValue("Test");
-		ctx.getViewRoot().addComponentResource(ctx, dynamicallyGenerated);
-		ctx.getViewRoot().addComponentResource(ctx, commandButton);
-
 	}
 
 	@Override

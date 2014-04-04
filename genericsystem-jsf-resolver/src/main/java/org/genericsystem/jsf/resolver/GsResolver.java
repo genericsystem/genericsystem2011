@@ -14,10 +14,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import org.genericsystem.core.Cache;
 import org.genericsystem.file.FileSystem;
 import org.genericsystem.file.FileSystem.FileType.File;
-import org.jboss.solder.beanManager.BeanManagerLocator;
-import org.jboss.solder.beanManager.BeanManagerUtils;
-
-import com.sun.faces.facelets.impl.DefaultResourceResolver;
 
 public class GsResolver extends DefaultResourceResolver {
 

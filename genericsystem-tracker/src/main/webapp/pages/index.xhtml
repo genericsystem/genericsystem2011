@@ -11,6 +11,8 @@
 	</ui:define>
 
 	<ui:define name="content">
+		<f:event listener="#{rootComponent.getListener()}"
+			type="preRenderView" />
 		<h:messages errorStyle="color:red" />
 		<c:forEach items="#{rootComponent.children}" var="component">
 			<ui:include src="#{component.xhtmlPath}" />

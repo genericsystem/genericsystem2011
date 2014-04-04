@@ -26,6 +26,7 @@ public class AbstractTest extends Arquillian {
 		javaArchive.addPackage("org.genericsystem.cdi.event");
 		javaArchive.addPackage("org.genericsystem.cdi");
 		javaArchive.addPackage("org.genericsystem.core");
+		javaArchive.addPackage("org.apache.deltaspike.core.impl.scope.window");
 		javaArchive.addAsManifestResource(new StringAsset(""), "beans.xml");
 		return javaArchive;
 	}
