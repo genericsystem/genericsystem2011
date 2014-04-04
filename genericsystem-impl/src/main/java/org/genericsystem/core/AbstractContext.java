@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  */
 public abstract class AbstractContext {
 
@@ -168,7 +168,7 @@ public abstract class AbstractContext {
 		Generic[] components = new Generic[componentClasses.length];
 		for (int index = 0; index < componentClasses.length; index++)
 			components[index] = !clazz.equals(componentClasses[index]) ? find(componentClasses[index]) : null;
-		return components;
+			return components;
 	}
 
 	@SuppressWarnings("unchecked")
