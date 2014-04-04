@@ -3,9 +3,7 @@ package org.genericsystem.tracker.component;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
-import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
@@ -20,8 +18,7 @@ public class SelectorTypeComponent extends AbstractSelectorComponent implements 
 
 	public SelectorTypeComponent(AbstractComponent parent) {
 		super(parent);
-		FacesContext ctx = FacesContext.getCurrentInstance();
-		ctx.getViewRoot().subscribeToViewEvent(PostAddToViewEvent.class, this);
+		// log.info("-------------------------->" + this.getThisExpression());
 	}
 
 	@Override
@@ -73,4 +70,5 @@ public class SelectorTypeComponent extends AbstractSelectorComponent implements 
 		// TODO Auto-generated method stub
 
 	}
+
 }

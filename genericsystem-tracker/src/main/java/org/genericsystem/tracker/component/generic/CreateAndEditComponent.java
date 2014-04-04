@@ -79,4 +79,5 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 	public String getXhtmlPath() {
 		return "/pages/createandedit.xhtml";
 	}
+
 }

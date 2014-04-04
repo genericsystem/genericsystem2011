@@ -41,4 +41,5 @@ public class PanelGridComponent extends AbstractCollectableChildrenComponent {
 	public String getXhtmlPath() {
 		return "/pages/panelGrid.xhtml";
 	}
+
 }

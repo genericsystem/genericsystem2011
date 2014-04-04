@@ -13,6 +13,7 @@ public class GridComponent extends AbstractCollectableChildrenComponent {
 
 	public GridComponent(AbstractComponent parent) {
 		super(parent);
+		// log.info("-------------------------->" + this.getThisExpression());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -41,4 +42,5 @@ public class GridComponent extends AbstractCollectableChildrenComponent {
 	public String getXhtmlPath() {
 		return "/pages/grid.xhtml";
 	}
+
 }

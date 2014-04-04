@@ -3,8 +3,6 @@ package org.genericsystem.framework.component;
 import java.util.Collections;
 import java.util.List;
 
-import javax.faces.context.FacesContext;
-import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.SystemEventListener;
 
 public abstract class AbstractConnectionComponent extends AbstractComponent implements SystemEventListener {
@@ -15,8 +13,6 @@ public abstract class AbstractConnectionComponent extends AbstractComponent impl
 
 	public AbstractConnectionComponent(AbstractComponent parent) {
 		super(parent);
-		FacesContext ctx = FacesContext.getCurrentInstance();
-		ctx.getViewRoot().subscribeToViewEvent(PostAddToViewEvent.class, this);
 	}
 
 	@Override
@@ -45,4 +41,9 @@ public abstract class AbstractConnectionComponent extends AbstractComponent impl
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	// @Override
+	// protected String getThisExpression() {
+	// return "" + getParent().getChildren().indexOf(this);
+	// }
 }

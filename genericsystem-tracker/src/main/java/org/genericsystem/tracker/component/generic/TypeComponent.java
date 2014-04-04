@@ -22,6 +22,7 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 
 	public TypeComponent(AbstractComponent parent, Generic selected) {
 		super(parent, selected);
+		// log.info("-------------------------->" + this.getThisExpression());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -122,4 +123,5 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 	public String getXhtmlPath() {
 		return "/pages/type.xhtml";
 	}
+
 }

@@ -12,7 +12,6 @@ import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.solder.el.Expressions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,13 +19,15 @@ public abstract class AbstractTest extends Arquillian {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractTest.class);
 
+	@Inject
+	Cache cache;
+
 	@Deployment
 	public static JavaArchive createDeployment() {
 		JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
-		javaArchive.addClasses(CacheProvider.class, SerializableCache.class, MockCdiFactory.class, GenericProvider.class, EngineProvider.class, UserClassesProvider.class, PersistentDirectoryProvider.class, CdiFactory.class,EventLauncher.class);
-		javaArchive.addPackage(Expressions.class.getPackage());
+		javaArchive.addClasses(CacheProvider.class, SerializableCache.class, MockCdiFactory.class, GenericProvider.class, EngineProvider.class, UserClassesProvider.class, PersistentDirectoryProvider.class, CdiFactory.class, EventLauncher.class);
+		javaArchive.addPackage("org.apache.deltaspike.core.impl.scope.window");
 		createBeansXml(javaArchive);
-		// createArquillianXml(javaArchive);
 		javaArchive.addAsServiceProvider(Extension.class, CDIExtension.class);
 		return javaArchive;
 	}
@@ -40,22 +41,6 @@ public abstract class AbstractTest extends Arquillian {
 		stringBuilder.append("</beans>");
 		javaArchive.addAsManifestResource(new StringAsset(stringBuilder.toString()), "beans.xml");
 	}
-
-	private static void createArquillianXml(JavaArchive javaArchive) {
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-		stringBuilder.append("<arquillian xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd\">");
-		stringBuilder.append("<container qualifier=\"weld\" default=\"true\">");
-		stringBuilder.append("<configuration>");
-		stringBuilder.append("<property name=\"enableConversationScope\">true</property>");
-		stringBuilder.append("</configuration>");
-		stringBuilder.append("</container>");
-		stringBuilder.append("</arquillian>");
-		javaArchive.addAsManifestResource(new StringAsset(stringBuilder.toString()), "arquillian.xml");
-	}
-
-	@Inject
-	Cache cache;
 
 	public abstract static class RollbackCatcher {
 		public void assertIsCausedBy(Class<? extends Throwable> clazz) {

@@ -25,4 +25,5 @@ public class OutputTextComponent extends AbstractValuedGenericComponent implemen
 	public String getXhtmlPath() {
 		return "outputText.xhtml";
 	}
+
 }

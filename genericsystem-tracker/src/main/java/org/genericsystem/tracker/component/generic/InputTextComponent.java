@@ -30,4 +30,5 @@ public class InputTextComponent extends AbstractValuedGenericComponent implement
 	public String getXhtmlPath() {
 		return "inputText.xhtml";
 	}
+
 }

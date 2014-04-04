@@ -49,4 +49,5 @@ public class TextAreaComponent extends AbstractGenericComponent implements Value
 	public String getXhtmlPath() {
 		return "textArea.xhtml";
 	}
+
 }

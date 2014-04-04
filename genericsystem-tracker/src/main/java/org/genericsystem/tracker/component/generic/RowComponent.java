@@ -48,4 +48,5 @@ public class RowComponent extends AbstractGenericComponent {
 	public String getXhtmlPath() {
 		return "row.xhtml";
 	}
+
 }

@@ -18,27 +18,19 @@
 		</dependency>
 
 		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
 			<artifactId>weld-servlet</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>com.sun.faces</groupId>
-			<artifactId>jsf-api</artifactId>
-			<version>${jsf.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.faces</groupId>
-			<artifactId>jsf-impl</artifactId>
-			<version>${jsf.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
+			<groupId>org.jboss.spec.javax.faces</groupId>
+			<artifactId>jboss-jsf-api_2.2_spec</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
@@ -50,46 +42,22 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.jboss.solder</groupId>
-			<artifactId>solder-api</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jboss.solder</groupId>
-			<artifactId>solder-impl</artifactId>
-			<scope>compile</scope>
-		</dependency>
-
-
-		<dependency>
-			<groupId>javax.enterprise</groupId>
-			<artifactId>cdi-api</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>de.odysseus.juel</groupId>
 			<artifactId>juel-impl</artifactId>
-			<version>2.2.5</version>
+			<version>${juel.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>de.odysseus.juel</groupId>
 			<artifactId>juel-spi</artifactId>
-			<version>2.2.5</version>
+			<version>${juel.version}</version>
 		</dependency>
 
+		<!-- tests -->
 		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>el-api</artifactId>
-			<scope>provided</scope>
+			<groupId>org.jboss.weld</groupId>
+			<artifactId>weld-core</artifactId>
+			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.jboss.arquillian.testng</groupId>
 			<artifactId>arquillian-testng-container</artifactId>
@@ -100,12 +68,20 @@
 			<artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
 		<dependency>
-			<groupId>org.jboss.ejb3</groupId>
-			<artifactId>jboss-ejb3-api</artifactId>
-			<version>${jboss-ejb3-api.version}</version>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-container-spi</artifactId>
+			<version>${arquillian.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-container-test-impl-base</artifactId>
+			<version>${arquillian.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
@@ -114,6 +90,12 @@
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.ejb3</groupId>
+			<artifactId>jboss-ejb3-api</artifactId>
+			<version>${jboss-ejb3-api.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -129,15 +111,6 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-
-			<dependency>
-				<groupId>org.jboss.seam</groupId>
-				<artifactId>seam-bom</artifactId>
-				<version>${seam.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-bom</artifactId>
@@ -145,20 +118,10 @@
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
-
-			<dependency>
-				<groupId>org.jboss.arquillian</groupId>
-				<artifactId>arquillian-bom</artifactId>
-				<version>${arquillian.version}</version>
-				<scope>import</scope>
-				<type>pom</type>
-			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
-
 	<build>
-		<finalName>genericsystem-security</finalName>
+		<finalName>${project.artifactId}</finalName>
 	</build>
 
 </project>

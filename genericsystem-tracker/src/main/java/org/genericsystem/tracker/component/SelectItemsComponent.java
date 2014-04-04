@@ -12,6 +12,7 @@ public class SelectItemsComponent extends AbstractComponent {
 
 	public SelectItemsComponent(AbstractComponent parent) {
 		super(parent);
+		// log.info("-------------------------->" + this.getThisExpression());
 	}
 
 	@Override
@@ -31,4 +32,5 @@ public class SelectItemsComponent extends AbstractComponent {
 	public String getXhtmlPath() {
 		return "selectItems.xhtml";
 	}
+
 }

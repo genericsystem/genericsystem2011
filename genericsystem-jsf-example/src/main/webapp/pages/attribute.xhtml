@@ -17,9 +17,9 @@
 		</h:dataTable>
 		<f:facet name="footer">
 			<h:panelGroup>
-				<h:inputText rendered="#{!component.relation}"
+				<h:inputText rendered="#{!component.isRelation()}"
 					value="#{component.newValue}" />
-				<h:selectOneMenu rendered="#{component.relation}"
+				<h:selectOneMenu rendered="#{component.isRelation()}"
 					value="#{component.newValue}">
 					<f:selectItems value="#{component.targetRows}" var="target"
 						itemValue="#{target}" itemLabel="#{target}" />

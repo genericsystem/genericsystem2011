@@ -23,4 +23,5 @@ public class SelectOneMenuComponent extends AbstractValuedGenericComponent imple
 	public String getXhtmlPath() {
 		return "selectOneMenu.xhtml";
 	}
+
 }
