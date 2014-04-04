@@ -1279,7 +1279,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Iterator<T> allInstancesIterator() {
-		return Statics.levelFilter(this.<T> allInheritingsAboveIterator(getMetaLevel() + 1), getMetaLevel() + 1);
+		return Statics.levelFilter(() -> this.<T> allInheritingsAboveIterator(getMetaLevel() + 1), getMetaLevel() + 1);
 	}
 
 	private <T extends Generic> Iterator<T> allInheritingsAboveIterator(final int metaLevel) {
@@ -1360,7 +1360,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> subTypesIterator() {
-		return Statics.levelFilter(GenericImpl.this.<T> inheritingsIterator(), getMetaLevel());
+		return Statics.levelFilter(() -> GenericImpl.this.<T> inheritingsIterator(), getMetaLevel());
 	}
 
 	@Override
@@ -1380,7 +1380,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> allSubTypesIteratorWithoutRoot() {
-		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
+		return Statics.levelFilter(() -> this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
 	}
 
 	public <T extends Generic> FunctionalSnapshot<T> getAllInheritings() {
