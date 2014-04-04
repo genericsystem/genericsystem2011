@@ -2,6 +2,7 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.Snapshot;
@@ -9,7 +10,7 @@ import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Tree;
-import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.snapshot.FunctionalSnapshot;
 
 public class NodeImpl extends GenericImpl implements Node {
 	@Override
@@ -28,9 +29,14 @@ public class NodeImpl extends GenericImpl implements Node {
 		return getChildren(getBasePos(this.<Tree> getMeta()));
 	}
 
+	// @Override
+	// public <T extends Node> FunctionalSnapshot<T> getChildren(final int basePos) {
+	// return () -> childrenIterator(basePos);
+	// }
+
 	@Override
 	public <T extends Node> Snapshot<T> getChildren(final int basePos) {
-		return new AbstractSnapshot<T>() {
+		return new FunctionalSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
 				return childrenIterator(basePos);

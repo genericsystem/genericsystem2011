@@ -9,8 +9,11 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.enterprise.inject.Vetoed;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 
+import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.genericsystem.core.AbstractContext;
 import org.genericsystem.core.AbstractWriter;
 import org.genericsystem.core.AbstractWriter.AbstractLoader;
@@ -21,11 +24,8 @@ import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.core.HomeTreeNode;
 import org.genericsystem.core.Transaction;
-import org.jboss.solder.beanManager.BeanManagerLocator;
-import org.jboss.solder.beanManager.BeanManagerUtils;
-import org.jboss.solder.core.Veto;
 
-@Veto
+@Vetoed
 public class SerializableCache extends CacheImpl implements Externalizable {
 
 	public SerializableCache() {
@@ -87,8 +87,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		BeanManager beanManager = getBeanManager();
-		Engine engine = BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
+		Engine engine = BeanProvider.getContextualReference(Engine.class);// TODO BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
 		Cache currentCache = engine.getCurrentCache();
 		try {
 			subContext = in.readBoolean() ? (AbstractContext) in.readObject() : new Transaction(in.readLong(), engine);
@@ -113,7 +112,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 	protected BeanManager getBeanManager() {
 		BeanManager beanManager = null;
 		try {
-			beanManager = new BeanManagerLocator().getBeanManager();
+			beanManager = CDI.current().getBeanManager();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}

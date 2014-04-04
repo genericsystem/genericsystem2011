@@ -2,15 +2,15 @@ package org.genericsystem.tree;
 
 import java.io.Serializable;
 import java.util.Iterator;
+
 import org.genericsystem.annotation.InstanceGenericClass;
 import org.genericsystem.annotation.NoInheritance;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
-import org.genericsystem.core.Snapshot;
 import org.genericsystem.core.Statics;
 import org.genericsystem.generic.Node;
 import org.genericsystem.generic.Tree;
-import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.snapshot.FunctionalSnapshot;
 
 @InstanceGenericClass(NodeImpl.class)
 @NoInheritance
@@ -28,14 +28,24 @@ public class TreeImpl extends GenericImpl implements Tree {
 
 	// TODO KK
 	@Override
-	public <T extends Node> Snapshot<T> getRoots() {
-		return new AbstractSnapshot<T>() {
+	public <T extends Node> FunctionalSnapshot<T> getRoots() {
+		return new FunctionalSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
 				return Statics.<T> rootFilter(TreeImpl.this.<T> instancesIterator());
 			}
 		};
 	}
+
+	// @Override
+	// public <T extends Node> Snapshot<T> getRoots() {
+	// return new FunctionalSnapshot<T>() {
+	// @Override
+	// public Iterator<T> iterator() {
+	// return Statics.<T> rootFilter(TreeImpl.this.<T> instancesIterator());
+	// }
+	// };
+	// }
 
 	// TODO KK
 	@Override

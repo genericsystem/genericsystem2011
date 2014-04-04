@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.snapshot.FunctionalSnapshot;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -20,7 +20,7 @@ public class SnapshotTest extends AbstractTest {
 
 	@BeforeTest
 	public void init() {
-		snapshot = new AbstractSnapshot<String>() {
+		snapshot = new FunctionalSnapshot<String>() {
 			@Override
 			public Iterator<String> iterator() {
 				List<String> elements = new ArrayList<>();
@@ -30,7 +30,7 @@ public class SnapshotTest extends AbstractTest {
 				return elements.iterator();
 			}
 		};
-		snapshotEmpty = new AbstractSnapshot<String>() {
+		snapshotEmpty = new FunctionalSnapshot<String>() {
 			@Override
 			public Iterator<String> iterator() {
 				return new ArrayList<String>().iterator();

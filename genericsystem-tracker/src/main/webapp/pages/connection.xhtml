@@ -6,7 +6,7 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 	<h:form>
-		<c:if test="#{!component.securityManager.isConnected}">
+		<c:if test="#{!component.securityManager.isConnected()}">
 			<h:outputText name="login" value="login :" />
 			<h:inputText name="login" value="#{component.login}" />
 			<h:outputText name="password" value="password :" />
@@ -16,7 +16,7 @@
 	</h:form>
 
 	<h:form>
-		<c:if test="#{component.securityManager.isConnected}">
+		<c:if test="#{component.securityManager.isConnected()}">
 			<h:commandButton value="disconnect"
 				action="#{component.disconnect()}" />
 		</c:if>

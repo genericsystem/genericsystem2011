@@ -18,17 +18,15 @@ import org.slf4j.LoggerFactory;
  */
 
 @FunctionalInterface
-public interface AbstractSnapshot<T> extends Snapshot<T> {
+public interface FunctionalSnapshot<T> extends Snapshot<T> {
 
-	static Logger log = LoggerFactory.getLogger(AbstractSnapshot.class);
+	static Logger log = LoggerFactory.getLogger(FunctionalSnapshot.class);
 
 	// methods of Snapshot
 
-	// @Override
-
 	@Override
-	default public <E> AbstractSnapshot<E> project(final Projector<E, T> projector) {
-		return () -> new AbstractProjectionIterator<T, E>(AbstractSnapshot.this.iterator()) {
+	default public <E> FunctionalSnapshot<E> project(final Projector<E, T> projector) {
+		return () -> new AbstractProjectionIterator<T, E>(FunctionalSnapshot.this.iterator()) {
 			@Override
 			public E project(T t) {
 				return projector.project(t);
@@ -38,10 +36,10 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 
 	@Override
 	default public Snapshot<T> filter(final Filter<T> filter) {
-		return new AbstractSnapshot<T>() {
+		return new FunctionalSnapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return new AbstractFilterIterator<T>(AbstractSnapshot.this.iterator()) {
+				return new AbstractFilterIterator<T>(FunctionalSnapshot.this.iterator()) {
 					@Override
 					public boolean isSelected() {
 						return filter.isSelected(next);
@@ -226,11 +224,12 @@ public interface AbstractSnapshot<T> extends Snapshot<T> {
 		return (minCapacity > MAX_ARRAY_SIZE) ? Integer.MAX_VALUE : MAX_ARRAY_SIZE;
 	}
 
-	@SuppressWarnings("hiding")
+	@SuppressWarnings("unchecked")
 	@Override
 	default public <F> F[] toArray(F[] a) {
 		// Estimate size of array; be prepared to see more or fewer elements
 		int size = size();
+		@SuppressWarnings("unchecked")
 		F[] r = a.length >= size ? a : (F[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
 		Iterator<T> it = iterator();
 
