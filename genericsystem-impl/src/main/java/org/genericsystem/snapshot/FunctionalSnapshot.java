@@ -23,6 +23,7 @@ public interface FunctionalSnapshot<T> extends Snapshot<T> {
 	static Logger log = LoggerFactory.getLogger(FunctionalSnapshot.class);
 
 	// methods of Snapshot
+	
 
 	@Override
 	default public <E> Snapshot<E> project(final Projector<E, T> projector) {
