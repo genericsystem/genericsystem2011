@@ -25,11 +25,16 @@ public interface FunctionalSnapshot<T> extends Snapshot<T> {
 	// methods of Snapshot
 
 	@Override
-	default public <E> FunctionalSnapshot<E> project(final Projector<E, T> projector) {
-		return () -> new AbstractProjectionIterator<T, E>(FunctionalSnapshot.this.iterator()) {
+	default public <E> Snapshot<E> project(final Projector<E, T> projector) {
+		return new FunctionalSnapshot<E>() {
 			@Override
-			public E project(T t) {
-				return projector.project(t);
+			public Iterator<E> iterator() {
+				return new AbstractProjectionIterator<T, E>(FunctionalSnapshot.this.iterator()) {
+					@Override
+					public E project(T t) {
+						return projector.project(t);
+					}
+				};
 			}
 		};
 	}
