@@ -1359,20 +1359,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Type> T getSubType(Serializable value) {
-		return unambigousFirst(Statics.<T> valueFilter(this.<T> subTypesIterator(), value));
+		return unambigousFirst(this.<T> getSubTypesSnapshot().filter(next -> Objects.equals(value, next.getValue())).iterator());
+		// return unambigousFirst(Statics.<T> valueFilter(this.<T> subTypesIterator(), value));
 	}
 
 	@Override
 	public <T extends Generic> FunctionalSnapshot<T> getSubTypes() {
-		return () -> subTypesIterator();
+		return getSubTypesSnapshot();
 	}
 
-	private <T extends Generic> FunctionalSnapshot<T> subTypesSnapshot() {
+	private <T extends Generic> FunctionalSnapshot<T> getSubTypesSnapshot() {
 		return GenericImpl.this.<T> getInheritingsSnapshot().filter(next -> next.getMetaLevel() == getMetaLevel());
-	}
-
-	private <T extends Generic> Iterator<T> subTypesIterator() {
-		return Statics.levelFilter(GenericImpl.this.<T> inheritingsIterator(), getMetaLevel());
 	}
 
 	@Override
