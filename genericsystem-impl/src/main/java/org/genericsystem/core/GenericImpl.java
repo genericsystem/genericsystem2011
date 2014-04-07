@@ -1334,10 +1334,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return internalComponentsFilter(iterator, attribute, true, targets);
 	}
 
-	// <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, Generic... targets) {
-	// return internalComponentsFilter(iterator, attribute, true, targets);
-	// }
-
 	<T extends Generic> Iterator<T> componentsFilter(Iterator<T> iterator, Holder attribute, Generic... components) {
 		return internalComponentsFilter(iterator, attribute, false, components);
 	}
@@ -1387,8 +1383,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	// TODO super KK what is this method, what dost it do : no components ? no supers ? ???
 	@Override
 	public <T extends Generic> T getAllSubType(Serializable value) {
-		// return (T) (this.<T> getAllInheritingsSnapshotWithoutRoot().filter(next -> next.isStructural()).filter(next -> Objects.equals(value, next.getValue()));//.unambigousFirst();
-		return this.unambigousFirst(Statics.<T> valueFilter(Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL), value));
+		return unambigousFirst((this.<T> getAllInheritingsSnapshotWithoutRoot().filter(next -> next.isStructural()).filter(next -> Objects.equals(value, next.getValue()))).iterator());
+		// return this.unambigousFirst(Statics.<T> valueFilter(Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL), value));
 	}
 
 	@Override
