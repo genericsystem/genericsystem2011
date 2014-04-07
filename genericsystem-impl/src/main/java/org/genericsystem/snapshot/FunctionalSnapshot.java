@@ -23,34 +23,23 @@ public interface FunctionalSnapshot<T> extends Snapshot<T> {
 	static Logger log = LoggerFactory.getLogger(FunctionalSnapshot.class);
 
 	// methods of Snapshot
-	
 
 	@Override
-	default public <E> Snapshot<E> project(final Projector<E, T> projector) {
-		return new FunctionalSnapshot<E>() {
+	default public <E> FunctionalSnapshot<E> project(final Projector<E, T> projector) {
+		return () -> new AbstractProjectionIterator<T, E>(FunctionalSnapshot.this.iterator()) {
 			@Override
-			public Iterator<E> iterator() {
-				return new AbstractProjectionIterator<T, E>(FunctionalSnapshot.this.iterator()) {
-					@Override
-					public E project(T t) {
-						return projector.project(t);
-					}
-				};
+			public E project(T t) {
+				return projector.project(t);
 			}
 		};
 	}
 
 	@Override
-	default public Snapshot<T> filter(final Filter<T> filter) {
-		return new FunctionalSnapshot<T>() {
+	default public FunctionalSnapshot<T> filter(final Filter<T> filter) {
+		return () -> new AbstractFilterIterator<T>(FunctionalSnapshot.this.iterator()) {
 			@Override
-			public Iterator<T> iterator() {
-				return new AbstractFilterIterator<T>(FunctionalSnapshot.this.iterator()) {
-					@Override
-					public boolean isSelected() {
-						return filter.isSelected(next);
-					}
-				};
+			public boolean isSelected() {
+				return filter.isSelected(next);
 			}
 		};
 	}
