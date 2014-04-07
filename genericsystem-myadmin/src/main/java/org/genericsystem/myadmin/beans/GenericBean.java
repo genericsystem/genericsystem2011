@@ -21,12 +21,10 @@ import org.genericsystem.exception.NotRemovableException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 import org.genericsystem.generic.Type;
+import org.genericsystem.jsf.util.GsMessages;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
-import org.genericsystem.myadmin.util.GsMessages;
-import org.jboss.seam.international.status.MessageFactory;
-import org.jboss.seam.international.status.builder.BundleKey;
 import org.richfaces.component.UIMenuGroup;
 import org.richfaces.component.UIMenuItem;
 import org.slf4j.Logger;
@@ -49,8 +47,6 @@ public class GenericBean implements Serializable {
 	private GsMessages messages;
 	@Inject
 	private GuiGenericsTreeBean genericTreeBean;
-	@Inject
-	MessageFactory factory;
 
 	private List<StructuralWrapper> structuralWrappers = new ArrayList<>();
 
@@ -188,7 +184,7 @@ public class GenericBean implements Serializable {
 		int i = 0;
 		for (Generic generic : ((Type) getGeneric()).getAttributes()) {
 			UIMenuItem uiMenuItem = (UIMenuItem) facesContext.getApplication().createComponent(UIMenuItem.COMPONENT_TYPE);
-			uiMenuItem.setLabel(factory.info(new BundleKey(MESSAGES_BUNDLE_NAME, "itmShowValuesOf"), generic.toString()).build().getText());
+			uiMenuItem.setLabel(messages.getInfos(generic.toString()));
 			MethodExpression methodExpression = facesContext.getApplication().getExpressionFactory()
 					.createMethodExpression(facesContext.getELContext(), "#{guiGenericsTreeBean.changeAttributeSelected(" + i + ")}", void.class, new Class<?>[] { Integer.class });
 			uiMenuItem.setActionExpression(methodExpression);
