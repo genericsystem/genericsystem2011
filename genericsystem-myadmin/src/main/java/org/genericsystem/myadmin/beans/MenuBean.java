@@ -6,8 +6,8 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.genericsystem.jsf.util.GsMessages;
 import org.genericsystem.myadmin.gui.GuiGenericsTreeNode;
-import org.genericsystem.myadmin.util.GsMessages;
 
 @RequestScoped
 @Named

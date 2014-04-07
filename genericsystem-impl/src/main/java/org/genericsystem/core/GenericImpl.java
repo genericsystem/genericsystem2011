@@ -483,6 +483,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getCurrentCache().inheritingsIterator(this);
 	}
 
+	public <T extends Generic> FunctionalSnapshot<T> inheritingsSnapshot() {
+		return () -> getCurrentCache().inheritingsIterator(this);
+	}
+
 	public <T extends Generic> Iterator<T> dependenciesIterator() {
 		return new ConcateIterator<T>(this.<T> inheritingsIterator(), this.<T> compositesIterator());
 	}
@@ -1275,11 +1279,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> FunctionalSnapshot<T> getAllInstances() {
-		return () -> allInstancesIterator();
+		return this.<T> allInheritingsAboveSnapshot().filter(next -> next.getMetaLevel() == getMetaLevel() + 1);
 	}
 
 	public <T extends Generic> Iterator<T> allInstancesIterator() {
-		return Statics.levelFilter(this.<T> allInheritingsAboveIterator(getMetaLevel() + 1), getMetaLevel() + 1);
+		return Statics.levelFilter(() -> this.<T> allInheritingsAboveIterator(getMetaLevel() + 1), getMetaLevel() + 1);
+	}
+
+	private <T extends Generic> FunctionalSnapshot<T> allInheritingsAboveSnapshot() {
+		return () -> this.<T> allInheritingsAboveIterator(getMetaLevel() + 1);
 	}
 
 	private <T extends Generic> Iterator<T> allInheritingsAboveIterator(final int metaLevel) {
@@ -1360,7 +1368,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> subTypesIterator() {
-		return Statics.levelFilter(GenericImpl.this.<T> inheritingsIterator(), getMetaLevel());
+		return Statics.levelFilter(() -> GenericImpl.this.<T> inheritingsIterator(), getMetaLevel());
 	}
 
 	@Override
@@ -1380,7 +1388,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	private <T extends Generic> Iterator<T> allSubTypesIteratorWithoutRoot() {
-		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
+		return Statics.levelFilter(() -> this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
 	}
 
 	public <T extends Generic> FunctionalSnapshot<T> getAllInheritings() {

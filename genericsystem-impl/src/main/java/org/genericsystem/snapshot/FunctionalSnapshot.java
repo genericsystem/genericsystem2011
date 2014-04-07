@@ -35,16 +35,11 @@ public interface FunctionalSnapshot<T> extends Snapshot<T> {
 	}
 
 	@Override
-	default public Snapshot<T> filter(final Filter<T> filter) {
-		return new FunctionalSnapshot<T>() {
+	default public FunctionalSnapshot<T> filter(final Filter<T> filter) {
+		return () -> new AbstractFilterIterator<T>(FunctionalSnapshot.this.iterator()) {
 			@Override
-			public Iterator<T> iterator() {
-				return new AbstractFilterIterator<T>(FunctionalSnapshot.this.iterator()) {
-					@Override
-					public boolean isSelected() {
-						return filter.isSelected(next);
-					}
-				};
+			public boolean isSelected() {
+				return filter.isSelected(next);
 			}
 		};
 	}

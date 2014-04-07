@@ -10,14 +10,14 @@ import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.deltaspike.jsf.api.listener.phase.AfterPhase;
+import org.apache.deltaspike.jsf.api.listener.phase.JsfPhaseId;
 import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.CacheImpl;
 import org.genericsystem.core.Statics;
 import org.genericsystem.exception.ConstraintViolationException;
-import org.genericsystem.myadmin.util.GsMessages;
-import org.jboss.seam.faces.event.qualifier.After;
-import org.jboss.seam.faces.event.qualifier.InvokeApplication;
+import org.genericsystem.jsf.util.GsMessages;
 
 /**
  * Bean for management of cache via GUI of MyAdmin.
@@ -98,7 +98,7 @@ public class CacheBean implements Serializable {
 	 *            - event of JSF phase.
 	 * @throws ConstraintViolationException
 	 */
-	public void resetTransactionTs(@Observes @After @InvokeApplication PhaseEvent phaseEvent) throws ConstraintViolationException {
+	public void resetTransactionTs(@Observes @AfterPhase(JsfPhaseId.INVOKE_APPLICATION) PhaseEvent phaseEvent) throws ConstraintViolationException {
 		((CacheImpl) cacheProvider.getCurrentCache()).refresh();
 	}
 

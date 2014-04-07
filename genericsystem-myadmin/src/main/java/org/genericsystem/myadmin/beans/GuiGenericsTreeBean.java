@@ -13,16 +13,16 @@ import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.deltaspike.jsf.api.listener.phase.AfterPhase;
+import org.apache.deltaspike.jsf.api.listener.phase.JsfPhaseId;
 import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.GenericImpl;
+import org.genericsystem.jsf.util.GsMessages;
 import org.genericsystem.myadmin.beans.MenuBean.MenuEvent;
 import org.genericsystem.myadmin.beans.PanelBean.PanelTitleChangeEvent;
 import org.genericsystem.myadmin.gui.GuiGenericsTreeNode;
 import org.genericsystem.myadmin.gui.GuiGenericsTreeNode.GuiTreeChildrenType;
-import org.genericsystem.myadmin.util.GsMessages;
-import org.jboss.seam.faces.event.qualifier.After;
-import org.jboss.seam.faces.event.qualifier.InvokeApplication;
 import org.richfaces.component.UITree;
 import org.richfaces.event.TreeSelectionChangeEvent;
 import org.slf4j.Logger;
@@ -275,7 +275,7 @@ public class GuiGenericsTreeBean implements Serializable {
 	 * @param phaseEvent
 	 *            - event of phase changing.
 	 */
-	public void fireEvent(@Observes @InvokeApplication @After PhaseEvent phaseEvent) {
+	public void fireEvent(@Observes @AfterPhase(JsfPhaseId.INVOKE_APPLICATION) PhaseEvent phaseEvent) {
 		if (event != null) {
 			launcher.fire(event);
 			event = null;

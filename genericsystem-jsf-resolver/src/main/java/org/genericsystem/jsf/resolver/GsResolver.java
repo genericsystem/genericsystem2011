@@ -9,15 +9,13 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
 import javax.enterprise.context.ContextNotActiveException;
-import javax.enterprise.inject.spi.BeanManager;
+import javax.faces.view.facelets.ResourceResolver;
 
+import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.genericsystem.core.Cache;
 import org.genericsystem.file.FileSystem;
-import org.genericsystem.file.FileSystem.FileType.File;
 
-public class GsResolver extends DefaultResourceResolver {
-
-	private BeanManager beanManager = new BeanManagerLocator().getBeanManager();
+public class GsResolver extends ResourceResolver {
 
 	static byte[] asByteArray(final InputStream in) throws IllegalArgumentException {
 		if (in == null)
@@ -44,21 +42,21 @@ public class GsResolver extends DefaultResourceResolver {
 	@Override
 	public URL resolveUrl(String resource) {
 		try {
-			Cache cache = BeanManagerUtils.getContextualInstance(beanManager, Cache.class);
+			Cache cache = BeanProvider.getContextualReference(Cache.class);
 			FileSystem fileSystem = cache.<FileSystem> find(FileSystem.class);
 			byte[] fileContent = fileSystem.getFileContent(resource);
 			if (fileContent != null)
 				return new URL("", "", 0, resource, new GsStreamHandler(fileContent));
-			URL url = super.resolveUrl(resource);
-			if (url != null) {
-				File file = fileSystem.setFile(resource, asByteArray(((ByteArrayInputStream) url.getContent())));
-				return new URL("", "", 0, resource, new GsStreamHandler(file.getContent()));
-			}
+			// URL url = super.resolveUrl(resource);
+			// if (url != null) {
+			// File file = fileSystem.setFile(resource, asByteArray(((ByteArrayInputStream) url.getContent())));
+			// return new URL("", "", 0, resource, new GsStreamHandler(file.getContent()));
+			// }
 		} catch (ContextNotActiveException ignore) {
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
-		return super.resolveUrl(resource);
+		return null;// super.resolveUrl(resource);
 	}
 
 	public class GsStreamHandler extends URLStreamHandler {
