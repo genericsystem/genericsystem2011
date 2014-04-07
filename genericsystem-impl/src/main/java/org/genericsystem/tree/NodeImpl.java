@@ -35,14 +35,19 @@ public class NodeImpl extends GenericImpl implements Node {
 	// }
 
 	@Override
-	public <T extends Node> Snapshot<T> getChildren(final int basePos) {
-		return new FunctionalSnapshot<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return childrenIterator(basePos);
-			}
-		};
+	public <T extends Node> FunctionalSnapshot<T> getChildren(final int basePos) {
+		return () -> childrenIterator(basePos);
 	}
+
+	// @Override
+	// public <T extends Node> Snapshot<T> getChildren(final int basePos) {
+	// return new FunctionalSnapshot<T>() {
+	// @Override
+	// public Iterator<T> iterator() {
+	// return childrenIterator(basePos);
+	// }
+	// };
+	// }
 
 	<T extends Generic> Iterator<T> childrenIterator(int basePos) {
 		return thisFilter(this.<T> holdersIterator(Statics.CONCRETE, this.<Tree> getMeta(), basePos));
