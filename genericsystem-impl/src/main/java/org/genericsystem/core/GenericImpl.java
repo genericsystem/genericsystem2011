@@ -1275,11 +1275,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> FunctionalSnapshot<T> getAllInstances() {
-		return () -> allInstancesIterator();
+		return this.<T> allInheritingsAboveSnapshot().filter(next -> next.getMetaLevel() == getMetaLevel() + 1);
 	}
 
 	public <T extends Generic> Iterator<T> allInstancesIterator() {
 		return Statics.levelFilter(this.<T> allInheritingsAboveIterator(getMetaLevel() + 1), getMetaLevel() + 1);
+	}
+
+	private <T extends Generic> FunctionalSnapshot<T> allInheritingsAboveSnapshot() {
+		return () -> this.<T> allInheritingsAboveIterator(getMetaLevel() + 1);
 	}
 
 	private <T extends Generic> Iterator<T> allInheritingsAboveIterator(final int metaLevel) {
@@ -1321,6 +1325,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			}
 		});
 	}
+
+	// <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, Generic... targets) {
+	// return internalComponentsFilter(iterator, attribute, true, targets);
+	// }
 
 	<T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, Generic... targets) {
 		return internalComponentsFilter(iterator, attribute, true, targets);
@@ -1365,22 +1373,27 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Generic> FunctionalSnapshot<T> getAllSubTypes() {
-		return () -> allSubTypesIteratorWithoutRoot();
+		return () -> Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
 	}
 
 	// TODO super KK what is this method, what dost it do : no components ? no supers ? ???
 	@Override
 	public <T extends Generic> T getAllSubType(Serializable value) {
-		return this.unambigousFirst(Statics.<T> valueFilter(this.<T> allSubTypesIteratorWithoutRoot(), value));
+		return this.unambigousFirst(Statics.<T> valueFilter(Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL), value));
 	}
 
 	@Override
 	public <T extends Generic> FunctionalSnapshot<T> getAllSubTypes(final String name) {
-		return () -> Statics.valueFilter(GenericImpl.this.<T> allSubTypesIteratorWithoutRoot(), name);
+		return this.<T> allSubTypesSnapshotWithoutRoot().<T> filter(next -> Objects.equals(name, next.getValue()));
+		// return () -> Statics.valueFilter(GenericImpl.this.<T> allSubTypesIteratorWithoutRoot(), name);
 	}
 
-	private <T extends Generic> Iterator<T> allSubTypesIteratorWithoutRoot() {
-		return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
+	// private <T extends Generic> Iterator<T> allSubTypesIteratorWithoutRoot() {
+	// return Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
+	// }
+
+	private <T extends Generic> FunctionalSnapshot<T> allSubTypesSnapshotWithoutRoot() {
+		return () -> Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
 	}
 
 	public <T extends Generic> FunctionalSnapshot<T> getAllInheritings() {
