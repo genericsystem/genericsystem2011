@@ -27,17 +27,17 @@ public class GsRedirect {
 		}
 	}
 
-	public void redirectError(String key, Object... params) {
+	public void redirectError(String key, String... params) {
 		messages.redirectError(key, params);
 		redirect();
 	}
 
-	public void redirectWarn(String key, Object... params) {
+	public void redirectWarn(String key, String... params) {
 		messages.redirectWarn(key, params);
 		redirect();
 	}
 
-	public void redirectInfo(String key, Object... params) {
+	public void redirectInfo(String key, String... params) {
 		messages.redirectInfo(key, params);
 		redirect();
 	}
