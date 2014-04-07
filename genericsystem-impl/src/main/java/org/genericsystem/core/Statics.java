@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.genericsystem.core.UnsafeGList.Supers;
 import org.genericsystem.core.UnsafeGList.UnsafeComponents;
 import org.genericsystem.iterator.AbstractFilterIterator;
-import org.genericsystem.snapshot.FunctionalSnapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -337,8 +336,8 @@ public class Statics {
 		}
 	}
 
-	public static <T extends Generic> Iterator<T> levelFilter(FunctionalSnapshot<T> snapshot, final int instanciationLevel) {
-		return new AbstractFilterIterator<T>(snapshot.iterator()) {
+	public static <T extends Generic> Iterator<T> levelFilter(Iterator<T> iterator, final int instanciationLevel) {
+		return new AbstractFilterIterator<T>(iterator) {
 
 			@Override
 			public boolean isSelected() {
