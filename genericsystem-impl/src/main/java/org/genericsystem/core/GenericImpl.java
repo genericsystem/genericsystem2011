@@ -1326,6 +1326,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		});
 	}
 
+	// <T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, Generic... targets) {
+	// return internalComponentsFilter(iterator, attribute, true, targets);
+	// }
+
 	<T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, Generic... targets) {
 		return internalComponentsFilter(iterator, attribute, true, targets);
 	}
