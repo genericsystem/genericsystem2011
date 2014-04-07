@@ -496,6 +496,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return () -> inheritingsIterator();
 	}
 
+	public <T extends Generic> FunctionalSnapshot<T> compositesSnapshot() {
+		return () -> getCurrentCache().compositesIterator(this);
+	}
+
 	public <T extends Generic> Iterator<T> compositesIterator() {
 		return getCurrentCache().compositesIterator(this);
 	}
@@ -507,6 +511,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return GenericImpl.this.equals(((Holder) next).getComponent(pos));
 			}
 		};
+	}
+
+	public <T extends Generic> FunctionalSnapshot<T> compositesSnapshot(final int pos) {
+		return this.<T> compositesSnapshot().filter(next -> GenericImpl.this.equals(((Holder) next).getComponent(pos)));
 	}
 
 	@Override
@@ -700,6 +708,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((Attribute) origin).isInheritanceEnabled() ? this.<T> inheritanceIterator(level, origin, basePos) : this.<T> noInheritanceIterator(level, basePos, origin);
 	}
 
+	public <T extends Generic> FunctionalSnapshot<T> holdersSnapshot(int level, Holder origin, int basePos) {
+		if (Statics.STRUCTURAL == level)
+			basePos = Statics.MULTIDIRECTIONAL;
+		return ((Attribute) origin).isInheritanceEnabled() ? this.<T> inheritanceSnapshot(level, origin, basePos) : this.<T> noInheritanceSnapshot(level, basePos, origin);
+	}
+
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final int metaLevel, int pos, final Generic origin) {
 		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
 			@Override
@@ -707,6 +721,15 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return next.getMetaLevel() == metaLevel && next.inheritsFrom(origin);
 			}
 		};
+	}
+
+	private <T extends Generic> FunctionalSnapshot<T> noInheritanceSnapshot(final int metaLevel, int pos, final Generic origin) {
+		return (Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesSnapshot() : this.<T> compositesSnapshot(pos)).filter(next -> next.getMetaLevel() == metaLevel && next.inheritsFrom(origin));
+	}
+
+	private <T extends Generic> FunctionalSnapshot<T> inheritanceSnapshot(final int level, final Generic origin, final int pos) {
+		return this.<T> getInternalInheritings(level, origin, pos).filter(
+				next -> level == next.getMetaLevel() && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) next).isAttributeOf(GenericImpl.this)));
 	}
 
 	private <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
@@ -901,8 +924,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	private <T extends Generic> Set<T> getInternalInheritings(int level, Generic origin, int pos) {
-		return new Inheritings<>(level, origin, pos);
+	private <T extends Generic> FunctionalSnapshot<T> getInternalInheritings(int level, Generic origin, int pos) {
+		return () -> new Inheritings<T>(level, origin, pos).iterator();
 	}
 
 	public void project() {
