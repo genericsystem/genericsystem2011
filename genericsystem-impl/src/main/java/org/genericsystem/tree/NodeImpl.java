@@ -17,7 +17,7 @@ public class NodeImpl extends GenericImpl implements Node {
 	@Override
 	public <T extends Node> T getChild(Serializable value) {
 		Tree attribute = getMeta();
-		return unambigousFirst(this.<T> holdersSnapshot(attribute, Statics.CONCRETE, getBasePos(attribute)).filter(next -> !equals(next)).filter(next -> Objects.equals(value, next.getValue())));
+		return unambigousFirst(this.<T> getChildren(getBasePos(attribute)).filter(next -> Objects.equals(value, next.getValue())));
 	}
 
 	@Override
@@ -34,11 +34,6 @@ public class NodeImpl extends GenericImpl implements Node {
 	public <T extends Node> FunctionalSnapshot<T> getChildren(final int basePos) {
 		return this.<T> holdersSnapshot(Statics.CONCRETE, this.<Tree> getMeta(), basePos).filter(next -> !equals(next));
 	}
-
-	// @Override
-	// public <T extends Node> FunctionalSnapshot<T> getChildren(final int basePos) {
-	// return () -> thisFilter(this.<T> holdersIterator(Statics.CONCRETE, this.<Tree> getMeta(), basePos));
-	// }
 
 	@Override
 	public <T extends Node> T addNode(Serializable value, Generic... targets) {

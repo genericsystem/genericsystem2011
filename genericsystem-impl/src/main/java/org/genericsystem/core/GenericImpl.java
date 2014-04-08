@@ -254,7 +254,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Serializable> Snapshot<T> getValues(final Holder attribute) {
+	public <T extends Serializable> FunctionalSnapshot<T> getValues(final Holder attribute) {
 		return getHolders(attribute).project(holder -> holder.<T> getValue());
 	}
 
@@ -321,12 +321,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		internalCancel(unambigousFirst(holdersSnapshot(holder, metaLevel, getBasePos(holder))), metaLevel, getBasePos(holder));
 	}
 
-	// @Override
-	// public void cancel(Holder holder, int metaLevel) {
-	// internalClear(unambigousFirst(holdersIterator(holder, metaLevel, getBasePos(holder))));
-	// internalCancel(unambigousFirst(holdersIterator(holder, metaLevel, getBasePos(holder))), metaLevel, getBasePos(holder));
-	// }
-
 	@Override
 	public void cancelAll(Holder attribute, Generic... targets) {
 		cancelAll(attribute, Statics.CONCRETE, targets);
@@ -336,14 +330,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	public void cancelAll(Holder attribute, int metaLevel, Generic... targets) {
 		cancelAll(attribute, getBasePos(attribute), metaLevel, targets);
 	}
-
-	// @Override
-	// public void cancelAll(Holder attribute, int basePos, int metaLevel, Generic... targets) {
-	// internalClearAll(attribute, basePos, metaLevel, targets);
-	// Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, metaLevel, basePos, targets);
-	// while (holders.hasNext())
-	// internalCancel(holders.next(), metaLevel, basePos);
-	// }
 
 	@Override
 	public void cancelAll(Holder attribute, int basePos, int metaLevel, Generic... targets) {
@@ -389,12 +375,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			internalClear(holder);
 	}
 
-	// private void internalClearAll(Holder attribute, int basePos, int metaLevel, Generic... targets) {
-	// Iterator<Holder> holders = this.<Holder> holdersIterator(attribute, metaLevel, basePos, targets);
-	// while (holders.hasNext())
-	// internalClear(holders.next());
-	// }
-
 	private void internalClear(Holder holder) {
 		if (holder != null && equals(holder.getBaseComponent()))
 			holder.remove();
@@ -407,7 +387,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Holder> Snapshot<T> getHolders(final Holder attribute, final Generic... targets) {
+	public <T extends Holder> FunctionalSnapshot<T> getHolders(final Holder attribute, final Generic... targets) {
 		return getHolders(attribute, getBasePos(attribute), targets);
 	}
 
@@ -417,7 +397,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public <T extends Link> Snapshot<T> getLinks(final Relation relation, final Generic... targets) {
+	public <T extends Link> FunctionalSnapshot<T> getLinks(final Relation relation, final Generic... targets) {
 		return getLinks(relation, getBasePos(relation), targets);
 	}
 
@@ -441,13 +421,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Holder> FunctionalSnapshot<T> holdersSnapshot(Holder attribute, Generic... targets) {
-		// return this.<T> targetsFilter(GenericImpl.this.<T> holdersSnapshot(Statics.CONCRETE, attribute, getBasePos(attribute)), attribute, targets);
 		return holdersSnapshot(attribute, Statics.CONCRETE, getBasePos(attribute), targets);
 	}
-
-	// public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int metaLevel, int basePos, Generic... targets) {
-	// return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(metaLevel, attribute, basePos), attribute, targets);
-	// }
 
 	public <T extends Holder> FunctionalSnapshot<T> holdersSnapshot(Holder attribute, int metaLevel, int basePos, Generic... targets) {
 		return this.<T> targetsFilter(GenericImpl.this.<T> holdersSnapshot(metaLevel, attribute, basePos), attribute, targets);
@@ -481,15 +456,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return unambigousFirst(snapshot.filter(next -> Objects.equals(value, next.getValue())));
 	}
 
-	// public <T extends Holder> T getHolderByValue(int metaLevel, Holder attribute, Serializable value, int basePos, final Generic... targets) {
-	// return this.unambigousFirst(Statics.valueFilter(this.<T> holdersIterator(attribute, metaLevel, basePos, targets), value));
-	// }
-
-	// @Override
-	// public <T extends Link> T getLink(Link relation, int basePos, Generic... targets) {
-	// return this.unambigousFirst(this.<T> linksIterator(relation, basePos, targets));
-	// }
-
 	@Override
 	public <T extends Link> T getLink(Link relation, int basePos, Generic... targets) {
 		return this.unambigousFirst(this.<T> linksSnapshot(relation, basePos, targets));
@@ -498,15 +464,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	private <T extends Link> FunctionalSnapshot<T> linksSnapshot(final Link relation, final int basePos, final Generic... targets) {
 		return GenericImpl.this.<T> holdersSnapshot(relation, Statics.CONCRETE, basePos, targets).filter(next -> next.isRelation());
 	}
-
-	// private <T extends Link> Iterator<T> linksIterator(final Link relation, final int basePos, final Generic... targets) {
-	// return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(relation, Statics.CONCRETE, basePos, targets)) {
-	// @Override
-	// public boolean isSelected() {
-	// return next.isRelation();
-	// }
-	// };
-	// }
 
 	@Override
 	public <T extends Link> T getLink(Link relation, Generic... targets) {
@@ -556,24 +513,20 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return () -> compositesIterator();
 	}
 
-	public <T extends Generic> FunctionalSnapshot<T> attributesSnapshot() {
-		return this.<T> holdersSnapshot(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL);
-	}
-
 	@Override
 	public <T extends Attribute> FunctionalSnapshot<T> getAttributes() {
-		return attributesSnapshot();
+		return getAttributes(getCurrentCache().getMetaAttribute());
 	}
 
 	@Override
 	public <T extends Attribute> FunctionalSnapshot<T> getAttributes(final Attribute attribute) {
-		return () -> holdersIterator(Statics.STRUCTURAL, attribute, Statics.MULTIDIRECTIONAL);
+		return this.<T> holdersSnapshot(Statics.STRUCTURAL, attribute, Statics.MULTIDIRECTIONAL);
 	}
 
 	@Override
 	public <T extends Attribute> T getAttribute(Serializable value, Generic... targets) {
 		Attribute metaAttribute = getCurrentCache().getMetaAttribute();
-		return this.<T> unambigousFirst(this.<T> targetsFilter(this.<T> holdersSnapshot(Statics.STRUCTURAL, metaAttribute, Statics.MULTIDIRECTIONAL).filter(next -> Objects.equals(value, next.getValue())), metaAttribute, targets));
+		return this.<T> unambigousFirst(this.<T> targetsFilter(this.<T> getAttributes().filter(next -> Objects.equals(value, next.getValue())), metaAttribute, targets));
 	}
 
 	@Override
@@ -587,15 +540,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public <T extends Relation> T getRelation(Serializable value, Generic... targets) {
-		Relation metaRelation = getCurrentCache().getMetaRelation();
-		return this.unambigousFirst(targetsFilter(this.<T> holdersSnapshot(Statics.STRUCTURAL, metaRelation, Statics.MULTIDIRECTIONAL).filter(next -> Objects.equals(value, next.getValue())), metaRelation, targets));
+		return getAttribute(value, targets);
 	}
-
-	// @Override
-	// public <T extends Relation> T getRelation(Serializable value, Generic... targets) {
-	// Relation metaRelation = getCurrentCache().getMetaRelation();
-	// return this.unambigousFirst(targetsFilter(Statics.valueFilter(this.<T> holdersIterator(Statics.STRUCTURAL, metaRelation, Statics.MULTIDIRECTIONAL), value), metaRelation, targets));
-	// }
 
 	@Override
 	public <T extends Attribute> T getProperty(Serializable value, Generic... targets) {
@@ -1348,7 +1294,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> Iterator<T> allInstancesIterator() {
-		// return this.<T> allInheritingsAboveSnapshot().filter(next -> next.getMetaLevel() == getMetaLevel() + 1);
 		return Statics.levelFilter(this.<T> allInheritingsAboveIterator(getMetaLevel() + 1), getMetaLevel() + 1);
 	}
 
