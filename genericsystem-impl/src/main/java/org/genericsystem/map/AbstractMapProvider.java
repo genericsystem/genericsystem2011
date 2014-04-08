@@ -122,6 +122,8 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 
 			@Override
 			public Set<Key> keySet() {
+				// return new InternalSnapshot<Key>();
+
 				return new FunctionalSnapshot<Key>() {
 					@Override
 					public Iterator<Key> iterator() {
@@ -130,9 +132,54 @@ public abstract class AbstractMapProvider<Key extends Serializable, Value extend
 				};
 			}
 
+			private FunctionalSnapshot<Holder> getAllKeysSnapshot() {
+				Holder map = generic.getHolder(AbstractMapProvider.this);
+				return map == null ? () -> Collections.<Holder> emptyIterator() : ((GenericImpl) map).<Holder> holdersSnapshot(getKeyAttribute(null));
+			}
+
 			private Iterator<Holder> getAllKeysIterator() {
 				Holder map = generic.getHolder(AbstractMapProvider.this);
 				return map == null ? Collections.<Holder> emptyIterator() : ((GenericImpl) map).<Holder> holdersIterator(getKeyAttribute(null));
+			}
+
+			class InternalSnapshot<T> implements FunctionalSnapshot<T> {
+
+				protected Holder valueHolder;
+				Holder mapHolder = getMapHolder();
+				Attribute valueAttribute = getValueAttribute();
+
+				@Override
+				public Iterator<T> iterator() {
+					throw new UnsupportedOperationException();
+				}
+
+				public InternalSnapshot() {
+					getAllKeysSnapshot().filter(next -> {
+						Attribute keyAttribute = getKeyAttribute(next.<Key> getValue());
+						if (!keyAttribute.isInheritanceEnabled() && isMapHolderInherited(mapHolder))
+							return false;
+						Holder keyHolder = getKeyHolder(mapHolder, keyAttribute, next.<Key> getValue());
+						if (keyHolder == null)
+							return false;
+						valueHolder = next.getHolder(valueAttribute);
+						return valueHolder != null;
+					}).project(next -> next.getValue());
+				}
+
+				@Override
+				public boolean remove(Object obj) {
+					if (!(obj instanceof Holder))
+						return false;
+					Holder next = (Holder) obj;
+					assert next.isAlive();
+					Holder map = next.getBaseComponent();
+					if (generic.equals(map.getBaseComponent()))
+						next.remove();
+					else
+						put(next.<Key> getValue(), null);
+					return true;
+				}
+
 			}
 
 			class InternalIterator<T> extends AbstractProjectorAndFilterIterator<Holder, T> {
