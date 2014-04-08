@@ -60,8 +60,8 @@ public class TypesTest extends AbstractTest {
 
 	public void testGetOtherTargets() {
 		Type human = cache.setType("Human");
-		Generic michael = human.addInstance("Michael");
-		Generic quentin = human.addInstance("Quentin");
+		Generic michael = human.setInstance("Michael");
+		Generic quentin = human.setInstance("Quentin");
 		Relation isBrotherOf = human.setRelation("isBrotherOf", human);
 		// isBrotherOf.enableMultiDirectional();
 		Link link = quentin.bind(isBrotherOf, michael);

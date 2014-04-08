@@ -14,7 +14,7 @@ import org.genericsystem.constraints.SingularConstraintImpl;
 import org.genericsystem.constraints.SizeConstraintImpl;
 import org.genericsystem.core.GenericImpl;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.myadmin.util.GsMessages;
+import org.genericsystem.jsf.util.GsMessages;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceProperty;
 import org.slf4j.Logger;

@@ -4,8 +4,6 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
 						http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
 
-	<name>gsmyadmin</name>
-
 	<application>
 		<resource-bundle>
 			<base-name>/bundles/messages</base-name>
