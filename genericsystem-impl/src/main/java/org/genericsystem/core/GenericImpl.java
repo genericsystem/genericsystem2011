@@ -526,9 +526,13 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.<T> holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL);
 	}
 
+	public <T extends Generic> FunctionalSnapshot<T> attributesSnapshot() {
+		return this.<T> holdersSnapshot(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL);
+	}
+
 	@Override
 	public <T extends Attribute> FunctionalSnapshot<T> getAttributes() {
-		return () -> attributesIterator();
+		return attributesSnapshot();
 	}
 
 	@Override
