@@ -12,7 +12,7 @@ import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.iterator.AbstractPostTreeIterator;
 import org.genericsystem.iterator.AbstractPreTreeIterator;
-import org.genericsystem.snapshot.AbstractSnapshot;
+import org.genericsystem.snapshot.FunctionalSnapshot;
 import org.testng.annotations.Test;
 
 @Test
@@ -23,7 +23,7 @@ public class IteratorTest extends AbstractTest {
 		Type vehicle = cache.addType("Vehicle");
 		Type truck = cache.addType("Truck");
 		Type car = vehicle.addSubType( "Car");
-		AbstractSnapshot<Generic> snapshot = new AbstractSnapshot<Generic>() {
+		FunctionalSnapshot<Generic> snapshot = new FunctionalSnapshot<Generic>() {
 			@Override
 			public Iterator<Generic> iterator() {
 				return new AbstractPostTreeIterator<Generic>(cache.getEngine()) {
@@ -44,7 +44,7 @@ public class IteratorTest extends AbstractTest {
 	public void testPreTree() {
 		final Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type car = cache.addType("Car");
-		Snapshot<Generic> snapshot = new AbstractSnapshot<Generic>() {
+		Snapshot<Generic> snapshot = new FunctionalSnapshot<Generic>() {
 			@Override
 			public Iterator<Generic> iterator() {
 				return new AbstractPreTreeIterator<Generic>(cache.getEngine()) {
@@ -67,7 +67,7 @@ public class IteratorTest extends AbstractTest {
 		Type pilot = cache.addType("Pilot");
 		pilot.addSubType( "pilot1");
 		pilot.addSubType( "pilot2");
-		Snapshot<Generic> snapshot = new AbstractSnapshot<Generic>() {
+		Snapshot<Generic> snapshot = new FunctionalSnapshot<Generic>() {
 			@Override
 			public Iterator<Generic> iterator() {
 				return new AbstractPreTreeIterator<Generic>(cache.getEngine()) {

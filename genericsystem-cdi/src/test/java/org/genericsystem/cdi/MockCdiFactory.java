@@ -3,12 +3,12 @@ package org.genericsystem.cdi;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.Specializes;
+import javax.enterprise.inject.Vetoed;
 import javax.enterprise.inject.spi.BeanManager;
 
 import org.genericsystem.core.Cache;
 import org.genericsystem.core.Engine;
 import org.jboss.arquillian.testenricher.cdi.container.CDIExtension;
-import org.jboss.solder.core.Veto;
 
 @Specializes
 @Alternative
@@ -22,7 +22,7 @@ public class MockCdiFactory extends CdiFactory {
 		return MockSerializableCache.class;
 	}
 
-	@Veto
+	@Vetoed
 	public static class MockSerializableCache extends SerializableCache {
 
 		public MockSerializableCache() {

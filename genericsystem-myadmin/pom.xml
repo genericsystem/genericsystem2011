@@ -18,13 +18,12 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
-				<finalName>gsmyadmin</finalName>
-
+				<finalName>${project.artifactId}</finalName>
 				<plugins>
 					<plugin>
-						<groupId>org.jboss.as.plugins</groupId>
-						<artifactId>jboss-as-maven-plugin</artifactId>
-						<version>7.4.Final</version>
+						<groupId>org.wildfly.plugins</groupId>
+						<artifactId>wildfly-maven-plugin</artifactId>
+						<version>${wildfly-maven-plugin.version}</version>
 						<executions>
 							<execution>
 								<phase>install</phase>
@@ -34,16 +33,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					<!-- <plugin> <groupId>org.codehaus.cargo</groupId> <artifactId>cargo-maven2-plugin</artifactId> 
-						<version>${cargo-maven2-plugin.version}</version> <executions> <execution> 
-						<id>verify-deploy</id> <phase>install</phase> <goals> <goal>deployer-deploy</goal> 
-						</goals> </execution> </executions> <configuration> <deployer> <deployables> 
-						<deployable> <groupId>${project.groupId}</groupId> <artifactId>${project.artifactId}</artifactId> 
-						</deployable> </deployables> </deployer> <container> <containerId>tomcat7x</containerId> 
-						<home>${user.home}/apache-tomcat</home> </container> <type>existing</type> 
-						<home>${user.home}/apache-tomcat</home> </configuration> </plugin> -->
 				</plugins>
-
 			</build>
 		</profile>
 
@@ -62,12 +52,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.genericsystem</groupId>
-			<artifactId>genericsystem-cdi</artifactId>
+			<artifactId>genericsystem-jsf-resolver</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.genericsystem</groupId>
-			<artifactId>genericsystem-file</artifactId>
+			<artifactId>genericsystem-framework</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -83,35 +73,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.sun.faces</groupId>
-			<artifactId>jsf-api</artifactId>
-			<version>${jsf.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.faces</groupId>
-			<artifactId>jsf-impl</artifactId>
-			<version>${jsf.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<scope>provided</scope>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>jstl</groupId>
-			<artifactId>jstl</artifactId>
-			<version>${jstl.version}</version>
+			<groupId>org.jboss.spec.javax.faces</groupId>
+			<artifactId>jboss-jsf-api_2.2_spec</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
@@ -125,53 +88,23 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax.enterprise</groupId>
-			<artifactId>cdi-api</artifactId>
+			<groupId>jstl</groupId>
+			<artifactId>jstl</artifactId>
+			<version>${jstl.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.jboss.solder</groupId>
-			<artifactId>solder-api</artifactId>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.jboss.solder</groupId>
-			<artifactId>solder-impl</artifactId>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jboss.seam.faces</groupId>
-			<artifactId>seam-faces</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.ocpsoft</groupId>
-			<artifactId>prettyfaces-jsf2</artifactId>
-			<version>3.3.3</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jboss.seam.international</groupId>
-			<artifactId>seam-international</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<scope>compile</scope>
-		</dependency>
-
-
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
+			<version>2.2</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<!-- <dependency> <groupId>org.apache.tomcat</groupId> <artifactId>servlet-api</artifactId> 
-			<version>6.0.35</version> <scope>provided</scope> </dependency> -->
 
 		<!-- tests -->
 
@@ -190,6 +123,20 @@
 			<artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-container-spi</artifactId>
+			<version>${arquillian.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-container-test-impl-base</artifactId>
+			<version>${arquillian.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
@@ -206,13 +153,7 @@
 			<version>${jboss-ejb3-api.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -222,15 +163,6 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-
-			<dependency>
-				<groupId>org.jboss.seam</groupId>
-				<artifactId>seam-bom</artifactId>
-				<version>${seam.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
 			<dependency>
 				<groupId>org.richfaces</groupId>
 				<artifactId>richfaces-bom</artifactId>
@@ -238,7 +170,6 @@
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
-
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-bom</artifactId>

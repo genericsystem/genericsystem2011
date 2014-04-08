@@ -12,9 +12,9 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.util.AnnotationLiteral;
 
+import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.cdi.event.EventLauncher;
-import org.jboss.solder.beanManager.BeanManagerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class StartupBean implements Extension {
 
 	public void onStartup(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
 		log.info("------------------start initialization-----------------------");
-		UserClassesProvider userClasses = BeanManagerUtils.getContextualInstance(beanManager, UserClassesProvider.class);
+		UserClassesProvider userClasses = BeanProvider.getContextualReference(UserClassesProvider.class);// TODO BeanManagerUtils.getContextualInstance(beanManager, UserClassesProvider.class);
 		@SuppressWarnings("serial")
 		Set<Bean<?>> beans = beanManager.getBeans(Object.class, new AnnotationLiteral<Any>() {
 		});
@@ -39,8 +39,9 @@ public class StartupBean implements Extension {
 				}
 			}
 		}
-		EventLauncher eventLauncher = BeanManagerUtils.getContextualInstance(beanManager, EventLauncher.class);
+		EventLauncher eventLauncher = BeanProvider.getContextualReference(EventLauncher.class);// TODO BeanManagerUtils.getContextualInstance(beanManager, EventLauncher.class);
 		eventLauncher.launchStartEvent();
 		log.info("-------------------end initialization------------------------");
 	}
+
 }

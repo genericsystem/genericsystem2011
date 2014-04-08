@@ -18,6 +18,10 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		super(parent, generic);
 	}
 
+	public boolean isRelation() {
+		return generic.isRelation();
+	}
+
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
 		return Collections.emptyList();

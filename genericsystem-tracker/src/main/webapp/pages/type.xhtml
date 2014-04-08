@@ -32,11 +32,6 @@
 					action="#{component.remove(row)}" />
 			</h:column>
 		</h:dataTable>
-
 	</h:form>
-	<ui:include src="#{component.child.xhtmlPath}"
-		rendered="#{! empty component.child}">
-		<ui:param name="component" value="#{component.child}"></ui:param>
-	</ui:include>
 
 </ui:composition>

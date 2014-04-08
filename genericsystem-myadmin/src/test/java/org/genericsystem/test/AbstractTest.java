@@ -3,8 +3,7 @@ package org.genericsystem.test;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
-
+import org.apache.deltaspike.core.api.message.MessageContext;
 import org.genericsystem.cdi.CacheProvider;
 import org.genericsystem.cdi.CdiFactory;
 import org.genericsystem.cdi.EngineProvider;
@@ -12,21 +11,18 @@ import org.genericsystem.cdi.PersistentDirectoryProvider;
 import org.genericsystem.cdi.UserClassesProvider;
 import org.genericsystem.example.Example.MyVehicle;
 import org.genericsystem.example.Example.Vehicle;
+import org.genericsystem.jsf.util.FacesContextProvider;
+import org.genericsystem.jsf.util.GsMessages;
+import org.genericsystem.jsf.util.GsRedirect;
 import org.genericsystem.myadmin.beans.GenericBean;
 import org.genericsystem.myadmin.beans.GuiGenericsTreeBean;
 import org.genericsystem.myadmin.beans.WrapperBean;
-import org.genericsystem.myadmin.util.GsMessages;
-import org.genericsystem.myadmin.util.GsRedirect;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
-import org.jboss.seam.faces.environment.FacesContextProducer;
-import org.jboss.seam.international.status.MessageFactory;
-import org.jboss.seam.international.status.MessagesImpl;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.solder.el.Expressions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +32,9 @@ public abstract class AbstractTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createTestArchive() {
-		return new Archiver(GenericBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersistentDirectoryProvider.class, FacesContextProducer.class, MessagesImpl.class,
-				MessageFactory.class, CdiFactory.class, GuiGenericsTreeBean.class, WrapperBean.class, MyVehicle.class, Vehicle.class).archive();
+		return new Archiver(GenericBean.class, CacheProvider.class, GsMessages.class, GsRedirect.class, EngineProvider.class, UserClassesProvider.class, PersistentDirectoryProvider.class, CdiFactory.class, GuiGenericsTreeBean.class, WrapperBean.class,
+				MyVehicle.class, Vehicle.class).archive();
 	}
-
-	@Inject
-	Expressions expressions;
 
 	public static class Archiver {
 		JavaArchive archive = ShrinkWrap.create(JavaArchive.class);
@@ -49,7 +42,11 @@ public abstract class AbstractTest extends Arquillian {
 		public Archiver(Class<?>... classes) {
 			BeansXml beanXml = new BeansXml();
 			archive.addClasses(classes);
-			archive.addPackage(Expressions.class.getPackage());
+			archive.addPackage("org.apache.deltaspike.core.impl.scope.window");
+			archive.addPackage("org.genericsystem.cdi.event");
+			archive.addPackage("org.apache.deltaspike.core.impl.message");
+			archive.addPackage(MessageContext.class.getPackage());
+			archive.addPackage(FacesContextProvider.class.getPackage());
 			archive.addAsManifestResource(beanXml.byteArraySet(), ArchivePaths.create("beans.xml"));
 		}
 

@@ -11,11 +11,12 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.7</java.version>
+		<java.version>1.8</java.version>
 
-		<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+		<maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
 		<maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
 		<cargo-maven2-plugin.version>1.2.1</cargo-maven2-plugin.version>
+		<wildfly-maven-plugin.version>1.0.1.Final</wildfly-maven-plugin.version>
 		<maven-surefire-plugin.version>2.9</maven-surefire-plugin.version>
 
 		<jsf.version>2.1.19</jsf.version>
@@ -23,29 +24,33 @@
 
 		<org.richfaces.bom.version>4.3.2.Final</org.richfaces.bom.version>
 
-		<weld.core.version>1.1.12.Final</weld.core.version>
+		<weld.core.version>2.1.2.Final</weld.core.version>
 
-		<arquillian.version>1.0.4.Final</arquillian.version>
-		
+		<arquillian.version>1.1.4.Final</arquillian.version>
+
 		<seam.version>3.1.0.Final</seam.version>
+		<juel.version>2.2.5</juel.version>
+		<deltaspike.version>0.5</deltaspike.version>
 
 		<jboss-ejb3-api.version>3.1.0</jboss-ejb3-api.version>
 
 		<testng.version>6.8.1</testng.version>
 		<slf4j.version>1.7.2</slf4j.version>
+		<javassist.version>3.12.1.GA</javassist.version>
 	</properties>
 
 	<modules>
 		<module>genericsystem-api</module>
+		<module>genericsystem-impl</module>
 		<module>genericsystem-cdi</module>
 		<module>genericsystem-file</module>
-		<module>genericsystem-impl</module>
-		<module>genericsystem-myadmin</module>
 		<module>genericsystem-example</module>
 		<module>genericsystem-jsf</module>
 		<module>genericsystem-jsf-resolver</module>
 		<module>genericsystem-framework</module>
+		<module>genericsystem-security</module>
 		<module>genericsystem-jsf-example</module>
+		<module>genericsystem-myadmin</module>
 		<module>genericsystem-tracker</module>
 	</modules>
 
