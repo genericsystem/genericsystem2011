@@ -445,10 +445,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return holdersSnapshot(attribute, Statics.CONCRETE, getBasePos(attribute), targets);
 	}
 
-	// public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, int metaLevel, int basePos, Generic... targets) {
-	// return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(metaLevel, attribute, basePos), attribute, targets);
-	// }
-
 	public <T extends Holder> FunctionalSnapshot<T> holdersSnapshot(Holder attribute, int metaLevel, int basePos, Generic... targets) {
 		return this.<T> targetsFilter(GenericImpl.this.<T> holdersSnapshot(metaLevel, attribute, basePos), attribute, targets);
 	}
@@ -498,15 +494,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	private <T extends Link> FunctionalSnapshot<T> linksSnapshot(final Link relation, final int basePos, final Generic... targets) {
 		return GenericImpl.this.<T> holdersSnapshot(relation, Statics.CONCRETE, basePos, targets).filter(next -> next.isRelation());
 	}
-
-	// private <T extends Link> Iterator<T> linksIterator(final Link relation, final int basePos, final Generic... targets) {
-	// return new AbstractFilterIterator<T>(GenericImpl.this.<T> holdersIterator(relation, Statics.CONCRETE, basePos, targets)) {
-	// @Override
-	// public boolean isSelected() {
-	// return next.isRelation();
-	// }
-	// };
-	// }
 
 	@Override
 	public <T extends Link> T getLink(Link relation, Generic... targets) {
