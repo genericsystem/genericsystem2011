@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  */
 public class Statics {
 
@@ -256,7 +256,7 @@ public class Statics {
 
 	static class TsGenerator {
 		private final long startTime = System.currentTimeMillis() * Statics.MILLI_TO_NANOSECONDS - System.nanoTime();
-		private AtomicLong lastTime = new AtomicLong(0L);
+		private final AtomicLong lastTime = new AtomicLong(0L);
 
 		long pickNewTs() {
 			long nanoTs;
