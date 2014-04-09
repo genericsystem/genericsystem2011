@@ -8,7 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+import org.genericsystem.core.Generic;
 import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.AbstractSelectablePostTreeIterator;
 
@@ -242,6 +244,49 @@ public class Vertex {
 		};
 		// TODO
 		return overrides;
+	}
+
+	public static class OrderedSupers extends TreeSet<Vertex> {
+		private static final long serialVersionUID = 4756135385933890439L;
+
+		public OrderedSupers() {}
+
+		public OrderedSupers(Vertex add) {
+			add(add);
+		}
+
+		public OrderedSupers(Vertex... supers) {
+			for (Vertex superVertex : supers)
+				add(superVertex);
+		}
+
+		public OrderedSupers(Vertex[] supers, Vertex add) {
+			this(supers);
+			add(add);
+		}
+
+		public OrderedSupers(Vertex[] supers, Vertex[] adds) {
+			this(supers);
+			for (Vertex add : adds)
+				add(add);
+		}
+
+		@Override
+		public Generic[] toArray() {
+			return toArray(new Generic[size()]);
+		}
+
+		@Override
+		public boolean add(Vertex candidate) {
+			for (Vertex vertex : this)
+				if (vertex.inheritsFrom(candidate))
+					return false;
+			Iterator<Vertex> it = iterator();
+			while (it.hasNext())
+				if (candidate.inheritsFrom(it.next()))
+					it.remove();
+			return super.add(candidate);
+		}
 	}
 
 	public Vertex setInstance(Vertex[] supers, Serializable value, Vertex... components) {
