@@ -45,6 +45,10 @@ public class VertexText extends AbstractTest {
 		assert !carRed.isSuperOf(vehicleColor, "myBmwRed", red, red);
 		assert carRed.isSuperOf(vehicleColor, "CarRed", myBmw, red);
 		Vertex myBmwRed = vehicleColor.addInstance(new Vertex[] { carRed }, "myBmwRed", myBmw, red);
+		assert myBmwRed == vehicleColor.setInstance(new Vertex[] {}, "myBmwRed", myBmw, red);
+		assert myBmwRed == vehicleColor.getInstance("myBmwRed", myBmw, red) : vehicleColor.getInstance("myBmwRed", myBmw, red).info();
+
+		assert myBmwRed.inheritsFrom(carRed);
 		assert car.getAttributes(engine).contains(power);
 		assert car.getAttributes(engine).size() == 1;
 		assert !myBmwRed.inheritsFrom(power);

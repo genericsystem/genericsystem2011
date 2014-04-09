@@ -1,15 +1,18 @@
 package org.genericsystem.impl;
 
 import java.io.Serializable;
-import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+import org.genericsystem.core.Generic;
+import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
+import org.genericsystem.iterator.AbstractSelectablePostTreeIterator;
 
 public class Vertex {
 
@@ -52,19 +55,20 @@ public class Vertex {
 	}
 
 	private Vertex plug(boolean throwExistException) {
-		Arrays.asList(supers).forEach(superGeneric -> indexVertex(superGeneric.inheritings, throwExistException));
-		Arrays.asList(components).forEach(component -> indexVertex(component.composites, throwExistException));
-		return indexVertex(meta.instances, throwExistException);
+		Arrays.asList(supers).forEach(superGeneric -> putThisIfAbsentOfIndex(superGeneric.inheritings, throwExistException));
+		Arrays.asList(components).forEach(component -> putThisIfAbsentOfIndex(component.composites, throwExistException));
+		return putThisIfAbsentOfIndex(meta.instances, throwExistException);
 	}
 
-	private Vertex indexVertex(Map<Vertex, Vertex> index, boolean throwExistException) throws ExistException {
-		Vertex result = index.put(this, this);
-		if (result != null) {
+	private Vertex putThisIfAbsentOfIndex(Map<Vertex, Vertex> index, boolean throwExistException) throws ExistException {
+		if (!index.containsKey(this)) {
+			index.put(this, this);
+			return this;
+		} else {
 			if (throwExistException)
 				throw new ExistException();
-			return result;
+			return index.get(this);
 		}
-		return this;
 	}
 
 	public Serializable getValue() {
@@ -171,83 +175,35 @@ public class Vertex {
 	}
 
 	public static boolean inheritsFrom(Vertex subMeta, Serializable subValue, Vertex[] subComponents, Vertex superMeta, Serializable superValue, Vertex[] superComponents) {
-		Inheritance inheritance = DEFAULT_INHERITANCE;
-		return inheritance.inheritsFrom(subMeta, subValue, subComponents, superMeta, superValue, superComponents);
+		if (!subMeta.inheritsFrom(superMeta))
+			return false;
+		int subIndex = 0;
+		loop: for (int superIndex = 0; superIndex < superComponents.length; superIndex++) {
+			Vertex superComponent = superComponents[superIndex];
+			for (; subIndex < subComponents.length; subIndex++) {
+				Vertex subComponent = subComponents[subIndex];
+				if (subComponent.inheritsFrom(superComponent) || subComponent.isInstanceOf(superComponent)) {
+					if (subMeta.getSingulars()[subIndex])
+						return true;
+					subIndex++;
+					continue loop;
+				}
+			}
+			return false;
+		}
+		return subMeta.isProperty() || Objects.equals(subValue, superValue);
 	}
 
-	private final static Inheritance DEFAULT_INHERITANCE = new Inheritance();
-	private final static Inheritance PROPERTY_INHERITANCE = new PropertyInheritance();
+	private boolean property = false;
+	private boolean[] singulars = new boolean[/* components.length */10];
 
-	private static class Inheritance {
-		private final boolean inheritsFrom(Vertex subMeta, Serializable subValue, Vertex[] subComponents, Vertex superMeta, Serializable superValue, Vertex[] superComponents) {
-			return metasInheritance().inheritsFrom(subMeta, superMeta) && componentsInheritance().inheritsFrom(subComponents, superComponents) && valuesInheritance().inheritsFrom(subValue, superValue);
-		}
-
-		protected MetasInheritance metasInheritance() {
-			return DEFAULT_METAS_INHERITANCE;
-		}
-
-		protected ComponentsInheritance componentsInheritance() {
-			return DEFAULT_COMPONENTS_INHERITANCE;
-		}
-
-		protected ValuesInheritance valuesInheritance() {
-			return DEFAULT_VALUES_INHERITANCE;
-		}
+	private boolean isProperty() {
+		return property;
 	}
 
-	private static class PropertyInheritance extends Inheritance {
-		@Override
-		protected ValuesInheritance valuesInheritance() {
-			return ALL_VALUES_INHERITANCE;
-		}
+	private boolean[] getSingulars() {
+		return singulars;
 	}
-
-	private static class SingularInheritance extends Inheritance {
-		@Override
-		protected ComponentsInheritance componentsInheritance() {
-			return SINGULAR_COMPONENTS_INHERITANCE;
-		}
-
-		@Override
-		protected ValuesInheritance valuesInheritance() {
-			return ALL_VALUES_INHERITANCE;
-		}
-	}
-
-	private static class MapInheritance extends Inheritance {
-		@Override
-		protected ValuesInheritance valuesInheritance() {
-			return MAP_VALUES_INHERITANCE;
-		}
-	}
-
-	@FunctionalInterface
-	public interface MetasInheritance {
-		boolean inheritsFrom(Vertex subMeta, Vertex superMeta);
-	}
-
-	@FunctionalInterface
-	public interface ComponentsInheritance {
-		boolean inheritsFrom(Vertex[] subComponents, Vertex[] superComponents);
-	}
-
-	@FunctionalInterface
-	public interface ValuesInheritance {
-		boolean inheritsFrom(Serializable subValue, Serializable superValue);
-	}
-
-	private final static MetasInheritance DEFAULT_METAS_INHERITANCE = (subMeta, superMeta) -> subMeta.inheritsFrom(superMeta);
-
-	private final static ComponentsInheritance DEFAULT_COMPONENTS_INHERITANCE = (subComponents, superComponents) -> componentsInherits(subComponents, superComponents);
-	private final static ComponentsInheritance SINGULAR_COMPONENTS_INHERITANCE = (subComponents, superComponents) -> componentsInherits(subComponents, superComponents);
-
-	private final static ValuesInheritance DEFAULT_VALUES_INHERITANCE = (subValue, superValue) -> Objects.equals(subValue, superValue);
-	private final static ValuesInheritance ALL_VALUES_INHERITANCE = (subValue, superValue) -> true;
-	private final static ValuesInheritance MAP_VALUES_INHERITANCE = (subValue, superValue) -> {
-		return (subValue instanceof AbstractMap.SimpleImmutableEntry<?, ?> && superValue instanceof AbstractMap.SimpleImmutableEntry<?, ?>) ? Objects.equals(((Entry<?, ?>) subValue).getKey(), ((Entry<?, ?>) superValue).getKey()) : Objects.equals(subValue,
-				superValue);
-	};
 
 	private static boolean componentsInherits(Vertex[] subComponents, Vertex[] superComponents) {
 		int subIndex = 0;
@@ -269,12 +225,68 @@ public class Vertex {
 		return addInstance(EMPTY_VERTICES, value, components);
 	}
 
-	public Vertex addInstance(Vertex[] supers, Serializable value, Vertex... components) {
+	public Vertex addInstance(Vertex[] overrides, Serializable value, Vertex... components) {
+		Vertex[] supers = computeSupers(this, overrides, value, components);
 		return new Vertex(this, supers, value, components).plug(true);
 	}
 
 	public Vertex setInstance(Serializable value, Vertex... components) {
 		return setInstance(EMPTY_VERTICES, value, components);
+	}
+
+	public Vertex[] computeSupers(Vertex meta, Vertex[] overrides, Serializable value, Vertex... components) {
+		Iterator<Vertex> it = new AbstractSelectablePostTreeIterator<Vertex>(getEngine()) {
+			@Override
+			protected Iterator<Vertex> children(Vertex node) {
+				return node.getLevel() < meta.getLevel() + 1 ? new ConcateIterator<Vertex>(node.inheritings.values().iterator(), node.instances.values().iterator()) : node.inheritings.values().iterator();
+			}
+
+		};
+		// TODO
+		return overrides;
+	}
+
+	public static class OrderedSupers extends TreeSet<Vertex> {
+		private static final long serialVersionUID = 4756135385933890439L;
+
+		public OrderedSupers() {}
+
+		public OrderedSupers(Vertex add) {
+			add(add);
+		}
+
+		public OrderedSupers(Vertex... supers) {
+			for (Vertex superVertex : supers)
+				add(superVertex);
+		}
+
+		public OrderedSupers(Vertex[] supers, Vertex add) {
+			this(supers);
+			add(add);
+		}
+
+		public OrderedSupers(Vertex[] supers, Vertex[] adds) {
+			this(supers);
+			for (Vertex add : adds)
+				add(add);
+		}
+
+		@Override
+		public Generic[] toArray() {
+			return toArray(new Generic[size()]);
+		}
+
+		@Override
+		public boolean add(Vertex candidate) {
+			for (Vertex vertex : this)
+				if (vertex.inheritsFrom(candidate))
+					return false;
+			Iterator<Vertex> it = iterator();
+			while (it.hasNext())
+				if (candidate.inheritsFrom(it.next()))
+					it.remove();
+			return super.add(candidate);
+		}
 	}
 
 	public Vertex setInstance(Vertex[] supers, Serializable value, Vertex... components) {
