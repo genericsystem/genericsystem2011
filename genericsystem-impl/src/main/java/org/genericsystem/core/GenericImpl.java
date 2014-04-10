@@ -826,7 +826,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			// }
 			// }
 
-			// TODO IS MIGRATED (remove iterator in return)
+			// TODO TO FINISH - IS MIGRATED (remove iterator in return)
 			private <T extends Generic> Iterator<T> getIndexedCompositeIterator(Generic base, final Generic index) {
 				Map<Generic, Set<Generic>> indexedCompositeMap = get(base);
 				if (indexedCompositeMap == null) {
