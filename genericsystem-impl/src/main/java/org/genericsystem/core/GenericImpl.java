@@ -482,7 +482,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return () -> getCurrentCache().inheritingsIterator(this);
 	}
 
-	// TODO TO MIGRATE IN SNAPSHOT + TO DELETE
+	// TODO FINISH MIGRATION IN SNAPSHOT (ConcateIterator -> ConcateSnapshot before deleting) + TO DELETE
 	public <T extends Generic> Iterator<T> dependenciesIterator() {
 		return new ConcateIterator<T>(this.<T> inheritingsIterator(), this.<T> compositesIterator());
 	}
@@ -755,14 +755,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((FunctionalSnapshot<Generic>) () -> getSupers().iterator()).filter(next -> !GenericImpl.this.equals(next) && origin.isAttributeOf(next));
 	}
 
-	// DONT TOUCH !
-	private <T extends Generic> Iterator<T> inheritanceIterator2(final int level, final Generic origin, final int pos) {
-		return new AbstractFilterIterator<T>(new SpecializedMainInheritance(origin, level).<T> specialize()) {
-			@Override
-			public boolean isSelected() {
-				return level == next.getMetaLevel() && (pos == Statics.MULTIDIRECTIONAL || ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos));
-			}
-		};
+	// DONT TOUCH ! is not touched..
+	// private <T extends Generic> Iterator<T> inheritanceIterator2(final int level, final Generic origin, final int pos) {
+	// return new AbstractFilterIterator<T>(new SpecializedMainInheritance(origin, level).<T> specialize()) {
+	// @Override
+	// public boolean isSelected() {
+	// return level == next.getMetaLevel() && (pos == Statics.MULTIDIRECTIONAL || ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos));
+	// }
+	// };
+	// }
+
+	// DONT TOUCH TO JAVA8 VERSION TOO !
+	private <T extends Generic> FunctionalSnapshot<T> inheritanceIterator2(final int level, final Generic origin, final int pos) {
+		return new SpecializedMainInheritance(origin, level).<T> specialize().filter(next -> level == next.getMetaLevel() && (pos == Statics.MULTIDIRECTIONAL || ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos)));
 	}
 
 	// DONT TOUCH !
@@ -778,15 +783,19 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			this.origin = origin;
 		}
 
-		// TODO TO MIGRATE + TO DELETE
-		private <T extends Generic> Iterator<T> specialize() {
-			return new AbstractFilterIterator<T>(new MainInheritanceProjector(GenericImpl.this).<T> project()) {
-				@Override
-				public boolean isSelected() {
-					return !contains(next);
-				}
-			};
+		// TODO MIGRATION DONE - inheritanceIterator2() migrated too but old version is commented and intact (!)
+		private <T extends Generic> FunctionalSnapshot<T> specialize() {
+			return ((FunctionalSnapshot<T>) () -> new MainInheritanceProjector(GenericImpl.this).<T> project()).filter(next -> !contains(next));
 		}
+
+		// private <T extends Generic> Iterator<T> specialize() {
+		// return new AbstractFilterIterator<T>(new MainInheritanceProjector(GenericImpl.this).<T> project()) {
+		// @Override
+		// public boolean isSelected() {
+		// return !contains(next);
+		// }
+		// };
+		// }
 
 		private class CompositesIndex extends HashMap<Generic, Map<Generic, Set<Generic>>> {
 
