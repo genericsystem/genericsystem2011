@@ -473,7 +473,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getLink(relation, getBasePos(relation), targets);
 	}
 
-	// TODO TO DELETE
+	// TODO TO DELETE - ( is called by 'dependencidesIterator()' l.486 - see also class ConcateIterator)
 	public <T extends Generic> Iterator<T> inheritingsIterator() {
 		return getCurrentCache().inheritingsIterator(this);
 	}
@@ -487,16 +487,16 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return new ConcateIterator<T>(this.<T> inheritingsIterator(), this.<T> compositesIterator());
 	}
 
-	// public <T extends Generic> FunctionalSnapshot<T> dependenciesSnapshot() {
-	//
-	// }
+	public <T extends Generic> FunctionalSnapshot<T> dependenciesSnapshot() {
+		return () -> new ConcateIterator<T>(this.<T> inheritingsIterator(), this.<T> compositesIterator());
+	}
 
 	@Override
 	public <T extends Generic> FunctionalSnapshot<T> getInheritings() {
 		return () -> inheritingsIterator();
 	}
 
-	// TODO TO DELETE
+	// TODO TO DELETE - ( is called by 'dependencidesIterator()' l.486 - see also class ConcateIterator)
 	public <T extends Generic> Iterator<T> compositesIterator() {
 		return getCurrentCache().compositesIterator(this);
 	}
