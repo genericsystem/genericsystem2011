@@ -418,6 +418,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getLinks(relation, basePos).project(element -> element.getComponent(targetPos));
 	}
 
+	// TODO To Delete
 	public <T extends Holder> Iterator<T> holdersIterator(Holder attribute, Generic... targets) {
 		return this.<T> targetsFilter(GenericImpl.this.<T> holdersIterator(Statics.CONCRETE, attribute, getBasePos(attribute)), attribute, targets);
 	}
@@ -472,6 +473,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return getLink(relation, getBasePos(relation), targets);
 	}
 
+	// TODO TO DELETE
 	public <T extends Generic> Iterator<T> inheritingsIterator() {
 		return getCurrentCache().inheritingsIterator(this);
 	}
@@ -480,23 +482,30 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return () -> getCurrentCache().inheritingsIterator(this);
 	}
 
+	// TODO TO MIGRATE IN SNAPSHOT + TO DELETE
 	public <T extends Generic> Iterator<T> dependenciesIterator() {
 		return new ConcateIterator<T>(this.<T> inheritingsIterator(), this.<T> compositesIterator());
 	}
+
+	// public <T extends Generic> FunctionalSnapshot<T> dependenciesSnapshot() {
+	//
+	// }
 
 	@Override
 	public <T extends Generic> FunctionalSnapshot<T> getInheritings() {
 		return () -> inheritingsIterator();
 	}
 
-	public <T extends Generic> FunctionalSnapshot<T> compositesSnapshot() {
-		return () -> getCurrentCache().compositesIterator(this);
-	}
-
+	// TODO TO DELETE
 	public <T extends Generic> Iterator<T> compositesIterator() {
 		return getCurrentCache().compositesIterator(this);
 	}
 
+	public <T extends Generic> FunctionalSnapshot<T> compositesSnapshot() {
+		return () -> getCurrentCache().compositesIterator(this);
+	}
+
+	// TODO TO DELETE
 	public <T extends Generic> Iterator<T> compositesIterator(final int pos) {
 		return new AbstractFilterIterator<T>(this.<T> compositesIterator()) {
 			@Override
@@ -690,6 +699,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return result;
 	}
 
+	// TODO TO DELETE
 	public <T extends Generic> Iterator<T> holdersIterator(int level, Holder origin, int basePos) {
 		if (Statics.STRUCTURAL == level)
 			basePos = Statics.MULTIDIRECTIONAL;
@@ -702,6 +712,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return ((Attribute) origin).isInheritanceEnabled() ? this.<T> inheritanceSnapshot(level, origin, basePos) : this.<T> noInheritanceSnapshot(level, basePos, origin);
 	}
 
+	// TODO TO DELETE
 	private <T extends Generic> Iterator<T> noInheritanceIterator(final int metaLevel, int pos, final Generic origin) {
 		return new AbstractFilterIterator<T>(Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesIterator() : this.<T> compositesIterator(pos)) {
 			@Override
@@ -715,11 +726,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return (Statics.MULTIDIRECTIONAL == pos ? this.<T> compositesSnapshot() : this.<T> compositesSnapshot(pos)).filter(next -> next.getMetaLevel() == metaLevel && next.inheritsFrom(origin));
 	}
 
-	private <T extends Generic> FunctionalSnapshot<T> inheritanceSnapshot(final int level, final Generic origin, final int pos) {
-		return this.<T> getInternalInheritings(level, origin, pos).filter(
-				next -> level == next.getMetaLevel() && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) next).isAttributeOf(GenericImpl.this)));
-	}
-
+	// TODO TO DELETE
 	private <T extends Generic> Iterator<T> inheritanceIterator(final int level, final Generic origin, final int pos) {
 		return new AbstractFilterIterator<T>(this.<T> getInternalInheritings(level, origin, pos).iterator()) {
 			@Override
@@ -727,6 +734,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return level == next.getMetaLevel() && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) next).isAttributeOf(GenericImpl.this));
 			}
 		};
+	}
+
+	private <T extends Generic> FunctionalSnapshot<T> inheritanceSnapshot(final int level, final Generic origin, final int pos) {
+		return this.<T> getInternalInheritings(level, origin, pos).filter(
+				next -> level == next.getMetaLevel() && (pos != Statics.MULTIDIRECTIONAL ? ((GenericImpl) next).isAttributeOf(GenericImpl.this, pos) : ((GenericImpl) next).isAttributeOf(GenericImpl.this)));
 	}
 
 	private Iterator<Generic> supersIterator(final Generic origin) {
@@ -737,6 +749,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return !GenericImpl.this.equals(next) && origin.isAttributeOf(next);
 			}
 		};
+	}
+
+	private FunctionalSnapshot<Generic> supersSnapshot(final Generic origin) {
+		return ((FunctionalSnapshot<Generic>) () -> getSupers().iterator()).filter(next -> !GenericImpl.this.equals(next) && origin.isAttributeOf(next));
 	}
 
 	// DONT TOUCH !
@@ -762,6 +778,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			this.origin = origin;
 		}
 
+		// TODO TO MIGRATE + TO DELETE
 		private <T extends Generic> Iterator<T> specialize() {
 			return new AbstractFilterIterator<T>(new MainInheritanceProjector(GenericImpl.this).<T> project()) {
 				@Override
@@ -775,6 +792,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			private static final long serialVersionUID = -6404067063383874676L;
 
+			// TODO TO MIGRATE + TO DELETE
 			private <T extends Generic> Iterator<T> getIndexedCompositeIterator(Generic base, final Generic index) {
 				Map<Generic, Set<Generic>> indexedCompositeMap = get(base);
 				if (indexedCompositeMap == null) {
@@ -822,10 +840,12 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				this.base = base;
 			}
 
+			// TODO TO MIGRATE + TO DELETE
 			private <T extends Generic> Iterator<T> project() {
 				return projectIterator(this.<T> projectFromSupersIterator());
 			}
 
+			// TODO TO MIGRATE + TO DELETE
 			private <T extends Generic> Iterator<T> projectFromSupersIterator() {
 				if (!origin.isAttributeOf(base))
 					return Collections.emptyIterator();
@@ -840,6 +860,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				};
 			}
 
+			// TODO TO MIGRATE + TO DELETE
 			private <T extends Generic> Iterator<T> projectIterator(Iterator<T> iteratorToProject) {
 				return new AbstractConcateIterator<T, T>(iteratorToProject) {
 					@Override
@@ -1295,6 +1316,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.<T> allInheritingsAboveSnapshot().filter(next -> next.getMetaLevel() == getMetaLevel() + 1);
 	}
 
+	// TODO TO DELETE
 	public <T extends Generic> Iterator<T> allInstancesIterator() {
 		return Statics.levelFilter(this.<T> allInheritingsAboveIterator(getMetaLevel() + 1), getMetaLevel() + 1);
 	}
@@ -1307,18 +1329,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return () -> this.<T> allInheritingsAboveIterator(getMetaLevel() + 1);
 	}
 
-	private <T extends Generic> FunctionalSnapshot<T> getAllInheritingsAboveSnapshot(final int metaLevel) {
-		return (FunctionalSnapshot<T>) new AbstractPreTreeSnapshot<Generic>(this) {
-
-			private static final long serialVersionUID = 2056157222479853791L;
-
-			@Override
-			public FunctionalSnapshot<Generic> children(Generic node) {
-				return ((GenericImpl) node).getInheritingsSnapshot().filter(next -> next.getMetaLevel() <= metaLevel);
-			}
-		}.getSnapshot();
-	}
-
+	// TO DELETE
 	private <T extends Generic> Iterator<T> allInheritingsAboveIterator(final int metaLevel) {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 
@@ -1334,6 +1345,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				};
 			}
 		};
+	}
+
+	private <T extends Generic> FunctionalSnapshot<T> getAllInheritingsAboveSnapshot(final int metaLevel) {
+		return (FunctionalSnapshot<T>) new AbstractPreTreeSnapshot<Generic>(this) {
+
+			private static final long serialVersionUID = 2056157222479853791L;
+
+			@Override
+			public FunctionalSnapshot<Generic> children(Generic node) {
+				return ((GenericImpl) node).getInheritingsSnapshot().filter(next -> next.getMetaLevel() <= metaLevel);
+			}
+		}.getSnapshot();
 	}
 
 	public abstract class AbstractPreTreeSnapshot<T> extends HashSet<T> {
@@ -1424,16 +1447,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		});
 	}
 
-	<T extends Generic> FunctionalSnapshot<T> targetsFilter(FunctionalSnapshot<T> snapshot, Holder attribute, Generic... targets) {
-		final List<Integer> positions = ((GenericImpl) attribute).getComponentsPositions(Statics.insertFirst(this, targets));
-		return snapshot.filter(next -> {
-			for (int i = 0; i < targets.length; i++)
-				if (!targets[i].equals(((Holder) next).getComponent(positions.get(i + 1))))
-					return false;
-			return true;
-		});
-	}
-
+	// TODO TO DELETE
 	<T extends Generic> Iterator<T> targetsFilter(Iterator<T> iterator, Holder attribute, Generic... targets) {
 		final List<Integer> positions = ((GenericImpl) attribute).getComponentsPositions(Statics.insertFirst(this, targets));
 		return new AbstractFilterIterator<T>(iterator) {
@@ -1447,6 +1461,17 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	<T extends Generic> FunctionalSnapshot<T> targetsFilter(FunctionalSnapshot<T> snapshot, Holder attribute, Generic... targets) {
+		final List<Integer> positions = ((GenericImpl) attribute).getComponentsPositions(Statics.insertFirst(this, targets));
+		return snapshot.filter(next -> {
+			for (int i = 0; i < targets.length; i++)
+				if (!targets[i].equals(((Holder) next).getComponent(positions.get(i + 1))))
+					return false;
+			return true;
+		});
+	}
+
+	// TODO TO MIGRATE + TO DELETE
 	<T extends Generic> Iterator<T> componentsFilter(Iterator<T> iterator, Holder attribute, Generic... components) {
 		final List<Integer> positions = ((GenericImpl) attribute).getComponentsPositions(components);
 		return new AbstractFilterIterator<T>(iterator) {
@@ -1512,6 +1537,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return () -> allInheritingsIteratorWithoutRoot();
 	}
 
+	// TODO TO DELETE
 	protected <T extends Generic> Iterator<T> allInheritingsIterator() {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 			private static final long serialVersionUID = 4540682035671625893L;
@@ -1523,10 +1549,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	<T extends Generic> FunctionalSnapshot<T> getAllInheritingsSnapshotWithoutRoot() {
-		return () -> allInheritingsIteratorWithoutRoot();
-	}
-
+	// TODO TO DELETE
 	<T extends Generic> Iterator<T> allInheritingsIteratorWithoutRoot() {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 
@@ -1541,6 +1564,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				return (((GenericImpl) node).inheritingsIterator());
 			}
 		};
+	}
+
+	<T extends Generic> FunctionalSnapshot<T> getAllInheritingsSnapshotWithoutRoot() {
+		return () -> allInheritingsIteratorWithoutRoot();
 	}
 
 	void mountConstraints(Class<?> clazz) {
@@ -2013,11 +2040,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
-	@Override
-	public FunctionalSnapshot<Generic> getOtherTargets(final Holder holder) {
-		return () -> otherTargetsIterator(holder);
-	}
-
+	// TODO TO DELETE
 	public Iterator<Generic> otherTargetsIterator(final Holder holder) {
 		final List<Generic> components = ((GenericImpl) holder).getComponents();
 		return new AbstractProjectorAndFilterIterator<Integer, Generic>(new CountIterator(components.size())) {
@@ -2034,6 +2057,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	@Override
+	public FunctionalSnapshot<Generic> getOtherTargetsSnapshot(final Holder holder) {
+		return () -> otherTargetsIterator(holder);
+	}
+
 	public boolean isAutomatic() {
 		return getCurrentCache().isAutomatic(this);
 	}
@@ -2047,6 +2075,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.getValue() instanceof Class && AbstractMapProvider.class.isAssignableFrom((Class<?>) this.getValue());
 	}
 
+	// TODO TO DELETE
 	public <T> T unambigousFirst(Iterator<T> iterator) throws RollbackException {
 		if (!iterator.hasNext())
 			return null;
