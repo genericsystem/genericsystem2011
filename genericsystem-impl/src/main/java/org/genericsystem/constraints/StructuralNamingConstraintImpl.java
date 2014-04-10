@@ -1,6 +1,6 @@
 package org.genericsystem.constraints;
 
-import java.util.Iterator;
+import java.util.Objects;
 
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Dependencies;
@@ -18,10 +18,11 @@ import org.genericsystem.exception.UniqueStructuralValueConstraintViolationExcep
 import org.genericsystem.generic.Holder;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
+import org.genericsystem.snapshot.FunctionalSnapshot;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  */
 @SystemGeneric
 @Extends(ConstraintKey.class)
@@ -53,21 +54,15 @@ public class StructuralNamingConstraintImpl extends AbstractBooleanNoAxedConstra
 		if (!modified.isStructural())
 			return;
 		if (modified.getComponents().isEmpty()) {
-			Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) modified.getEngine()).allInstancesIterator(), modified.getValue());
-			if (iterator.hasNext()) {
-				Generic next = iterator.next();
-				if (iterator.hasNext())
-					throw new UniqueStructuralValueConstraintViolationException(next.info() + iterator.next().info());
-			}
+			FunctionalSnapshot<Generic> snapshot = ((GenericImpl) modified.getEngine()).getAllInstancesSnapshot().filter(next -> Objects.equals(modified.getValue(), modified));
+			if (snapshot.size() > 1)
+				throw new UniqueStructuralValueConstraintViolationException(snapshot.get(0).info() + snapshot.get(1).info());
 		} else
 			for (int i = 0; i < modified.getComponents().size(); i++)
 				for (Generic inherited : ((GenericImpl) ((GenericImpl) modified).getComponents().get(i)).getAllInheritings()) {
-					Iterator<Generic> iterator = Statics.valueFilter(((GenericImpl) inherited).holdersIterator(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL), modified.getValue());
-					if (iterator.hasNext()) {
-						Generic next = iterator.next();
-						if (iterator.hasNext())
-							throw new UniqueStructuralValueConstraintViolationException(inherited.info() + next.info() + iterator.next().info());
-					}
+					FunctionalSnapshot<Generic> snapshot = ((GenericImpl) inherited).holdersSnapshot(Statics.STRUCTURAL, getCurrentCache().getMetaAttribute(), Statics.MULTIDIRECTIONAL).filter(next -> Objects.equals(modified.getValue(), next.getValue()));
+					if (snapshot.size() > 1)
+						throw new UniqueStructuralValueConstraintViolationException(inherited.info() + snapshot.get(0).info() + snapshot.get(1).info());
 				}
 	}
 
