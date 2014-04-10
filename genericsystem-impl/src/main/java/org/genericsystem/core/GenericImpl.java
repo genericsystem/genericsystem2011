@@ -801,7 +801,32 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 			private static final long serialVersionUID = -6404067063383874676L;
 
-			// TODO TO MIGRATE + TO DELETE
+			// private <T extends Generic> FunctionalSnapshot<T> getIndexedCompositeSnapshot(Generic base, final Generic index) {
+			// Map<Generic, Set<Generic>> indexedCompositeMap = get(base);
+			// if (indexedCompositeMap == null) {
+			// put(base, indexedCompositeMap = new HashMap<>());
+			// FunctionalSnapshot<T> snapshot = ((GenericImpl) base).<T> compositesSnapshot().filter(next -> next.getMetaLevel() <= level);
+			// for (int i = 0; i < snapshot.size(); i++)
+			// {
+			// final T next = snapshot.get(i);
+			// for (Generic superGeneric : next.getSupers())
+			// {
+			// Set<Generic> indexedCompositeSet = indexedCompositeMap.get(superGeneric);
+			// if (indexedCompositeSet == null)
+			// indexedCompositeMap.put(superGeneric, indexedCompositeSet) = new HashSet<Generic>());
+			// indexedCompositeSet.add(next);
+			// }
+			// }
+			// }
+			// //TODO Remove Iterator used for return
+			// Set<Generic> indexedCompositeSet = indexedCompositeMap.get(index);
+			// if (indexedCompositeSet == null)
+			// return Collections.emptyIterator();
+			// return () -> indexedCompositeSet.iterator();
+			// }
+			// }
+
+			// TODO IS MIGRATED (remove iterator in return)
 			private <T extends Generic> Iterator<T> getIndexedCompositeIterator(Generic base, final Generic index) {
 				Map<Generic, Set<Generic>> indexedCompositeMap = get(base);
 				if (indexedCompositeMap == null) {
