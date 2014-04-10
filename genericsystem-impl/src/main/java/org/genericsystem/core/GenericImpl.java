@@ -2,10 +2,12 @@ package org.genericsystem.core;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1305,6 +1307,18 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return () -> this.<T> allInheritingsAboveIterator(getMetaLevel() + 1);
 	}
 
+	private <T extends Generic> FunctionalSnapshot<T> getAllInheritingsAboveSnapshot(final int metaLevel) {
+		return (FunctionalSnapshot<T>) new AbstractPreTreeSnapshot<Generic>(this) {
+
+			private static final long serialVersionUID = 2056157222479853791L;
+
+			@Override
+			public FunctionalSnapshot<Generic> children(Generic node) {
+				return ((GenericImpl) node).getInheritingsSnapshot().filter(next -> next.getMetaLevel() <= metaLevel);
+			}
+		}.getSnapshot();
+	}
+
 	private <T extends Generic> Iterator<T> allInheritingsAboveIterator(final int metaLevel) {
 		return (Iterator<T>) new AbstractPreTreeIterator<Generic>(GenericImpl.this) {
 
@@ -1320,6 +1334,71 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 				};
 			}
 		};
+	}
+
+	public abstract class AbstractPreTreeSnapshot<T> extends HashSet<T> {
+
+		private static final long serialVersionUID = -518282246760045090L;
+
+		class Entry {
+			int index = 0;
+
+			FunctionalSnapshot<T> functionalSnapshot;
+
+			public Entry(FunctionalSnapshot<T> functionalSnapshot) {
+				this.functionalSnapshot = functionalSnapshot;
+			}
+
+			public T getAndIncrement() {
+				return functionalSnapshot.get(index++);
+			}
+
+			public boolean hasNext() {
+				return index < functionalSnapshot.size();
+			}
+		}
+
+		protected Deque<Entry> deque = new ArrayDeque<Entry>();
+
+		public AbstractPreTreeSnapshot(T rootNode) {
+			deque.push(new Entry(new SingletonSnapshot<T>(rootNode)));
+		}
+
+		public FunctionalSnapshot<T> getSnapshot() {
+			Entry entry = deque.peek();
+			final T node = entry.getAndIncrement();
+			if (!entry.hasNext())
+				deque.pop();
+
+			FunctionalSnapshot<T> children = children(node).filter(next -> add(next));
+			if (!children.isEmpty())
+				deque.push(new Entry(children));
+
+			return children;
+		}
+
+		public abstract FunctionalSnapshot<T> children(T node);
+	}
+
+	public class SingletonSnapshot<T> implements FunctionalSnapshot<T> {
+
+		private final T singleton;
+
+		public SingletonSnapshot(T singleton) {
+			assert singleton != null;
+			this.singleton = singleton;
+		}
+
+		@Override
+		public Iterator<T> iterator() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public T get(int pos) {
+			return singleton;
+		}
+
 	}
 
 	@Override
