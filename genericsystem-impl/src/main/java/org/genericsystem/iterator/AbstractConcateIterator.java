@@ -8,16 +8,16 @@ import java.util.Set;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  * @param <U>
  * @param <T>
  */
 public abstract class AbstractConcateIterator<U, T> extends AbstractAwareIterator<T> implements Iterator<T> {
 
-	private Iterator<U> elements;
+	private final Iterator<U> elements;
 	private Iterator<T> iterator = Collections.emptyIterator();
 
-	private Set<T> alreadyAdded = new HashSet<>();
+	private final Set<T> alreadyAdded = new HashSet<>();
 
 	public AbstractConcateIterator(Iterator<U> elements) {
 		this.elements = elements;
@@ -42,6 +42,7 @@ public abstract class AbstractConcateIterator<U, T> extends AbstractAwareIterato
 		}
 	}
 
+	// TODO class to migrate - is called in GenericImpl.java l.486 by dependenciesIterator()
 	public static class ConcateIterator<T> extends AbstractConcateIterator<Iterator<T>, T> {
 
 		@SafeVarargs

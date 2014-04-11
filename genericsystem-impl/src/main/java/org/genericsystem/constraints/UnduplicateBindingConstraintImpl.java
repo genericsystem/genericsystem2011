@@ -20,7 +20,7 @@ import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  */
 @SystemGeneric
 @Extends(ConstraintKey.class)
@@ -33,13 +33,24 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	@Meta(UnduplicateBindingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
-	public static class DefaultKey {}
+	public static class DefaultKey {
+	}
 
 	@SystemGeneric
 	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {}
+	public static class DefaultValue {
+	}
+
+	// TODO Version snapshot of check(...) -> 4 failed test - 569/576 tests passed
+	// @Override
+	// public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
+	// org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
+	// if ((components.isEmpty() ? modified.<GenericImpl> getMeta().getInheritingsSnapshot() : ((GenericImpl) components.get(0)).compositesSnapshot()).filter(next -> !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex()))
+	// .size() > 1)
+	// throw new UnduplicateBindingConstraintViolationException();
+	// }
 
 	@Override
 	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {

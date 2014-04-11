@@ -3,16 +3,12 @@ package org.genericsystem.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
-import org.genericsystem.core.Generic;
-import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
-import org.genericsystem.iterator.AbstractSelectablePostTreeIterator;
 
 public class Vertex {
 
@@ -40,6 +36,7 @@ public class Vertex {
 		assert Arrays.asList(supers).stream().allMatch(superVertex -> meta.inheritsFrom(superVertex.getMeta())) : "Inconsistant supers : " + Arrays.toString(supers);
 		assert Arrays.asList(supers).stream().allMatch(superVertex -> componentsInherits(components, superVertex.components)) : "Inconsistant supers : " + Arrays.toString(supers);
 		assert Arrays.asList(supers).stream().filter(superVertex -> superVertex.inheritsFrom(meta)).count() <= 1 : "Inconsistant supers : " + Arrays.toString(supers);
+		assert Arrays.asList(supers).stream().noneMatch(superVertex -> Objects.equals(superVertex.value, value)) : "Inconsistant supers : " + Arrays.toString(supers);;
 	}
 
 	public Set<Vertex> getInstances() {
@@ -64,11 +61,10 @@ public class Vertex {
 		if (!index.containsKey(this)) {
 			index.put(this, this);
 			return this;
-		} else {
-			if (throwExistException)
-				throw new ExistException();
-			return index.get(this);
 		}
+		if (throwExistException)
+			throw new ExistException();
+		return index.get(this);
 	}
 
 	public Serializable getValue() {
@@ -151,7 +147,11 @@ public class Vertex {
 		if (!(o instanceof Vertex))
 			return false;
 		Vertex vertex = (Vertex) o;
-		return meta.equals(vertex.meta) && Objects.equals(value, vertex.value) && Arrays.equals(components, vertex.components);
+		return equals(vertex.getMeta(), vertex.getValue(), vertex.getComponents());
+	}
+
+	public boolean equals(Vertex meta, Serializable value, Vertex... components) {
+		return this.meta.equals(meta) && Objects.equals(this.value, value) && Arrays.equals(this.components, components);
 	}
 
 	public boolean inheritsFrom(Vertex superVertex) {
@@ -170,7 +170,7 @@ public class Vertex {
 		return inheritsFrom(meta, value, components, superMeta, superValue, superComponents);
 	}
 
-	public boolean isSuperOf(Vertex subMeta, Serializable subValue, Vertex... subComponents) {
+	public boolean isSuperOrMetaOf(Vertex subMeta, Serializable subValue, Vertex... subComponents) {
 		return inheritsFrom(subMeta, subValue, subComponents, meta, value, components);
 	}
 
@@ -226,7 +226,7 @@ public class Vertex {
 	}
 
 	public Vertex addInstance(Vertex[] overrides, Serializable value, Vertex... components) {
-		Vertex[] supers = computeSupers(this, overrides, value, components);
+		Vertex[] supers = new SupersComputer(this, overrides, value, components).toArray();
 		return new Vertex(this, supers, value, components).plug(true);
 	}
 
@@ -234,63 +234,61 @@ public class Vertex {
 		return setInstance(EMPTY_VERTICES, value, components);
 	}
 
-	public Vertex[] computeSupers(Vertex meta, Vertex[] overrides, Serializable value, Vertex... components) {
-		Iterator<Vertex> it = new AbstractSelectablePostTreeIterator<Vertex>(getEngine()) {
-			@Override
-			protected Iterator<Vertex> children(Vertex node) {
-				return node.getLevel() < meta.getLevel() + 1 ? new ConcateIterator<Vertex>(node.inheritings.values().iterator(), node.instances.values().iterator()) : node.inheritings.values().iterator();
-			}
-
-		};
-		// TODO
-		return overrides;
-	}
-
-	public static class OrderedSupers extends TreeSet<Vertex> {
-		private static final long serialVersionUID = 4756135385933890439L;
-
-		public OrderedSupers() {}
-
-		public OrderedSupers(Vertex add) {
-			add(add);
-		}
-
-		public OrderedSupers(Vertex... supers) {
-			for (Vertex superVertex : supers)
-				add(superVertex);
-		}
-
-		public OrderedSupers(Vertex[] supers, Vertex add) {
-			this(supers);
-			add(add);
-		}
-
-		public OrderedSupers(Vertex[] supers, Vertex[] adds) {
-			this(supers);
-			for (Vertex add : adds)
-				add(add);
-		}
-
-		@Override
-		public Generic[] toArray() {
-			return toArray(new Generic[size()]);
-		}
-
-		@Override
-		public boolean add(Vertex candidate) {
-			for (Vertex vertex : this)
-				if (vertex.inheritsFrom(candidate))
-					return false;
-			Iterator<Vertex> it = iterator();
-			while (it.hasNext())
-				if (candidate.inheritsFrom(it.next()))
-					it.remove();
-			return super.add(candidate);
-		}
-	}
-
-	public Vertex setInstance(Vertex[] supers, Serializable value, Vertex... components) {
+	public Vertex setInstance(Vertex[] overrides, Serializable value, Vertex... components) {
+		Vertex[] supers = new SupersComputer(this, overrides, value, components).toArray();
 		return new Vertex(this, supers, value, components).plug(false);
+	}
+
+	private static class SupersComputer extends LinkedHashSet<Vertex> {
+
+		private static final long serialVersionUID = -1078004898524170057L;
+		private final Vertex meta;
+		private final Vertex[] overrides;
+		private final Serializable value;
+		private final Vertex[] components;
+
+		private SupersComputer(Vertex meta, Vertex[] overrides, Serializable value, Vertex... components) {
+			this.meta = meta;
+			this.overrides = overrides;
+			this.value = value;
+			this.components = components;
+			isSelected(meta.getEngine());
+		}
+
+		private boolean isSelected(Vertex candidate) {
+			for (Vertex inheriting : candidate.getInheritings())
+				if (Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom(inheriting) || override.isInstanceOf(inheriting)) || inheriting.isSuperOrMetaOf(meta, value, components))
+					if (isSelected(inheriting))
+						return false;
+			if (candidate.getLevel() <= meta.getLevel())
+				for (Vertex instance : candidate.getInstances())
+					if (Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom(instance) || override.isInstanceOf(instance)) || instance.isSuperOrMetaOf(meta, value, components))
+						if (isSelected(instance))
+							return false;
+			if (candidate.getLevel() == meta.getLevel() + 1) {
+				if (!candidate.equals(meta, value, components))
+					add(candidate);
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public Vertex[] toArray() {
+			return toArray(new Vertex[size()]);
+		}
+
+		// @Override
+		// public boolean add(Vertex candidate) {
+		// for (Vertex vertex : this)
+		// if (vertex.inheritsFrom(candidate))
+		// return false;
+		// Iterator<Vertex> it = iterator();
+		// while (it.hasNext())
+		// if (candidate.inheritsFrom(it.next()))
+		// it.remove();
+		// return super.add(candidate);
+		// }
 	}
 
 	public Vertex getInstance(/* Vertex[] supers, */Serializable value, Vertex... components) {
