@@ -42,7 +42,6 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	public static class DefaultValue {
 	}
 
-	// TODO Version snapshot of check(...) -> 4 failed test - 569/576 tests passed
 	@Override
 	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
 		org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
