@@ -170,8 +170,8 @@ public class Vertex {
 		return inheritsFrom(meta, value, components, superMeta, superValue, superComponents);
 	}
 
-	public boolean isSuperOrMetaOf(Vertex subMeta, Serializable subValue, Vertex... subComponents) {
-		return inheritsFrom(subMeta, subValue, subComponents, meta, value, components);
+	public boolean isSuperOrMetaOf(Vertex subMeta, Vertex[] overrides, Serializable subValue, Vertex... subComponents) {
+		return Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom(this) || override.isInstanceOf(this)) || inheritsFrom(subMeta, subValue, subComponents, meta, value, components);
 	}
 
 	public static boolean inheritsFrom(Vertex subMeta, Serializable subValue, Vertex[] subComponents, Vertex superMeta, Serializable superValue, Vertex[] superComponents) {
@@ -257,12 +257,12 @@ public class Vertex {
 
 		private boolean isSelected(Vertex candidate) {
 			for (Vertex inheriting : candidate.getInheritings())
-				if (Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom(inheriting) || override.isInstanceOf(inheriting)) || inheriting.isSuperOrMetaOf(meta, value, components))
+				if (inheriting.isSuperOrMetaOf(meta, overrides, value, components))
 					if (isSelected(inheriting))
 						return false;
 			if (candidate.getLevel() <= meta.getLevel())
 				for (Vertex instance : candidate.getInstances())
-					if (Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom(instance) || override.isInstanceOf(instance)) || instance.isSuperOrMetaOf(meta, value, components))
+					if (instance.isSuperOrMetaOf(meta, overrides, value, components))
 						if (isSelected(instance))
 							return false;
 			if (candidate.getLevel() == meta.getLevel() + 1) {

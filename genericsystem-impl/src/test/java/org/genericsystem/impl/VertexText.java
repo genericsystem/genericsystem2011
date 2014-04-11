@@ -43,9 +43,9 @@ public class VertexText extends AbstractTest {
 		assert engine.getInstance("Car") != null;
 		assert power.getInstance(233, myBmw) != null;
 		Vertex carRed = vehicleColor.addInstance("CarRed", car, red);
-		assert !carRed.isSuperOrMetaOf(vehicleColor, "myBmwRed", myBmw, red);
-		assert !carRed.isSuperOrMetaOf(vehicleColor, "myBmwRed", red, red);
-		assert carRed.isSuperOrMetaOf(vehicleColor, "CarRed", myBmw, red);
+		assert carRed.isSuperOrMetaOf(vehicleColor, new Vertex[] { carRed }, "myBmwRed", myBmw, red);
+		assert !carRed.isSuperOrMetaOf(vehicleColor, new Vertex[] {}, "myBmwRed", red, red);
+		assert carRed.isSuperOrMetaOf(vehicleColor, new Vertex[] { carRed }, "CarRed", myBmw, red);
 
 		Vertex myBmwRed = vehicleColor.addInstance(new Vertex[] { carRed }, "myBmwRed", myBmw, red);
 		assert myBmwRed == vehicleColor.setInstance("myBmwRed", myBmw, red);

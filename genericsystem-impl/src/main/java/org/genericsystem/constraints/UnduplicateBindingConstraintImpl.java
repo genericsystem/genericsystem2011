@@ -14,7 +14,6 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UnduplicateBindingConstraintViolationException;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 
@@ -43,25 +42,11 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	public static class DefaultValue {
 	}
 
-	// TODO Version snapshot of check(...) -> 4 failed test - 569/576 tests passed
-	// @Override
-	// public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
-	// org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
-	// if ((components.isEmpty() ? modified.<GenericImpl> getMeta().getInheritingsSnapshot() : ((GenericImpl) components.get(0)).compositesSnapshot()).filter(next -> !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex()))
-	// .size() > 1)
-	// throw new UnduplicateBindingConstraintViolationException();
-	// }
-
 	@Override
 	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
 		org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
-		if (new AbstractFilterIterator<Generic>(components.isEmpty() ? modified.<GenericImpl> getMeta().inheritingsIterator() : ((GenericImpl) components.get(0)).compositesIterator()) {
-			@Override
-			public boolean isSelected() {
-				// return !next.equals(modified) && ((GenericImpl) next).equivByMeta(((GenericImpl) modified).vertex());
-				return !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex());
-			}
-		}.hasNext())
+		if (!(components.isEmpty() ? modified.<GenericImpl> getMeta().getInheritingsSnapshot() : ((GenericImpl) components.get(0)).compositesSnapshot())
+				.filter(next -> !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex())).isEmpty())
 			throw new UnduplicateBindingConstraintViolationException();
 	}
 
