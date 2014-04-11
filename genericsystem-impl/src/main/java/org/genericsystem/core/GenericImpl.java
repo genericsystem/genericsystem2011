@@ -2059,7 +2059,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	@Override
-	public FunctionalSnapshot<Generic> getOtherTargetsSnapshot(final Holder holder) {
+	public FunctionalSnapshot<Generic> getOtherTargets(final Holder holder) {
 		return () -> otherTargetsIterator(holder);
 	}
 
