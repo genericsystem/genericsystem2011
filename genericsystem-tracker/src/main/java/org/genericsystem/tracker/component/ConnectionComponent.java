@@ -6,8 +6,6 @@ import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
-import javax.faces.event.SystemEvent;
 
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractConnectionComponent;
@@ -17,7 +15,6 @@ public class ConnectionComponent extends AbstractConnectionComponent {
 
 	public ConnectionComponent(AbstractComponent parent) {
 		super(parent);
-		// log.info("-------------------------->" + this.getThisExpression());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -27,54 +24,60 @@ public class ConnectionComponent extends AbstractConnectionComponent {
 	}
 
 	@Override
-	public void connect() {
-
+	public String connect() {
 		((SecurityManager) getSecurityManager()).connect(getLogin(), getPassword());
+		return "index.xhtml";
 	}
 
 	@Override
-	public void disconnect() {
+	public String disconnect() {
 		((SecurityManager) getSecurityManager()).disconnect();
+		return "index.xhtml";
 	}
 
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
-		// TODO Auto-generated method stub
-	}
+	protected void buildJsfComponentsBefore(UIComponent father) {
+		FacesContext ctx = FacesContext.getCurrentInstance();
+		if (!((SecurityManager) getSecurityManager()).isConnected()) {
 
-	@Override
-	public boolean isListenerForSource(Object source) {
-		// TODO Auto-generated method stub
-		return false;
+			HtmlForm form1 = new HtmlForm();
+
+			HtmlOutputText outputLogin = new HtmlOutputText();
+			outputLogin.setValue("Login");
+
+			HtmlInputText inputLogin = new HtmlInputText();
+			inputLogin.setValueExpression("value", getValueExpression("login"));
+
+			HtmlOutputText outputPassword = new HtmlOutputText();
+			outputPassword.setValue("Password");
+
+			HtmlInputText inputPassword = new HtmlInputText();
+			inputPassword.setValueExpression("value", getValueExpression("password"));
+
+			HtmlCommandButton buttonSubmit = new HtmlCommandButton();
+			buttonSubmit.setValue("connect");
+
+			buttonSubmit.setActionExpression(getMethodExpression("connect"));
+
+			form1.getChildren().add(outputLogin);
+			form1.getChildren().add(inputLogin);
+			form1.getChildren().add(outputPassword);
+			form1.getChildren().add(inputPassword);
+			form1.getChildren().add(buttonSubmit);
+			ctx.getViewRoot().getChildren().add(form1);
+		} else {
+			HtmlForm form = new HtmlForm();
+			HtmlCommandButton buttonDisconnect = new HtmlCommandButton();
+			buttonDisconnect.setValue("disconnect");
+			buttonDisconnect.setActionExpression(getMethodExpression("disconnect"));
+			form.getChildren().add(buttonDisconnect);
+			ctx.getViewRoot().getChildren().add(form);
+		}
 	}
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/connection.xhtml";
-	}
-
-	@Override
-	protected void buildJsfComponentsAfter(UIComponent father) {
-		FacesContext ctx = FacesContext.getCurrentInstance();
-		HtmlForm form = new HtmlForm();
-		HtmlOutputText outputLogin = new HtmlOutputText();
-		outputLogin.setValue("Login :");
-		HtmlInputText inputLogin = new HtmlInputText();
-
-		// ctx.getELContext().getVariableMapper().setVariable(variable, expression);
-		inputLogin.setValueExpression("login", ctx.getApplication().getExpressionFactory().createValueExpression("#{" + inputLogin.getId() + ".login}", String.class));
-		HtmlOutputText outputPassword = new HtmlOutputText();
-		outputPassword.setValue("Password :");
-		HtmlInputText inputPassword = new HtmlInputText();
-		HtmlCommandButton buttonSubmit = new HtmlCommandButton();
-		buttonSubmit.setValue("connect");
-
-		ctx.getViewRoot().addComponentResource(ctx, form);
-		ctx.getViewRoot().addComponentResource(ctx, outputLogin);
-		ctx.getViewRoot().addComponentResource(ctx, inputLogin);
-		ctx.getViewRoot().addComponentResource(ctx, outputPassword);
-		ctx.getViewRoot().addComponentResource(ctx, inputPassword);
-		ctx.getViewRoot().addComponentResource(ctx, buttonSubmit);
+		return null;
 	}
 
 }

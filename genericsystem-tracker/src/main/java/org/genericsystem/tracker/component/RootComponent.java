@@ -13,6 +13,7 @@ import javax.inject.Named;
 
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractRootComponent;
+import org.genericsystem.jsf.util.GsMessages;
 import org.genericsystem.security.manager.SecurityManager;
 
 @Named
@@ -26,22 +27,30 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 		this.children = initChildren();
 	}
 
+	@Inject
+	private SecurityManager securityManager;
+
+	@Inject
+	GsMessages gsMessage;
+
+	public GsMessages getGSMessage() {
+		return gsMessage;
+	}
+
 	public Object getListener() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
-		buildChildren(ctx.getViewRoot());
-		// logComponent(ctx.getViewRoot());
+		buildJsfChildren(ctx.getViewRoot());
+		logComponent(ctx.getViewRoot());
+
 		return null;
 	}
 
 	private void logComponent(UIComponent component) {
-		log.info("--->" + component.getClass());
+		log.info("Log Component : " + component.getClass());
 		for (UIComponent child : component.getChildren()) {
 			logComponent(child);
 		}
 	}
-
-	@Inject
-	SecurityManager securityManager;
 
 	public SecurityManager getSecurityManager() {
 		return securityManager;

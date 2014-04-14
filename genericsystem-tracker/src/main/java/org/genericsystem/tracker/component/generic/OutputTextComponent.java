@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.faces.component.UIComponent;
+import javax.faces.component.html.HtmlOutputText;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.ValuedComponent;
@@ -23,7 +26,13 @@ public class OutputTextComponent extends AbstractValuedGenericComponent implemen
 
 	@Override
 	public String getXhtmlPath() {
-		return "outputText.xhtml";
+		return null;
 	}
 
+	@Override
+	protected void buildJsfComponentsBefore(UIComponent father) {
+		HtmlOutputText outputText = new HtmlOutputText();
+		outputText.setValueExpression("value", getValueExpression("newValue"));
+		father.getChildren().add(outputText);
+	}
 }
