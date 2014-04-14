@@ -1,7 +1,7 @@
 package org.genericsystem.constraints;
 
-import java.util.Iterator;
 import java.util.Objects;
+
 import org.genericsystem.annotation.Components;
 import org.genericsystem.annotation.Extends;
 import org.genericsystem.annotation.SystemGeneric;
@@ -12,9 +12,9 @@ import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.PropertyConstraintViolationException;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
+import org.genericsystem.snapshot.FunctionalSnapshot;
 
 @SystemGeneric
 @Extends(ConstraintKey.class)
@@ -23,33 +23,20 @@ public class PropertyConstraintImpl extends AbstractBooleanNoAxedConstraintImpl 
 
 	@Override
 	public void check(final Generic constraintBase, final Generic modified) throws ConstraintViolationException {
-
 		if (modified.isAttribute()) {
 			for (final Generic inheriting : ((GenericImpl) ((Holder) modified).getBaseComponent()).getAllInheritings()) {
-				@SuppressWarnings({ "unchecked", "rawtypes" })
-				Iterator<Generic> it = new AbstractFilterIterator<Generic>((Iterator) inheriting.getHolders((Attribute) constraintBase).iterator()) {
-					@Override
-					public boolean isSelected() {
-						for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
-							if (!Objects.equals(((Holder) next).getComponent(componentPos), ((Holder) constraintBase).getComponent(componentPos)))
-								return false;
-						return true;
-					}
-				};
-				if (it.hasNext()) {
-					Generic value = it.next();
-					if (it.hasNext())
-						throw new PropertyConstraintViolationException(value.info() + it.next().info());
-				}
+				FunctionalSnapshot<Holder> snapshot = ((GenericImpl) inheriting).getHolders((Attribute) constraintBase).filter(next -> {
+					for (int componentPos = 1; componentPos < next.getComponents().size(); componentPos++)
+						if (!Objects.equals(next.getComponent(componentPos), ((Holder) constraintBase).getComponent(componentPos)))
+							return false;
+					return true;
+				});
+				if (snapshot.size() > 1)
+					throw new PropertyConstraintViolationException(snapshot.get(0).info() + snapshot.get(1).info());
 			}
 			return;
 		}
-		if (new AbstractFilterIterator<Generic>(((GenericImpl) constraintBase).getAllInstances().iterator()) {
-			@Override
-			public boolean isSelected() {
-				return !next.equals(modified) && Objects.equals(next.getValue(), modified.getValue());
-			}
-		}.hasNext())
+		if (!(((GenericImpl) constraintBase).getAllInstances().filter(next -> !next.equals(modified) && Objects.equals(next.getValue(), modified.getValue())).isEmpty()))
 			throw new PropertyConstraintViolationException("");
 	}
 
