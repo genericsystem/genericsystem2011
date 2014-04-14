@@ -40,4 +40,10 @@ public class TypesGridComponent extends AbstractCollectableChildrenComponent {
 		return "/pages/typesgrid.xhtml";
 	}
 
+	@Override
+	public <T> T getSecurityManager() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
