@@ -32,9 +32,9 @@ public class Vertex {
 		this.value = isEngine() ? value : getEngine().getCachedValue(value);
 		this.supers = supers;
 		this.components = components;
-		assert componentsInherits(components, this.meta.components) : "Inconsistant components : " + Arrays.toString(components);
+		assert componentsDepends(components, this.meta.components) : "Inconsistant components : " + Arrays.toString(components);
 		assert Arrays.asList(supers).stream().allMatch(superVertex -> meta.inheritsFrom(superVertex.getMeta())) : "Inconsistant supers : " + Arrays.toString(supers);
-		assert Arrays.asList(supers).stream().allMatch(superVertex -> componentsInherits(components, superVertex.components)) : "Inconsistant supers : " + Arrays.toString(supers);
+		assert Arrays.asList(supers).stream().allMatch(superVertex -> componentsDepends(components, superVertex.components)) : "Inconsistant supers : " + Arrays.toString(supers);
 		assert Arrays.asList(supers).stream().filter(superVertex -> superVertex.inheritsFrom(meta)).count() <= 1 : "Inconsistant supers : " + Arrays.toString(supers);
 		assert Arrays.asList(supers).stream().noneMatch(superVertex -> Objects.equals(superVertex.value, value)) : "Inconsistant supers : " + Arrays.toString(supers);;
 	}
@@ -59,8 +59,8 @@ public class Vertex {
 
 	private Vertex putThisIfAbsentOfIndex(Map<Vertex, Vertex> index, boolean throwExistException) throws ExistException {
 		if (!index.containsKey(this)) {
-			index.put(this, this);
-			return this;
+			Vertex result = index.put(this, this);
+			assert result == null; // TODO if result != null ?
 		}
 		if (throwExistException)
 			throw new ExistException();
@@ -170,8 +170,8 @@ public class Vertex {
 		return inheritsFrom(meta, value, components, superMeta, superValue, superComponents);
 	}
 
-	public boolean isSuperOrMetaOf(Vertex subMeta, Vertex[] overrides, Serializable subValue, Vertex... subComponents) {
-		return Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom(this) || override.isInstanceOf(this)) || inheritsFrom(subMeta, subValue, subComponents, meta, value, components);
+	public boolean isSuperOf(Vertex subMeta, Vertex[] overrides, Serializable subValue, Vertex... subComponents) {
+		return Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom(this)) || inheritsFrom(subMeta, subValue, subComponents, meta, value, components);
 	}
 
 	public static boolean inheritsFrom(Vertex subMeta, Serializable subValue, Vertex[] subComponents, Vertex superMeta, Serializable superValue, Vertex[] superComponents) {
@@ -182,7 +182,7 @@ public class Vertex {
 			Vertex superComponent = superComponents[superIndex];
 			for (; subIndex < subComponents.length; subIndex++) {
 				Vertex subComponent = subComponents[subIndex];
-				if (subComponent.inheritsFrom(superComponent) || subComponent.isInstanceOf(superComponent)) {
+				if (subComponent.inheritsFrom(superComponent) /* || subComponent.isInstanceOf(superComponent) */) {
 					if (subMeta.getSingulars()[subIndex])
 						return true;
 					subIndex++;
@@ -205,7 +205,7 @@ public class Vertex {
 		return singulars;
 	}
 
-	private static boolean componentsInherits(Vertex[] subComponents, Vertex[] superComponents) {
+	private static boolean componentsDepends(Vertex[] subComponents, Vertex[] superComponents) {
 		int subIndex = 0;
 		loop: for (int superIndex = 0; superIndex < superComponents.length; superIndex++) {
 			Vertex superComponent = superComponents[superIndex];
@@ -256,21 +256,19 @@ public class Vertex {
 		}
 
 		private boolean isSelected(Vertex candidate) {
-			for (Vertex inheriting : candidate.getInheritings())
-				if (inheriting.isSuperOrMetaOf(meta, overrides, value, components))
-					if (isSelected(inheriting))
-						return false;
 			if (candidate.getLevel() <= meta.getLevel())
 				for (Vertex instance : candidate.getInstances())
-					if (instance.isSuperOrMetaOf(meta, overrides, value, components))
-						if (isSelected(instance))
-							return false;
-			if (candidate.getLevel() == meta.getLevel() + 1) {
-				if (!candidate.equals(meta, value, components))
-					add(candidate);
-				return true;
-			}
-			return false;
+					if (isSelected(instance))
+						return false;
+			if (!meta.inheritsFrom(candidate.getMeta()))
+				return false;
+			for (Vertex inheriting : candidate.getInheritings())
+				if (inheriting.isSuperOf(meta, overrides, value, components))
+					if (isSelected(inheriting))
+						return false;
+			if (!candidate.equals(meta, value, components))
+				add(candidate);
+			return true;
 		}
 
 		@Override
