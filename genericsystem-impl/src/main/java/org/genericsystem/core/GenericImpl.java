@@ -756,19 +756,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return ((FunctionalSnapshot<T>) () -> new MainInheritanceProjector(GenericImpl.this).<T> project()).filter(next -> !contains(next));
 		}
 
-		// private <T extends Generic> Iterator<T> specialize() {
-		// return new AbstractFilterIterator<T>(new MainInheritanceProjector(GenericImpl.this).<T> project()) {
-		// @Override
-		// public boolean isSelected() {
-		// return !contains(next);
-		// }
-		// };
-		// }
-
 		private class CompositesIndex extends HashMap<Generic, Map<Generic, Set<Generic>>> {
 
 			private static final long serialVersionUID = -6404067063383874676L;
 
+			// TODO NOT TESTED : MUST BE OK NORMALY
 			// private <T extends Generic> FunctionalSnapshot<T> getIndexedCompositeSnapshot(Generic base, final Generic index) {
 			// Map<Generic, Set<Generic>> indexedCompositeMap = get(base);
 			// if (indexedCompositeMap == null) {
@@ -946,36 +938,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}
 	}
 
-	// public void project(final int pos) {
-	// Iterator<Generic[]> cartesianIterator = new CartesianIterator<>(projections(pos));
-	// while (cartesianIterator.hasNext()) {
-	// final UnsafeComponents components = new UnsafeComponents(cartesianIterator.next());
-	// Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
-	// @Override
-	// public boolean isSelected() {
-	// return ((GenericImpl) next).inheritsFrom(((GenericImpl) next).filterToProjectVertex(components, pos));
-	// }
-	// });
-	// if (projection == null)
-	// getReplacedComponentsBuilder(components).bind(null, false, true);
-	// }
-	// }
-
-	// private Iterable<Generic>[] projections(final int pos) {
-	// final Iterable<Generic>[] projections = new Iterable[getComponents().size()];
-	// for (int i = 0; i < projections.length; i++) {
-	// final int column = i;
-	// projections[i] = new Iterable<Generic>() {
-	// @Override
-	// public Iterator<Generic> iterator() {
-	// return pos != column && getComponents().get(column).isStructural() ? ((GenericImpl) getComponents().get(column)).allInstancesIterator() : new SingletonIterator<Generic>(getComponents().get(column));
-	// }
-	// };
-	// }
-	// return projections;
-	// }
-
-	// projections(final int pos) {...} - VERSION WITH LAMBDA EXPRESSION --- error with tests
 	private Iterable<Generic>[] projections(final int pos) {
 		final Iterable<Generic>[] projections = new Iterable[getComponents().size()];
 		for (int i = 0; i < projections.length; i++) {
