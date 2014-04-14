@@ -14,13 +14,12 @@ import org.genericsystem.core.GenericImpl;
 import org.genericsystem.exception.ConstraintViolationException;
 import org.genericsystem.exception.UnduplicateBindingConstraintViolationException;
 import org.genericsystem.generic.Holder;
-import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.ConstraintsMapProvider.ConstraintKey;
 
 /**
  * @author Nicolas Feybesse
- * 
+ *
  */
 @SystemGeneric
 @Extends(ConstraintKey.class)
@@ -33,24 +32,21 @@ public class UnduplicateBindingConstraintImpl extends AbstractBooleanNoAxedConst
 	@Meta(UnduplicateBindingConstraintImpl.class)
 	@Components(ConstraintsMapProvider.class)
 	@AxedConstraintValue(UnduplicateBindingConstraintImpl.class)
-	public static class DefaultKey {}
+	public static class DefaultKey {
+	}
 
 	@SystemGeneric
 	@Meta(ConstraintsMapProvider.ConstraintValue.class)
 	@Components(DefaultKey.class)
 	@BooleanValue(true)
-	public static class DefaultValue {}
+	public static class DefaultValue {
+	}
 
 	@Override
 	public void check(Generic constraintBase, final Generic modified) throws ConstraintViolationException {
 		org.genericsystem.core.UnsafeGList.Components components = ((GenericImpl) modified).getComponents();
-		if (new AbstractFilterIterator<Generic>(components.isEmpty() ? modified.<GenericImpl> getMeta().inheritingsIterator() : ((GenericImpl) components.get(0)).compositesIterator()) {
-			@Override
-			public boolean isSelected() {
-				// return !next.equals(modified) && ((GenericImpl) next).equivByMeta(((GenericImpl) modified).vertex());
-				return !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex());
-			}
-		}.hasNext())
+		if (!(components.isEmpty() ? modified.<GenericImpl> getMeta().getInheritingsSnapshot() : ((GenericImpl) components.get(0)).compositesSnapshot())
+				.filter(next -> !next.equals(modified) && ((GenericImpl) next).equiv(((GenericImpl) modified).vertex())).isEmpty())
 			throw new UnduplicateBindingConstraintViolationException();
 	}
 

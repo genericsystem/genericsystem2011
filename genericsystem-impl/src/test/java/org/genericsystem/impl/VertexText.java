@@ -25,6 +25,8 @@ public class VertexText extends AbstractTest {
 		assert car.getInstances().contains(myBmw);
 		assert power.getInstances().contains(v233);
 		assert car.getComposites().contains(power);
+		assert car.getSupers()[0] == vehicle : car.getSupers()[0].info();
+		assert Arrays.asList(car.getSupers()).contains(vehicle);
 		assert vehicle.getInheritings().contains(car);
 		assert car.getComposites().contains(power);
 		assert myBmw.getComposites().contains(v233);
@@ -41,10 +43,15 @@ public class VertexText extends AbstractTest {
 		assert engine.getInstance("Car") != null;
 		assert power.getInstance(233, myBmw) != null;
 		Vertex carRed = vehicleColor.addInstance("CarRed", car, red);
-		assert !carRed.isSuperOf(vehicleColor, "myBmwRed", myBmw, red);
-		assert !carRed.isSuperOf(vehicleColor, "myBmwRed", red, red);
-		assert carRed.isSuperOf(vehicleColor, "CarRed", myBmw, red);
+		assert carRed.isSuperOrMetaOf(vehicleColor, new Vertex[] { carRed }, "myBmwRed", myBmw, red);
+		assert !carRed.isSuperOrMetaOf(vehicleColor, new Vertex[] {}, "myBmwRed", red, red);
+		assert carRed.isSuperOrMetaOf(vehicleColor, new Vertex[] { carRed }, "CarRed", myBmw, red);
+
 		Vertex myBmwRed = vehicleColor.addInstance(new Vertex[] { carRed }, "myBmwRed", myBmw, red);
+		assert myBmwRed == vehicleColor.setInstance("myBmwRed", myBmw, red);
+		assert myBmwRed == vehicleColor.getInstance("myBmwRed", myBmw, red) : vehicleColor.getInstance("myBmwRed", myBmw, red).info();
+
+		assert myBmwRed.inheritsFrom(carRed);
 		assert car.getAttributes(engine).contains(power);
 		assert car.getAttributes(engine).size() == 1;
 		assert !myBmwRed.inheritsFrom(power);
