@@ -1,7 +1,11 @@
 package org.genericsystem.tracker.component;
 
-import javax.faces.event.AbortProcessingException;
-import javax.faces.event.SystemEvent;
+import javax.faces.component.UIComponent;
+import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlForm;
+import javax.faces.component.html.HtmlInputText;
+import javax.faces.component.html.HtmlOutputText;
+import javax.faces.context.FacesContext;
 
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractConnectionComponent;
@@ -20,28 +24,60 @@ public class ConnectionComponent extends AbstractConnectionComponent {
 	}
 
 	@Override
-	public void connect() {
+	public String connect() {
 		((SecurityManager) getSecurityManager()).connect(getLogin(), getPassword());
+		return "index.xhtml";
 	}
 
 	@Override
-	public void disconnect() {
+	public String disconnect() {
 		((SecurityManager) getSecurityManager()).disconnect();
+		return "index.xhtml";
 	}
 
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
-		// TODO Auto-generated method stub
-	}
+	protected void buildJsfComponentsBefore(UIComponent father) {
+		FacesContext ctx = FacesContext.getCurrentInstance();
+		if (!((SecurityManager) getSecurityManager()).isConnected()) {
 
-	@Override
-	public boolean isListenerForSource(Object source) {
-		// TODO Auto-generated method stub
-		return false;
+			HtmlForm form1 = new HtmlForm();
+
+			HtmlOutputText outputLogin = new HtmlOutputText();
+			outputLogin.setValue("Login");
+
+			HtmlInputText inputLogin = new HtmlInputText();
+			inputLogin.setValueExpression("value", getValueExpression("login"));
+
+			HtmlOutputText outputPassword = new HtmlOutputText();
+			outputPassword.setValue("Password");
+
+			HtmlInputText inputPassword = new HtmlInputText();
+			inputPassword.setValueExpression("value", getValueExpression("password"));
+
+			HtmlCommandButton buttonSubmit = new HtmlCommandButton();
+			buttonSubmit.setValue("connect");
+
+			buttonSubmit.setActionExpression(getMethodExpression("connect"));
+
+			form1.getChildren().add(outputLogin);
+			form1.getChildren().add(inputLogin);
+			form1.getChildren().add(outputPassword);
+			form1.getChildren().add(inputPassword);
+			form1.getChildren().add(buttonSubmit);
+			ctx.getViewRoot().getChildren().add(form1);
+		} else {
+			HtmlForm form = new HtmlForm();
+			HtmlCommandButton buttonDisconnect = new HtmlCommandButton();
+			buttonDisconnect.setValue("disconnect");
+			buttonDisconnect.setActionExpression(getMethodExpression("disconnect"));
+			form.getChildren().add(buttonDisconnect);
+			ctx.getViewRoot().getChildren().add(form);
+		}
 	}
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/connection.xhtml";
+		return null;
 	}
+
 }

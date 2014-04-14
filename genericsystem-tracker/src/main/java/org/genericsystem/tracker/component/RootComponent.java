@@ -6,15 +6,14 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.SessionScoped;
-import javax.faces.component.html.HtmlCommandButton;
-import javax.faces.component.html.HtmlInputText;
-import javax.faces.component.html.HtmlOutputText;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractRootComponent;
+import org.genericsystem.jsf.util.GsMessages;
 import org.genericsystem.security.manager.SecurityManager;
 
 @Named
@@ -28,21 +27,30 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 		this.children = initChildren();
 	}
 
+	@Inject
+	private SecurityManager securityManager;
+
+	@Inject
+	GsMessages gsMessage;
+
+	public GsMessages getGSMessage() {
+		return gsMessage;
+	}
+
 	public Object getListener() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
-		HtmlInputText dynamicallyGenerated = new HtmlInputText();
-		HtmlCommandButton commandButton = new HtmlCommandButton();
-		HtmlOutputText outputText = new HtmlOutputText();
-		outputText.setValue("Yes");
-		commandButton.setValue("Submit");
-		dynamicallyGenerated.setValue("Test");
-		ctx.getViewRoot().addComponentResource(ctx, dynamicallyGenerated);
-		ctx.getViewRoot().addComponentResource(ctx, commandButton);
+		buildJsfChildren(ctx.getViewRoot());
+		logComponent(ctx.getViewRoot());
+
 		return null;
 	}
 
-	@Inject
-	SecurityManager securityManager;
+	private void logComponent(UIComponent component) {
+		log.info("Log Component : " + component.getClass());
+		for (UIComponent child : component.getChildren()) {
+			logComponent(child);
+		}
+	}
 
 	public SecurityManager getSecurityManager() {
 		return securityManager;
@@ -57,4 +65,15 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	public String getXhtmlPath() {
 		return "/pages/index.xhtml";
 	}
+
+	@Override
+	protected int getComponentIndex() {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	protected String getInternalElExpression() {
+		return "rootComponent";
+	}
+
 }

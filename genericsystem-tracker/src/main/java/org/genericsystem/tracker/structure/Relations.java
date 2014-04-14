@@ -12,9 +12,9 @@ import org.genericsystem.tracker.structure.Types.Users;
 public class Relations {
 
 	/**
-	 * 
+	 *
 	 * Issues Relations
-	 * 
+	 *
 	 */
 
 	@SystemGeneric

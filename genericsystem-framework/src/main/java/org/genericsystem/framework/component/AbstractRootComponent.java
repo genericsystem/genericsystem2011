@@ -8,6 +8,10 @@ public abstract class AbstractRootComponent extends AbstractComponent {
 	@Inject
 	private Cache cache;
 
+	public AbstractRootComponent() {
+		super(null);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends AbstractComponent> T getRoot() {

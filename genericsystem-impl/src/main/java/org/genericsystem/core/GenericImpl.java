@@ -315,67 +315,34 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	@Override
 	public void cancel(Holder holder) {
-		cancel(holder, Statics.CONCRETE);
-	}
-
-	@Override
-	public void cancel(Holder holder, int metaLevel) {
-		internalClear(unambigousFirst(holdersSnapshot(holder, metaLevel, getBasePos(holder))));
-		internalCancel(unambigousFirst(holdersSnapshot(holder, metaLevel, getBasePos(holder))), metaLevel, getBasePos(holder));
+		internalClear(unambigousFirst(holdersSnapshot(holder, Statics.CONCRETE, getBasePos(holder))));
+		internalCancel(unambigousFirst(holdersSnapshot(holder, Statics.CONCRETE, getBasePos(holder))), Statics.CONCRETE, getBasePos(holder));
 	}
 
 	@Override
 	public void cancelAll(Holder attribute, Generic... targets) {
-		cancelAll(attribute, Statics.CONCRETE, targets);
-	}
-
-	@Override
-	public void cancelAll(Holder attribute, int metaLevel, Generic... targets) {
-		cancelAll(attribute, getBasePos(attribute), metaLevel, targets);
-	}
-
-	@Override
-	public void cancelAll(Holder attribute, int basePos, int metaLevel, Generic... targets) {
-		internalClearAll(attribute, basePos, metaLevel, targets);
-		FunctionalSnapshot<Holder> holders = this.<Holder> holdersSnapshot(attribute, metaLevel, basePos, targets);
+		int basePos = getBasePos(attribute);
+		clearAll(attribute, targets);
+		FunctionalSnapshot<Holder> holders = this.<Holder> holdersSnapshot(attribute, Statics.CONCRETE, basePos, targets);
 		for (Holder holder : holders)
-			internalCancel(holder, metaLevel, basePos);
+			internalCancel(holder, Statics.CONCRETE, basePos);
+	}
+
+	@Override
+	public void clear(Holder holder) {
+		internalClear(unambigousFirst(holdersSnapshot(holder, Statics.CONCRETE, getBasePos(holder))));
+	}
+
+	@Override
+	public void clearAll(Holder attribute, Generic... targets) {
+		FunctionalSnapshot<Holder> holders = this.<Holder> holdersSnapshot(attribute, Statics.CONCRETE, getBasePos(attribute), targets);
+		for (Holder holder : holders)
+			internalClear(holder);
 	}
 
 	private void internalCancel(Holder attribute, int metaLevel, int basePos) {
 		if (attribute != null)
 			bind(metaLevel == attribute.getMetaLevel() ? attribute.getMeta() : attribute, null, null, attribute, Statics.EMPTY_GENERIC_ARRAY, basePos, false);
-	}
-
-	@Override
-	public void clear(Holder holder) {
-		clear(holder, Statics.CONCRETE);
-	}
-
-	@Override
-	public void clear(Holder holder, int metaLevel) {
-		internalClear(unambigousFirst(holdersSnapshot(holder, metaLevel, getBasePos(holder))));
-	}
-
-	@Override
-	public void clearAll(Holder attribute, Generic... targets) {
-		clearAll(attribute, Statics.CONCRETE, targets);
-	}
-
-	@Override
-	public void clearAll(Holder attribute, int metaLevel, Generic... targets) {
-		clearAll(attribute, getBasePos(attribute), metaLevel, targets);
-	}
-
-	@Override
-	public void clearAll(Holder attribute, int basePos, int metaLevel, Generic... targets) {
-		internalClearAll(attribute, basePos, metaLevel, targets);
-	}
-
-	private void internalClearAll(Holder attribute, int basePos, int metaLevel, Generic... targets) {
-		FunctionalSnapshot<Holder> holders = this.<Holder> holdersSnapshot(attribute, metaLevel, basePos, targets);
-		for (Holder holder : holders)
-			internalClear(holder);
 	}
 
 	private void internalClear(Holder holder) {

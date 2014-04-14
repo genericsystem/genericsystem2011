@@ -810,16 +810,6 @@ public interface Generic extends Comparable<Generic> {
 	void cancel(Holder holder);
 
 	/**
-	 * Abandons current value of the holder setting it to null.
-	 * 
-	 * @param holder
-	 *            the holder.
-	 * @param metaLevel
-	 *            meta level for the modified values
-	 */
-	public void cancel(Holder holder, int metaLevel);
-
-	/**
 	 * Abandons concrete values of the holder setting it to null.
 	 * 
 	 * @param holder
@@ -828,32 +818,6 @@ public interface Generic extends Comparable<Generic> {
 	 *            the optional targets for link.
 	 */
 	void cancelAll(Holder holder, Generic... targets);
-
-	/**
-	 * Abandons current value of the holder setting it to null.
-	 * 
-	 * @param holder
-	 *            the holder.
-	 * @param metaLevel
-	 *            meta level for the modified values
-	 * @param targets
-	 *            the optional targets for link.
-	 */
-	void cancelAll(Holder attribute, int metaLevel, Generic... targets);
-
-	/**
-	 * Abandons current value of the holder setting it to null.
-	 * 
-	 * @param holder
-	 *            the holder.
-	 * @param basePos
-	 *            the base position.
-	 * @param metaLevel
-	 *            meta level for the modified values
-	 * @param targets
-	 *            the optional targets for link.
-	 */
-	void cancelAll(Holder holder, int basePos, int metaLevel, Generic... targets);
 
 	/**
 	 * Removes holder from the graph.
@@ -868,46 +832,10 @@ public interface Generic extends Comparable<Generic> {
 	 * 
 	 * @param holder
 	 *            the holder.
-	 * @param metaLevel
-	 *            meta level for the modified values
-	 */
-	void clear(Holder holder, int metaLevel);
-
-	/**
-	 * Removes holder from the graph.
-	 * 
-	 * @param holder
-	 *            the holder.
 	 * @param targets
 	 *            the optional targets for relation.
 	 */
 	void clearAll(Holder holder, Generic... targets);
-
-	/**
-	 * Removes holder from the graph.
-	 * 
-	 * @param holder
-	 *            the holder.
-	 * @param metaLevel
-	 *            meta level for the modified values
-	 * @param targets
-	 *            the optional targets for relation.
-	 */
-	void clearAll(Holder attribute, int metaLevel, Generic... targets);
-
-	/**
-	 * Removes holder from the graph.
-	 * 
-	 * @param holder
-	 *            the holder.
-	 * @param basePos
-	 *            the base position.
-	 * @param metaLevel
-	 *            meta level for the modified values
-	 * @param targets
-	 *            the optional targets for relation.
-	 */
-	void clearAll(Holder holder, int basePos, int metaLevel, Generic... targets);
 
 	/**
 	 * Returns the map associated with this generic. Map is found by class of Map Provider.

@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.faces.component.UIComponent;
+import javax.faces.component.html.HtmlInputText;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.ValuedComponent;
@@ -28,6 +31,13 @@ public class InputTextComponent extends AbstractValuedGenericComponent implement
 
 	@Override
 	public String getXhtmlPath() {
-		return "inputText.xhtml";
+		return null;
+	}
+
+	@Override
+	protected void buildJsfComponentsAfter(UIComponent father) {
+		HtmlInputText inputText = new HtmlInputText();
+		inputText.setValueExpression("value", getValueExpression("newValue"));
+		father.getChildren().add(inputText);
 	}
 }

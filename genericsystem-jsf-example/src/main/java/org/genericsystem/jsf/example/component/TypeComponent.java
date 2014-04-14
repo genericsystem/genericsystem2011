@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.InstanceRow;
 import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
+import org.genericsystem.framework.component.AbstractCollectableChildrenComponent.FilterGeneric;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.ValuedComponent;
 import org.genericsystem.framework.component.generic.GenericComponent;
@@ -80,12 +80,7 @@ public class TypeComponent extends AbstractCollectableChildrenComponent implemen
 	}
 
 	public List<InstanceRow> getInstanceRows() {
-		return ((Type) getGeneric()).getAllInstances().<InstanceRow> project(new Projector<InstanceRow, Generic>() {
-			@Override
-			public InstanceRow project(Generic instance) {
-				return new InstanceRow(instance);
-			}
-		});
+		return ((Type) getGeneric()).getAllInstances().<InstanceRow> project(instance -> new InstanceRow(instance));
 	}
 
 	public void remove(InstanceRow instanceRow) {
@@ -125,6 +120,12 @@ public class TypeComponent extends AbstractCollectableChildrenComponent implemen
 	@Override
 	public String getXhtmlPath() {
 		return "/pages/type.xhtml";
+	}
+
+	@Override
+	public <T> T getSecurityManager() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

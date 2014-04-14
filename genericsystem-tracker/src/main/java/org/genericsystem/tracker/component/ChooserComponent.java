@@ -2,17 +2,27 @@ package org.genericsystem.tracker.component;
 
 import java.io.Serializable;
 
+import javax.faces.component.UIComponent;
+import javax.faces.component.html.HtmlPanelGrid;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
 import org.genericsystem.framework.component.AbstractComponent;
-import org.genericsystem.tracker.component.generic.TypeComponent;
+import org.genericsystem.tracker.component.generic.CommandButtonComponent;
 import org.genericsystem.tracker.structure.Types;
 
-public class GridComponent extends AbstractCollectableChildrenComponent {
+public class ChooserComponent extends AbstractCollectableChildrenComponent {
 
-	public GridComponent(AbstractComponent parent) {
+	private static final int NB_COLUMNS_PANEL_GRID = 4;
+
+	public ChooserComponent(AbstractComponent parent) {
 		super(parent);
+	}
+
+	@Override
+	public <T> T getSecurityManager() {
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -33,12 +43,20 @@ public class GridComponent extends AbstractCollectableChildrenComponent {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends AbstractComponent, U extends Generic> T buildComponent(U key) {
-		return (T) new TypeComponent(GridComponent.this, key);
+	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
+		return (T) new CommandButtonComponent(ChooserComponent.this, generic);
 	}
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/grid.xhtml";
+		return null;
+	}
+
+	@Override
+	protected UIComponent buildJsfContainer(UIComponent father) {
+		HtmlPanelGrid panelGrid = new HtmlPanelGrid();
+		panelGrid.setColumns(NB_COLUMNS_PANEL_GRID);
+		father.getChildren().add(panelGrid);
+		return panelGrid;
 	}
 }
