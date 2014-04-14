@@ -7,15 +7,12 @@
 	template="/pages/layouts/commonLayout.xhtml">
 
 	<ui:define name="header">
-		<title>JSF Example Use Case</title>
+		<title>Tracker</title>
 	</ui:define>
 
 	<ui:define name="content">
 		<f:event listener="#{rootComponent.getListener()}"
 			type="preRenderView" />
 		<h:messages errorStyle="color:red" />
-		<c:forEach items="#{rootComponent.children}" var="component">
-			<ui:include src="#{component.xhtmlPath}" />
-		</c:forEach>
 	</ui:define>
 </ui:composition>
