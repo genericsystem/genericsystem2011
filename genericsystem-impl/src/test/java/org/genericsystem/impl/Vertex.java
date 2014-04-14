@@ -59,8 +59,8 @@ public class Vertex {
 
 	private Vertex putThisIfAbsentOfIndex(Map<Vertex, Vertex> index, boolean throwExistException) throws ExistException {
 		if (!index.containsKey(this)) {
-			index.put(this, this);
-			return this;
+			Vertex result = index.put(this, this);
+			assert result == null; // TODO if result != null ?
 		}
 		if (throwExistException)
 			throw new ExistException();
