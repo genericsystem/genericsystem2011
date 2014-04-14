@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import org.genericsystem.annotation.Dependencies;
 import org.genericsystem.annotation.SystemGeneric;
 import org.genericsystem.annotation.value.StringValue;
@@ -36,10 +37,10 @@ import org.genericsystem.systemproperties.MetaRelation;
 @StringValue(Statics.ROOT_NODE_VALUE)
 public class EngineImpl extends GenericImpl implements Engine {
 
-	private SystemCache systemCache = new SystemCache();
-	private TsGenerator generator = new TsGenerator();
-	private Factory factory;
-	private Archiver archiver;
+	private final SystemCache systemCache = new SystemCache();
+	private final TsGenerator generator = new TsGenerator();
+	private final Factory factory;
+	private final Archiver archiver;
 
 	private final GarbageCollectorManager garbageCollectorManager;
 
@@ -146,7 +147,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 		return Statics.META;
 	}
 
-	private ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
+	private final ThreadLocal<Cache> cacheLocal = new ThreadLocal<>();
 
 	public Cache start(Cache cache) {
 		if (!equals(cache.getEngine()))
@@ -271,7 +272,7 @@ public class EngineImpl extends GenericImpl implements Engine {
 	public class GarbageCollectorManager extends LinkedHashSet<Generic> {
 
 		private static final long serialVersionUID = -2021341943811568201L;
-		private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+		private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 		public void startScheduler() {
 			scheduler.scheduleAtFixedRate(new Runnable() {
