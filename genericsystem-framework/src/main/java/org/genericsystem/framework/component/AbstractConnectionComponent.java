@@ -3,9 +3,7 @@ package org.genericsystem.framework.component;
 import java.util.Collections;
 import java.util.List;
 
-import javax.faces.event.SystemEventListener;
-
-public abstract class AbstractConnectionComponent extends AbstractComponent implements SystemEventListener {
+public abstract class AbstractConnectionComponent extends AbstractComponent {
 
 	private String login;
 
@@ -22,9 +20,9 @@ public abstract class AbstractConnectionComponent extends AbstractComponent impl
 
 	public abstract <T> T getSecurityManager();
 
-	public abstract void connect();
+	public abstract String connect();
 
-	public abstract void disconnect();
+	public abstract String disconnect();
 
 	public String getLogin() {
 		return login;
@@ -41,9 +39,4 @@ public abstract class AbstractConnectionComponent extends AbstractComponent impl
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	// @Override
-	// protected String getThisExpression() {
-	// return "" + getParent().getChildren().indexOf(this);
-	// }
 }

@@ -12,10 +12,10 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 
 	public AbstractSelectorComponent(AbstractComponent parent) {
 		super(parent);
-		selectDefaultComponent();
+		// selectDefaultComponent();
 	}
 
-	public AbstractSelectorComponent getParentSelector() {
+	public final AbstractSelectorComponent getParentSelector() {
 		return this;
 	}
 
