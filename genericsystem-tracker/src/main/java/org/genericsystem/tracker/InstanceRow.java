@@ -1,5 +1,6 @@
 package org.genericsystem.tracker;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
@@ -8,7 +9,9 @@ import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Holder;
 
-public class InstanceRow {
+public class InstanceRow implements Serializable {
+
+	private static final long serialVersionUID = -4815584822358965253L;
 
 	private Generic instance;
 

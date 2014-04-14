@@ -3,6 +3,11 @@ package org.genericsystem.tracker.component.generic;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.faces.component.UIComponent;
+import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlForm;
+import javax.faces.component.html.HtmlPanelGrid;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 import org.genericsystem.framework.component.AbstractComponent;
@@ -48,7 +53,7 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 		return (T) new RowComponent(this, generic);
 	}
 
-	public void execute() {
+	public String execute() {
 		List<RowComponent> rows = this.<RowComponent> getChildren();
 		InputTextComponent inputTextComponent = rows.get(0).<InputTextComponent> getChildren().get(1);
 		setGeneric(generic.isStructural() ? ((Type) generic).setInstance(inputTextComponent.getNewValue()) : getGeneric().setValue(inputTextComponent.getNewValue()));
@@ -64,7 +69,8 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 					getGeneric().setValue((Attribute) attribute, (((InputTextComponent) component).getNewValue()).toString());
 			}
 		}
-		getParentSelector().selectDefaultComponent();
+		((FilterCreateEditComponent) getParent()).child = null;
+		return "index.xhtml";
 	}
 
 	public String getTitle() {
@@ -77,6 +83,35 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/createandedit.xhtml";
+		return null;
+	}
+
+	@Override
+	public <T> T getSecurityManager() {
+		return null;
+	}
+
+	@Override
+	protected UIComponent buildJsfContainer(UIComponent father) {
+		HtmlForm form = new HtmlForm();
+
+		HtmlPanelGrid panelGrid = new HtmlPanelGrid();
+		if (((FilterCreateEditComponent) getParent()).child != null) {
+			panelGrid.setColumns(2);
+			panelGrid.setStyleClass("order-table");
+			panelGrid.setHeaderClass("order-table-header");
+			panelGrid.setRowClasses("order-table-odd-row,order-table-even-row");
+			form.getChildren().add(panelGrid);
+			father.getChildren().add(form);
+		}
+		return panelGrid;
+	}
+
+	@Override
+	protected void buildJsfComponentsAfter(UIComponent container) {
+		HtmlCommandButton button = new HtmlCommandButton();
+		button.setValue(getTitle());
+		button.setActionExpression(getMethodExpression("execute"));
+		container.getChildren().add(button);
 	}
 }

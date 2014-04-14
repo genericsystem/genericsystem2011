@@ -4,6 +4,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.faces.component.UIComponent;
+import javax.faces.component.html.HtmlColumn;
+import javax.faces.component.html.HtmlDataTable;
+import javax.faces.component.html.HtmlOutputText;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.component.AbstractComponent;
@@ -48,7 +53,30 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 
 	@Override
 	public String getXhtmlPath() {
-		return "/pages/attribute.xhtml";
+		return null;
+	}
+
+	@Override
+	protected void buildJsfComponentsAfter(UIComponent container) {
+		HtmlOutputText attributeValue = new HtmlOutputText();
+		attributeValue.setValueExpression("value", getValueExpression("getColumnTitleAttribute()"));
+		((HtmlColumn) container).setHeader(attributeValue);
+		HtmlDataTable innerDataTable = new HtmlDataTable();
+		innerDataTable.setValueExpression("value", createValueExpression("row.getAttributeValues(" + getInternalElExpression() + ".generic" + ")"));
+		innerDataTable.setVar("value");
+		HtmlColumn column = new HtmlColumn();
+		HtmlOutputText attribut = new HtmlOutputText();
+		attribut.setValueExpression("value", createValueExpression("value"));
+		column.getChildren().add(attribut);
+		innerDataTable.getChildren().add(column);
+		container.getChildren().add(innerDataTable);
+	}
+
+	@Override
+	protected UIComponent buildJsfContainer(UIComponent father) {
+		HtmlColumn column = new HtmlColumn();
+		father.getChildren().add(column);
+		return column;
 	}
 
 }

@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import javax.faces.component.UIComponent;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericCollectableChildrenComponent;
@@ -45,7 +47,12 @@ public class RowComponent extends AbstractGenericComponent {
 	}
 
 	@Override
+	protected UIComponent buildJsfContainer(UIComponent father) {
+		return father;
+	}
+
+	@Override
 	public String getXhtmlPath() {
-		return "row.xhtml";
+		return null;
 	}
 }

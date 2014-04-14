@@ -44,13 +44,13 @@ public class SecurityManager implements Serializable {
 		users = cache.find(Users.class);
 	}
 
-	public void connect(String login, String password) throws AuthentificationException {
+	public String connect(String login, String password) throws AuthentificationException {
 		Attribute loginAtt = cache.find(Login.class);
 		Attribute passwordAtt = cache.find(Password.class);
 		for (Generic user : users.getAllInstances()) {
 			if (Objects.equals(user.getValue(loginAtt), login) && Objects.equals(user.getValue(passwordAtt), MD5Hashing.hashPassword(password))) {
 				currentUser = user;
-				return;
+				return password;
 			}
 		}
 		throw new AuthentificationException("User login/password :" + login + "/" + password + " doesn't exist");
