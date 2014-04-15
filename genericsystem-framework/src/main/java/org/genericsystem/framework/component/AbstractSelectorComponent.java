@@ -11,7 +11,7 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractSelectorComponent.class);
 
-	protected AbstractComponent child;
+	public AbstractComponent child;
 
 	public AbstractSelectorComponent(AbstractComponent parent) {
 		super(parent);
