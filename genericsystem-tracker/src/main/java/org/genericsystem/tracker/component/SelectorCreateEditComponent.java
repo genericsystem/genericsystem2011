@@ -16,11 +16,6 @@ public class SelectorCreateEditComponent extends AbstractSelectorComponent {
 
 	DisplayerCreateEditComponent displayerCreateEdit = new DisplayerCreateEditComponent(this);
 
-	// @Override
-	// public List<? extends AbstractComponent> initChildren() {
-	// return Arrays.asList(new ChooserCreateEditComponent(this), displayerCreateEdit);
-	// }
-
 	@Override
 	public void selectDefaultComponent() {
 
