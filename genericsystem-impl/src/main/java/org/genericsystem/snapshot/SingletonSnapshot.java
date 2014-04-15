@@ -10,7 +10,8 @@ public class SingletonSnapshot<T> implements FunctionalSnapshot<T> {
 		this.singleton = singleton;
 	}
 
-	public T getSingleton() {
+	@Override
+	public T get(int pos) {
 		return singleton;
 	}
 

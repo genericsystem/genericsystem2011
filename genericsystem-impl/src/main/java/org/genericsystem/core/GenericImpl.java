@@ -64,6 +64,7 @@ import org.genericsystem.map.ConstraintsMapProvider;
 import org.genericsystem.map.PropertiesMapProvider;
 import org.genericsystem.map.SystemPropertiesMapProvider;
 import org.genericsystem.snapshot.FunctionalSnapshot;
+import org.genericsystem.snapshot.SingletonSnapshot;
 import org.genericsystem.systemproperties.CascadeRemoveSystemProperty;
 import org.genericsystem.systemproperties.NoInheritanceProperty;
 import org.genericsystem.systemproperties.NoReferentialIntegritySystemProperty;
@@ -755,19 +756,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 			return ((FunctionalSnapshot<T>) () -> new MainInheritanceProjector(GenericImpl.this).<T> project()).filter(next -> !contains(next));
 		}
 
-		// private <T extends Generic> Iterator<T> specialize() {
-		// return new AbstractFilterIterator<T>(new MainInheritanceProjector(GenericImpl.this).<T> project()) {
-		// @Override
-		// public boolean isSelected() {
-		// return !contains(next);
-		// }
-		// };
-		// }
-
 		private class CompositesIndex extends HashMap<Generic, Map<Generic, Set<Generic>>> {
 
 			private static final long serialVersionUID = -6404067063383874676L;
 
+			// TODO NOT TESTED : MUST BE OK NORMALY
 			// private <T extends Generic> FunctionalSnapshot<T> getIndexedCompositeSnapshot(Generic base, final Generic index) {
 			// Map<Generic, Set<Generic>> indexedCompositeMap = get(base);
 			// if (indexedCompositeMap == null) {
@@ -824,12 +817,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 		private <T extends Generic> Iterator<T> indexedCompositeIterator(Generic base, final Generic index) {
 			return compositesIndex.getIndexedCompositeIterator(base, index);
-			// return new AbstractFilterIterator<T>(((GenericImpl) base).<T> compositesIterator()) {
-			// @Override
-			// public boolean isSelected() {
-			// return next.getMetaLevel() <= level && next.getSupers().contains(index);
-			// }
-			// };
 		}
 
 		private class MainInheritanceProjector extends HashSet<Generic> {
@@ -946,13 +933,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		Iterator<Generic[]> cartesianIterator = new CartesianIterator<>(projections(pos));
 		while (cartesianIterator.hasNext()) {
 			final UnsafeComponents components = new UnsafeComponents(cartesianIterator.next());
-			Generic projection = this.unambigousFirst(new AbstractFilterIterator<Generic>(allInheritingsIteratorWithoutRoot()) {
-				@Override
-				public boolean isSelected() {
-					return ((GenericImpl) next).inheritsFrom(((GenericImpl) next).filterToProjectVertex(components, pos));
-				}
-			});
-			if (projection == null)
+			if (this.unambigousFirst(getAllInheritingsSnapshotWithoutRoot().filter(next -> ((GenericImpl) next).inheritsFrom(((GenericImpl) next).filterToProjectVertex(components, pos)))) == null)
 				getReplacedComponentsBuilder(components).bind(null, false, true);
 		}
 	}
@@ -960,26 +941,11 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	private Iterable<Generic>[] projections(final int pos) {
 		final Iterable<Generic>[] projections = new Iterable[getComponents().size()];
 		for (int i = 0; i < projections.length; i++) {
-			final int column = i;
-			projections[i] = new Iterable<Generic>() {
-				@Override
-				public Iterator<Generic> iterator() {
-					return pos != column && getComponents().get(column).isStructural() ? ((GenericImpl) getComponents().get(column)).allInstancesIterator() : new SingletonIterator<Generic>(getComponents().get(column));
-				}
-			};
+			int column = i;
+			projections[i] = () -> pos != column && getComponents().get(column).isStructural() ? ((GenericImpl) getComponents().get(column)).allInstancesIterator() : new SingletonIterator<Generic>(getComponents().get(column));
 		}
 		return projections;
 	}
-
-	// projections(final int pos) {...} - VERSION WITH LAMBDA EXPRESSION --- error with tests
-	// private Iterable<Generic>[] projections(final int pos) {
-	// final Iterable<Generic>[] projections = new Iterable[getComponents().size()];
-	// for (int i = 0; i < projections.length; i++) {
-	// final int column = i;
-	// projections[i] = () -> pos != column && getComponents().get(column).isStructural() ? ((GenericImpl) getComponents().get(column)).allInstancesIterator() : new SingletonIterator<Generic>(getComponents().get(column));
-	// }
-	// return projections;
-	// }
 
 	@Override
 	public boolean inheritsFrom(Generic generic) {
@@ -1360,6 +1326,7 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		}.getSnapshot();
 	}
 
+	// TODO KK
 	public abstract class AbstractPreTreeSnapshot<T> extends HashSet<T> {
 
 		private static final long serialVersionUID = -518282246760045090L;
@@ -1404,27 +1371,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		public abstract FunctionalSnapshot<T> children(T node);
 	}
 
-	public class SingletonSnapshot<T> implements FunctionalSnapshot<T> {
-
-		private final T singleton;
-
-		public SingletonSnapshot(T singleton) {
-			assert singleton != null;
-			this.singleton = singleton;
-		}
-
-		@Override
-		public Iterator<T> iterator() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public T get(int pos) {
-			return singleton;
-		}
-
-	}
-
 	@Override
 	public <T extends Generic> FunctionalSnapshot<T> getInstances() {
 		return () -> instancesIterator();
@@ -1440,12 +1386,8 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 	}
 
 	public <T extends Generic> T getGeneric(final Serializable value, final Generic... components) {
-		return unambigousFirst(new AbstractFilterIterator<T>(this.<T> componentsFilter(Statics.<T> valueFilter(components.length > 0 ? ((GenericImpl) components[0]).<T> compositesIterator() : this.<T> instancesIterator(), value), this, components)) {
-			@Override
-			public boolean isSelected() {
-				return next.getMeta().equals(GenericImpl.this);
-			}
-		});
+		FunctionalSnapshot<T> snapshot = (components.length > 0 ? ((GenericImpl) components[0]).<T> compositesSnapshot() : this.<T> getInstances()).filter(next -> Objects.equals(value, next.getValue()));
+		return unambigousFirst(this.<T> componentsFilter(snapshot, this, components).filter(next -> next.getMeta().equals(GenericImpl.this)));
 	}
 
 	// TODO TO DELETE
@@ -1486,17 +1428,25 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		};
 	}
 
+	<T extends Generic> FunctionalSnapshot<T> componentsFilter(FunctionalSnapshot<T> snapshot, Holder attribute, Generic... components) {
+		final List<Integer> positions = ((GenericImpl) attribute).getComponentsPositions(components);
+		return snapshot.filter(next -> {
+			for (int i = 0; i < components.length; i++)
+				if (!components[i].equals(((Holder) next).getComponent(positions.get(i))))
+					return false;
+			return true;
+		});
+	}
+
 	// TODO KK supers are necessary for get instance from meta !!!
 	@Override
 	public <T extends Generic> T getInstance(Serializable value, Generic... targets) {
-
-		return this.unambigousFirst(targetsFilter(Statics.<T> valueFilter(GenericImpl.this.<T> allInstancesIterator(), value), this, targets));
+		return (T) unambigousFirst(targetsFilter(getAllInstancesSnapshot().filter(next -> Objects.equals(value, next.getValue())), this, targets));
 	}
 
 	@Override
 	public <T extends Type> T getSubType(Serializable value) {
-		return unambigousFirst(this.<T> getSubTypesSnapshot().filter(next -> Objects.equals(value, next.getValue())).iterator());
-		// return unambigousFirst(Statics.<T> valueFilter(this.<T> subTypesIterator(), value));
+		return unambigousFirst(this.<T> getSubTypesSnapshot().filter(next -> Objects.equals(value, next.getValue())));
 	}
 
 	@Override
@@ -1513,11 +1463,10 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 		return this.<T> getAllInheritingsSnapshotWithoutRoot().filter(next -> next.isStructural());
 	}
 
-	// TODO super KK what is this method, what dost it do : no components ? no supers ? ???
+	// TODO super KK what is this method, what does it do : no components ? no supers ? ???
 	@Override
 	public <T extends Generic> T getAllSubType(Serializable value) {
-		return unambigousFirst((this.<T> getAllInheritingsSnapshotWithoutRoot().filter(next -> next.isStructural()).filter(next -> Objects.equals(value, next.getValue()))).iterator());
-		// return this.unambigousFirst(Statics.<T> valueFilter(Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL), value));
+		return unambigousFirst((this.<T> getAllInheritingsSnapshotWithoutRoot().filter(next -> next.isStructural()).filter(next -> Objects.equals(value, next.getValue()))));
 	}
 
 	@Override
@@ -1527,7 +1476,6 @@ public class GenericImpl implements Generic, Type, Link, Relation, Holder, Attri
 
 	private <T extends Generic> FunctionalSnapshot<T> allSubTypesSnapshotWithoutRoot() {
 		return this.<T> getAllInheritingsSnapshotWithoutRoot().filter(next -> next.isStructural());
-		// return () -> Statics.levelFilter(this.<T> allInheritingsIteratorWithoutRoot(), Statics.STRUCTURAL);
 	}
 
 	public <T extends Generic> FunctionalSnapshot<T> getAllInheritings() {

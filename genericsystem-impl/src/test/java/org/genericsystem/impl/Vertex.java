@@ -2,15 +2,24 @@ package org.genericsystem.impl;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.genericsystem.iterator.AbstractConcateIterator;
+import org.genericsystem.iterator.AbstractFilterIterator;
+import org.genericsystem.iterator.SingletonIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Vertex {
+
+	protected static Logger log = LoggerFactory.getLogger(Vertex.class);
 
 	private final Serializable value;
 	private final Vertex meta;
@@ -27,16 +36,18 @@ public class Vertex {
 		this(meta, EMPTY_VERTICES, value, components);
 	}
 
-	private Vertex(Vertex meta, Vertex[] supers, Serializable value, Vertex[] components) {
+	private Vertex(Vertex meta, Vertex[] overrides, Serializable value, Vertex[] components) {
 		this.meta = isEngine() ? this : meta;
 		this.value = isEngine() ? value : getEngine().getCachedValue(value);
-		this.supers = supers;
 		this.components = components;
-		assert componentsInherits(components, this.meta.components) : "Inconsistant components : " + Arrays.toString(components);
+		supers = new SupersComputer(overrides).toArray();
+		assert Arrays.asList(overrides).stream().allMatch(override -> Arrays.asList(supers).stream().anyMatch(superVertex -> superVertex.inheritsFrom(override))) : "Inconsistant overrides : " + Arrays.toString(overrides) + Arrays.toString(supers);
+		assert componentsDepends(components, this.meta.components) : "Inconsistant components : " + Arrays.toString(components);
 		assert Arrays.asList(supers).stream().allMatch(superVertex -> meta.inheritsFrom(superVertex.getMeta())) : "Inconsistant supers : " + Arrays.toString(supers);
-		assert Arrays.asList(supers).stream().allMatch(superVertex -> componentsInherits(components, superVertex.components)) : "Inconsistant supers : " + Arrays.toString(supers);
+		// assert Arrays.asList(supers).stream().allMatch(superVertex -> componentsDepends(components, superVertex.components)) : "Inconsistant supers : " + Arrays.toString(supers);
 		assert Arrays.asList(supers).stream().filter(superVertex -> superVertex.inheritsFrom(meta)).count() <= 1 : "Inconsistant supers : " + Arrays.toString(supers);
-		assert Arrays.asList(supers).stream().noneMatch(superVertex -> Objects.equals(superVertex.value, value)) : "Inconsistant supers : " + Arrays.toString(supers);;
+		assert Arrays.asList(supers).stream().noneMatch(superVertex -> Objects.equals(superVertex, this)) : "Inconsistant supers : " + Arrays.toString(supers);
+		// assert Arrays.asList(supers).stream().filter(superVertex -> superVertex.isInstanceOf(meta)).count() < 2 : "Inconsistant supers : " + Arrays.toString(supers);
 	}
 
 	public Set<Vertex> getInstances() {
@@ -61,6 +72,7 @@ public class Vertex {
 		if (!index.containsKey(this)) {
 			Vertex result = index.put(this, this);
 			assert result == null; // TODO if result != null ?
+			return this;
 		}
 		if (throwExistException)
 			throw new ExistException();
@@ -170,8 +182,8 @@ public class Vertex {
 		return inheritsFrom(meta, value, components, superMeta, superValue, superComponents);
 	}
 
-	public boolean isSuperOrMetaOf(Vertex subMeta, Vertex[] overrides, Serializable subValue, Vertex... subComponents) {
-		return Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom(this) || override.isInstanceOf(this)) || inheritsFrom(subMeta, subValue, subComponents, meta, value, components);
+	public boolean isSuperOf(Vertex subMeta, Vertex[] overrides, Serializable subValue, Vertex... subComponents) {
+		return Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom(this)) || inheritsFrom(subMeta, subValue, subComponents, meta, value, components);
 	}
 
 	public static boolean inheritsFrom(Vertex subMeta, Serializable subValue, Vertex[] subComponents, Vertex superMeta, Serializable superValue, Vertex[] superComponents) {
@@ -205,7 +217,7 @@ public class Vertex {
 		return singulars;
 	}
 
-	private static boolean componentsInherits(Vertex[] subComponents, Vertex[] superComponents) {
+	private static boolean componentsDepends(Vertex[] subComponents, Vertex[] superComponents) {
 		int subIndex = 0;
 		loop: for (int superIndex = 0; superIndex < superComponents.length; superIndex++) {
 			Vertex superComponent = superComponents[superIndex];
@@ -226,8 +238,7 @@ public class Vertex {
 	}
 
 	public Vertex addInstance(Vertex[] overrides, Serializable value, Vertex... components) {
-		Vertex[] supers = new SupersComputer(this, overrides, value, components).toArray();
-		return new Vertex(this, supers, value, components).plug(true);
+		return new Vertex(this, overrides, value, components).plug(true);
 	}
 
 	public Vertex setInstance(Serializable value, Vertex... components) {
@@ -235,42 +246,68 @@ public class Vertex {
 	}
 
 	public Vertex setInstance(Vertex[] overrides, Serializable value, Vertex... components) {
-		Vertex[] supers = new SupersComputer(this, overrides, value, components).toArray();
-		return new Vertex(this, supers, value, components).plug(false);
+		Vertex result = new Vertex(this, overrides, value, components).plug(false);
+		assert Arrays.asList(overrides).stream().allMatch(override -> Arrays.asList(result.supers).stream().anyMatch(superVertex -> superVertex.inheritsFrom(override))) : "Result : " + result.info() + " don't satisfy overrides : "
+		+ Arrays.toString(overrides);
+		return result;
 	}
 
-	private static class SupersComputer extends LinkedHashSet<Vertex> {
+	private Vertex getMainSuper() {
+		return meta;
+	}
+
+	private Iterator<Vertex> inheritingIterator(Vertex origin) {
+		return new AbstractConcateIterator<Vertex, Vertex>(getMainSuper().inheritingIterator(origin)) {
+
+			@Override
+			protected Iterator<Vertex> getIterator(Vertex element) {
+				return null;
+			}
+
+		};
+
+	}
+
+	private class SupersComputer extends LinkedHashSet<Vertex> {
 
 		private static final long serialVersionUID = -1078004898524170057L;
-		private final Vertex meta;
-		private final Vertex[] overrides;
-		private final Serializable value;
-		private final Vertex[] components;
 
-		private SupersComputer(Vertex meta, Vertex[] overrides, Serializable value, Vertex... components) {
-			this.meta = meta;
+		private final Vertex[] overrides;
+		private final Map<Vertex, Boolean> alreadyComputed = new HashMap<>();
+
+		private SupersComputer(Vertex[] overrides) {
 			this.overrides = overrides;
-			this.value = value;
-			this.components = components;
 			isSelected(meta.getEngine());
 		}
 
 		private boolean isSelected(Vertex candidate) {
-			for (Vertex inheriting : candidate.getInheritings())
-				if (inheriting.isSuperOrMetaOf(meta, overrides, value, components))
-					if (isSelected(inheriting))
-						return false;
-			if (candidate.getLevel() <= meta.getLevel())
-				for (Vertex instance : candidate.getInstances())
-					if (instance.isSuperOrMetaOf(meta, overrides, value, components))
-						if (isSelected(instance))
-							return false;
-			if (candidate.getLevel() == meta.getLevel() + 1) {
-				if (!candidate.equals(meta, value, components))
-					add(candidate);
-				return true;
+			Boolean result = alreadyComputed.get(candidate);
+			if (result != null)
+				return result;
+			if ((!isEngine() && candidate.equals(meta, value, components))) {
+				alreadyComputed.put(candidate, false);
+				return false;
 			}
-			return false;
+			boolean isMeta = meta.inheritsFrom(candidate) || candidate.isEngine();
+			boolean isSuper = candidate.isSuperOf(meta, overrides, value, components);
+			if (!isMeta && !isSuper) {
+				alreadyComputed.put(candidate, false);
+				return false;
+			}
+			boolean selectable = true;
+			for (Vertex inheriting : candidate.getInheritings())
+				if (isSelected(inheriting))
+					selectable = false;
+			if (isMeta) {
+				selectable = false;
+				for (Vertex instance : candidate.getInstances())
+					isSelected(instance);
+			}
+			result = alreadyComputed.put(candidate, selectable);
+			assert result == null;
+			if (selectable)
+				add(candidate);
+			return selectable;
 		}
 
 		@Override
@@ -278,21 +315,33 @@ public class Vertex {
 			return toArray(new Vertex[size()]);
 		}
 
-		// @Override
-		// public boolean add(Vertex candidate) {
-		// for (Vertex vertex : this)
-		// if (vertex.inheritsFrom(candidate))
-		// return false;
-		// Iterator<Vertex> it = iterator();
-		// while (it.hasNext())
-		// if (candidate.inheritsFrom(it.next()))
-		// it.remove();
-		// return super.add(candidate);
-		// }
+		@Override
+		public boolean add(Vertex candidate) {
+			for (Vertex vertex : this) {
+				if (vertex.equals(candidate)) {
+					assert false : "Candidate already exists : " + candidate.info();
+				} else if (vertex.inheritsFrom(candidate)) {
+					assert false : vertex.info() + candidate.info();
+				}
+			}
+			Iterator<Vertex> it = iterator();
+			while (it.hasNext())
+				if (candidate.inheritsFrom(it.next())) {
+					assert false;
+					it.remove();
+				}
+			boolean result = super.add(candidate);
+			assert result;
+			return true;
+		}
 	}
 
 	public Vertex getInstance(/* Vertex[] supers, */Serializable value, Vertex... components) {
 		return new Vertex(this, value, components).getPlugged(false);
+	}
+
+	public boolean isMeta() {
+		return getLevel() == 0;
 	}
 
 	public boolean isStructural() {
@@ -334,6 +383,39 @@ public class Vertex {
 	@Override
 	public String toString() {
 		return Objects.toString(value);
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	private <T extends Vertex> Iterator<T> compositesIterator(final Vertex meta) {
+		return new AbstractFilterIterator<T>((Iterator<T>) getComposites().iterator()) {
+			@Override
+			public boolean isSelected() {
+				return next.getMeta().equals(meta);
+			}
+		};
+	}
+
+	private class MainInheritanceIterator {
+
+		private static final long serialVersionUID = 2189650244025973386L;
+
+		private <T extends Vertex> Iterator<T> iterator(Vertex origin) {
+			return projectIterator(projectFromMetaIterator(origin));
+		}
+
+		private Iterator<Vertex> projectFromMetaIterator(Vertex origin) {
+			Iterator<Vertex> mainMetaIterator = meta.new MainInheritanceIterator().iterator(origin);
+			if (!mainMetaIterator.hasNext())
+				return meta.composites.containsKey(origin) ? new SingletonIterator<Vertex>(origin) : Collections.emptyIterator();
+				return new AbstractConcateIterator<Vertex, Vertex>(mainMetaIterator) {
+
+					@Override
+					protected Iterator<Vertex> getIterator(Vertex attributeOfMeta) {
+						return compositesIterator(attributeOfMeta);
+					}
+
+				};
+		}
 	}
 
 	public class ExistException extends RuntimeException {
