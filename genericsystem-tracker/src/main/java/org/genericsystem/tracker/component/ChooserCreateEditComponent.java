@@ -40,7 +40,6 @@ public class ChooserCreateEditComponent extends AbstractChooserComponent {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
-		log.info("---*-*-*-*-*-*-**--*-*-*-*" + generic);
 		return (T) new TypeComponent(ChooserCreateEditComponent.this, generic);
 
 	}
