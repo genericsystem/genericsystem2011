@@ -69,7 +69,7 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 					getGeneric().setValue((Attribute) attribute, (((InputTextComponent) component).getNewValue()).toString());
 			}
 		}
-		((DisplayerCreateEditComponent) getParent()).child = null;
+		getParentSelector().child = null;
 		return "index.xhtml";
 	}
 
@@ -91,7 +91,7 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 		HtmlForm form = new HtmlForm();
 
 		HtmlPanelGrid panelGrid = new HtmlPanelGrid();
-		if (((DisplayerCreateEditComponent) getParent()).child != null) {
+		if (getParentSelector().child != null) {
 			panelGrid.setColumns(2);
 			panelGrid.setStyleClass("order-table");
 			panelGrid.setHeaderClass("order-table-header");
