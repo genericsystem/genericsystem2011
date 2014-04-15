@@ -14,11 +14,6 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 
 	DisplayerComponent displayerComponent = new DisplayerComponent(this);
 
-	// @Override
-	// public List<? extends AbstractComponent> initChildren() {
-	// return Arrays.asList(new ChooserComponent(this), displayerComponent);
-	// }
-
 	public void selectDefaultComponent() {
 		select(getCache().find(Issues.class));
 	}
