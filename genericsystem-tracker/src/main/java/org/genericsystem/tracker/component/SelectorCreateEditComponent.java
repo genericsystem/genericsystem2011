@@ -23,7 +23,7 @@ public class SelectorCreateEditComponent extends AbstractSelectorComponent {
 
 	@Override
 	public void select(Generic selected) {
-		child = displayerCreateEdit.buildChild(selected);
+		child = displayerCreateEdit.displayChild(selected);
 	}
 
 	public Generic getSelected() {

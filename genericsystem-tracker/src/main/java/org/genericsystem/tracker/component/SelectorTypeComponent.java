@@ -20,7 +20,7 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 
 	@Override
 	public void select(Generic selected) {
-		displayerComponent.buildChild(selected);
+		child = displayerComponent.displayChild(selected);
 	}
 
 	@Override
