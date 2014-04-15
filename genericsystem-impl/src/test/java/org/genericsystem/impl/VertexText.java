@@ -69,8 +69,9 @@ public class VertexText extends AbstractTest {
 		assert myBmwRed == vehicleColor.getInstance("myBmwRed", myBmw, red) : vehicleColor.getInstance("myBmwRed", myBmw, red).info();
 
 		assert myBmwRed.inheritsFrom(carRed);
-		assert car.getAttributes(engine).contains(power);
+		assert car.getAttributes(engine).contains(power) : car.getAttributes(engine);
 		assert car.getAttributes(engine).size() == 1;
+		assert false : myBmw.getAttributes(engine);
 		assert !myBmwRed.inheritsFrom(power);
 		assert !v233.inheritsFrom(power);
 		assert v233.isInstanceOf(power);

@@ -1,8 +1,9 @@
 package org.genericsystem.impl;
 
 import java.io.Serializable;
+import java.util.AbstractCollection;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -12,7 +13,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.genericsystem.iterator.AbstractConcateIterator;
-import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,24 +248,61 @@ public class Vertex {
 	public Vertex setInstance(Vertex[] overrides, Serializable value, Vertex... components) {
 		Vertex result = new Vertex(this, overrides, value, components).plug(false);
 		assert Arrays.asList(overrides).stream().allMatch(override -> Arrays.asList(result.supers).stream().anyMatch(superVertex -> superVertex.inheritsFrom(override))) : "Result : " + result.info() + " don't satisfy overrides : "
-		+ Arrays.toString(overrides);
+				+ Arrays.toString(overrides);
 		return result;
 	}
 
-	private Vertex getMainSuper() {
-		return meta;
-	}
-
-	private Iterator<Vertex> inheritingIterator(Vertex origin) {
-		return new AbstractConcateIterator<Vertex, Vertex>(getMainSuper().inheritingIterator(origin)) {
-
+	private Collection<Vertex> getInheritings(final Vertex origin, final int level) {
+		return new AbstractCollection<Vertex>() {
 			@Override
-			protected Iterator<Vertex> getIterator(Vertex element) {
-				return null;
+			public Iterator<Vertex> iterator() {
+				return Vertex.this.inheritanceIterator(origin, level);
 			}
 
+			@Override
+			public int size() {
+				Iterator<Vertex> iterator = iterator();
+				int size = 0;
+				while (iterator.hasNext()) {
+					iterator.next();
+					size++;
+				}
+				return size;
+			}
 		};
+	}
 
+	private boolean isAttributeOf(Vertex vertex) {
+		return Arrays.asList(vertex.getComponents()).stream().anyMatch(component -> Vertex.this.inheritsFrom(component) || this.isInstanceOf(component));
+	}
+
+	private Vertex getMainSuper(Vertex origin) {
+		return !Vertex.this.equals(meta) && origin.isAttributeOf(meta) ? meta : null;
+	}
+
+	private Iterator<Vertex> inheritanceIterator(Vertex origin, int level) {
+		Vertex mainSuper = getMainSuper(origin);
+		log.info("ZZZ this :" + info() + " " + mainSuper);
+		return projectIterator(level, mainSuper == null ? new SingletonIterator<Vertex>(origin) : mainSuper.inheritanceIterator(origin, level));
+	};
+
+	private Iterator<Vertex> projectIterator(final int level, Iterator<Vertex> iteratorToProject) {
+		return new AbstractConcateIterator<Vertex, Vertex>(iteratorToProject) {
+			@Override
+			protected Iterator<Vertex> getIterator(final Vertex index) {
+				log.info(info() + " index : " + index.info());
+				Iterator<Vertex> indexIterator = index.getLevel() < level ? new ConcateIterator<>(compositesWithMetaIterator(index), compositesWithSuperIterator(index)) : compositesWithSuperIterator(index);
+				return indexIterator.hasNext() ? projectIterator(level, indexIterator) : new SingletonIterator<Vertex>(index);
+			}
+		};
+	}
+
+	protected Iterator<Vertex> compositesWithMetaIterator(Vertex meta) {
+		return getComposites().stream().filter(composite -> composite.getMeta().equals(meta)).iterator();
+	}
+
+	protected Iterator<Vertex> compositesWithSuperIterator(Vertex superVertex) {
+		return getComposites().stream().filter(composite -> Arrays.asList(composite.getSupers()).contains(superVertex)).iterator();
 	}
 
 	private class SupersComputer extends LinkedHashSet<Vertex> {
@@ -352,12 +389,20 @@ public class Vertex {
 		return getLevel() == 2;
 	}
 
-	public Set<Vertex> getAttributes(Vertex attribute) {
-		return getComposites().stream().filter(holder -> holder.isInstanceOf(attribute)).filter(holder -> holder.isStructural()).collect(Collectors.toSet());
+	private Collection<Vertex> getFactuals(final Vertex origin) {
+		return getInheritings(origin, 2);
 	}
 
-	public Set<Vertex> getHolders(Vertex attribute) {
-		return getComposites().stream().filter(holder -> holder.isInstanceOf(attribute)).filter(holder -> holder.isFactual()).collect(Collectors.toSet());
+	private Collection<Vertex> getStructurals(final Vertex origin) {
+		return getInheritings(origin, 1);
+	}
+
+	public Collection<Vertex> getAttributes(Vertex attribute) {
+		return getInheritings(attribute, 1);
+	}
+
+	public Collection<Vertex> getHolders(Vertex attribute) {
+		return getInheritings(attribute, 2);
 	}
 
 	public Set<Serializable> getValues(Vertex attribute) {
@@ -383,39 +428,6 @@ public class Vertex {
 	@Override
 	public String toString() {
 		return Objects.toString(value);
-	}
-
-	@SuppressWarnings({ "unchecked" })
-	private <T extends Vertex> Iterator<T> compositesIterator(final Vertex meta) {
-		return new AbstractFilterIterator<T>((Iterator<T>) getComposites().iterator()) {
-			@Override
-			public boolean isSelected() {
-				return next.getMeta().equals(meta);
-			}
-		};
-	}
-
-	private class MainInheritanceIterator {
-
-		private static final long serialVersionUID = 2189650244025973386L;
-
-		private <T extends Vertex> Iterator<T> iterator(Vertex origin) {
-			return projectIterator(projectFromMetaIterator(origin));
-		}
-
-		private Iterator<Vertex> projectFromMetaIterator(Vertex origin) {
-			Iterator<Vertex> mainMetaIterator = meta.new MainInheritanceIterator().iterator(origin);
-			if (!mainMetaIterator.hasNext())
-				return meta.composites.containsKey(origin) ? new SingletonIterator<Vertex>(origin) : Collections.emptyIterator();
-				return new AbstractConcateIterator<Vertex, Vertex>(mainMetaIterator) {
-
-					@Override
-					protected Iterator<Vertex> getIterator(Vertex attributeOfMeta) {
-						return compositesIterator(attributeOfMeta);
-					}
-
-				};
-		}
 	}
 
 	public class ExistException extends RuntimeException {
