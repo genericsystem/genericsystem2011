@@ -34,8 +34,6 @@ public abstract class AbstractComponent {
 
 	public abstract List<? extends AbstractComponent> initChildren();
 
-	public abstract String getXhtmlPath();
-
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractComponent> T getParent() {
 		return (T) parent;
@@ -64,7 +62,6 @@ public abstract class AbstractComponent {
 
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		HtmlPanelGroup panelGroup = new HtmlPanelGroup();
-		// panelGroup.setLayout("block");
 		father.getChildren().add(panelGroup);
 		return panelGroup;
 	}
