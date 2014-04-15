@@ -6,7 +6,7 @@ import java.util.List;
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractSelectorComponent;
-import org.genericsystem.tracker.component.generic.FilterComponent;
+import org.genericsystem.tracker.component.generic.DisplayerComponent;
 import org.genericsystem.tracker.structure.Types.Issues;
 
 public class SelectorTypeComponent extends AbstractSelectorComponent {
@@ -15,7 +15,7 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 		super(parent);
 	}
 
-	FilterComponent filterComponent = new FilterComponent(this);
+	DisplayerComponent filterComponent = new DisplayerComponent(this);
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
@@ -31,16 +31,11 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 		filterComponent.buildChild(selected);
 	}
 
-	@Override
-	public String getXhtmlPath() {
-		return null;
-	}
-
-	public FilterComponent getFilterComponent() {
+	public DisplayerComponent getFilterComponent() {
 		return filterComponent;
 	}
 
-	public void setFilterComponent(FilterComponent filterComponent) {
+	public void setFilterComponent(DisplayerComponent filterComponent) {
 		this.filterComponent = filterComponent;
 	}
 }

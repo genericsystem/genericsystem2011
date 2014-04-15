@@ -6,7 +6,7 @@ import java.util.List;
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractSelectorComponent;
-import org.genericsystem.tracker.component.generic.FilterCreateEditComponent;
+import org.genericsystem.tracker.component.generic.DisplayerCreateEditComponent;
 
 public class SelectorCreateEditComponent extends AbstractSelectorComponent {
 
@@ -17,11 +17,11 @@ public class SelectorCreateEditComponent extends AbstractSelectorComponent {
 		this.selected = selected;
 	}
 
-	FilterCreateEditComponent filterCreateEdit = new FilterCreateEditComponent(this);
+	DisplayerCreateEditComponent displayerCreateEdit = new DisplayerCreateEditComponent(this);
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return Arrays.asList(new ChooserCreateEditComponent(this), filterCreateEdit);
+		return Arrays.asList(new ChooserCreateEditComponent(this), displayerCreateEdit);
 	}
 
 	@Override
@@ -31,20 +31,15 @@ public class SelectorCreateEditComponent extends AbstractSelectorComponent {
 
 	@Override
 	public void select(Generic selected) {
-		child = filterCreateEdit.buildChild(selected);
+		child = displayerCreateEdit.buildChild(selected);
 	}
 
-	@Override
-	public String getXhtmlPath() {
-		return null;
+	public DisplayerCreateEditComponent getFilterCreateEdit() {
+		return displayerCreateEdit;
 	}
 
-	public FilterCreateEditComponent getFilterCreateEdit() {
-		return filterCreateEdit;
-	}
-
-	public void setFilterCreateEdit(FilterCreateEditComponent filterCreateEdit) {
-		this.filterCreateEdit = filterCreateEdit;
+	public void setFilterCreateEdit(DisplayerCreateEditComponent filterCreateEdit) {
+		this.displayerCreateEdit = filterCreateEdit;
 	}
 
 	public Generic getSelected() {

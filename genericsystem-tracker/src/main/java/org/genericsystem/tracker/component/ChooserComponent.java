@@ -7,12 +7,12 @@ import javax.faces.component.html.HtmlPanelGrid;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
+import org.genericsystem.framework.component.AbstractChooserComponent;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.tracker.component.generic.CommandButtonComponent;
 import org.genericsystem.tracker.structure.Types;
 
-public class ChooserComponent extends AbstractCollectableChildrenComponent {
+public class ChooserComponent extends AbstractChooserComponent {
 
 	private static final int NB_COLUMNS_PANEL_GRID = 4;
 
@@ -20,9 +20,10 @@ public class ChooserComponent extends AbstractCollectableChildrenComponent {
 		super(parent);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getSecurityManager() {
-		return null;
+		return (T) this.<RootComponent> getRoot().getSecurityManager();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -45,11 +46,6 @@ public class ChooserComponent extends AbstractCollectableChildrenComponent {
 	@Override
 	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
 		return (T) new CommandButtonComponent(ChooserComponent.this, generic);
-	}
-
-	@Override
-	public String getXhtmlPath() {
-		return null;
 	}
 
 	@Override

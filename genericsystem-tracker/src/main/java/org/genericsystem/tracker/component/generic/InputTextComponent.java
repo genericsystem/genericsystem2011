@@ -30,11 +30,6 @@ public class InputTextComponent extends AbstractValuedGenericComponent implement
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return null;
-	}
-
-	@Override
 	protected void buildJsfComponentsAfter(UIComponent father) {
 		HtmlInputText inputText = new HtmlInputText();
 		inputText.setValueExpression("value", getValueExpression("newValue"));

@@ -23,11 +23,6 @@ public class SelectOneMenuComponent extends AbstractValuedGenericComponent imple
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return null;
-	}
-
-	@Override
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		HtmlSelectOneMenu selectOneMenu = new HtmlSelectOneMenu();
 		selectOneMenu.setValueExpression("value", getValueExpression("newValue"));

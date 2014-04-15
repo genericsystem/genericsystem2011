@@ -31,11 +31,6 @@ public class CommandButtonComponent extends AbstractGenericComponent implements 
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return null;
-	}
-
-	@Override
 	protected void buildJsfComponentsBefore(UIComponent father) {
 		HtmlForm form1 = new HtmlForm();
 		HtmlCommandButton commandButton = new HtmlCommandButton();

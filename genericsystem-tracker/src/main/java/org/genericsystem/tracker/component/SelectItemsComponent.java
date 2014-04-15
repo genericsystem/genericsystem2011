@@ -31,11 +31,6 @@ public class SelectItemsComponent extends AbstractComponent {
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return null;
-	}
-
-	@Override
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		UISelectItems selectItems = new UISelectItems();
 		selectItems.setValueExpression("value", getValueExpression("values"));

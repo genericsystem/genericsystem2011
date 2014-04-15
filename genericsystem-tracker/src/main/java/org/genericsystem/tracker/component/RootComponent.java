@@ -62,11 +62,6 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return "/pages/index.xhtml";
-	}
-
-	@Override
 	protected int getComponentIndex() {
 		throw new IllegalStateException();
 	}

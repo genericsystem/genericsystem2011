@@ -135,11 +135,6 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return null;
-	}
-
-	@Override
 	public <T> T getSecurityManager() {
 		return null;
 	}

@@ -50,9 +50,4 @@ public class RowComponent extends AbstractGenericComponent {
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		return father;
 	}
-
-	@Override
-	public String getXhtmlPath() {
-		return null;
-	}
 }
