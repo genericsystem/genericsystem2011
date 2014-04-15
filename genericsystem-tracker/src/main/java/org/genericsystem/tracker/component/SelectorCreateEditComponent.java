@@ -1,8 +1,5 @@
 package org.genericsystem.tracker.component;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractSelectorComponent;
@@ -19,10 +16,10 @@ public class SelectorCreateEditComponent extends AbstractSelectorComponent {
 
 	DisplayerCreateEditComponent displayerCreateEdit = new DisplayerCreateEditComponent(this);
 
-	@Override
-	public List<? extends AbstractComponent> initChildren() {
-		return Arrays.asList(new ChooserCreateEditComponent(this), displayerCreateEdit);
-	}
+	// @Override
+	// public List<? extends AbstractComponent> initChildren() {
+	// return Arrays.asList(new ChooserCreateEditComponent(this), displayerCreateEdit);
+	// }
 
 	@Override
 	public void selectDefaultComponent() {
@@ -34,20 +31,18 @@ public class SelectorCreateEditComponent extends AbstractSelectorComponent {
 		child = displayerCreateEdit.buildChild(selected);
 	}
 
-	public DisplayerCreateEditComponent getFilterCreateEdit() {
-		return displayerCreateEdit;
-	}
-
-	public void setFilterCreateEdit(DisplayerCreateEditComponent filterCreateEdit) {
-		this.displayerCreateEdit = filterCreateEdit;
-	}
-
 	public Generic getSelected() {
 		return selected;
 	}
 
-	public void setSelected(Generic selected) {
-		this.selected = selected;
+	@Override
+	protected AbstractComponent initDisplayer() {
+		return displayerCreateEdit;
+	}
+
+	@Override
+	protected AbstractComponent initChooser() {
+		return new ChooserCreateEditComponent(this);
 	}
 
 }
