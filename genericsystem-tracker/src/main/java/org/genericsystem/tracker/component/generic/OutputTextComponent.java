@@ -25,11 +25,6 @@ public class OutputTextComponent extends AbstractValuedGenericComponent implemen
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return null;
-	}
-
-	@Override
 	protected void buildJsfComponentsBefore(UIComponent father) {
 		HtmlOutputText outputText = new HtmlOutputText();
 		outputText.setValueExpression("value", getValueExpression("newValue"));

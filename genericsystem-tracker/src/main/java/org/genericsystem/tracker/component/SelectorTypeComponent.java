@@ -1,12 +1,9 @@
 package org.genericsystem.tracker.component;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractSelectorComponent;
-import org.genericsystem.tracker.component.generic.FilterComponent;
+import org.genericsystem.tracker.component.generic.DisplayerComponent;
 import org.genericsystem.tracker.structure.Types.Issues;
 
 public class SelectorTypeComponent extends AbstractSelectorComponent {
@@ -15,12 +12,7 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 		super(parent);
 	}
 
-	FilterComponent filterComponent = new FilterComponent(this);
-
-	@Override
-	public List<? extends AbstractComponent> initChildren() {
-		return Arrays.asList(new ChooserComponent(this), filterComponent);
-	}
+	DisplayerComponent displayerComponent = new DisplayerComponent(this);
 
 	public void selectDefaultComponent() {
 		select(getCache().find(Issues.class));
@@ -28,19 +20,17 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 
 	@Override
 	public void select(Generic selected) {
-		filterComponent.buildChild(selected);
+		child = displayerComponent.displayChild(selected);
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return null;
+	protected AbstractComponent initDisplayer() {
+		return displayerComponent;
 	}
 
-	public FilterComponent getFilterComponent() {
-		return filterComponent;
+	@Override
+	protected AbstractComponent initChooser() {
+		return new ChooserComponent(this);
 	}
 
-	public void setFilterComponent(FilterComponent filterComponent) {
-		this.filterComponent = filterComponent;
-	}
 }

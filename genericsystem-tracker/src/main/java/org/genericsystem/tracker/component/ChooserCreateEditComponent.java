@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
-import org.genericsystem.framework.component.AbstractCollectableChildrenComponent;
+import org.genericsystem.framework.component.AbstractChooserComponent;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.tracker.component.generic.TypeComponent;
 import org.genericsystem.tracker.structure.Types;
 
-public class ChooserCreateEditComponent extends AbstractCollectableChildrenComponent {
+public class ChooserCreateEditComponent extends AbstractChooserComponent {
 
 	public ChooserCreateEditComponent(AbstractComponent parent) {
 		super(parent);
@@ -42,11 +42,6 @@ public class ChooserCreateEditComponent extends AbstractCollectableChildrenCompo
 	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
 		return (T) new TypeComponent(ChooserCreateEditComponent.this, generic);
 
-	}
-
-	@Override
-	public String getXhtmlPath() {
-		return null;
 	}
 
 }

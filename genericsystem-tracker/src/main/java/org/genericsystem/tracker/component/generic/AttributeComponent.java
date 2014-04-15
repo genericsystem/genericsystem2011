@@ -52,8 +52,10 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 	}
 
 	@Override
-	public String getXhtmlPath() {
-		return null;
+	protected UIComponent buildJsfContainer(UIComponent father) {
+		HtmlColumn column = new HtmlColumn();
+		father.getChildren().add(column);
+		return column;
 	}
 
 	@Override
@@ -71,12 +73,4 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		innerDataTable.getChildren().add(column);
 		container.getChildren().add(innerDataTable);
 	}
-
-	@Override
-	protected UIComponent buildJsfContainer(UIComponent father) {
-		HtmlColumn column = new HtmlColumn();
-		father.getChildren().add(column);
-		return column;
-	}
-
 }

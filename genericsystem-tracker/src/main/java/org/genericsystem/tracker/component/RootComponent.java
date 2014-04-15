@@ -13,7 +13,6 @@ import javax.inject.Named;
 
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractRootComponent;
-import org.genericsystem.jsf.util.GsMessages;
 import org.genericsystem.security.manager.SecurityManager;
 
 @Named
@@ -29,13 +28,6 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 
 	@Inject
 	private SecurityManager securityManager;
-
-	@Inject
-	GsMessages gsMessage;
-
-	public GsMessages getGSMessage() {
-		return gsMessage;
-	}
 
 	public Object getListener() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
@@ -59,11 +51,6 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
 		return Arrays.asList(new ConnectionComponent(this), new SelectorTypeComponent(this));
-	}
-
-	@Override
-	public String getXhtmlPath() {
-		return "/pages/index.xhtml";
 	}
 
 	@Override
