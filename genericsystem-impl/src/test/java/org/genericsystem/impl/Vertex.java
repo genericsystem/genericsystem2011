@@ -1,7 +1,6 @@
 package org.genericsystem.impl;
 
 import java.io.Serializable;
-import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.genericsystem.iterator.AbstractConcateIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.slf4j.Logger;
@@ -253,27 +253,31 @@ public class Vertex {
 	}
 
 	private Collection<Vertex> getInheritings(final Vertex origin, final int level) {
-		return new AbstractCollection<Vertex>() {
-			@Override
-			public Iterator<Vertex> iterator() {
-				return Vertex.this.inheritanceIterator(origin, level);
-			}
-
-			@Override
-			public int size() {
-				Iterator<Vertex> iterator = iterator();
-				int size = 0;
-				while (iterator.hasNext()) {
-					iterator.next();
-					size++;
-				}
-				return size;
-			}
-		};
+		return this.getInheritings2(this, origin, level);
 	}
 
+	// private Collection<Vertex> getInheritings(final Vertex origin, final int level) {
+	// return new AbstractCollection<Vertex>() {
+	// @Override
+	// public Iterator<Vertex> iterator() {
+	// return Vertex.this.inheritanceIterator(origin, level);
+	// }
+	//
+	// @Override
+	// public int size() {
+	// Iterator<Vertex> iterator = iterator();
+	// int size = 0;
+	// while (iterator.hasNext()) {
+	// iterator.next();
+	// size++;
+	// }
+	// return size;
+	// }
+	// };
+	// }
+
 	private boolean isAttributeOf(Vertex vertex) {
-		return Arrays.asList(vertex.getComponents()).stream().anyMatch(component -> Vertex.this.inheritsFrom(component) || this.isInstanceOf(component));
+		return isEngine() || Arrays.asList(getComponents()).stream().anyMatch(component -> component.inheritsFrom(vertex) || component.isInstanceOf(vertex));
 	}
 
 	private Vertex getMainSuper(Vertex origin) {
@@ -282,7 +286,6 @@ public class Vertex {
 
 	private Iterator<Vertex> inheritanceIterator(Vertex origin, int level) {
 		Vertex mainSuper = getMainSuper(origin);
-		log.info("ZZZ this :" + info() + " " + mainSuper);
 		return projectIterator(level, mainSuper == null ? new SingletonIterator<Vertex>(origin) : mainSuper.inheritanceIterator(origin, level));
 	};
 
@@ -290,7 +293,6 @@ public class Vertex {
 		return new AbstractConcateIterator<Vertex, Vertex>(iteratorToProject) {
 			@Override
 			protected Iterator<Vertex> getIterator(final Vertex index) {
-				log.info(info() + " index : " + index.info());
 				Iterator<Vertex> indexIterator = index.getLevel() < level ? new ConcateIterator<>(compositesMetaIndex(index), compositesSuperIndex(index)) : compositesSuperIndex(index);
 				return indexIterator.hasNext() ? projectIterator(level, indexIterator) : new SingletonIterator<Vertex>(index);
 			}
@@ -303,6 +305,88 @@ public class Vertex {
 
 	protected Iterator<Vertex> compositesSuperIndex(Vertex superVertex) {
 		return getComposites().stream().filter(composite -> Arrays.asList(composite.getSupers()).contains(superVertex)).iterator();
+	}
+
+	protected Set<Vertex> getCompositesMetaIndex(Vertex meta) {
+		return getComposites().stream().filter(composite -> composite.getMeta().equals(meta)).collect(Collectors.toSet());
+	}
+
+	protected Set<Vertex> getCompositesSuperIndex(Vertex superVertex) {
+		return getComposites().stream().filter(composite -> Arrays.asList(composite.getSupers()).contains(superVertex)).collect(Collectors.toSet());
+	}
+
+	Set<Vertex> getInheritings2(Vertex base, Vertex origin, int level) {
+		return new Inheritings(base, origin, level);
+	}
+
+	private class Inheritings extends LinkedHashSet<Vertex> {
+
+		private static final long serialVersionUID = -1078004898524170057L;
+
+		// private final Map<Vertex, Boolean> alreadyComputed = new HashMap<>();
+
+		private final int level;
+		private final Vertex origin;
+
+		private Inheritings(Vertex base, Vertex origin, int level) {
+			this.level = level;
+			this.origin = origin;
+			build(base);
+		}
+
+		private void build(Vertex base) {
+			log.info("BuildVertex : " + base + origin.isAttributeOf(base.meta));
+			Stream<Vertex> supersStream = Arrays.asList(base.supers).stream().filter(next -> next.meta.equals(base.meta) && origin.isAttributeOf(next));
+			if (supersStream.count() != 0)
+				Arrays.asList(base.supers).stream().filter(next -> next.meta.equals(base.meta) && origin.isAttributeOf(next)).forEach(next -> computeFromAbove(base, next));
+			else if (!base.meta.equals(base) && origin.isAttributeOf(base.meta))
+				computeFromAbove(base, base.meta);
+			else
+				add(origin);
+		}
+
+		private void computeFromAbove(Vertex base, Vertex baseAbove) {
+			log.info("computeFromAbove : " + base + " from : " + baseAbove);
+			Collection<Vertex> aboveInheritings = getInheritings2(baseAbove, origin, level);
+			log.info(" aboveInheritings " + base + " from : " + baseAbove + aboveInheritings);
+			for (Vertex above : aboveInheritings) {
+				compute(base, above);
+			}
+		}
+
+		private void compute(Vertex base, Vertex above) {
+			log.info("aboveInheriting : " + above);
+			Stream<Vertex> fromAbove = above.getLevel() < level ? Stream.concat(base.getCompositesSuperIndex(above).stream(), base.getCompositesMetaIndex(above).stream()) : base.getCompositesSuperIndex(above).stream();
+			if (!Vertex.this.equals(base) || (fromAbove.count() == 0 && above.getLevel() == level))
+				add(above);
+			fromAbove = above.getLevel() < level ? Stream.concat(base.getCompositesSuperIndex(above).stream(), base.getCompositesMetaIndex(above).stream()) : base.getCompositesSuperIndex(above).stream();
+			fromAbove.forEach(next -> compute(next, next));
+		}
+
+		@Override
+		public Vertex[] toArray() {
+			return toArray(new Vertex[size()]);
+		}
+
+		// @Override
+		// public boolean add(Vertex candidate) {
+		// for (Vertex vertex : this) {
+		// if (vertex.equals(candidate)) {
+		// assert false : "Candidate already exists : " + candidate.info();
+		// } else if (vertex.inheritsFrom(candidate)) {
+		// assert false : vertex.info() + candidate.info();
+		// }
+		// }
+		// Iterator<Vertex> it = iterator();
+		// while (it.hasNext())
+		// if (candidate.inheritsFrom(it.next())) {
+		// assert false;
+		// it.remove();
+		// }
+		// boolean result = super.add(candidate);
+		// assert result;
+		// return true;
+		// }
 	}
 
 	private class SupersComputer extends LinkedHashSet<Vertex> {

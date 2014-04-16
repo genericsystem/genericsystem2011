@@ -70,13 +70,13 @@ public class VertexText extends AbstractTest {
 
 		assert myBmwRed.inheritsFrom(carRed);
 		assert car.getAttributes(engine).contains(power) : car.getAttributes(engine);
-		assert car.getAttributes(engine).size() == 1;
-		assert false : myBmw.getAttributes(engine);
+		assert car.getAttributes(engine).size() == 2 : car.getAttributes(engine);
 		assert !myBmwRed.inheritsFrom(power);
 		assert !v233.inheritsFrom(power);
 		assert v233.isInstanceOf(power);
 
-		assert myBmw.getHolders(power).contains(v233);
+		log.info("----------------------------------");
+		assert myBmw.getHolders(power).contains(v233) : myBmw.getHolders(power);
 		assert myBmw.getHolders(power).size() == 1 : myBmw.getHolders(engine);
 		assert myBmw.getValues(power).contains(233);
 	}
