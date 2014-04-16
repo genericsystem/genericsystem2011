@@ -291,17 +291,17 @@ public class Vertex {
 			@Override
 			protected Iterator<Vertex> getIterator(final Vertex index) {
 				log.info(info() + " index : " + index.info());
-				Iterator<Vertex> indexIterator = index.getLevel() < level ? new ConcateIterator<>(compositesWithMetaIterator(index), compositesWithSuperIterator(index)) : compositesWithSuperIterator(index);
+				Iterator<Vertex> indexIterator = index.getLevel() < level ? new ConcateIterator<>(compositesMetaIndex(index), compositesSuperIndex(index)) : compositesSuperIndex(index);
 				return indexIterator.hasNext() ? projectIterator(level, indexIterator) : new SingletonIterator<Vertex>(index);
 			}
 		};
 	}
 
-	protected Iterator<Vertex> compositesWithMetaIterator(Vertex meta) {
+	protected Iterator<Vertex> compositesMetaIndex(Vertex meta) {
 		return getComposites().stream().filter(composite -> composite.getMeta().equals(meta)).iterator();
 	}
 
-	protected Iterator<Vertex> compositesWithSuperIterator(Vertex superVertex) {
+	protected Iterator<Vertex> compositesSuperIndex(Vertex superVertex) {
 		return getComposites().stream().filter(composite -> Arrays.asList(composite.getSupers()).contains(superVertex)).iterator();
 	}
 
