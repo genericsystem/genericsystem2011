@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.genericsystem.iterator.AbstractConcateIterator;
+import org.genericsystem.iterator.AbstractConcateIterator.ConcateIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class Vertex {
 		// assert Arrays.asList(supers).stream().allMatch(superVertex -> componentsDepends(components, superVertex.components)) : "Inconsistant supers : " + Arrays.toString(supers);
 		assert Arrays.asList(supers).stream().filter(superVertex -> superVertex.inheritsFrom(meta)).count() <= 1 : "Inconsistant supers : " + Arrays.toString(supers);
 		assert Arrays.asList(supers).stream().noneMatch(superVertex -> Objects.equals(superVertex, this)) : "Inconsistant supers : " + Arrays.toString(supers);
-		// assert Arrays.asList(supers).stream().filter(superVertex -> superVertex.isInstanceOf(meta)).count() < 2 : "Inconsistant supers : " + Arrays.toString(supers);
+		assert Arrays.asList(components).stream().noneMatch(next -> next.getLevel() > getLevel());
 	}
 
 	public Set<Vertex> getInstances() {
@@ -252,8 +252,12 @@ public class Vertex {
 		return result;
 	}
 
-	private Collection<Vertex> getInheritings(final Vertex origin, final int level) {
-		return this.getInheritings2(this, origin, level);
+	private boolean isAttributeOf(Vertex vertex) {
+		return isEngine() || Arrays.asList(getComponents()).stream().anyMatch(component -> component.inheritsFrom(vertex) || component.isInstanceOf(vertex));
+	}
+
+	private Vertex getMainSuper(Vertex origin) {
+		return !Vertex.this.equals(meta) && origin.isAttributeOf(meta) ? meta : null;
 	}
 
 	// private Collection<Vertex> getInheritings(final Vertex origin, final int level) {
@@ -275,14 +279,6 @@ public class Vertex {
 	// }
 	// };
 	// }
-
-	private boolean isAttributeOf(Vertex vertex) {
-		return isEngine() || Arrays.asList(getComponents()).stream().anyMatch(component -> component.inheritsFrom(vertex) || component.isInstanceOf(vertex));
-	}
-
-	private Vertex getMainSuper(Vertex origin) {
-		return !Vertex.this.equals(meta) && origin.isAttributeOf(meta) ? meta : null;
-	}
 
 	private Iterator<Vertex> inheritanceIterator(Vertex origin, int level) {
 		Vertex mainSuper = getMainSuper(origin);
@@ -307,16 +303,8 @@ public class Vertex {
 		return getComposites().stream().filter(composite -> Arrays.asList(composite.getSupers()).contains(superVertex)).iterator();
 	}
 
-	protected Set<Vertex> getCompositesMetaIndex(Vertex meta) {
-		return getComposites().stream().filter(composite -> composite.getMeta().equals(meta)).collect(Collectors.toSet());
-	}
-
-	protected Set<Vertex> getCompositesSuperIndex(Vertex superVertex) {
-		return getComposites().stream().filter(composite -> Arrays.asList(composite.getSupers()).contains(superVertex)).collect(Collectors.toSet());
-	}
-
-	Set<Vertex> getInheritings2(Vertex base, Vertex origin, int level) {
-		return new Inheritings(base, origin, level);
+	private Collection<Vertex> getInheritings(final Vertex origin, final int level) {
+		return new Inheritings(this, origin, level);
 	}
 
 	private class Inheritings extends LinkedHashSet<Vertex> {
@@ -326,41 +314,36 @@ public class Vertex {
 		// private final Map<Vertex, Boolean> alreadyComputed = new HashMap<>();
 
 		private final int level;
+		private final Vertex base;
 		private final Vertex origin;
 
 		private Inheritings(Vertex base, Vertex origin, int level) {
 			this.level = level;
 			this.origin = origin;
-			build(base);
-		}
-
-		private void build(Vertex base) {
-			log.info("BuildVertex : " + base + origin.isAttributeOf(base.meta));
-			Stream<Vertex> supersStream = Arrays.asList(base.supers).stream().filter(next -> next.meta.equals(base.meta) && origin.isAttributeOf(next));
-			if (supersStream.count() != 0)
-				Arrays.asList(base.supers).stream().filter(next -> next.meta.equals(base.meta) && origin.isAttributeOf(next)).forEach(next -> computeFromAbove(base, next));
+			this.base = base;
+			Iterator<Vertex> it = Arrays.asList(base.supers).stream().filter(next -> next.meta.equals(base.meta) && origin.isAttributeOf(next)).iterator();
+			if (it.hasNext())
+				it.forEachRemaining(next -> projectFromAbove(next));
 			else if (!base.meta.equals(base) && origin.isAttributeOf(base.meta))
-				computeFromAbove(base, base.meta);
-			else
-				add(origin);
-		}
-
-		private void computeFromAbove(Vertex base, Vertex baseAbove) {
-			log.info("computeFromAbove : " + base + " from : " + baseAbove);
-			Collection<Vertex> aboveInheritings = getInheritings2(baseAbove, origin, level);
-			log.info(" aboveInheritings " + base + " from : " + baseAbove + aboveInheritings);
-			for (Vertex above : aboveInheritings) {
-				compute(base, above);
+				projectFromAbove(base.meta);
+			else {
+				if (origin.isAttributeOf(base))
+					add(origin);
 			}
 		}
 
-		private void compute(Vertex base, Vertex above) {
-			log.info("aboveInheriting : " + above);
-			Stream<Vertex> fromAbove = above.getLevel() < level ? Stream.concat(base.getCompositesSuperIndex(above).stream(), base.getCompositesMetaIndex(above).stream()) : base.getCompositesSuperIndex(above).stream();
-			if (!Vertex.this.equals(base) || (fromAbove.count() == 0 && above.getLevel() == level))
+		private void projectFromAbove(Vertex baseAbove) {
+			for (Vertex above : new Inheritings(baseAbove, origin, level))
+				compute(above);
+		}
+
+		private void compute(Vertex above) {
+			Iterator<Vertex> fromAbove = base.compositesSuperIndex(above);
+			if (above.getLevel() < level)
+				fromAbove = new ConcateIterator<Vertex>(fromAbove, base.compositesMetaIndex(above));
+			if (!Vertex.this.equals(base) || (!fromAbove.hasNext() && above.getLevel() == level))
 				add(above);
-			fromAbove = above.getLevel() < level ? Stream.concat(base.getCompositesSuperIndex(above).stream(), base.getCompositesMetaIndex(above).stream()) : base.getCompositesSuperIndex(above).stream();
-			fromAbove.forEach(next -> compute(next, next));
+			fromAbove.forEachRemaining(next -> compute(next));
 		}
 
 		@Override
