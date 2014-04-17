@@ -15,6 +15,7 @@ public class SelectOneMenuComponent extends AbstractValuedGenericComponent imple
 
 	public SelectOneMenuComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
+		children = initChildren();
 	}
 
 	@Override

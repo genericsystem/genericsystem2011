@@ -21,7 +21,6 @@ import org.genericsystem.framework.component.ValuedComponent;
 import org.genericsystem.framework.component.generic.AbstractGenericCollectableChildrenComponent;
 import org.genericsystem.framework.component.generic.GenericComponent;
 import org.genericsystem.generic.Attribute;
-import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
 import org.genericsystem.tracker.InstanceRow;
 import org.genericsystem.tracker.structure.Attributes;
@@ -52,22 +51,7 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends AbstractComponent, U extends Generic> T buildComponent(U generic) {
-		return (T) new AttributeComponent(TypeComponent.this, generic);
-	}
-
-	public String add() {
-		Generic instance = ((Type) getGeneric()).setInstance(newValue);
-		for (AttributeComponent attributeComponent : this.<AttributeComponent> getChildren()) {
-			if (!attributeComponent.getGeneric().isRelation())
-				instance.setValue((Attribute) attributeComponent.getGeneric(), attributeComponent.getNewValue());
-			else {
-				// TODO : KK just add link for binary relation
-				Generic newTarget = getGeneric().<Type> getOtherTargets((Attribute) attributeComponent.getGeneric()).get(0).getInstance(attributeComponent.getNewValue());
-				if (newTarget != null)
-					instance.bind((Relation) attributeComponent.getGeneric(), newTarget);
-			}
-		}
-		return null;
+		return (T) new AttributeComponent(this, generic);
 	}
 
 	public List<InstanceRow> getInstanceRows() {
@@ -77,19 +61,16 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 				return new InstanceRow(instance);
 			}
 		});
-
 	}
 
 	public String setEdit(InstanceRow instanceRow) {
 		getParentSelector().select(instanceRow.getInstance());
-		// child = new CreateAndEditComponent(this, instanceRow.getInstance(), CreateAndEditComponent.MODE.EDITION);
 		return "index.xhtml";
 	}
 
 	public String setCreate() {
 		getParentSelector().select(generic);
 		return "index.xhtml";
-		// child = new CreateAndEditComponent(TypeComponent.this, generic, CreateAndEditComponent.MODE.CREATION);
 	}
 
 	public String remove(InstanceRow instanceRow) {
@@ -192,5 +173,4 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 		panel.getChildren().add(button);
 		dataTable.setHeader(panel);
 	}
-
 }

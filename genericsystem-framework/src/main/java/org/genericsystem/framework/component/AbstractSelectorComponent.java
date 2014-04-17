@@ -13,16 +13,15 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 
 	public AbstractComponent child;
 
+	protected Generic selected;
+
 	public AbstractSelectorComponent(AbstractComponent parent) {
 		super(parent);
-		// selectDefaultComponent();
 	}
 
 	public final AbstractSelectorComponent getParentSelector() {
 		return this;
 	}
-
-	public abstract void selectDefaultComponent();
 
 	public abstract void select(Generic selected);
 
@@ -32,7 +31,11 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 	}
 
 	public List<? extends AbstractComponent> initChildren() {
-		return Arrays.asList(initChooser(), initDisplayer());
+		if (selected == null)
+			return Arrays.asList(initChooser());
+		List<AbstractComponent> children = Arrays.asList(initChooser(), initDisplayer());
+		assert child == null || children.contains(child) : "child " + child + " must in children " + children;
+		return children;
 	}
 
 	protected abstract AbstractComponent initDisplayer();
