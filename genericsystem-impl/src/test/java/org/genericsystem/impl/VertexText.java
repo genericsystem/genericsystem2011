@@ -107,7 +107,7 @@ public class VertexText extends AbstractTest {
 		Vertex car = engine.addInstance(new Vertex[] { vehicle }, "Car");
 		Vertex vehiclePower = engine.addInstance("Power", vehicle);
 		Vertex carPower = engine.addInstance("Power", car);
-		assert car.getAttributes(engine).containsAll(Arrays.asList(carPower));
+		assert car.getAttributes(engine).contains(carPower);
 		assert car.getAttributes(engine).size() == 1;
 	}
 
@@ -117,7 +117,54 @@ public class VertexText extends AbstractTest {
 		Vertex car = engine.addInstance(new Vertex[] { vehicle }, "Car");
 		Vertex vehiclePower = engine.addInstance("VehiclePower", vehicle);
 		Vertex carPower = engine.addInstance(new Vertex[] { vehiclePower }, "CarPower", car);
-		assert car.getAttributes(engine).containsAll(Arrays.asList(carPower));
+		assert car.getAttributes(engine).contains(carPower);
 		assert car.getAttributes(engine).size() == 1;
+	}
+
+	public void test6() {
+		Vertex engine = new Engine();
+		Vertex vehicle = engine.addInstance("Vehicle");
+		Vertex car = engine.addInstance(new Vertex[] { vehicle }, "Car");
+		Vertex sportCar = engine.addInstance(new Vertex[] { car }, "SportCar");
+		Vertex vehiclePower = engine.addInstance("VehiclePower", vehicle);
+		Vertex carPower = engine.addInstance(new Vertex[] { vehiclePower }, "CarPower", car);
+		Vertex sportCarPower = engine.addInstance(new Vertex[] { vehiclePower }, "SportCarPower", sportCar);
+		assert sportCar.getAttributes(engine).containsAll(Arrays.asList(carPower, sportCarPower)) : car.getAttributes(engine) + " " + sportCarPower.info();
+		assert sportCar.getAttributes(engine).size() == 2;
+	}
+
+	public void test7() {
+		Vertex engine = new Engine();
+		Vertex vehicle = engine.addInstance("Vehicle");
+		Vertex robot = engine.addInstance("robot");
+		Vertex transformer = engine.addInstance(new Vertex[] { vehicle, robot }, "Transformer");
+		Vertex vehiclePower = engine.addInstance("Power", vehicle);
+		Vertex robotPower = engine.addInstance("Power", robot);
+		assert transformer.getAttributes(engine).containsAll(Arrays.asList(robotPower, vehiclePower)) : transformer.getAttributes(engine);
+		assert transformer.getAttributes(engine).size() == 2;
+	}
+
+	public void test8() {
+		Vertex engine = new Engine();
+		Vertex vehicle = engine.addInstance("Vehicle");
+		Vertex robot = engine.addInstance("robot");
+		Vertex transformer = engine.addInstance(new Vertex[] { vehicle, robot }, "Transformer");
+		Vertex vehiclePower = engine.addInstance("VehiclePower", vehicle);
+		Vertex robotPower = engine.addInstance("RobotPower", robot);
+		Vertex transformerPower = engine.addInstance(new Vertex[] { vehiclePower, robotPower }, "TransformerPower", transformer);
+		assert transformer.getAttributes(engine).contains(transformerPower) : transformer.getAttributes(engine);
+		assert transformer.getAttributes(engine).size() == 1;
+	}
+
+	public void test9() {
+		Vertex engine = new Engine();
+		Vertex vehicle = engine.addInstance("Vehicle");
+		Vertex robot = engine.addInstance("robot");
+		Vertex transformer = engine.addInstance(new Vertex[] { vehicle, robot }, "Transformer");
+		Vertex vehiclePower = engine.addInstance("Power", vehicle);
+		Vertex robotPower = engine.addInstance("Power", robot);
+		Vertex transformerPower = engine.addInstance("Power", transformer);
+		assert transformer.getAttributes(engine).contains(transformerPower) : transformer.getAttributes(engine);
+		assert transformer.getAttributes(engine).size() == 1;
 	}
 }
