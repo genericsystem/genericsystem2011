@@ -3,8 +3,6 @@ package org.genericsystem.tracker.component;
 import org.genericsystem.core.Generic;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractSelectorComponent;
-import org.genericsystem.tracker.component.generic.DisplayerComponent;
-import org.genericsystem.tracker.structure.Types.Issues;
 
 public class SelectorTypeComponent extends AbstractSelectorComponent {
 
@@ -12,20 +10,16 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 		super(parent);
 	}
 
-	DisplayerComponent displayerComponent = new DisplayerComponent(this);
-
-	public void selectDefaultComponent() {
-		select(getCache().find(Issues.class));
-	}
-
 	@Override
 	public void select(Generic selected) {
-		child = displayerComponent.displayChild(selected);
+		this.selected = selected;
+		reInitChildren();
 	}
 
 	@Override
 	protected AbstractComponent initDisplayer() {
-		return displayerComponent;
+		child = new SelectorInstanceComponent(this, selected);
+		return child;
 	}
 
 	@Override

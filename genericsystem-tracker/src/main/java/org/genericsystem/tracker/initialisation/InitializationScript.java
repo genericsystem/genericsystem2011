@@ -69,8 +69,10 @@ public class InitializationScript {
 		 */
 
 		Type priority = cache.find(Priorities.class);
-		Generic major = priority.getAllInstances().get(0);
-		Generic minor = priority.getAllInstances().get(1);
+		Generic major = priority.setInstance("Major");
+		Generic minor = priority.setInstance("Minor");
+		// Generic major = priority.getAllInstances().get(0);
+		// Generic minor = priority.getAllInstances().get(1);
 
 		/**
 		 * Relation

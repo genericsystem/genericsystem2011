@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.faces.bean.SessionScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -33,7 +33,6 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 		FacesContext ctx = FacesContext.getCurrentInstance();
 		buildJsfChildren(ctx.getViewRoot());
 		logComponent(ctx.getViewRoot());
-
 		return null;
 	}
 

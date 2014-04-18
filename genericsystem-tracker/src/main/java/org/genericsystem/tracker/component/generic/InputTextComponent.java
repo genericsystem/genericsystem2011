@@ -16,7 +16,7 @@ public class InputTextComponent extends AbstractValuedGenericComponent implement
 
 	public InputTextComponent(AbstractComponent parent, Generic generic) {
 		super(parent, generic);
-		newValue = Objects.toString(generic);
+		newValue = generic == null ? "" : Objects.toString(generic);
 	}
 
 	@Override

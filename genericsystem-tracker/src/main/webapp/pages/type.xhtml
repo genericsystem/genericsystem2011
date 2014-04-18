@@ -6,33 +6,33 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 
-	<h:form>
-		<h:dataTable value="#{component.instanceRows}" var="row"
-			styleClass="order-table" headerClass="order-table-header"
-			rowClasses="order-table-odd-row,order-table-even-row">
-			<f:facet name="header">
-				<h:outputText value="#{component}" />
-				<h:commandButton value="#{component.createMsg}"
-					action="#{component.setCreate()}" />
-			</f:facet>
-			<h:column>
-				<h:outputText value="#{row}" />
-			</h:column>
+<!-- 	<h:form> -->
+<!-- 		<h:dataTable value="#{component.instanceRows}" var="row" -->
+<!-- 			styleClass="order-table" headerClass="order-table-header" -->
+<!-- 			rowClasses="order-table-odd-row,order-table-even-row"> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{component}" /> -->
+<!-- 				<h:commandButton value="#{component.createMsg}" -->
+<!-- 					action="#{component.setCreate()}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:column> -->
+<!-- 				<h:outputText value="#{row}" /> -->
+<!-- 			</h:column> -->
 
-			<c:forEach items="#{component.children}" var="component">
-				<ui:include src="#{component.xhtmlPath}" />
-			</c:forEach>
+<!-- 			<c:forEach items="#{component.children}" var="component"> -->
+<!-- 				<ui:include src="#{component.xhtmlPath}" /> -->
+<!-- 			</c:forEach> -->
 
-			<h:column>
-				<h:commandLink value="#{component.editMsg}"
-					action="#{component.setEdit(row)}" />
-			</h:column>
+<!-- 			<h:column> -->
+<!-- 				<h:commandLink value="#{component.editMsg}" -->
+<!-- 					action="#{component.setEdit(row)}" /> -->
+<!-- 			</h:column> -->
 
-			<h:column>
-				<h:commandLink value="#{component.removeMsg}"
-					action="#{component.remove(row)}" />
-			</h:column>
-		</h:dataTable>
-	</h:form>
+<!-- 			<h:column> -->
+<!-- 				<h:commandLink value="#{component.removeMsg}" -->
+<!-- 					action="#{component.remove(row)}" /> -->
+<!-- 			</h:column> -->
+<!-- 		</h:dataTable> -->
+<!-- 	</h:form> -->
 
 </ui:composition>

@@ -5,15 +5,15 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 
-	<c:if test="#{component.root.securityManager.isConnected()}">
-		<c:forEach items="#{component.children}" var="component">
-			<ui:include src="#{component.xhtmlPath}" />
-		</c:forEach>
+<!-- 	<c:if test="#{component.root.securityManager.isConnected()}"> -->
+<!-- 		<c:forEach items="#{component.children}" var="component"> -->
+<!-- 			<ui:include src="#{component.xhtmlPath}" /> -->
+<!-- 		</c:forEach> -->
 
-		<ui:include src="#{component.child.xhtmlPath}"
-			rendered="#{! empty component.child}">
-			<ui:param name="component" value="#{component.child}" />
-		</ui:include>
-	</c:if>
+<!-- 		<ui:include src="#{component.child.xhtmlPath}" -->
+<!-- 			rendered="#{! empty component.child}"> -->
+<!-- 			<ui:param name="component" value="#{component.child}" /> -->
+<!-- 		</ui:include> -->
+<!-- 	</c:if> -->
 
 </ui:composition>

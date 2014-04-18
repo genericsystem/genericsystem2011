@@ -20,7 +20,7 @@ public abstract class AbstractComponent {
 
 	protected List<? extends AbstractComponent> children;
 
-	AbstractComponent() {
+	public AbstractComponent() {
 		this(null);
 	}
 
@@ -39,11 +39,23 @@ public abstract class AbstractComponent {
 		return (T) parent;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends AbstractComponent> List<T> getChildren() {
+	public void reInitChildren() {
+		children = null;
+	}
+
+	private <T extends AbstractComponent> List<T> initAndGetChildren() {
 		if (children == null)
 			children = initChildren();
+		return getChildren();
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends AbstractComponent> List<T> getChildren() {
 		return (List<T>) children;
+	}
+
+	public void setChildren(List<? extends AbstractComponent> children) {
+		this.children = children;
 	}
 
 	public <T extends AbstractComponent> T getRoot() {
@@ -69,9 +81,8 @@ public abstract class AbstractComponent {
 	protected void buildJsfChildren(UIComponent father) {
 		UIComponent container = buildJsfContainer(father);
 		buildJsfComponentsBefore(container);
-		for (AbstractComponent component : getChildren()) {
+		for (AbstractComponent component : initAndGetChildren())
 			component.buildJsfChildren(container);
-		}
 		buildJsfComponentsAfter(container);
 	}
 
