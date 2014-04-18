@@ -51,7 +51,7 @@ public class WrapperBean {
 		public void setValue(String newValue) {
 			if (!newValue.equals(generic.toString())) {
 				generic.setValue(newValue);
-				messages.info("updateValue", generic, newValue);
+				messages.info("updateValue", generic.toString(), newValue.toString());
 			}
 		}
 	}
@@ -107,7 +107,7 @@ public class WrapperBean {
 		public void setValue(String newValue) {
 			if (!newValue.equals(entry.getValue())) {
 				genericTreeBean.getSelectedTreeNode().getGeneric().getPropertiesMap().put(entry.getKey(), newValue);
-				messages.info("updateValue", entry.getValue(), newValue);
+				messages.info("updateValue", entry.getValue().toString(), newValue.toString());
 			}
 		}
 	}
@@ -126,7 +126,7 @@ public class WrapperBean {
 		public void setValue(Boolean newValue) {
 			if (!newValue.equals(entry.getValue())) {
 				genericTreeBean.getSelectedTreeNode().getGeneric().getMap(ConstraintsMapProvider.class).put(entry.getKey(), newValue);
-				messages.info("updateValue", entry.getValue(), newValue);
+				messages.info("updateValue", entry.getValue().toString(), newValue.toString());
 			}
 		}
 	}
@@ -145,7 +145,7 @@ public class WrapperBean {
 		public void setValue(Boolean newValue) {
 			if (!newValue.equals(entry.getValue())) {
 				genericTreeBean.getSelectedTreeNode().getGeneric().getMap(SystemPropertiesMapProvider.class).put(entry.getKey(), newValue);
-				messages.info("updateValue", entry.getValue(), newValue);
+				messages.info("updateValue", entry.getValue().toString(), newValue.toString());
 			}
 		}
 	}

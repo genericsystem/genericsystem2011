@@ -56,7 +56,7 @@ public class CacheBean implements Serializable {
 	public String flushCurrentCache() {
 		cacheProvider.flushCurrentCache();
 
-		messages.info("flushCache", cacheProvider.getCurrentCache().getLevel());
+		messages.info("flushCache", "" + cacheProvider.getCurrentCache().getLevel());
 
 		return "HOME";
 	}
@@ -69,7 +69,7 @@ public class CacheBean implements Serializable {
 	public String discardCurrentCache() {
 		cacheProvider.discardCurrentCache();
 
-		messages.info("discardCache", cacheProvider.getCurrentCache().getLevel());
+		messages.info("discardCache", "" + cacheProvider.getCurrentCache().getLevel());
 
 		return "HOME";
 	}

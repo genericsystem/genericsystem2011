@@ -127,7 +127,7 @@ public class MapProviderBean implements Serializable {
 	public void removeEntryFromMap(Map<Serializable, Serializable> map, Entry<Serializable, Serializable> entry) {
 		try {
 			map.remove(entry.getKey());
-			messages.info("remove", entry.getKey());
+			messages.info("remove", entry.getKey().toString());
 		} catch (NotRemovableException e) {
 			messages.info("cannotremove", e.getMessage());
 		}

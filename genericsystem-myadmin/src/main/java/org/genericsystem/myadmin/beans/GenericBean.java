@@ -128,14 +128,14 @@ public class GenericBean implements Serializable {
 		Generic currentInstance = genericTreeBean.getSelectedTreeNode().getGeneric();
 		currentInstance.setValue(attribute, value);
 
-		messages.info("addValue", value, attribute, currentInstance);
+		messages.info("addValue", value.toString(), attribute.toString(), currentInstance.toString());
 	}
 
 	public void remove(Holder holder) {
 		genericTreeBean.getSelectedTreeNode().getGeneric().cancel(holder);
 		genericTreeBean.updateTree();
 
-		messages.info("remove", holder);
+		messages.info("remove", holder.toString());
 	}
 
 	public String delete() {
@@ -148,7 +148,7 @@ public class GenericBean implements Serializable {
 			genericTreeBean.updateTree();
 		}
 
-		messages.info("remove", generic);
+		messages.info("remove", generic.toString());
 		return "";
 	}
 
@@ -168,7 +168,7 @@ public class GenericBean implements Serializable {
 	private void removeEntry(Map<Serializable, Serializable> map, Entry<Serializable, Serializable> entry) {
 		try {
 			map.remove(entry.getKey());
-			messages.info("remove", entry.getKey());
+			messages.info("remove", entry.getKey().toString());
 		} catch (NotRemovableException e) {
 			messages.info("cannotremove", e.getMessage());
 		}
