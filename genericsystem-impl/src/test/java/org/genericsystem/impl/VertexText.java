@@ -76,11 +76,13 @@ public class VertexText extends AbstractTest {
 		assert !v233.inheritsFrom(power);
 		assert v233.isInstanceOf(power);
 
-		log.info("----------------------------------");
 		assert myBmw.getHolders(power).contains(v233) : myBmw.getHolders(power);
 		assert myBmw.getHolders(power).size() == 1 : myBmw.getHolders(engine);
 		assert myBmw.getValues(power).contains(233);
-		assert car.getAttributes(engine).equals(myBmw.getAttributes(engine));
+		assert engine.isAttributeOf(myBmw);
+		log.info("----------------------------------");
+
+		assert car.getAttributes(engine).equals(myBmw.getAttributes(engine)) : car.getAttributes(engine) + " " + myBmw.getAttributes(engine);
 	}
 
 	public void test2() {
