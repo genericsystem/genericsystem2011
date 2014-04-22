@@ -1,7 +1,7 @@
 package org.genericsystem.exception;
 
 /**
- * Is triggered if the constraint is positioned and that the generic does not respect the constraint.<br/>
+ * Is triggered if the constraint is positioned and that the generic does not respect the constraint.<br>
  * Checks the value can not be used that by a single instance.
  * 
  * @author Nicolas Feybesse

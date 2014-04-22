@@ -5,7 +5,6 @@ import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
-import javax.faces.context.FacesContext;
 
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.AbstractConnectionComponent;
@@ -36,8 +35,7 @@ public class ConnectionComponent extends AbstractConnectionComponent {
 	}
 
 	@Override
-	protected void buildJsfComponentsBefore(UIComponent father) {
-		FacesContext ctx = FacesContext.getCurrentInstance();
+	protected UIComponent buildJsfComponentsBefore(UIComponent father) {
 		HtmlForm formAuthentification = new HtmlForm();
 		if (!((SecurityManager) getSecurityManager()).isConnected()) {
 
@@ -62,13 +60,12 @@ public class ConnectionComponent extends AbstractConnectionComponent {
 			formAuthentification.getChildren().add(outputPassword);
 			formAuthentification.getChildren().add(inputPassword);
 			formAuthentification.getChildren().add(buttonSubmit);
-			ctx.getViewRoot().getChildren().add(formAuthentification);
-		} else {
-			HtmlCommandButton buttonDisconnect = new HtmlCommandButton();
-			buttonDisconnect.setValue("disconnect");
-			buttonDisconnect.setActionExpression(getMethodExpression("disconnect"));
-			formAuthentification.getChildren().add(buttonDisconnect);
-			ctx.getViewRoot().getChildren().add(formAuthentification);
+			return formAuthentification;
 		}
+		HtmlCommandButton buttonDisconnect = new HtmlCommandButton();
+		buttonDisconnect.setValue("disconnect");
+		buttonDisconnect.setActionExpression(getMethodExpression("disconnect"));
+		formAuthentification.getChildren().add(buttonDisconnect);
+		return formAuthentification;
 	}
 }

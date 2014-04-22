@@ -117,7 +117,6 @@ public class TypeComponent extends AbstractCollectableChildrenComponent implemen
 		return getGeneric().toString();
 	}
 
-	@Override
 	public String getXhtmlPath() {
 		return "/pages/type.xhtml";
 	}

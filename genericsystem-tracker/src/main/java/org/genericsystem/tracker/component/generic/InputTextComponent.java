@@ -30,9 +30,9 @@ public class InputTextComponent extends AbstractValuedGenericComponent implement
 	}
 
 	@Override
-	protected void buildJsfComponentsAfter(UIComponent father) {
+	protected UIComponent buildJsfComponentsAfter(UIComponent father) {
 		HtmlInputText inputText = new HtmlInputText();
 		inputText.setValueExpression("value", getValueExpression("newValue"));
-		father.getChildren().add(inputText);
+		return inputText;
 	}
 }

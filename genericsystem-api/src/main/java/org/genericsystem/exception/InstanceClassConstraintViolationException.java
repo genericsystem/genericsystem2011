@@ -1,8 +1,7 @@
 package org.genericsystem.exception;
 
 /**
- * Is triggered if the constraint is positioned and that the generic does not respect the constraint.<br/>
- * Checks that the value inherits from the type imposed by the constraint.
+ * Is triggered if the constraint is positioned and that the generic does not respect the constraint. Checks that the value inherits from the type imposed by the constraint.
  * 
  * @author Nicolas Feybessek
  */

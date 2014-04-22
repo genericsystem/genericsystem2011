@@ -3,6 +3,7 @@ package org.genericsystem.generic;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.genericsystem.core.Generic;
 import org.genericsystem.core.Snapshot;
 
@@ -68,7 +69,8 @@ public interface Node extends Holder {
 	/**
 	 * Returns the child of this.
 	 * 
-	 * @Param value The value
+	 * @param value
+	 *            The value
 	 * @see Snapshot
 	 * @return Return the children.
 	 */

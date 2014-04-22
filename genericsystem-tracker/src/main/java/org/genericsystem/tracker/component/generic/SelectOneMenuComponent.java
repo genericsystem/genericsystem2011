@@ -27,7 +27,6 @@ public class SelectOneMenuComponent extends AbstractValuedGenericComponent imple
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		HtmlSelectOneMenu selectOneMenu = new HtmlSelectOneMenu();
 		selectOneMenu.setValueExpression("value", getValueExpression("newValue"));
-		father.getChildren().add(selectOneMenu);
 		return selectOneMenu;
 	}
 }

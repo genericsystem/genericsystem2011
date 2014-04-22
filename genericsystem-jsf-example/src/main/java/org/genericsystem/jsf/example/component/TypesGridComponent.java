@@ -35,7 +35,6 @@ public class TypesGridComponent extends AbstractCollectableChildrenComponent {
 		return (T) new TypeComponent(this, generic);
 	}
 
-	@Override
 	public String getXhtmlPath() {
 		return "/pages/typesgrid.xhtml";
 	}

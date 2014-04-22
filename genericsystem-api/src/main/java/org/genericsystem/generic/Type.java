@@ -40,6 +40,8 @@ public interface Type extends Generic {
 	 * 
 	 * @param value
 	 *            The attribute value.
+	 * @param targets
+	 *            targets of Generic
 	 * @return Return the attribute.
 	 * @see Attribute
 	 */
@@ -116,6 +118,8 @@ public interface Type extends Generic {
 	 * 
 	 * @param value
 	 *            The property value.
+	 * @param targets
+	 *            The targets filter.
 	 * @return Return the property or null if no property find.
 	 */
 	<T extends Attribute> T getProperty(Serializable value, Generic... targets);
@@ -136,6 +140,8 @@ public interface Type extends Generic {
 	 * 
 	 * @param value
 	 *            The value of the requested instance.
+	 * @param targets
+	 *            The targets filter.
 	 * @return The requested instance if it exists, null otherwise.
 	 */
 	<T extends Generic> T getInstance(Serializable value, Generic... targets);

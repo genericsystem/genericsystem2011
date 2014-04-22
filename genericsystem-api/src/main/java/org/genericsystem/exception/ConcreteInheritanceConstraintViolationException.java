@@ -1,9 +1,7 @@
 package org.genericsystem.exception;
 
 /**
- * Is triggered if the constraint is positioned and that the generic does not respect the constraint.<br/>
- * The constraint is active by default.<br/>
- * Checks that no instance inherits a other instance.
+ * Is triggered if the constraint is positioned and that the generic does not respect the constraint. The constraint is active by default. Checks that no instance inherits a other instance.
  * 
  * @author Nicolas Feybesse
  * @author Michael Ory
