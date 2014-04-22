@@ -26,7 +26,6 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 		return Arrays.asList(new TypesGridComponent(RootComponent.this));
 	}
 
-	@Override
 	public String getXhtmlPath() {
 		return "/pages/index.xhtml";
 	}
