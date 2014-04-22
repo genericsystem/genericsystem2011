@@ -61,7 +61,6 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -80,23 +79,41 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<finalName>${project.artifactId}</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.wildfly.plugins</groupId>
+						<artifactId>wildfly-maven-plugin</artifactId>
+						<version>${wildfly-maven-plugin.version}</version>
+						<executions>
+							<execution>
+								<phase>install</phase>
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 
-	<build>
-		<finalName>${project.artifactId}</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.wildfly.plugins</groupId>
-				<artifactId>wildfly-maven-plugin</artifactId>
-				<version>${wildfly-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<goals>
-							<goal>deploy</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+		<profile>
+			<id>integration</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>environment</name>
+					<value>integration</value>
+				</property>
+			</activation>
+		</profile>
+	</profiles>
 </project>

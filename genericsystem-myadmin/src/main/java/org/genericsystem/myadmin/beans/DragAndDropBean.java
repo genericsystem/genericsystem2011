@@ -40,7 +40,7 @@ public class DragAndDropBean {
 			attribute.setConstraintClass(Boolean.class);
 		if (dragValue.equals("string"))
 			attribute.setConstraintClass(String.class);
-		messages.info("createRootAttribute", "new_attribute", type);
+		messages.info("createRootAttribute", "new_attribute", type.toString());
 	}
 
 	public void addTarget(DropEvent dropEvent) {
@@ -48,11 +48,11 @@ public class DragAndDropBean {
 		Attribute attribute = ((Structural) dropEvent.getDropValue()).getAttribute();
 		if (target.isStructural()) {
 			attribute.addComponent(target, ((GenericImpl) attribute).getComponents().size());
-			messages.info("targetRelation", target, attribute);
+			messages.info("targetRelation", target.toString(), attribute.toString());
 		} else if (target.isConcrete()) {
 			if (!attribute.isRelation()) {
 				genericTreeBean.getSelectedTreeNode().getGeneric().bind((Relation) attribute, target);
-				messages.info("targetLink", target, attribute);
+				messages.info("targetLink", target.toString(), attribute.toString());
 			} else
 				messages.info("errorTargetLink");
 		}
