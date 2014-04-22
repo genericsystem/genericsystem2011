@@ -1,8 +1,7 @@
 package org.genericsystem.exception;
 
 /**
- * Is triggered if the constraint is positioned and that the generic does not respect the constraint.<br/>
- * Checks that two generic can not have the same value, same meta and same components.
+ * Is triggered if the constraint is positioned and that the generic does not respect the constraint. Checks that two generic can not have the same value, same meta and same components.
  * 
  * @author Nicolas Feybesse
  * @author Michael Ory

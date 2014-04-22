@@ -3,7 +3,7 @@ package org.genericsystem.generic;
 import org.genericsystem.core.Generic;
 
 /**
- * A Link <br/>
+ * A Link <br>
  * Link any the instances of the Types.
  * 
  * @author Nicolas Feybesse

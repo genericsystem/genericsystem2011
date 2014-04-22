@@ -34,7 +34,7 @@ public interface Factory extends Serializable {
 	/**
 	 * Create a new Cache.
 	 * 
-	 * @param cache
+	 * @param subCache
 	 *            The sub cache.
 	 * @return The new Cache.
 	 */

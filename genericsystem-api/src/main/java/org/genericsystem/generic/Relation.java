@@ -1,8 +1,7 @@
 package org.genericsystem.generic;
 
-
 /**
- * A Relation <br/>
+ * A Relation <br>
  * Link any Type
  * 
  * @author Nicolas Feybesse
