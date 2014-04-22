@@ -31,12 +31,12 @@ public class CommandButtonComponent extends AbstractGenericComponent implements 
 	}
 
 	@Override
-	protected void buildJsfComponentsBefore(UIComponent father) {
+	protected UIComponent buildJsfComponentsBefore(UIComponent father) {
 		HtmlForm form1 = new HtmlForm();
 		HtmlCommandButton commandButton = new HtmlCommandButton();
 		commandButton.setValue(this);
 		commandButton.setActionExpression(getMethodExpression("select"));
 		form1.getChildren().add(commandButton);
-		father.getChildren().add(form1);
+		return form1;
 	}
 }
