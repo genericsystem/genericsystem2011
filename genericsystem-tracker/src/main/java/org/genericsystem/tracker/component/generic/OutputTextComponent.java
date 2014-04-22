@@ -25,9 +25,9 @@ public class OutputTextComponent extends AbstractValuedGenericComponent implemen
 	}
 
 	@Override
-	protected void buildJsfComponentsBefore(UIComponent father) {
+	protected UIComponent buildJsfComponentsBefore(UIComponent father) {
 		HtmlOutputText outputText = new HtmlOutputText();
 		outputText.setValueExpression("value", getValueExpression("newValue"));
-		father.getChildren().add(outputText);
+		return outputText;
 	}
 }

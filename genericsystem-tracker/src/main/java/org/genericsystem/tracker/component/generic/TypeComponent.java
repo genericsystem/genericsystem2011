@@ -122,6 +122,7 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		HtmlDataTable dataTable = new HtmlDataTable();
+		dataTable.setId("dataTableType");
 		dataTable.setValueExpression("value", getValueExpression("getInstanceRows()"));
 		dataTable.setVar("row");
 		setStyle(dataTable);
@@ -132,28 +133,32 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 		outputInstance.setValueExpression("value", createValueExpression("row"));
 		column1.getChildren().add(outputInstance);
 		dataTable.getChildren().add(column1);
-
-		HtmlForm form = new HtmlForm();
-		form.getChildren().add(dataTable);
-		father.getChildren().add(form);
 		return dataTable;
 	}
 
 	@Override
-	protected void buildJsfComponentsAfter(UIComponent container) {
-		HtmlColumn column2 = new HtmlColumn();
+	protected UIComponent buildJsfComponentsAfter(UIComponent container) {
+		HtmlColumn column = new HtmlColumn();
+		HtmlForm form = new HtmlForm();
 		HtmlCommandLink editLink = new HtmlCommandLink();
 		editLink.setValue(getEditMsg());
 		editLink.setActionExpression(getMethodExpression("setEdit(row)"));
-		column2.getChildren().add(editLink);
-		container.getChildren().add(column2);
 
-		HtmlColumn column3 = new HtmlColumn();
+		form.getChildren().add(editLink);
+		column.getChildren().add(form);
+		container.getChildren().add(column);
+
+		HtmlColumn columnRemove = new HtmlColumn();
+		HtmlForm formRemove = new HtmlForm();
 		HtmlCommandLink removeLink = new HtmlCommandLink();
 		removeLink.setValue(getRemoveMsg());
 		removeLink.setActionExpression(getMethodExpression("remove(row)"));
-		column3.getChildren().add(removeLink);
-		container.getChildren().add(column3);
+
+		formRemove.getChildren().add(removeLink);
+		columnRemove.getChildren().add(formRemove);
+		container.getChildren().add(columnRemove);
+
+		return container;
 	}
 
 	private void setStyle(HtmlDataTable dataTable) {
@@ -163,6 +168,7 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 	}
 
 	private void createHeader(HtmlDataTable dataTable) {
+		HtmlForm form = new HtmlForm();
 		HtmlPanelGroup panel = new HtmlPanelGroup();
 		HtmlCommandButton button = new HtmlCommandButton();
 		button.setValue(getCreateMsg());
@@ -171,6 +177,7 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 		header.setValue(generic);
 		panel.getChildren().add(header);
 		panel.getChildren().add(button);
-		dataTable.setHeader(panel);
+		form.getChildren().add(panel);
+		dataTable.setHeader(form);
 	}
 }

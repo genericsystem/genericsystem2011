@@ -31,13 +31,13 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 
 	public Object getListener() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
-		buildJsfChildren(ctx.getViewRoot());
+		buildJsf(ctx.getViewRoot());
 		logComponent(ctx.getViewRoot());
 		return null;
 	}
 
 	private void logComponent(UIComponent component) {
-		log.info("Log Component : " + component.getClass());
+		log.info("Log Component : " + component.getClass() + " " + component.getId());
 		for (UIComponent child : component.getChildren()) {
 			logComponent(child);
 		}

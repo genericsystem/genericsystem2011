@@ -66,24 +66,32 @@ public abstract class AbstractComponent {
 		return getRoot().getCache();
 	}
 
-	protected void buildJsfComponentsBefore(UIComponent container) {
+	protected UIComponent buildJsfComponentsBefore(UIComponent container) {
+		return null;
 	}
 
-	protected void buildJsfComponentsAfter(UIComponent container) {
+	protected UIComponent buildJsfComponentsAfter(UIComponent container) {
+		return null;
 	}
 
 	protected UIComponent buildJsfContainer(UIComponent father) {
-		HtmlPanelGroup panelGroup = new HtmlPanelGroup();
-		father.getChildren().add(panelGroup);
-		return panelGroup;
+		return new HtmlPanelGroup();
 	}
 
-	protected void buildJsfChildren(UIComponent father) {
+	protected UIComponent buildJsfChildren(UIComponent father) {
 		UIComponent container = buildJsfContainer(father);
-		buildJsfComponentsBefore(container);
-		for (AbstractComponent component : initAndGetChildren())
-			component.buildJsfChildren(container);
-		buildJsfComponentsAfter(container);
+		UIComponent before = buildJsfComponentsBefore(container);
+		if (before != null)
+			container.getChildren().add(before);
+		for (AbstractComponent component : initAndGetChildren()) {
+			UIComponent children = component.buildJsfChildren(container);
+			if (children != null)
+				container.getChildren().add(children);
+		}
+		UIComponent after = buildJsfComponentsAfter(container);
+		if (after != null)
+			container.getChildren().add(after);
+		return container;
 	}
 
 	protected int getComponentIndex() {
