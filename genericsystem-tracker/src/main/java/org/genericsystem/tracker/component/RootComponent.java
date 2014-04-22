@@ -49,8 +49,7 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		// return Arrays.asList(new ConnectionComponent(this), new SelectorTypeComponent(this));
-		return Arrays.asList(new ConnectionComponent(this), new SecurityComponent(this));
+		return Arrays.asList(new ConnectionComponent(this), new SelectorTypeComponent(this));
 	}
 
 	@Override
