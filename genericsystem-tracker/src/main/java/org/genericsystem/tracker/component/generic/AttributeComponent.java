@@ -53,13 +53,11 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 
 	@Override
 	protected UIComponent buildJsfContainer(UIComponent father) {
-		HtmlColumn column = new HtmlColumn();
-		father.getChildren().add(column);
-		return column;
+		return new HtmlColumn();
 	}
 
 	@Override
-	protected void buildJsfComponentsAfter(UIComponent container) {
+	protected UIComponent buildJsfComponentsAfter(UIComponent container) {
 		HtmlOutputText attributeValue = new HtmlOutputText();
 		attributeValue.setValueExpression("value", getValueExpression("getColumnTitleAttribute()"));
 		((HtmlColumn) container).setHeader(attributeValue);
@@ -71,6 +69,6 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		attribut.setValueExpression("value", createValueExpression("value"));
 		column.getChildren().add(attribut);
 		innerDataTable.getChildren().add(column);
-		container.getChildren().add(innerDataTable);
+		return innerDataTable;
 	}
 }

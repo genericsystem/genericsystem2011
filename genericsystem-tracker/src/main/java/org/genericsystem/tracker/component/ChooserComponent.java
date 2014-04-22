@@ -52,7 +52,6 @@ public class ChooserComponent extends AbstractChooserComponent {
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		HtmlPanelGrid panelGrid = new HtmlPanelGrid();
 		panelGrid.setColumns(NB_COLUMNS_PANEL_GRID);
-		father.getChildren().add(panelGrid);
 		return panelGrid;
 	}
 }

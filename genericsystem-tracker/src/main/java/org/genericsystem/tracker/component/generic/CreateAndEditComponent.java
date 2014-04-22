@@ -97,16 +97,15 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 			panelGrid.setHeaderClass("order-table-header");
 			panelGrid.setRowClasses("order-table-odd-row,order-table-even-row");
 			form.getChildren().add(panelGrid);
-			father.getChildren().add(form);
 		}
-		return panelGrid;
+		return form;
 	}
 
 	@Override
-	protected void buildJsfComponentsAfter(UIComponent container) {
+	protected UIComponent buildJsfComponentsAfter(UIComponent container) {
 		HtmlCommandButton button = new HtmlCommandButton();
 		button.setValue(getTitle());
 		button.setActionExpression(getMethodExpression("execute"));
-		container.getChildren().add(button);
+		return button;
 	}
 }

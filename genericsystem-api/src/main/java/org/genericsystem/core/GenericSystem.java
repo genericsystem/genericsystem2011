@@ -1,7 +1,5 @@
 package org.genericsystem.core;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.genericsystem.core.Factory.DefaultFactory;
 
 /**
@@ -91,7 +89,7 @@ public class GenericSystem {
 	}
 
 	/**
-	 * Creates and returns a new Persistent <tt>Engine</tt>.
+	 * Creates and returns a new Persistent <tt>Engine</tt>. Throws InvocationTargetException
 	 * 
 	 * @param directoryPath
 	 *            the directory of persistence.
@@ -99,15 +97,13 @@ public class GenericSystem {
 	 *            the list of user classes.
 	 * 
 	 * @return a new engine.
-	 * 
-	 * @throws InvocationTargetException
 	 */
 	public static Engine newPersistentEngine(String directoryPath, Class<?>... userClasses) {
 		return newPersistentEngine(new DefaultFactory(), directoryPath, userClasses);
 	}
 
 	/**
-	 * Creates and returns a new Persistent <tt>Engine</tt>.
+	 * Creates and returns a new Persistent <tt>Engine</tt>. Throws InvocationTargetException
 	 * 
 	 * @param factory
 	 *            the factory for generic.
@@ -117,8 +113,6 @@ public class GenericSystem {
 	 *            the list of user classes.
 	 * 
 	 * @return a new engine.
-	 * 
-	 * @throws InvocationTargetException
 	 */
 	public static Engine newPersistentEngine(Factory factory, String directoryPath, Class<?>... userClasses) {
 		try {

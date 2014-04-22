@@ -42,7 +42,6 @@ public abstract class AbstractConcateIterator<U, T> extends AbstractAwareIterato
 		}
 	}
 
-	// TODO class to migrate - is called in GenericImpl.java l.486 by dependenciesIterator()
 	public static class ConcateIterator<T> extends AbstractConcateIterator<Iterator<T>, T> {
 
 		@SafeVarargs

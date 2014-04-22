@@ -25,16 +25,14 @@ import org.genericsystem.generic.Relation;
  * In <tt>Generic System</tt> exist tree meta-levels of generics:
  * <dl>
  * <dt>Meta
- * <dt>
  * <dd>This level define the meta-model. Here we found generics necessary for the function of the system.</dd>
+ * 
  * <dt>Structurals
- * <dt>
  * <dd>On this level we find user-defined data-models: <tt>Types</tt>, <tt>Attributes</tt> and <tt>Relations</tt></dd>
+ * 
  * <dt>Concretes
- * <dt>
  * <dd>Data level. Level of the objects that inherit from user-defined classes. This level defines business-data. Managed by <tt>Generic System</tt>.</dd>
  * </dl>
- * </p>
  * 
  * <h1>Types of nodes</h1>
  * <p>
@@ -49,7 +47,6 @@ import org.genericsystem.generic.Relation;
  * <dt>Composites</dt>
  * <dd>Nodes that contains this <tt>Generic</tt>.</dd>
  * </dl>
- * </p>
  * 
  * <p>
  * This interface is a part of <tt>Generic System Core</tt>.
@@ -235,11 +232,11 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> Snapshot<T> getLinks(Relation relation, Generic... targets);
 
 	/**
-	 * Creates a new link between this generic and targets.<br />
+	 * Creates a new link between this generic and targets.
 	 * 
-	 * Parameters relation can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link between one Structural and one Concrete, this default link must be passed as parameter relation.<br />
+	 * Parameters relation can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link between one Structural and one Concrete, this default link must be passed as parameter relation.
 	 * 
-	 * Exception is thrown is there is another link instantiating the same relation between the same components. <br/>
+	 * Exception is thrown is there is another link instantiating the same relation between the same components.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the relation, then one link will be created on the targets.
 	 * 
@@ -255,9 +252,9 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T addLink(Link relation, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new link between this generic and targets. If the same link already exists an exception is thrown.<br />
+	 * Creates a new link between this generic and targets. If the same link already exists an exception is thrown.
 	 * 
-	 * Parameters relation can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter relation.<br />
+	 * Parameters relation can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter relation.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
@@ -273,9 +270,9 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T setLink(Link relation, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new link between this generic and targets. If the same link already exists it will be returned.<br />
+	 * Creates a new link between this generic and targets. If the same link already exists it will be returned.
 	 * 
-	 * Parameter relation can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter relation.<br />
+	 * Parameter relation can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter relation.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
@@ -293,9 +290,9 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T setLink(Link relation, Serializable value, int basePos, Generic... targets);
 
 	/**
-	 * Creates a new link between this generic and targets. If the same link is already exists it will be returned.<br />
+	 * Creates a new link between this generic and targets. If the same link is already exists it will be returned.
 	 * 
-	 * Parameter relation can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter relation.<br />
+	 * Parameter relation can be of type <tt>Relation</tt> in the most cases. In the case when there is a default link beetween one Structural and one Concrete, this default link must be passed as parameter relation.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
@@ -315,11 +312,11 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Link> T setLink(Link relation, Serializable value, int basePos, int metaLevel, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. A new holder inherits from attribute supplied in parameters.<br />
+	 * Creates a new holder on this generic. A new holder inherits from attribute supplied in parameters.
 	 * 
-	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
+	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.
 	 * 
-	 * Exception is thrown if this generic has another holder that inherits from the same attribute.<br />
+	 * Exception is thrown if this generic has another holder that inherits from the same attribute.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
@@ -335,11 +332,11 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> T addHolder(Holder attribute, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from attribute supplied in parameters.<br />
+	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from attribute supplied in parameters.
 	 * 
-	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
+	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.
 	 * 
-	 * Exception is thrown if this generic has another holder that inherits from the same attribute.<br />
+	 * Exception is thrown if this generic has another holder that inherits from the same attribute.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
@@ -357,11 +354,11 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> T addHolder(Holder attribute, int basePos, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. A new holder inherits from attribute supplied in parameters.<br />
+	 * Creates a new holder on this generic. A new holder inherits from attribute supplied in parameters.
 	 * 
-	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
+	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.
 	 * 
-	 * Exception is thrown if this generic has another holder that inherits from the same attribute.<br />
+	 * Exception is thrown if this generic has another holder that inherits from the same attribute.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
@@ -381,9 +378,9 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> T addHolder(Holder attribute, Serializable value, int basePos, int metaLevel, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from attribute supplied in parameters.<br />
+	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from attribute supplied in parameters.
 	 * 
-	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
+	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
@@ -399,9 +396,9 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> T setHolder(Holder attribute, Serializable value, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from attribute supplied in parameters.<br />
+	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from attribute supplied in parameters.
 	 * 
-	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
+	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
@@ -419,9 +416,9 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> T setHolder(Holder attribute, Serializable value, int metaLevel, Generic... targets);
 
 	/**
-	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from attribute supplied in parameters.<br />
+	 * Creates a new holder on this generic. If the same holder exists already it will be returned. A new holder inherits from attribute supplied in parameters.
 	 * 
-	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.<br />
+	 * Parameter attribute is of type <tt>Attribute</tt> the most time but it can also have type <tt>Holder</tt>.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the property, then one link will be created on the targets.
 	 * 
@@ -563,9 +560,9 @@ public interface Generic extends Comparable<Generic> {
 	<S extends Serializable> S getValue(Holder holder);
 
 	/**
-	 * Creates a new value holder (<tt>Holder</tt>) inheriting from attribute supplied as parameter.<br />
+	 * Creates a new value holder (<tt>Holder</tt>) inheriting from attribute supplied as parameter.
 	 * 
-	 * If the same holder is already exists an exception will be thrown. <br/>
+	 * If the same holder is already exists an exception will be thrown.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the attribute, then one value will be created.
 	 * 
@@ -579,7 +576,7 @@ public interface Generic extends Comparable<Generic> {
 	<T extends Holder> T addValue(Holder attribute, Serializable value);
 
 	/**
-	 * Creates a new value holder (<tt>Holder</tt>) inheriting from attribute supplied as parameter. If the same value holder exists already it will be returned.<br />
+	 * Creates a new value holder (<tt>Holder</tt>) inheriting from attribute supplied as parameter. If the same value holder exists already it will be returned.
 	 * 
 	 * If the <tt>Singular Constraint</tt> is enabled on the attribute, then one value will be created.
 	 * 
@@ -595,7 +592,7 @@ public interface Generic extends Comparable<Generic> {
 	/**
 	 * Returns true if this directly or indirectly inherits from generic.
 	 * 
-	 * @param generics
+	 * @param generic
 	 *            supposed generic which this generic inherits from.
 	 * 
 	 * @return true if this generic inherits from meta.

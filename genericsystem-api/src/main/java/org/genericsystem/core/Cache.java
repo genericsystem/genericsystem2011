@@ -54,7 +54,6 @@ public interface Cache {
 	/**
 	 * Stop the execution of this cache.
 	 * 
-	 * @return this cache.
 	 */
 	void stop();
 
@@ -62,6 +61,7 @@ public interface Cache {
 	 * Flush the content of current cache into it's subcache or into current user's transaction. If cache flush it's data into transaction modifications become available to other users.
 	 * 
 	 * @throws RollbackException
+	 *             rollback
 	 */
 	void flush() throws RollbackException;
 
@@ -91,6 +91,13 @@ public interface Cache {
 
 	/**
 	 * Returns the Generic. A Generic is identified by value, meta and components.
+	 * 
+	 * @param value
+	 *            value of Generic
+	 * @param meta
+	 *            meta of Generic
+	 * @param components
+	 *            components of Generic
 	 * 
 	 * @return the Generic.
 	 */

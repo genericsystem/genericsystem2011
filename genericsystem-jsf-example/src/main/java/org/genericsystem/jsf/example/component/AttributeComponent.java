@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.genericsystem.core.Generic;
-import org.genericsystem.core.Snapshot.Projector;
 import org.genericsystem.framework.InstanceRow;
 import org.genericsystem.framework.component.AbstractComponent;
 import org.genericsystem.framework.component.generic.AbstractValuedGenericComponent;
@@ -35,16 +34,9 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 	}
 
 	public List<InstanceRow> getTargetRows() {
-		return this.<TypeComponent> getParent().getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).getAllInstances().<InstanceRow> project(new Projector<InstanceRow, Generic>() {
-
-			@Override
-			public InstanceRow project(Generic instance) {
-				return new InstanceRow(instance);
-			}
-		});
+		return this.<TypeComponent> getParent().getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).getAllInstances().<InstanceRow> project(instance -> new InstanceRow(instance));
 	}
 
-	@Override
 	public String getXhtmlPath() {
 		return "/pages/attribute.xhtml";
 	}

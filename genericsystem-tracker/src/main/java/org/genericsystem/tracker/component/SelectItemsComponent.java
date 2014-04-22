@@ -34,7 +34,6 @@ public class SelectItemsComponent extends AbstractComponent {
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		UISelectItems selectItems = new UISelectItems();
 		selectItems.setValueExpression("value", getValueExpression("values"));
-		father.getChildren().add(selectItems);
 		return selectItems;
 	}
 }

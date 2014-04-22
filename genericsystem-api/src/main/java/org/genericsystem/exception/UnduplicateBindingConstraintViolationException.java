@@ -1,9 +1,8 @@
 package org.genericsystem.exception;
 
 /**
- * Is triggered if the constraint is positioned and that the generic does not respect the constraint.<br/>
- * The constraint is active by default.<br/>
- * Checks that two Generic that have the same supers doesn't have the same value. This problem can occur when creating identical in different caches.
+ * Is triggered if the constraint is positioned and that the generic does not respect the constraint. The constraint is active by default. Checks that two Generic that have the same supers doesn't have the same value. This problem can occur when creating
+ * identical in different caches.
  * 
  * @author Nicolas Feybesse
  * @author Michaël Ory
