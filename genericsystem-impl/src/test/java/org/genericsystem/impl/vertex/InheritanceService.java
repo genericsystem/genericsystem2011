@@ -7,29 +7,34 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-interface InheritanceService extends AncestorsService {
+public interface InheritanceService extends AncestorsService {
 
 	default boolean isSuperOf(Vertex subMeta, Vertex[] overrides, Serializable subValue, Vertex... subComponents) {
-		return Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom((Vertex) this)) || inheritsFrom(subMeta, subValue, subComponents, getMeta(), getValue(), getComponents());
+		return Arrays.asList(overrides).stream().anyMatch(override -> override.inheritsFrom((Vertex) InheritanceService.this)) || inheritsFrom(subMeta, subValue, subComponents, getMeta(), getValue(), getComponents());
 	}
+
+	// default boolean inheritsFrom(Vertex superMeta, Serializable superValue, Vertex... superComponents) {
+	// return inheritsFrom(getMeta(), getValue(), getComponents(), superMeta, superValue, superComponents);
+	// }
 
 	public static boolean inheritsFrom(Vertex subMeta, Serializable subValue, Vertex[] subComponents, Vertex superMeta, Serializable superValue, Vertex[] superComponents) {
 		if (!subMeta.inheritsFrom(superMeta))
 			return false;
-		if (!componentsDepends(subMeta.getSingulars(), subComponents, superComponents))
+		if (!componentsDepends(subMeta, subComponents, superComponents))
 			return false;
 		return subMeta.isProperty() || Objects.equals(subValue, superValue);
 	}
 
-	static boolean componentsDepends(boolean[] singulars, Vertex[] subComponents, Vertex[] superComponents) {
+	static boolean componentsDepends(Vertex subMeta, Vertex[] subComponents, Vertex[] superComponents) {
 		int subIndex = 0;
 		loop: for (int superIndex = 0; superIndex < superComponents.length; superIndex++) {
 			Vertex superComponent = superComponents[superIndex];
 			for (; subIndex < subComponents.length; subIndex++) {
 				Vertex subComponent = subComponents[subIndex];
 				if (subComponent.inheritsFrom(superComponent) || subComponent.isInstanceOf(superComponent)) {
-					if (singulars[subIndex])
+					if (subMeta.isSingularConstraint(subIndex))
 						return true;
 					subIndex++;
 					continue loop;
@@ -109,5 +114,17 @@ interface InheritanceService extends AncestorsService {
 			}
 		}
 		return new SupersComputer(overrides).toArray();
+	}
+
+	default void checkOverrides(Vertex[] overrides) {
+		assert Arrays.asList(overrides).stream().allMatch(override -> getSupersStream().anyMatch(superVertex -> superVertex.inheritsFrom(override))) : "Inconsistant overrides : " + Arrays.toString(overrides)
+				+ getSupersStream().collect(Collectors.toList());
+	}
+
+	default void checkSupers() {
+		// assert InheritanceService.componentsDepends(getMeta(), getComponents(), getMeta().getComponents()) : "Inconsistant components : " + Arrays.toString(getComponents());
+		// assert getSupersStream().allMatch(superVertex -> getMeta().inheritsFrom(superVertex.getMeta())) : "Inconsistant supers : " + getSupersStream().collect(Collectors.toList());
+		// assert getSupersStream().filter(superVertex -> superVertex.inheritsFrom(getMeta())).count() <= 1 : "Inconsistant supers : " + getSupersStream().collect(Collectors.toList());
+		// assert getSupersStream().noneMatch(superVertex -> superVertex.equals(this)) : "Inconsistant supers : " + getSupersStream().collect(Collectors.toList());
 	}
 }

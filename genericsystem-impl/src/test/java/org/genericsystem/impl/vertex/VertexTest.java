@@ -86,6 +86,7 @@ public class VertexTest extends AbstractTest {
 		assert car.getAttributes(engine).equals(myBmw.getAttributes(engine)) : car.getAttributes(engine) + " " + myBmw.getAttributes(engine);
 	}
 
+	@Test(enabled = false)
 	public void test2() {
 		Vertex engine = new Engine();
 		Vertex vehicle = engine.addInstance("Vehicle");

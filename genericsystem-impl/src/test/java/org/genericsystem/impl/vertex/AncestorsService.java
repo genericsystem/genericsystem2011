@@ -1,6 +1,8 @@
 package org.genericsystem.impl.vertex;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public interface AncestorsService {
@@ -47,5 +49,13 @@ public interface AncestorsService {
 
 	default boolean isInstanceOf(Vertex metaVertex) {
 		return getMeta().inheritsFrom(metaVertex);
+	}
+
+	default boolean isAttributeOf(Vertex vertex) {
+		return isEngine() || Arrays.asList(getComponents()).stream().anyMatch(component -> vertex.inheritsFrom(component) || vertex.isInstanceOf(component));
+	}
+
+	default boolean equals(Vertex meta, Serializable value, Vertex... components) {
+		return this.getMeta().equals(meta) && Objects.equals(this.getValue(), value) && Arrays.equals(this.getComponents(), components);
 	}
 }

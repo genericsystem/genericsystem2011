@@ -4,11 +4,15 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 public class Engine extends Vertex {
-	private final static String ENGINE_VALUE = "Engine";
-	private ValueCache valueCache;
+	ValueCache valueCache;
+	Factory factory;
+
+	public Engine(Factory factory) {
+		super(factory);
+	}
 
 	public Engine() {
-		super(null, new Vertex[] {}, ENGINE_VALUE, new Vertex[] {});
+		this(new Factory() {});
 	}
 
 	@Override
@@ -27,7 +31,12 @@ public class Engine extends Vertex {
 	}
 
 	public Serializable getCachedValue(Serializable value) {
-		return (valueCache != null ? valueCache : (valueCache = new ValueCache())).get(value);
+		return valueCache.get(value);
+	}
+
+	@Override
+	public Factory getFactory() {
+		return factory;
 	}
 
 	public static class ValueCache extends HashMap<Serializable, Serializable> {
