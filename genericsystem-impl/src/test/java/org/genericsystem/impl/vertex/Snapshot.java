@@ -3,6 +3,8 @@ package org.genericsystem.impl.vertex;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.genericsystem.iterator.AbstractFilterIterator;
 import org.genericsystem.iterator.AbstractProjectionIterator;
 
@@ -118,4 +120,17 @@ public abstract class Snapshot<T> implements Iterable<T> {
 		return hashCode;
 	}
 
+	public T get(T o) {
+		Iterator<T> it = iterator();
+		while (it.hasNext()) {
+			T next = it.next();
+			if (o.equals(next))
+				return next;
+		}
+		return null;
+	}
+
+	public Stream<T> stream() {
+		return StreamSupport.stream(spliterator(), false);
+	}
 }

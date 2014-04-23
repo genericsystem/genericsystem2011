@@ -4,28 +4,85 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.genericsystem.impl.vertex.Engine.ValueCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Vertex extends InheritanceServiceImpl implements AncestorsService, DependenciesService, InheritanceService, BindingService, ComponentsInheritanceService {
+public class Vertex implements AncestorsService, DependenciesService, InheritanceService, BindingService, ComponentsInheritanceService, FactoryService, DisplayService, SystemPropertiesService {
 
 	protected static Logger log = LoggerFactory.getLogger(Vertex.class);
 
-	public static final Vertex[] EMPTY_VERTICES = new Vertex[] {};
+	private final Serializable value;
+	private final Vertex meta;
+	private final Vertex[] components;
+	private final Dependencies instances;
+	private final Dependencies inheritings;
+	private final Dependencies composites;
+	private final Vertex[] supers;
 
 	private Vertex(Vertex meta, Serializable value, Vertex[] components) {
-		this(meta, EMPTY_VERTICES, value, components);
+		this(meta, Statics.EMPTY_VERTICES, value, components);
+	}
+
+	// Engine constructor
+	protected Vertex(Factory factory) {
+		((Engine) this).valueCache = new ValueCache();
+		((Engine) this).factory = factory;
+		this.meta = this;
+		this.value = ((Engine) this).getCachedValue(Statics.ENGINE_VALUE);
+		this.components = Statics.EMPTY_VERTICES;
+		this.instances = getFactory().buildDependency(this);
+		this.inheritings = getFactory().buildDependency(this);
+		this.composites = getFactory().buildDependency(this);
+		this.supers = Statics.EMPTY_VERTICES;
 	}
 
 	protected Vertex(Vertex meta, Vertex[] overrides, Serializable value, Vertex[] components) {
-		super(meta, overrides, value, components);
-		assert Arrays.asList(overrides).stream().allMatch(override -> getSupersStream().anyMatch(superVertex -> superVertex.inheritsFrom(override))) : "Inconsistant overrides : " + Arrays.toString(overrides)
-				+ getSupersStream().collect(Collectors.toList());
-		assert InheritanceService.componentsDepends(getMeta().getSingulars(), components, getMeta().getComponents()) : "Inconsistant components : " + Arrays.toString(components);
-		assert getSupersStream().allMatch(superVertex -> meta.inheritsFrom(superVertex.getMeta())) : "Inconsistant supers : " + getSupersStream().collect(Collectors.toList());
-		assert getSupersStream().filter(superVertex -> superVertex.inheritsFrom(meta)).count() <= 1 : "Inconsistant supers : " + getSupersStream().collect(Collectors.toList());
-		assert getSupersStream().noneMatch(superVertex -> superVertex.equals(this)) : "Inconsistant supers : " + getSupersStream().collect(Collectors.toList());
+		this.meta = isEngine() ? (Vertex) this : meta;
+		this.value = getEngine().getCachedValue(value);
+		this.components = components;
+		this.instances = getFactory().buildDependency(this);
+		this.inheritings = getFactory().buildDependency(this);
+		this.composites = getFactory().buildDependency(this);
+		this.supers = getSupers(overrides);
+		checkOverrides(overrides);
+		checkSupers();
+	}
+
+	@Override
+	public Vertex getMeta() {
+		return meta;
+	}
+
+	@Override
+	public Vertex[] getComponents() {
+		return components;
+	}
+
+	@Override
+	public Serializable getValue() {
+		return value;
+	}
+
+	@Override
+	public Dependencies getInstances() {
+		return instances;
+	}
+
+	@Override
+	public Dependencies getInheritings() {
+		return inheritings;
+	}
+
+	@Override
+	public Dependencies getComposites() {
+		return composites;
+	}
+
+	@Override
+	public Stream<Vertex> getSupersStream() {
+		return Arrays.stream(supers);
 	}
 
 	@Override
@@ -43,14 +100,6 @@ public class Vertex extends InheritanceServiceImpl implements AncestorsService, 
 		return equals(vertex.getMeta(), vertex.getValue(), vertex.getComponents());
 	}
 
-	public boolean equals(Vertex meta, Serializable value, Vertex... components) {
-		return this.getMeta().equals(meta) && Objects.equals(this.getValue(), value) && Arrays.equals(this.getComponents(), components);
-	}
-
-	// public boolean inheritsFrom(Vertex superMeta, Serializable superValue, Vertex... superComponents) {
-	// return SupersComputingService.inheritsFrom(meta, value, components, superMeta, superValue, superComponents);
-	// }
-
 	private boolean property = false;
 	private boolean[] singulars = new boolean[/* components.length */10];
 
@@ -60,10 +109,6 @@ public class Vertex extends InheritanceServiceImpl implements AncestorsService, 
 
 	boolean[] getSingulars() {
 		return singulars;
-	}
-
-	boolean isAttributeOf(Vertex vertex) {
-		return isEngine() || Arrays.asList(getComponents()).stream().anyMatch(component -> vertex.inheritsFrom(component) || vertex.isInstanceOf(component));
 	}
 
 	protected Iterator<Vertex> compositesMetaIndex(Vertex meta) {
@@ -76,10 +121,6 @@ public class Vertex extends InheritanceServiceImpl implements AncestorsService, 
 
 	public Vertex getInstance(/* Vertex[] supers, */Serializable value, Vertex... components) {
 		return new Vertex(this, value, components).getPlugged(false);
-	}
-
-	public String info() {
-		return " (" + getMeta().getValue() + "){" + this + "}" + getSupersStream().collect(Collectors.toList()) + Arrays.toString(getComponents()) + " ";
 	}
 
 	@Override
