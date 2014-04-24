@@ -1,7 +1,7 @@
 package org.genericsystem.impl.vertex;
 
 import java.util.Iterator;
-import org.genericsystem.impl.vertex.DependenciesService.Dependencies;
+import org.genericsystem.impl.vertex.services.DependenciesService.Dependencies;
 import org.genericsystem.iterator.AbstractGeneralAwareIterator;
 
 public class DependenciesImpl extends Dependencies {

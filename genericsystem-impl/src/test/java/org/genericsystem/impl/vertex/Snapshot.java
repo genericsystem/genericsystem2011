@@ -10,7 +10,7 @@ import org.genericsystem.iterator.AbstractProjectionIterator;
 
 public abstract class Snapshot<T> implements Iterable<T> {
 
-	int size() {
+	public int size() {
 		Iterator<T> iterator = iterator();
 		int size = 0;
 		while (iterator.hasNext()) {
@@ -25,7 +25,7 @@ public abstract class Snapshot<T> implements Iterable<T> {
 		boolean isSelected(T candidate);
 	}
 
-	Snapshot<T> filter(final Filter<T> filter) {
+	public Snapshot<T> filter(final Filter<T> filter) {
 		return new Snapshot<T>() {
 			@Override
 			public Iterator<T> iterator() {
@@ -40,7 +40,7 @@ public abstract class Snapshot<T> implements Iterable<T> {
 	}
 
 	@FunctionalInterface
-	static interface Projector<T, E> {
+	public static interface Projector<T, E> {
 		T project(E element);
 	}
 

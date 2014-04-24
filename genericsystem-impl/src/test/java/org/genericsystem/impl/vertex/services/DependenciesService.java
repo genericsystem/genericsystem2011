@@ -1,6 +1,11 @@
-package org.genericsystem.impl.vertex;
+package org.genericsystem.impl.vertex.services;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import org.genericsystem.impl.vertex.ExistException;
+import org.genericsystem.impl.vertex.NotFoundException;
+import org.genericsystem.impl.vertex.Snapshot;
+import org.genericsystem.impl.vertex.Vertex;
 
 public interface DependenciesService extends AncestorsService, FactoryService {
 
@@ -24,6 +29,14 @@ public interface DependenciesService extends AncestorsService, FactoryService {
 	Dependencies getInheritings();
 
 	Dependencies getComposites();
+
+	default Iterator<Vertex> compositesMetaIndex(Vertex meta) {
+		return getComposites().stream().filter(composite -> composite.getMeta().equals(meta)).iterator();
+	}
+
+	default Iterator<Vertex> compositesSuperIndex(Vertex superVertex) {
+		return getComposites().stream().filter(composite -> composite.getSupersStream().anyMatch(next -> next.equals(superVertex))).iterator();
+	}
 
 	default boolean isPlugged() throws NotFoundException {
 		return this == getPlugged(false);

@@ -1,4 +1,6 @@
-package org.genericsystem.impl.vertex;
+package org.genericsystem.impl.vertex.services;
+
+import org.genericsystem.impl.vertex.Statics;
 
 public interface SystemPropertiesService {
 
@@ -15,11 +17,11 @@ public interface SystemPropertiesService {
 	}
 
 	default boolean isSingularConstraint(int pos) {
-		return isEnabled(SingularConstraint.class);
+		return isEnabled(SingularConstraint.class, pos);
 	};
 
-	default boolean isPropertyConstraint(int pos) {
-		return isEnabled(PropertyConstraint.class, pos);
+	default boolean isPropertyConstraint() {
+		return isEnabled(PropertyConstraint.class);
 	};
 
 	default boolean isEnabled(Class<? extends Constraint> clazz) {
