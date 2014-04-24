@@ -14,7 +14,7 @@ public class AddComponentSuperTest extends AbstractTest {
 
 	public void addComponentOnType() {
 		Vertex vertex = null;
-		vertex.getPlugged(throwNotFoundException)
+		// vertex.getPlugged(throwNotFoundException);
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Type power = cache.addType("power");
