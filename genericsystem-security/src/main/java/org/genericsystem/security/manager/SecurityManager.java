@@ -37,6 +37,10 @@ public class SecurityManager implements Serializable {
 
 	private Generic currentUser;
 
+	public Generic getCurrentUser() {
+		return currentUser;
+	}
+
 	private static final String ADMIN = "Admin";
 
 	@PostConstruct
