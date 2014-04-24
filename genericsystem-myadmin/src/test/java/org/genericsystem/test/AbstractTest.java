@@ -45,6 +45,8 @@ public abstract class AbstractTest extends Arquillian {
 			archive.addPackage("org.apache.deltaspike.core.impl.scope.window");
 			archive.addPackage("org.genericsystem.cdi.event");
 			archive.addPackage("org.apache.deltaspike.core.impl.message");
+			archive.addPackage("org.apache.deltaspike.core.impl.scope.conversation");
+			archive.addPackage("org.apache.deltaspike.core.impl.scope.viewaccess");
 			archive.addPackage(MessageContext.class.getPackage());
 			archive.addPackage(FacesContextProvider.class.getPackage());
 			archive.addAsManifestResource(beanXml.byteArraySet(), ArchivePaths.create("beans.xml"));
