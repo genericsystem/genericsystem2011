@@ -18,8 +18,6 @@ public abstract class AbstractConnectionComponent extends AbstractComponent {
 		return Collections.emptyList();
 	}
 
-	public abstract <T> T getSecurityManager();
-
 	public abstract String connect();
 
 	public abstract String disconnect();

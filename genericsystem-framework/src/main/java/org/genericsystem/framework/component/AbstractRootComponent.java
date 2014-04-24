@@ -27,4 +27,9 @@ public abstract class AbstractRootComponent extends AbstractComponent {
 	public Cache getCache() {
 		return cache;
 	}
+
+	@Override
+	public <T> T getSecurityManager() {
+		return null;
+	}
 }

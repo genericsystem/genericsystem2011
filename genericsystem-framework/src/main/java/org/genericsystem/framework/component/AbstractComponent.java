@@ -129,4 +129,8 @@ public abstract class AbstractComponent {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 		return ctx.getApplication().getExpressionFactory().createValueExpression(ctx.getELContext(), "#{" + attribut + "}", Object.class);
 	}
+
+	public <T> T getSecurityManager() {
+		return getRoot().getSecurityManager();
+	}
 }

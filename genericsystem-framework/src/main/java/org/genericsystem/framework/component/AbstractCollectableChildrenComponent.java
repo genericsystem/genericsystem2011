@@ -20,8 +20,6 @@ public abstract class AbstractCollectableChildrenComponent extends AbstractCompo
 		return getGenerics().filter(new FilterGeneric<Generic>()).project(new ProjectorGeneric<AbstractComponent, Generic>());
 	}
 
-	public abstract <T> T getSecurityManager();
-
 	public abstract <T extends Generic> Snapshot<T> getGenerics();
 
 	public abstract <T extends Generic> boolean isSelected(T candidate);

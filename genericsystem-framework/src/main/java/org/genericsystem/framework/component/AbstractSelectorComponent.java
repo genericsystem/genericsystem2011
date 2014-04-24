@@ -15,19 +15,12 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 
 	protected Generic selected;
 
+	public Generic getSelected() {
+		return selected;
+	}
+
 	public AbstractSelectorComponent(AbstractComponent parent) {
 		super(parent);
-	}
-
-	public final AbstractSelectorComponent getParentSelector() {
-		return this;
-	}
-
-	public abstract void select(Generic selected);
-
-	@SuppressWarnings("unchecked")
-	public <T extends AbstractComponent> T getChild() {
-		return (T) child;
 	}
 
 	public List<? extends AbstractComponent> initChildren() {
@@ -38,8 +31,22 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 		return children;
 	}
 
+	public final AbstractSelectorComponent getParentSelector() {
+		return this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends AbstractComponent> T getChild() {
+		return (T) child;
+	}
+
+	public Generic getTypeSelected() {
+		return ((AbstractSelectorComponent) getParent()).getSelected();
+	}
+
+	public abstract void select(Generic selected, String... value);
+
 	protected abstract AbstractComponent initDisplayer();
 
 	protected abstract AbstractComponent initChooser();
-
 }
