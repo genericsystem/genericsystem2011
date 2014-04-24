@@ -2,7 +2,6 @@ package org.genericsystem.security;
 
 import javax.inject.Inject;
 
-import org.genericsystem.core.Cache;
 import org.genericsystem.exception.RollbackException;
 import org.genericsystem.security.exception.AuthentificationException;
 import org.genericsystem.security.exception.ConnectionException;
@@ -14,9 +13,6 @@ import org.testng.annotations.Test;
 
 @Test
 public class AddUserTest extends AbstractTest {
-
-	@Inject
-	Cache cache;
 
 	@Inject
 	SecurityManager securityManager;

@@ -1,6 +1,8 @@
-package org.genericsystem.impl.vertex;
+package org.genericsystem.impl.vertex.services;
 
 import java.io.Serializable;
+import org.genericsystem.impl.vertex.Statics;
+import org.genericsystem.impl.vertex.Vertex;
 
 public interface BindingService extends AncestorsService, FactoryService {
 

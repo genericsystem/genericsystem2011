@@ -1,8 +1,10 @@
-package org.genericsystem.impl.vertex;
+package org.genericsystem.impl.vertex.services;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
+import org.genericsystem.impl.vertex.Snapshot;
+import org.genericsystem.impl.vertex.Vertex;
 import org.genericsystem.iterator.AbstractConcateIterator;
 import org.genericsystem.iterator.SingletonIterator;
 

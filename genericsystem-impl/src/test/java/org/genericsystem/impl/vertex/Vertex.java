@@ -2,10 +2,16 @@ package org.genericsystem.impl.vertex;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.genericsystem.impl.vertex.Engine.ValueCache;
+import org.genericsystem.impl.vertex.services.AncestorsService;
+import org.genericsystem.impl.vertex.services.BindingService;
+import org.genericsystem.impl.vertex.services.ComponentsInheritanceService;
+import org.genericsystem.impl.vertex.services.DependenciesService;
+import org.genericsystem.impl.vertex.services.FactoryService;
+import org.genericsystem.impl.vertex.services.InheritanceService;
+import org.genericsystem.impl.vertex.services.SystemPropertiesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,23 +35,23 @@ public class Vertex implements AncestorsService, DependenciesService, Inheritanc
 	protected Vertex(Factory factory) {
 		((Engine) this).valueCache = new ValueCache();
 		((Engine) this).factory = factory;
-		this.meta = this;
-		this.value = ((Engine) this).getCachedValue(Statics.ENGINE_VALUE);
-		this.components = Statics.EMPTY_VERTICES;
-		this.instances = getFactory().buildDependency(this);
-		this.inheritings = getFactory().buildDependency(this);
-		this.composites = getFactory().buildDependency(this);
-		this.supers = Statics.EMPTY_VERTICES;
+		meta = this;
+		value = ((Engine) this).getCachedValue(Statics.ENGINE_VALUE);
+		components = Statics.EMPTY_VERTICES;
+		instances = getFactory().buildDependency(this);
+		inheritings = getFactory().buildDependency(this);
+		composites = getFactory().buildDependency(this);
+		supers = Statics.EMPTY_VERTICES;
 	}
 
 	protected Vertex(Vertex meta, Vertex[] overrides, Serializable value, Vertex[] components) {
 		this.meta = isEngine() ? (Vertex) this : meta;
 		this.value = getEngine().getCachedValue(value);
 		this.components = components;
-		this.instances = getFactory().buildDependency(this);
-		this.inheritings = getFactory().buildDependency(this);
-		this.composites = getFactory().buildDependency(this);
-		this.supers = getSupers(overrides);
+		instances = getFactory().buildDependency(this);
+		inheritings = getFactory().buildDependency(this);
+		composites = getFactory().buildDependency(this);
+		supers = getSupers(overrides);
 		checkOverrides(overrides);
 		checkSupers();
 	}
@@ -98,25 +104,6 @@ public class Vertex implements AncestorsService, DependenciesService, Inheritanc
 			return false;
 		Vertex vertex = (Vertex) o;
 		return equals(vertex.getMeta(), vertex.getValue(), vertex.getComponents());
-	}
-
-	private boolean property = false;
-	private boolean[] singulars = new boolean[/* components.length */10];
-
-	boolean isProperty() {
-		return property;
-	}
-
-	boolean[] getSingulars() {
-		return singulars;
-	}
-
-	protected Iterator<Vertex> compositesMetaIndex(Vertex meta) {
-		return getComposites().stream().filter(composite -> composite.getMeta().equals(meta)).iterator();
-	}
-
-	protected Iterator<Vertex> compositesSuperIndex(Vertex superVertex) {
-		return getComposites().stream().filter(composite -> composite.getSupersStream().anyMatch(next -> next.equals(superVertex))).iterator();
 	}
 
 	public Vertex getInstance(/* Vertex[] supers, */Serializable value, Vertex... components) {

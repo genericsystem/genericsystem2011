@@ -1,4 +1,4 @@
-package org.genericsystem.impl.vertex;
+package org.genericsystem.impl.vertex.services;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import org.genericsystem.impl.vertex.Vertex;
 
 public interface InheritanceService extends AncestorsService {
 
@@ -24,7 +24,7 @@ public interface InheritanceService extends AncestorsService {
 			return false;
 		if (!componentsDepends(subMeta, subComponents, superComponents))
 			return false;
-		return subMeta.isProperty() || Objects.equals(subValue, superValue);
+		return subMeta.isPropertyConstraint() || Objects.equals(subValue, superValue);
 	}
 
 	static boolean componentsDepends(Vertex subMeta, Vertex[] subComponents, Vertex[] superComponents) {
@@ -117,8 +117,8 @@ public interface InheritanceService extends AncestorsService {
 	}
 
 	default void checkOverrides(Vertex[] overrides) {
-		assert Arrays.asList(overrides).stream().allMatch(override -> getSupersStream().anyMatch(superVertex -> superVertex.inheritsFrom(override))) : "Inconsistant overrides : " + Arrays.toString(overrides)
-				+ getSupersStream().collect(Collectors.toList());
+		// assert Arrays.asList(overrides).stream().allMatch(override -> getSupersStream().anyMatch(superVertex -> superVertex.inheritsFrom(override))) : "Inconsistant overrides : " + Arrays.toString(overrides)
+		// + getSupersStream().collect(Collectors.toList());
 	}
 
 	default void checkSupers() {

@@ -1,9 +1,11 @@
-package org.genericsystem.impl.vertex;
+package org.genericsystem.impl.vertex.services;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.genericsystem.impl.vertex.Engine;
+import org.genericsystem.impl.vertex.Vertex;
 
 public interface AncestorsService {
 

@@ -6,12 +6,15 @@ import org.genericsystem.core.GenericSystem;
 import org.genericsystem.generic.Attribute;
 import org.genericsystem.generic.Relation;
 import org.genericsystem.generic.Type;
+import org.genericsystem.impl.vertex.Vertex;
 import org.testng.annotations.Test;
 
 @Test
 public class AddComponentSuperTest extends AbstractTest {
 
 	public void addComponentOnType() {
+		Vertex vertex = null;
+		// vertex.getPlugged(throwNotFoundException);
 		Cache cache = GenericSystem.newCacheOnANewInMemoryEngine().start();
 		Type vehicle = cache.addType("Vehicle");
 		Type power = cache.addType("power");
