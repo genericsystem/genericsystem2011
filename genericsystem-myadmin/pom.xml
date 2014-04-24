@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>genericsystem2011</artifactId>
 		<groupId>org.genericsystem</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>genericsystem-myadmin</artifactId>
@@ -15,17 +15,17 @@
 		<dependency>
 			<groupId>org.genericsystem</groupId>
 			<artifactId>genericsystem-jsf-resolver</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.genericsystem</groupId>
 			<artifactId>genericsystem-framework</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.genericsystem</groupId>
 			<artifactId>genericsystem-example</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>2.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
