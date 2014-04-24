@@ -43,13 +43,15 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
 	public SecurityManager getSecurityManager() {
 		return securityManager;
 	}
 
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
-		return Arrays.asList(new ConnectionComponent(this), new SelectorTypeComponent(this));
+		return Arrays.asList(new ConnectionComponent(this), new SecurityComponent(this));
 	}
 
 	@Override

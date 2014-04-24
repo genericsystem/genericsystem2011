@@ -3,6 +3,7 @@ package org.genericsystem.tracker.component;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlForm;
+import javax.faces.component.html.HtmlInputSecret;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
 
@@ -25,12 +26,14 @@ public class ConnectionComponent extends AbstractConnectionComponent {
 	@Override
 	public String connect() {
 		((SecurityManager) getSecurityManager()).connect(getLogin(), getPassword());
+		getRoot().reInitChildren();
 		return "index.xhtml";
 	}
 
 	@Override
 	public String disconnect() {
 		((SecurityManager) getSecurityManager()).disconnect();
+		getRoot().reInitChildren();
 		return "index.xhtml";
 	}
 
@@ -48,7 +51,7 @@ public class ConnectionComponent extends AbstractConnectionComponent {
 			HtmlOutputText outputPassword = new HtmlOutputText();
 			outputPassword.setValue("Password");
 
-			HtmlInputText inputPassword = new HtmlInputText();
+			HtmlInputSecret inputPassword = new HtmlInputSecret();
 			inputPassword.setValueExpression("value", getValueExpression("password"));
 
 			HtmlCommandButton buttonSubmit = new HtmlCommandButton();

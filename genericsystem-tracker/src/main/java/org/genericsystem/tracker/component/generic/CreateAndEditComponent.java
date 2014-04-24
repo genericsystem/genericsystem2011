@@ -82,11 +82,6 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 	}
 
 	@Override
-	public <T> T getSecurityManager() {
-		return null;
-	}
-
-	@Override
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		HtmlForm form = new HtmlForm();
 

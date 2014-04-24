@@ -26,13 +26,12 @@ public class RowComponent extends AbstractGenericComponent {
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
 		if (generic.getComponents().isEmpty()) {
-			Generic selectedType = ((SelectorInstanceComponent) getParentSelector()).getGeneric();
+			Generic selectedType = ((SelectorInstanceComponent) getParentSelector()).getTypeSelected();
 			return Arrays.asList(new OutputTextComponent(this, selectedType), new InputTextComponent(this, generic.isStructural() ? null : generic));
 		}
 		OutputTextComponent outputTextComponent = new OutputTextComponent(this, getGeneric());
 		if (getGeneric().isRelation())
 			outputTextComponent.setNewValue(Objects.toString(getParentSelector().<AbstractGenericCollectableChildrenComponent> getChild().getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0)));
-		// Snapshot<Holder> holders = type.getHolders((Holder) getGeneric());
 		Generic type = ((AbstractGenericCollectableChildrenComponent) getParentSelector().getChild()).getGeneric();
 		SelectOneMenuComponent selectOneMenuComponent = null;
 		if (getGeneric().isRelation()) {

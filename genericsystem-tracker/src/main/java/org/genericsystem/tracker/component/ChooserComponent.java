@@ -22,12 +22,6 @@ public class ChooserComponent extends AbstractChooserComponent {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getSecurityManager() {
-		return (T) this.<RootComponent> getRoot().getSecurityManager();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
 	public <T extends Generic> Snapshot<T> getGenerics() {
 		return (Snapshot<T>) getCache().getAllTypes();
 	}

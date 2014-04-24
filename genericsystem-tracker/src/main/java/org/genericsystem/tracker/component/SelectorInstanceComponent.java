@@ -8,25 +8,14 @@ import org.genericsystem.tracker.component.generic.TypeComponent;
 
 public class SelectorInstanceComponent extends AbstractSelectorComponent {
 
-	private Generic generic;
-
-	public SelectorInstanceComponent(AbstractComponent parent, Generic generic) {
+	public SelectorInstanceComponent(AbstractComponent parent) {
 		super(parent);
-		this.generic = generic;
-	}
-
-	public Generic getGeneric() {
-		return generic;
 	}
 
 	@Override
-	public void select(Generic selected) {
+	public void select(Generic selected, String... value) {
 		this.selected = selected;
 		reInitChildren();
-	}
-
-	public Generic getSelected() {
-		return selected;
 	}
 
 	@Override
@@ -37,8 +26,6 @@ public class SelectorInstanceComponent extends AbstractSelectorComponent {
 
 	@Override
 	protected AbstractComponent initChooser() {
-		// return new ChooserCreateEditComponent(this, generic);
-		return new TypeComponent(this, generic);
+		return new TypeComponent(this, getTypeSelected());
 	}
-
 }

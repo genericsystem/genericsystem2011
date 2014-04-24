@@ -78,46 +78,9 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 		return "index.xhtml";
 	}
 
-	public String getEditMsg() {
-		return "Edit instance";
-	}
-
-	public String getCreateMsg() {
-		return "+";
-	}
-
-	public String getAddMsg() {
-		return "Set instance";
-	}
-
-	public String getRemoveMsg() {
-		return "Remove instance";
-	}
-
-	@Override
-	public String getNewValue() {
-		return newValue;
-	}
-
-	public void setNewValue(String newValue) {
-		this.newValue = newValue;
-	}
-
-	public String getColumnTitleAttribute() {
-		if (!getGeneric().isRelation())
-			return Objects.toString(getGeneric());
-		else
-			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
-	}
-
 	@Override
 	public String toString() {
 		return getGeneric().toString();
-	}
-
-	@Override
-	public <T> T getSecurityManager() {
-		return null;
 	}
 
 	protected UIComponent buildJsfContainer(UIComponent father) {
@@ -179,5 +142,37 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 		panel.getChildren().add(button);
 		form.getChildren().add(panel);
 		dataTable.setHeader(form);
+	}
+
+	public String getColumnTitleAttribute() {
+		if (!getGeneric().isRelation())
+			return Objects.toString(getGeneric());
+		else
+			return Objects.toString(((GenericComponent) this.getParent()).getGeneric().<Type> getOtherTargets((Attribute) getGeneric()).get(0).<Class<?>> getValue().getSimpleName());
+	}
+
+	public String getEditMsg() {
+		return "Edit instance";
+	}
+
+	public String getCreateMsg() {
+		return "+";
+	}
+
+	public String getAddMsg() {
+		return "Set instance";
+	}
+
+	public String getRemoveMsg() {
+		return "Remove instance";
+	}
+
+	@Override
+	public String getNewValue() {
+		return newValue;
+	}
+
+	public void setNewValue(String newValue) {
+		this.newValue = newValue;
 	}
 }
