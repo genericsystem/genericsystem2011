@@ -26,9 +26,8 @@ public abstract class AbstractTest extends Arquillian {
 	public static JavaArchive createDeployment() {
 		JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
 		javaArchive.addClasses(CacheProvider.class, SerializableCache.class, MockCdiFactory.class, GenericProvider.class, EngineProvider.class, UserClassesProvider.class, PersistentDirectoryProvider.class, CdiFactory.class, EventLauncher.class);
-		javaArchive.addPackage("org.apache.deltaspike.core.impl.scope.window");
-		createBeansXml(javaArchive);
 		javaArchive.addAsServiceProvider(Extension.class, CDIExtension.class);
+		createBeansXml(javaArchive);
 		return javaArchive;
 	}
 

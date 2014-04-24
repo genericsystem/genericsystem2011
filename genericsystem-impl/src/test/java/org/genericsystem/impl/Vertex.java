@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.genericsystem.iterator.AbstractConcateIterator;
 import org.genericsystem.iterator.SingletonIterator;
 import org.slf4j.Logger;
@@ -249,7 +250,7 @@ public class Vertex {
 	public Vertex setInstance(Vertex[] overrides, Serializable value, Vertex... components) {
 		Vertex result = new Vertex(this, overrides, value, components).plug(false);
 		assert Arrays.asList(overrides).stream().allMatch(override -> Arrays.asList(result.supers).stream().anyMatch(superVertex -> superVertex.inheritsFrom(override))) : "Result : " + result.info() + " don't satisfy overrides : "
-		+ Arrays.toString(overrides);
+				+ Arrays.toString(overrides);
 		return result;
 	}
 
@@ -535,19 +536,19 @@ public class Vertex {
 			Iterator<Vertex> supersIterator = base.supersIterator(origin);
 			if (!supersIterator.hasNext())
 				return (base.isEngine() || !origin.isAttributeOf(base.meta)) ? new SingletonIterator<Vertex>(origin) : new Inheritings(base.meta, origin, level).inheritanceIterator();
-				return new AbstractConcateIterator<Vertex, Vertex>(supersIterator) {
-					@Override
-					protected Iterator<Vertex> getIterator(final Vertex superVertex) {
-						return new Inheritings(superVertex, origin, level).inheritanceIterator();
-					}
-				};
+			return new AbstractConcateIterator<Vertex, Vertex>(supersIterator) {
+				@Override
+				protected Iterator<Vertex> getIterator(final Vertex superVertex) {
+					return new Inheritings(superVertex, origin, level).inheritanceIterator();
+				}
+			};
 		}
 
 		private Iterator<Vertex> projectIterator(Iterator<Vertex> iteratorToProject) {
 			return new AbstractConcateIterator<Vertex, Vertex>(iteratorToProject) {
 				@Override
 				protected Iterator<Vertex> getIterator(final Vertex holder) {
-					Iterator<Vertex> indexIterator = holder.getLevel() < level ? new ConcateIterator<>(base.compositesMetaIndex(holder), base.compositesSuperIndex(holder)) : compositesSuperIndex(holder);
+					Iterator<Vertex> indexIterator = holder.getLevel() < level ? new ConcateIterator<>(base.compositesMetaIndex(holder), base.compositesSuperIndex(holder)) : base.compositesSuperIndex(holder);
 					if (!Vertex.this.equals(base)) {
 						return indexIterator.hasNext() ? new ConcateIterator<Vertex>(new SingletonIterator<Vertex>(holder), projectIterator(indexIterator)) : new SingletonIterator<Vertex>(holder);
 					} else {

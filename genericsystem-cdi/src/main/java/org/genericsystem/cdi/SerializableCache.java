@@ -13,7 +13,6 @@ import javax.enterprise.inject.Vetoed;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 
-import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.genericsystem.core.AbstractContext;
 import org.genericsystem.core.AbstractWriter;
 import org.genericsystem.core.AbstractWriter.AbstractLoader;
@@ -87,7 +86,7 @@ public class SerializableCache extends CacheImpl implements Externalizable {
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		Engine engine = BeanProvider.getContextualReference(Engine.class);// TODO BeanManagerUtils.getContextualInstance(beanManager, Engine.class);
+		Engine engine = StartupBean.getBean(Engine.class, getBeanManager());
 		Cache currentCache = engine.getCurrentCache();
 		try {
 			subContext = in.readBoolean() ? (AbstractContext) in.readObject() : new Transaction(in.readLong(), engine);

@@ -18,7 +18,6 @@ public class SerializationTest extends AbstractTest {
 
 	public void testAdds() {
 		cache.start();
-		cache.clear();
 		Type vehicle = cache.addType("Vehicle");
 		Cache clone = deSerialize(serialize(cache)).start();
 		assert clone.getGeneric("Vehicle", cache.getEngine()) != vehicle;

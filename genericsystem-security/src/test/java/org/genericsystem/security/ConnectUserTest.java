@@ -2,16 +2,12 @@ package org.genericsystem.security;
 
 import javax.inject.Inject;
 
-import org.genericsystem.core.Cache;
 import org.genericsystem.security.exception.AuthentificationException;
 import org.genericsystem.security.manager.SecurityManager;
 import org.testng.annotations.Test;
 
 @Test
 public class ConnectUserTest extends AbstractTest {
-
-	@Inject
-	Cache cache;
 
 	@Inject
 	SecurityManager securityManager;
