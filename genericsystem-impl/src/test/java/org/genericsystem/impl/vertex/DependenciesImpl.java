@@ -10,18 +10,7 @@ public class DependenciesImpl extends Dependencies {
 	private Node tail = null;
 
 	@Override
-	public Vertex bind(Vertex vertex, boolean throwExistException) throws ExistException {
-		Vertex result = get(vertex);
-		if (result == null) {
-			add(vertex);
-			return vertex;
-		}
-		if (throwExistException)
-			throw new ExistException(vertex);
-		return result;
-	}
-
-	private void add(Vertex element) {
+	protected void add(Vertex element) {
 		assert !this.contains(element);
 		assert element != null;
 		Node newNode = new Node(element);
@@ -33,7 +22,7 @@ public class DependenciesImpl extends Dependencies {
 	}
 
 	@Override
-	public boolean remove(Vertex element) {
+	protected boolean remove(Vertex element) {
 		Iterator<Vertex> iterator = iterator();
 		while (iterator.hasNext())
 			if (element.equals(iterator.next())) {

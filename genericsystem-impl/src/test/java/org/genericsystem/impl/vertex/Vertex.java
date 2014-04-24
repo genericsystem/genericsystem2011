@@ -106,10 +106,6 @@ public class Vertex implements AncestorsService, DependenciesService, Inheritanc
 		return equals(vertex.getMeta(), vertex.getValue(), vertex.getComponents());
 	}
 
-	public Vertex getInstance(/* Vertex[] supers, */Serializable value, Vertex... components) {
-		return new Vertex(this, value, components).getPlugged(false);
-	}
-
 	@Override
 	public String toString() {
 		return Objects.toString(getValue());

@@ -1,7 +1,6 @@
 package org.genericsystem.impl.vertex.services;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import org.genericsystem.impl.vertex.ExistException;
 import org.genericsystem.impl.vertex.NotFoundException;
 import org.genericsystem.impl.vertex.Snapshot;
@@ -11,17 +10,18 @@ public interface DependenciesService extends AncestorsService, FactoryService {
 
 	public abstract static class Dependencies extends Snapshot<Vertex> {
 
-		public Vertex remove(Vertex vertex, boolean throwNotFoundException) {
-			boolean result = remove(vertex);
-			if (!result && throwNotFoundException)
-				throw new NotFoundException(vertex);
-			return vertex;
-		};
+		abstract protected boolean remove(Vertex vertex);
 
-		public abstract boolean remove(Vertex vertex);
+		abstract protected void add(Vertex vertex);
 
-		public abstract Vertex bind(Vertex vertex, boolean throwExistException) throws ExistException;
-
+		public Vertex set(Vertex vertex) {
+			Vertex result = get(vertex);
+			if (result == null) {
+				add(vertex);
+				return vertex;
+			}
+			return result;
+		}
 	}
 
 	Dependencies getInstances();
@@ -30,36 +30,40 @@ public interface DependenciesService extends AncestorsService, FactoryService {
 
 	Dependencies getComposites();
 
-	default Iterator<Vertex> compositesMetaIndex(Vertex meta) {
-		return getComposites().stream().filter(composite -> composite.getMeta().equals(meta)).iterator();
+	default Snapshot<Vertex> getMetaComposites(Vertex meta) {
+		return getComposites().filter(composite -> composite.getMeta().equals(meta));
 	}
 
-	default Iterator<Vertex> compositesSuperIndex(Vertex superVertex) {
-		return getComposites().stream().filter(composite -> composite.getSupersStream().anyMatch(next -> next.equals(superVertex))).iterator();
+	default Snapshot<Vertex> getSuperComposites(Vertex superVertex) {
+		return getComposites().filter(composite -> composite.getSupersStream().anyMatch(next -> next.equals(superVertex)));
 	}
 
 	default boolean isPlugged() throws NotFoundException {
-		return this == getPlugged(false);
+		return this == getPlugged();
 	}
 
-	default Vertex getPlugged(boolean throwNotFoundException) throws NotFoundException {
-		Vertex result = getMeta().getInstances().get((Vertex) this);
-		if (result == null)
-			if (throwNotFoundException)
-				throw new NotFoundException((Vertex) this);
+	default Vertex getPlugged() {
+		return getMeta().getInstances().get((Vertex) this);
+	}
+
+	default Vertex plug(boolean throwsExistException) {
+		Vertex vertex = getMeta().getInstances().set((Vertex) this);
+		if (this != vertex) {
+			if (throwsExistException)
+				throw new ExistException(vertex);
+			return vertex;
+		}
+		getSupersStream().forEach(superGeneric -> superGeneric.getInheritings().set((Vertex) this));
+		Arrays.asList(getComponents()).forEach(component -> component.getComposites().set((Vertex) this));
+		return vertex;
+	}
+
+	default boolean unplug() throws NotFoundException {
+		boolean result = getMeta().getInstances().remove((Vertex) this);
+		if (!result)
+			throw new NotFoundException((Vertex) this);
+		getSupersStream().forEach(superGeneric -> superGeneric.getInheritings().remove((Vertex) this));
+		Arrays.asList(getComponents()).forEach(component -> component.getComposites().remove((Vertex) this));
 		return result;
 	}
-
-	default Vertex plug(boolean throwExistException) {
-		getSupersStream().forEach(superGeneric -> superGeneric.getInheritings().bind((Vertex) this, throwExistException));
-		Arrays.asList(getComponents()).forEach(component -> component.getComposites().bind((Vertex) this, throwExistException));
-		return getMeta().getInstances().bind((Vertex) this, throwExistException);
-	}
-
-	default Vertex unplug(boolean throwNotFoundException) throws NotFoundException {
-		getSupersStream().forEach(superGeneric -> superGeneric.getInheritings().remove((Vertex) this, throwNotFoundException));
-		Arrays.asList(getComponents()).forEach(component -> component.getComposites().remove((Vertex) this, throwNotFoundException));
-		return getMeta().getInstances().remove((Vertex) this, throwNotFoundException);
-	}
-
 }

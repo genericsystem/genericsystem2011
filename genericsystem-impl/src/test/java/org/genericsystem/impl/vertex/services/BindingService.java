@@ -11,7 +11,7 @@ public interface BindingService extends AncestorsService, FactoryService {
 	}
 
 	default Vertex addInstance(Vertex[] overrides, Serializable value, Vertex... components) {
-		return bind(true, (Vertex) BindingService.this, overrides, value, components);
+		return getFactory().buildVertex((Vertex) this, overrides, value, components).plug(true);
 	}
 
 	default Vertex setInstance(Serializable value, Vertex... components) {
@@ -19,13 +19,10 @@ public interface BindingService extends AncestorsService, FactoryService {
 	}
 
 	default Vertex setInstance(Vertex[] overrides, Serializable value, Vertex... components) {
-		return bind(false, (Vertex) BindingService.this, overrides, value, components);
+		return getFactory().buildVertex((Vertex) this, overrides, value, components).plug(false);
 	}
 
-	default Vertex bind(boolean throwExistsException, Vertex meta, Vertex[] overrides, Serializable value, Vertex... components) {
-		Vertex result = getFactory().buildVertex(meta, overrides, value, components).plug(throwExistsException);
-		// generate dirty bytecode with eclipse
-		// assert Arrays.asList(overrides).stream().allMatch(overVertex -> result.getSupersStream().anyMatch(superVertex -> superVertex.inheritsFrom(overVertex))) : "Result : " + result.info() + " don't satisfy overrides : " + Arrays.toString(overrides);
-		return result;
+	default Vertex getInstance(/* Vertex[] supers, */Serializable value, Vertex... components) {
+		return getFactory().buildVertex((Vertex) this, Statics.EMPTY_VERTICES, value, components).getPlugged();
 	}
 }

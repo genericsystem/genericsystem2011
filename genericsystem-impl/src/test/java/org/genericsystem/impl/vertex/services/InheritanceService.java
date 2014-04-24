@@ -117,11 +117,13 @@ public interface InheritanceService extends AncestorsService {
 	}
 
 	default void checkOverrides(Vertex[] overrides) {
+		// generate dirty bytecode with eclipse
 		// assert Arrays.asList(overrides).stream().allMatch(override -> getSupersStream().anyMatch(superVertex -> superVertex.inheritsFrom(override))) : "Inconsistant overrides : " + Arrays.toString(overrides)
 		// + getSupersStream().collect(Collectors.toList());
 	}
 
 	default void checkSupers() {
+		// generate dirty bytecode with eclipse
 		// assert InheritanceService.componentsDepends(getMeta(), getComponents(), getMeta().getComponents()) : "Inconsistant components : " + Arrays.toString(getComponents());
 		// assert getSupersStream().allMatch(superVertex -> getMeta().inheritsFrom(superVertex.getMeta())) : "Inconsistant supers : " + getSupersStream().collect(Collectors.toList());
 		// assert getSupersStream().filter(superVertex -> superVertex.inheritsFrom(getMeta())).count() <= 1 : "Inconsistant supers : " + getSupersStream().collect(Collectors.toList());
