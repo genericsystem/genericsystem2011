@@ -23,7 +23,7 @@ public class ChooserApplicationComponent extends AbstractComponent {
 
 	public String select(String value) {
 		getParentSelector().select(((SecurityManager) getSecurityManager()).getCurrentUser(), value);
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	@Override
@@ -46,5 +46,15 @@ public class ChooserApplicationComponent extends AbstractComponent {
 	@Override
 	public <T> T getSecurityManager() {
 		return (T) this.<RootComponent> getRoot().getSecurityManager();
+	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
 	}
 }

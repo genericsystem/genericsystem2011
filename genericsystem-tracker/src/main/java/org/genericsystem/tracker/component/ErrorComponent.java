@@ -28,4 +28,15 @@ public class ErrorComponent extends AbstractComponent {
 		ctx.getViewRoot().getChildren().add(outputText);
 		return outputText;
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
+
 }

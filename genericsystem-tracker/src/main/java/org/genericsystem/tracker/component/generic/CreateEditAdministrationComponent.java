@@ -74,7 +74,7 @@ public class CreateEditAdministrationComponent extends AbstractGenericCollectabl
 			}
 		}
 		getParentSelector().child = null;
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	public String getTitle() {

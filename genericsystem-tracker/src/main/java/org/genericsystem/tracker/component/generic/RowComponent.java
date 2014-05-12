@@ -49,4 +49,14 @@ public class RowComponent extends AbstractGenericComponent {
 	protected UIComponent buildJsfContainer(UIComponent father) {
 		return father;
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
 }

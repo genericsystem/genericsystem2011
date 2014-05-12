@@ -37,4 +37,14 @@ public class SelectorApplicationComponent extends AbstractSelectorComponent {
 		if (APPLI.equals(selected))
 			child = new SelectorTypeComponent(this);
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
 }

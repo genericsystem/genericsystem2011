@@ -12,6 +12,7 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 
 	@Override
 	public void select(Generic selected, String... value) {
+		setDirty(true);
 		this.selected = selected;
 		reInitChildren();
 	}
@@ -26,4 +27,5 @@ public class SelectorTypeComponent extends AbstractSelectorComponent {
 	protected AbstractComponent initChooser() {
 		return new ChooserComponent(this);
 	}
+
 }

@@ -65,17 +65,17 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 
 	public String setEdit(InstanceRow instanceRow) {
 		getParentSelector().select(instanceRow.getInstance());
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	public String setCreate() {
 		getParentSelector().select(generic);
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	public String remove(InstanceRow instanceRow) {
 		instanceRow.getInstance().remove();
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	@Override
@@ -132,6 +132,7 @@ public class TypeComponent extends AbstractGenericCollectableChildrenComponent i
 
 	private void createHeader(HtmlDataTable dataTable) {
 		HtmlForm form = new HtmlForm();
+		form.setId("formulaireCreateEdit");
 		HtmlPanelGroup panel = new HtmlPanelGroup();
 		HtmlCommandButton button = new HtmlCommandButton();
 		button.setValue(getCreateMsg());

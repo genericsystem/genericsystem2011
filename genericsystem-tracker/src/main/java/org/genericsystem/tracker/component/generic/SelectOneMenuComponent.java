@@ -29,4 +29,14 @@ public class SelectOneMenuComponent extends AbstractValuedGenericComponent imple
 		selectOneMenu.setValueExpression("value", getValueExpression("newValue"));
 		return selectOneMenu;
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
 }

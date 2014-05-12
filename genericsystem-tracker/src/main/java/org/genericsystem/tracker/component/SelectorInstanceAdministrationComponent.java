@@ -28,4 +28,14 @@ public class SelectorInstanceAdministrationComponent extends AbstractSelectorCom
 	protected AbstractComponent initChooser() {
 		return new TypeAdministrationComponent(this, getTypeSelected());
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
 }

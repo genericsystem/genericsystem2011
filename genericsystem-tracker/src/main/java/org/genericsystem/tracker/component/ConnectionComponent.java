@@ -24,17 +24,41 @@ public class ConnectionComponent extends AbstractConnectionComponent {
 	}
 
 	@Override
+	public CashManagementComponent getCashManagement() {
+		return this.<RootComponent> getRoot().getCashManagement();
+	}
+
+	@Override
 	public String connect() {
 		((SecurityManager) getSecurityManager()).connect(getLogin(), getPassword());
 		getRoot().reInitChildren();
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	@Override
 	public String disconnect() {
 		((SecurityManager) getSecurityManager()).disconnect();
 		getRoot().reInitChildren();
-		return "index.xhtml";
+		return INDEX_XHTML;
+	}
+
+	public String save() {
+		getCashManagement().flushCurrentCache();
+		return INDEX_XHTML;
+	}
+
+	public String mountCache() {
+		getCashManagement().mountNewCache();
+		return INDEX_XHTML;
+	}
+
+	public String discardCache() {
+		getCashManagement().discardCurrentCache();
+		return INDEX_XHTML;
+	}
+
+	public String getCacheLevel() {
+		return " Level : " + getCashManagement().getLevelCasheProvider().toString();
 	}
 
 	@Override
@@ -63,12 +87,45 @@ public class ConnectionComponent extends AbstractConnectionComponent {
 			formAuthentification.getChildren().add(outputPassword);
 			formAuthentification.getChildren().add(inputPassword);
 			formAuthentification.getChildren().add(buttonSubmit);
+
 			return formAuthentification;
 		}
+
 		HtmlCommandButton buttonDisconnect = new HtmlCommandButton();
 		buttonDisconnect.setValue("disconnect");
 		buttonDisconnect.setActionExpression(getMethodExpression("disconnect"));
+
+		HtmlCommandButton buttonSave = new HtmlCommandButton();
+		buttonSave.setValue("save");
+		buttonSave.setActionExpression(getMethodExpression("save"));
+
+		HtmlCommandButton buttonMountCache = new HtmlCommandButton();
+		buttonMountCache.setValue("mount cache");
+		buttonMountCache.setActionExpression(getMethodExpression("mountCache"));
+
+		HtmlCommandButton buttonDiscardCache = new HtmlCommandButton();
+		buttonDiscardCache.setValue("discard cache");
+		buttonDiscardCache.setActionExpression(getMethodExpression("discardCache"));
+
+		HtmlOutputText cacheLevel = new HtmlOutputText();
+		cacheLevel.setValueExpression("value", getValueExpression("getCacheLevel()"));
+
 		formAuthentification.getChildren().add(buttonDisconnect);
+		formAuthentification.getChildren().add(buttonSave);
+		formAuthentification.getChildren().add(buttonMountCache);
+		formAuthentification.getChildren().add(buttonDiscardCache);
+		formAuthentification.getChildren().add(cacheLevel);
+
 		return formAuthentification;
+	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
 	}
 }

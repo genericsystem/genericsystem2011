@@ -69,8 +69,8 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 					getGeneric().setValue((Attribute) attribute, (((InputTextComponent) component).getNewValue()).toString());
 			}
 		}
-		getParentSelector().child = null;
-		return "index.xhtml";
+		getParentSelector().reInitChildren();
+		return INDEX_XHTML;
 	}
 
 	public String getTitle() {
@@ -86,13 +86,11 @@ public class CreateAndEditComponent extends AbstractGenericCollectableChildrenCo
 		HtmlForm form = new HtmlForm();
 
 		HtmlPanelGrid panelGrid = new HtmlPanelGrid();
-		if (getParentSelector().child != null) {
-			panelGrid.setColumns(2);
-			panelGrid.setStyleClass("order-table");
-			panelGrid.setHeaderClass("order-table-header");
-			panelGrid.setRowClasses("order-table-odd-row,order-table-even-row");
-			form.getChildren().add(panelGrid);
-		}
+		panelGrid.setColumns(2);
+		panelGrid.setStyleClass("order-table");
+		panelGrid.setHeaderClass("order-table-header");
+		panelGrid.setRowClasses("order-table-odd-row,order-table-even-row");
+		form.getChildren().add(panelGrid);
 		return form;
 	}
 

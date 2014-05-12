@@ -27,7 +27,7 @@ public class CommandButtonComponent extends AbstractGenericComponent implements 
 
 	public String select() {
 		getParentSelector().select(getGeneric());
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	@Override
@@ -38,5 +38,15 @@ public class CommandButtonComponent extends AbstractGenericComponent implements 
 		commandButton.setActionExpression(getMethodExpression("select"));
 		form1.getChildren().add(commandButton);
 		return form1;
+	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
 	}
 }
