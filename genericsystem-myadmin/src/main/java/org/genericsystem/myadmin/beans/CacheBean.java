@@ -35,11 +35,6 @@ public class CacheBean implements Serializable {
 	@Inject
 	private transient CacheProvider cacheProvider;
 
-	/**
-	 * Creates new super cache.
-	 * 
-	 * @return string "HOME".
-	 */
 	public String mountNewCache() {
 		cacheProvider.mountNewCache();
 
@@ -48,11 +43,6 @@ public class CacheBean implements Serializable {
 		return "HOME";
 	}
 
-	/**
-	 * Flush current cache into it's sub cache.
-	 * 
-	 * @return string "HOME".
-	 */
 	public String flushCurrentCache() {
 		cacheProvider.flushCurrentCache();
 
@@ -61,11 +51,6 @@ public class CacheBean implements Serializable {
 		return "HOME";
 	}
 
-	/**
-	 * Discards all changes in the current cache and returns to it's sub cache.
-	 * 
-	 * @return string "HOME".
-	 */
 	public String discardCurrentCache() {
 		cacheProvider.discardCurrentCache();
 
@@ -74,11 +59,6 @@ public class CacheBean implements Serializable {
 		return "HOME";
 	}
 
-	/**
-	 * Returns the formated timestamp of current cache (transaction).
-	 * 
-	 * @return the formated timestamp of current cache.
-	 */
 	public String getCurrentCacheTs() {
 		return new SimpleDateFormat(Statics.LOG_PATTERN).format(new Date(((CacheImpl) cacheProvider.getCurrentCache()).getTs() / Statics.MILLI_TO_NANOSECONDS)).toString();
 	}
@@ -91,13 +71,6 @@ public class CacheBean implements Serializable {
 		cacheProvider.setCurrentCache(cache);
 	}
 
-	/**
-	 * Reset the timestamp of current transaction before the phase of RENDER_RESPONSE.
-	 * 
-	 * @param phaseEvent
-	 *            - event of JSF phase.
-	 * @throws ConstraintViolationException
-	 */
 	public void resetTransactionTs(@Observes @AfterPhase(JsfPhaseId.INVOKE_APPLICATION) PhaseEvent phaseEvent) throws ConstraintViolationException {
 		((CacheImpl) cacheProvider.getCurrentCache()).refresh();
 	}
