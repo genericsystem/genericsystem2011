@@ -15,6 +15,8 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 
 	protected Generic selected;
 
+	private boolean isDirty = false;
+
 	public Generic getSelected() {
 		return selected;
 	}
@@ -49,4 +51,15 @@ public abstract class AbstractSelectorComponent extends AbstractComponent {
 	protected abstract AbstractComponent initDisplayer();
 
 	protected abstract AbstractComponent initChooser();
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
+
 }

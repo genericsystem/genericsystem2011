@@ -1,5 +1,7 @@
 package org.genericsystem.framework.component;
 
+import java.util.ArrayList;
+
 import javax.faces.component.UIViewRoot;
 import javax.inject.Inject;
 
@@ -20,7 +22,7 @@ public abstract class AbstractRootComponent extends AbstractComponent {
 	}
 
 	protected void buildJsf(UIViewRoot root) {
-		root.getChildren().add(buildJsfChildren(root));
+		root.getChildren().add(buildJsfChildren(root, new ArrayList<String>()));
 	}
 
 	@Override
@@ -32,4 +34,10 @@ public abstract class AbstractRootComponent extends AbstractComponent {
 	public <T> T getSecurityManager() {
 		return null;
 	}
+
+	@Override
+	public AbstractCacheManagementComponent getCashManagement() {
+		return null;
+	}
+
 }

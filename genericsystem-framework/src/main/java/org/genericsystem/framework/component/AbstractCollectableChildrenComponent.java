@@ -11,6 +11,8 @@ import org.genericsystem.core.Snapshot.Projector;
 
 public abstract class AbstractCollectableChildrenComponent extends AbstractComponent {
 
+	private boolean isDirty = false;
+
 	public AbstractCollectableChildrenComponent(AbstractComponent parent) {
 		super(parent);
 	}
@@ -36,6 +38,7 @@ public abstract class AbstractCollectableChildrenComponent extends AbstractCompo
 	public abstract <T extends AbstractComponent, U extends Generic> T buildComponent(U generic);
 
 	public class ProjectorGeneric<T extends AbstractComponent, U extends Generic> implements Projector<T, U> {
+
 		private final Map<U, T> map = new HashMap<U, T>() {
 
 			private static final long serialVersionUID = -7927996818181180784L;
@@ -44,8 +47,10 @@ public abstract class AbstractCollectableChildrenComponent extends AbstractCompo
 			@Override
 			public T get(Object key) {
 				T result = super.get(key);
-				if (result == null)
+				if (result == null) {
 					put((U) key, result = buildComponent((U) key));
+					setDirty(true);
+				}
 				return result;
 			}
 		};
@@ -55,4 +60,13 @@ public abstract class AbstractCollectableChildrenComponent extends AbstractCompo
 			return map.get(element);
 		}
 	};
+
+	public boolean isDirty() {
+		return isDirty;
+	}
+
+	public void setDirty(boolean isDirty) {
+		this.isDirty = isDirty;
+	}
+
 }
