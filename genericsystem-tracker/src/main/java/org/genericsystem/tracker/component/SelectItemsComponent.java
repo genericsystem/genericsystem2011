@@ -36,4 +36,14 @@ public class SelectItemsComponent extends AbstractComponent {
 		selectItems.setValueExpression("value", getValueExpression("values"));
 		return selectItems;
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
 }

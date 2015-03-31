@@ -35,4 +35,14 @@ public class SecurityComponent extends AbstractSecurityComponent {
 			return child = new SelectorTypeComponent(this);
 		return child = new ErrorComponent(this);
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
 }

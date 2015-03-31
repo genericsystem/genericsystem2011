@@ -41,4 +41,11 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		return "/pages/attribute.xhtml";
 	}
 
+	public boolean isDirty() {
+		return true;
+	}
+
+	public void setDirty(boolean isDirty) {
+	}
+
 }

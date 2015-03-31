@@ -35,4 +35,14 @@ public class InputTextComponent extends AbstractValuedGenericComponent implement
 		inputText.setValueExpression("value", getValueExpression("newValue"));
 		return inputText;
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
 }

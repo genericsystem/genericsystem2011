@@ -71,4 +71,14 @@ public class AttributeComponent extends AbstractValuedGenericComponent {
 		innerDataTable.getChildren().add(column);
 		return innerDataTable;
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
 }

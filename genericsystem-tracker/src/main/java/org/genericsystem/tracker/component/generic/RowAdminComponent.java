@@ -48,4 +48,14 @@ public class RowAdminComponent extends AbstractGenericComponent {
 		return father;
 	}
 
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+
+	}
+
 }

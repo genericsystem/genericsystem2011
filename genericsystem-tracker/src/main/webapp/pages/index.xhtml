@@ -11,6 +11,7 @@
 	</ui:define>
 
 	<ui:define name="content">
+		<h:outputScript name="jsf.js" library="javax.faces" target="head" />
 		<f:event listener="#{rootComponent.getListener()}"
 			type="preRenderView" />
 		<h:messages errorStyle="color:red" />

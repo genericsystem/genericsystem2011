@@ -9,7 +9,6 @@ public class MockPersistentDirectoryProvider extends PersistentDirectoryProvider
 
 	@Override
 	public String getDirectoryPath() {
-		// return DIRECTORY_PATH;
-		return null;
+		return DIRECTORY_PATH;
 	}
 }

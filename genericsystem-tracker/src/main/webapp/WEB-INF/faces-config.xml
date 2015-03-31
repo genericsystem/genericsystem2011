@@ -10,4 +10,9 @@
 			<var>msg</var>
 		</resource-bundle>
 	</application>
+<factory>
+	<partial-view-context-factory>
+		org.genericsystem.tracker.factory.MyPartielViewContextFactory
+	</partial-view-context-factory>
+</factory>
 </faces-config>

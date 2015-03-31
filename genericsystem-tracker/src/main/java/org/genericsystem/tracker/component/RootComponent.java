@@ -29,6 +29,9 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	@Inject
 	private SecurityManager securityManager;
 
+	@Inject
+	private CashManagementComponent cashManagement;
+
 	public Object getListener() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 		buildJsf(ctx.getViewRoot());
@@ -49,6 +52,15 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 		return securityManager;
 	}
 
+	public String action() {
+		return INDEX_XHTML;
+	}
+
+	@Override
+	public CashManagementComponent getCashManagement() {
+		return cashManagement;
+	}
+
 	@Override
 	public List<? extends AbstractComponent> initChildren() {
 		return Arrays.asList(new ConnectionComponent(this), new SecurityComponent(this));
@@ -62,6 +74,16 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	@Override
 	protected String getInternalElExpression() {
 		return "rootComponent";
+	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
 	}
 
 }

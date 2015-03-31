@@ -1,5 +1,6 @@
 package org.genericsystem.framework.component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.el.MethodExpression;
@@ -19,6 +20,8 @@ public abstract class AbstractComponent {
 	protected AbstractComponent parent;
 
 	protected List<? extends AbstractComponent> children;
+
+	public static final String INDEX_XHTML = "index.xhtml";
 
 	public AbstractComponent() {
 		this(null);
@@ -75,22 +78,30 @@ public abstract class AbstractComponent {
 	}
 
 	protected UIComponent buildJsfContainer(UIComponent father) {
-		return new HtmlPanelGroup();
+		HtmlPanelGroup panelGroup = new HtmlPanelGroup();
+		panelGroup.setLayout("block");
+		panelGroup.setId(String.valueOf("_" + this.hashCode()));
+		return panelGroup;
 	}
 
-	protected UIComponent buildJsfChildren(UIComponent father) {
+	protected UIComponent buildJsfChildren(UIComponent father, List<String> ajaxRefreshList) {
+		if (ajaxRefreshList == null)
+			ajaxRefreshList = new ArrayList<String>();
 		UIComponent container = buildJsfContainer(father);
 		UIComponent before = buildJsfComponentsBefore(container);
 		if (before != null)
 			container.getChildren().add(before);
 		for (AbstractComponent component : initAndGetChildren()) {
-			UIComponent children = component.buildJsfChildren(container);
+			if (component.isDirty() == true)
+				ajaxRefreshList.add(container.getId());
+			UIComponent children = component.buildJsfChildren(container, ajaxRefreshList);
 			if (children != null)
 				container.getChildren().add(children);
 		}
 		UIComponent after = buildJsfComponentsAfter(container);
 		if (after != null)
 			container.getChildren().add(after);
+		log.info("!!!   Ajax Refresh List :::::::::   " + ajaxRefreshList);
 		return container;
 	}
 
@@ -133,4 +144,13 @@ public abstract class AbstractComponent {
 	public <T> T getSecurityManager() {
 		return getRoot().getSecurityManager();
 	}
+
+	public AbstractCacheManagementComponent getCashManagement() {
+		return getRoot().getCashManagement();
+	}
+
+	public abstract boolean isDirty();
+
+	public abstract void setDirty(boolean isDirty);
+
 }

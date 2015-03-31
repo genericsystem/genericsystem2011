@@ -30,4 +30,14 @@ public class OutputTextComponent extends AbstractValuedGenericComponent implemen
 		outputText.setValueExpression("value", getValueExpression("newValue"));
 		return outputText;
 	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public void setDirty(boolean isDirty) {
+		return;
+	}
 }

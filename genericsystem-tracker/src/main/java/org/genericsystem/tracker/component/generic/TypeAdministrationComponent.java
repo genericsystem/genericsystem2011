@@ -63,17 +63,17 @@ public class TypeAdministrationComponent extends AbstractGenericCollectableChild
 
 	public String setEdit(InstanceRow instanceRow) {
 		getParentSelector().select(instanceRow.getInstance());
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	public String setCreate() {
 		getParentSelector().select(generic);
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	public String remove(InstanceRow instanceRow) {
 		instanceRow.getInstance().remove();
-		return "index.xhtml";
+		return INDEX_XHTML;
 	}
 
 	public String getEditMsg() {

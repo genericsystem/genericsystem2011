@@ -29,4 +29,11 @@ public class RootComponent extends AbstractRootComponent implements Serializable
 	public String getXhtmlPath() {
 		return "/pages/index.xhtml";
 	}
+
+	public boolean isDirty() {
+		return true;
+	}
+
+	public void setDirty(boolean isDirty) {
+	}
 }
